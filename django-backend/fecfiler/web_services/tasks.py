@@ -19,7 +19,6 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
 )
 from .web_service_storage import get_file_bytes, store_file
 from fecfiler.settings import (
-    WEBPRINT_EMAIL,
     INITIAL_POLLING_INTERVAL,
     INITIAL_POLLING_DURATION,
     INITIAL_POLLING_MAX_ATTEMPTS,
@@ -68,7 +67,7 @@ def create_dot_fec(
         submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
     try:
-        file_content = compose_dot_fec(report_id, upload_submission_id)
+        file_content = compose_dot_fec(report_id)
         if file_name is None:
             file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
 
@@ -201,17 +200,12 @@ def submit_to_webprint(
         submission.save_error("Could not retrieve .FEC bytes")
         return
 
-    """Get email for WebPrint
-    There is no way to override this in the UI and we do not
-    want to email actual committees, so this is stopgap"""
-    email = WEBPRINT_EMAIL
-
     """Submit to WebPrint"""
     try:
         submission_type_key = WEB_PRINT_KEY if not mock else MOCK_WEB_PRINT_KEY
         submitter = SUBMISSION_MANAGERS[submission_type_key]()
         logger.info(f"Uploading {file_name} to FEC WebPrint")
-        submission_response_string = submitter.submit(email, dot_fec_bytes)
+        submission_response_string = submitter.submit(None, dot_fec_bytes)
         submission.save_fec_response(submission_response_string)
 
         if submission.fec_status not in FECStatus.get_terminal_statuses_strings():

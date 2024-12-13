@@ -38,11 +38,12 @@ class DotFECForm24TestCase(TestCase):
         self.f24.treasurer_middle_name = "Middlename"
         self.f24.treasurer_prefix = "Mr."
         self.f24.treasurer_suffix = "Junior"
-        upload_submission = UploadSubmission.objects.initiate_submission(self.f24.id)
-        self.f24.upload_submission = upload_submission
         self.f24.save()
 
-        report = compose_report(self.f24.id, upload_submission.id)
+        UploadSubmission.objects.initiate_submission(self.f24.id)
+        self.f24.refresh_from_db()
+
+        report = compose_report(self.f24.id)
         report_row = serialize_instance(report.get_form_name(), report)
         self.split_row = report_row.split(FS_STR)
 

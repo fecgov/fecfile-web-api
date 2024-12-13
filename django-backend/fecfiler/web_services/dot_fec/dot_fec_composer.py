@@ -1,7 +1,6 @@
 from decimal import Decimal
 from fecfiler.memo_text.models import MemoText
 from fecfiler.reports.models import Report
-from fecfiler.web_services.models import UploadSubmission
 from fecfiler.transactions.models import get_read_model
 from fecfiler.transactions.managers import Schedule
 from django.core.exceptions import ObjectDoesNotExist
@@ -19,18 +18,14 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-def compose_report(report_id, upload_submission_record_id):
+def compose_report(report_id):
     report_result = Report.objects.filter(id=report_id)
-    upload_submission_result = UploadSubmission.objects.filter(
-        id=upload_submission_record_id
-    )
     if report_result.exists():
         logger.info(f"composing report: {report_id}")
         report = report_result.first()
         """Compose derived fields"""
         report.filer_committee_id_number = report.committee_account.committee_id
-        if upload_submission_result.exists():
-            report.date_signed = upload_submission_result.first().created
+
         return report
     else:
         raise ObjectDoesNotExist(f"report: {report_id} not found")
@@ -161,7 +156,7 @@ def get_test_info_prefix(transaction):
     return ""
 
 
-def compose_dot_fec(report_id, upload_submission_record_id):
+def compose_dot_fec(report_id):
     logger.info(f"composing .FEC for report: {report_id}")
     try:
         header = compose_header(report_id)
@@ -170,7 +165,7 @@ def compose_dot_fec(report_id, upload_submission_record_id):
         logger.debug(header_row)
         file_content = add_row_to_content(None, header_row)
 
-        report = compose_report(report_id, upload_submission_record_id)
+        report = compose_report(report_id)
         report_row = serialize_instance(report.get_form_name(), report)
         logger.debug("Serialized Report:")
         logger.debug(report_row)
