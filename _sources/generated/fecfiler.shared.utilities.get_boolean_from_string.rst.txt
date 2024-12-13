@@ -1,0 +1,6 @@
+fecfiler.shared.utilities.get\_boolean\_from\_string
+====================================================
+
+.. currentmodule:: fecfiler.shared.utilities
+
+.. autofunction:: get_boolean_from_string
