@@ -11,7 +11,7 @@ from .env import env
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
 from fecfiler.celery import CeleryStorageType
-from fecfiler.shared.utilities import get_float_from_string
+from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
 from math import floor
 
 
@@ -156,7 +156,9 @@ OIDC_OP_AUTODISCOVER_ENDPOINT = env.get_credential(
     "https://idp.int.identitysandbox.gov/.well-known/openid-configuration",
 )
 
-MOCK_OIDC_PROVIDER = env.get_credential("MOCK_OIDC_PROVIDER", "False").lower() == "true"
+MOCK_OIDC_PROVIDER = get_boolean_from_string(
+    env.get_credential("MOCK_OIDC_PROVIDER", "False")
+)
 MOCK_OIDC_PROVIDER_CACHE = env.get_credential("REDIS_URL")
 
 OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
@@ -322,7 +324,7 @@ CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorag
 
 """FEC Webload settings
 """
-MOCK_EFO = env.get_credential("MOCK_EFO", "False").lower() == "true"
+MOCK_EFO = get_boolean_from_string(env.get_credential("MOCK_EFO", "False"))
 FEC_FILING_API = env.get_credential("FEC_FILING_API")
 if not MOCK_EFO and FEC_FILING_API is None:
     raise Exception("FEC_FILING_API must be set if MOCK_EFO is False")
@@ -379,3 +381,7 @@ CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
 )
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
+
+ENABLE_DEVELOPER_COMMANDS = get_boolean_from_string(
+    env.get_credential("ENABLE_DEVELOPER_COMMANDS", "False")
+)
