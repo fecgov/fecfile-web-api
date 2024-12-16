@@ -72,6 +72,15 @@ jobs:
           working_directory: ~/project/django-backend/
 
       - run:
+          name: Run lint
+          command: |
+            flake8 --config django-backend/.flake8
+
+      - run:
+          name: Run deptry
+          command: deptry ~/project/
+
+      - run:
           name: Run tests
           # Use built-in Django test module
           command: coverage run --source='.' --rcfile=.coveragerc manage.py test
@@ -120,14 +129,7 @@ jobs:
           key: v1-sonarcloud-scanner-5.0.1.3006
           paths: /tmp/cache/scanner
 
-      - run:
-          name: Run lint
-          command: |
-            flake8 --config django-backend/.flake8
 
-      - run:
-          name: Run deptry
-          command: deptry ~/project/
 
   deploy-job:
     docker:
