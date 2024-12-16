@@ -19,10 +19,12 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
 )
 from .web_service_storage import get_file_bytes, store_file
 from fecfiler.settings import (
-    WEBPRINT_EMAIL,
-    EFO_POLLING_MAX_DURATION,
-    EFO_POLLING_INTERVAL,
-    EFO_POLLING_MAX_ATTEMPTS,
+    INITIAL_POLLING_INTERVAL,
+    INITIAL_POLLING_DURATION,
+    INITIAL_POLLING_MAX_ATTEMPTS,
+    SECONDARY_POLLING_INTERVAL,
+    SECONDARY_POLLING_DURATION,
+    SECONDARY_POLLING_MAX_ATTEMPTS,
 )
 
 import structlog
@@ -47,6 +49,8 @@ SUBMISSION_CLASSES = {
     MOCK_DOT_FEC_KEY: UploadSubmission,
 }
 
+MAX_ATTEMPTS = INITIAL_POLLING_MAX_ATTEMPTS + SECONDARY_POLLING_MAX_ATTEMPTS
+
 
 @shared_task
 def create_dot_fec(
@@ -63,7 +67,7 @@ def create_dot_fec(
         submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
     try:
-        file_content = compose_dot_fec(report_id, upload_submission_id)
+        file_content = compose_dot_fec(report_id)
         if file_name is None:
             file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
 
@@ -89,12 +93,19 @@ def create_dot_fec(
     return dot_fec_record.id
 
 
-def log_polling_notice():
-    duration_in_minutes = EFO_POLLING_MAX_DURATION / 60
+def log_polling_notice(attempts):
+    duration = INITIAL_POLLING_DURATION + SECONDARY_POLLING_DURATION
+    interval = (
+        INITIAL_POLLING_INTERVAL
+        if attempts <= INITIAL_POLLING_MAX_ATTEMPTS
+        else SECONDARY_POLLING_INTERVAL
+    )
+
+    duration_in_minutes = duration / 60
     duration_in_hours = duration_in_minutes / 60
     duration_in_days = duration_in_hours / 24
 
-    duration_string = f"{EFO_POLLING_MAX_DURATION} second(s)"
+    duration_string = f"{duration} second(s)"
     if duration_in_days >= 1:
         duration_string = f"{duration_in_days} day(s)"
     elif duration_in_hours >= 1:
@@ -104,9 +115,8 @@ def log_polling_notice():
 
     logger.info(
         f"""Submission queued for processing.  Polling every {
-        EFO_POLLING_INTERVAL} seconds for {
-            EFO_POLLING_MAX_ATTEMPTS
-        } attempts over {duration_string}"""
+        interval} seconds for {
+        MAX_ATTEMPTS} attempts over {duration_string}"""
     )
 
 
@@ -154,16 +164,17 @@ def submit_to_fec(
         """Poll FEC for status of submission"""
 
         if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
-            log_polling_notice()
+            log_polling_notice(submission.fecfile_polling_attempts)
             """ apply_async()
             The apply_async() method can only take json serializable values as arguments.
             This means we can't pass objects with methods.  To get around that, we pass
             the submission id and a key that we can use to determine the type of the
             submission.  This lets us instantiate objects of the correct classes as we
             need them."""
+            countdown = calculate_polling_interval(submission.fecfile_polling_attempts)
             return poll_for_fec_response.apply_async(
                 [submission.id, submission_type_key, "Dot FEC"],
-                countdown=EFO_POLLING_INTERVAL,
+                countdown=countdown,
             )
         else:
             return resolve_final_submission_state(submission)
@@ -189,30 +200,26 @@ def submit_to_webprint(
         submission.save_error("Could not retrieve .FEC bytes")
         return
 
-    """Get email for WebPrint
-    There is no way to override this in the UI and we do not
-    want to email actual committees, so this is stopgap"""
-    email = WEBPRINT_EMAIL
-
     """Submit to WebPrint"""
     try:
         submission_type_key = WEB_PRINT_KEY if not mock else MOCK_WEB_PRINT_KEY
         submitter = SUBMISSION_MANAGERS[submission_type_key]()
         logger.info(f"Uploading {file_name} to FEC WebPrint")
-        submission_response_string = submitter.submit(email, dot_fec_bytes)
+        submission_response_string = submitter.submit(None, dot_fec_bytes)
         submission.save_fec_response(submission_response_string)
 
         if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
-            log_polling_notice()
+            log_polling_notice(submission.fecfile_polling_attempts)
             """ apply_async()
             The apply_async() method can only take json serializable values as arguments.
             This means we can't pass objects with methods.  To get around that, we pass
             the submission id and a key that we can use to determine the type of the
             submission.  This lets us instantiate objects of the correct classes as we
             need them."""
+            countdown = calculate_polling_interval(submission.fecfile_polling_attempts)
             return poll_for_fec_response.apply_async(
                 [submission.id, submission_type_key, "WebPrint"],
-                countdown=EFO_POLLING_INTERVAL,
+                countdown=countdown,
             )
         else:
             return resolve_final_submission_state(submission)
@@ -234,27 +241,40 @@ def poll_for_fec_response(submission_id, submission_type_key, submission_name):
         logger.info(
             f"""Submission Polling - Attempt {
                 submission.fecfile_polling_attempts
-            } / {EFO_POLLING_MAX_ATTEMPTS}"""
+            } / {MAX_ATTEMPTS}"""
         )
         status_response_string = submitter.poll_status(submission)
         submission.save_fec_response(status_response_string)
         if (
             submission.fec_status in FECStatus.get_terminal_statuses_strings()
-            or submission.fecfile_polling_attempts >= EFO_POLLING_MAX_ATTEMPTS
+            or submission.fecfile_polling_attempts >= MAX_ATTEMPTS
         ):
-            if submission.fecfile_polling_attempts >= EFO_POLLING_MAX_ATTEMPTS:
+            if submission.fecfile_polling_attempts >= MAX_ATTEMPTS:
                 logger.warning("POLLING ATTEMPTS EXCEEDED")
                 submission.fecfile_task_state = FECSubmissionState.FAILED.value
             return resolve_final_submission_state(submission)
         else:
+            countdown = calculate_polling_interval(submission.fecfile_polling_attempts)
             return poll_for_fec_response.apply_async(
                 [submission_id, submission_type_key, submission_name],
-                countdown=EFO_POLLING_INTERVAL,
+                countdown=countdown,
             )
     except Exception as e:
         logger.error(f"Error in polling: {str(e)}")
         submission.save_error(f"Failed submitting to {submission_name}")
         return resolve_final_submission_state(submission)
+
+
+def calculate_polling_interval(attempts):
+    """
+    Determine the countdown interval based on the number of attempts.
+    """
+    if attempts <= INITIAL_POLLING_MAX_ATTEMPTS:
+        return INITIAL_POLLING_INTERVAL
+    elif attempts <= MAX_ATTEMPTS:
+        return SECONDARY_POLLING_INTERVAL
+    else:
+        raise ValueError("Polling attempts exceeded the maximum allowed.")
 
 
 def resolve_final_submission_state(submission):

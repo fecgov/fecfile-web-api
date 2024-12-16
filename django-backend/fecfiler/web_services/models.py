@@ -68,12 +68,12 @@ class FECStatus(str, Enum):
 
 class UploadSubmissionManager(models.Manager):
     def initiate_submission(self, report_id):
-        submission = self.create(
-            fecfile_task_state=FECSubmissionState.INITIALIZING.value
-        )
+        submission = self.create(fecfile_task_state=FECSubmissionState.INITIALIZING.value)
         submission.save()
 
-        Report.objects.filter(id=report_id).update(upload_submission=submission)
+        Report.objects.filter(id=report_id).update(
+            upload_submission=submission, date_signed=submission.created
+        )
 
         logger.info(
             f"""Submission to Webload has been initialized for report :{report_id}
@@ -84,9 +84,7 @@ class UploadSubmissionManager(models.Manager):
 
 class WebPrintSubmissionManager(models.Manager):
     def initiate_submission(self, report_id):
-        submission = self.create(
-            fecfile_task_state=FECSubmissionState.INITIALIZING.value
-        )
+        submission = self.create(fecfile_task_state=FECSubmissionState.INITIALIZING.value)
         submission.save()
 
         Report.objects.filter(id=report_id).update(webprint_submission=submission)

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .utilities import generate_fec_uid, get_float_from_string
+from .utilities import generate_fec_uid, get_float_from_string, get_boolean_from_string
 
 
 class SharedUtilitiesTestCase(TestCase):
@@ -23,3 +23,17 @@ class SharedUtilitiesTestCase(TestCase):
     def test_get_fallback_from_none_string(self):
         value = get_float_from_string(None, 1)
         self.assertEqual(value, 1)
+
+    def test_get_boolean_from_true_string(self):
+        value = get_boolean_from_string("true")
+        self.assertTrue(value)
+        value = get_boolean_from_string("True")
+        self.assertTrue(value)
+
+    def test_get_boolean_from_false_string(self):
+        value = get_boolean_from_string("false")
+        self.assertFalse(value)
+        value = get_boolean_from_string("Frue")
+        self.assertFalse(value)
+        value = get_boolean_from_string("")
+        self.assertFalse(value)

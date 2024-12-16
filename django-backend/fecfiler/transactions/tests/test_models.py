@@ -901,6 +901,43 @@ class TransactionModelTestCase(TestCase):
             partnership_attribution_jf_transfer_memo,
         )
 
+    def test_get_transaction_family(self):
+        a, b, c = self.set_up_jf_transfer()
+        b2 = create_schedule_a(
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            amount="50.00",
+            itemized=True,
+            report=self.m1_report,
+        )
+        b2.parent_transaction = a
+        b2.save()
+
+        a_family = a.get_transaction_family()
+        self.assertIn(a, a_family)
+        self.assertIn(b, a_family)
+        self.assertIn(c, a_family)
+        self.assertIn(b2, a_family)
+
+        b_family = b.get_transaction_family()
+        self.assertIn(a, b_family)
+        self.assertIn(b, b_family)
+        self.assertIn(c, b_family)
+        self.assertNotIn(b2, b_family)
+
+        c_family = c.get_transaction_family()
+        self.assertIn(a, c_family)
+        self.assertIn(b, c_family)
+        self.assertIn(c, c_family)
+        self.assertNotIn(b2, c_family)
+
+    def test_get_children(self):
+        a, b, c = self.set_up_jf_transfer()
+        self.assertNotIn(c, a.children)
+        self.assertIn(b, a.children)
+
 
 def undelete(transaction):
     transaction.deleted = None

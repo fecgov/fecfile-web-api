@@ -21,3 +21,4 @@ applications:
       FEC_FILING_API: https://efoservices.stage.efo.fec.gov
       LOG_FORMAT: KEY_VALUE
       FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, MOCKED
+      ENABLE_DEVELOPER_COMMANDS: True

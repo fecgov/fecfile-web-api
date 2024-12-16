@@ -374,11 +374,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         try:
             transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+            transactions = transaction.get_transaction_family()
+            for t in transactions:
+                t.reports.add(report)
         except Transaction.DoesNotExist:
             return Response("No transaction matching id provided", status=404)
 
-        transaction.reports.add(report)
-        return Response("Transaction added to report")
+        return Response(f"Transaction(s) added to report: {[x.id for x in transactions]}")
 
     @action(detail=False, methods=["post"], url_path=r"remove-from-report")
     def remove_transaction_from_report(self, request):

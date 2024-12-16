@@ -41,6 +41,7 @@ class TransactionViewsTestCase(TestCase):
         self.user = User.objects.create(email="test@fec.gov", username="gov")
         create_committee_view(self.committee.id)
         self.q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        self.q2_report = create_form3x(self.committee, "2024-02-02", "2024-03-01", {})
         self.contact_1 = create_test_individual_contact(
             "last name", "First name", self.committee.id
         )
@@ -51,6 +52,7 @@ class TransactionViewsTestCase(TestCase):
             self.committee,
             self.contact_1,
             "2023-01-12",
+            "2023-01-15",
             "2023-01-15",
             "153.00",
             "C2012",
@@ -298,8 +300,9 @@ class TransactionViewsTestCase(TestCase):
         view_set = TransactionViewSet()
         response = view_set.add_transaction_to_report(self.post_request(payload))
 
+        expected_data = f"Transaction(s) added to report: [UUID('{transaction_id}')]"
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, "Transaction added to report")
+        self.assertEqual(response.data, expected_data)
 
         # Verify that the report is added to the transaction
         transaction = Transaction.objects.get(id=transaction_id)
@@ -323,6 +326,72 @@ class TransactionViewsTestCase(TestCase):
         response = view_set.add_transaction_to_report(self.post_request(payload))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "No report matching id provided")
+
+    def test_add_transaction_family_to_report_from_parent(self):
+        jf_transfer = create_schedule_a(
+            "JOINT_FUNDRAISING_TRANSFER",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="500.00",
+            itemized=True,
+            report=self.q1_report,
+        )
+        jf_transfer.save()
+
+        partnership_jf_transfer_memo = create_schedule_a(
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            amount="50.00",
+            itemized=True,
+            report=self.q1_report,
+        )
+        partnership_jf_transfer_memo.parent_transaction = jf_transfer
+        partnership_jf_transfer_memo.save()
+
+        transaction_id = str(jf_transfer.id)
+        report_id = str(self.q2_report.id)
+        payload = {"transaction_id": transaction_id, "report_id": report_id}
+        view_set = TransactionViewSet()
+        view_set.add_transaction_to_report(self.post_request(payload))
+
+        self.assertIn(self.q2_report, jf_transfer.reports.all())
+        self.assertIn(self.q2_report, partnership_jf_transfer_memo.reports.all())
+
+    def test_add_transaction_family_to_report_from_child(self):
+        jf_transfer = create_schedule_a(
+            "JOINT_FUNDRAISING_TRANSFER",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="500.00",
+            itemized=True,
+            report=self.q1_report,
+        )
+        jf_transfer.save()
+
+        partnership_jf_transfer_memo = create_schedule_a(
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            amount="50.00",
+            itemized=True,
+            report=self.q1_report,
+        )
+        partnership_jf_transfer_memo.parent_transaction = jf_transfer
+        partnership_jf_transfer_memo.save()
+
+        transaction_id = str(partnership_jf_transfer_memo.id)
+        report_id = str(self.q2_report.id)
+        payload = {"transaction_id": transaction_id, "report_id": report_id}
+        view_set = TransactionViewSet()
+        view_set.add_transaction_to_report(self.post_request(payload))
+
+        self.assertIn(self.q2_report, jf_transfer.reports.all())
+        self.assertIn(self.q2_report, partnership_jf_transfer_memo.reports.all())
 
     def test_remove_transaction_from_report(self):
         report_id = str(self.q1_report.id)

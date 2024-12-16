@@ -11,7 +11,7 @@ from .env import env
 from corsheaders.defaults import default_headers
 from django.utils.crypto import get_random_string
 from fecfiler.celery import CeleryStorageType
-from fecfiler.shared.utilities import get_float_from_string
+from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
 from math import floor
 
 
@@ -24,6 +24,8 @@ TEMPLATE_DEBUG = DEBUG
 
 LINE = "LINE"
 KEY_VALUE = "KEY_VALUE"
+
+APPEND_SLASH = False
 
 LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
 
@@ -57,7 +59,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "corsheaders",
-    "storages",
     "django_structlog",
     "fecfiler.committee_accounts",
     "fecfiler.reports",
@@ -157,7 +158,9 @@ OIDC_OP_AUTODISCOVER_ENDPOINT = env.get_credential(
     "https://idp.int.identitysandbox.gov/.well-known/openid-configuration",
 )
 
-MOCK_OIDC_PROVIDER = env.get_credential("MOCK_OIDC_PROVIDER", "False").lower() == "true"
+MOCK_OIDC_PROVIDER = get_boolean_from_string(
+    env.get_credential("MOCK_OIDC_PROVIDER", "False")
+)
 MOCK_OIDC_PROVIDER_CACHE = env.get_credential("REDIS_URL")
 
 OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
@@ -217,11 +220,15 @@ def get_logging_config(log_format=LINE):
         "formatters": {
             "json_formatter": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.processors.JSONRenderer(),
+                "processors": [
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.JSONRenderer(),
+                ],
             },
             "plain_console": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
                     structlog.dev.ConsoleRenderer(
                         colors=True, exception_formatter=structlog.dev.rich_traceback
                     )
@@ -230,6 +237,7 @@ def get_logging_config(log_format=LINE):
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
                     structlog.processors.ExceptionRenderer(),
                     structlog.processors.KeyValueRenderer(
                         key_order=["level", "event", "logger"]
@@ -285,7 +293,6 @@ def get_logging_processors():
     return [
         structlog.contextvars.merge_contextvars,
         structlog.stdlib.filter_by_level,
-        structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.StackInfoRenderer(),
@@ -323,23 +330,35 @@ CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorag
 
 """FEC Webload settings
 """
-MOCK_EFO = env.get_credential("MOCK_EFO", "False").lower() == "true"
+MOCK_EFO = get_boolean_from_string(env.get_credential("MOCK_EFO", "False"))
 FEC_FILING_API = env.get_credential("FEC_FILING_API")
 if not MOCK_EFO and FEC_FILING_API is None:
     raise Exception("FEC_FILING_API must be set if MOCK_EFO is False")
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
-WEBPRINT_EMAIL = env.get_credential("WEBPRINT_EMAIL")
 
 """EFO POLLING SETTINGS
 """
-EFO_POLLING_MAX_DURATION = get_float_from_string(
-    env.get_credential("EFO_POLLING_MAX_DURATION", 300)
+
+INITIAL_POLLING_INTERVAL = get_float_from_string(
+    env.get_credential("INITIAL_POLLING_INTERVAL", 30)
 )
-EFO_POLLING_INTERVAL = get_float_from_string(
-    env.get_credential("EFO_POLLING_INTERVAL", 30)
+INITIAL_POLLING_DURATION = get_float_from_string(
+    env.get_credential("INITIAL_POLLING_DURATION", 300)
 )
-EFO_POLLING_MAX_ATTEMPTS = floor(EFO_POLLING_MAX_DURATION / EFO_POLLING_INTERVAL)
+
+INITIAL_POLLING_MAX_ATTEMPTS = floor(INITIAL_POLLING_DURATION / INITIAL_POLLING_INTERVAL)
+
+SECONDARY_POLLING_INTERVAL = get_float_from_string(
+    env.get_credential("SECONDARY_POLLING_INTERVAL", 30)
+)
+SECONDARY_POLLING_DURATION = get_float_from_string(
+    env.get_credential("SECONDARY_POLLING_DURATION", 300)
+)
+
+SECONDARY_POLLING_MAX_ATTEMPTS = floor(
+    SECONDARY_POLLING_DURATION / SECONDARY_POLLING_INTERVAL
+)
 
 """OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra
 info for testing purposes
@@ -381,3 +400,7 @@ CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
 )
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
+
+ENABLE_DEVELOPER_COMMANDS = get_boolean_from_string(
+    env.get_credential("ENABLE_DEVELOPER_COMMANDS", "False")
+)
