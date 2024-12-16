@@ -50,6 +50,7 @@ DEPLOY_RULES = (
     ("test", lambda _, branch: branch == "release/test"),
     ("stage", lambda _, branch: branch.startswith("release/sprint")),
     ("dev", lambda _, branch: branch == "develop"),
+    # ("dev", lambda _, branch: branch == "spike/test-json-logging"),
 )
 
 

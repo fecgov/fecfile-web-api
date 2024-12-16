@@ -250,7 +250,7 @@ workflows:
             - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+              only: /spike\/test-json-logging/
       - docs-build:
           requires:
             - test
