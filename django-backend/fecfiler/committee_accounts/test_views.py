@@ -1,6 +1,3 @@
-from importlib import import_module
-import inspect
-import os
 from uuid import UUID
 from django.test import RequestFactory, TestCase
 from fecfiler.committee_accounts.models import Membership
@@ -9,9 +6,12 @@ from fecfiler.committee_accounts.views import (
     CommitteeOwnedViewMixin,
     CommitteeViewSet,
 )
-from rest_framework.viewsets import ViewSetMixin
 from fecfiler.user.models import User
 from unittest.mock import Mock, patch
+from fecfiler.routers import get_all_routers
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class CommitteeMemberViewSetTest(TestCase):
@@ -229,66 +229,40 @@ class CommitteeViewSetTest(TestCase):
                 self.assertIn("C12345678", was_called_with)
                 self.assertEqual(response.data["name"], "TEST")
 
-    def test_all_viewsets_include_mixin(self):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.join(script_dir, "../..")
-        exclude_dirs = ["venv", "__pycache__"]
-
+    def test_viewsets_have_committee_owned_mixin(self):
         exclude_list = [
             "CommitteeViewSet",
             "UserViewSet",
             "SystemStatusViewSet",
-            "WebServicesViewSet",
             "SummaryViewSet",
             "FeedbackViewSet",
         ]
+        routers = get_all_routers()
+        missing_mixin = []
 
-        subclasses = find_subclasses(ViewSetMixin, project_root, exclude_dirs)
-        missing_mixin = [
-            subclass
-            for subclass in subclasses
-            if not issubclass(subclass, CommitteeOwnedViewMixin)
-            and subclass.__name__ not in exclude_list
-        ]
+        for router in routers:
+            for prefix, viewset, basename in router.registry:
+                if (
+                    not issubclass(viewset, CommitteeOwnedViewMixin)
+                    and viewset.__name__ not in exclude_list
+                ):
+                    missing_mixin.append(
+                        {
+                            "viewset": viewset.__name__,
+                            "prefix": prefix,
+                            "basename": basename,
+                        }
+                    )
 
-        self.assertEqual(
-            len(missing_mixin),
-            0,
-            f"The following subclasses of GenericViewSet "
-            f"do not include CommitteeOwnedViewMixin:"
-            f"{', '.join([f'{cls.__module__}.{cls.__name__}' for cls in missing_mixin])}",
-        )
-
-
-def find_subclasses(base_class, project_path, exclude_dirs=None):
-    subclasses = []
-    exclude_dirs = exclude_dirs or []
-
-    for root, dirs, files in os.walk(project_path):
-        dirs[:] = [d for d in dirs if d not in exclude_dirs]
-
-        for file in files:
-            if (
-                file.endswith("views.py")
-                and not file.startswith("__init__")
-                and "test_views" not in file
-            ):
-                module_path = os.path.join(root, file)
-                module_name = (
-                    module_path.replace(project_path, "")
-                    .replace(os.sep, ".")
-                    .lstrip(".")
-                    .replace(".py", "")
-                )
-                try:
-                    module = import_module(module_name)
-                except (ModuleNotFoundError, ImportError):
-                    print(f"module not found: {module_name}")
-                    continue
-
-                for name, obj in inspect.getmembers(module, inspect.isclass):
-                    if obj.__module__ == module.__name__:
-                        if issubclass(obj, base_class) and obj != base_class:
-                            subclasses.append(obj)
-
-    return subclasses
+        if missing_mixin:
+            error_message = "\n".join(
+                [
+                    f"ViewSet '{entry['viewset']}' "
+                    f"does not inherit from CommitteeOwnedViewMixin."
+                    for entry in missing_mixin
+                ]
+            )
+            self.fail(
+                f"The following ViewSets are missing CommitteeOwnedViewMixin:\n"
+                f"{error_message}"
+            )
