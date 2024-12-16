@@ -4,6 +4,7 @@ from uuid import uuid4
 from django.test import TestCase, tag, override_settings
 from unittest.mock import patch
 from .tasks import (
+    calculate_polling_interval,
     create_dot_fec,
     submit_to_fec,
     submit_to_webprint,
@@ -32,10 +33,16 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
 )
 from fecfiler.web_services.dot_fec.dot_fec_submitter import MockDotFECSubmitter
 from uuid import uuid4 as uuid
+from fecfiler.settings import (
+    INITIAL_POLLING_MAX_ATTEMPTS,
+    SECONDARY_POLLING_MAX_ATTEMPTS,
+)
 
 import structlog
 
 logger = structlog.get_logger(__name__)
+
+MAX_ATTEMPTS = INITIAL_POLLING_MAX_ATTEMPTS + SECONDARY_POLLING_MAX_ATTEMPTS
 
 
 class TasksTestCase(TestCase):
@@ -361,7 +368,19 @@ class PollingTasksTestCase(TestCase):
             self.assertEqual(
                 resolved_submission.fecfile_task_state, FECSubmissionState.FAILED.value
             )
-            self.assertEqual(resolved_submission.fecfile_polling_attempts, 10)
+            self.assertEqual(
+                resolved_submission.fecfile_polling_attempts,
+                MAX_ATTEMPTS,
+            )
 
     def test_log_polling_notice_does_not_crash(self):
-        self.assertIsNone(log_polling_notice())
+        self.assertIsNone(log_polling_notice(3))
+
+    def test_calculate_polling_interval_throws_exception_when_more_than_max(self):
+        with self.assertRaises(ValueError) as context:
+            calculate_polling_interval(MAX_ATTEMPTS + 1)
+
+        # Verify the error message
+        self.assertEqual(
+            str(context.exception), "Polling attempts exceeded the maximum allowed."
+        )

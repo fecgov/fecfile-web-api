@@ -218,11 +218,15 @@ def get_logging_config(log_format=LINE):
         "formatters": {
             "json_formatter": {
                 "()": structlog.stdlib.ProcessorFormatter,
-                "processor": structlog.processors.JSONRenderer(),
+                "processors": [
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.JSONRenderer(),
+                ],
             },
             "plain_console": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
                     structlog.dev.ConsoleRenderer(
                         colors=True, exception_formatter=structlog.dev.rich_traceback
                     )
@@ -231,6 +235,7 @@ def get_logging_config(log_format=LINE):
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
+                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
                     structlog.processors.ExceptionRenderer(),
                     structlog.processors.KeyValueRenderer(
                         key_order=["level", "event", "logger"]
@@ -286,7 +291,6 @@ def get_logging_processors():
     return [
         structlog.contextvars.merge_contextvars,
         structlog.stdlib.filter_by_level,
-        structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
         structlog.stdlib.PositionalArgumentsFormatter(),
         structlog.processors.StackInfoRenderer(),
@@ -333,13 +337,26 @@ FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 
 """EFO POLLING SETTINGS
 """
-EFO_POLLING_MAX_DURATION = get_float_from_string(
-    env.get_credential("EFO_POLLING_MAX_DURATION", 300)
+
+INITIAL_POLLING_INTERVAL = get_float_from_string(
+    env.get_credential("INITIAL_POLLING_INTERVAL", 30)
 )
-EFO_POLLING_INTERVAL = get_float_from_string(
-    env.get_credential("EFO_POLLING_INTERVAL", 30)
+INITIAL_POLLING_DURATION = get_float_from_string(
+    env.get_credential("INITIAL_POLLING_DURATION", 300)
 )
-EFO_POLLING_MAX_ATTEMPTS = floor(EFO_POLLING_MAX_DURATION / EFO_POLLING_INTERVAL)
+
+INITIAL_POLLING_MAX_ATTEMPTS = floor(INITIAL_POLLING_DURATION / INITIAL_POLLING_INTERVAL)
+
+SECONDARY_POLLING_INTERVAL = get_float_from_string(
+    env.get_credential("SECONDARY_POLLING_INTERVAL", 30)
+)
+SECONDARY_POLLING_DURATION = get_float_from_string(
+    env.get_credential("SECONDARY_POLLING_DURATION", 300)
+)
+
+SECONDARY_POLLING_MAX_ATTEMPTS = floor(
+    SECONDARY_POLLING_DURATION / SECONDARY_POLLING_INTERVAL
+)
 
 """OUTPUT_TEST_INFO_IN_DOT_FEC will configure the .fec writer to output extra
 info for testing purposes
