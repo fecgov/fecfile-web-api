@@ -23,6 +23,7 @@ DEBUG = os.environ.get("DEBUG", True)
 TEMPLATE_DEBUG = DEBUG
 
 LINE = "LINE"
+JSON = "JSON"
 KEY_VALUE = "KEY_VALUE"
 
 LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
@@ -252,6 +253,11 @@ def get_logging_config(log_format=LINE):
                 "formatter": "plain_console",
                 "stream": sys.stdout,
             },
+            "json": {
+                "class": "logging.StreamHandler",
+                "formatter": "json_formatter",
+                "stream": sys.stdout,
+            },
             "cloud": {
                 "class": "logging.StreamHandler",
                 "formatter": "key_value",
@@ -268,6 +274,17 @@ def get_logging_config(log_format=LINE):
             },
             "fecfiler": {
                 "handlers": ["console"],
+                "level": "DEBUG",
+            },
+        }
+    elif log_format == JSON:
+        logging_config["loggers"] = {
+            "django_structlog": {
+                "handlers": ["json"],
+                "level": "DEBUG",
+            },
+            "fecfiler": {
+                "handlers": ["json"],
                 "level": "DEBUG",
             },
         }
