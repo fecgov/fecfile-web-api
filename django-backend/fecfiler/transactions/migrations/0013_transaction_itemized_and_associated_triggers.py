@@ -136,7 +136,7 @@ class Migration(migrations.Migration):
                     UNION
                     SELECT type
                     FROM over_two_hundred_types_scheduleb
-                )
+                ) as scha_schb_types
                 WHERE type = txn.transaction_type_identifier
             ) THEN
                 IF txn.aggregate > 200 THEN
@@ -178,7 +178,7 @@ class Migration(migrations.Migration):
             IF cardinality(ids) > 0 THEN
                 UPDATE transactions_transaction
                 SET
-                    itemize = itemization
+                    itemized = itemization
                 WHERE id = ANY (ids);
             END IF;
         END;

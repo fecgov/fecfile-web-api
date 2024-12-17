@@ -107,8 +107,8 @@ class TransactionManager(SoftDeleteManager):
     )
 
     FORM_TYPE_CLAUSE = Case(
-        When(_form_type="SA11AI", _itemized=False, then=Value("SA11AII")),
-        When(_form_type="SA11AII", _itemized=True, then=Value("SA11AI")),
+        When(_form_type="SA11AI", itemized=False, then=Value("SA11AII")),
+        When(_form_type="SA11AII", itemized=True, then=Value("SA11AI")),
         When(
             transaction_type_identifier="C2_LOAN_GUARANTOR",
             loan__transaction_type_identifier=("LOAN_BY_COMMITTEE"),
