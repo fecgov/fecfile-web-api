@@ -29,6 +29,7 @@ def create_schedule_a(
     transaction_data = {
         "_form_type": form_type,
         "memo_code": memo_code,
+        "force_itemized": itemized,
     }
     if parent_id is not None:
         transaction_data["parent_transaction_id"] = parent_id
