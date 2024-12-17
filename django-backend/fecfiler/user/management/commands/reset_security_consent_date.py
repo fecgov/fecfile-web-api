@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from fecfiler.user.models import User
 import structlog
-import sys
 
 logger = structlog.get_logger(__name__)
 
