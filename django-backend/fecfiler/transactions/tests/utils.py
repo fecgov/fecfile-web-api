@@ -10,11 +10,6 @@ from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.contacts.models import Contact
 from fecfiler.reports.models import ReportTransaction
 from fecfiler.memo_text.models import MemoText
-from fecfiler.contacts.tests.utils import (
-    create_test_committee_contact,
-    create_test_individual_contact,
-    create_test_organization_contact,
-)
 
 
 def create_schedule_a(
@@ -271,37 +266,6 @@ def create_transaction_memo(committee_account, transaction, text4000):
         committee_account_id=committee_account.id,
         transaction_uuid=transaction.id,
     )
-
-
-def create_tier123_transactions(
-    committee_account, test_com_contact, test_org_contact, test_ind_contact
-):
-    test_tier1_transaction = create_schedule_a(
-        "JOINT_FUNDRAISING_TRANSFER",
-        committee_account,
-        test_com_contact,
-        "2024-01-01",
-        amount="100.00",
-    )
-
-    test_tier2_transaction = create_schedule_a(
-        "PARTNERSHIP_JF_TRANSFER_MEMO",
-        committee_account,
-        test_org_contact,
-        "2024-01-02",
-        amount="90.00",
-        parent_id=test_tier1_transaction.id,
-    )
-
-    test_tier3_transaction = create_schedule_a(
-        "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
-        committee_account,
-        test_ind_contact,
-        "2024-01-03",
-        amount="80.00",
-        parent_id=test_tier2_transaction.id,
-    )
-    return test_tier1_transaction, test_tier2_transaction, test_tier3_transaction
 
 
 SCHEDULE_CLASS_TO_FIELD = {
