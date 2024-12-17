@@ -31,11 +31,13 @@ fecfiler.user
    :template: custom-module-template.rst                 
    :recursive:
 
+   fecfiler.user.management
    fecfiler.user.managers
    fecfiler.user.migrations
    fecfiler.user.models
    fecfiler.user.serializers
    fecfiler.user.test_models
+   fecfiler.user.test_reset_security_consent_date_command
    fecfiler.user.test_views
    fecfiler.user.urls
    fecfiler.user.views
