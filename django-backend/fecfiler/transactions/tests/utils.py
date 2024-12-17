@@ -193,6 +193,7 @@ def create_loan_from_bank(
         loan_amount,
         report=report,
         parent_id=loan.id,
+        itemized=None,
     )
     loan_agreement = create_test_transaction(
         "C1_LOAN_AGREEMENT",
