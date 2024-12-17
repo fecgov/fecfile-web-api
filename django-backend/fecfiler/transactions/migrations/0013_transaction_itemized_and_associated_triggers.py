@@ -88,28 +88,9 @@ class Migration(migrations.Migration):
             """
         CREATE OR REPLACE FUNCTION before_transactions_transaction_insert_or_update()
         RETURNS TRIGGER AS $$
-        DECLARE
-            needs_itemized_set boolean;
-            itemization boolean;
         BEGIN
-            needs_itemized_set := needs_itemized_set(OLD, NEW);
-            IF needs_itemized_set THEN
-                NEW.itemized := calculate_itemization(NEW);
-            END IF;
+            NEW.itemized := calculate_itemization(NEW);
             RETURN NEW;
-        END;
-        $$ LANGUAGE plpgsql;
-
-        CREATE OR REPLACE FUNCTION needs_itemized_set(
-            OLD RECORD,
-            NEW RECORD
-        )
-        RETURNS BOOLEAN AS $$
-        BEGIN
-            return OLD IS NULL OR (
-                OLD.force_itemized IS DISTINCT FROM NEW.force_itemized
-                OR OLD.aggregate IS DISTINCT FROM NEW.aggregate
-            );
         END;
         $$ LANGUAGE plpgsql;
 
