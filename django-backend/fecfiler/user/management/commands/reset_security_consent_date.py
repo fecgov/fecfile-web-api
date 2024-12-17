@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from fecfiler.user.models import User
 import structlog
+import sys
 
 logger = structlog.get_logger(__name__)
 
@@ -14,7 +15,7 @@ class Command(BaseCommand):
             "email",
             type=str,
             help="""The email of the user account
-            whose security consent date will be reset"""
+            whose security consent date will be reset""",
         )
 
     def handle(self, *args, **options):
@@ -23,6 +24,7 @@ class Command(BaseCommand):
             user = User.objects.filter(email=email).first()
             if user is None:
                 logger.error("No user found matching that email")
+                return
 
             user.security_consent_exp_date = None
             user.save()
