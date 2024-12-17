@@ -435,7 +435,7 @@ class TransactionViewTestCase(TestCase):
             None,
         )
         obs = Transaction.objects.transaction_view().filter(id=scha.id)
-        self.assertFalse(obs[0]._itemized)
+        self.assertFalse(obs[0].itemized)
 
         schb = create_schedule_b(
             "OPERATING_EXPENDITURE",
@@ -447,7 +447,7 @@ class TransactionViewTestCase(TestCase):
             "SB21B",
         )
         obs = Transaction.objects.transaction_view().filter(id=schb.id)
-        self.assertFalse(obs[0]._itemized)
+        self.assertFalse(obs[0].itemized)
 
         scha = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -461,7 +461,7 @@ class TransactionViewTestCase(TestCase):
             None,
         )
         obs = Transaction.objects.transaction_view().filter(id=scha.id)
-        self.assertTrue(obs[0]._itemized)
+        self.assertTrue(obs[0].itemized)
 
         schb = create_schedule_b(
             "OPERATING_EXPENDITURE",
@@ -473,7 +473,7 @@ class TransactionViewTestCase(TestCase):
             "SB21B",
         )
         obs = Transaction.objects.transaction_view().filter(id=schb.id)
-        self.assertTrue(obs[0]._itemized)
+        self.assertTrue(obs[0].itemized)
 
         candidate_a = Contact.objects.create(
             committee_account_id=self.committee.id,
@@ -492,7 +492,7 @@ class TransactionViewTestCase(TestCase):
             candidate_a,
         )
         obs = Transaction.objects.transaction_view().filter(id=ie.id)
-        self.assertTrue(obs[0]._itemized)
+        self.assertTrue(obs[0].itemized)
 
         ie = create_ie(
             self.committee,
@@ -505,4 +505,4 @@ class TransactionViewTestCase(TestCase):
             candidate_a,
         )
         obs = Transaction.objects.transaction_view().filter(id=ie.id)
-        self.assertTrue(obs[0]._itemized)
+        self.assertTrue(obs[0].itemized)
