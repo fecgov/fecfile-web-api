@@ -59,9 +59,9 @@ class DotFECSerializerTestCase(TestCase):
 
     def test_compose_dot_fec(self):
         with self.assertRaisesMessage(Exception, "header: 100000000 not found"):
-            compose_dot_fec(100000000, None)
+            compose_dot_fec(100000000)
 
-        file_content = compose_dot_fec(self.f3x.id, None)
+        file_content = compose_dot_fec(self.f3x.id)
         self.assertEqual(file_content.count(CRLF_STR), 3)
 
     def test_add_row_to_content(self):
@@ -111,7 +111,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertIn("75.00", row_str)
 
     def test_f99(self):
-        content = compose_dot_fec(self.f99.id, None)
+        content = compose_dot_fec(self.f99.id)
         split_content = content.split("\n")
         split_report_row = split_content[1].split(FS_STR)
         self.assertEqual(split_report_row[14], "ABC\r")

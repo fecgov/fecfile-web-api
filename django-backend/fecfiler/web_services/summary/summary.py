@@ -12,13 +12,35 @@ logger = structlog.get_logger(__name__)
 class SummaryService:
     def __init__(self, report) -> None:
         self.report = report
-        cash_on_hand_override = CashOnHandYearly.objects.filter(
-            committee_account=report.committee_account,
-            year=self.report.coverage_from_date.year,
-        ).first()
+
+        reports_from_prior_years = Report.objects.filter(
+            committee_account=self.report.committee_account,
+            coverage_through_date__year__lt=self.report.coverage_from_date.year,
+            form_3x__isnull=False,
+        ).order_by("coverage_from_date")
+        self.closest_report_from_prior_years = reports_from_prior_years.last()
+        year_of_closest_report = (
+            self.closest_report_from_prior_years.coverage_from_date.year
+            if self.closest_report_from_prior_years
+            else 0
+        )
+
+        """ Get the most recent cash on hand override that is
+         for a year after the closest report from prior years """
+        cash_on_hand_override = (
+            CashOnHandYearly.objects.filter(
+                committee_account=report.committee_account,
+                year__lte=self.report.coverage_from_date.year,
+                year__gt=year_of_closest_report,
+            )
+            .order_by("-year")
+            .first()
+        )
+
         self.cash_on_hand_override = (
             cash_on_hand_override.cash_on_hand if cash_on_hand_override else None
         )
+
         self.previous_report_this_year = (
             Report.objects.filter(
                 ~Q(id=report.id),
@@ -230,17 +252,11 @@ class SummaryService:
         return column_b
 
     def calculate_cash_on_hand_fields(self, column_a, column_b):
-        reports_from_prior_years = Report.objects.filter(
-            committee_account=self.report.committee_account,
-            coverage_through_date__year__lt=self.report.coverage_from_date.year,
-            form_3x__isnull=False,
-        ).order_by("coverage_from_date")
-
-        if self.cash_on_hand_override:
+        if self.cash_on_hand_override is not None:
             column_b["line_6a"] = self.cash_on_hand_override
-        elif reports_from_prior_years.count() > 0:
+        elif self.closest_report_from_prior_years is not None:
             column_b["line_6a"] = (
-                reports_from_prior_years.last().form_3x.L8_cash_on_hand_close_ytd
+                self.closest_report_from_prior_years.form_3x.L8_cash_on_hand_close_ytd
             )  # noqa: E501
         else:
             # user defined cash on hand

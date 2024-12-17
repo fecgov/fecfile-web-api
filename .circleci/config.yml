@@ -118,6 +118,10 @@ jobs:
           command: |
             flake8 --config django-backend/.flake8
 
+      - run:
+          name: Run deptry
+          command: deptry ~/project/
+
   deploy-job:
     docker:
       - image: cimg/python:3.10
