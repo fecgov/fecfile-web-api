@@ -321,7 +321,7 @@ class TransactionViewTestCase(TestCase):
             "GENERAL",
             "SA11AI",
             False,
-            True,
+            itemized=True,
         )
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -331,6 +331,7 @@ class TransactionViewTestCase(TestCase):
             "2.00",
             "GENERAl",
             "SA11AI",
+            itemized=False,
         )
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -340,6 +341,7 @@ class TransactionViewTestCase(TestCase):
             "1000.00",
             "GENERAL",
             "SA11AII",
+            itemized=False,
         )
         create_schedule_b(
             "OPERATING_EXPENDITURE",

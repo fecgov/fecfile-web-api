@@ -21,7 +21,7 @@ def create_schedule_a(
     group="GENERAL",
     form_type="SA11I",
     memo_code=False,
-    itemized=False,
+    itemized=None,
     report=None,
     parent_id=None,
     purpose_description=None,
@@ -193,7 +193,6 @@ def create_loan_from_bank(
         loan_amount,
         report=report,
         parent_id=loan.id,
-        itemized=None,
     )
     loan_agreement = create_test_transaction(
         "C1_LOAN_AGREEMENT",

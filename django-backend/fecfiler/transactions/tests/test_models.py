@@ -1012,7 +1012,6 @@ class TransactionModelTestCase(TestCase):
             amount="60.00",
             report=self.q1_report,
             parent_id=partnership_jf_transfer_memo_90.id,
-            itemized=None,
         )
 
         jf_transfer_100.refresh_from_db()
@@ -1069,7 +1068,6 @@ class TransactionModelTestCase(TestCase):
             "2024-01-01",
             amount="100.00",
             report=self.q1_report,
-            itemized=None,
         )
 
         partnership_jf_transfer_memo_90 = create_schedule_a(
@@ -1080,7 +1078,6 @@ class TransactionModelTestCase(TestCase):
             amount="90.00",
             report=self.q1_report,
             parent_id=jf_transfer_100.id,
-            itemized=None,
         )
 
         partnership_attribution_jf_transfer_memo_80 = create_schedule_a(
@@ -1091,7 +1088,6 @@ class TransactionModelTestCase(TestCase):
             amount="80.00",
             report=self.q1_report,
             parent_id=partnership_jf_transfer_memo_90.id,
-            itemized=None,
         )
 
         partnership_attribution_jf_transfer_memo_70 = create_schedule_a(
@@ -1102,7 +1098,6 @@ class TransactionModelTestCase(TestCase):
             amount="70.00",
             report=self.q1_report,
             parent_id=partnership_jf_transfer_memo_90.id,
-            itemized=None,
         )
 
         return (
