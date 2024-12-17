@@ -57,7 +57,7 @@ services:
       FEC_FILING_API_KEY:
       FEC_AGENCY_ID:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
-      LOG_FORMAT:
+      LOG_FORMAT: JSON
       FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
       ENABLE_DEVELOPER_COMMANDS: True
     deploy:
@@ -108,7 +108,7 @@ services:
       PRODUCTION_OPEN_FEC_API_KEY: DEMO_KEY
       STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
       STAGE_OPEN_FEC_API_KEY: DEMO_KEY
-      LOG_FORMAT:
+      LOG_FORMAT: JSON
       FECFILE_GITHUB_TOKEN:
       OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
       INITIAL_POLLING_INTERVAL: 10
