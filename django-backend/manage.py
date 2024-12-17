@@ -10,6 +10,7 @@ core = [
     "help",
     "create_committee_views",
     "migrate",
+    "lintmigrations",
     "makemigrations",
     "showmigrations",
     # DEVOPS COMMANDS #
