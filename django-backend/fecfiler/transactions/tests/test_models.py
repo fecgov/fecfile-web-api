@@ -147,7 +147,7 @@ class TransactionModelTestCase(TestCase):
         )
 
     def test_tier3_itemization(self):
-        ### CREATE ###
+        # CREATE JF TRANSFER FAMILY
         (
             jf_transfer_100,
             partnership_jf_transfer_memo_90,
@@ -176,7 +176,7 @@ class TransactionModelTestCase(TestCase):
         self.assertEqual(partnership_attribution_jf_transfer_memo_80.itemized, False)
         self.assertEqual(partnership_attribution_jf_transfer_memo_70.itemized, False)
 
-        ### ITEMIZE PARENTS ###
+        # ADD ITEMIZED CHILD TO TRIGGER PARENT ITEMIZATION
         partnership_attribution_jf_transfer_memo_60 = create_schedule_a(
             "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
             self.committee,
@@ -197,11 +197,27 @@ class TransactionModelTestCase(TestCase):
         self.assertEqual(partnership_jf_transfer_memo_90.itemized, True)
         self.assertEqual(partnership_attribution_jf_transfer_memo_80.itemized, False)
         self.assertEqual(partnership_attribution_jf_transfer_memo_70.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_60.itemized, True)
+
+        # FORCE UNITEMIZE PARENT TO TRIGGER UNITEMIZATION OF CHILDREN
+
+        jf_transfer_100.force_itemized = False
+        jf_transfer_100.save()
+
+        jf_transfer_100.refresh_from_db()
+        partnership_jf_transfer_memo_90.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_80.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_70.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_60.refresh_from_db()
+
+        self.assertEqual(jf_transfer_100.itemized, False)
+        self.assertEqual(partnership_jf_transfer_memo_90.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_80.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_70.itemized, False)
         self.assertEqual(partnership_attribution_jf_transfer_memo_60.itemized, False)
 
-        """
-        ### UNITEMIZE PARENTS ###
-        partnership_attribution_jf_transfer_memo_60.schedule_a.contribution_amount = 6.00
+        # UPDATE ITEMIZED CHILD TO ITEMIZE PARENT CHAIN ONCE MORE
+        partnership_attribution_jf_transfer_memo_60.schedule_a.contribution_amount = 65.00
         partnership_attribution_jf_transfer_memo_60.schedule_a.save()
         partnership_attribution_jf_transfer_memo_60.save()
 
@@ -211,107 +227,11 @@ class TransactionModelTestCase(TestCase):
         partnership_attribution_jf_transfer_memo_70.refresh_from_db()
         partnership_attribution_jf_transfer_memo_60.refresh_from_db()
 
-        self.assertEqual(jf_transfer_100._itemized, True)
         self.assertEqual(jf_transfer_100.itemized, True)
-        self.assertEqual(jf_transfer_100.relationally_itemized_count, 0)
-        self.assertEqual(jf_transfer_100.relationally_unitemized_count, 0)
-
-        self.assertEqual(partnership_jf_transfer_memo_90._itemized, False)
-        self.assertEqual(partnership_jf_transfer_memo_90.itemized, False)
-        self.assertEqual(partnership_jf_transfer_memo_90.relationally_itemized_count, 0)
-        self.assertEqual(partnership_jf_transfer_memo_90.relationally_unitemized_count, 0)
-
-        self.assertEqual(partnership_attribution_jf_transfer_memo_80._itemized, False)
+        self.assertEqual(partnership_jf_transfer_memo_90.itemized, True)
         self.assertEqual(partnership_attribution_jf_transfer_memo_80.itemized, False)
-        self.assertEqual(
-            partnership_attribution_jf_transfer_memo_80.relationally_itemized_count, 0
-        )
-        self.assertEqual(
-            partnership_attribution_jf_transfer_memo_80.relationally_unitemized_count, 1
-        )
-
-        self.assertEqual(partnership_attribution_jf_transfer_memo_70._itemized, False)
         self.assertEqual(partnership_attribution_jf_transfer_memo_70.itemized, False)
-        self.assertEqual(
-            partnership_attribution_jf_transfer_memo_70.relationally_itemized_count, 0
-        )
-        self.assertEqual(
-            partnership_attribution_jf_transfer_memo_70.relationally_unitemized_count, 1
-        )
-
-        self.assertEqual(partnership_attribution_jf_transfer_memo_60._itemized, False)
-        self.assertEqual(partnership_attribution_jf_transfer_memo_60.itemized, False)
-        self.assertEqual(
-            partnership_attribution_jf_transfer_memo_60.relationally_itemized_count, 0
-        )
-        self.assertEqual(
-            partnership_attribution_jf_transfer_memo_60.relationally_unitemized_count, 1
-        )
-        """
-
-    def xtest_tier3_itemization_add_new_itemized_grandchild(self):
-        self.test_new_tier3_transaction = create_schedule_a(
-            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
-            self.committee,
-            self.test_ind_contact,
-            "2024-01-04",
-            amount="250.00",
-            parent_id=self.test_tier2_transaction.id,
-        )
-
-        transactions = list(
-            Transaction.objects.filter(
-                id__in=[
-                    self.test_tier1_transaction.id,
-                    self.test_tier2_transaction.id,
-                    self.test_tier3_transaction.id,
-                    self.test_new_tier3_transaction.id,
-                ]
-            ).order_by("created")
-        )
-
-        self.assertEqual(
-            transactions[1].transaction_type_identifier,
-            "PARTNERSHIP_JF_TRANSFER_MEMO",
-        )
-        # self.assertEqual(transactions[1].itemized, True)
-
-        self.assertEqual(
-            transactions[3].transaction_type_identifier,
-            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
-        )
-        self.assertEqual(transactions[3]._itemized, True)
-        self.assertEqual(transactions[3].itemized, True)
-        self.assertEqual(transactions[3].relationally_unitemized_count, 0)
-
-    def xtest_tier3_itemization_update_new_itemized_grandchild(self):
-        Transaction.objects.filter(
-            pk=self.test_new_tier3_transaction.id,
-        ).update(amount="2")
-
-        transactions = list(
-            Transaction.objects.filter(
-                id__in=[
-                    self.test_tier1_transaction.id,
-                    self.test_tier2_transaction.id,
-                    self.test_tier3_transaction.id,
-                    self.test_new_tier3_transaction.id,
-                ]
-            ).order_by("created")
-        )
-
-        self.assertEqual(
-            transactions[1].transaction_type_identifier,
-            "PARTNERSHIP_JF_TRANSFER_MEMO",
-        )
-        self.assertEqual(transactions[1].itemized, False)
-
-        self.assertEqual(
-            transactions[3].transaction_type_identifier,
-            "PARTNERSHIP_JF_TRANSFER_MEMO",
-        )
-        self.assertEqual(transactions[3].itemized, False)
-        self.assertEqual(transactions[3].relationally_unitemized_count, 1)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_60.itemized, True)
 
     def set_up_jf_transfer(self):
         jf_transfer = create_schedule_a(

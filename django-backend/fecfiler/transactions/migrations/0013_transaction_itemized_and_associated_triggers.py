@@ -155,15 +155,13 @@ class Migration(migrations.Migration):
             parent_and_grandparent_ids uuid[];
             children_and_grandchildren_ids uuid[];
         BEGIN
-            IF OLD.itemized <> NEW.itemized THEN
-                IF NEW.itemized is TRUE THEN
-                    parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(NEW);
-                    PERFORM set_itemization_for_ids(TRUE, parent_and_grandparent_ids);
-                ELSE
-                    children_and_grandchildren_ids :=
-                        get_children_and_grandchildren_transaction_ids(NEW.id);
-                    PERFORM set_itemization_for_ids(FALSE, children_and_grandchildren_ids);
-                END IF;
+            IF NEW.itemized is TRUE THEN
+                parent_and_grandparent_ids := get_parent_grandparent_transaction_ids(NEW);
+                PERFORM set_itemization_for_ids(TRUE, parent_and_grandparent_ids);
+            ELSE
+                children_and_grandchildren_ids :=
+                    get_children_and_grandchildren_transaction_ids(NEW);
+                PERFORM set_itemization_for_ids(FALSE, children_and_grandchildren_ids);
             END IF;
             RETURN NEW;
         END;
