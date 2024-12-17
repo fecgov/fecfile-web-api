@@ -1060,50 +1060,6 @@ class TransactionModelTestCase(TestCase):
         self.assertEqual(partnership_attribution_jf_transfer_memo_70.itemized, False)
         self.assertEqual(partnership_attribution_jf_transfer_memo_60.itemized, True)
 
-    def set_up_jf_transfer(self):
-        jf_transfer = create_schedule_a(
-            "JOINT_FUNDRAISING_TRANSFER",
-            self.committee,
-            self.contact_1,
-            "2024-01-01",
-            amount="500.00",
-            itemized=True,
-            report=self.m1_report,
-        )
-        jf_transfer.save()
-
-        partnership_jf_transfer_memo = create_schedule_a(
-            "PARTNERSHIP_JF_TRANSFER_MEMO",
-            self.committee,
-            self.contact_1,
-            "2024-01-02",
-            amount="50.00",
-            itemized=True,
-            report=self.m1_report,
-        )
-        partnership_jf_transfer_memo.parent_transaction = jf_transfer
-        partnership_jf_transfer_memo.save()
-
-        partnership_attribution_jf_transfer_memo = create_schedule_a(
-            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
-            self.committee,
-            self.contact_1,
-            "2024-01-03",
-            amount="5.00",
-            itemized=True,
-            report=self.m1_report,
-        )
-        partnership_attribution_jf_transfer_memo.parent_transaction = (
-            partnership_jf_transfer_memo
-        )
-        partnership_attribution_jf_transfer_memo.save()
-
-        return (
-            jf_transfer,
-            partnership_jf_transfer_memo,
-            partnership_attribution_jf_transfer_memo,
-        )
-
     def set_up_jf_transfer_for_itemization_tests(self):
         jf_transfer_100 = create_schedule_a(
             "JOINT_FUNDRAISING_TRANSFER",
