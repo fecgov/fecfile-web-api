@@ -52,9 +52,7 @@ class Migration(migrations.Migration):
             options={
                 "db_table": "over_two_hundred_types_schedulea",
                 "indexes": [
-                    models.Index(
-                        fields=["type"], name="over_two_hu_type_21f14e_scheda_idx"
-                    )
+                    models.Index(fields=["type"], name="over_two_hu_type_2c8314_idx")
                 ],
             },
         ),
@@ -76,9 +74,7 @@ class Migration(migrations.Migration):
             options={
                 "db_table": "over_two_hundred_types_scheduleb",
                 "indexes": [
-                    models.Index(
-                        fields=["type"], name="over_two_hu_type_21f14e_schedb_idx"
-                    )
+                    models.Index(fields=["type"], name="over_two_hu_type_411a44_idx")
                 ],
             },
         ),
