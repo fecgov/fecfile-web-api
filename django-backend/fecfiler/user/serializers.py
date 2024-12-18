@@ -26,7 +26,7 @@ class CurrentUserSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         request = self.context.get("request")
         data["security_consented"] = (
-            date.today() <= request.user.security_consent_exp_date
-            or request.session.get(session_security_consented_key, None) is True
-        )
+            request.user.security_consent_exp_date
+            and date.today() <= request.user.security_consent_exp_date
+        ) or (request.session.get(session_security_consented_key, None) is True)
         return data
