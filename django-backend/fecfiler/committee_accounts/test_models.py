@@ -1,5 +1,6 @@
+from django.apps import apps
 from django.test import TestCase
-from .models import CommitteeAccount
+from .models import CommitteeAccount, CommitteeOwnedModel
 
 
 class CommitteeAccountTestCase(TestCase):
@@ -16,9 +17,7 @@ class CommitteeAccountTestCase(TestCase):
 
     def test_save_and_delete(self):
         self.valid_committee_account.save()
-        committee_account_from_db = CommitteeAccount.objects.get(
-            committee_id="C87654321"
-        )
+        committee_account_from_db = CommitteeAccount.objects.get(committee_id="C87654321")
         self.assertIsInstance(committee_account_from_db, CommitteeAccount)
         self.assertEquals(committee_account_from_db.committee_id, "C87654321")
         committee_account_from_db.delete()
@@ -39,3 +38,38 @@ class CommitteeAccountTestCase(TestCase):
             CommitteeAccount.all_objects.get,
             committee_id="C87654321",
         )
+
+    def test_all_models_include_committee_owned_mixin(self):
+        ignore_list = [
+            "Permission",
+            "Group",
+            "ContentType",
+            "Session",
+            "CommitteeAccount",
+            "Membership",
+            "Form3X",
+            "Form24",
+            "Form99",
+            "Form1M",
+            "ReportTransaction",
+            "ScheduleA",
+            "ScheduleB",
+            "ScheduleC",
+            "ScheduleC1",
+            "ScheduleC2",
+            "ScheduleD",
+            "ScheduleE",
+            "DotFEC",
+            "UploadSubmission",
+            "WebPrintSubmission",
+            "User",
+        ]
+        app_models = apps.get_models()
+
+        for model in app_models:
+            with self.subTest(model=model):
+                if model.__name__ not in ignore_list:
+                    self.assertTrue(
+                        issubclass(model, CommitteeOwnedModel),
+                        f"{model.__name__} does not include CommitteeOwnedModel mixin.",
+                    )

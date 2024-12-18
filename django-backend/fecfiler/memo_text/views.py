@@ -1,11 +1,10 @@
 from .models import MemoText
 from .serializers import MemoTextSerializer
-from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.reports.views import ReportViewMixin
 from rest_framework.viewsets import ModelViewSet
 
 
-class MemoTextViewSet(CommitteeOwnedViewMixin, ReportViewMixin, ModelViewSet):
+class MemoTextViewSet(ReportViewMixin, ModelViewSet):
     def get_queryset(self):
         memos = super().get_queryset()
         query_params = self.request.query_params.keys()
