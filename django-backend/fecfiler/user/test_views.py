@@ -34,7 +34,7 @@ class UserViewSetTest(TestCase):
             "consent_for_one_year": False,
         }
 
-        response = client.put("/api/v1/users/current/", test_put_data, secure=True)
+        client.put("/api/v1/users/current/", test_put_data, secure=True)
         response = client.get("/api/v1/users/current/", secure=True)
 
         self.assertEqual(response.status_code, 200)
@@ -54,7 +54,7 @@ class UserViewSetTest(TestCase):
             "consent_for_one_year": True,
         }
 
-        response = client.put("/api/v1/users/current/", test_put_data, secure=True)
+        client.put("/api/v1/users/current/", test_put_data, secure=True)
         response = client.get("/api/v1/users/current/", secure=True)
 
         self.assertEqual(response.status_code, 200)
