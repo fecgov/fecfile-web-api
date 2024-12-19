@@ -3,7 +3,7 @@ from requests.exceptions import HTTPError
 from django.core.exceptions import SuspiciousOperation
 from django.test import RequestFactory, TestCase
 from fecfiler.oidc.backends import OIDCAuthenticationBackend
-from fecfiler.oidc.utils import base64_encode_left_128_bits_of_string
+from fecfiler.oidc.utils import idp_base64_encode_left_128_bits_of_str
 
 import json
 
@@ -112,7 +112,7 @@ class OIDCAuthenticationBackendTestCase(TestCase):
     ):
         test_access_token = "test_access_token"
         test_nonce_value = "test_nonce_value"
-        test_at_hash_value = base64_encode_left_128_bits_of_string(test_access_token)
+        test_at_hash_value = idp_base64_encode_left_128_bits_of_str(test_access_token)
         test_invalid_c_hash_value = "test_invalid_c_hash_value"
         test_jws_payload = json.dumps(
             {
@@ -155,8 +155,8 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         test_code = "test_code_that_a_fair_length"
         test_access_token = "test_access_token"
         test_nonce_value = "test_nonce_value"
-        test_at_hash_value = base64_encode_left_128_bits_of_string(test_access_token)
-        test_c_hash_value = base64_encode_left_128_bits_of_string(test_code)
+        test_at_hash_value = idp_base64_encode_left_128_bits_of_str(test_access_token)
+        test_c_hash_value = idp_base64_encode_left_128_bits_of_str(test_code)
         test_jws_payload = json.dumps(
             {
                 "nonce": test_nonce_value,
@@ -203,8 +203,8 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         test_code = "test_code_that_a_fair_length"
         test_access_token = "test_access_token"
         test_nonce_value = "test_nonce_value"
-        test_at_hash_value = base64_encode_left_128_bits_of_string(test_access_token)
-        test_c_hash_value = base64_encode_left_128_bits_of_string(test_code)
+        test_at_hash_value = idp_base64_encode_left_128_bits_of_str(test_access_token)
+        test_c_hash_value = idp_base64_encode_left_128_bits_of_str(test_code)
         test_jws_payload = json.dumps(
             {
                 "nonce": test_nonce_value,
@@ -252,8 +252,8 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         test_code = "test_code_that_a_fair_length"
         test_access_token = "test_access_token"
         test_nonce_value = "test_nonce_value"
-        test_at_hash_value = base64_encode_left_128_bits_of_string(test_access_token)
-        test_c_hash_value = base64_encode_left_128_bits_of_string(test_code)
+        test_at_hash_value = idp_base64_encode_left_128_bits_of_str(test_access_token)
+        test_c_hash_value = idp_base64_encode_left_128_bits_of_str(test_code)
         test_jws_payload = json.dumps(
             {
                 "nonce": test_nonce_value,
@@ -301,8 +301,8 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         test_code = "test_code_that_a_fair_length"
         test_access_token = "test_access_token"
         test_nonce_value = "test_nonce_value"
-        test_at_hash_value = base64_encode_left_128_bits_of_string(test_access_token)
-        test_c_hash_value = base64_encode_left_128_bits_of_string(test_code)
+        test_at_hash_value = idp_base64_encode_left_128_bits_of_str(test_access_token)
+        test_c_hash_value = idp_base64_encode_left_128_bits_of_str(test_code)
         test_jws_payload = json.dumps(
             {
                 "nonce": test_nonce_value,
