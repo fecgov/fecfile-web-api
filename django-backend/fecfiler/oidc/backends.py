@@ -27,7 +27,7 @@ from jwcrypto import jwk, jws
 from requests.exceptions import HTTPError
 
 from . import oidc_op_config
-from .utils import base64_encode_left_128_bits_of_string
+from .utils import idp_base64_encode_left_128_bits_of_str
 
 from django.conf import settings
 
@@ -105,8 +105,8 @@ class OIDCAuthenticationBackend(ModelBackend):
         self.verify_token_payload(jwstoken.payload, code, access_token, nonce)
 
     def verify_token_payload(self, id_token_payload, code, access_token, nonce):
-        access_token_left_128_bits = base64_encode_left_128_bits_of_string(access_token)
-        code_left_128_bits = base64_encode_left_128_bits_of_string(code)
+        access_token_left_128_bits = idp_base64_encode_left_128_bits_of_str(access_token)
+        code_left_128_bits = idp_base64_encode_left_128_bits_of_str(code)
 
         payload = json.loads(id_token_payload)
 

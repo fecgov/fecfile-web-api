@@ -13,6 +13,7 @@ https://github.com/mozilla/mozilla-django-oidc/blob/main/mozilla_django_oidc/vie
 import logging
 import time
 import base64
+import hashlib
 
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import logout, authenticate, login
@@ -106,5 +107,8 @@ def delete_user_logged_in_cookies(response):
     response.delete_cookie("csrftoken", domain=FFAPI_COOKIE_DOMAIN)
 
 
-def base64_encode_left_128_bits_of_string(target_string: str):
-    return base64.b64encode(str.encode(target_string)[:16]).decode()
+# based on idp impl:
+# https://github.com/18F/identity-idp/blob/799fc62621a30c54e7edba17e376d94606d0c956/app/services/id_token_builder.rb#L69
+def idp_base64_encode_left_128_bits_of_str(target_string: str):
+    digest = hashlib.sha256(target_string.encode()).digest()
+    return base64.urlsafe_b64encode(digest[:16]).rstrip(b"=").decode()
