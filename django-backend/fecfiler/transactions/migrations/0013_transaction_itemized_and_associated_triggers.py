@@ -22,14 +22,8 @@ def populate_over_two_hundred_types(apps, schema_editor):
     OverTwoHundredTypesScheduleB.objects.bulk_create(schb_types_to_create)
 
 
-def reverse_populate_over_two_hundred_types(apps, schema_editor):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            """
-                DELETE FROM over_two_hundred_types_schedulea;
-                DELETE FROM over_two_hundred_types_scheduleb;
-            """
-        )
+def drop_over_two_hundred_types(apps, schema_editor):
+    print("this reverses migration automatically.")
 
 
 def create_itemized_triggers_and_functions(apps, schema_editor):
@@ -194,26 +188,25 @@ def create_itemized_triggers_and_functions(apps, schema_editor):
 
 
 def drop_itemized_triggers_and_functions(apps, schema_editor):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            """
-                DROP TRIGGER
-                IF EXISTS zafter_transactions_transaction_insert_or_update_trigger
-                ON transactions_transaction;
+    schema_editor.execute(
+        """
+        DROP TRIGGER
+        IF EXISTS zafter_transactions_transaction_insert_or_update_trigger
+        ON transactions_transaction;
 
-                DROP TRIGGER
-                IF EXISTS before_transactions_transaction_insert_or_update_trigger
-                ON transactions_transaction;
+        DROP TRIGGER
+        IF EXISTS before_transactions_transaction_insert_or_update_trigger
+        ON transactions_transaction;
 
-                DROP FUNCTION IF EXISTS before_transactions_transaction_insert_or_update;
-                DROP FUNCTION IF EXISTS calculate_itemization;
-                DROP FUNCTION IF EXISTS after_transactions_transaction_insert_or_update;
-                DROP FUNCTION IF EXISTS needs_itemized_set;
-                DROP FUNCTION IF EXISTS set_itemization_for_ids;
-                DROP FUNCTION IF EXISTS get_parent_grandparent_transaction_ids;
-                DROP FUNCTION IF EXISTS get_children_and_grandchildren_transaction_ids;
-            """
-        )
+        DROP FUNCTION IF EXISTS before_transactions_transaction_insert_or_update;
+        DROP FUNCTION IF EXISTS calculate_itemization;
+        DROP FUNCTION IF EXISTS after_transactions_transaction_insert_or_update;
+        DROP FUNCTION IF EXISTS needs_itemized_set;
+        DROP FUNCTION IF EXISTS set_itemization_for_ids;
+        DROP FUNCTION IF EXISTS get_parent_grandparent_transaction_ids;
+        DROP FUNCTION IF EXISTS get_children_and_grandchildren_transaction_ids;
+        """
+    )
 
 
 class Migration(migrations.Migration):
@@ -274,7 +267,7 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(
             populate_over_two_hundred_types,
-            reverse_code=reverse_populate_over_two_hundred_types,
+            reverse_code=drop_over_two_hundred_types,
         ),
         migrations.RunPython(
             create_itemized_triggers_and_functions,
