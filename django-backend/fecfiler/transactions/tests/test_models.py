@@ -1107,6 +1107,59 @@ class TransactionModelTestCase(TestCase):
             partnership_attribution_jf_transfer_memo_70,
         )
 
+    def test_itemization_with_parent_child_disbursement(self):
+        org = create_test_organization_contact("org", self.committee.id)
+        individual = create_test_individual_contact("ind", "ividual", self.committee.id)
+        tier1 = create_schedule_b(
+            "OPERATING_EXPENDITURE_PAYMENT_TO_PAYROLL",
+            self.committee,
+            org,
+            "2024-01-01",
+            "100.00",
+            "GENERAL_DISBURSEMENT",
+        )
+        tier1.save()
+        tier1.refresh_from_db()
+        self.assertFalse(tier1.itemized)
+        tier2 = create_schedule_b(
+            "OPERATING_EXPENDITURE_PAYMENT_TO_PAYROLL_MEMO",
+            self.committee,
+            individual,
+            "2024-01-02",
+            "201.00",
+            "GENERAL_DISBURSEMENT",
+        )
+        tier2.parent_transaction = tier1
+        tier2.save()
+        tier1.refresh_from_db()
+        tier2.refresh_from_db()
+        self.assertTrue(tier1.itemized)
+        self.assertTrue(tier2.itemized)
+        tier1.schedule_b.expenditure_amount = 150.00
+        tier1.schedule_b.save()
+        tier1.save()
+        tier1.refresh_from_db()
+        tier2.refresh_from_db()
+        self.assertEqual(tier1.schedule_b.expenditure_amount, Decimal("150.00"))
+        self.assertFalse(tier1.itemized)
+        self.assertFalse(tier2.itemized)
+        tier1.force_itemized = True
+        tier1.save()
+        tier1.refresh_from_db()
+        tier2.refresh_from_db()
+        self.assertTrue(tier1.itemized)
+        self.assertFalse(tier2.itemized)
+        tier2.force_itemized = True
+        tier2.save()
+        tier2.refresh_from_db()
+        self.assertTrue(tier2.itemized)
+        tier1.force_itemized = False
+        tier1.save()
+        tier1.refresh_from_db()
+        tier2.refresh_from_db()
+        self.assertFalse(tier1.itemized)
+        self.assertFalse(tier2.itemized)
+
 
 def undelete(transaction):
     transaction.deleted = None
