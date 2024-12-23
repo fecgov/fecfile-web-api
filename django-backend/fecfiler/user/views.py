@@ -1,5 +1,6 @@
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import GenericViewSet
+from rest_framework.decorators import action
 from .serializers import CurrentUserSerializer, session_security_consented_key
 from datetime import date, timedelta
 import logging
@@ -7,13 +8,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class UserViewSet(ModelViewSet):
-
-    def retrieve(self, request, *args, **kwargs):
+class UserViewSet(
+    GenericViewSet,
+):
+    @action(detail=False, methods=["get"])
+    def get_current(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
-    def update(self, request, *args, **kwargs):
+    @action(detail=False, methods=["put"])
+    def update_current(self, request):
         additional_data = {}
         serializer = self.get_serializer(request.user, data=request.data)
         serializer.is_valid(raise_exception=True)
