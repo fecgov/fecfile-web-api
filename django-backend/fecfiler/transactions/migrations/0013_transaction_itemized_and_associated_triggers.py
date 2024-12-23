@@ -78,11 +78,6 @@ class Migration(migrations.Migration):
                 ],
             },
         ),
-        migrations.RunSQL(
-            """
-            CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-        """
-        ),
         migrations.RunPython(populate_over_two_hundred_types),
         migrations.RunSQL(
             """
