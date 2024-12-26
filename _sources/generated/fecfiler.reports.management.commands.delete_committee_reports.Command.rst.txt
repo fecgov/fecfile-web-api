@@ -25,6 +25,7 @@ fecfiler.reports.management.commands.delete\_committee\_reports.Command
       ~Command.check
       ~Command.check_migrations
       ~Command.create_parser
+      ~Command.delete_committee_contacts
       ~Command.delete_committee_reports
       ~Command.execute
       ~Command.get_version
