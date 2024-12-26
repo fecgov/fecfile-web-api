@@ -109,6 +109,7 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.setUpClass
       ~TransactionModelTestCase.setUpTestData
       ~TransactionModelTestCase.set_up_jf_transfer
+      ~TransactionModelTestCase.set_up_jf_transfer_for_itemization_tests
       ~TransactionModelTestCase.settings
       ~TransactionModelTestCase.shortDescription
       ~TransactionModelTestCase.skipTest
@@ -130,6 +131,8 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.test_delete_transaction_with_children
       ~TransactionModelTestCase.test_get_children
       ~TransactionModelTestCase.test_get_transaction_family
+      ~TransactionModelTestCase.test_itemization_with_parent_child_disbursement
+      ~TransactionModelTestCase.test_tier3_itemization
    
    
 

@@ -30,6 +30,8 @@ fecfiler.transactions.models
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      OverTwoHundredTypesScheduleA
+      OverTwoHundredTypesScheduleB
       Transaction
    
    

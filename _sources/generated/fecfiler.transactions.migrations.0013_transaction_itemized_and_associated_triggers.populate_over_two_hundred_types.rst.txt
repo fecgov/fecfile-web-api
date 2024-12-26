@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0013\_transaction\_itemized\_and\_associated\_triggers.populate\_over\_two\_hundred\_types
+===========================================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0013_transaction_itemized_and_associated_triggers
+
+.. autofunction:: populate_over_two_hundred_types

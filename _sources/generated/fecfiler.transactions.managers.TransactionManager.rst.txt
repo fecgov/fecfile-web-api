@@ -20,7 +20,6 @@ fecfiler.transactions.managers.TransactionManager
    .. autosummary::
    
       ~TransactionManager.INCURRED_PRIOR_CLAUSE
-      ~TransactionManager.ITEMIZATION_CLAUSE
       ~TransactionManager.LOAN_KEY_CLAUSE
       ~TransactionManager.PAYMENT_AMOUNT_CLAUSE
       ~TransactionManager.PAYMENT_PRIOR_CLAUSE

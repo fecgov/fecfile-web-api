@@ -43,4 +43,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0010_update_aggregate_trigger_performance
    fecfiler.transactions.migrations.0011_transaction_can_delete
    fecfiler.transactions.migrations.0012_alter_transactions_blocking_reports
+   fecfiler.transactions.migrations.0013_transaction_itemized_and_associated_triggers
 
