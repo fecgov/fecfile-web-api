@@ -107,10 +107,13 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_claims" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_claims"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_claims</span></code></a>(claims)</p></td>
 <td><p>Verify the provided claims to decide if authentication should be allowed.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_token" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_token"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_token</span></code></a>(token, **kwargs)</p></td>
-<td><p>Validate the token signature.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_token</span></code>(id_token, code, access_token, nonce)</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with_perm</span></code></a>(perm[, is_active, ...])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">verify_token_payload</span></code>(id_token_payload, code, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm" title="fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">with_perm</span></code></a>(perm[, is_active, ...])</p></td>
 <td><p>Return users that have permission &quot;perm&quot;.</p></td>
 </tr>
 </tbody>
@@ -220,12 +223,6 @@ that attribute are allowed.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_token">
-<span class="sig-name descname"><span class="pre">verify_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_token" title="Link to this definition">¶</a></dt>
-<dd><p>Validate the token signature.</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm">
 <span class="sig-name descname"><span class="pre">with_perm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_active</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_superusers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm" title="Link to this definition">¶</a></dt>
 <dd><p>Return users that have permission “perm”. By default, filter out
@@ -287,7 +284,6 @@ inactive users and include superusers.</p>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.update_user"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.update_user()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.user_can_authenticate"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.user_can_authenticate()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_claims"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.verify_claims()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.verify_token"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.verify_token()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.oidc.backends.OIDCAuthenticationBackend.with_perm"><code class="docutils literal notranslate"><span class="pre">OIDCAuthenticationBackend.with_perm()</span></code></a></li>
 </ul>
 </li>

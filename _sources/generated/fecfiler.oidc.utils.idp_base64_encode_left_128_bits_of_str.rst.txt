@@ -1,0 +1,6 @@
+fecfiler.oidc.utils.idp\_base64\_encode\_left\_128\_bits\_of\_str
+=================================================================
+
+.. currentmodule:: fecfiler.oidc.utils
+
+.. autofunction:: idp_base64_encode_left_128_bits_of_str

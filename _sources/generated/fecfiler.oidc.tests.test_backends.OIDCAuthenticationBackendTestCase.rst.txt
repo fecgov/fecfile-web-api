@@ -114,7 +114,9 @@ fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
       ~OIDCAuthenticationBackendTestCase.subTest
       ~OIDCAuthenticationBackendTestCase.tearDown
       ~OIDCAuthenticationBackendTestCase.tearDownClass
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_at_hash_verification_failed
       ~OIDCAuthenticationBackendTestCase.test_authenticate_bad_token_response
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_c_hash_verification_failed
       ~OIDCAuthenticationBackendTestCase.test_authenticate_nonce_verification_failed
       ~OIDCAuthenticationBackendTestCase.test_authenticate_oidc_op_unique_identifier_not_found
       ~OIDCAuthenticationBackendTestCase.test_authenticate_payload_claims_verification_failed
