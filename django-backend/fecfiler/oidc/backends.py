@@ -27,6 +27,7 @@ from jwcrypto import jwk, jws
 from requests.exceptions import HTTPError
 
 from . import oidc_op_config
+from .utils import idp_base64_encode_left_128_bits_of_str
 
 from django.conf import settings
 
@@ -96,20 +97,32 @@ class OIDCAuthenticationBackend(ModelBackend):
         keyset = jwk.JWKSet.from_json(jwks)
         return keyset.get_key(kid)
 
-    def verify_token(self, token, **kwargs):
-        """Validate the token signature."""
-        nonce = kwargs.get("nonce")
-
+    def verify_token(self, id_token, code, access_token, nonce):
         jwstoken = jws.JWS()
-        jwstoken.deserialize(token)
+        jwstoken.deserialize(id_token)
         pub_key = self.retrieve_matching_jwk(jwstoken.jose_header.get("kid"))
         jwstoken.verify(pub_key, settings.OIDC_RP_SIGN_ALGO)
+        self.verify_token_payload(jwstoken.payload, code, access_token, nonce)
 
-        payload = json.loads(jwstoken.payload)
+    def verify_token_payload(self, id_token_payload, code, access_token, nonce):
+        access_token_left_128_bits = idp_base64_encode_left_128_bits_of_str(access_token)
+        code_left_128_bits = idp_base64_encode_left_128_bits_of_str(code)
+
+        payload = json.loads(id_token_payload)
+
         token_nonce = payload.get("nonce")
-
         if nonce != token_nonce:
-            msg = "JWT Nonce verification failed. "
+            msg = "JWT nonce verification failed."
+            raise SuspiciousOperation(msg)
+
+        token_at_hash = payload.get("at_hash")
+        if token_at_hash != access_token_left_128_bits:
+            msg = "JWT at_hash verification failed."
+            raise SuspiciousOperation(msg)
+
+        token_c_hash = payload.get("c_hash")
+        if token_c_hash != code_left_128_bits:
+            msg = "JWT c_hash verification failed."
             raise SuspiciousOperation(msg)
 
     def get_token(self, payload):
@@ -201,7 +214,7 @@ class OIDCAuthenticationBackend(ModelBackend):
         access_token = token_info.get("access_token")
 
         # Validate the token
-        self.verify_token(id_token, nonce=nonce)
+        self.verify_token(id_token, code, access_token, nonce)
 
         return self.get_or_create_user(access_token)
 
