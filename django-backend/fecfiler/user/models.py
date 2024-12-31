@@ -14,6 +14,7 @@ class User(AbstractUser):
     )
     first_name = models.CharField(max_length=150, null=True, blank=True)
     last_name = models.CharField(max_length=150, null=True, blank=True)
+    new_field_for_testing = models.CharField(max_length=2, null=True, blank=True)
     groups = None
     user_permissions = None
     security_consent_exp_date = models.DateField(null=True, blank=True)
