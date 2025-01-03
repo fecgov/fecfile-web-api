@@ -88,7 +88,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
 
-    itemized = models.BooleanField(default=True)
+    itemized = models.BooleanField(db_default=True)
 
     force_itemized = models.BooleanField(null=True, blank=True)
     force_unaggregated = models.BooleanField(null=True, blank=True)
@@ -165,7 +165,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         return [
             self,
             *self.get_ancestor_transactions(),
-            *self.get_descendant_transactions()
+            *self.get_descendant_transactions(),
         ]
 
     def get_ancestor_transactions(self):
@@ -174,7 +174,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         else:
             return [
                 self.parent_transaction,
-                *self.parent_transaction.get_ancestor_transactions()
+                *self.parent_transaction.get_ancestor_transactions(),
             ]
 
     def get_descendant_transactions(self):
@@ -184,10 +184,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             grandchildren = []
             for child in self.children:
                 grandchildren += child.get_descendant_transactions()
-            return [
-                *self.children,
-                *grandchildren
-            ]
+            return [*self.children, *grandchildren]
 
     @property
     def children(self):
