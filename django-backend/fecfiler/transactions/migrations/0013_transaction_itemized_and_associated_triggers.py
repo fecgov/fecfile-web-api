@@ -5,11 +5,16 @@ from fecfiler.transactions.schedule_a.managers import (
 from fecfiler.transactions.schedule_b.managers import (
     over_two_hundred_types as schedule_b_over_two_hundred_types,
 )
-from ..models import OverTwoHundredTypesScheduleA, OverTwoHundredTypesScheduleB
 import uuid
 
 
 def populate_over_two_hundred_types(apps, schema_editor):
+    OverTwoHundredTypesScheduleA = apps.get_model(
+        "transactions", "OverTwoHundredTypesScheduleA"
+    )
+    OverTwoHundredTypesScheduleB = apps.get_model(
+        "transactions", "OverTwoHundredTypesScheduleB"
+    )
     scha_types_to_create = [
         OverTwoHundredTypesScheduleA(type=type_to_create)
         for type_to_create in schedule_a_over_two_hundred_types
@@ -219,7 +224,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="transaction",
             name="itemized",
-            field=models.BooleanField(default=True),
+            field=models.BooleanField(db_default=True),
         ),
         migrations.CreateModel(
             name="OverTwoHundredTypesScheduleA",
