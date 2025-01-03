@@ -9,7 +9,6 @@ from fecfiler.transactions.serializers import (
     REDESIGNATED,
 )
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.transactions.tests.utils import create_schedule_a, create_schedule_b
 
 
@@ -19,7 +18,6 @@ class TransactionSerializerBaseTestCase(TestCase):
         self.missing_type_transaction = {}
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.user = User.objects.create(email="test@fec.gov", username="gov")
-        create_committee_view(self.committee.id)
         self.mock_request = Request(HttpRequest())
         self.mock_request.user = self.user
         self.mock_request.session = {

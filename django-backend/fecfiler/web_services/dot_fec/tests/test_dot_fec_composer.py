@@ -3,7 +3,6 @@ from fecfiler.web_services.dot_fec.dot_fec_composer import (
     compose_dot_fec,
     add_row_to_content,
 )
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.web_services.dot_fec.dot_fec_serializer import (
     serialize_instance,
     CRLF_STR,
@@ -20,7 +19,6 @@ class DotFECSerializerTestCase(TestCase):
 
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
         coverage_from = datetime.strptime("2024-01-01", "%Y-%m-%d")
         coverage_through = datetime.strptime("2024-02-01", "%Y-%m-%d")
         self.f3x = create_form3x(
@@ -115,7 +113,7 @@ class DotFECSerializerTestCase(TestCase):
         split_content = content.split("\n")
         split_report_row = split_content[1].split(FS_STR)
         self.assertEqual(split_report_row[14], "ABC\r")
-        free_text = content[content.find("[BEGINTEXT]"):]
+        free_text = content[content.find("[BEGINTEXT]") :]
         self.assertEqual(
             free_text,
             "[BEGINTEXT]\r\n\nBEHOLD! A large text string"

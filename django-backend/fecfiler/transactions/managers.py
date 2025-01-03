@@ -231,6 +231,12 @@ class TransactionManager(SoftDeleteManager):
         )
 
     def transaction_view(self):
+        REPORT_CODE_LABEL_CLAUSE = Subquery(  # noqa: N806
+            Report.objects.filter(transactions=OuterRef("pk"))
+            .annotate(report_code_label=report_code_label_case)
+            .values("report_code_label")[:1]
+        )
+
         return (
             super()
             .get_queryset()
@@ -248,22 +254,6 @@ class TransactionManager(SoftDeleteManager):
                 transaction_ptr_id=F("id"),
                 back_reference_tran_id_number=self.BACK_REFERENCE_CLAUSE,
                 back_reference_sched_name=self.BACK_REFERENCE_NAME_CLAUSE,
-            )
-        )
-
-
-class TransactionViewManager(Manager):
-    def get_queryset(self):
-        REPORT_CODE_LABEL_CLAUSE = Subquery(  # noqa: N806
-            Report.objects.filter(transactions=OuterRef("pk"))
-            .annotate(report_code_label=report_code_label_case)
-            .values("report_code_label")[:1]
-        )
-
-        return (
-            super()
-            .get_queryset()
-            .annotate(
                 beginning_balance=Case(
                     When(
                         schedule_d__isnull=False,
@@ -296,8 +286,8 @@ class TransactionViewManager(Manager):
                     ),
                 ),
                 calendar_ytd_per_election_office=Coalesce(
-                    "view_parent_transaction__view_parent_transaction___calendar_ytd_per_election_office",  # noqa
-                    "view_parent_transaction___calendar_ytd_per_election_office",
+                    "parent_transaction__parent_transaction___calendar_ytd_per_election_office",  # noqa
+                    "parent_transaction___calendar_ytd_per_election_office",
                     "_calendar_ytd_per_election_office",
                 ),
                 line_label=self.LINE_LABEL_CLAUSE(),

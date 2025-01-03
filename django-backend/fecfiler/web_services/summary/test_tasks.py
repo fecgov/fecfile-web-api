@@ -2,7 +2,6 @@ from datetime import datetime
 from decimal import Decimal
 from django.test import TestCase
 from .tasks import CalculationState, calculate_summary
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.models import Report
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
@@ -16,7 +15,6 @@ class F3XSerializerTestCase(TestCase):
 
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
         self.contact_1 = create_test_individual_contact(
             "last name", "First name", self.committee.id
         )
@@ -197,7 +195,6 @@ class F3XSerializerTestCase(TestCase):
 
     def test_only_update_committees_reports(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
-        create_committee_view(other_committee.id)
         other_committees_f3x = create_form3x(
             other_committee,
             datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
@@ -223,7 +220,6 @@ class F3XSerializerTestCase(TestCase):
 
     def test_cash_on_hand_carries_over_gap_years(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
-        create_committee_view(other_committee.id)
         create_cash_on_hand_yearly(
             committee_account=other_committee,
             year="2005",
@@ -254,7 +250,6 @@ class F3XSerializerTestCase(TestCase):
 
     def test_cash_on_hand_override_between_reports(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
-        create_committee_view(other_committee.id)
         create_cash_on_hand_yearly(
             committee_account=other_committee,
             year="2007",
@@ -322,7 +317,6 @@ class F3XSerializerTestCase(TestCase):
 
     def test_cash_on_hand_override_for_last_year(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
-        create_committee_view(other_committee.id)
         create_cash_on_hand_yearly(
             committee_account=other_committee,
             year="2005",
@@ -368,7 +362,6 @@ class F3XSerializerTestCase(TestCase):
 
     def test_cash_on_hand_override_for_last_year_with_no_prior_report(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
-        create_committee_view(other_committee.id)
         # confirm order of override years
         create_cash_on_hand_yearly(
             committee_account=other_committee,

@@ -1,14 +1,10 @@
 import logging
 import requests
 import re
-from django.db import connection
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
-from fecfiler.transactions.models import (
-    Transaction,
-    get_committee_view_name,
-)
+
 from fecfiler import settings
 import redis
 import json
@@ -119,23 +115,7 @@ def create_committee_account(committee_id, user):
         role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
     )
 
-    create_committee_view(account.id)
     return account
-
-
-def create_committee_view(committee_uuid):
-    view_name = get_committee_view_name(committee_uuid)
-    with connection.cursor() as cursor:
-        sql, params = (
-            Transaction.objects.transaction_view()
-            .filter(committee_account_id=committee_uuid)
-            .query.sql_with_params()
-        )
-        definition = cursor.mogrify(sql, params).decode("utf-8")
-        cursor.execute(
-            f"DROP VIEW IF EXISTS {view_name};"
-            f"CREATE VIEW {view_name} as {definition}"
-        )
 
 
 def get_committee_account_data(committee_id):

@@ -5,7 +5,6 @@ from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import (
     TransactionManager,
-    TransactionViewManager,
     Schedule,
 )
 from fecfiler.transactions.schedule_a.models import ScheduleA
@@ -290,44 +289,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
-
-
-def get_read_model(committee_uuid):
-
-    committee_transaction_view = get_committee_view_name(committee_uuid)
-
-    class T(Transaction):
-        view_parent_transaction = models.ForeignKey(
-            "self",
-            db_column="parent_transaction_id",
-            on_delete=models.CASCADE,
-            null=True,
-            blank=True,
-        )
-        schedule = models.TextField()
-        amount = models.DecimalField()
-        date = models.DateField()
-        form_type = models.TextField()
-        effective_amount = models.DecimalField()
-        back_reference_tran_id_number = models.TextField()
-        back_reference_sched_name = models.TextField()
-        loan_key = models.TextField()
-        incurred_prior = models.DecimalField()
-        payment_prior = models.DecimalField()
-        payment_amount = models.DecimalField()
-        name = models.TextField()
-
-        objects = TransactionViewManager()
-
-        class Meta:
-            db_table = committee_transaction_view
-            app_label = committee_transaction_view
-
-    return T
-
-
-def get_committee_view_name(committee_uuid):
-    return f"transaction_view__{str(committee_uuid).replace('-','_')}"
 
 
 TABLE_TO_SCHEDULE = {

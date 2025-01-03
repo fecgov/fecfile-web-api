@@ -2,10 +2,9 @@ from django.test import TestCase
 from django.db.models import QuerySet
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.contacts.models import Contact
-from fecfiler.transactions.models import Transaction, get_read_model
+from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.reports.tests.utils import create_form3x
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.transactions.tests.utils import (
     create_test_transaction,
     create_schedule_b,
@@ -25,7 +24,6 @@ logger = structlog.get_logger(__name__)
 class TransactionViewTestCase(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
         self.contact_1 = Contact.objects.create(committee_account_id=self.committee.id)
 
     def test_transaction_view(self):
@@ -93,7 +91,7 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(transactions[0].force_unaggregated, True)
         self.assertEqual(transactions[1].aggregate, Decimal("200"))
 
-    def test_transaction_view_parent(self):
+    def test_transaction_parent(self):
         partnership_receipt = create_schedule_a(
             "PARTNERSHIP_RECEIPT",
             self.committee,
@@ -157,7 +155,11 @@ class TransactionViewTestCase(TestCase):
             )
             parnership_attribution_jf_transfer_memo.save()
 
-        view = get_read_model(self.committee.id).objects.all().order_by("date")
+        view = (
+            Transaction.objects.transaction_view()
+            .filter(committee_account__id=self.committee.id)
+            .order_by("date")
+        )
 
         self.assertEqual(view[0].itemized, True)
         self.assertEqual(view[0].aggregate, 500)
@@ -270,7 +272,7 @@ class TransactionViewTestCase(TestCase):
                 ie["contact"],
             )
 
-        view = get_read_model(self.committee.id).objects.all()
+        view = Transaction.objects.filter(committee_account__id=self.committee.id)
 
         self.assertEqual(view[0]._calendar_ytd_per_election_office, Decimal("123.45"))
         self.assertEqual(view[1]._calendar_ytd_per_election_office, Decimal("1.00"))
@@ -305,9 +307,11 @@ class TransactionViewTestCase(TestCase):
         second_repayment.debt = original_debt
         second_repayment.save()
 
-        view = get_read_model(self.committee.id).objects.all()
+        view = Transaction.objects.filter(committee_account__id=self.committee.id)
         original_debt_view = view.filter(id=original_debt.id).first()
-        self.assertEqual(original_debt_view.incurred_prior, Decimal("0"))
+        self.assertEqual(
+            original_debt_view.transaction_view().incurred_prior, Decimal("0")
+        )
         self.assertEqual(original_debt_view.payment_prior, Decimal("0"))
         self.assertEqual(original_debt_view.payment_amount, Decimal("3.50"))
 
@@ -353,7 +357,7 @@ class TransactionViewTestCase(TestCase):
             "SB21B",
         )
 
-        view = get_read_model(self.committee.id).objects.all().order_by("date")
+        view = Transaction.objects.filter(committee_account__id=self.committee.id)
         self.assertEqual(view[0].line_label, "11(a)(i)")
         self.assertEqual(view[1].line_label, "11(a)(ii)")
         self.assertEqual(view[2].line_label, "11(a)(ii)")
