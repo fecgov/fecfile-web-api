@@ -5,8 +5,10 @@ from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.models import Transaction
 from fecfiler.contacts.tests.utils import (
+    create_test_committee_contact,
     create_test_individual_contact,
     create_test_candidate_contact,
+    create_test_organization_contact,
 )
 from .utils import (
     create_schedule_a,
@@ -110,6 +112,39 @@ class TransactionModelTestCase(TestCase):
         )
         self.earmark_memo.parent_transaction = self.earmark_receipt
         self.earmark_memo.save()
+
+        self.test_com_contact_for_itemization = create_test_committee_contact(
+            "test-com-name1",
+            "C00000000",
+            self.committee.id,
+            {
+                "street_1": "test_sa1",
+                "street_2": "test_sa2",
+                "city": "test_c1",
+                "state": "AL",
+                "zip": "12345",
+                "telephone": "555-555-5555",
+                "country": "USA",
+            },
+        )
+        self.test_org_contact_for_itemization = create_test_organization_contact(
+            "test-org-name1",
+            self.committee.id,
+            {
+                "street_1": "test_sa1",
+                "street_2": "test_sa2",
+                "city": "test_c1",
+                "state": "AL",
+                "zip": "12345",
+                "telephone": "555-555-5555",
+                "country": "USA",
+            },
+        )
+        self.test_ind_contact_for_itemization = create_test_individual_contact(
+            "test_ln1",
+            "test_fn1",
+            self.committee.id,
+        )
 
     def test_delete_transaction(self):
         partnership_receipt = Transaction.objects.filter(
@@ -937,6 +972,193 @@ class TransactionModelTestCase(TestCase):
         a, b, c = self.set_up_jf_transfer()
         self.assertNotIn(c, a.children)
         self.assertIn(b, a.children)
+
+    def test_tier3_itemization(self):
+        # CREATE JF TRANSFER FAMILY
+        (
+            jf_transfer_100,
+            partnership_jf_transfer_memo_90,
+            partnership_attribution_jf_transfer_memo_80,
+            partnership_attribution_jf_transfer_memo_70,
+        ) = self.set_up_jf_transfer_for_itemization_tests()
+        self.assertEqual(
+            partnership_jf_transfer_memo_90.parent_transaction, jf_transfer_100
+        )
+        self.assertEqual(
+            partnership_attribution_jf_transfer_memo_80.parent_transaction,
+            partnership_jf_transfer_memo_90,
+        )
+        self.assertEqual(
+            partnership_attribution_jf_transfer_memo_70.parent_transaction,
+            partnership_jf_transfer_memo_90,
+        )
+
+        jf_transfer_100.refresh_from_db()
+        partnership_jf_transfer_memo_90.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_80.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_70.refresh_from_db()
+
+        self.assertEqual(jf_transfer_100.itemized, True)
+        self.assertEqual(partnership_jf_transfer_memo_90.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_80.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_70.itemized, False)
+
+        # ADD ITEMIZED CHILD TO TRIGGER PARENT ITEMIZATION
+        partnership_attribution_jf_transfer_memo_60 = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+            self.committee,
+            self.test_ind_contact_for_itemization,
+            "2024-01-05",
+            amount="60.00",
+            report=self.q1_report,
+            parent_id=partnership_jf_transfer_memo_90.id,
+        )
+
+        jf_transfer_100.refresh_from_db()
+        partnership_jf_transfer_memo_90.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_80.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_70.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_60.refresh_from_db()
+
+        self.assertEqual(jf_transfer_100.itemized, True)
+        self.assertEqual(partnership_jf_transfer_memo_90.itemized, True)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_80.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_70.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_60.itemized, True)
+
+        # FORCE UNITEMIZE PARENT TO TRIGGER UNITEMIZATION OF CHILDREN
+
+        jf_transfer_100.force_itemized = False
+        jf_transfer_100.save()
+
+        jf_transfer_100.refresh_from_db()
+        partnership_jf_transfer_memo_90.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_80.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_70.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_60.refresh_from_db()
+
+        self.assertEqual(jf_transfer_100.itemized, False)
+        self.assertEqual(partnership_jf_transfer_memo_90.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_80.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_70.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_60.itemized, False)
+
+        # UPDATE ITEMIZED CHILD TO ITEMIZE PARENT CHAIN ONCE MORE
+        partnership_attribution_jf_transfer_memo_60.schedule_a.contribution_amount = 65.00
+        partnership_attribution_jf_transfer_memo_60.schedule_a.save()
+        partnership_attribution_jf_transfer_memo_60.save()
+
+        jf_transfer_100.refresh_from_db()
+        partnership_jf_transfer_memo_90.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_80.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_70.refresh_from_db()
+        partnership_attribution_jf_transfer_memo_60.refresh_from_db()
+
+        self.assertEqual(jf_transfer_100.itemized, True)
+        self.assertEqual(partnership_jf_transfer_memo_90.itemized, True)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_80.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_70.itemized, False)
+        self.assertEqual(partnership_attribution_jf_transfer_memo_60.itemized, True)
+
+    def set_up_jf_transfer_for_itemization_tests(self):
+        jf_transfer_100 = create_schedule_a(
+            "JOINT_FUNDRAISING_TRANSFER",
+            self.committee,
+            self.test_com_contact_for_itemization,
+            "2024-01-01",
+            amount="100.00",
+            report=self.q1_report,
+        )
+
+        partnership_jf_transfer_memo_90 = create_schedule_a(
+            "PARTNERSHIP_JF_TRANSFER_MEMO",
+            self.committee,
+            self.test_org_contact_for_itemization,
+            "2024-01-02",
+            amount="90.00",
+            report=self.q1_report,
+            parent_id=jf_transfer_100.id,
+        )
+
+        partnership_attribution_jf_transfer_memo_80 = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+            self.committee,
+            self.test_ind_contact_for_itemization,
+            "2024-01-03",
+            amount="80.00",
+            report=self.q1_report,
+            parent_id=partnership_jf_transfer_memo_90.id,
+        )
+
+        partnership_attribution_jf_transfer_memo_70 = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
+            self.committee,
+            self.test_ind_contact_for_itemization,
+            "2024-01-04",
+            amount="70.00",
+            report=self.q1_report,
+            parent_id=partnership_jf_transfer_memo_90.id,
+        )
+
+        return (
+            jf_transfer_100,
+            partnership_jf_transfer_memo_90,
+            partnership_attribution_jf_transfer_memo_80,
+            partnership_attribution_jf_transfer_memo_70,
+        )
+
+    def test_itemization_with_parent_child_disbursement(self):
+        org = create_test_organization_contact("org", self.committee.id)
+        individual = create_test_individual_contact("ind", "ividual", self.committee.id)
+        tier1 = create_schedule_b(
+            "OPERATING_EXPENDITURE_PAYMENT_TO_PAYROLL",
+            self.committee,
+            org,
+            "2024-01-01",
+            "100.00",
+            "GENERAL_DISBURSEMENT",
+        )
+        tier1.save()
+        tier1.refresh_from_db()
+        self.assertFalse(tier1.itemized)
+        tier2 = create_schedule_b(
+            "OPERATING_EXPENDITURE_PAYMENT_TO_PAYROLL_MEMO",
+            self.committee,
+            individual,
+            "2024-01-02",
+            "201.00",
+            "GENERAL_DISBURSEMENT",
+        )
+        tier2.parent_transaction = tier1
+        tier2.save()
+        tier1.refresh_from_db()
+        tier2.refresh_from_db()
+        self.assertTrue(tier1.itemized)
+        self.assertTrue(tier2.itemized)
+        tier1.schedule_b.expenditure_amount = 150.00
+        tier1.schedule_b.save()
+        tier1.save()
+        tier1.refresh_from_db()
+        tier2.refresh_from_db()
+        self.assertEqual(tier1.schedule_b.expenditure_amount, Decimal("150.00"))
+        self.assertFalse(tier1.itemized)
+        self.assertFalse(tier2.itemized)
+        tier1.force_itemized = True
+        tier1.save()
+        tier1.refresh_from_db()
+        tier2.refresh_from_db()
+        self.assertTrue(tier1.itemized)
+        self.assertFalse(tier2.itemized)
+        tier2.force_itemized = True
+        tier2.save()
+        tier2.refresh_from_db()
+        self.assertTrue(tier2.itemized)
+        tier1.force_itemized = False
+        tier1.save()
+        tier1.refresh_from_db()
+        tier2.refresh_from_db()
+        self.assertFalse(tier1.itemized)
+        self.assertFalse(tier2.itemized)
 
 
 def undelete(transaction):
