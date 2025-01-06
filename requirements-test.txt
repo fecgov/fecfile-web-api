@@ -1,7 +1,5 @@
-flake8==4.0.1
-pep8-naming
 coverage==6.3
-jsonschema==3.2
-safety
+deptry==0.21.1
+flake8==4.0.1
 liccheck==0.6.2
 sphinx==7.2.6

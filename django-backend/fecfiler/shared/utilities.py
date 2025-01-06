@@ -23,3 +23,7 @@ def get_float_from_string(string, fallback=None):
         if fallback is not None:
             return fallback
         raise ValueError("String to float conversion failed with no provided fallback")
+
+
+def get_boolean_from_string(string):
+    return string.lower() == "true"

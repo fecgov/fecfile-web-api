@@ -69,91 +69,7 @@ export FEC_FILING_API_KEY="EFO_get_this_from_team_member"
 
 # Deployment (FEC team only)
 
-### Repositories
-
-- API: https://github.com/fecgov/fecfile-web-api
-- API proxy: https://github.com/fecgov/fecfile-api-proxy
-- Web APP: https://github.com/fecgov/fecfile-web-app
-- Validator: https://github.com/fecgov/fecfile-validate
-
-_Special Note:_ If the fecfile-validate repo was updated, the commit of the update needs to be updated in the requirements.txt file otherwise the CircleCI cache will not roll out the change.
-
-### Create a feature branch
-
-Using git-flow extensions:
-`git flow feature start feature_branch`
-
-Without the git-flow extensions:
-`git checkout develop
-    git pull
-    git checkout -b feature/feature_branch develop`
-
-- Developer creates a GitHub PR when ready to merge to `develop` branch
-- Reviewer reviews and merges feature branch into `develop` via GitHub
-- [auto] `develop` is deployed to `dev`
-
-### Create a release branch
-
-See [Repositories](#repositories) for full list 
-
-- Using git-flow extensions:
-
-```
-git flow release start sprint-#
-```
-
-- Without the git-flow extensions:
-
-```
-git checkout develop
-git pull
-git checkout -b release/sprint-# develop
-git push --set-upstream origin release/sprint-#
-```
-
-- Developer creates a PR in GitHub to merge release/sprint-# branch into the `main` branch to track if commits pass deployment checks. The actual merge will happen when deploying a release to test/production.
-
-### Create and deploy a hotfix
-
-- Using git-flow extensions:
-
-```
-git flow hotfix start my-fix
-# Work happens here
-git flow hotfix finish my-fix
-```
-
-- Without the git-flow extensions:
-
-```
-git checkout -b hotfix/my-fix main
-# Work happens here
-git push --set-upstream origin hotfix/my-fix
-```
-
-- Developer creates a hotfix branch, commits changes, and **makes a PR to the `main` and `develop` branches**:
-- Reviewer merges hotfix/my-fix branch into `develop` and `main`
-- [auto] `develop` is deployed to `dev`. Make sure the build passes before deploying to `main`.
-- Developer deploys hotfix/my-fix branch to main using **Deploying a release to test/production** instructions below
-
-### Deploying a release to test/production
-
-See [Repositories](#repositories) for full list 
-
-- Reviewer approves PR and merges into `main` (At this point the code is automatically deployed)
-- Check CircleCI for passing pipeline tests
-- If all tests pass, continue
-- (If commits were made to release/sprint-#) Developer creates a PR in GitHub to merge release/sprint-# branch into the `develop` branch
-- Reviewer approves PR and merges into `develop`
-- Delete release/sprint-# branch
-- Publish a new release using tag sprint-#, be sure to Auto-generate release notes
-  - On Github, click on "Code" tab, then the "tags" link, then the "Releases" toggle
-  - Click the button "Draft a new release"
-  - Enter the new sprint tag "sprint-XX"
-  - Set Target option to "main"
-  - Set Release title to "sprint-XX"
-  - Click the button "Generate release notes"
-  - Click the "Publish release" button
+[Deployment instructions...](https://github.com/fecgov/fecfile-web-api/wiki/Deployment)
 
 ## Technical Environment Plan
 
@@ -209,13 +125,4 @@ See here for comment style rules: https://google.github.io/styleguide/pyguide.ht
 
 ### Snyk security scanning
 
-A Snyk online account has been set up for FEC to monitor the FECFile Online GitHub repositories. The management of vulnerability alerts will be handled as a weekly rotating task performed by a developer who will log into the [Snyk Dashboard](https://app.snyk.io/invite/link/accept?invite=93042de6-4eca-4bb5-bf76-9c2e9f895e24&utm_source=link_invite&utm_medium=referral&utm_campaign=product-link-invite&from=link_invite) and perform the following tasks:
-
-1. Review the vulnerability reports for each of the FECFile Online GitHub repository.
-2. Write up a ticket (1 for each vulnerable package, ok to combine per package if multiple found on the same day) to remediate the vulnerability.
-3. Point and mark each ticket with the following tags: "security", "high priority".
-4. Ticket title should contain the deadline (Critical/high: 30 days, Medium: 60 days, Low: 90 days)
-5. Move each new ticket into the sprint that will be deployed before the deadline.
-6. Update weekly assignment log with tickets created or "None".
-
-The weekly assignment log can be found in the Google drive 🔒 [here](https://docs.google.com/spreadsheets/d/1SNMOyGS4JAKgXQ0RhhzoX7M2ib1vm14dD0LxWNpssP4) 🔒
+A Snyk online account has been set up for FEC to monitor the FECFile Online GitHub repositories. The management of vulnerability alerts will be handled as a weekly rotating task performed by a developer.  For more information, consult the Snyk security scannning [wiki page](https://github.com/fecgov/fecfile-web-api/wiki/Snyk-security-scanning).
