@@ -10,6 +10,7 @@ core = [
     "help",
     "create_committee_views",
     "migrate",
+    "lintmigrations",
     "makemigrations",
     "showmigrations",
     # DEVOPS COMMANDS #
@@ -29,6 +30,8 @@ developer = [
     "delete_committee_account",
     # REPORT COMMANDS #
     "delete_committee_reports",
+    # users
+    "reset_security_consent_date"
 ]
 
 if __name__ == "__main__":

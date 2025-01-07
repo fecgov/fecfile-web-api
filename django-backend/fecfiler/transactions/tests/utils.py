@@ -21,7 +21,7 @@ def create_schedule_a(
     group="GENERAL",
     form_type="SA11I",
     memo_code=False,
-    itemized=False,
+    itemized=None,
     report=None,
     parent_id=None,
     purpose_description=None,
@@ -43,7 +43,7 @@ def create_schedule_a(
         schedule_data={
             "contribution_date": date,
             "contribution_amount": amount,
-            "contribution_purpose_descrip": purpose_description
+            "contribution_purpose_descrip": purpose_description,
         },
         transaction_data=transaction_data,
     )
@@ -104,7 +104,7 @@ def create_ie(
             "dissemination_date": dissemination_date,
             "expenditure_amount": amount,
             "election_code": code,
-            "date_signed": date_signed
+            "date_signed": date_signed,
         },
         transaction_data={
             "_form_type": "SE",
@@ -240,7 +240,7 @@ def create_test_transaction(
         contact_1=contact_1,
         contact_2=contact_2,
         aggregation_group=group,
-        entity_type=getattr(contact_1, 'type', None),
+        entity_type=getattr(contact_1, "type", None),
         **{SCHEDULE_CLASS_TO_FIELD[schedule]: schedule_object},
         **(transaction_data or {})
     )

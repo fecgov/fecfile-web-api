@@ -11,6 +11,7 @@ from rest_framework.decorators import (
     api_view,
 )
 
+from fecfiler.oidc.utils import idp_base64_encode_left_128_bits_of_str
 from fecfiler.settings import MOCK_OIDC_PROVIDER_CACHE
 
 from jwcrypto import jwk
@@ -99,23 +100,26 @@ def authorize(request):
 @require_http_methods(["POST"])
 def token(request):
     auth_data = json.loads(redis_instance.get(MOCK_OIDC_PROVIDER_DATA))
-    if not auth_data.get("code"):
+    code = auth_data.get("code")
+    if not code:
         return HttpResponseBadRequest("call to authorize endpoint is required first")
     request_code = request.data.get("code")
-    if request_code != auth_data.get("code"):
+    if request_code != code:
         return HttpResponseBadRequest("authorize code is invalid")
 
     nonce = auth_data.get("nonce")
     access_token = auth_data.get("access_token")
     token_type = "Bearer"
     expires_in = 3600
+    at_hash = idp_base64_encode_left_128_bits_of_str(access_token)
+    c_hash = idp_base64_encode_left_128_bits_of_str(code)
     args = {
         "iss": request.build_absolute_uri().replace(request.path, ""),
         "sub": test_username,
         "aud": "test_client_id",
         "acr": "test_acr",
-        "at_hash": "test_at_hash",
-        "c_hash": "test_c_hash",
+        "at_hash": at_hash,
+        "c_hash": c_hash,
         "exp": time.time() + 60,
         "iat": time.time(),
         "jti": "test_jti",
