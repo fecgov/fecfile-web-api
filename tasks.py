@@ -154,7 +154,7 @@ def _do_migrations(ctx, space):
     print("Running migrations...")
 
     manifest_filename = f"manifests/manifest-{space}-migrator.yml"
-    app = f"fecfile-api-migrator-{space}"
+    app = f"fecfile-api-migrator"
 
     # Start migrator app
     cmd = "push"
