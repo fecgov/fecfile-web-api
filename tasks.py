@@ -151,15 +151,13 @@ def _rollback(ctx, app):
 
 
 def _do_migrations(ctx, space):
+    migrator_app = 'fecfile-api-migrator'
     print("Running migrations...")
 
-    manifest_filename = f"manifests/manifest-{space}-migrator.yml"
-    app = f"fecfile-api-migrator"
-
     # Start migrator app
-    cmd = "push"
+    manifest_filename = f"manifests/manifest-{space}-migrator.yml"
     migrator = ctx.run(
-        f"cf {cmd} {app} -f {manifest_filename}",
+        f"cf push {migrator_app} -f {manifest_filename}",
         echo=True,
         warn=True,
     )
@@ -170,7 +168,7 @@ def _do_migrations(ctx, space):
     # Run migrations
     task = 'django-backend/manage.py migrate --no-input --traceback --verbosity 3'
     migrations = ctx.run(
-        f"cf rt {app} --command '{task}' --wait --name 'Run Migrations'",
+        f"cf rt {migrator_app} --command '{task}' --wait --name 'Run Migrations'",
         echo=True,
         warn=True,
     )
@@ -179,16 +177,16 @@ def _do_migrations(ctx, space):
         return False
     print("Successfully ran migrations.")
 
-    # Stop migrator app
-    stop_app = ctx.run(
-        f"cf stop {app}",
+    # Delete migrator app
+    delete_app = ctx.run(
+        f"cf delete {migrator_app} -f",
         echo=True,
         warn=True
     )
-    if not stop_app.ok:
-        print(f"Failed to stop migrator app - f{app}")
+    if not delete_app.ok:
+        print(f"Failed to delete migrator app - f{migrator_app}")
         return False
-    print("Migrator app halted successfully.")
+    print("Migrator app deleted successfully.")
 
     print("Migration process has finished successfully.")
     return True
