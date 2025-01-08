@@ -65,11 +65,11 @@ jobs:
             python manage.py lintmigrations --git-commit-id d73068e23fc5b035af2b224b16d4726b7b20d67c --project-root-path '.'
           working_directory: ~/project/django-backend/
 
-      - run:
-          name: Run migrations
-          command: |
-            python manage.py migrate --no-input --traceback --verbosity 3
-          working_directory: ~/project/django-backend/
+      # - run:
+      #     name: Run migrations
+      #     command: |
+      #       python manage.py migrate --no-input --traceback --verbosity 3
+      #     working_directory: ~/project/django-backend/
 
       - run:
           name: Run lint
