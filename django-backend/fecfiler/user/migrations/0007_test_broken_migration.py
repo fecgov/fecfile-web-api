@@ -4,7 +4,7 @@ from django.db import migrations
 
 
 def do_nothing(apps, schema_editor):
-    print("We're truly doing nothing here")
+    raise ValueError
 
 
 class Migration(migrations.Migration):
