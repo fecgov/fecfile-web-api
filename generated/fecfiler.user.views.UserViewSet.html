@@ -63,29 +63,29 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.check_throttles" title="fecfiler.user.views.UserViewSet.check_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_throttles</span></code></a>(request)</p></td>
 <td><p>Check if request should be throttled.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">current</span></code>(request)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.determine_version" title="fecfiler.user.views.UserViewSet.determine_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_version</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.determine_version" title="fecfiler.user.views.UserViewSet.determine_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_version</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>If versioning is being used, then determine any API version for the incoming request.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.dispatch" title="fecfiler.user.views.UserViewSet.dispatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.dispatch" title="fecfiler.user.views.UserViewSet.dispatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p><cite>.dispatch()</cite> is pretty much the same as Django's regular dispatch, but with extra hooks for startup, finalize, and exception handling.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.filter_queryset" title="fecfiler.user.views.UserViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.filter_queryset" title="fecfiler.user.views.UserViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
 <td><p>Given a queryset, filter it with whichever filter backend is in use.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.finalize_response" title="fecfiler.user.views.UserViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.finalize_response" title="fecfiler.user.views.UserViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
 <td><p>Returns the final response object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.get_authenticate_header" title="fecfiler.user.views.UserViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.get_authenticate_header" title="fecfiler.user.views.UserViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
 <td><p>If a request is unauthenticated, determine the WWW-Authenticate header to use for 401 responses, if any.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.get_authenticators" title="fecfiler.user.views.UserViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.get_authenticators" title="fecfiler.user.views.UserViewSet.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of authenticators that this view can use.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.get_content_negotiator" title="fecfiler.user.views.UserViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.get_content_negotiator" title="fecfiler.user.views.UserViewSet.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
 <td><p>Instantiate and return the content negotiation class to use.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_current</span></code>(request)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.get_exception_handler" title="fecfiler.user.views.UserViewSet.get_exception_handler"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_exception_handler</span></code></a>()</p></td>
 <td><p>Returns the exception handler that this view uses.</p></td>
@@ -183,6 +183,9 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.throttled" title="fecfiler.user.views.UserViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
 <td><p>If request is throttled, determine what kind of exception to raise.</p></td>
 </tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_current</span></code>(request)</p></td>
+<td><p></p></td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Attributes</p>
@@ -221,25 +224,25 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.paginator" title="fecfiler.user.views.UserViewSet.paginator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paginator</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.pagination_class" title="fecfiler.user.views.UserViewSet.pagination_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pagination_class</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.views.UserViewSet.paginator" title="fecfiler.user.views.UserViewSet.paginator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paginator</span></code></a></p></td>
 <td><p>The paginator instance associated with the view, or <cite>None</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parser_classes</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">parser_classes</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_classes</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_classes</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">queryset</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">queryset</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">renderer_classes</span></code></p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">renderer_classes</span></code></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializer_class</span></code></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">schema</span></code></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">settings</span></code></p></td>
@@ -525,9 +528,8 @@ determine what kind of exception to raise.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="fecfiler.user.views.UserViewSet.pagination_class">
-<span class="sig-name descname"><span class="pre">pagination_class</span></span><a class="headerlink" href="#fecfiler.user.views.UserViewSet.pagination_class" title="Link to this definition">¶</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">PageNumberPagination</span></code></p>
-</dd></dl>
+<span class="sig-name descname"><span class="pre">pagination_class</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#fecfiler.user.views.UserViewSet.pagination_class" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="fecfiler.user.views.UserViewSet.paginator">
@@ -560,6 +562,12 @@ will instead be performed lazily, the first time either
 <dt class="sig sig-object py" id="fecfiler.user.views.UserViewSet.reverse_action">
 <span class="sig-name descname"><span class="pre">reverse_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.views.UserViewSet.reverse_action" title="Link to this definition">¶</a></dt>
 <dd><p>Reverse the action for the given <cite>url_name</cite>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.user.views.UserViewSet.serializer_class">
+<span class="sig-name descname"><span class="pre">serializer_class</span></span><a class="headerlink" href="#fecfiler.user.views.UserViewSet.serializer_class" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="fecfiler.user.serializers.CurrentUserSerializer.html#fecfiler.user.serializers.CurrentUserSerializer" title="fecfiler.user.serializers.CurrentUserSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">CurrentUserSerializer</span></code></a></p>
 </dd></dl>
 
 <dl class="py method">
@@ -674,6 +682,7 @@ will instead be performed lazily, the first time either
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.views.UserViewSet.perform_content_negotiation"><code class="docutils literal notranslate"><span class="pre">UserViewSet.perform_content_negotiation()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.views.UserViewSet.permission_denied"><code class="docutils literal notranslate"><span class="pre">UserViewSet.permission_denied()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.views.UserViewSet.reverse_action"><code class="docutils literal notranslate"><span class="pre">UserViewSet.reverse_action()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.views.UserViewSet.serializer_class"><code class="docutils literal notranslate"><span class="pre">UserViewSet.serializer_class</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.views.UserViewSet.setup"><code class="docutils literal notranslate"><span class="pre">UserViewSet.setup()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.views.UserViewSet.throttled"><code class="docutils literal notranslate"><span class="pre">UserViewSet.throttled()</span></code></a></li>
 </ul>

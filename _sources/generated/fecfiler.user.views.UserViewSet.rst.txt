@@ -24,7 +24,6 @@ fecfiler.user.views.UserViewSet
       ~UserViewSet.check_object_permissions
       ~UserViewSet.check_permissions
       ~UserViewSet.check_throttles
-      ~UserViewSet.current
       ~UserViewSet.determine_version
       ~UserViewSet.dispatch
       ~UserViewSet.filter_queryset
@@ -32,6 +31,7 @@ fecfiler.user.views.UserViewSet
       ~UserViewSet.get_authenticate_header
       ~UserViewSet.get_authenticators
       ~UserViewSet.get_content_negotiator
+      ~UserViewSet.get_current
       ~UserViewSet.get_exception_handler
       ~UserViewSet.get_exception_handler_context
       ~UserViewSet.get_extra_action_url_map
@@ -64,6 +64,7 @@ fecfiler.user.views.UserViewSet
       ~UserViewSet.reverse_action
       ~UserViewSet.setup
       ~UserViewSet.throttled
+      ~UserViewSet.update_current
    
    
 
@@ -84,13 +85,13 @@ fecfiler.user.views.UserViewSet
       ~UserViewSet.lookup_field
       ~UserViewSet.lookup_url_kwarg
       ~UserViewSet.name
+      ~UserViewSet.pagination_class
       ~UserViewSet.paginator
       ~UserViewSet.parser_classes
       ~UserViewSet.permission_classes
       ~UserViewSet.queryset
       ~UserViewSet.renderer_classes
       ~UserViewSet.schema
-      ~UserViewSet.serializer_class
       ~UserViewSet.settings
       ~UserViewSet.suffix
       ~UserViewSet.throttle_classes

@@ -114,8 +114,9 @@ fecfiler.user.test\_views.UserViewSetTest
       ~UserViewSetTest.subTest
       ~UserViewSetTest.tearDown
       ~UserViewSetTest.tearDownClass
-      ~UserViewSetTest.test_get_current_user_happy_path
-      ~UserViewSetTest.test_update_current_user_happy_path
+      ~UserViewSetTest.test_get_current_user_signed_annual_security_consent
+      ~UserViewSetTest.test_get_current_user_signed_ephemeral_security_consent
+      ~UserViewSetTest.test_get_current_user_unsigned_security_consent
    
    
 
