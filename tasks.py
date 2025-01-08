@@ -168,7 +168,7 @@ def _do_migrations(ctx, space):
     # Run migrations
     task = 'django-backend/manage.py migrate --no-input --traceback --verbosity 3'
     migrations = ctx.run(
-        f"cf rt {migrator_app} --wait --command '{task}' --name 'Run Migrations'",
+        f"cf rt {migrator_app} --command '{task}' --name 'Run Migrations' --wait",
         echo=True,
         warn=True,
     )
