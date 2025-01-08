@@ -1,6 +1,6 @@
 ---
 applications:
-  - name: fecfile-web-api
+  - name: fecfile-api-migrator
     instances: 1
     stack: cflinuxfs4
     buildpacks:
