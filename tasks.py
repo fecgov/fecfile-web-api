@@ -89,7 +89,6 @@ def _login_to_cf(ctx, space):
 
 
 def _do_deploy(ctx, space, app):
-
     manifest_filename = f"manifests/manifest-{space}-{MANIFEST_LABEL.get(app)}.yml"
     existing_deploy = ctx.run(f"cf app {app}", echo=True, warn=True)
     print("\n")
@@ -151,6 +150,50 @@ def _rollback(ctx, app):
             print("Unable to cancel deploy. Check logs.")
 
 
+def _do_migrations(ctx, space):
+    print("Running migrations...")
+
+    manifest_filename = f"manifests/manifest-{space}-migrator.yml"
+    app = f"fecfile-api-migrator-{space}"
+
+    # Start migrator app
+    cmd = "push"
+    migrator = ctx.run(
+        f"cf {cmd} {app} -f {manifest_filename}",
+        echo=True,
+        warn=True,
+    )
+    if not migrator.ok:
+        print("Failed to spin up migrator app.  Check logs.")
+        return False
+
+    # Run migrations
+    task = 'django-backend/manage.py migrate --no-input --traceback --verbosity 3'
+    migrations = ctx.run(
+        f"cf rt {app} --command '{task}' --wait --name 'Run Migrations'",
+        echo=True,
+        warn=True,
+    )
+    if not migrations.ok:
+        print("Failed to run migrations.  Check logs.")
+        return False
+    print("Successfully ran migrations.")
+
+    # Stop migrator app
+    stop_app = ctx.run(
+        f"cf stop {app}",
+        echo=True,
+        warn=True
+    )
+    if not stop_app.ok:
+        print(f"Failed to stop migrator app - f{app}")
+        return False
+    print("Migrator app halted successfully.")
+
+    print("Migration process has finished successfully.")
+    return True
+
+
 @task
 def deploy(ctx, space=None, branch=None, login=False, help=False):
     """Deploy app to Cloud Foundry.
@@ -186,6 +229,13 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     # Set deploy variables
     with open(".cfmeta", "w") as fp:
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
+
+    # Runs migrations
+    # tasks.py does not continue until the migrations task has completed
+    migrations_successful = _do_migrations(ctx, space)
+    if not migrations_successful:
+        print("Migrations process failed.  Stopping deploy.")
+        sys.exit(1)
 
     for app in [APP_NAME, WEB_SERVICES_NAME]:
         new_deploy = _do_deploy(ctx, space, app)
