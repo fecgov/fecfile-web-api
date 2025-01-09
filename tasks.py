@@ -51,7 +51,7 @@ def _detect_space(repo, branch=None):
 DEPLOY_RULES = (
     ("test", lambda _, branch: branch == "main"),
     ("stage", lambda _, branch: branch.startswith("release")),
-    ("dev", lambda _, branch: branch == "feature/1865"),
+    ("dev", lambda _, branch: branch == "develop"),
 )
 
 
@@ -88,12 +88,8 @@ def _login_to_cf(ctx, space):
         exit(1)
 
 
-def _get_manifest_filename(space, app):
-    return f"manifests/manifest-{space}-{MANIFEST_LABEL.get(app)}.yml"
-
-
 def _do_deploy(ctx, space, app):
-    manifest_filename = _get_manifest_filename(space, app)
+    manifest_filename = f"manifests/manifest-{space}-{MANIFEST_LABEL.get(app)}.yml"
     existing_deploy = ctx.run(f"cf app {app}", echo=True, warn=True)
     print("\n")
 
@@ -154,12 +150,25 @@ def _rollback(ctx, app):
             print("Unable to cancel deploy. Check logs.")
 
 
-def _run_migrations(ctx, space, app):
-    migrator_app = 'fecfile-api-migrator'
+def _delete_migrator_app(ctx, migrator_app):
+    print("Deleting migrator app...")
+    delete_app = ctx.run(
+        f"cf delete {migrator_app} -f",
+        echo=True,
+        warn=True
+    )
+    if not delete_app.ok:
+        print(f"Failed to delete migrator app - {migrator_app}")
+        return False
+    print("Migrator app deleted successfully.")
+    return True
+
+
+def _run_migrations(ctx, space, migrator_app):
     print("Running migrations...")
 
     # Start migrator app
-    manifest_filename = _get_manifest_filename(space, app)
+    manifest_filename = f"manifests/manifest-{space}-migrator.yml"
     migrator = ctx.run(
         f"cf push {migrator_app} -f {manifest_filename}",
         echo=True,
@@ -179,18 +188,6 @@ def _run_migrations(ctx, space, app):
     if not migrations.ok:
         print("Failed to run migrations.  Check logs.")
         return False
-    print("Successfully ran migrations.")
-
-    # Delete migrator app
-    delete_app = ctx.run(
-        f"cf delete {migrator_app} -f",
-        echo=True,
-        warn=True
-    )
-    if not delete_app.ok:
-        print(f"Failed to delete migrator app - f{migrator_app}")
-        return False
-    print("Migrator app deleted successfully.")
 
     print("Migration process has finished successfully.")
     return True
@@ -234,9 +231,13 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
-    migrations_successful = _run_migrations(ctx, space, APP_NAME)
-    if not migrations_successful:
-        print("Migrations process failed.  Stopping deploy.")
+    migrator_app = 'fecfile-api-migrator'
+    migrations_successful = _run_migrations(ctx, space, migrator_app)
+    migrator_app_deleted = _delete_migrator_app(ctx, migrator_app)
+
+    if not (migrations_successful and migrator_app_deleted):
+        print("Migrations failed and/or the migrator app was not deleted successfully.")
+        print("Canceling deploy...")
         sys.exit(1)
 
     for app in [APP_NAME, WEB_SERVICES_NAME]:
