@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "corsheaders",
     "django_structlog",
+    "django_migration_linter",
     "fecfiler.committee_accounts",
     "fecfiler.reports",
     "fecfiler.transactions",
@@ -129,6 +130,7 @@ DATABASES = {
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+MIGRATION_LINTER_OVERRIDE_MAKEMIGRATIONS = True
 
 FECFILE_GITHUB_TOKEN = env.get_credential("FECFILE_GITHUB_TOKEN")
 
