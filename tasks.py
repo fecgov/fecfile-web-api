@@ -243,7 +243,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
-    migrator_app = 'fecfile-api-migrator'  # warning: the app with this name will get deleted
+    migrator_app = 'fecfile-api-migrator'  # the app with this name will get deleted!
     migrations_successful = _run_migrations(ctx, space, migrator_app)
     migrator_app_deleted = _delete_migrator_app(ctx, space, migrator_app)
 
