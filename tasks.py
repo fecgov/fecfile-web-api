@@ -150,15 +150,27 @@ def _rollback(ctx, app):
             print("Unable to cancel deploy. Check logs.")
 
 
-def _delete_migrator_app(ctx, migrator_app):
+def _delete_migrator_app(ctx, space, migrator_app):
     print("Deleting migrator app...")
+
+    existing_migrator_app = ctx.run(f"cf app {migrator_app}", echo=True, warn=True)
+    if not existing_migrator_app.ok:
+        print("No migrator app detected.  There is nothing to delete.")
+        return True
+
+    if migrator_app == APP_NAME:
+        print(f"Possible error: could result in deleting main app - {APP_NAME}")
+        print("Canceling migrator app deletion attempt.")
+        return False
+
     delete_app = ctx.run(
         f"cf delete {migrator_app} -f",
         echo=True,
         warn=True
     )
     if not delete_app.ok:
-        print(f"Failed to delete migrator app - {migrator_app}")
+        print('Failed to delete migrator app.')
+        print(f'Stray migrator app remains on {space}: "{migrator_app}"')
         return False
     print("Migrator app deleted successfully.")
     return True
@@ -231,13 +243,13 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
-    migrator_app = 'fecfile-api-migrator'
+    migrator_app = 'fecfile-api-migrator'  # warning: the app with this name will get deleted
     migrations_successful = _run_migrations(ctx, space, migrator_app)
-    migrator_app_deleted = _delete_migrator_app(ctx, migrator_app)
+    migrator_app_deleted = _delete_migrator_app(ctx, space, migrator_app)
 
     if not (migrations_successful and migrator_app_deleted):
         print("Migrations failed and/or the migrator app was not deleted successfully.")
-        print("Canceling deploy...")
+        print("See the logs for more information.\nCanceling deploy...")
         sys.exit(1)
 
     for app in [APP_NAME, WEB_SERVICES_NAME]:
