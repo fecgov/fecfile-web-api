@@ -25,7 +25,7 @@ applications:
       STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
       SESSION_COOKIE_AGE: 64800
       BP_PIP_VERSION: latest
-      LOG_FORMAT: KEY_VALUE
+      LOG_FORMAT: JSON
       MOCK_EFO: True
       SYSTEM_STATUS_CACHE_AGE: 60
       INITIAL_POLLING_INTERVAL: 10
