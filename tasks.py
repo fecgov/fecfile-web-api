@@ -51,7 +51,7 @@ def _detect_space(repo, branch=None):
 DEPLOY_RULES = (
     ("test", lambda _, branch: branch == "main"),
     ("stage", lambda _, branch: branch.startswith("release")),
-    ("dev", lambda _, branch: branch == "feature/1865"),
+    ("dev", lambda _, branch: branch == "develop"),
 )
 
 
@@ -88,8 +88,12 @@ def _login_to_cf(ctx, space):
         exit(1)
 
 
+def _get_manifest_filename(space, app):
+    return f"manifests/manifest-{space}-{MANIFEST_LABEL.get(app)}.yml"
+
+
 def _do_deploy(ctx, space, app):
-    manifest_filename = f"manifests/manifest-{space}-{MANIFEST_LABEL.get(app)}.yml"
+    manifest_filename = _get_manifest_filename(space, app)
     existing_deploy = ctx.run(f"cf app {app}", echo=True, warn=True)
     print("\n")
 
@@ -150,12 +154,12 @@ def _rollback(ctx, app):
             print("Unable to cancel deploy. Check logs.")
 
 
-def _do_migrations(ctx, space):
+def _run_migrations(ctx, space, app):
     migrator_app = 'fecfile-api-migrator'
     print("Running migrations...")
 
     # Start migrator app
-    manifest_filename = f"manifests/manifest-{space}-migrator.yml"
+    manifest_filename = _get_manifest_filename(space, app)
     migrator = ctx.run(
         f"cf push {migrator_app} -f {manifest_filename}",
         echo=True,
@@ -230,7 +234,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
-    migrations_successful = _do_migrations(ctx, space)
+    migrations_successful = _run_migrations(ctx, space, APP_NAME)
     if not migrations_successful:
         print("Migrations process failed.  Stopping deploy.")
         sys.exit(1)
