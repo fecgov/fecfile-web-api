@@ -23,7 +23,6 @@ from django.db.models import (
     TextField,
     DecimalField,
     CharField,
-    Manager,
 )
 from decimal import Decimal
 from enum import Enum

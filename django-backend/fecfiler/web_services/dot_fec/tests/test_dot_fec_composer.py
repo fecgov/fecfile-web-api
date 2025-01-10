@@ -113,7 +113,7 @@ class DotFECSerializerTestCase(TestCase):
         split_content = content.split("\n")
         split_report_row = split_content[1].split(FS_STR)
         self.assertEqual(split_report_row[14], "ABC\r")
-        free_text = content[content.find("[BEGINTEXT]") :]
+        free_text = content[content.find("[BEGINTEXT]"):]
         self.assertEqual(
             free_text,
             "[BEGINTEXT]\r\n\nBEHOLD! A large text string"

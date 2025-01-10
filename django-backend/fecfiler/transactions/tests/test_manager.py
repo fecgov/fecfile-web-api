@@ -307,11 +307,11 @@ class TransactionViewTestCase(TestCase):
         second_repayment.debt = original_debt
         second_repayment.save()
 
-        view = Transaction.objects.filter(committee_account__id=self.committee.id)
-        original_debt_view = view.filter(id=original_debt.id).first()
-        self.assertEqual(
-            original_debt_view.transaction_view().incurred_prior, Decimal("0")
+        view = Transaction.objects.transaction_view().filter(
+            committee_account__id=self.committee.id
         )
+        original_debt_view = view.filter(id=original_debt.id).first()
+        self.assertEqual(original_debt_view.incurred_prior, Decimal("0"))
         self.assertEqual(original_debt_view.payment_prior, Decimal("0"))
         self.assertEqual(original_debt_view.payment_amount, Decimal("3.50"))
 
@@ -357,7 +357,9 @@ class TransactionViewTestCase(TestCase):
             "SB21B",
         )
 
-        view = Transaction.objects.filter(committee_account__id=self.committee.id)
+        view = Transaction.objects.transaction_view().filter(
+            committee_account__id=self.committee.id
+        )
         self.assertEqual(view[0].line_label, "11(a)(i)")
         self.assertEqual(view[1].line_label, "11(a)(ii)")
         self.assertEqual(view[2].line_label, "11(a)(ii)")

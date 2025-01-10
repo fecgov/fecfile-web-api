@@ -12,253 +12,302 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             """
-        CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
-                txn RECORD, sql_committee_id text
-            )
-            RETURNS VOID AS $$
-            DECLARE
-                schedule_date date;
-            BEGIN
-                IF txn.schedule_a_id IS NOT NULL THEN
-                    SELECT
-                        contribution_date INTO schedule_date
-                    FROM
-                        transactions_schedulea
-                    WHERE
-                        id = txn.schedule_a_id;
-                ELSIF txn.schedule_b_id IS NOT NULL THEN
-                    SELECT
-                        expenditure_date INTO schedule_date
-                    FROM
-                        transactions_scheduleb
-                    WHERE
-                        id = txn.schedule_b_id;
-                END IF;
+CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
+    txn RECORD, sql_committee_id text
+)
+RETURNS VOID AS $$
+DECLARE
+    schedule_date date;
+BEGIN
+    IF txn.schedule_a_id IS NOT NULL THEN
+        SELECT
+            contribution_date INTO schedule_date
+        FROM
+            transactions_schedulea
+        WHERE
+            id = txn.schedule_a_id;
+    ELSIF txn.schedule_b_id IS NOT NULL THEN
+        SELECT
+            expenditure_date INTO schedule_date
+        FROM
+            transactions_scheduleb
+        WHERE
+            id = txn.schedule_b_id;
+    END IF;
 
-                EXECUTE '
-                    UPDATE transactions_transaction AS t
-                    SET aggregate = tc.new_sum
-                    FROM (
-                        SELECT
-                            t.id,
-                            COALESCE(
-                                sa.contribution_date,
-                                sb.expenditure_date,
-                                sc.loan_incurred_date,
-                                se.disbursement_date,
-                                se.dissemination_date
-                            ) AS date,
-                            SUM(
-                                calculate_effective_amount(
-                                    t.transaction_type_identifier,
-                                    calculate_amount(
-                                        sa.contribution_amount,
-                                        sb.expenditure_amount,
-                                        sc.loan_amount,
-                                        sc2.guaranteed_amount,
-                                        se.expenditure_amount,
-                                        t.debt_id,
-                                        t.schedule_d_id
-                                    ),
-                                    t.schedule_c_id)
-                                ) OVER (
-                                ORDER BY 
-                                    COALESCE(
-                                        sa.contribution_date,
-                                        sb.expenditure_date,
-                                        sc.loan_incurred_date,
-                                        se.disbursement_date,
-                                        se.dissemination_date
-                                    ),
-                                    t.created
-                            ) AS new_sum
-                        FROM transactions_transaction t
-                        LEFT JOIN transactions_schedulea AS sa ON t.schedule_a_id = sa.id
-                        LEFT JOIN transactions_scheduleb AS sb ON t.schedule_b_id = sb.id
-                        LEFT JOIN transactions_schedulec AS sc ON t.schedule_c_id = sc.id
-                        LEFT JOIN transactions_schedulec2 AS sc2 ON t.schedule_c2_id = sc2.id
-                        LEFT JOIN transactions_schedulee AS se ON t.schedule_e_id = se.id
-                        LEFT JOIN transactions_scheduled AS sd ON t.schedule_d_id = sd.id
-                        WHERE
-                            contact_1_id = $1
-                            AND EXTRACT(YEAR FROM COALESCE(
-                                sa.contribution_date,
-                                sb.expenditure_date,
-                                sc.loan_incurred_date,
-                                se.disbursement_date,
-                                se.dissemination_date
-                            )) = $2
-                            AND aggregation_group = $3
-                            AND force_unaggregated IS NOT TRUE
-                            AND deleted IS NULL
-                    ) AS tc
-                    WHERE t.id = tc.id
-                        AND (
-                            tc.date > $4
-                            OR (
-                                tc.date = $4
-                                AND t.created >= $5
-                            )
-                        );
-                    '
-                USING
-                    txn.contact_1_id,
-                    EXTRACT(YEAR FROM schedule_date),
-                    txn.aggregation_group,
-                    schedule_date,
-                    txn.created;
-            END;
-            $$
-            LANGUAGE plpgsql;
+    EXECUTE '
+        UPDATE transactions_transaction AS t
+        SET aggregate = tc.new_sum
+        FROM (
+            SELECT
+                t.id,
+                COALESCE(
+                    sa.contribution_date,
+                    sb.expenditure_date,
+                    sc.loan_incurred_date,
+                    se.disbursement_date,
+                    se.dissemination_date
+                ) AS date,
+                SUM(
+                    calculate_effective_amount(
+                        t.transaction_type_identifier,
+                        calculate_amount(
+                            sa.contribution_amount,
+                            sb.expenditure_amount,
+                            sc.loan_amount,
+                            sc2.guaranteed_amount,
+                            se.expenditure_amount,
+                            t.debt_id,
+                            t.schedule_d_id
+                        ),
+                        t.schedule_c_id)
+                    ) OVER (
+                    ORDER BY
+                        COALESCE(
+                            sa.contribution_date,
+                            sb.expenditure_date,
+                            sc.loan_incurred_date,
+                            se.disbursement_date,
+                            se.dissemination_date
+                        ),
+                        t.created
+                ) AS new_sum
+            FROM transactions_transaction t
+            LEFT JOIN transactions_schedulea AS sa ON t.schedule_a_id = sa.id
+            LEFT JOIN transactions_scheduleb AS sb ON t.schedule_b_id = sb.id
+            LEFT JOIN transactions_schedulec AS sc ON t.schedule_c_id = sc.id
+            LEFT JOIN transactions_schedulec2 AS sc2 ON t.schedule_c2_id = sc2.id
+            LEFT JOIN transactions_schedulee AS se ON t.schedule_e_id = se.id
+            LEFT JOIN transactions_scheduled AS sd ON t.schedule_d_id = sd.id
+            WHERE
+                contact_1_id = $1
+                AND EXTRACT(YEAR FROM COALESCE(
+                    sa.contribution_date,
+                    sb.expenditure_date,
+                    sc.loan_incurred_date,
+                    se.disbursement_date,
+                    se.dissemination_date
+                )) = $2
+                AND aggregation_group = $3
+                AND force_unaggregated IS NOT TRUE
+                AND deleted IS NULL
+        ) AS tc
+        WHERE t.id = tc.id
+            AND (
+                tc.date > $4
+                OR (
+                    tc.date = $4
+                    AND t.created >= $5
+                )
+            );
+        '
+    USING
+        txn.contact_1_id,
+        EXTRACT(YEAR FROM schedule_date),
+        txn.aggregation_group,
+        schedule_date,
+        txn.created;
+END;
+$$
+LANGUAGE plpgsql;
         """
         ),
         migrations.RunSQL(
             """
-    CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
-            txn RECORD, sql_committee_id text
-            )
-            RETURNS VOID
-            AS $$
-        DECLARE
-            schedule_date date;
-            v_election_code text;
-            v_candidate_office text;
-            v_candidate_state text;
-            v_candidate_district text;
-        BEGIN
-            SELECT
-                COALESCE(disbursement_date, dissemination_date) INTO schedule_date
-            FROM transactions_schedulee
-            WHERE id = txn.schedule_e_id;
+CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
+    txn RECORD, sql_committee_id text
+)
+RETURNS VOID
+AS $$
+DECLARE
+    schedule_date date;
+    v_election_code text;
+    v_candidate_office text;
+    v_candidate_state text;
+    v_candidate_district text;
+BEGIN
+    SELECT
+        COALESCE(disbursement_date, dissemination_date) INTO schedule_date
+    FROM transactions_schedulee
+    WHERE id = txn.schedule_e_id;
 
-            SELECT election_code INTO v_election_code
-            FROM transactions_schedulee
-            WHERE id = txn.schedule_e_id;
+    SELECT election_code INTO v_election_code
+    FROM transactions_schedulee
+    WHERE id = txn.schedule_e_id;
 
+    SELECT
+        candidate_office,
+        candidate_state,
+        candidate_district INTO v_candidate_office,
+        v_candidate_state,
+        v_candidate_district
+    FROM contacts
+    WHERE id = txn.contact_2_id;
+    EXECUTE '
+        UPDATE transactions_transaction AS t
+        SET _calendar_ytd_per_election_office = tc.new_sum
+        FROM (
             SELECT
-                candidate_office,
-                candidate_state,
-                candidate_district INTO v_candidate_office,
-                v_candidate_state,
-                v_candidate_district
-            FROM contacts
-            WHERE id = txn.contact_2_id;
-            EXECUTE '
-                UPDATE transactions_transaction AS t
-                SET _calendar_ytd_per_election_office = tc.new_sum
-                FROM (
-                    SELECT
-                        t.id,
-                        Coalesce(
-                            e.disbursement_date,
-                            e.dissemination_date,
-                        ) as date,
-                        SUM(t.effective_amount) OVER
-                        (ORDER BY date, t.created) AS new_sum
-                    FROM transactions_schedulee e
-                        JOIN transactions_transaction t
-                            ON e.id = t.schedule_e_id
-                        JOIN contacts c
-                            ON t.contact_2_id = c.id
-                    WHERE
-                        e.election_code  = $1
-                        AND c.candidate_office = $2
-                        AND (
-                            c.candidate_state = $3
-                            OR (
-                                c.candidate_state IS NULL
-                                AND $3 = ''''
-                            )
-                        )
-                        AND (
-                            c.candidate_district = $4
-                            OR (
-                                c.candidate_district IS NULL
-                                AND $4 = ''''
-                            )
-                        )
-                        AND EXTRACT(YEAR FROM date) = $5
-                        AND aggregation_group = $6
-                        AND force_unaggregated IS NOT TRUE
-                ) AS tc
-                WHERE t.id = tc.id
-                AND (
-                    tc.date > $7
-                    OR (
-                        tc.date = $7
-                        AND t.created >= $8
+                t.id,
+                Coalesce(
+                    e.disbursement_date,
+                    e.dissemination_date
+                ) as date,
+                SUM(
+                    calculate_effective_amount(
+                        t.transaction_type_identifier,
+                        calculate_amount(
+                            NULL,
+                            NULL,
+                            NULL,
+                            NULL,
+                            e.expenditure_amount,
+                            t.debt_id,
+                            t.schedule_d_id
+                        ),
+                    t.schedule_c_id
                     )
-                );
-            '
-            USING
-                v_election_code,
-                v_candidate_office,
-                COALESCE(v_candidate_state, ''),
-                COALESCE(v_candidate_district, ''),
-                EXTRACT(YEAR FROM schedule_date),
-                txn.aggregation_group,
-                schedule_date,
-                txn.created;
-    END;
-    $$
-    LANGUAGE plpgsql;
+                ) OVER (ORDER BY Coalesce(
+                    e.disbursement_date,
+                    e.dissemination_date
+                ), t.created) AS new_sum
+            FROM transactions_schedulee e
+                JOIN transactions_transaction t
+                    ON e.id = t.schedule_e_id
+                JOIN contacts c
+                    ON t.contact_2_id = c.id
+            WHERE
+                e.election_code  = $1
+                AND c.candidate_office = $2
+                AND (
+                    c.candidate_state = $3
+                    OR (
+                        c.candidate_state IS NULL
+                        AND $3 = ''''
+                    )
+                )
+                AND (
+                    c.candidate_district = $4
+                    OR (
+                        c.candidate_district IS NULL
+                        AND $4 = ''''
+                    )
+                )
+                AND EXTRACT(YEAR FROM Coalesce(
+                    e.disbursement_date,
+                    e.dissemination_date
+                )) = $5
+                AND aggregation_group = $6
+                AND force_unaggregated IS NOT TRUE
+        ) AS tc
+        WHERE t.id = tc.id
+        AND (
+            tc.date > $7
+            OR (
+                tc.date = $7
+                AND t.created >= $8
+            )
+        );
+    '
+    USING
+        v_election_code,
+        v_candidate_office,
+        COALESCE(v_candidate_state, ''),
+        COALESCE(v_candidate_district, ''),
+        EXTRACT(YEAR FROM schedule_date),
+        txn.aggregation_group,
+        schedule_date,
+        txn.created;
+END;
+$$
+LANGUAGE plpgsql;
     """
         ),
         migrations.RunSQL(
             """
-    CREATE OR REPLACE FUNCTION calculate_effective_amount(
-        transaction_type_identifier TEXT,
-        amount NUMERIC,
-        schedule_c_id UUID
-    )
-    RETURNS NUMERIC
-    AS $$
-    DECLARE
-        effective_amount NUMERIC;
-    BEGIN
-        -- Case 1: transaction type is a refund
-        IF transaction_type_identifier IN (
-            'TRIBAL_REFUND_NP_HEADQUARTERS_ACCOUNT',
-            'TRIBAL_REFUND_NP_CONVENTION_ACCOUNT',
-            'TRIBAL_REFUND_NP_RECOUNT_ACCOUNT',
-            'INDIVIDUAL_REFUND_NP_HEADQUARTERS_ACCOUNT',
-            'INDIVIDUAL_REFUND_NP_CONVENTION_ACCOUNT',
-            'INDIVIDUAL_REFUND_NP_RECOUNT_ACCOUNT',
-            'REFUND_PARTY_CONTRIBUTION',
-            'REFUND_PARTY_CONTRIBUTION_VOID',
-            'REFUND_PAC_CONTRIBUTION',
-            'REFUND_PAC_CONTRIBUTION_VOID',
-            'INDIVIDUAL_REFUND_NON_CONTRIBUTION_ACCOUNT',
-            'BUSINESS_LABOR_REFUND_NON_CONTRIBUTION_ACCOUNT',
-            'OTHER_COMMITTEE_REFUND_NON_CONTRIBUTION_ACCOUNT',
-            'REFUND_UNREGISTERED_CONTRIBUTION',
-            'REFUND_UNREGISTERED_CONTRIBUTION_VOID',
-            'REFUND_INDIVIDUAL_CONTRIBUTION',
-            'REFUND_INDIVIDUAL_CONTRIBUTION_VOID',
-            'OTHER_COMMITTEE_REFUND_REFUND_NP_HEADQUARTERS_ACCOUNT',
-            'OTHER_COMMITTEE_REFUND_REFUND_NP_CONVENTION_ACCOUNT',
-            'OTHER_COMMITTEE_REFUND_REFUND_NP_RECOUNT_ACCOUNT'
-        ) THEN
-            effective_amount := amount * -1;
+CREATE OR REPLACE FUNCTION calculate_effective_amount(
+    transaction_type_identifier TEXT,
+    amount NUMERIC,
+    schedule_c_id UUID
+)
+RETURNS NUMERIC
+AS $$
+DECLARE
+    effective_amount NUMERIC;
+BEGIN
+    -- Case 1: transaction type is a refund
+    IF transaction_type_identifier IN (
+        'TRIBAL_REFUND_NP_HEADQUARTERS_ACCOUNT',
+        'TRIBAL_REFUND_NP_CONVENTION_ACCOUNT',
+        'TRIBAL_REFUND_NP_RECOUNT_ACCOUNT',
+        'INDIVIDUAL_REFUND_NP_HEADQUARTERS_ACCOUNT',
+        'INDIVIDUAL_REFUND_NP_CONVENTION_ACCOUNT',
+        'INDIVIDUAL_REFUND_NP_RECOUNT_ACCOUNT',
+        'REFUND_PARTY_CONTRIBUTION',
+        'REFUND_PARTY_CONTRIBUTION_VOID',
+        'REFUND_PAC_CONTRIBUTION',
+        'REFUND_PAC_CONTRIBUTION_VOID',
+        'INDIVIDUAL_REFUND_NON_CONTRIBUTION_ACCOUNT',
+        'BUSINESS_LABOR_REFUND_NON_CONTRIBUTION_ACCOUNT',
+        'OTHER_COMMITTEE_REFUND_NON_CONTRIBUTION_ACCOUNT',
+        'REFUND_UNREGISTERED_CONTRIBUTION',
+        'REFUND_UNREGISTERED_CONTRIBUTION_VOID',
+        'REFUND_INDIVIDUAL_CONTRIBUTION',
+        'REFUND_INDIVIDUAL_CONTRIBUTION_VOID',
+        'OTHER_COMMITTEE_REFUND_REFUND_NP_HEADQUARTERS_ACCOUNT',
+        'OTHER_COMMITTEE_REFUND_REFUND_NP_CONVENTION_ACCOUNT',
+        'OTHER_COMMITTEE_REFUND_REFUND_NP_RECOUNT_ACCOUNT'
+    ) THEN
+        effective_amount := amount * -1;
 
-        -- Case 2: schedule_c exists (return NULL)
-        ELSIF schedule_c_id IS NOT NULL THEN
-            effective_amount := NULL;
+    -- Case 2: schedule_c exists (return NULL)
+    ELSIF schedule_c_id IS NOT NULL THEN
+        effective_amount := NULL;
 
-        -- Default case: return the original amount
-        ELSE
-            effective_amount := amount;
-        END IF;
+    -- Default case: return the original amount
+    ELSE
+        effective_amount := amount;
+    END IF;
 
-        RETURN effective_amount;
-    END;
-    $$
-    LANGUAGE plpgsql;
+    RETURN effective_amount;
+END;
+$$
+LANGUAGE plpgsql;
     """
         ),
         migrations.RunSQL(
             """
-   CREATE OR REPLACE FUNCTION calculate_loan_key(
+CREATE OR REPLACE FUNCTION calculate_is_loan(
+    loan UUID,
+    transaction_type_identifier TEXT,
+    schedule_c_id UUID
+)
+RETURNS TEXT
+AS $$
+DECLARE
+    loan_key TEXT;
+BEGIN
+    IF loan IS NOT NULL AND transaction_type_identifier
+        IN ('LOAN_REPAYMENT_RECEIVED', 'LOAN_REPAYMENT_MADE')
+    THEN
+        loan_key := 'F';
+
+    ELSIF schedule_c_id IS NOT NULL THEN
+        loan_key := 'T';
+
+    ELSE
+        loan_key := 'F';
+    END IF;
+
+    RETURN loan_key;
+END;
+$$
+LANGUAGE plpgsql;
+    """
+        ),
+        migrations.RunSQL(
+            """
+CREATE OR REPLACE FUNCTION calculate_original_loan_id(
     transaction_id text,
     loan UUID,
     transaction_type_identifier TEXT,
@@ -268,36 +317,63 @@ class Migration(migrations.Migration):
 RETURNS TEXT
 AS $$
 DECLARE
-    loan_key TEXT;
     loan_transaction_id text;
-    report_coverage_through_date DATE;
-    expenditure_date DATE;
 BEGIN
-    -- Case 1: loan is not NULL and transaction_type_identifier matches
-    IF loan IS NOT NULL AND transaction_type_identifier IN ('LOAN_REPAYMENT_RECEIVED', 'LOAN_REPAYMENT_MADE') THEN
-        -- Get the related transaction_id and expenditure_date
-        SELECT t.transaction_id, sb.expenditure_date
-        INTO loan_transaction_id, expenditure_date
+    IF loan IS NOT NULL AND transaction_type_identifier
+        IN ('LOAN_REPAYMENT_RECEIVED', 'LOAN_REPAYMENT_MADE')
+    THEN
+        SELECT t.transaction_id
+        INTO loan_transaction_id
         FROM transactions_transaction t
         LEFT JOIN transactions_scheduleb sb ON t.schedule_b_id = sb.id
         WHERE t.id = loan;
 
-        loan_key := CONCAT(loan_transaction_id, expenditure_date::TEXT);
-
-    -- Case 2: schedule_c exists
     ELSIF schedule_c_id IS NOT NULL THEN
-        SELECT s.report_coverage_through_date INTO report_coverage_through_date
+        loan_transaction_id := transaction_id;
+
+    ELSE
+        loan_transaction_id := NULL;
+    END IF;
+
+    RETURN loan_transaction_id;
+END;
+$$
+LANGUAGE plpgsql;
+    """
+        ),
+        migrations.RunSQL(
+            """
+CREATE OR REPLACE FUNCTION calculate_loan_date(
+    trans_id TEXT,
+    loan UUID,
+    transaction_type_identifier TEXT,
+    schedule_c_id UUID,
+    schedule_b_id UUID
+)
+RETURNS DATE
+AS $$
+DECLARE
+    date DATE;
+BEGIN
+    IF loan IS NOT NULL AND transaction_type_identifier
+        IN ('LOAN_REPAYMENT_RECEIVED', 'LOAN_REPAYMENT_MADE')
+    THEN
+        SELECT sb.expenditure_date
+        INTO date
+        FROM transactions_transaction t
+        LEFT JOIN transactions_scheduleb sb ON t.schedule_b_id = sb.id
+        WHERE t.transaction_id = trans_id;
+
+    ELSIF schedule_c_id IS NOT NULL THEN
+        SELECT s.report_coverage_through_date INTO date
         FROM transactions_schedulec s
         WHERE s.id = schedule_c_id;
 
-        loan_key := CONCAT(transaction_id, report_coverage_through_date::TEXT, 'LOAN');
-
-    -- Default case
     ELSE
-        loan_key := NULL;
+        date := NULL;
     END IF;
 
-    RETURN loan_key;
+    RETURN date;
 END;
 $$
 LANGUAGE plpgsql;
@@ -311,7 +387,7 @@ CREATE OR REPLACE FUNCTION calculate_amount(
     schedule_c_loan_amount NUMERIC,
     schedule_c2_guaranteed_amount NUMERIC,
     schedule_e_expenditure_amount NUMERIC,
-    debt_id UUID, -- Reference to another transaction
+    debt UUID, -- Reference to another transaction
     schedule_d_id UUID
 )
 RETURNS NUMERIC
@@ -319,18 +395,16 @@ AS $$
 DECLARE
     debt_incurred_amount NUMERIC;
 BEGIN
-    -- Fetch the incurred_amount from the linked transaction's schedule_d
-    IF debt_id IS NOT NULL THEN
+    IF debt IS NOT NULL THEN
         SELECT sd.incurred_amount
         INTO debt_incurred_amount
         FROM transactions_transaction t
         LEFT JOIN transactions_scheduled sd ON t.schedule_d_id = sd.id
-        WHERE t.id = debt_id;
+        WHERE t.id = debt;
     ELSE
         debt_incurred_amount := NULL;
     END IF;
 
-    -- Return the first non-NULL value based on priority
     RETURN COALESCE(
         schedule_a_contribution_amount,
         schedule_b_expenditure_amount,
@@ -359,18 +433,34 @@ BEGIN
         FROM (
             SELECT
                 data.id,
-                data.loan_key,
-                SUM(data.effective_amount) OVER (ORDER BY data.loan_key) AS new_sum
+                data.original_loan_id,
+                data.is_loan,
+                SUM(data.effective_amount) OVER (
+                    PARTITION BY data.original_loan_id
+                    ORDER BY data.date
+                ) AS new_sum
             FROM (
                 SELECT
                     t.id,
-                    calculate_loan_key(
+                    calculate_loan_date(
                         t.transaction_id,
                         t.loan_id,
                         t.transaction_type_identifier,
                         t.schedule_c_id,
                         t.schedule_b_id
-                    ) AS loan_key,
+                    ) AS date,
+                    calculate_original_loan_id(
+                        t.transaction_id,
+                        t.loan_id,
+                        t.transaction_type_identifier,
+                        t.schedule_c_id,
+                        t.schedule_b_id
+                    ) AS original_loan_id,
+                    calculate_is_loan(
+                        t.loan_id,
+                        t.transaction_type_identifier,
+                        t.schedule_c_id
+                    ) AS is_loan,
                     calculate_effective_amount(
                         t.transaction_type_identifier,
                         calculate_amount(
@@ -390,24 +480,39 @@ BEGIN
                 LEFT JOIN transactions_schedulec sc ON t.schedule_c_id = sc.id
                 LEFT JOIN transactions_schedulec2 sc2 ON t.schedule_c2_id = sc2.id
                 LEFT JOIN transactions_schedulee se ON t.schedule_e_id = se.id
+                WHERE t.deleted IS NULL
             ) AS data
-            WHERE data.loan_key LIKE (
-                SELECT
-                    CASE
-                        WHEN loan_id IS NULL THEN transaction_id
-                        ELSE (
-                            SELECT transaction_id
-                            FROM transactions_transaction
-                            WHERE id = t.loan_id
-                        )
-                    END
+            WHERE data.original_loan_id = (
+                SELECT calculate_original_loan_id(
+                    t.transaction_id,
+                    t.loan_id,
+                    t.transaction_type_identifier,
+                    t.schedule_c_id,
+                    t.schedule_b_id
+                )
                 FROM transactions_transaction t
-                WHERE id = $1
-            ) || ''%%''
+                WHERE t.id = COALESCE(
+                    (SELECT loan_id FROM transactions_transaction WHERE id = $1),
+                    $1
+                )
+            )
+            AND data.date <= (
+                SELECT calculate_loan_date(
+                    t.transaction_id,
+                    t.loan_id,
+                    t.transaction_type_identifier,
+                    t.schedule_c_id,
+                    t.schedule_b_id
+                )
+                FROM transactions_transaction t
+                WHERE t.id = COALESCE(
+                    (SELECT loan_id FROM transactions_transaction WHERE id = $1),
+                    $1
+                )
+            )
         ) AS tc
         WHERE t.id = tc.id
-        AND tc.loan_key LIKE ''%%LOAN''
-        ;
+        AND tc.is_loan = ''T'';
     '
     USING txn.id;
 END;
