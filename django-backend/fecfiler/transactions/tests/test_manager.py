@@ -385,7 +385,7 @@ class TransactionViewTestCase(TestCase):
             loan_id=loan.id,
             report=m1_report,
         )
-        create_schedule_b(
+        repayment = create_schedule_b(
             "LOAN_REPAYMENT_MADE",
             self.committee,
             self.contact_1,
@@ -428,6 +428,21 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(transactions[2].amount, Decimal("500.00"))
         self.assertEqual(transactions[4].amount, Decimal("5000.00"))
         self.assertEqual(transactions[4].loan_payment_to_date, Decimal("2100.00"))
+        self.assertEqual(transactions[5].amount, Decimal("600.00"))
+
+        # test changing values
+        repayment.schedule_b.expenditure_amount = 200.00
+        repayment.schedule_b.save()
+        repayment.save()
+        transactions = view.filter(committee_account_id=self.committee.id).order_by(
+            "created"
+        )
+        self.assertEqual(transactions[0].amount, Decimal("5000.00"))
+        self.assertEqual(transactions[0].loan_payment_to_date, Decimal("1200.00"))
+        self.assertEqual(transactions[1].amount, Decimal("1000.00"))
+        self.assertEqual(transactions[2].amount, Decimal("200.00"))
+        self.assertEqual(transactions[4].amount, Decimal("5000.00"))
+        self.assertEqual(transactions[4].loan_payment_to_date, Decimal("1800.00"))
         self.assertEqual(transactions[5].amount, Decimal("600.00"))
 
     def test_itemization(self):

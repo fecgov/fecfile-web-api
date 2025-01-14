@@ -426,6 +426,8 @@ CREATE OR REPLACE FUNCTION calculate_loan_payment_to_date(
 )
 RETURNS VOID
 AS $$
+DECLARE
+    pulled_forward_loans RECORD;
 BEGIN
     EXECUTE '
         UPDATE transactions_transaction AS t
@@ -515,6 +517,77 @@ BEGIN
         AND tc.is_loan = ''T'';
     '
     USING txn.id;
+
+    -- Handle pulled-forward loans
+    FOR pulled_forward_loans IN
+        SELECT t.transaction_id
+        FROM transactions_transaction t
+        WHERE t.schedule_c_id IS NOT NULL
+          AND t.loan_id =  txn.loan_id
+    LOOP
+        -- Recalculate loan_payment_to_date for each pulled-forward loan
+        EXECUTE '
+            UPDATE transactions_transaction AS t
+            SET loan_payment_to_date = tc.new_sum
+            FROM (
+                SELECT
+                    data.id,
+                    data.original_loan_id,
+                    data.is_loan,
+                    SUM(data.effective_amount) OVER (
+                        PARTITION BY data.original_loan_id
+                        ORDER BY data.date
+                    ) AS new_sum
+                FROM (
+                    SELECT
+                        t.id,
+                        calculate_loan_date(
+                            t.transaction_id,
+                            t.loan_id,
+                            t.transaction_type_identifier,
+                            t.schedule_c_id,
+                            t.schedule_b_id
+                        ) AS date,
+                        calculate_original_loan_id(
+                            t.transaction_id,
+                            t.loan_id,
+                            t.transaction_type_identifier,
+                            t.schedule_c_id,
+                            t.schedule_b_id
+                        ) AS original_loan_id,
+                        calculate_is_loan(
+                            t.loan_id,
+                            t.transaction_type_identifier,
+                            t.schedule_c_id
+                        ) AS is_loan,
+                        calculate_effective_amount(
+                            t.transaction_type_identifier,
+                            calculate_amount(
+                                sa.contribution_amount,
+                                sb.expenditure_amount,
+                                sc.loan_amount,
+                                sc2.guaranteed_amount,
+                                se.expenditure_amount,
+                                t.debt_id,
+                                t.schedule_d_id
+                            ),
+                            t.schedule_c_id
+                        ) AS effective_amount
+                    FROM transactions_transaction t
+                    LEFT JOIN transactions_schedulea sa ON t.schedule_a_id = sa.id
+                    LEFT JOIN transactions_scheduleb sb ON t.schedule_b_id = sb.id
+                    LEFT JOIN transactions_schedulec sc ON t.schedule_c_id = sc.id
+                    LEFT JOIN transactions_schedulec2 sc2 ON t.schedule_c2_id = sc2.id
+                    LEFT JOIN transactions_schedulee se ON t.schedule_e_id = se.id
+                    WHERE t.deleted IS NULL
+                ) AS data
+                WHERE data.original_loan_id = $1
+            ) AS tc
+            WHERE t.id = tc.id
+            AND tc.is_loan = ''T'';
+        '
+        USING pulled_forward_loans.transaction_id;
+    END LOOP;
 END;
 $$
 LANGUAGE plpgsql;
