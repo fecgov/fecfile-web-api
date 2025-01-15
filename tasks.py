@@ -189,6 +189,7 @@ def _run_migrations(ctx, space, migrator_app):
 
     # Printing information on ctx
     print('''For the sake of #1871, we're investigating "ctx"''')
+    print(ctx.__class__)
     print(ctx.__dir__())
     print("-----------------------")
     print("We're also investigating options with objects returned by .run()")
