@@ -207,8 +207,11 @@ def _run_migrations(ctx, space, migrator_app):
         warn=True,
     )
 
+    print("Printing stdout from migrations:")
     if getattr(migrations, "stdout"):
         print(migrations.stdout)
+    else:
+        print("No stdout found...")
 
     if not migrations.ok:
         print("Failed to run migrations.  Check logs.")
@@ -258,7 +261,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     # tasks.py does not continue until the migrations task has completed
     migrator_app = 'fecfile-api-migrator'  # the app with this name will get deleted!
     migrations_successful = _run_migrations(ctx, space, migrator_app)
-    migrator_app_deleted = _delete_migrator_app(ctx, space, migrator_app)
+    # migrator_app_deleted = _delete_migrator_app(ctx, space, migrator_app)
 
     if not (migrations_successful and migrator_app_deleted):
         print("Migrations failed and/or the migrator app was not deleted successfully.")
