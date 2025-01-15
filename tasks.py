@@ -206,6 +206,10 @@ def _run_migrations(ctx, space, migrator_app):
         echo=True,
         warn=True,
     )
+
+    if getattr(migrations, "stdout"):
+        print(migrations.stdout)
+
     if not migrations.ok:
         print("Failed to run migrations.  Check logs.")
         return False
