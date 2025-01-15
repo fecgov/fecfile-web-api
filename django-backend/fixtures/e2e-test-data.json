@@ -1,22 +1,6 @@
 [
     {
         "model": "user.user",
-        "pk": "1cb79553-a0e6-43f2-b182-f102eca4a043",
-        "fields": {
-            "password": "pbkdf2_sha256$260000$8lcKqWHCEOwOMqtzTV6oDr$/fvcNuEmdyOaEpKjISOJuwngn5enhl3uSaEDI7N+RNk=",
-            "is_superuser": false,
-            "email": "test@test.com",
-            "username": "C99999999test@test.com",
-            "first_name": "Test",
-            "last_name": "Testson",
-            "last_login": "2022-05-02T13:44:07.324Z",
-            "is_staff": false,
-            "is_active": true,
-            "date_joined": "2020-09-28T15:22:56.477Z"
-        }
-    },
-    {
-        "model": "user.user",
         "pk": "e100e1da-cbfc-4189-aece-d139048a8e0a",
         "fields": {
             "password": "",
@@ -36,18 +20,6 @@
         "pk": "c94c5d1a-9e73-464d-ad72-b73b5d8667a9",
         "fields": {
             "committee_id": "C99999999",
-            "created": "2022-02-09T00:00:00.000Z",
-            "updated": "2022-02-09T00:00:00.000Z"
-        }
-    },
-    {
-        "model": "committee_accounts.Membership",
-        "pk": "3e281c08-2b1f-4cd0-9236-410fe872edb9",
-        "fields": {
-            "role": "COMMITTEE_ADMINISTRATOR",
-            "committee_account_id": "c94c5d1a-9e73-464d-ad72-b73b5d8667a9",
-            "user_id": "1cb79553-a0e6-43f2-b182-f102eca4a043",
-            "pending_email": null,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z"
         }
