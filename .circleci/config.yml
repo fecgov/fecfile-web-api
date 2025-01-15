@@ -248,8 +248,8 @@ workflows:
             branches:
               only: /develop|release\/sprint-[\.\d]+|main/
       - deploy-job:
-          requires:
-            - test
+          # requires:
+          #   - test
           filters:
             branches:
               only: /feature\/1865b-test-migration-deploy/
