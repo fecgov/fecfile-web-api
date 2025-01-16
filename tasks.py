@@ -9,6 +9,7 @@ from invoke import task
 env = cfenv.AppEnv()
 
 APP_NAME = "fecfile-web-api"
+MIGRATOR_APP_NAME = 'fecfile-api-migrator'  # THE APP WITH THIS NAME WILL GET DELETED!
 WEB_SERVICES_NAME = "fecfile-web-services"
 PROXY_NAME = "fecfile-api-proxy"
 ORG_NAME = "fec-fecfileonline-prototyping"
@@ -150,39 +151,39 @@ def _rollback(ctx, app):
             print("Unable to cancel deploy. Check logs.")
 
 
-def _delete_migrator_app(ctx, space, migrator_app):
+def _delete_migrator_app(ctx, space):
     print("Deleting migrator app...")
 
-    existing_migrator_app = ctx.run(f"cf app {migrator_app}", echo=True, warn=True)
+    existing_migrator_app = ctx.run(f"cf app {MIGRATOR_APP_NAME}", echo=True, warn=True)
     if not existing_migrator_app.ok:
         print("No migrator app detected.  There is nothing to delete.")
         return True
 
-    if migrator_app == APP_NAME:
+    if MIGRATOR_APP_NAME == APP_NAME:
         print(f"Possible error: could result in deleting main app - {APP_NAME}")
         print("Canceling migrator app deletion attempt.")
         return False
 
     delete_app = ctx.run(
-        f"cf delete {migrator_app} -f",
+        f"cf delete {MIGRATOR_APP_NAME} -f",
         echo=True,
         warn=True
     )
     if not delete_app.ok:
         print('Failed to delete migrator app.')
-        print(f'Stray migrator app remains on {space}: "{migrator_app}"')
+        print(f'Stray migrator app remains on {space}: "{MIGRATOR_APP_NAME}"')
         return False
     print("Migrator app deleted successfully.")
     return True
 
 
-def _run_migrations(ctx, space, migrator_app):
+def _run_migrations(ctx, space):
     print("Running migrations...")
 
     # Start migrator app
     manifest_filename = f"manifests/manifest-{space}-migrator.yml"
     migrator = ctx.run(
-        f"cf push {migrator_app} -f {manifest_filename}",
+        f"cf push {MIGRATOR_APP_NAME} -f {manifest_filename}",
         echo=True,
         warn=True,
     )
@@ -193,7 +194,7 @@ def _run_migrations(ctx, space, migrator_app):
     # Run migrations
     task = 'django-backend/manage.py migrate --no-input --traceback --verbosity 3'
     migrations = ctx.run(
-        f"cf rt {migrator_app} --command '{task}' --name 'Run Migrations' --wait",
+        f"cf rt {MIGRATOR_APP_NAME} --command '{task}' --name 'Run Migrations' --wait",
         echo=True,
         warn=True,
     )
@@ -243,9 +244,8 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
-    migrator_app = 'fecfile-api-migrator'  # the app with this name will get deleted!
-    migrations_successful = _run_migrations(ctx, space, migrator_app)
-    migrator_app_deleted = _delete_migrator_app(ctx, space, migrator_app)
+    migrations_successful = _run_migrations(ctx, space)
+    migrator_app_deleted = _delete_migrator_app(ctx, space)
 
     if not (migrations_successful and migrator_app_deleted):
         print("Migrations failed and/or the migrator app was not deleted successfully.")
