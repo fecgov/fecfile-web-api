@@ -1,0 +1,19 @@
+---
+applications:
+  - name: fecfile-scheduler
+    instances: 1
+    no-route: true
+    health-check-type: process
+    stack: cflinuxfs4
+    buildpacks:
+      - python_buildpack
+    command: bin/run-celery-beat.sh
+    memory: 1G
+    services:
+      - fecfile-api-rds
+      - fecfile-api-s3
+      - fecfile-api-redis
+      - fecfile-api-creds-test
+    env:
+      DISABLE_COLLECTSTATIC: 1
+      DJANGO_SETTINGS_MODULE: fecfiler.settings.production

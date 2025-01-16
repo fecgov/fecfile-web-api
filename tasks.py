@@ -10,12 +10,14 @@ env = cfenv.AppEnv()
 
 APP_NAME = "fecfile-web-api"
 WEB_SERVICES_NAME = "fecfile-web-services"
+SCHEDULER_NAME = "fecfile-scheduler"
 PROXY_NAME = "fecfile-api-proxy"
 ORG_NAME = "fec-fecfileonline-prototyping"
 
 MANIFEST_LABEL = {
     APP_NAME: "api",
     WEB_SERVICES_NAME: "web-services",
+    SCHEDULER_NAME: "scheduler",
 }
 
 
@@ -187,7 +189,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     with open(".cfmeta", "w") as fp:
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
 
-    for app in [APP_NAME, WEB_SERVICES_NAME]:
+    for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
         new_deploy = _do_deploy(ctx, space, app)
 
         if not new_deploy.ok:

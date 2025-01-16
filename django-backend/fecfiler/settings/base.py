@@ -231,7 +231,7 @@ def get_logging_config(log_format=LINE):
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
                     structlog.dev.ConsoleRenderer(
                         colors=True, exception_formatter=structlog.dev.rich_traceback
-                    )
+                    ),
                 ],
             },
             "key_value": {
@@ -327,6 +327,17 @@ DJANGO_STRUCTLOG_CELERY_ENABLED = True
 
 CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "web_services/dot_fec/output")
 CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorageType.AWS)
+
+CELERY_BEAT_SCHEDULE = {
+    "print-db-stats": {
+        "task": "fecfiler.web_services.summary.tasks.get_database_connections",
+        "schedule": 60.0,
+        "args": (),
+        "options": {
+            "expires": 15.0,
+        },
+    },
+}
 
 """FEC Webload settings
 """
