@@ -1,3 +1,4 @@
+from django.conf import settings
 import structlog
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
@@ -8,13 +9,16 @@ from fecfiler.settings import SYSTEM_STATUS_CACHE_BACKEND, SYSTEM_STATUS_CACHE_A
 import json
 import redis
 
-if SYSTEM_STATUS_CACHE_BACKEND:
+if settings.FLAG__COMMITTEE_DATA_SOURCE == "MOCKED":
+    redis_instance = redis.Redis.from_url(settings.MOCK_OPENFEC_REDIS_URL)
+elif SYSTEM_STATUS_CACHE_BACKEND:
     redis_instance = redis.Redis.from_url(SYSTEM_STATUS_CACHE_BACKEND)
 else:
     raise SystemError("SYSTEM_STATUS_CACHE_BACKEND is not set")
 
 CELERY_STATUS = "CELERY_STATUS"
 DATABASE_STATUS = "DATABASE_STATUS"
+SCHEDULER_STATUS = "SCHEDULER_STATUS"
 
 
 logger = structlog.get_logger(__name__)
@@ -59,6 +63,29 @@ class SystemStatusViewSet(viewsets.ViewSet):
             return Response({"status": "celery is completing tasks"})
         return Response(
             {"status": "celery queue is not circulating"},
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="scheduler-status",
+        permission_classes=[],
+    )
+    def scheduler_status(self, request):
+        """
+        Check the status of the celery beat queue
+        Get the status from the cache if it exists, otherwise update the cache
+        """
+        scheduler_status = get_redis_value(SCHEDULER_STATUS)
+
+        if scheduler_status is None:
+            scheduler_status = update_status_cache(SCHEDULER_STATUS, get_scheduler_status)
+
+        if scheduler_status.get("scheduler_is_running"):
+            return Response({"status": "scheduler is completing tasks"})
+        return Response(
+            {"status": "scheduler queue is not circulating"},
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
 
@@ -111,6 +138,15 @@ def get_celery_status():
     # need to investigate further.
     # return {"celery_is_running": True}
     return {"celery_is_running": debug_task.delay().wait(timeout=30, interval=1)}
+
+
+def get_scheduler_status():
+    """
+    Run a debug task and wait form it to complete (for 30s max)
+    If the task completes, the queue is being circulated
+    """
+
+    return {"scheduler_is_running": redis_instance.get("scheduler_status") is not None}
 
 
 def update_status_cache(key, method):

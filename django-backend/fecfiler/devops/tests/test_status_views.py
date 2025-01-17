@@ -1,8 +1,10 @@
+from unittest.mock import patch
 from django.test import TestCase, override_settings
 from fecfiler.devops.views import (
     get_celery_status,
     get_database_status,
     get_redis_value,
+    get_scheduler_status,
     update_status_cache,
     redis_instance,
 )
@@ -14,6 +16,14 @@ class SystemStatusViewTest(TestCase):
     def test_get_celery_status(self):
         status = get_celery_status()
         self.assertTrue(status.get("celery_is_running"))
+
+    @patch("fecfiler.devops.views.redis_instance.get")
+    def test_get_scheduler_status(self, mock_redis_get):
+        mock_redis_get.return_value = "some_value"
+        status = get_scheduler_status()
+        self.assertTrue(status.get("scheduler_is_running"))
+
+        mock_redis_get.assert_called_once_with("scheduler_status")
 
     def test_get_database_satus(self):
         status = get_database_status()

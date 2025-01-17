@@ -1,12 +1,22 @@
 from enum import Enum
 from celery import shared_task
+from django.conf import settings
+from fecfiler.settings import SYSTEM_STATUS_CACHE_BACKEND, SYSTEM_STATUS_CACHE_AGE
 from django.db import connection
+import redis
 from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
 from .summary import SummaryService
+
 import uuid
 import structlog
 
 logger = structlog.get_logger(__name__)
+if settings.FLAG__COMMITTEE_DATA_SOURCE == "MOCKED":
+    redis_instance = redis.Redis.from_url(settings.MOCK_OPENFEC_REDIS_URL)
+elif SYSTEM_STATUS_CACHE_BACKEND:
+    redis_instance = redis.Redis.from_url(SYSTEM_STATUS_CACHE_BACKEND)
+else:
+    raise SystemError("SYSTEM_STATUS_CACHE_BACKEND is not set")
 
 
 class CalculationState(Enum):
@@ -304,3 +314,5 @@ def get_database_connections():
 
     results_dict = {"results": dict(zip(column_labels, row)) for row in results}
     logger.info(results_dict)
+
+    redis_instance.set("scheduler_status", "success", ex=SYSTEM_STATUS_CACHE_AGE)
