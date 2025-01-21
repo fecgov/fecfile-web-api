@@ -12,7 +12,7 @@ APP_NAME = "fecfile-web-api"
 MIGRATOR_APP_NAME = 'fecfile-api-migrator'  # THE APP WITH THIS NAME WILL GET DELETED!
 WEB_SERVICES_NAME = "fecfile-web-services"
 PROXY_NAME = "fecfile-api-proxy"
-ORG_NAME = "fec-fecfileonline-prototyping"
+ORG_NAME = "fec-fecfile"
 
 MANIFEST_LABEL = {
     APP_NAME: "api",
