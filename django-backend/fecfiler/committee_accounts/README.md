@@ -1,9 +1,3 @@
-# Updating Committee Views in the Database
-
-When changes are made to the Committee Account model, it is necessary to update
-the Committee Views for each committee in the database. To do this, create a new
-migration in the Committee Account app and refer to the following boilerplate code:
-
 # Mock Open FEC
 
 ## Setup

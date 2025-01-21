@@ -21,12 +21,9 @@ from django.db.models import (
     When,
     Value,
     TextField,
-    DecimalField,
-    CharField,
 )
 from decimal import Decimal
 from enum import Enum
-from .schedule_b.managers import refunds as schedule_b_refunds
 from ..reports.models import Report
 from fecfiler.reports.report_code_label import report_code_label_case
 
@@ -38,16 +35,6 @@ class TransactionManager(SoftDeleteManager):
 
     def get_queryset(self):
         return super().get_queryset()
-
-    EFFECTIVE_AMOUNT_CLAUSE = Case(
-        When(
-            transaction_type_identifier__in=schedule_b_refunds,
-            then=F("amount") * Value(Decimal(-1)),
-        ),
-        When(schedule_c__isnull=False, then=None),
-        default="amount",
-        output_field=DecimalField(),
-    )
 
     def SCHEDULE_CLAUSE(self):  # noqa: N802
         return Case(
@@ -120,40 +107,6 @@ class TransactionManager(SoftDeleteManager):
         default=F("_form_type"),
         output_field=TextField(),
     )
-
-    def LOAN_KEY_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(
-                Q(loan_id__isnull=False)
-                & Q(
-                    schedule__in=[
-                        Schedule.A.value,
-                        Schedule.B.value,
-                        Schedule.E.value,
-                    ]
-                )
-                & Q(
-                    transaction_type_identifier__in=[
-                        "LOAN_REPAYMENT_RECEIVED",
-                        "LOAN_REPAYMENT_MADE",
-                    ]
-                ),
-                then=Concat(
-                    F("loan__transaction_id"), F("date"), output_field=CharField()
-                ),
-            ),
-            When(
-                schedule_c__isnull=False,
-                then=Concat(
-                    F("transaction_id"),
-                    F("schedule_c__report_coverage_through_date"),
-                    Value("LOAN"),
-                    output_field=CharField(),
-                ),
-            ),
-            default=None,
-            output_field=TextField(),
-        )
 
     def INCURRED_PRIOR_CLAUSE(self):  # noqa: N802
         return Case(
@@ -243,11 +196,9 @@ class TransactionManager(SoftDeleteManager):
                 schedule=self.SCHEDULE_CLAUSE(),
                 date=self.DATE_CLAUSE,
                 amount=self.AMOUNT_CLAUSE,
-                effective_amount=self.EFFECTIVE_AMOUNT_CLAUSE,
                 incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
                 payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
                 payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
-                loan_key=self.LOAN_KEY_CLAUSE(),
                 form_type=self.FORM_TYPE_CLAUSE,
                 name=self.DISPLAY_NAME_CLAUSE,
                 transaction_ptr_id=F("id"),
