@@ -87,42 +87,4 @@ The following events occur for fecfile-web-api and fecfile-web-app independently
 
 ## Additional developer notes
 
-This section covers a few topics we think might help developers after setup.
-
-### Git Secrets
-
-Set up git secrets to protect oneself from committing sensitive information such as passwords to the repository.
-
-- First install AWS git-secret utility in your PATH so it can be run at the command line: https://github.com/awslabs/git-secrets#installing-git-secrets
-- Once you have git-secrets installed, run the fecfile-web-api/install-git-secrets-hook.sh shell script in the root directory of your cloned fecfile-web-api repo to install the pre-commit hooks.
-  NOTE: The pre-commit hook is installed GLOBALLY by default so commits to all cloned repositories on your computer will be scanned for sensitive data. See the comments at the top of the script for local install options.
-- See git-secrets README for more features: https://github.com/awslabs/git-secrets#readme
-
-### Code formatting
-
-[Black](https://github.com/psf/black) is the Python code formatter used on the project.
-
-- Install using `pip install black`.
-- If using vscode, add (or update) the following section of your settings.json to the following so that code is formatted on save:
-
-```
-"[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter",
-    "editor.formatOnSave": true
-}
-```
-
-- To format a specific file or directory manually, use `black <file_or_directory>`
-
-### Commit local code changes to origin daily
-
-As a best practice policy, please commit any feature code changes made during the day to origin each evening before signing off for the day.
-
-### Google-style inline documentation
-
-The project is using the Google Python Style Guide as the baseline to keep code style consistent across project repositories.
-See here for comment style rules: https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
-
-### Snyk security scanning
-
-A Snyk online account has been set up for FEC to monitor the FECFile Online GitHub repositories. The management of vulnerability alerts will be handled as a weekly rotating task performed by a developer.  For more information, consult the Snyk security scannning [wiki page](https://github.com/fecgov/fecfile-web-api/wiki/Snyk-security-scanning).
+See [Additional Developer Notes](https://github.com/fecgov/fecfile-web-api/wiki/Additional-Developer-Notes).
