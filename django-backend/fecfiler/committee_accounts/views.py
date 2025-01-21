@@ -1,4 +1,5 @@
 from uuid import UUID
+import django_filters.rest_framework
 from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins, pagination, status
 from django.contrib.sessions.exceptions import SuspiciousSession
@@ -89,18 +90,48 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         return {**committee_account, **(committee_data or {})}
 
 
+class CommitteeOwnedFilterBackend(filters.BaseFilterBackend):
+    """FilterBackend for mixins using CommitteeOwnedViewMixin
+    Proving a queryset filter
+    """
+
+    def get_committee_uuid(self):
+        committee_uuid = self.request.session["committee_uuid"]
+        if not committee_uuid:
+            raise SuspiciousSession("session has invalid committee_uuid")
+        return committee_uuid
+
+    def get_committee_id(self):
+        committee_id = self.request.session["committee_id"]
+        if not committee_id:
+            raise SuspiciousSession("session has invalid committee_id")
+        return committee_id
+
+    def filter_queryset(self, request, queryset, view):
+        committee_uuid = self.get_committee_uuid()
+        committee_id = self.get_committee_id()
+        logger.info(f'Made it to filter_queryset')
+        structlog.contextvars.bind_contextvars(
+            committee_id=committee_id, committee_uuid=committee_uuid
+        )
+        return queryset.filter(committee_account_id=committee_uuid)
+
 class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
     """ModelViewSet for models using CommitteeOwnedModel
     Inherit this view set to filter the queryset by the user's committee
     """
 
+    filter_backends = [CommitteeOwnedFilterBackend]
+
     def get_queryset(self):
         committee_uuid = self.get_committee_uuid()
         committee_id = self.get_committee_id()
         structlog.contextvars.bind_contextvars(
-            committee_id=committee_id, committee_uuid=committee_id
+            committee_id=committee_id, committee_uuid=committee_uuid
         )
-        return super().get_queryset().filter(committee_account_id=committee_uuid)
+        logger.info(f'Made it to get_queryset')
+        return super().get_queryset()
+        #return super().get_queryset().filter(committee_account_id=committee_uuid)
 
     def get_committee_uuid(self):
         committee_uuid = self.request.session["committee_uuid"]
