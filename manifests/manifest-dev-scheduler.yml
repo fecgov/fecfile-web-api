@@ -17,3 +17,5 @@ applications:
     env:
       DISABLE_COLLECTSTATIC: 1
       DJANGO_SETTINGS_MODULE: fecfiler.settings.production
+      MOCK_EFO: True
+      FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, MOCKED
