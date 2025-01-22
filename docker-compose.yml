@@ -65,7 +65,7 @@ services:
         limits:
           memory: 1G
 
-  celery-beat:
+  scheduler:
     build:
       context: "./"
       dockerfile: "${SCHEDULER_DOCKERFILE:-Scheduler_Dockerfile}"

@@ -7,7 +7,7 @@ applications:
     stack: cflinuxfs4
     buildpacks:
       - python_buildpack
-    command: bin/run-celery-beat.sh
+    command: bin/run-scheduler.sh
     memory: 1G
     services:
       - fecfile-api-rds
