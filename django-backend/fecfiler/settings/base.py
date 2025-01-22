@@ -330,7 +330,7 @@ CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorag
 
 CELERY_BEAT_SCHEDULE = {
     "print-db-stats": {
-        "task": "fecfiler.web_services.summary.tasks.get_database_connections",
+        "task": "fecfiler.devops.tasks.get_database_connections",
         "schedule": 60.0,
         "args": (),
         "options": {
