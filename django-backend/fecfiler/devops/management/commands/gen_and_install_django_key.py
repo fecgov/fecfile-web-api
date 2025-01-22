@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from fecfiler.devops.django_key_utils import gen_and_install_django_key
+from fecfiler.devops.utils.django_key_utils import gen_and_install_django_key
 
 
 class Command(BaseCommand):

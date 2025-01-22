@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from fecfiler.devops.login_dot_gov_cert_utils import install_login_dot_gov_cert
+from fecfiler.devops.utils.login_dot_gov_cert_utils import install_login_dot_gov_cert
 
 
 class Command(BaseCommand):
