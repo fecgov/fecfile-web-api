@@ -1,6 +1,0 @@
-fecfiler.devops.views.get\_redis\_value
-=======================================
-
-.. currentmodule:: fecfiler.devops.views
-
-.. autofunction:: get_redis_value

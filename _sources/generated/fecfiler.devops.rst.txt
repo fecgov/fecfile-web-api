@@ -31,14 +31,10 @@ fecfiler.devops
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.devops.cf_api_utils
-   fecfiler.devops.crypt_utils
-   fecfiler.devops.django_key_utils
-   fecfiler.devops.login_dot_gov_cert_utils
    fecfiler.devops.management
    fecfiler.devops.tasks
-   fecfiler.devops.test_tasks
    fecfiler.devops.tests
    fecfiler.devops.urls
+   fecfiler.devops.utils
    fecfiler.devops.views
 

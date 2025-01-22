@@ -12,16 +12,6 @@ fecfiler.devops.views
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      get_celery_status
-      get_database_status
-      get_redis_value
-      update_status_cache
-   
    
 
    

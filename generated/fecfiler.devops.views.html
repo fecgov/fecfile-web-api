@@ -13,8 +13,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.devops.views.get_celery_status" href="fecfiler.devops.views.get_celery_status.html" />
-    <link rel="prev" title="fecfiler.devops.urls" href="fecfiler.devops.urls.html" />
+    <link rel="next" title="fecfiler.devops.views.SystemStatusViewSet" href="fecfiler.devops.views.SystemStatusViewSet.html" />
+    <link rel="prev" title="fecfiler.devops.utils.redis_utils.set_redis_value" href="fecfiler.devops.utils.redis_utils.set_redis_value.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -34,23 +34,6 @@
             
   <section id="module-fecfiler.devops.views">
 <span id="fecfiler-devops-views"></span><h1>fecfiler.devops.views<a class="headerlink" href="#module-fecfiler.devops.views" title="Link to this heading">¶</a></h1>
-<p class="rubric">Functions</p>
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.devops.views.get_celery_status.html#fecfiler.devops.views.get_celery_status" title="fecfiler.devops.views.get_celery_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_celery_status</span></code></a>()</p></td>
-<td><p>Run a debug task and wait form it to complete (for 30s max) If the task completes, the queue is being circulated</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.devops.views.get_database_status.html#fecfiler.devops.views.get_database_status" title="fecfiler.devops.views.get_database_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_database_status</span></code></a>()</p></td>
-<td><p>Query the pg_stat_activity table to look for our current database.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.devops.views.get_redis_value.html#fecfiler.devops.views.get_redis_value" title="fecfiler.devops.views.get_redis_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_redis_value</span></code></a>(key)</p></td>
-<td><p>Get value from redis and parse the json.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.devops.views.update_status_cache.html#fecfiler.devops.views.update_status_cache" title="fecfiler.devops.views.update_status_cache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_status_cache</span></code></a>(key, method)</p></td>
-<td><p>First set the cache value to an empty dictionary to indicate that the status is being checked.</p></td>
-</tr>
-</tbody>
-</table>
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -87,20 +70,12 @@
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.dcf_importer.html">fecfiler.dcf_importer</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.devops.html">fecfiler.devops</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.cf_api_utils.html">fecfiler.devops.cf_api_utils</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.crypt_utils.html">fecfiler.devops.crypt_utils</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.django_key_utils.html">fecfiler.devops.django_key_utils</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.login_dot_gov_cert_utils.html">fecfiler.devops.login_dot_gov_cert_utils</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.management.html">fecfiler.devops.management</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.tasks.html">fecfiler.devops.tasks</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.test_tasks.html">fecfiler.devops.test_tasks</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.tests.html">fecfiler.devops.tests</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.urls.html">fecfiler.devops.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.utils.html">fecfiler.devops.utils</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.devops.views</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.views.get_celery_status.html">fecfiler.devops.views.get_celery_status</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.views.get_database_status.html">fecfiler.devops.views.get_database_status</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.views.get_redis_value.html">fecfiler.devops.views.get_redis_value</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.views.update_status_cache.html">fecfiler.devops.views.update_status_cache</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.views.SystemStatusViewSet.html">fecfiler.devops.views.SystemStatusViewSet</a></li>
 </ul>
 </li>
@@ -136,8 +111,8 @@
   <li><a href="../api.html">API</a><ul>
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.devops.html">fecfiler.devops</a><ul>
-      <li>Previous: <a href="fecfiler.devops.urls.html" title="previous chapter">fecfiler.devops.urls</a></li>
-      <li>Next: <a href="fecfiler.devops.views.get_celery_status.html" title="next chapter">fecfiler.devops.views.get_celery_status</a></li>
+      <li>Previous: <a href="fecfiler.devops.utils.redis_utils.set_redis_value.html" title="previous chapter">fecfiler.devops.utils.redis_utils.set_redis_value</a></li>
+      <li>Next: <a href="fecfiler.devops.views.SystemStatusViewSet.html" title="next chapter">fecfiler.devops.views.SystemStatusViewSet</a></li>
   </ul></li>
   </ul></li>
   </ul></li>

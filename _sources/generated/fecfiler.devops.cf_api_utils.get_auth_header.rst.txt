@@ -1,6 +1,0 @@
-fecfiler.devops.cf\_api\_utils.get\_auth\_header
-================================================
-
-.. currentmodule:: fecfiler.devops.cf_api_utils
-
-.. autofunction:: get_auth_header

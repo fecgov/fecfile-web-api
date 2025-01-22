@@ -1,0 +1,6 @@
+fecfiler.devops.utils.crypt\_utils.x509\_cert\_to\_bytes
+========================================================
+
+.. currentmodule:: fecfiler.devops.utils.crypt_utils
+
+.. autofunction:: x509_cert_to_bytes

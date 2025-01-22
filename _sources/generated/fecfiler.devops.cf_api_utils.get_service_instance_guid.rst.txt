@@ -1,6 +1,0 @@
-fecfiler.devops.cf\_api\_utils.get\_service\_instance\_guid
-===========================================================
-
-.. currentmodule:: fecfiler.devops.cf_api_utils
-
-.. autofunction:: get_service_instance_guid

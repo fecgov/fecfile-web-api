@@ -55,6 +55,7 @@ fecfiler.devops.views.SystemStatusViewSet
       ~SystemStatusViewSet.permission_denied
       ~SystemStatusViewSet.raise_uncaught_exception
       ~SystemStatusViewSet.reverse_action
+      ~SystemStatusViewSet.scheduler_status
       ~SystemStatusViewSet.setup
       ~SystemStatusViewSet.throttled
    

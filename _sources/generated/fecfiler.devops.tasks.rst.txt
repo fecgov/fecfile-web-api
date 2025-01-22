@@ -12,6 +12,14 @@ fecfiler.devops.tasks
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      get_celery_status
+      get_database_status
+   
    
 
    
