@@ -17,13 +17,12 @@ from .web_service_storage import get_file
 from .models import DotFEC, UploadSubmission, WebPrintSubmission
 from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
 from celery.result import AsyncResult
-from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
-class WebServicesViewSet(CommitteeOwnedViewMixin, viewsets.ViewSet):
+class WebServicesViewSet(viewsets.ViewSet):
     """
     A viewset that provides actions to start web service tasks and
     retrieve thier statuses and results

@@ -236,6 +236,7 @@ class CommitteeViewSetTest(TestCase):
             "SystemStatusViewSet",
             "SummaryViewSet",
             "FeedbackViewSet",
+            "WebServicesViewSet",
         ]
         routers = get_all_routers()
         missing_mixin = []
