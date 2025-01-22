@@ -114,6 +114,7 @@ fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
       ~CommitteeAccountTestCase.subTest
       ~CommitteeAccountTestCase.tearDown
       ~CommitteeAccountTestCase.tearDownClass
+      ~CommitteeAccountTestCase.test_all_models_include_committee_owned_mixin
       ~CommitteeAccountTestCase.test_get_contact
       ~CommitteeAccountTestCase.test_save_and_delete
    

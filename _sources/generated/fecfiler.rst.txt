@@ -43,6 +43,7 @@ fecfiler
    fecfiler.mock_oidc_provider
    fecfiler.oidc
    fecfiler.reports
+   fecfiler.routers
    fecfiler.s3
    fecfiler.settings
    fecfiler.shared

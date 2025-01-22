@@ -37,7 +37,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.reports.views.ReportViewMixin">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.reports.views.</span></span><span class="sig-name descname"><span class="pre">ReportViewMixin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.reports.views.ReportViewMixin" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericViewSet</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin.html#fecfiler.committee_accounts.views.CommitteeOwnedViewMixin" title="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommitteeOwnedViewMixin</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">GenericViewSet</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.reports.views.ReportViewMixin.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.reports.views.ReportViewMixin.__init__" title="Link to this definition">¶</a></dt>
@@ -80,6 +80,12 @@ keyword arguments, and other things.</p>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.get_authenticators" title="fecfiler.reports.views.ReportViewMixin.get_authenticators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticators</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of authenticators that this view can use.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_id</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_uuid</span></code>()</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.get_content_negotiator" title="fecfiler.reports.views.ReportViewMixin.get_content_negotiator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_content_negotiator</span></code></a>()</p></td>
 <td><p>Instantiate and return the content negotiation class to use.</p></td>
@@ -153,31 +159,34 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.initialize_request" title="fecfiler.reports.views.ReportViewMixin.initialize_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_request</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Set the <cite>.action</cite> attribute on the view, depending on the request method.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.options" title="fecfiler.reports.views.ReportViewMixin.options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code></a>(request, *args, **kwargs)</p></td>
-<td><p>Handler method for HTTP 'OPTIONS' request.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.paginate_queryset" title="fecfiler.reports.views.ReportViewMixin.paginate_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paginate_queryset</span></code></a>(queryset)</p></td>
-<td><p>Return a single page of results, or <cite>None</cite> if pagination is disabled.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.perform_authentication" title="fecfiler.reports.views.ReportViewMixin.perform_authentication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_authentication</span></code></a>(request)</p></td>
-<td><p>Perform authentication on the incoming request.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.perform_content_negotiation" title="fecfiler.reports.views.ReportViewMixin.perform_content_negotiation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_content_negotiation</span></code></a>(request[, force])</p></td>
-<td><p>Determine which renderer and media type to use render the response.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.permission_denied" title="fecfiler.reports.views.ReportViewMixin.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
-<td><p>If request is not permitted, determine what kind of exception to raise.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>(request, *args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.reverse_action" title="fecfiler.reports.views.ReportViewMixin.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.options" title="fecfiler.reports.views.ReportViewMixin.options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p>Handler method for HTTP 'OPTIONS' request.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.paginate_queryset" title="fecfiler.reports.views.ReportViewMixin.paginate_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">paginate_queryset</span></code></a>(queryset)</p></td>
+<td><p>Return a single page of results, or <cite>None</cite> if pagination is disabled.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.perform_authentication" title="fecfiler.reports.views.ReportViewMixin.perform_authentication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_authentication</span></code></a>(request)</p></td>
+<td><p>Perform authentication on the incoming request.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.perform_content_negotiation" title="fecfiler.reports.views.ReportViewMixin.perform_content_negotiation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_content_negotiation</span></code></a>(request[, force])</p></td>
+<td><p>Determine which renderer and media type to use render the response.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.permission_denied" title="fecfiler.reports.views.ReportViewMixin.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
+<td><p>If request is not permitted, determine what kind of exception to raise.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.reverse_action" title="fecfiler.reports.views.ReportViewMixin.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
 <td><p>Reverse the action for the given <cite>url_name</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.setup" title="fecfiler.reports.views.ReportViewMixin.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.setup" title="fecfiler.reports.views.ReportViewMixin.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Initialize attributes shared by all view methods.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.throttled" title="fecfiler.reports.views.ReportViewMixin.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.views.ReportViewMixin.throttled" title="fecfiler.reports.views.ReportViewMixin.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
 <td><p>If request is throttled, determine what kind of exception to raise.</p></td>
 </tr>
 </tbody>
@@ -669,6 +678,7 @@ will instead be performed lazily, the first time either
 </li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.routers.html">fecfiler.routers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.s3.html">fecfiler.s3</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.shared.html">fecfiler.shared</a></li>

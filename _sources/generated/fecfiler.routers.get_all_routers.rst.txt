@@ -1,0 +1,6 @@
+fecfiler.routers.get\_all\_routers
+==================================
+
+.. currentmodule:: fecfiler.routers
+
+.. autofunction:: get_all_routers

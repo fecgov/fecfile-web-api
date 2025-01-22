@@ -30,6 +30,8 @@ fecfiler.reports.views.ReportViewMixin
       ~ReportViewMixin.finalize_response
       ~ReportViewMixin.get_authenticate_header
       ~ReportViewMixin.get_authenticators
+      ~ReportViewMixin.get_committee_id
+      ~ReportViewMixin.get_committee_uuid
       ~ReportViewMixin.get_content_negotiator
       ~ReportViewMixin.get_exception_handler
       ~ReportViewMixin.get_exception_handler_context
@@ -54,6 +56,7 @@ fecfiler.reports.views.ReportViewMixin
       ~ReportViewMixin.http_method_not_allowed
       ~ReportViewMixin.initial
       ~ReportViewMixin.initialize_request
+      ~ReportViewMixin.list
       ~ReportViewMixin.options
       ~ReportViewMixin.paginate_queryset
       ~ReportViewMixin.perform_authentication

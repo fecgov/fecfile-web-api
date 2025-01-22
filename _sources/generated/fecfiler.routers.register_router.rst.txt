@@ -1,0 +1,6 @@
+fecfiler.routers.register\_router
+=================================
+
+.. currentmodule:: fecfiler.routers
+
+.. autofunction:: register_router
