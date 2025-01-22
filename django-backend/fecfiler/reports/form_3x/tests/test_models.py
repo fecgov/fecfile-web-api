@@ -1,7 +1,6 @@
 from django.test import TestCase
 from ..models import Form3X
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 
 
@@ -9,7 +8,6 @@ class F3XTestCase(TestCase):
 
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
         self.q1_report = create_form3x(
             self.committee,
             "2024-01-01",

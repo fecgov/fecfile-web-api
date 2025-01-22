@@ -2,7 +2,6 @@ from django.test import TestCase
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.reports.models import Report, Form24, Form3X
 from fecfiler.reports.tests.utils import create_form3x, create_form24
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.tests.utils import create_ie
 from fecfiler.contacts.models import Contact
@@ -17,7 +16,6 @@ class ReportModelTestCase(TestCase):
     def setUp(self):
         self.missing_type_transaction = {}
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
         self.f24_report = create_form24(self.committee)
         self.f3x_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.contact_1 = Contact.objects.create(committee_account_id=self.committee.id)

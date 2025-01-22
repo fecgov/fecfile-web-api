@@ -1,4 +1,4 @@
-from fecfiler.transactions.models import get_read_model, Transaction
+from fecfiler.transactions.models import Transaction
 from django.forms.models import model_to_dict
 from fecfiler.utils import save_copy
 from django.db.models import Q
@@ -29,13 +29,12 @@ def add_schedule_d_contact_fields(instance, representation=None):
 
 def carry_forward_debts(report):
     if report.previous_report:
-        debts_to_carry_forward = get_read_model(
-            report.committee_account.id
-        ).objects.filter(
+        debts_to_carry_forward = Transaction.objects.transaction_view().filter(
             ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
             ~Q(memo_code=True),
             reports=report.previous_report,
             schedule_d_id__isnull=False,
+            committee_account__id=report.committee_account.id,
         )
 
         for debt in debts_to_carry_forward:
