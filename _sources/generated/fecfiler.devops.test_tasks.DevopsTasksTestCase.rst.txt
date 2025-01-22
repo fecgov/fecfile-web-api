@@ -1,0 +1,135 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.devops.test\_tasks.DevopsTasksTestCase
+===============================================
+
+.. currentmodule:: fecfiler.devops.test_tasks
+
+.. autoclass:: DevopsTasksTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DevopsTasksTestCase.__init__
+      ~DevopsTasksTestCase.addClassCleanup
+      ~DevopsTasksTestCase.addCleanup
+      ~DevopsTasksTestCase.addTypeEqualityFunc
+      ~DevopsTasksTestCase.assertAlmostEqual
+      ~DevopsTasksTestCase.assertAlmostEquals
+      ~DevopsTasksTestCase.assertContains
+      ~DevopsTasksTestCase.assertCountEqual
+      ~DevopsTasksTestCase.assertDictContainsSubset
+      ~DevopsTasksTestCase.assertDictEqual
+      ~DevopsTasksTestCase.assertEqual
+      ~DevopsTasksTestCase.assertEquals
+      ~DevopsTasksTestCase.assertFalse
+      ~DevopsTasksTestCase.assertFieldOutput
+      ~DevopsTasksTestCase.assertFormError
+      ~DevopsTasksTestCase.assertFormSetError
+      ~DevopsTasksTestCase.assertGreater
+      ~DevopsTasksTestCase.assertGreaterEqual
+      ~DevopsTasksTestCase.assertHTMLEqual
+      ~DevopsTasksTestCase.assertHTMLNotEqual
+      ~DevopsTasksTestCase.assertIn
+      ~DevopsTasksTestCase.assertInHTML
+      ~DevopsTasksTestCase.assertIs
+      ~DevopsTasksTestCase.assertIsInstance
+      ~DevopsTasksTestCase.assertIsNone
+      ~DevopsTasksTestCase.assertIsNot
+      ~DevopsTasksTestCase.assertIsNotNone
+      ~DevopsTasksTestCase.assertJSONEqual
+      ~DevopsTasksTestCase.assertJSONNotEqual
+      ~DevopsTasksTestCase.assertLess
+      ~DevopsTasksTestCase.assertLessEqual
+      ~DevopsTasksTestCase.assertListEqual
+      ~DevopsTasksTestCase.assertLogs
+      ~DevopsTasksTestCase.assertMultiLineEqual
+      ~DevopsTasksTestCase.assertNoLogs
+      ~DevopsTasksTestCase.assertNotAlmostEqual
+      ~DevopsTasksTestCase.assertNotAlmostEquals
+      ~DevopsTasksTestCase.assertNotContains
+      ~DevopsTasksTestCase.assertNotEqual
+      ~DevopsTasksTestCase.assertNotEquals
+      ~DevopsTasksTestCase.assertNotIn
+      ~DevopsTasksTestCase.assertNotInHTML
+      ~DevopsTasksTestCase.assertNotIsInstance
+      ~DevopsTasksTestCase.assertNotRegex
+      ~DevopsTasksTestCase.assertNotRegexpMatches
+      ~DevopsTasksTestCase.assertNumQueries
+      ~DevopsTasksTestCase.assertQuerySetEqual
+      ~DevopsTasksTestCase.assertRaises
+      ~DevopsTasksTestCase.assertRaisesMessage
+      ~DevopsTasksTestCase.assertRaisesRegex
+      ~DevopsTasksTestCase.assertRaisesRegexp
+      ~DevopsTasksTestCase.assertRedirects
+      ~DevopsTasksTestCase.assertRegex
+      ~DevopsTasksTestCase.assertRegexpMatches
+      ~DevopsTasksTestCase.assertSequenceEqual
+      ~DevopsTasksTestCase.assertSetEqual
+      ~DevopsTasksTestCase.assertTemplateNotUsed
+      ~DevopsTasksTestCase.assertTemplateUsed
+      ~DevopsTasksTestCase.assertTrue
+      ~DevopsTasksTestCase.assertTupleEqual
+      ~DevopsTasksTestCase.assertURLEqual
+      ~DevopsTasksTestCase.assertWarns
+      ~DevopsTasksTestCase.assertWarnsMessage
+      ~DevopsTasksTestCase.assertWarnsRegex
+      ~DevopsTasksTestCase.assertXMLEqual
+      ~DevopsTasksTestCase.assertXMLNotEqual
+      ~DevopsTasksTestCase.assert_
+      ~DevopsTasksTestCase.captureOnCommitCallbacks
+      ~DevopsTasksTestCase.countTestCases
+      ~DevopsTasksTestCase.debug
+      ~DevopsTasksTestCase.defaultTestResult
+      ~DevopsTasksTestCase.doClassCleanups
+      ~DevopsTasksTestCase.doCleanups
+      ~DevopsTasksTestCase.ensure_connection_patch_method
+      ~DevopsTasksTestCase.enterClassContext
+      ~DevopsTasksTestCase.fail
+      ~DevopsTasksTestCase.failIf
+      ~DevopsTasksTestCase.failIfAlmostEqual
+      ~DevopsTasksTestCase.failIfEqual
+      ~DevopsTasksTestCase.failUnless
+      ~DevopsTasksTestCase.failUnlessAlmostEqual
+      ~DevopsTasksTestCase.failUnlessEqual
+      ~DevopsTasksTestCase.failUnlessRaises
+      ~DevopsTasksTestCase.id
+      ~DevopsTasksTestCase.modify_settings
+      ~DevopsTasksTestCase.run
+      ~DevopsTasksTestCase.setUp
+      ~DevopsTasksTestCase.setUpClass
+      ~DevopsTasksTestCase.setUpTestData
+      ~DevopsTasksTestCase.settings
+      ~DevopsTasksTestCase.shortDescription
+      ~DevopsTasksTestCase.skipTest
+      ~DevopsTasksTestCase.subTest
+      ~DevopsTasksTestCase.tearDown
+      ~DevopsTasksTestCase.tearDownClass
+      ~DevopsTasksTestCase.test_get_database_connections
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DevopsTasksTestCase.available_apps
+      ~DevopsTasksTestCase.databases
+      ~DevopsTasksTestCase.fixtures
+      ~DevopsTasksTestCase.longMessage
+      ~DevopsTasksTestCase.maxDiff
+      ~DevopsTasksTestCase.reset_sequences
+      ~DevopsTasksTestCase.serialized_rollback
+   
+   

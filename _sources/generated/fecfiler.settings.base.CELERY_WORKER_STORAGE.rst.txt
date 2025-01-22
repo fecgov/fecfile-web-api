@@ -1,6 +1,0 @@
-fecfiler.settings.base.CELERY\_WORKER\_STORAGE
-==============================================
-
-.. currentmodule:: fecfiler.settings.base
-
-.. autodata:: CELERY_WORKER_STORAGE
