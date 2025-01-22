@@ -129,8 +129,6 @@ jobs:
           key: v1-sonarcloud-scanner-5.0.1.3006
           paths: /tmp/cache/scanner
 
-
-
   deploy-job:
     docker:
       - image: cimg/python:3.10
