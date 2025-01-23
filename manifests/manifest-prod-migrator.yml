@@ -12,6 +12,7 @@ applications:
       - fecfile-api-s3
       - fecfile-api-redis
       - fecfile-api-creds-prod
+    no-route: true
     env:
       DISABLE_COLLECTSTATIC: 1
       DJANGO_SETTINGS_MODULE: fecfiler.settings.production
