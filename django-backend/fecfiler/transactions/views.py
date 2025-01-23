@@ -1,4 +1,4 @@
-from django.db import transaction as db_transaction
+from django.db import transaction as db_transaction, models
 from rest_framework import pagination
 from rest_framework.filters import OrderingFilter
 
@@ -245,6 +245,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def save_transaction(self, transaction_data, request):
+        prior_expenditure_amount = None
         committee_id = request.session["committee_uuid"]
         report_ids = transaction_data.pop("report_ids", [])
         children = transaction_data.pop("children", [])
@@ -269,6 +270,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             schedule_serializer = SCHEDULE_SERIALIZERS.get(schedule)(
                 transaction_instance.get_schedule(), data=transaction_data
             )
+            if transaction_instance.schedule_b is not None:
+                prior_expenditure_amount = (
+                    transaction_instance.schedule_b.expenditure_amount
+                )
         else:
             transaction_serializer = TransactionSerializer(
                 data=transaction_data, context={"request": request}
@@ -348,7 +353,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         children and grandchildren transactions with any changes to the committee name
         """
         update_dependent_children(transaction_instance)
-
+        delete_carried_forward_loans_if_needed(
+            transaction_instance, committee_id, prior_expenditure_amount
+        )
         return self.queryset.get(id=transaction_instance.id)
 
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
@@ -435,3 +442,36 @@ def stringify_queryset(qs):
         s = cursor.mogrify(sql, params)
     conn.close()
     return s
+
+
+def delete_carried_forward_loans_if_needed(
+    transaction: Transaction, committee_id, prior_expenditure_amount=None
+):
+    if (
+        transaction.schedule_b is not None
+        and transaction.transaction_type_identifier == "LOAN_REPAYMENT_MADE"
+        and (
+            prior_expenditure_amount is None
+            or transaction.schedule_b.expenditure_amount != prior_expenditure_amount
+        )
+    ):
+        current_loan_read_model_dict = (
+            get_read_model(committee_id)
+            .objects.values("loan_balance", "loan_id", "id")
+            .get(pk=transaction.loan_id)
+        )
+        current_loan_balance = current_loan_read_model_dict["loan_balance"]
+        original_loan_id = current_loan_read_model_dict.get(
+            "loan_id", current_loan_read_model_dict.get("id")
+        )
+        if current_loan_balance == 0:
+            current_report = transaction.reports.filter(form_3x__isnull=False).first()
+            future_reports = current_report.get_future_in_progress_reports()
+            transactions_to_delete = list(
+                Transaction.objects.filter(
+                    loan_id=original_loan_id,
+                    reports__id__in=models.Subquery(future_reports.values("id")),
+                )
+            )
+            for transaction_to_delete in transactions_to_delete:
+                transaction_to_delete.delete()

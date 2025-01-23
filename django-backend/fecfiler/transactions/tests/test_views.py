@@ -706,10 +706,6 @@ class TransactionViewsTestCase(TestCase):
             "2025-04-03",
             750.00,
         )
-        print(
-            "===================== "
-            + json.dumps(test_q2_final_loan_repayment, default=str)
-        )
         response = TransactionViewSet().create(
             self.post_request(test_q2_final_loan_repayment)
         )
@@ -720,11 +716,11 @@ class TransactionViewsTestCase(TestCase):
             .loan_balance,
             0.00,
         )
-        self.assertEqual(
-            get_read_model(self.committee.id)
-            .objects.get(pk=test_q3_carried_over_loan.id)
-            .deleted,
-            True,
+        self.assertIsNotNone(
+            Transaction.all_objects.get(pk=test_q3_carried_over_loan.id).deleted
+        )
+        self.assertIsNone(
+            Transaction.all_objects.get(pk=test_q2_carried_over_loan.id).deleted
         )
 
     def create_loan_repayment_payload(
