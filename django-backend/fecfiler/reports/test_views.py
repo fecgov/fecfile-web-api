@@ -6,7 +6,6 @@ from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 import structlog
 
@@ -17,7 +16,6 @@ class CommitteeMemberViewSetTest(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.user = User.objects.create(email="test@fec.gov", username="gov")
-        create_committee_view(self.committee.id)
         self.factory = RequestFactory()
 
     def test_list_paginated(self):

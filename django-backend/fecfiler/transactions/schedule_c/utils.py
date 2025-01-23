@@ -1,4 +1,4 @@
-from fecfiler.transactions.models import get_read_model, Transaction
+from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_c2.utils import carry_forward_guarantor
 from django.forms.models import model_to_dict
 from fecfiler.utils import save_copy
@@ -41,13 +41,12 @@ def add_schedule_c_contact_fields(instance, representation=None):
 
 def carry_forward_loans(report):
     if report.previous_report:
-        loans_to_carry_forward = get_read_model(
-            report.committee_account.id
-        ).objects.filter(
+        loans_to_carry_forward = Transaction.objects.transaction_view().filter(
             ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
             ~Q(memo_code=True),
             reports=report.previous_report,
             schedule_c_id__isnull=False,
+            committee_account__id=report.committee_account.id,
         )
 
         for loan in loans_to_carry_forward:

@@ -5,7 +5,6 @@ from rest_framework.test import force_authenticate
 from fecfiler.web_services.views import WebServicesViewSet
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.cash_on_hand.tests.utils import create_cash_on_hand_yearly
 from fecfiler.reports.tests.utils import (
     create_form3x,
@@ -24,7 +23,6 @@ class WebServicesViewSetTest(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.user = User.objects.create(email="test@fec.gov", username="gov")
-        create_committee_view(self.committee.id)
         self.committee.members.add(self.user)
         self.factory = RequestFactory()
         self.view = WebServicesViewSet()

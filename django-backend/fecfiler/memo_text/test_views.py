@@ -4,7 +4,6 @@ from fecfiler.memo_text.models import MemoText
 from rest_framework.test import APIClient
 from .views import MemoTextViewSet
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 
 
@@ -13,7 +12,6 @@ class MemoTextViewSetTest(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.user = User.objects.create(email="test@fec.gov", username="gov")
-        create_committee_view(self.committee.id)
         self.q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.factory = RequestFactory()
 
@@ -97,7 +95,6 @@ class MemoTextViewSetTest(TestCase):
 
     def test_cannot_get_other_committee_memos(self):
         committee2 = CommitteeAccount.objects.create(committee_id="C00000001")
-        create_committee_view(committee2.id)
         request = self.factory.get(f"/api/v1/memo-text/?report_id={self.q1_report.id}")
         request.user = self.user
         request.session = {

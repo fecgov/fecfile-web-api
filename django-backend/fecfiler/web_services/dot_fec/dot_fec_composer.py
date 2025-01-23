@@ -1,7 +1,7 @@
 from decimal import Decimal
 from fecfiler.memo_text.models import MemoText
 from fecfiler.reports.models import Report
-from fecfiler.transactions.models import get_read_model
+from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.managers import Schedule
 from django.core.exceptions import ObjectDoesNotExist
 from .dot_fec_serializer import serialize_instance, CRLF_STR
@@ -33,8 +33,10 @@ def compose_report(report_id):
 
 def compose_transactions(report_id):
     report = Report.objects.get(id=report_id)
-    transaction_view_model = get_read_model(report.committee_account_id)
-    transactions = transaction_view_model.objects.filter(reports__id=report_id)
+    transactions = Transaction.objects.transaction_view().filter(
+        reports__id=report_id,
+        committee_account__id=report.committee_account.id,
+    )
     if transactions.exists():
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""

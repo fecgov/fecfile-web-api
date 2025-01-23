@@ -329,6 +329,5 @@ class OIDCAuthenticationBackendTestCase(TestCase):
 
         auth_request = RequestFactory().get("/foo", {"code": test_code, "state": "bar"})
 
-        self.backend.UserModel.objects.create_user = Mock()
         retval = self.backend.authenticate(request=auth_request, nonce=test_nonce_value)
         self.assertIsNotNone(retval)

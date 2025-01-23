@@ -17,7 +17,6 @@ from fecfiler.transactions.models import (
     Transaction,
     SCHEDULE_TO_TABLE,
     Schedule,
-    get_read_model,
 )
 from fecfiler.transactions.serializers import (
     TransactionSerializer,
@@ -102,8 +101,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             queryset = super().get_queryset()
         else:  # Otherwise, use the view for reading
             committee_uuid = self.get_committee_uuid()
-            model = get_read_model(committee_uuid)
-            queryset = model.objects
+            queryset = Transaction.objects.transaction_view().filter(
+                committee_account__id=committee_uuid
+            )
 
         report_id = (
             (

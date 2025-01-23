@@ -2,7 +2,6 @@ from django.test import TestCase
 from ..models import CashOnHandYearly
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.web_services.summary.tasks import CalculationState
 from fecfiler.reports.models import Report
 
@@ -11,7 +10,6 @@ class CashOnHandYearlyTestCase(TestCase):
 
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
 
     def test_calcualtion_status_flag(self):
         f3x1 = create_form3x(
