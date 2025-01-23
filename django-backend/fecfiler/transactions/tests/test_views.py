@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.test import TestCase
 from django.test.client import RequestFactory
 from rest_framework import status
+from rest_framework.request import HttpRequest, Request
 from rest_framework.test import force_authenticate
 from fecfiler.user.models import User
 from fecfiler.reports.models import Report
@@ -9,6 +10,7 @@ import json
 from copy import deepcopy
 from fecfiler.transactions.views import TransactionViewSet, TransactionOrderingFilter
 from fecfiler.transactions.models import Transaction, get_read_model
+from fecfiler.transactions.serializers import TransactionSerializer
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
@@ -122,6 +124,13 @@ class TransactionViewsTestCase(TestCase):
             self.committee.id,
         )
 
+        self.mock_request = Request(HttpRequest())
+        self.mock_request.user = self.user
+        self.mock_request.session = {
+            "committee_uuid": str(self.committee.id),
+            "committee_id": str(self.committee.committee_id),
+        }
+
     def create_trans_from_data(self, receipt_data):
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -137,7 +146,7 @@ class TransactionViewsTestCase(TestCase):
     def post_request(self, payload, params={}):
         request = self.factory.post(
             "/api/v1/transactions",
-            json.dumps(payload),
+            json.dumps(payload, default=str),
             content_type=self.json_content_type,
         )
         request.user = self.user
@@ -475,87 +484,6 @@ class TransactionViewsTestCase(TestCase):
             report_coverage_from_date,
         )
 
-    def test_delete_carried_forward_loans_on_repayment(self):
-        """Paying off a loan in one report should delete any carried forward
-        copies in future reports"""
-        # create q1 and associated loan
-        test_q1_report_2025 = create_form3x(
-            self.committee, "2025-01-01", "2025-03-31", {}
-        )
-        test_loan = create_loan(
-            self.committee,
-            self.test_ind_contact,
-            "1000.00",
-            "2025-12-31",
-            "6%",
-            form_type="SC/10",
-            loan_incurred_date="2025-01-01",
-            report=test_q1_report_2025,
-        )
-        create_schedule_b(
-            "LOAN_REPAYMENT_MADE",
-            self.committee,
-            self.test_ind_contact,
-            "2025-01-02",
-            "100.00",
-            loan_id=test_loan.id,
-            report=test_q1_report_2025,
-        )
-
-        # create q2 and confirm loan carry forward
-        test_q2_report_2025 = create_form3x(
-            self.committee, "2025-04-01", "2025-06-30", {}
-        )
-        test_q2_carried_over_loan = (
-            get_read_model(self.committee.id)
-            .objects.filter(reports__id=test_q2_report_2025.id, loan_id=test_loan.id)
-            .get()
-        )
-        self.assertEqual(test_q2_carried_over_loan.loan_balance, 900.00)
-
-        # create q3 and confirm loan carry forward
-        create_schedule_b(
-            "LOAN_REPAYMENT_MADE",
-            self.committee,
-            self.test_ind_contact,
-            "2025-04-02",
-            "150.00",
-            loan_id=test_q2_carried_over_loan.id,
-            report=test_q2_report_2025,
-        )
-        test_q3_report_2025 = create_form3x(
-            self.committee, "2025-07-01", "2025-09-30", {}
-        )
-        test_q3_carried_over_loan = (
-            get_read_model(self.committee.id)
-            .objects.filter(reports__id=test_q3_report_2025.id, loan_id=test_loan.id)
-            .get()
-        )
-        self.assertEqual(test_q3_carried_over_loan.loan_balance, 750.00)
-
-        # pay off loan on q2 and q3 carry foward loan deleted
-        create_schedule_b(
-            "LOAN_REPAYMENT_MADE",
-            self.committee,
-            self.test_ind_contact,
-            "2025-04-03",
-            "750.00",
-            loan_id=test_q2_carried_over_loan.id,
-            report=test_q2_report_2025,
-        )
-        self.assertEqual(
-            get_read_model(self.committee.id)
-            .objects.get(pk=test_q2_carried_over_loan.id)
-            .loan_balance,
-            0.00,
-        )
-        self.assertEqual(
-            get_read_model(self.committee.id)
-            .objects.get(pk=test_q3_carried_over_loan.id)
-            .deleted,
-            True,
-        )
-
     def xtest_sorting_memo_code(self):
         indiviual_receipt_data = [
             {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo": False},
@@ -707,4 +635,102 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(
             response.data["contribution_purpose_descrip"],
             "JF Memo: None (Partnership attributions do not meet itemization threshold)",
+        )
+
+    def test_delete_carried_forward_loans_on_create_repayment(self):
+        """Paying off a loan in one report should delete any carried forward
+        copies in future reports"""
+        # create q1 and associated loan
+        test_q1_report_2025 = create_form3x(
+            self.committee, "2025-01-01", "2025-03-31", {}
+        )
+        test_loan = create_loan(
+            self.committee,
+            self.test_ind_contact,
+            "1000.00",
+            "2025-12-31",
+            "6%",
+            form_type="SC/10",
+            loan_incurred_date="2025-01-01",
+            report=test_q1_report_2025,
+        )
+        create_schedule_b(
+            "LOAN_REPAYMENT_MADE",
+            self.committee,
+            self.test_ind_contact,
+            "2025-01-02",
+            "100.00",
+            loan_id=test_loan.id,
+            report=test_q1_report_2025,
+        )
+
+        # create q2 and confirm loan carry forward
+        test_q2_report_2025 = create_form3x(
+            self.committee, "2025-04-01", "2025-06-30", {}
+        )
+        test_q2_carried_over_loan = (
+            get_read_model(self.committee.id)
+            .objects.filter(reports__id=test_q2_report_2025.id, loan_id=test_loan.id)
+            .get()
+        )
+        self.assertEqual(test_q2_carried_over_loan.loan_balance, 900.00)
+
+        # create q3 and confirm loan carry forward
+        test_q2_loan_repayment = create_schedule_b(
+            "LOAN_REPAYMENT_MADE",
+            self.committee,
+            self.test_ind_contact,
+            "2025-04-02",
+            "150.00",
+            loan_id=test_q2_carried_over_loan.id,
+            report=test_q2_report_2025,
+        )
+        test_q3_report_2025 = create_form3x(
+            self.committee, "2025-07-01", "2025-09-30", {}
+        )
+        test_q3_carried_over_loan = (
+            get_read_model(self.committee.id)
+            .objects.filter(reports__id=test_q3_report_2025.id, loan_id=test_loan.id)
+            .get()
+        )
+        self.assertEqual(test_q3_carried_over_loan.loan_balance, 750.00)
+
+        # pay off loan on q2 and confirm q3 carry foward loan deleted
+        serializer = TransactionSerializer(
+            context={"request": self.mock_request},
+        )
+        test_q2_loan_repayment_representation = serializer.to_representation(
+            test_q2_loan_repayment
+        )
+        test_q2_final_loan_repayment = deepcopy(self.payloads["LOAN_REPAYMENT_MADE"])
+        test_q2_final_loan_repayment["contact_1"] = test_q2_loan_repayment_representation[
+            "contact_1"
+        ]
+        test_q2_final_loan_repayment["contact_1_id"] = (
+            test_q2_loan_repayment_representation["contact_1_id"]
+        )
+        test_q2_final_loan_repayment["loan"] = test_q2_loan_repayment_representation[
+            "loan"
+        ]
+        test_q2_final_loan_repayment["loan_id"] = test_q2_loan_repayment_representation[
+            "loan_id"
+        ]
+        test_q2_final_loan_repayment["report_ids"] = [str(test_q2_report_2025.id)]
+        test_q2_final_loan_repayment["expenditure_date"] = "2025-04-03"
+        test_q2_final_loan_repayment["expenditure_amount"] = 750.00
+        response = TransactionViewSet().create(
+            self.post_request(test_q2_final_loan_repayment)
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            get_read_model(self.committee.id)
+            .objects.get(pk=test_q2_carried_over_loan.id)
+            .loan_balance,
+            0.00,
+        )
+        self.assertEqual(
+            get_read_model(self.committee.id)
+            .objects.get(pk=test_q3_carried_over_loan.id)
+            .deleted,
+            True,
         )
