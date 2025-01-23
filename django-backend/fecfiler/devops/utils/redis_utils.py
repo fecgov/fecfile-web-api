@@ -19,10 +19,9 @@ def get_redis_value(key):
     return json.loads(value) if value else None
 
 
-def set_redis_value(key, value, age=SYSTEM_STATUS_CACHE_AGE):
+def set_redis_value(key, value, age):
     """
-    Set redis value and parse the json.
-    If they value is falsy ("", None), return None
+    Serialize the value to json and set it in redis with the given age
     """
     redis_instance.set(key, json.dumps(value), ex=age)
 
@@ -34,7 +33,7 @@ def refresh_cache(key, method):
     the result. The empty dictionary value keeps us from checking the status multiple
     times if the cache expires.
     """
-    set_redis_value(key, json.dumps({}))
+    redis_instance.set(key, json.dumps({}), ex=SYSTEM_STATUS_CACHE_AGE)
     status = method()
-    set_redis_value(key, json.dumps(status))
+    redis_instance.set(key, json.dumps(status), ex=SYSTEM_STATUS_CACHE_AGE)
     return status
