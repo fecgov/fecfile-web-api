@@ -2,6 +2,7 @@ from django.db import connection
 from celery import shared_task
 from fecfiler.celery import debug_task
 from .utils.redis_utils import set_redis_value
+from fecfiler.settings import SYSTEM_STATUS_CACHE_AGE
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -44,7 +45,9 @@ def get_database_connections():
 
     results_dict = {"results": dict(zip(column_labels, row)) for row in results}
     logger.info(results_dict)
-    set_redis_value(SCHEDULER_STATUS, {"scheduler_is_running": True})
+    set_redis_value(
+        SCHEDULER_STATUS, {"scheduler_is_running": True}, ex=SYSTEM_STATUS_CACHE_AGE
+    )
 
 
 def get_database_status():

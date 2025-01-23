@@ -19,10 +19,9 @@ def get_redis_value(key):
     return json.loads(value) if value else None
 
 
-def set_redis_value(key, value, age=SYSTEM_STATUS_CACHE_AGE):
+def set_redis_value(key, value, age):
     """
-    Set redis value and parse the json.
-    If they value is falsy ("", None), return None
+    Serialize the value to json and set it in redis with the given age
     """
     redis_instance.set(key, json.dumps(value), ex=age)
 
