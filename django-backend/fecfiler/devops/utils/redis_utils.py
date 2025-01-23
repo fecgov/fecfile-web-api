@@ -34,7 +34,7 @@ def refresh_cache(key, method):
     the result. The empty dictionary value keeps us from checking the status multiple
     times if the cache expires.
     """
-    set_redis_value(key, json.dumps({}))
+    redis_instance.set(key, json.dumps({}), ex=SYSTEM_STATUS_CACHE_AGE)
     status = method()
-    set_redis_value(key, json.dumps(status))
+    redis_instance.set(key, json.dumps(status), ex=SYSTEM_STATUS_CACHE_AGE)
     return status
