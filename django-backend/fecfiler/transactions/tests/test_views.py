@@ -10,7 +10,6 @@ import json
 from copy import deepcopy
 from fecfiler.transactions.views import TransactionViewSet, TransactionOrderingFilter
 from fecfiler.transactions.models import Transaction, get_read_model
-from fecfiler.transactions.serializers import TransactionSerializer
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
@@ -26,6 +25,7 @@ from fecfiler.transactions.tests.utils import (
     create_loan,
     create_ie,
 )
+from fecfiler.transactions.serializers import TransactionSerializer
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -130,6 +130,10 @@ class TransactionViewsTestCase(TestCase):
             "committee_uuid": str(self.committee.id),
             "committee_id": str(self.committee.committee_id),
         }
+
+        self.transaction_serializer = TransactionSerializer(
+            context={"request": self.mock_request},
+        )
 
     def create_trans_from_data(self, receipt_data):
         create_schedule_a(
@@ -676,7 +680,7 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(test_q2_carried_over_loan.loan_balance, 900.00)
 
         # create q3 and confirm loan carry forward
-        test_q2_loan_repayment = create_schedule_b(
+        create_schedule_b(
             "LOAN_REPAYMENT_MADE",
             self.committee,
             self.test_ind_contact,
@@ -696,28 +700,16 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(test_q3_carried_over_loan.loan_balance, 750.00)
 
         # pay off loan on q2 and confirm q3 carry foward loan deleted
-        serializer = TransactionSerializer(
-            context={"request": self.mock_request},
+        test_q2_final_loan_repayment = self.create_loan_repayment_payload(
+            test_q2_carried_over_loan,
+            test_q2_report_2025,
+            "2025-04-03",
+            750.00,
         )
-        test_q2_loan_repayment_representation = serializer.to_representation(
-            test_q2_loan_repayment
+        print(
+            "===================== "
+            + json.dumps(test_q2_final_loan_repayment, default=str)
         )
-        test_q2_final_loan_repayment = deepcopy(self.payloads["LOAN_REPAYMENT_MADE"])
-        test_q2_final_loan_repayment["contact_1"] = test_q2_loan_repayment_representation[
-            "contact_1"
-        ]
-        test_q2_final_loan_repayment["contact_1_id"] = (
-            test_q2_loan_repayment_representation["contact_1_id"]
-        )
-        test_q2_final_loan_repayment["loan"] = test_q2_loan_repayment_representation[
-            "loan"
-        ]
-        test_q2_final_loan_repayment["loan_id"] = test_q2_loan_repayment_representation[
-            "loan_id"
-        ]
-        test_q2_final_loan_repayment["report_ids"] = [str(test_q2_report_2025.id)]
-        test_q2_final_loan_repayment["expenditure_date"] = "2025-04-03"
-        test_q2_final_loan_repayment["expenditure_amount"] = 750.00
         response = TransactionViewSet().create(
             self.post_request(test_q2_final_loan_repayment)
         )
@@ -734,3 +726,21 @@ class TransactionViewsTestCase(TestCase):
             .deleted,
             True,
         )
+
+    def create_loan_repayment_payload(
+        self,
+        loan: Transaction,
+        report: Report,
+        repayment_date: str,
+        repayment_amount: int,
+    ):
+        loan_representation = self.transaction_serializer.to_representation(loan)
+        loan_repayment_payload = deepcopy(self.payloads["LOAN_REPAYMENT_MADE"])
+        loan_repayment_payload["contact_1"] = loan_representation["contact_1"]
+        loan_repayment_payload["contact_1_id"] = loan_representation["contact_1_id"]
+        loan_repayment_payload["loan"] = loan_representation
+        loan_repayment_payload["loan_id"] = loan_representation["id"]
+        loan_repayment_payload["report_ids"] = [str(report.id)]
+        loan_repayment_payload["expenditure_date"] = repayment_date
+        loan_repayment_payload["expenditure_amount"] = repayment_amount
+        return loan_repayment_payload
