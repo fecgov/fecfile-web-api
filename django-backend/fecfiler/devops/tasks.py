@@ -46,7 +46,7 @@ def get_database_connections():
     results_dict = {"results": dict(zip(column_labels, row)) for row in results}
     logger.info(results_dict)
     set_redis_value(
-        SCHEDULER_STATUS, {"scheduler_is_running": True}, ex=SYSTEM_STATUS_CACHE_AGE
+        SCHEDULER_STATUS, {"scheduler_is_running": True}, age=SYSTEM_STATUS_CACHE_AGE
     )
 
 
