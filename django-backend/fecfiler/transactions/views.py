@@ -1,7 +1,6 @@
 from django.db import transaction as db_transaction
 from rest_framework import pagination
 from rest_framework.filters import OrderingFilter
-
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -12,7 +11,7 @@ from fecfiler.transactions.transaction_dependencies import (
     update_dependent_children,
     update_dependent_parent,
 )
-from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
+from fecfiler.filters import CommitteeOwnedFilterBackend
 from fecfiler.transactions.models import (
     Transaction,
     SCHEDULE_TO_TABLE,
@@ -70,7 +69,7 @@ class TransactionOrderingFilter(OrderingFilter):
         return queryset
 
 
-class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
+class TransactionViewSet(ModelViewSet):
     serializer_class = TransactionSerializer
     pagination_class = TransactionListPagination
     filter_backends = [TransactionOrderingFilter]
@@ -90,6 +89,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     ]
     ordering = ["-created"]
     queryset = Transaction.objects
+
+    def get_committee_uuid(self):
+        committee_uuid = self.request.session["committee_uuid"]
+        if not committee_uuid:
+            raise SuspiciousSession("session has invalid committee_uuid")
+        return committee_uuid
 
     def get_queryset(self):
         # Use the table if writing
