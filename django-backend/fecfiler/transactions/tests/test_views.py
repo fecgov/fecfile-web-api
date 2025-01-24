@@ -832,7 +832,7 @@ class TransactionViewsTestCase(TestCase):
         debt_repayment_payload["contact_1"] = debt_representation["contact_1"]
         debt_repayment_payload["contact_1_id"] = debt_representation["contact_1_id"]
         debt_repayment_payload["debt"] = debt_representation
-        debt_repayment_payload["loan_id"] = debt_representation["id"]
+        debt_repayment_payload["debt_id"] = debt_representation["id"]
         debt_repayment_payload["report_ids"] = [str(report.id)]
         debt_repayment_payload["expenditure_date"] = repayment_date
         debt_repayment_payload["expenditure_amount"] = repayment_amount
