@@ -44,6 +44,34 @@ class ReportListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
+class ReportFilterBackend(filters.BaseFilterBackend):
+    """FilterBackend for viewsets using ReportViewSet
+    Proving a queryset filter
+    """
+
+    def get_committee_uuid(selfi, request):
+        committee_uuid = request.session["committee_uuid"]
+        if not committee_uuid:
+            raise SuspiciousSession("session has invalid committee_uuid")
+        return committee_uuid
+
+    def get_committee_id(selfi, request):
+        committee_id = request.session["committee_id"]
+        if not committee_id:
+            raise SuspiciousSession("session has invalid committee_id")
+        return committee_id
+
+    def filter_queryset(self, request, queryset, view):
+        logger.info(f'Made it to filter_queryset')
+        committee_uuid = self.get_committee_uuid(request)
+        committee_id = self.get_committee_id(request)
+        structlog.contextvars.bind_contextvars(
+            committee_id=committee_id, committee_uuid=committee_uuid
+        )
+        logger.info(f'Exiting filter_queryset')
+        return queryset.filter(committee_account_id=committee_uuid)
+
+
 class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
@@ -57,7 +85,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     queryset = Report.objects
     serializer_class = ReportSerializer
     pagination_class = ReportListPagination
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [filters.OrderingFilter, ReportFilterBackend]
     ordering_fields = [
         "report_code_label",
         "coverage_through_date",
