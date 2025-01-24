@@ -2,7 +2,7 @@ from rest_framework import filters, status, pagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
+from fecfiler.filters import CommitteeOwnedFilterBackend
 from .models import Report
 from .report_code_label import report_code_label_case
 from fecfiler.transactions.models import Transaction
@@ -44,34 +44,6 @@ class ReportListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
-class ReportFilterBackend(filters.BaseFilterBackend):
-    """FilterBackend for viewsets using ReportViewSet
-    Proving a queryset filter
-    """
-
-    def get_committee_uuid(self, request):
-        committee_uuid = request.session["committee_uuid"]
-        if not committee_uuid:
-            raise SuspiciousSession("session has invalid committee_uuid")
-        return committee_uuid
-
-    def get_committee_id(self, request):
-        committee_id = request.session["committee_id"]
-        if not committee_id:
-            raise SuspiciousSession("session has invalid committee_id")
-        return committee_id
-
-    def filter_queryset(self, request, queryset, view):
-        logger.info(f'Made it to filter_queryset')
-        committee_uuid = self.get_committee_uuid(request)
-        committee_id = self.get_committee_id(request)
-        structlog.contextvars.bind_contextvars(
-            committee_id=committee_id, committee_uuid=committee_uuid
-        )
-        logger.info(f'Exiting filter_queryset')
-        return queryset.filter(committee_account_id=committee_uuid)
-
-
 class ReportViewSet(ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
@@ -84,7 +56,7 @@ class ReportViewSet(ModelViewSet):
     queryset = Report.objects
     serializer_class = ReportSerializer
     pagination_class = ReportListPagination
-    filter_backends = [filters.OrderingFilter, ReportFilterBackend]
+    filter_backends = [filters.OrderingFilter, CommitteeOwnedFilterBackend]
     ordering_fields = [
         "report_code_label",
         "coverage_through_date",

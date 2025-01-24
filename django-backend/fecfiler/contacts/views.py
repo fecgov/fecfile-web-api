@@ -7,15 +7,13 @@ from django.db.models import CharField, Q, Value
 from django.db.models.functions import Concat, Lower, Coalesce
 from django.http import HttpResponseBadRequest, JsonResponse
 from rest_framework import viewsets, pagination
-from fecfiler.committee_accounts.views import (
-    CommitteeOwnedViewMixin,
-)
 from rest_framework.decorators import action
 from rest_framework import filters, status
 from rest_framework.response import Response
 from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
+from fecfiler.filters import CommitteeOwnedFilterBackend
 import fecfiler.settings as settings
 
 logger = structlog.get_logger(__name__)
@@ -60,19 +58,17 @@ class ContactListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
-class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
+class ContactViewSet(viewsets.ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
+
+    Note that the queryset will be limited by the user's committee
+    via ReportFilterBackend
     """
 
     serializer_class = ContactSerializer
     pagination_class = ContactListPagination
-
-    """Note that this ViewSet inherits from CommitteeOwnedViewMixin
-    The queryset will be further limmited by the user's committee
-    in CommitteeOwnedViewMixin's implementation of get_queryset()
-    """
 
     queryset = Contact.objects.alias(
         sort_name=Concat(
@@ -81,7 +77,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         sort_fec_id=Coalesce("committee_id", "candidate_id"),
     ).all()
 
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [filters.OrderingFilter, CommitteeOwnedFilterBackend]
 
     ordering_fields = [
         "sort_name",
@@ -346,7 +342,6 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
 
 
 class DeletedContactsViewSet(
-    CommitteeOwnedViewMixin,
     mixins.ListModelMixin,
     GenericViewSet,
 ):
@@ -362,7 +357,7 @@ class DeletedContactsViewSet(
         )
         .all()
     )
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [filters.OrderingFilter, CommitteeOwnedFilterBackend]
 
     ordering_fields = [
         "sort_name",
