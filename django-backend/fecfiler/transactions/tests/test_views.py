@@ -185,13 +185,13 @@ class TransactionViewsTestCase(TestCase):
         }
         return request
 
-    def xtest_save_transaction_pair(self):
+    def test_save_transaction_pair(self):
         request = self.post_request(self.payloads["IN_KIND"])
         transaction = TransactionViewSet().save_transaction(request.data, request)
         self.assertEqual("John", transaction.contact_1.first_name)
         self.assertEqual("Smith", transaction.contact_1.last_name)
 
-    def xtest_update(self):
+    def test_update(self):
         request = self.post_request(self.payloads["IN_KIND"])
         transaction = TransactionViewSet().save_transaction(request.data, request)
         updated_payload = deepcopy(self.payloads["IN_KIND"])
@@ -207,7 +207,7 @@ class TransactionViewsTestCase(TestCase):
             updated_transaction.children[0].schedule_b.expenditure_amount, 999
         )
 
-    def xtest_get_queryset(self):
+    def test_get_queryset(self):
         for i in range(8):
             create_schedule_a(
                 "INDIVIDUAL_RECEIPT",
@@ -231,7 +231,7 @@ class TransactionViewsTestCase(TestCase):
         view_set.request = self.post_request({}, {"schedules": ""})
         self.assertEqual(view_set.get_queryset().count(), 0)
 
-    def xtest_get_previous_entity(self):
+    def test_get_previous_entity(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
@@ -263,7 +263,7 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    def xtest_get_previous_election(self):
+    def test_get_previous_election(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request(
@@ -308,7 +308,7 @@ class TransactionViewsTestCase(TestCase):
 
         self.assertEqual(transaction.get("date"), "2023-01-12")
 
-    def xtest_inherited_election_aggregate(self):
+    def test_inherited_election_aggregate(self):
         request = self.factory.get(f"/api/v1/transactions/{self.transaction.id}/")
         request.user = self.user
         request.query_params = {}
@@ -326,7 +326,7 @@ class TransactionViewsTestCase(TestCase):
         logger.debug(transaction)
         self.assertEqual(transaction.get("_calendar_ytd_per_election_office"), "153.00")
 
-    def xtest_reatt_redes_multisave_transactions(self):
+    def test_reatt_redes_multisave_transactions(self):
         txn1 = deepcopy(self.payloads["IN_KIND"])
         txn1["contributor_last_name"] = "one"
         txn2 = deepcopy(self.payloads["IN_KIND"])
@@ -341,7 +341,7 @@ class TransactionViewsTestCase(TestCase):
         transactions = response.data
         self.assertEqual(len(transactions), 2)
 
-    def xtest_add_transaction_to_report(self):
+    def test_add_transaction_to_report(self):
         report_id = str(self.q1_report.id)
         transaction_id = str(self.transaction.id)
 
@@ -376,7 +376,7 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "No report matching id provided")
 
-    def xtest_add_transaction_family_to_report_from_parent(self):
+    def test_add_transaction_family_to_report_from_parent(self):
         jf_transfer = create_schedule_a(
             "JOINT_FUNDRAISING_TRANSFER",
             self.committee,
@@ -409,7 +409,7 @@ class TransactionViewsTestCase(TestCase):
         self.assertIn(self.q2_report, jf_transfer.reports.all())
         self.assertIn(self.q2_report, partnership_jf_transfer_memo.reports.all())
 
-    def xtest_add_transaction_family_to_report_from_child(self):
+    def test_add_transaction_family_to_report_from_child(self):
         jf_transfer = create_schedule_a(
             "JOINT_FUNDRAISING_TRANSFER",
             self.committee,
@@ -442,7 +442,7 @@ class TransactionViewsTestCase(TestCase):
         self.assertIn(self.q2_report, jf_transfer.reports.all())
         self.assertIn(self.q2_report, partnership_jf_transfer_memo.reports.all())
 
-    def xtest_remove_transaction_from_report(self):
+    def test_remove_transaction_from_report(self):
         report_id = str(self.q1_report.id)
         transaction_id = str(self.transaction.id)
 
@@ -475,7 +475,7 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "No report matching id provided")
 
-    def xtest_save_debt(self):
+    def test_save_debt(self):
         payload = self.payloads["DEBT"]
         payload["report_ids"] = [str(self.q1_report.id)]
         view_set = TransactionViewSet()
@@ -489,7 +489,7 @@ class TransactionViewsTestCase(TestCase):
             report_coverage_from_date,
         )
 
-    def xtest_sorting_memo_code(self):
+    def test_sorting_memo_code(self):
         indiviual_receipt_data = [
             {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo": False},
             {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo": None},
@@ -507,7 +507,7 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(ordered_queryset.first().id, memos_sorted.first().id)
 
-    def xtest_sorting_memo_code_inverted(self):
+    def test_sorting_memo_code_inverted(self):
         indiviual_receipt_data = [
             {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo": False},
             {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo": None},
@@ -528,7 +528,7 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(ordered_queryset.first().id, memos_inverted.first().id)
 
-    def xtest_sorting_memos_only_true(self):
+    def test_sorting_memos_only_true(self):
         indiviual_receipt_data = [
             {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo": True},
             {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo": True},
@@ -554,7 +554,7 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(ordered_queryset.first().id, memos_sorted.first().id)
 
-    def xtest_multi_sorting(self):
+    def test_multi_sorting(self):
         indiviual_receipt_data = [
             {"date": "2023-01-01", "amount": "200.00", "group": "GENERAL", "memo": True},
             {"date": "2024-01-01", "amount": "300.00", "group": "GENERAL", "memo": True},
@@ -577,7 +577,7 @@ class TransactionViewsTestCase(TestCase):
         for i in range(ordered_queryset.count()):
             self.assertEqual(ordered_queryset[i].id, memos_sorted[i].id)
 
-    def xtest_destroy(self):
+    def test_destroy(self):
         request = self.delete_request(f"api/v1/transactions/{self.transaction.id}/")
         force_authenticate(request, self.user)
         response = TransactionViewSet.as_view({"delete": "destroy"})(
@@ -586,7 +586,7 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Transaction.objects.filter(pk=self.transaction.pk).exists())
 
-    def xtest_destroy_with_dependent_parent(self):
+    def test_destroy_with_dependent_parent(self):
         jf_transfer = create_schedule_a(
             "JOINT_FUNDRAISING_TRANSFER",
             self.committee,
