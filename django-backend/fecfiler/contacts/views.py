@@ -64,7 +64,7 @@ class ContactViewSet(viewsets.ModelViewSet):
     `update` and `destroy` actions.
 
     Note that the queryset will be limited by the user's committee
-    via ReportFilterBackend
+    via CommitteeOwnedFilterBackend
     """
 
     serializer_class = ContactSerializer
