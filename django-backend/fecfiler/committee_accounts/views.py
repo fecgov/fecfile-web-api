@@ -94,13 +94,14 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
     Inherit this view set to filter the queryset by the user's committee
     """
 
-#    def get_queryset(self):
-#        committee_uuid = self.get_committee_uuid()
-#        committee_id = self.get_committee_id()
-#        structlog.contextvars.bind_contextvars(
-#            committee_id=committee_id, committee_uuid=committee_id
-#        )
-#        return super().get_queryset().filter(committee_account_id=committee_uuid)
+    #def get_queryset(self):
+    #    committee_uuid = self.get_committee_uuid()
+    #    committee_id = self.get_committee_id()
+    #    structlog.contextvars.bind_contextvars(
+    #        committee_id=committee_id, committee_uuid=committee_id
+    #    )
+    #    logger.info(f'Exiting get_queryset')
+    #    return super().get_queryset().filter(committee_account_id=committee_uuid)
 
     def get_committee_uuid(self):
         committee_uuid = self.request.session["committee_uuid"]
