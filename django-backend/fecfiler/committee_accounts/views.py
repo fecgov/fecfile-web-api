@@ -11,7 +11,7 @@ from fecfiler.committee_accounts.utils import (
     create_committee_account,
     get_committee_account_data,
 )
-
+from fecfiler.filters import CommitteeOwnedFilterBackend
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
@@ -127,10 +127,10 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
         return Response(serializer.data)
 
 
-class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
+class CommitteeMembershipViewSet(viewsets.ModelViewSet):
     serializer_class = CommitteeMembershipSerializer
     pagination_class = CommitteeMemberListPagination
-    filter_backends = [filters.OrderingFilter]
+    filter_backends = [filters.OrderingFilter, CommitteeOwnedFilterBackend]
     ordering_fields = ["name", "email", "role", "is_active", "created"]
     ordering = ["-created"]
 
