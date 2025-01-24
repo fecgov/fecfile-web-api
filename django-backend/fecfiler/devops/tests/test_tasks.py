@@ -1,5 +1,5 @@
 from unittest.mock import MagicMock, patch
-from .tasks import get_database_connections
+from ..tasks import get_database_connections
 from django.test import TestCase
 
 
