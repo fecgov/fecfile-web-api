@@ -49,13 +49,13 @@ class ReportFilterBackend(filters.BaseFilterBackend):
     Proving a queryset filter
     """
 
-    def get_committee_uuid(selfi, request):
+    def get_committee_uuid(self, request):
         committee_uuid = request.session["committee_uuid"]
         if not committee_uuid:
             raise SuspiciousSession("session has invalid committee_uuid")
         return committee_uuid
 
-    def get_committee_id(selfi, request):
+    def get_committee_id(self, request):
         committee_id = request.session["committee_id"]
         if not committee_id:
             raise SuspiciousSession("session has invalid committee_id")
@@ -72,14 +72,13 @@ class ReportFilterBackend(filters.BaseFilterBackend):
         return queryset.filter(committee_account_id=committee_uuid)
 
 
-class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
+class ReportViewSet(ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
 
-    Note that this ViewSet inherits from CommitteeOwnedViewMixin
-    The queryset will be further limited by the user's committee
-    in CommitteeOwnedViewMixin's implementation of get_queryset()
+    Note that the queryset will be limited by the user's committee
+    via ReportFilterBackend
     """
 
     queryset = Report.objects
