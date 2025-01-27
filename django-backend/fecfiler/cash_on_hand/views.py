@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
+from fecfiler.filters import CommitteeOwnedFilterBackend
 from .serializers import CashOnHandYearlySerializer
 from .models import CashOnHandYearly
 import logging
@@ -11,14 +12,14 @@ logger = logging.getLogger(__name__)
 class CashOnHandYearlyViewSet(CommitteeOwnedViewMixin):
     """
 
-    Note that this ViewSet inherits from CommitteeOwnedViewMixin
-    The queryset will be further limited by the user's committee
-    in CommitteeOwnedViewMixin's implementation of get_queryset()
+    Note that the queryset will be limited by the user's committee
+    via CommitteeOwnedFilterBackend
     """
 
     queryset = CashOnHandYearly.objects
     serializer_class = CashOnHandYearlySerializer
     pagination_class = None
+    filter_backends = [CommitteeOwnedFilterBackend]
 
     @action(detail=False, methods=["get", "post"], url_path=r"year/(?P<year>\d+)")
     def cash_on_hand_for_year(self, request, year):

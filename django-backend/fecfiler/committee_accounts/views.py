@@ -127,7 +127,7 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
         return Response(serializer.data)
 
 
-class CommitteeMembershipViewSet(viewsets.ModelViewSet):
+class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     serializer_class = CommitteeMembershipSerializer
     pagination_class = CommitteeMemberListPagination
     filter_backends = [filters.OrderingFilter, CommitteeOwnedFilterBackend]

@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import mixins, GenericViewSet
 from .models import Contact
 from .serializers import ContactSerializer
+from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.filters import CommitteeOwnedFilterBackend
 import fecfiler.settings as settings
 
@@ -58,7 +59,7 @@ class ContactListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
-class ContactViewSet(viewsets.ModelViewSet):
+class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
@@ -342,6 +343,7 @@ class ContactViewSet(viewsets.ModelViewSet):
 
 
 class DeletedContactsViewSet(
+    CommitteeOwnedViewMixin,
     mixins.ListModelMixin,
     GenericViewSet,
 ):

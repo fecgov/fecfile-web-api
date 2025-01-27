@@ -2,6 +2,7 @@ from rest_framework import filters, status, pagination
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.filters import CommitteeOwnedFilterBackend
 from .models import Report
 from .report_code_label import report_code_label_case
@@ -44,7 +45,7 @@ class ReportListPagination(pagination.PageNumberPagination):
     page_size_query_param = "page_size"
 
 
-class ReportViewSet(ModelViewSet):
+class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
     `update` and `destroy` actions.
