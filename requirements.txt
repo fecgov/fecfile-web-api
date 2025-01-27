@@ -3,11 +3,11 @@ celery==5.4.0
 cfenv==0.5.3
 cryptography==44.0.0
 dj_database_url==2.3.0
-django-cors-headers==4.4.0
-django-deprecate-fields==0.1.2
+django-cors-headers==4.6.0
+django-deprecate-fields==0.2.1
 django-migration-linter==5.1.0
-django-structlog==8.1.0
-Django==5.1.4
+django-structlog==9.0.0
+Django==5.1.5
 djangorestframework==3.15.2
 drf-spectacular==0.27.2
 git+https://github.com/fecgov/fecfile-validate@b397d879b03f4050bbc81e3c88ed2aa445922210#egg=fecfile_validate&subdirectory=fecfile_validate_python
