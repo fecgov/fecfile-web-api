@@ -2,6 +2,7 @@ from enum import Enum
 from celery import shared_task
 from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
 from .summary import SummaryService
+
 import uuid
 import structlog
 

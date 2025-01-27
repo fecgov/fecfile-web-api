@@ -77,3 +77,6 @@ front-end/.vscode/launch.json
 
 # Virtual environment
 .venv/
+
+# Celery Beat
+django-backend/celerybeat-schedule

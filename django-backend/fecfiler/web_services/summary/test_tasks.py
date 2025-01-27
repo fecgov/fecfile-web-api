@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+
 from django.test import TestCase
 from .tasks import CalculationState, calculate_summary
 from fecfiler.committee_accounts.utils import create_committee_view

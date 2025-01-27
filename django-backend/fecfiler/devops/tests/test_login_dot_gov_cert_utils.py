@@ -1,6 +1,6 @@
 from django.test import TestCase, RequestFactory
 from unittest.mock import patch
-from fecfiler.devops.login_dot_gov_cert_utils import (
+from fecfiler.devops.utils.login_dot_gov_cert_utils import (
     stage_login_dot_gov_cert,
     stage_login_dot_gov_pk,
     gen_and_stage_login_dot_gov_cert,
@@ -17,7 +17,7 @@ class LoginDotGovUtilsTestCase(TestCase):
 
     # backout_login_dot_gov_cert
 
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.retrieve_credentials")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.retrieve_credentials")
     def test_backout_login_dot_gov_cert_throws_exception(
         self,
         retrieve_credentials_mock,
@@ -36,8 +36,8 @@ class LoginDotGovUtilsTestCase(TestCase):
                 test_token, test_space_name, test_service_instance_name
             )
 
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.retrieve_credentials")
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.update_credentials")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.retrieve_credentials")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.update_credentials")
     def test_backout_login_dot_gov_cert_happy_path(
         self,
         update_credentials_mock,
@@ -58,7 +58,7 @@ class LoginDotGovUtilsTestCase(TestCase):
 
     # install_login_dot_gov_cert
 
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.retrieve_credentials")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.retrieve_credentials")
     def test_install_login_dot_gov_cert_throws_exception(
         self,
         retrieve_credentials_mock,
@@ -77,8 +77,8 @@ class LoginDotGovUtilsTestCase(TestCase):
                 test_token, test_space_name, test_service_instance_name
             )
 
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.retrieve_credentials")
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.update_credentials")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.retrieve_credentials")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.update_credentials")
     def test_install_login_dot_gov_cert_happy_path(
         self,
         update_credentials_mock,
@@ -99,7 +99,7 @@ class LoginDotGovUtilsTestCase(TestCase):
 
     # gen_and_stage_login_dot_gov_cert
 
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.gen_rsa_pk")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.gen_rsa_pk")
     def test_gen_and_stage_login_dot_gov_cert_throws_exception(
         self,
         gen_rsa_pk_mock,
@@ -118,10 +118,10 @@ class LoginDotGovUtilsTestCase(TestCase):
                 test_token, test_space_name, test_service_instance_name
             )
 
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.gen_rsa_pk")
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.gen_x509_cert")
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.stage_login_dot_gov_cert")
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.stage_login_dot_gov_pk")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.gen_rsa_pk")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.gen_x509_cert")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.stage_login_dot_gov_cert")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.stage_login_dot_gov_pk")
     def test_gen_and_stage_login_dot_gov_cert_happy_path(
         self,
         stage_login_dot_gov_pk_mock,
@@ -144,8 +144,8 @@ class LoginDotGovUtilsTestCase(TestCase):
 
     # stage_login_dot_gov_pk
 
-    @patch("fecfiler.devops.crypt_utils.rsa_pk_to_bytes")
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.update_credentials")
+    @patch("fecfiler.devops.utils.crypt_utils.rsa_pk_to_bytes")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.update_credentials")
     @patch("cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey")
     def test_stage_login_dot_gov_pk_throws_exception(
         self,
@@ -167,8 +167,8 @@ class LoginDotGovUtilsTestCase(TestCase):
                 test_token, test_space_name, test_service_instance_name, rsa_pk_mock
             )
 
-    @patch("fecfiler.devops.crypt_utils.rsa_pk_to_bytes")
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.update_credentials")
+    @patch("fecfiler.devops.utils.crypt_utils.rsa_pk_to_bytes")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.update_credentials")
     @patch("cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey")
     def test_stage_login_dot_gov_pk_happy_path(
         self,
@@ -188,8 +188,8 @@ class LoginDotGovUtilsTestCase(TestCase):
 
     # stage_login_dot_gov_cert
 
-    @patch("fecfiler.devops.crypt_utils.x509_cert_to_bytes")
-    @patch("fecfiler.devops.crypt_utils.x509")
+    @patch("fecfiler.devops.utils.crypt_utils.x509_cert_to_bytes")
+    @patch("fecfiler.devops.utils.crypt_utils.x509")
     def test_stage_login_dot_gov_cert_throws_exception(
         self,
         x509_mock,
@@ -203,9 +203,9 @@ class LoginDotGovUtilsTestCase(TestCase):
         ):
             stage_login_dot_gov_cert(x509_mock)
 
-    @patch("fecfiler.devops.crypt_utils.x509_cert_to_bytes")
-    @patch("fecfiler.devops.crypt_utils.x509")
-    @patch("fecfiler.devops.login_dot_gov_cert_utils.S3_SESSION")
+    @patch("fecfiler.devops.utils.crypt_utils.x509_cert_to_bytes")
+    @patch("fecfiler.devops.utils.crypt_utils.x509")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.S3_SESSION")
     def test_stage_login_dot_gov_cert_happy_path(
         self,
         s3_session_mock,

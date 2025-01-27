@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from fecfiler.devops.cf_api_utils import update_credentials
+from fecfiler.devops.utils.cf_api_utils import update_credentials
 import json
 
 

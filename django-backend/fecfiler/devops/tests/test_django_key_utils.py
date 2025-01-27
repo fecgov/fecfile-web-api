@@ -1,6 +1,6 @@
 from django.test import TestCase, RequestFactory
 from unittest.mock import patch
-from fecfiler.devops.django_key_utils import (
+from fecfiler.devops.utils.django_key_utils import (
     gen_and_install_django_key,
     clear_fallback_django_keys,
 )
@@ -14,7 +14,7 @@ class DjangoKeyUtilsTestCase(TestCase):
 
     # gen_and_install_django_key
 
-    @patch("fecfiler.devops.django_key_utils.retrieve_credentials")
+    @patch("fecfiler.devops.utils.django_key_utils.retrieve_credentials")
     def test_gen_and_install_django_key_throws_exception(
         self,
         retrieve_credentials_mock,
@@ -33,8 +33,8 @@ class DjangoKeyUtilsTestCase(TestCase):
                 test_token, test_space_name, test_service_instance_name
             )
 
-    @patch("fecfiler.devops.django_key_utils.retrieve_credentials")
-    @patch("fecfiler.devops.django_key_utils.update_credentials")
+    @patch("fecfiler.devops.utils.django_key_utils.retrieve_credentials")
+    @patch("fecfiler.devops.utils.django_key_utils.update_credentials")
     def test_gen_and_install_django_key_happy_path(
         self,
         update_credentials_mock,
@@ -55,7 +55,7 @@ class DjangoKeyUtilsTestCase(TestCase):
 
     # clear_fallback_django_keys
 
-    @patch("fecfiler.devops.django_key_utils.update_credentials")
+    @patch("fecfiler.devops.utils.django_key_utils.update_credentials")
     def test_clear_fallback_django_keys_throws_exception(
         self,
         update_credentials_mock,
@@ -74,7 +74,7 @@ class DjangoKeyUtilsTestCase(TestCase):
                 test_token, test_space_name, test_service_instance_name
             )
 
-    @patch("fecfiler.devops.django_key_utils.update_credentials")
+    @patch("fecfiler.devops.utils.django_key_utils.update_credentials")
     def test_clear_fallback_django_keys_happy_path(
         self,
         update_credentials_mock,

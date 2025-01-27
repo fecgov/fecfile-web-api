@@ -1,10 +1,17 @@
 from uuid import UUID
 from django.test import RequestFactory, TestCase
 from fecfiler.committee_accounts.models import Membership
-from fecfiler.committee_accounts.views import CommitteeMembershipViewSet, CommitteeViewSet
-
+from fecfiler.committee_accounts.views import (
+    CommitteeMembershipViewSet,
+    CommitteeOwnedViewMixin,
+    CommitteeViewSet,
+)
 from fecfiler.user.models import User
 from unittest.mock import Mock, patch
+from fecfiler.routers import get_all_routers
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class CommitteeMemberViewSetTest(TestCase):
@@ -221,3 +228,42 @@ class CommitteeViewSetTest(TestCase):
                 self.assertNotEqual(len(was_called_with), 0)
                 self.assertIn("C12345678", was_called_with)
                 self.assertEqual(response.data["name"], "TEST")
+
+    def test_viewsets_have_committee_owned_mixin(self):
+        exclude_list = [
+            "CommitteeViewSet",
+            "UserViewSet",
+            "SystemStatusViewSet",
+            "SummaryViewSet",
+            "FeedbackViewSet",
+            "WebServicesViewSet",
+        ]
+        routers = get_all_routers()
+        missing_mixin = []
+
+        for router in routers:
+            for prefix, viewset, basename in router.registry:
+                if (
+                    not issubclass(viewset, CommitteeOwnedViewMixin)
+                    and viewset.__name__ not in exclude_list
+                ):
+                    missing_mixin.append(
+                        {
+                            "viewset": viewset.__name__,
+                            "prefix": prefix,
+                            "basename": basename,
+                        }
+                    )
+
+        if missing_mixin:
+            error_message = "\n".join(
+                [
+                    f"ViewSet '{entry['viewset']}' "
+                    f"does not inherit from CommitteeOwnedViewMixin."
+                    for entry in missing_mixin
+                ]
+            )
+            self.fail(
+                f"The following ViewSets are missing CommitteeOwnedViewMixin:\n"
+                f"{error_message}"
+            )

@@ -256,7 +256,7 @@ class Tasks(TaskSet):
 
     @task
     def celery_test(self):
-        self.client.get("/celery-test/", name="celery-test", timeout=TIMEOUT)
+        self.client.get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
 
     @task
     def load_contacts(self):
@@ -298,4 +298,4 @@ class Tasks(TaskSet):
 
 class Swarm(user.HttpUser):
     tasks = [Tasks]
-    wait_time = between(1, 5)
+    wait_time = between(1.5, 4)

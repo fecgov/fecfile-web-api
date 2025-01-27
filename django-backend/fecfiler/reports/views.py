@@ -183,7 +183,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return super().list(request, args, kwargs)
 
 
-class ReportViewMixin(GenericViewSet):
+class ReportViewMixin(CommitteeOwnedViewMixin, GenericViewSet):
     def get_queryset(self):
         return filter_by_report(super().get_queryset(), self)
 

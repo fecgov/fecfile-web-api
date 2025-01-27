@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from fecfiler.devops.django_key_utils import clear_fallback_django_keys
+from fecfiler.devops.utils.django_key_utils import clear_fallback_django_keys
 
 
 class Command(BaseCommand):
