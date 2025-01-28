@@ -189,6 +189,9 @@ def _run_migrations(ctx, space):
         print("Failed to spin up migrator app.  Check logs.")
         return False
 
+    print("Stopping here!")
+    sys.exit(1)
+
     # Run migrations
     task = "django-backend/manage.py migrate --no-input --traceback --verbosity 3"
     migrations = ctx.run(
@@ -240,6 +243,8 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     with open(".cfmeta", "w") as fp:
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
 
+    # CPU SPIKES happen between here
+
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
     migrations_successful = _run_migrations(ctx, space)
@@ -251,7 +256,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
         sys.exit(1)
 
     print("Halting test deploy in order to test CPU spikes")
-    sys.exit(1)
+    sys.exit(1)  # AND HERE
 
     for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
         new_deploy = _do_deploy(ctx, space, app)
