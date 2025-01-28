@@ -25,6 +25,6 @@ class SystemStatusViewTest(TestCase):
         key, value = "test_key", "test_value"
         self.assertIsNone(get_redis_value(key))
         refresh_cache(key, lambda: value)
-        self.assertEqual(get_redis_value(key).strip('"'), value)
+        self.assertEqual(get_redis_value(key), value)
         redis_instance.delete(key)
         self.assertIsNone(get_redis_value(key))
