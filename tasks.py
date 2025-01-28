@@ -54,7 +54,7 @@ def _detect_space(repo, branch=None):
 DEPLOY_RULES = (
     ("test", lambda _, branch: branch == "main"),
     ("stage", lambda _, branch: branch.startswith("release")),
-    ("dev", lambda _, branch: branch == "develop"),
+    ("dev", lambda _, branch: branch == "test/find-cpu-spike"),
 )
 
 
@@ -239,6 +239,9 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     # Set deploy variables
     with open(".cfmeta", "w") as fp:
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
+
+    print("Halting test deploy in order to test CPU spikes")
+    sys.exit(1)
 
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed

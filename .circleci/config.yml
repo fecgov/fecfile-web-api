@@ -246,11 +246,9 @@ workflows:
             branches:
               only: /develop|release\/sprint-[\.\d]+|main/
       - deploy-job:
-          requires:
-            - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|main/
+              only: /develop|release\/sprint-[\.\d]+|main|test\/find-cpu-spike/
       - docs-build:
           requires:
             - test
