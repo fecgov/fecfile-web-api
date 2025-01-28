@@ -1,0 +1,64 @@
+---
+defaults: &amp;defaults
+  instances: 2
+  stack: cflinuxfs4
+  buildpacks:
+    - python_buildpack
+  memory: 1G
+  services:
+    - fecfile-api-rds
+    - fecfile-api-s3
+    - fecfile-api-redis
+    - fecfile-api-creds-test
+  env:
+    DISABLE_COLLECTSTATIC: 1
+    DJANGO_SETTINGS_MODULE: fecfiler.settings.production
+    FFAPI_COOKIE_DOMAIN: fecfile.fec.gov
+    LOGIN_REDIRECT_CLIENT_URL: https://test.fecfile.fec.gov
+    LOGIN_REDIRECT_SERVER_URL: https://test-api.fecfile.fec.gov/api/v1/oidc/login-redirect
+    LOGOUT_REDIRECT_URL: https://test-api.fecfile.fec.gov/api/v1/oidc/logout-redirect
+    PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
+    STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
+    FEC_FILING_API: https://efoservices.stage.efo.fec.gov
+    SESSION_COOKIE_AGE: 64800
+    BP_PIP_VERSION: latest
+    LOG_FORMAT: KEY_VALUE
+    SYSTEM_STATUS_CACHE_AGE: 60
+    INITIAL_POLLING_INTERVAL: 10
+    INITIAL_POLLING_DURATION: 900
+    SECONDARY_POLLING_INTERVAL: 3600
+    SECONDARY_POLLING_DURATION: 86400
+    # ---- FEATURE FLAGS ----
+    FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, and MOCKED
+    ENABLE_DEVELOPER_COMMANDS: True
+
+applications:
+  - name: fecfile-web-api
+    &lt;&lt;: *defaults
+    instances: 4
+    routes:
+      - route: fecfile-web-api-test.apps.internal
+    command: bin/run-api.sh
+    memory: 2G
+  - name: fecfile-web-services
+    &lt;&lt;: *defaults
+    no-route: true
+    health-check-type: process
+    command: bin/run-celery-worker.sh
+  - name: fecfile-api-migrator
+    &lt;&lt;: *defaults
+    instances: 1
+    command: bin/run-api.sh
+    memory: 2G
+    no-route: true
+  - name: fecfile-scheduler
+    &lt;&lt;: *defaults
+    instances: 1
+    no-route: true
+    health-check-type: process
+    command: bin/run-scheduler.sh
+  - name: fecfile-web-services
+    &lt;&lt;: *defaults
+    no-route: true
+    health-check-type: process
+    command: bin/run-celery-worker.sh
