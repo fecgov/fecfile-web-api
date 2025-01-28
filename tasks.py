@@ -240,9 +240,6 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     with open(".cfmeta", "w") as fp:
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
 
-    print("Halting test deploy in order to test CPU spikes")
-    sys.exit(1)
-
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
     migrations_successful = _run_migrations(ctx, space)
@@ -252,6 +249,9 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
         print("Migrations failed and/or the migrator app was not deleted successfully.")
         print("See the logs for more information.\nCanceling deploy...")
         sys.exit(1)
+
+    print("Halting test deploy in order to test CPU spikes")
+    sys.exit(1)
 
     for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
         new_deploy = _do_deploy(ctx, space, app)
