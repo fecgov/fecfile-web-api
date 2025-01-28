@@ -1,5 +1,5 @@
 ---
-defaults: &amp;defaults
+defaults: &defaults
   instances: 2
   stack: cflinuxfs4
   buildpacks:
@@ -34,31 +34,31 @@ defaults: &amp;defaults
 
 applications:
   - name: fecfile-web-api
-    &lt;&lt;: *defaults
+    <<: *defaults
     instances: 0
     routes:
       - route: fecfile-web-api-prod.apps.internal
     command: bin/run-api.sh
     memory: 2G
   - name: fecfile-web-services
-    &lt;&lt;: *defaults
+    <<: *defaults
     no-route: true
     health-check-type: process
     command: bin/run-celery-worker.sh
   - name: fecfile-api-migrator
-    &lt;&lt;: *defaults
+    <<: *defaults
     instances: 1
     command: bin/run-api.sh
     memory: 2G
     no-route: true
   - name: fecfile-scheduler
-    &lt;&lt;: *defaults
+    <<: *defaults
     instances: 1
     no-route: true
     health-check-type: process
     command: bin/run-scheduler.sh
   - name: fecfile-web-services
-    &lt;&lt;: *defaults
+    <<: *defaults
     no-route: true
     health-check-type: process
     command: bin/run-celery-worker.sh
