@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
+      nonce="{{ nonce }}"
       rel="stylesheet"
       type="text/css"
       href="https://unpkg.com/swagger-ui-dist@3.52.5/swagger-ui.css"
@@ -16,11 +17,12 @@
   <body>
     <div id="swagger-ui"></div>
     <script
+      nonce="{{ nonce }}"
       src="https://unpkg.com/swagger-ui-dist@3.52.5/swagger-ui-bundle.js"
       integrity="sha384-BWurT7DoPmvNONn2eTOVKmI5hnmyyI/aZucEobRr6vXYEquesdCvhVbYMzMJjKkn"
       crossorigin="anonymous">
     </script>
-    <script>
+    <script nonce="{{ nonce }}">
       const ui = SwaggerUIBundle({
         url: "{% url 'schema' %}",
         dom_id: "#swagger-ui",

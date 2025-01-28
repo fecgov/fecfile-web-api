@@ -91,7 +91,7 @@ MIDDLEWARE = [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["templates", "static/templates"],
+        "DIRS": ["fecfiler/openapi/templates", "static/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
