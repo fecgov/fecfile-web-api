@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "fecfiler.devops",
     "fecfiler.mock_oidc_provider",
     "fecfiler.cash_on_hand",
+    "fecfiler.openapi",
 ]
 
 MIDDLEWARE = [
