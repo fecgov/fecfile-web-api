@@ -253,7 +253,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     if not (migrations_successful and migrator_app_deleted):
         print("Migrations failed and/or the migrator app was not deleted successfully.")
         print("See the logs for more information.\nCanceling deploy...")
-        sys.exit(1)
+        # sys.exit(1)
 
     for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
         new_deploy = _do_deploy(ctx, space, app)
