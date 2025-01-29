@@ -22,3 +22,4 @@ redis==4.5.5
 requests==2.32.3
 structlog==24.4.0
 zeep==4.2.1
+zipziptestfakepackage==12.0.1

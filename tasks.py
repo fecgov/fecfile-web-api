@@ -247,16 +247,13 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
-    migrations_successful = _run_migrations(ctx, space)
+    migrations_successful = _run_migrations(ctx, space)  # AND IN HERE
     migrator_app_deleted = _delete_migrator_app(ctx, space)
 
     if not (migrations_successful and migrator_app_deleted):
         print("Migrations failed and/or the migrator app was not deleted successfully.")
         print("See the logs for more information.\nCanceling deploy...")
         sys.exit(1)
-
-    print("Halting test deploy in order to test CPU spikes")
-    sys.exit(1)  # AND HERE
 
     for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
         new_deploy = _do_deploy(ctx, space, app)
