@@ -9,6 +9,6 @@ class FecfileSpectacularSwaggerView(SpectacularSwaggerView):
         response = super().get(request, *args, **kwargs)
         response.data["nonce"] = nonce
         response["Content-Security-Policy"] = (
-            f"default-src 'self'; script-src 'nonce-{nonce}'; style-src 'nonce-{nonce}'"
+            f"default-src 'self'; script-src 'nonce-{nonce}'; style-src 'nonce-{nonce}'; frame-ancestors 'none'"
         )
         return response
