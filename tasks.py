@@ -189,9 +189,6 @@ def _run_migrations(ctx, space):
         print("Failed to spin up migrator app.  Check logs.")
         return False
 
-    print("Stopping here!")
-    sys.exit(1)
-
     # Run migrations
     task = "django-backend/manage.py migrate --no-input --traceback --verbosity 3"
     migrations = ctx.run(
@@ -253,7 +250,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     if not (migrations_successful and migrator_app_deleted):
         print("Migrations failed and/or the migrator app was not deleted successfully.")
         print("See the logs for more information.\nCanceling deploy...")
-        # sys.exit(1)
+        # # sys.exit(1)
 
     for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
         new_deploy = _do_deploy(ctx, space, app)
