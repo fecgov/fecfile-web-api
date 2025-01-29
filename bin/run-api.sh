@@ -1,5 +1,7 @@
 cd django-backend
 
+exit 1
+
 # Only Instance 0 runs migrations and creates views
 echo "------ Starting APP ------"
 if [ $CF_INSTANCE_INDEX = "0" ]; then
