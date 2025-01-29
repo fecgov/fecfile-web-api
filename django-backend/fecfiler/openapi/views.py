@@ -8,7 +8,11 @@ class FecfileSpectacularSwaggerView(SpectacularSwaggerView):
         nonce = secrets.token_urlsafe(32)
         response = super().get(request, *args, **kwargs)
         response.data["nonce"] = nonce
+        default_src = "default-src 'self'"
+        script_src = f"script-src 'nonce-{nonce}'"
+        style_src = f"style-src 'nonce-{nonce}'"
+        frame_ancestors = "frame-ancestors 'none'"
         response["Content-Security-Policy"] = (
-            f"default-src 'self'; script-src 'nonce-{nonce}'; style-src 'nonce-{nonce}'; frame-ancestors 'none'"
+            f"{default_src}; {script_src}; {style_src}; {frame_ancestors}"
         )
         return response
