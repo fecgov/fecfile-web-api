@@ -15,6 +15,8 @@ from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_st
 from math import floor
 
 
+raise ValueError("Intentionally crashing on startup")
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
