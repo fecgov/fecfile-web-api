@@ -1,6 +1,6 @@
 cd django-backend
 
-exit 1
+exit 0
 
 # Only Instance 0 runs migrations and creates views
 echo "------ Starting APP ------"

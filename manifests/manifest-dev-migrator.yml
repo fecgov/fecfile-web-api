@@ -3,8 +3,6 @@ applications:
   - name: fecfile-api-migrator
     instances: 1
     stack: cflinuxfs4
-    buildpacks:
-      - python_buildpack
     command: bin/run-api.sh
     memory: 2G
     services:
