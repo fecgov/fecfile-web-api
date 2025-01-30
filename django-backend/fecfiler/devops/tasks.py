@@ -81,7 +81,9 @@ def log_database_size(nbytes):
         set_redis_value(
             INITIAL_DB_SIZE, [nbytes, timestamp.strftime('%Y%m%d%H%M%S')], None
         )
+
     logger.info(log_dict)
+    return log_dict
 
 
 def get_database_connections():

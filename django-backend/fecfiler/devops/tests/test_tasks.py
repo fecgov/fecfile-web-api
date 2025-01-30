@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, patch
+from datetime import datetime, timedelta
 from ..tasks import (
     get_database_connections,
     get_database_size,
@@ -50,10 +51,23 @@ class DevopsTasksTestCase(TestCase):
     def test_log_db_size(self):
         redis_initial_db_size = get_redis_value(INITIAL_DB_SIZE)
         set_redis_value(INITIAL_DB_SIZE, None, None)
-        db_size = 10 * 1024**3
-        log_database_size(db_size)
+
+        ten_gb = 10 * 1024**3
+        results = log_database_size(ten_gb)
+        self.assertEqual(results["db_size_gb"], 10.0)
+
         stored_db_size = get_redis_value(INITIAL_DB_SIZE)[0]
-        self.assertEqual(stored_db_size, db_size)
+        self.assertEqual(stored_db_size, ten_gb)
+
+        timestamp = datetime.now()-timedelta(days=10)
+        set_redis_value(
+            INITIAL_DB_SIZE, [2 * 1024**3, timestamp.strftime('%Y%m%d%H%M%S')], None
+        )
+
+        later_results = log_database_size(ten_gb)
+        self.assertIsNotNone(later_results["db_growth"])
+        self.assertIsNotNone(later_results["db_est_days_to_full"])
+
         set_redis_value(INITIAL_DB_SIZE, redis_initial_db_size, None)
 
     def test_get_db_status_report(self):
