@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .tasks import (
     get_celery_status,
-    get_database_status,
+    check_database_running,
 )
 
 from .utils.redis_utils import get_redis_value, refresh_cache
@@ -93,7 +93,7 @@ class SystemStatusViewSet(viewsets.ViewSet):
         db_status = get_redis_value(DATABASE_STATUS)
 
         if db_status is None:
-            db_status = refresh_cache(DATABASE_STATUS, get_database_status)
+            db_status = refresh_cache(DATABASE_STATUS, check_database_running)
 
         if db_status.get("database_is_running"):
             return Response({"status": "database is running"})
