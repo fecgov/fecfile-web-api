@@ -1,5 +1,12 @@
 from unittest.mock import MagicMock, patch
-from ..tasks import get_database_connections
+from ..tasks import (
+	get_database_connections,
+    get_database_size,
+    report_database_size,
+    get_database_status_report,
+    INITIAL_DB_SIZE
+)
+from ..utils.redis_utils import get_redis_value, set_redis_value
 from django.test import TestCase
 
 
@@ -17,7 +24,7 @@ class DevopsTasksTestCase(TestCase):
         ]
 
         # Call the task
-        get_database_connections()
+        connection_results = get_database_connections()
 
         # Verify that the SQL query was executed
         mock_cursor.execute.assert_called_once()
@@ -35,4 +42,23 @@ class DevopsTasksTestCase(TestCase):
                 "connections_utilization_pctg": "10.00",
             }
         }
-        mock_logger.info.assert_called_once_with(expected_results_dict)
+        self.assertEqual(connection_results, expected_results_dict)
+
+    def test_get_db_size(self):
+        self.assertGreater(get_database_size(), 0)
+
+    def test_log_db_size(self):
+        redis_initial_db_size = get_redis_value(INITIAL_DB_SIZE)
+        set_redis_value(INITIAL_DB_SIZE, None, None)
+        db_size = 10*1024**3
+        report_database_size(db_size)
+        stored_db_size = get_redis_value(INITIAL_DB_SIZE)[0]
+        self.assertEqual(stored_db_size, db_size)
+        set_redis_value(INITIAL_DB_SIZE, redis_initial_db_size, None)
+
+    def test_get_db_status_report(self):
+        redis_initial_db_size = get_redis_value(INITIAL_DB_SIZE)
+        set_redis_value(INITIAL_DB_SIZE, None, None)
+        get_database_status_report()
+        self.assertIsNotNone(get_redis_value(INITIAL_DB_SIZE))
+        set_redis_value(INITIAL_DB_SIZE, redis_initial_db_size, None)

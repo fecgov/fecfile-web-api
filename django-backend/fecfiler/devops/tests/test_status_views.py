@@ -1,6 +1,10 @@
 from django.test import TestCase, override_settings
-from ..tasks import get_celery_status, get_database_status
-from ..utils.redis_utils import get_redis_value, refresh_cache, redis_instance
+from ..tasks import get_celery_status, check_database_running
+from ..utils.redis_utils import (
+	get_redis_value,
+	refresh_cache,
+	redis_instance,
+)
 import json
 
 
@@ -10,8 +14,8 @@ class SystemStatusViewTest(TestCase):
         status = get_celery_status()
         self.assertTrue(status.get("celery_is_running"))
 
-    def test_get_database_satus(self):
-        status = get_database_status()
+    def test_check_database_running(self):
+        status = check_database_running()
         self.assertTrue(status.get("database_is_running"))
 
     def test_get_redis_value(self):
