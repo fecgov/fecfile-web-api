@@ -1,9 +1,9 @@
 from django.test import TestCase, override_settings
 from ..tasks import get_celery_status, check_database_running
 from ..utils.redis_utils import (
-	get_redis_value,
-	refresh_cache,
-	redis_instance,
+    get_redis_value,
+    refresh_cache,
+    redis_instance,
 )
 import json
 

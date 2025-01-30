@@ -1,7 +1,7 @@
 from django.db import connection
 from celery import shared_task
 from fecfiler.celery import debug_task
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 from .utils.redis_utils import set_redis_value, get_redis_value
 from fecfiler.settings import SYSTEM_STATUS_CACHE_AGE
 import structlog
@@ -34,7 +34,7 @@ def get_database_size():
         cursor.execute(sql)
         results = cursor.fetchall()
 
-    if results != None:
+    if results is not None:
         return results[0][0]
 
 

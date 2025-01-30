@@ -1,6 +1,6 @@
 from unittest.mock import MagicMock, patch
 from ..tasks import (
-	get_database_connections,
+    get_database_connections,
     get_database_size,
     log_database_size,
     get_database_status_report,
