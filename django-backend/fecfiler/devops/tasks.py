@@ -23,7 +23,7 @@ def get_database_status_report():
     logger.info(db_connections_results)
 
     db_size = get_database_size()
-    report_database_size(db_size)
+    log_database_size(db_size)
 
 
 def get_database_size():
@@ -38,13 +38,19 @@ def get_database_size():
         return results[0][0]
 
 
-def report_database_size(nbytes):
+def log_database_size(nbytes):
     ngbytes = nbytes / (1024**3)
     capacity = 1024  # in GB
     pct_full = (ngbytes / capacity) * 100
 
     size_pretty = f"{round(ngbytes, 2)} GB / {capacity} GB ({round(pct_full, 2)}%)"
-    logger.info(f"Database Size: {size_pretty}")
+
+    log_dict = {
+        "db_size_gb": ngbytes,
+        "db_size_pretty": size_pretty,
+        "db_growth": None,
+        "db_est_days_to_full": None,
+    }
 
     timestamp = datetime.now()
     logged_db_size = get_redis_value(INITIAL_DB_SIZE)
@@ -61,21 +67,21 @@ def report_database_size(nbytes):
         logged_time_delta_pretty = round(days_since_logged, 2)
 
         size_delta_pretty = round(logged_ngbytes_delta, 2)
-        logger.info(f"""DB has grown {size_delta_pretty} GB in the last {
-            logged_time_delta_pretty
-        } days""")
+        log_dict[
+            "db_growth"
+        ] = f"{size_delta_pretty} GB in the last {logged_time_delta_pretty} days"
 
         if days_since_logged >= 1 and logged_ngbytes_delta > 0:
             gb_per_day = logged_ngbytes_delta / days_since_logged
             space_remaining = capacity - ngbytes
             days_till_full = space_remaining / gb_per_day
             days_till_full_pretty = round(days_till_full, 2)
-            logger.info(f"DB estimated to reach capacity in {days_till_full_pretty} days")
+            log_dict["db_est_days_to_full"] = days_till_full_pretty
     else:
         set_redis_value(
             INITIAL_DB_SIZE, [nbytes, timestamp.strftime('%Y%m%d%H%M%S')], None
         )
-
+    logger.info(log_dict)
 
 
 def get_database_connections():
