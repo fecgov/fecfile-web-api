@@ -5,7 +5,6 @@ from fecfiler.web_services.dot_fec.dot_fec_submitter import MockDotFECSubmitter
 from fecfiler.web_services.dot_fec.web_print_submitter import MockWebPrintSubmitter
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from fecfiler.web_services.tasks import create_dot_fec
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 
@@ -14,7 +13,6 @@ class DotFECSubmitterTestCase(TestCase):
 
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
         self.f3x = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.dot_fec_id = create_dot_fec(
             str(self.f3x.id),

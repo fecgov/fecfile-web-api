@@ -8,7 +8,6 @@ logger = structlog.get_logger(__name__)
 
 core = [
     "help",
-    "create_committee_views",
     "migrate",
     "lintmigrations",
     "makemigrations",
@@ -31,7 +30,7 @@ developer = [
     # REPORT COMMANDS #
     "delete_committee_reports",
     # users
-    "reset_security_consent_date"
+    "reset_security_consent_date",
 ]
 
 if __name__ == "__main__":

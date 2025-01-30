@@ -1,6 +1,6 @@
 from uuid import UUID
 from django.test import RequestFactory, TestCase
-from fecfiler.committee_accounts.models import Membership
+from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.committee_accounts.views import (
     CommitteeMembershipViewSet,
     CommitteeOwnedViewMixin,
@@ -20,6 +20,11 @@ class CommitteeMemberViewSetTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.factory = RequestFactory()
+
+    def tearDown(self):
+        Membership.objects.all().delete()
+        User.objects.all().delete()
+        CommitteeAccount.objects.all().delete()
 
     def test_remove_member(self):
         membership_uuid = UUID("136a21f2-66fe-4d56-89e9-0d1d4612741c")

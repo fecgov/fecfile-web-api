@@ -7,14 +7,11 @@ from fecfiler.transactions.transaction_dependencies import (
     update_dependent_parent,
 )
 from fecfiler.transactions.tests.utils import create_schedule_a
-from fecfiler.committee_accounts.utils import create_committee_view
 
 
 class TransactionDependenciesTestCase(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-
-        create_committee_view(self.committee.id)
         self.parent_contact = Contact.objects.create(
             committee_account_id=self.committee.id, name="Parent Contact"
         )

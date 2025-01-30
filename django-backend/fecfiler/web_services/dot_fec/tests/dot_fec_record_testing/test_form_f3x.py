@@ -3,7 +3,6 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import serialize_instance
 from fecfiler.web_services.dot_fec.dot_fec_composer import compose_report
 from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from datetime import datetime, timezone
@@ -16,7 +15,6 @@ logger = structlog.get_logger(__name__)
 class DotFECForm3XTestCase(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
         coverage_from = datetime.strptime("2024-01-01", "%Y-%m-%d")
         coverage_through = datetime.strptime("2024-02-01", "%Y-%m-%d")
         self.f3x = create_form3x(

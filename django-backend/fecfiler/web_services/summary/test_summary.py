@@ -1,7 +1,6 @@
 from decimal import Decimal
 from django.test import TestCase
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from .summary import SummaryService
 from fecfiler.reports.tests.utils import create_form3x
 from datetime import datetime
@@ -14,7 +13,6 @@ class F3XReportTestCase(TestCase):
 
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
         self.contact_1 = create_test_individual_contact(
             "last name", "First name", self.committee.id
         )

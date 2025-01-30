@@ -2,7 +2,6 @@ from uuid import UUID
 from fecfiler.user.models import User
 from rest_framework import filters, viewsets, mixins, pagination, status
 from django.contrib.sessions.exceptions import SuspiciousSession
-from fecfiler.transactions.models import get_read_model
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
@@ -46,8 +45,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             return Response("Committee could not be activated", status=403)
         request.session["committee_id"] = str(committee.committee_id)
         request.session["committee_uuid"] = str(committee.id)
-        """ create view if it doesn't exist """
-        get_read_model(committee.id)
+
         return Response("Committee activated")
 
     @action(detail=False, methods=["get"])
