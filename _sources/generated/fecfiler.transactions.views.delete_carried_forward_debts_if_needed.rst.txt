@@ -1,0 +1,6 @@
+fecfiler.transactions.views.delete\_carried\_forward\_debts\_if\_needed
+=======================================================================
+
+.. currentmodule:: fecfiler.transactions.views
+
+.. autofunction:: delete_carried_forward_debts_if_needed

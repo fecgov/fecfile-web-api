@@ -17,6 +17,8 @@ fecfiler.transactions.views
    .. autosummary::
       :toctree:                                          
    
+      delete_carried_forward_debts_if_needed
+      delete_carried_forward_loans_if_needed
       get_save_hook
       noop
       stringify_queryset

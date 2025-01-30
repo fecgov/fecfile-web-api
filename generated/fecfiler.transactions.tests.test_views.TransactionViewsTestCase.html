@@ -256,6 +256,12 @@ not have a method with the specified name.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">countTestCases</span></code>()</p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_debt_repayment_payload</span></code>(debt, report, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_loan_repayment_payload</span></code>(loan, report, ...)</p></td>
+<td><p></p></td>
+</tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_trans_from_data</span></code>(receipt_data)</p></td>
 <td><p></p></td>
 </tr>
@@ -354,6 +360,12 @@ not have a method with the specified name.</p>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_add_transaction_to_report</span></code>()</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_create_repayment" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_create_repayment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_carried_forward_debt_on_create_repayment</span></code></a>()</p></td>
+<td><p>Paying off a debt in one report should delete any carried forward copies in future reports</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_create_repayment" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_create_repayment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_carried_forward_loan_on_create_repayment</span></code></a>()</p></td>
+<td><p>Paying off a loan in one report should delete any carried forward copies in future reports</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_destroy</span></code>()</p></td>
 <td><p></p></td>
@@ -1117,6 +1129,20 @@ block, allowing further test code to be executed.</p>
 <dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_create_repayment">
+<span class="sig-name descname"><span class="pre">test_delete_carried_forward_debt_on_create_repayment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_create_repayment" title="Link to this definition">¶</a></dt>
+<dd><p>Paying off a debt in one report should delete any carried forward
+copies in future reports</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_create_repayment">
+<span class="sig-name descname"><span class="pre">test_delete_carried_forward_loan_on_create_repayment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_create_repayment" title="Link to this definition">¶</a></dt>
+<dd><p>Paying off a loan in one report should delete any carried forward
+copies in future reports</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1254,6 +1280,8 @@ block, allowing further test code to be executed.</p>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.subTest"><code class="docutils literal notranslate"><span class="pre">TransactionViewsTestCase.subTest()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.tearDown"><code class="docutils literal notranslate"><span class="pre">TransactionViewsTestCase.tearDown()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.tearDownClass"><code class="docutils literal notranslate"><span class="pre">TransactionViewsTestCase.tearDownClass()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_create_repayment"><code class="docutils literal notranslate"><span class="pre">TransactionViewsTestCase.test_delete_carried_forward_debt_on_create_repayment()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_create_repayment"><code class="docutils literal notranslate"><span class="pre">TransactionViewsTestCase.test_delete_carried_forward_loan_on_create_repayment()</span></code></a></li>
 </ul>
 </li>
 </ul>

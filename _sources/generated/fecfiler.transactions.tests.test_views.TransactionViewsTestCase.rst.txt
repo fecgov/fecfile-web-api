@@ -88,6 +88,8 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.assert_
       ~TransactionViewsTestCase.captureOnCommitCallbacks
       ~TransactionViewsTestCase.countTestCases
+      ~TransactionViewsTestCase.create_debt_repayment_payload
+      ~TransactionViewsTestCase.create_loan_repayment_payload
       ~TransactionViewsTestCase.create_trans_from_data
       ~TransactionViewsTestCase.debug
       ~TransactionViewsTestCase.defaultTestResult
@@ -121,6 +123,8 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.test_add_transaction_family_to_report_from_child
       ~TransactionViewsTestCase.test_add_transaction_family_to_report_from_parent
       ~TransactionViewsTestCase.test_add_transaction_to_report
+      ~TransactionViewsTestCase.test_delete_carried_forward_debt_on_create_repayment
+      ~TransactionViewsTestCase.test_delete_carried_forward_loan_on_create_repayment
       ~TransactionViewsTestCase.test_destroy
       ~TransactionViewsTestCase.test_destroy_with_dependent_parent
       ~TransactionViewsTestCase.test_get_previous_election

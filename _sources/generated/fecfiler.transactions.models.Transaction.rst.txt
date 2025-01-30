@@ -42,6 +42,8 @@ fecfiler.transactions.models.Transaction
       ~Transaction.get_schedule_name
       ~Transaction.get_transaction_family
       ~Transaction.hard_delete
+      ~Transaction.is_debt_repayment
+      ~Transaction.is_loan_repayment
       ~Transaction.prepare_database_save
       ~Transaction.refresh_from_db
       ~Transaction.save
