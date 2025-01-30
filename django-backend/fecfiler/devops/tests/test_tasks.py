@@ -59,7 +59,7 @@ class DevopsTasksTestCase(TestCase):
         stored_db_size = get_redis_value(INITIAL_DB_SIZE)[0]
         self.assertEqual(stored_db_size, ten_gb)
 
-        timestamp = datetime.now()-timedelta(days=10)
+        timestamp = datetime.now() - timedelta(days=10)
         set_redis_value(
             INITIAL_DB_SIZE, [2 * 1024**3, timestamp.strftime('%Y%m%d%H%M%S')], None
         )
