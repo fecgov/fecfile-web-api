@@ -50,7 +50,7 @@ class DevopsTasksTestCase(TestCase):
     def test_log_db_size(self):
         redis_initial_db_size = get_redis_value(INITIAL_DB_SIZE)
         set_redis_value(INITIAL_DB_SIZE, None, None)
-        db_size = 10*1024**3
+        db_size = 10 * 1024**3
         log_database_size(db_size)
         stored_db_size = get_redis_value(INITIAL_DB_SIZE)[0]
         self.assertEqual(stored_db_size, db_size)
