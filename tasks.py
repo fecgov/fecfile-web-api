@@ -9,13 +9,16 @@ from invoke import task
 env = cfenv.AppEnv()
 
 APP_NAME = "fecfile-web-api"
+MIGRATOR_APP_NAME = "fecfile-api-migrator"  # THE APP WITH THIS NAME WILL GET DELETED!
 WEB_SERVICES_NAME = "fecfile-web-services"
+SCHEDULER_NAME = "fecfile-scheduler"
 PROXY_NAME = "fecfile-api-proxy"
 ORG_NAME = "fec-fecfileonline-prototyping"
 
 MANIFEST_LABEL = {
     APP_NAME: "api",
     WEB_SERVICES_NAME: "web-services",
+    SCHEDULER_NAME: "scheduler",
 }
 
 
@@ -89,7 +92,6 @@ def _login_to_cf(ctx, space):
 
 
 def _do_deploy(ctx, space, app):
-
     manifest_filename = f"manifests/manifest-{space}-{MANIFEST_LABEL.get(app)}.yml"
     existing_deploy = ctx.run(f"cf app {app}", echo=True, warn=True)
     print("\n")
@@ -151,6 +153,57 @@ def _rollback(ctx, app):
             print("Unable to cancel deploy. Check logs.")
 
 
+def _delete_migrator_app(ctx, space):
+    print("Deleting migrator app...")
+
+    existing_migrator_app = ctx.run(f"cf app {MIGRATOR_APP_NAME}", echo=True, warn=True)
+    if not existing_migrator_app.ok:
+        print("No migrator app detected.  There is nothing to delete.")
+        return True
+
+    if MIGRATOR_APP_NAME == APP_NAME:
+        print(f"Possible error: could result in deleting main app - {APP_NAME}")
+        print("Canceling migrator app deletion attempt.")
+        return False
+
+    delete_app = ctx.run(f"cf delete {MIGRATOR_APP_NAME} -f", echo=True, warn=True)
+    if not delete_app.ok:
+        print("Failed to delete migrator app.")
+        print(f'Stray migrator app remains on {space}: "{MIGRATOR_APP_NAME}"')
+        return False
+    print("Migrator app deleted successfully.")
+    return True
+
+
+def _run_migrations(ctx, space):
+    print("Running migrations...")
+
+    # Start migrator app
+    manifest_filename = f"manifests/manifest-{space}-migrator.yml"
+    migrator = ctx.run(
+        f"cf push {MIGRATOR_APP_NAME} -f {manifest_filename}",
+        echo=True,
+        warn=True,
+    )
+    if not migrator.ok:
+        print("Failed to spin up migrator app.  Check logs.")
+        return False
+
+    # Run migrations
+    task = "django-backend/manage.py migrate --no-input --traceback --verbosity 3"
+    migrations = ctx.run(
+        f"cf rt {MIGRATOR_APP_NAME} --command '{task}' --name 'Run Migrations' --wait",
+        echo=True,
+        warn=True,
+    )
+    if not migrations.ok:
+        print("Failed to run migrations.  Check logs.")
+        return False
+
+    print("Migration process has finished successfully.")
+    return True
+
+
 @task
 def deploy(ctx, space=None, branch=None, login=False, help=False):
     """Deploy app to Cloud Foundry.
@@ -187,7 +240,17 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     with open(".cfmeta", "w") as fp:
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
 
-    for app in [APP_NAME, WEB_SERVICES_NAME]:
+    # Runs migrations
+    # tasks.py does not continue until the migrations task has completed
+    migrations_successful = _run_migrations(ctx, space)
+    migrator_app_deleted = _delete_migrator_app(ctx, space)
+
+    if not (migrations_successful and migrator_app_deleted):
+        print("Migrations failed and/or the migrator app was not deleted successfully.")
+        print("See the logs for more information.\nCanceling deploy...")
+        sys.exit(1)
+
+    for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
         new_deploy = _do_deploy(ctx, space, app)
 
         if not new_deploy.ok:

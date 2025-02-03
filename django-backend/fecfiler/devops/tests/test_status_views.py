@@ -1,11 +1,6 @@
 from django.test import TestCase, override_settings
-from fecfiler.devops.views import (
-    get_celery_status,
-    get_database_status,
-    get_redis_value,
-    update_status_cache,
-    redis_instance,
-)
+from ..tasks import get_celery_status, get_database_status
+from ..utils.redis_utils import get_redis_value, refresh_cache, redis_instance
 import json
 
 
@@ -29,7 +24,7 @@ class SystemStatusViewTest(TestCase):
     def test_update_status_cache(self):
         key, value = "test_key", "test_value"
         self.assertIsNone(get_redis_value(key))
-        update_status_cache(key, lambda: value)
+        refresh_cache(key, lambda: value)
         self.assertEqual(get_redis_value(key), value)
         redis_instance.delete(key)
         self.assertIsNone(get_redis_value(key))
