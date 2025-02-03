@@ -15,12 +15,6 @@ SCHEDULER_NAME = "fecfile-scheduler"
 PROXY_NAME = "fecfile-api-proxy"
 ORG_NAME = "fec-fecfileonline-prototyping"
 
-MANIFEST_LABEL = {
-    APP_NAME: "api",
-    WEB_SERVICES_NAME: "web-services",
-    SCHEDULER_NAME: "scheduler",
-}
-
 
 def _resolve_rule(repo, branch):
     """Get space associated with first matching rule."""

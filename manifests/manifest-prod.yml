@@ -1,6 +1,6 @@
 ---
 defaults: &defaults
-  instances: 1
+  instances: 0
   stack: cflinuxfs4
   buildpacks:
     - python_buildpack
@@ -20,6 +20,7 @@ defaults: &defaults
     PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
     STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
     FEC_FILING_API: https://efoservices.stage.efo.fec.gov
+    FEC_AGENCY_ID: FEC
     SESSION_COOKIE_AGE: 64800
     BP_PIP_VERSION: latest
     LOG_FORMAT: KEY_VALUE
@@ -35,14 +36,12 @@ defaults: &defaults
 applications:
   - name: fecfile-web-api
     <<: *defaults
-    instances: 0
     routes:
       - route: fecfile-web-api-prod.apps.internal
     command: bin/run-api.sh
     memory: 2G
   - name: fecfile-web-services
     <<: *defaults
-    instances: 2
     no-route: true
     health-check-type: process
     command: bin/run-celery-worker.sh
