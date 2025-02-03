@@ -214,6 +214,12 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             if getattr(self, schedule_key, None):
                 return getattr(self, schedule_key)
 
+    def is_loan_repayment(self):
+        return self.loan is not None and self.schedule_c is None
+
+    def is_debt_repayment(self):
+        return self.debt is not None and self.schedule_d is None
+
     def save(self, *args, **kwargs):
         if self.memo_text:
             self.memo_text.transaction_uuid = self.id
