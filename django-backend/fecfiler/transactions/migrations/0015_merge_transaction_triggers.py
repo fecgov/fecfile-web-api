@@ -5,37 +5,21 @@ def create_triggers(apps, schema_editor):
     with connection.cursor() as cursor:
         cursor.execute(
             """
-        CREATE TRIGGER before_transactions_transaction_insert_trigger
-        BEFORE INSERT ON transactions_transaction
+        CREATE TRIGGER before_transactions_transaction_trigger
+        BEFORE INSERT OR UPDATE ON transactions_transaction
         FOR EACH ROW
-        EXECUTE FUNCTION before_transactions_transaction_insert();
+        EXECUTE FUNCTION before_transactions_transaction();
 
-        CREATE TRIGGER before_transactions_transaction_update_trigger
-        BEFORE UPDATE ON transactions_transaction
+        CREATE TRIGGER after_transactions_transaction_infinite_trigger
+        AFTER INSERT OR UPDATE ON transactions_transaction
         FOR EACH ROW
-        EXECUTE FUNCTION before_transactions_transaction_update();
+        EXECUTE FUNCTION after_transactions_transaction_infinite();
 
-        CREATE TRIGGER after_transactions_transaction_insert_trigger
-        AFTER INSERT ON transactions_transaction
+        CREATE TRIGGER after_transactions_transaction_trigger
+        AFTER INSERT OR UPDATE ON transactions_transaction
         FOR EACH ROW
-        WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
-        EXECUTE FUNCTION after_transactions_transaction_insert();
-
-        CREATE TRIGGER after_transactions_transaction_update_trigger
-        AFTER UPDATE ON transactions_transaction
-        FOR EACH ROW
-        WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
-        EXECUTE FUNCTION after_transactions_transaction_update();
-
-        CREATE TRIGGER after_transactions_transaction_infinite_insert_trigger
-        AFTER INSERT ON transactions_transaction
-        FOR EACH ROW
-        EXECUTE FUNCTION after_transactions_transaction_infinite_insert();
-
-        CREATE TRIGGER after_transactions_transaction_update_infinite_trigger
-        AFTER UPDATE ON transactions_transaction
-        FOR EACH ROW
-        EXECUTE FUNCTION after_transactions_transaction_infinite_update();
+        WHEN (pg_trigger_depth() = 0)
+        EXECUTE FUNCTION after_transactions_transaction();
         """
         )
 
@@ -45,37 +29,25 @@ def reverse_create_triggers(apps, schema):
         cursor.execute(
             """
             DROP TRIGGER
-            IF EXISTS before_transactions_transaction_insert_trigger
+            IF EXISTS before_transactions_transaction_trigger
             ON transactions_transaction;
 
             DROP TRIGGER
-            IF EXISTS before_transactions_transaction_update_trigger
+            IF EXISTS after_transactions_transaction_infinite_trigger
             ON transactions_transaction;
 
             DROP TRIGGER
-            IF EXISTS after_transactions_transaction_insert_trigger
-            ON transactions_transaction;
-
-            DROP TRIGGER
-            IF EXISTS after_transactions_transaction_update_trigger
-            ON transactions_transaction;
-
-            DROP TRIGGER
-            IF EXISTS after_transactions_transaction_infinite_insert_trigger
-            ON transactions_transaction;
-
-            DROP TRIGGER
-            IF EXISTS after_transactions_transaction_update_infinite_trigger
+            IF EXISTS after_transactions_transaction_trigger
             ON transactions_transaction;
             """
         )
 
 
-def before_transactions_transaction_insert(apps, schema_editor):
+def before_transactions_transaction(apps, schema_editor):
     with connection.cursor() as cursor:
         cursor.execute(
             """
-        CREATE OR REPLACE FUNCTION before_transactions_transaction_insert()
+        CREATE OR REPLACE FUNCTION before_transactions_transaction()
         RETURNS TRIGGER AS $$
         BEGIN
             NEW := process_itemization(OLD, NEW);
@@ -86,95 +58,43 @@ def before_transactions_transaction_insert(apps, schema_editor):
         )
 
 
-def before_transactions_transaction_update(apps, schema_editor):
+def after_transactions_transaction(apps, schema_editor):
     with connection.cursor() as cursor:
         cursor.execute(
             """
-        CREATE OR REPLACE FUNCTION before_transactions_transaction_update()
+        CREATE OR REPLACE FUNCTION after_transactions_transaction()
         RETURNS TRIGGER AS $$
         BEGIN
-            NEW := process_itemization(OLD, NEW);
-            RETURN NEW;
-        END;
-        $$ LANGUAGE plpgsql;
-            """
-        )
-
-
-def reverse_before_transactions_transaction_update(apps, schema):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            """
-            DROP FUNCTION IF EXISTS before_transactions_transaction_update
-            """
-        )
-
-
-def after_transactions_transaction_insert(apps, schema_editor):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            """
-        CREATE OR REPLACE FUNCTION after_transactions_transaction_insert()
-        RETURNS TRIGGER AS $$
-        BEGIN
-            NEW := calculate_aggregates(OLD, NEW, TG_OP);
+            IF TG_OP = 'UPDATE'
+            THEN
+                NEW := calculate_aggregates(OLD, NEW, TG_OP);
+                NEW := update_can_unamend(NEW);
+            ELSE
+                NEW := calculate_aggregates(OLD, NEW, TG_OP);
+            END IF;
 
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION after_transactions_transaction_infinite_insert()
+        CREATE OR REPLACE FUNCTION after_transactions_transaction_infinite()
         RETURNS TRIGGER AS $$
         BEGIN
             NEW := handle_parent_itemization(OLD, NEW);
-
-            RETURN NEW;
-        END;
-        $$ LANGUAGE plpgsql;
-            """
-        )
-
-
-def reverse_after_transactions_transaction_insert(apps, schema):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            """
-            DROP FUNCTION IF EXISTS after_transactions_transaction_insert
-            """
-        )
-
-
-def after_transactions_transaction_update(apps, schema_editor):
-    with connection.cursor() as cursor:
-        cursor.execute(
-            """
-        CREATE OR REPLACE FUNCTION after_transactions_transaction_update()
-        RETURNS TRIGGER AS $$
-        BEGIN
-            NEW := calculate_aggregates(OLD, NEW, TG_OP);
-            NEW := update_can_unamend(NEW);
-
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
 
-        CREATE OR REPLACE FUNCTION after_transactions_transaction_infinite_update()
-        RETURNS TRIGGER AS $$
-        BEGIN
-            NEW := handle_parent_itemization(OLD, NEW);
-
-            RETURN NEW;
-        END;
-        $$ LANGUAGE plpgsql;
             """
         )
 
 
-def reverse_after_transactions_transaction_update(apps, schema):
+def reverse_after_transactions_transaction(apps, schema):
     with connection.cursor() as cursor:
         cursor.execute(
             """
-            DROP FUNCTION IF EXISTS after_transactions_transaction_update
+            DROP FUNCTION IF EXISTS after_transactions_transaction
+            DROP FUNCTION IF EXISTS after_transactions_transaction_infinite
             """
         )
 
@@ -538,20 +458,12 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(update_can_unamend, reverse_code=reverse_update_can_unamend),
         migrations.RunPython(
-            before_transactions_transaction_insert,
-            reverse_code=before_transactions_transaction_insert,
+            before_transactions_transaction,
+            reverse_code=before_transactions_transaction,
         ),
         migrations.RunPython(
-            before_transactions_transaction_update,
-            reverse_code=reverse_before_transactions_transaction_update,
-        ),
-        migrations.RunPython(
-            after_transactions_transaction_insert,
-            reverse_code=reverse_after_transactions_transaction_insert,
-        ),
-        migrations.RunPython(
-            after_transactions_transaction_update,
-            reverse_code=reverse_after_transactions_transaction_update,
+            after_transactions_transaction,
+            reverse_code=reverse_after_transactions_transaction,
         ),
         migrations.RunPython(create_triggers, reverse_code=reverse_create_triggers),
     ]
