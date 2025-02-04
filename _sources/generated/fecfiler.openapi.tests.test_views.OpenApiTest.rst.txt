@@ -1,0 +1,135 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.openapi.tests.test\_views.OpenApiTest
+==============================================
+
+.. currentmodule:: fecfiler.openapi.tests.test_views
+
+.. autoclass:: OpenApiTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~OpenApiTest.__init__
+      ~OpenApiTest.addClassCleanup
+      ~OpenApiTest.addCleanup
+      ~OpenApiTest.addTypeEqualityFunc
+      ~OpenApiTest.assertAlmostEqual
+      ~OpenApiTest.assertAlmostEquals
+      ~OpenApiTest.assertContains
+      ~OpenApiTest.assertCountEqual
+      ~OpenApiTest.assertDictContainsSubset
+      ~OpenApiTest.assertDictEqual
+      ~OpenApiTest.assertEqual
+      ~OpenApiTest.assertEquals
+      ~OpenApiTest.assertFalse
+      ~OpenApiTest.assertFieldOutput
+      ~OpenApiTest.assertFormError
+      ~OpenApiTest.assertFormSetError
+      ~OpenApiTest.assertGreater
+      ~OpenApiTest.assertGreaterEqual
+      ~OpenApiTest.assertHTMLEqual
+      ~OpenApiTest.assertHTMLNotEqual
+      ~OpenApiTest.assertIn
+      ~OpenApiTest.assertInHTML
+      ~OpenApiTest.assertIs
+      ~OpenApiTest.assertIsInstance
+      ~OpenApiTest.assertIsNone
+      ~OpenApiTest.assertIsNot
+      ~OpenApiTest.assertIsNotNone
+      ~OpenApiTest.assertJSONEqual
+      ~OpenApiTest.assertJSONNotEqual
+      ~OpenApiTest.assertLess
+      ~OpenApiTest.assertLessEqual
+      ~OpenApiTest.assertListEqual
+      ~OpenApiTest.assertLogs
+      ~OpenApiTest.assertMultiLineEqual
+      ~OpenApiTest.assertNoLogs
+      ~OpenApiTest.assertNotAlmostEqual
+      ~OpenApiTest.assertNotAlmostEquals
+      ~OpenApiTest.assertNotContains
+      ~OpenApiTest.assertNotEqual
+      ~OpenApiTest.assertNotEquals
+      ~OpenApiTest.assertNotIn
+      ~OpenApiTest.assertNotInHTML
+      ~OpenApiTest.assertNotIsInstance
+      ~OpenApiTest.assertNotRegex
+      ~OpenApiTest.assertNotRegexpMatches
+      ~OpenApiTest.assertNumQueries
+      ~OpenApiTest.assertQuerySetEqual
+      ~OpenApiTest.assertRaises
+      ~OpenApiTest.assertRaisesMessage
+      ~OpenApiTest.assertRaisesRegex
+      ~OpenApiTest.assertRaisesRegexp
+      ~OpenApiTest.assertRedirects
+      ~OpenApiTest.assertRegex
+      ~OpenApiTest.assertRegexpMatches
+      ~OpenApiTest.assertSequenceEqual
+      ~OpenApiTest.assertSetEqual
+      ~OpenApiTest.assertTemplateNotUsed
+      ~OpenApiTest.assertTemplateUsed
+      ~OpenApiTest.assertTrue
+      ~OpenApiTest.assertTupleEqual
+      ~OpenApiTest.assertURLEqual
+      ~OpenApiTest.assertWarns
+      ~OpenApiTest.assertWarnsMessage
+      ~OpenApiTest.assertWarnsRegex
+      ~OpenApiTest.assertXMLEqual
+      ~OpenApiTest.assertXMLNotEqual
+      ~OpenApiTest.assert_
+      ~OpenApiTest.captureOnCommitCallbacks
+      ~OpenApiTest.countTestCases
+      ~OpenApiTest.debug
+      ~OpenApiTest.defaultTestResult
+      ~OpenApiTest.doClassCleanups
+      ~OpenApiTest.doCleanups
+      ~OpenApiTest.ensure_connection_patch_method
+      ~OpenApiTest.enterClassContext
+      ~OpenApiTest.fail
+      ~OpenApiTest.failIf
+      ~OpenApiTest.failIfAlmostEqual
+      ~OpenApiTest.failIfEqual
+      ~OpenApiTest.failUnless
+      ~OpenApiTest.failUnlessAlmostEqual
+      ~OpenApiTest.failUnlessEqual
+      ~OpenApiTest.failUnlessRaises
+      ~OpenApiTest.id
+      ~OpenApiTest.modify_settings
+      ~OpenApiTest.run
+      ~OpenApiTest.setUp
+      ~OpenApiTest.setUpClass
+      ~OpenApiTest.setUpTestData
+      ~OpenApiTest.settings
+      ~OpenApiTest.shortDescription
+      ~OpenApiTest.skipTest
+      ~OpenApiTest.subTest
+      ~OpenApiTest.tearDown
+      ~OpenApiTest.tearDownClass
+      ~OpenApiTest.test_api_docs_endpoint
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~OpenApiTest.available_apps
+      ~OpenApiTest.databases
+      ~OpenApiTest.fixtures
+      ~OpenApiTest.longMessage
+      ~OpenApiTest.maxDiff
+      ~OpenApiTest.reset_sequences
+      ~OpenApiTest.serialized_rollback
+   
+   

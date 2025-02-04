@@ -42,6 +42,7 @@ fecfiler
    fecfiler.middleware
    fecfiler.mock_oidc_provider
    fecfiler.oidc
+   fecfiler.openapi
    fecfiler.reports
    fecfiler.routers
    fecfiler.s3

@@ -1,0 +1,83 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.openapi.views.FecfileSpectacularSwaggerView
+====================================================
+
+.. currentmodule:: fecfiler.openapi.views
+
+.. autoclass:: FecfileSpectacularSwaggerView
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FecfileSpectacularSwaggerView.__init__
+      ~FecfileSpectacularSwaggerView.as_view
+      ~FecfileSpectacularSwaggerView.check_object_permissions
+      ~FecfileSpectacularSwaggerView.check_permissions
+      ~FecfileSpectacularSwaggerView.check_throttles
+      ~FecfileSpectacularSwaggerView.determine_version
+      ~FecfileSpectacularSwaggerView.dispatch
+      ~FecfileSpectacularSwaggerView.finalize_response
+      ~FecfileSpectacularSwaggerView.get
+      ~FecfileSpectacularSwaggerView.get_authenticate_header
+      ~FecfileSpectacularSwaggerView.get_authenticators
+      ~FecfileSpectacularSwaggerView.get_content_negotiator
+      ~FecfileSpectacularSwaggerView.get_exception_handler
+      ~FecfileSpectacularSwaggerView.get_exception_handler_context
+      ~FecfileSpectacularSwaggerView.get_format_suffix
+      ~FecfileSpectacularSwaggerView.get_parser_context
+      ~FecfileSpectacularSwaggerView.get_parsers
+      ~FecfileSpectacularSwaggerView.get_permissions
+      ~FecfileSpectacularSwaggerView.get_renderer_context
+      ~FecfileSpectacularSwaggerView.get_renderers
+      ~FecfileSpectacularSwaggerView.get_throttles
+      ~FecfileSpectacularSwaggerView.get_view_description
+      ~FecfileSpectacularSwaggerView.get_view_name
+      ~FecfileSpectacularSwaggerView.handle_exception
+      ~FecfileSpectacularSwaggerView.http_method_not_allowed
+      ~FecfileSpectacularSwaggerView.initial
+      ~FecfileSpectacularSwaggerView.initialize_request
+      ~FecfileSpectacularSwaggerView.options
+      ~FecfileSpectacularSwaggerView.perform_authentication
+      ~FecfileSpectacularSwaggerView.perform_content_negotiation
+      ~FecfileSpectacularSwaggerView.permission_denied
+      ~FecfileSpectacularSwaggerView.raise_uncaught_exception
+      ~FecfileSpectacularSwaggerView.setup
+      ~FecfileSpectacularSwaggerView.throttled
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FecfileSpectacularSwaggerView.allowed_methods
+      ~FecfileSpectacularSwaggerView.authentication_classes
+      ~FecfileSpectacularSwaggerView.default_response_headers
+      ~FecfileSpectacularSwaggerView.http_method_names
+      ~FecfileSpectacularSwaggerView.parser_classes
+      ~FecfileSpectacularSwaggerView.permission_classes
+      ~FecfileSpectacularSwaggerView.renderer_classes
+      ~FecfileSpectacularSwaggerView.schema
+      ~FecfileSpectacularSwaggerView.settings
+      ~FecfileSpectacularSwaggerView.template_name
+      ~FecfileSpectacularSwaggerView.template_name_js
+      ~FecfileSpectacularSwaggerView.throttle_classes
+      ~FecfileSpectacularSwaggerView.title
+      ~FecfileSpectacularSwaggerView.url
+      ~FecfileSpectacularSwaggerView.url_name
+      ~FecfileSpectacularSwaggerView.versioning_class
+      ~FecfileSpectacularSwaggerView.view_is_async
+   
+   
