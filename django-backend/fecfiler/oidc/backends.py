@@ -10,7 +10,7 @@ https://github.com/mozilla/mozilla-django-oidc/blob/main/mozilla_django_oidc/aut
 """
 
 import json
-import logging
+import structlog
 import requests
 
 # logindotgov-oidc
@@ -30,8 +30,9 @@ from . import oidc_op_config
 from .utils import idp_base64_encode_left_128_bits_of_str
 
 from django.conf import settings
+from django.db.models import Q
 
-LOGGER = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class OIDCAuthenticationBackend(ModelBackend):
@@ -51,16 +52,31 @@ class OIDCAuthenticationBackend(ModelBackend):
             raise SuspiciousOperation(msg)
         return retval
 
+    def get_email(self, claims):
+        """Helper method to return email address from claim."""
+        retval = claims.get("email")
+        if not retval:
+            msg = (
+                "Failed to retrieve email from claims"
+            )
+            raise SuspiciousOperation(msg)
+        return retval
+
     def filter_users_by_claims(self, claims):
         """Return all users matching the specified unique identifier."""
         # Get the unique ID value from IDP
         unique_identifier_value = self.get_idp_unique_id_value(claims)
-        if not unique_identifier_value:
+
+        # get email too
+        email = self.get_email(claims)
+
+        if not unique_identifier_value and not email:
             return self.UserModel.objects.none()
+
         # Use the app label to filter
         filter_label = settings.OIDC_RP_UNIQUE_IDENTIFIER + "__iexact"
-        kwargs = {filter_label: unique_identifier_value}
-        filtered_users = self.UserModel.objects.filter(**kwargs)
+        kwargs = {filter_label: unique_identifier_value, "email": email}
+        filtered_users = self.UserModel.objects.filter(Q(**kwargs, _connector=Q.OR))
 
         return filtered_users
 
@@ -79,9 +95,17 @@ class OIDCAuthenticationBackend(ModelBackend):
         return self.get_idp_unique_id_value(claims)
 
     def update_user(self, user, claims):
-        """Update existing user with new email, if necessary save, and return user"""
+        """Update existing user with new email or new UUID, if necessary save, and return user"""
 
-        user.email = claims.get("email")
+        username = self.get_username(claims)
+
+        if user.get_username() == username:
+            # if we matched the user on username, update the email just in case it's changed
+            user.email = claims.get("email")
+        else:
+            # otherwise we match the user on email, so update the username
+            logger.info(f"Existing user found with matching email, updating existing username.")
+            user.username = username
         user.save()
         return user
 
