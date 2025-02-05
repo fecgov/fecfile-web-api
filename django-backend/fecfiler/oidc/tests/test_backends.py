@@ -426,7 +426,7 @@ class OIDCAuthenticationBackendTestCase(TestCase):
             }
         ).encode()
 
-        existing_user = User.objects.create(email=existing_email, 
+        existing_user = User.objects.create(email=existing_email,
                                             username=existing_username)
         committee = CommitteeAccount.objects.create(committee_id="C00000000")
         pending_membership = Membership.objects.create(
