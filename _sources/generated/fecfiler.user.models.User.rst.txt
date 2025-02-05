@@ -53,6 +53,7 @@ fecfiler.user.models.User
       ~User.natural_key
       ~User.normalize_username
       ~User.prepare_database_save
+      ~User.redeem_pending_memberships
       ~User.refresh_from_db
       ~User.save
       ~User.save_base
@@ -60,6 +61,7 @@ fecfiler.user.models.User
       ~User.set_password
       ~User.set_unusable_password
       ~User.unique_error_message
+      ~User.update_email
       ~User.validate_constraints
       ~User.validate_unique
    

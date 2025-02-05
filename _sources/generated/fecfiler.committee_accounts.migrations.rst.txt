@@ -35,4 +35,5 @@ fecfiler.committee\_accounts.migrations
    fecfiler.committee_accounts.migrations.0002_membership
    fecfiler.committee_accounts.migrations.0003_membership_pending_email_alter_membership_id_and_more
    fecfiler.committee_accounts.migrations.0004_remove_duplicate_memberships
+   fecfiler.committee_accounts.migrations.0005_remove_pending_emails
 

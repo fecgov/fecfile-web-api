@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.migrations.0005\_remove\_pending\_emails.remove\_pending\_emails
+=============================================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.migrations.0005_remove_pending_emails
+
+.. autofunction:: remove_pending_emails

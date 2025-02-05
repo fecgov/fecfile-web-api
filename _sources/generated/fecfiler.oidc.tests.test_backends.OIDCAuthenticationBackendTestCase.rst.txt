@@ -122,6 +122,7 @@ fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
       ~OIDCAuthenticationBackendTestCase.test_authenticate_payload_claims_verification_failed
       ~OIDCAuthenticationBackendTestCase.test_authenticate_payload_create_new_user_happy_path
       ~OIDCAuthenticationBackendTestCase.test_authenticate_payload_multiple_users_returned
+      ~OIDCAuthenticationBackendTestCase.test_authenticate_payload_update_user
    
    
 
