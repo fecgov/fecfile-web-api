@@ -81,8 +81,11 @@ class OIDCAuthenticationBackend(ModelBackend):
     def update_user(self, user, claims):
         """Update existing user with new email, if necessary save, and return user"""
 
-        user.email = claims.get("email")
-        user.save()
+        old_email = user.email
+        new_email = claims.get("email")
+        if old_email != new_email:
+            user.update_email(new_email)
+
         return user
 
     def retrieve_matching_jwk(self, kid):
