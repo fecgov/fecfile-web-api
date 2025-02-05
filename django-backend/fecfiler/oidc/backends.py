@@ -95,7 +95,7 @@ class OIDCAuthenticationBackend(ModelBackend):
         return self.get_idp_unique_id_value(claims)
 
     def update_user(self, user, claims):
-        """Update existing user with new email or new UUID, 
+        """Update existing user with new email or new UUID,
         if necessary save, and return user"""
 
         username = self.get_username(claims)
@@ -105,7 +105,8 @@ class OIDCAuthenticationBackend(ModelBackend):
             user.email = claims.get("email")
         else:
             # otherwise we match the user on email, so update the username
-            logger.info("Existing user found with matching email, updating existing username.")
+            logger.info("Existing user found with matching email, " \
+                        "updating existing username.")
             user.username = username
         user.save()
         return user
