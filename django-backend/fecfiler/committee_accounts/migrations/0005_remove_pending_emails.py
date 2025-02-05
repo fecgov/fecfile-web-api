@@ -4,6 +4,7 @@ from django.db import migrations
 
 
 def remove_pending_emails(apps, schema_editor):
+    # remove pending emails from memberships that have been redeemed
     Membership = apps.get_model("committee_accounts", "Membership")  # noqa
     Membership.objects.filter(pending_email__isnull=False, user_id__isnull=False).update(
         pending_email=None
