@@ -99,16 +99,15 @@ class OIDCAuthenticationBackend(ModelBackend):
         if necessary save, and return user"""
 
         username = self.get_username(claims)
+        email = claims.get("email")
 
         if user.get_username() == username:
-            # if we matched username, update the email just in case it's changed
-            user.email = claims.get("email")
+            # if we matched username, check email for change
+            if user.email != email:
+                user.update_email(email)
         else:
             # otherwise we match the user on email, so update the username
-            logger.info("Existing user found with matching email, "
-                        "updating existing username.")
-            user.username = username
-        user.save()
+            user.update_username(username)
         return user
 
     def retrieve_matching_jwk(self, kid):
