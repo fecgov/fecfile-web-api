@@ -33,16 +33,18 @@ class User(AbstractUser):
 
     def redeem_pending_memberships(self):
         from fecfiler.committee_accounts.models import Membership  # no circular import
-        pending_memberships = Membership.objects.filter(
-            user=None, pending_email__iexact=self.email
+
+        pending_memberships = list(
+            Membership.objects.filter(user=None, pending_email__iexact=self.email)
         )
 
-        for new_membership in pending_memberships:
-            new_membership.user = self
-            new_membership.save()
+        for pending_membership in pending_memberships:
+            pending_membership.user = self
+            pending_membership.pending_email = None
+            pending_membership.save()
 
-        redeemed = pending_memberships.count()
-        if redeemed > 0:
-            logger.info(f"Redeemed {redeemed} pending memberships - {self.email}")
+        redeemed_count = len(pending_memberships)
+        if redeemed_count > 0:
+            logger.info(f"Redeemed {redeemed_count} pending memberships - {self.email}")
 
-        return redeemed
+        return redeemed_count

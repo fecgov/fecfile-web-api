@@ -366,8 +366,7 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         test_user = User.objects.create(email="old_email", username=test_username)
         committee = CommitteeAccount.objects.create(committee_id="C00000000")
         pending_membership = Membership.objects.create(
-            pending_email="test_email",
-            committee_account=committee
+            pending_email="test_email", committee_account=committee
         )
 
         post_json_mock = Mock(status_code=200)
@@ -377,9 +376,7 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         }
 
         get_json_mock = Mock(status_code=200)
-        get_json_mock.json.side_effect = [
-            {"sub": test_username, "email": test_email}
-        ]
+        get_json_mock.json.side_effect = [{"sub": test_username, "email": test_email}]
 
         requests_mock.post.return_value = post_json_mock
         requests_mock.get.return_value = get_json_mock
@@ -388,15 +385,14 @@ class OIDCAuthenticationBackendTestCase(TestCase):
 
         auth_request = RequestFactory().get("/foo", {"code": test_code, "state": "bar"})
 
-        self.assertEqual(User.objects.filter(email='old_email').count(), 1)
+        self.assertEqual(User.objects.filter(email="old_email").count(), 1)
         self.assertEqual(User.objects.filter(email=test_email).count(), 0)
         retval = self.backend.authenticate(request=auth_request, nonce=test_nonce_value)
         self.assertIsNotNone(retval)
 
-        self.assertEqual(User.objects.filter(email='old_email').count(), 0)
+        self.assertEqual(User.objects.filter(email="old_email").count(), 0)
         self.assertEqual(User.objects.filter(email=test_email).count(), 1)
 
         pending_membership.refresh_from_db()
-        self.assertEqual(
-            pending_membership.user, test_user
-        )
+        self.assertEqual(pending_membership.pending_email, None)
+        self.assertEqual(pending_membership.user, test_user)
