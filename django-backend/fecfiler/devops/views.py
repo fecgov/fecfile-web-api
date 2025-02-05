@@ -3,15 +3,12 @@ from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .tasks import (
-    get_celery_status,
-    check_database_running,
+    DATABASE_STATUS,
+    CELERY_STATUS,
+    SCHEDULER_STATUS
 )
 
-from .utils.redis_utils import get_redis_value, refresh_cache
-
-CELERY_STATUS = "CELERY_STATUS"
-DATABASE_STATUS = "DATABASE_STATUS"
-SCHEDULER_STATUS = "SCHEDULER_STATUS"
+from .utils.redis_utils import get_redis_value
 
 
 logger = structlog.get_logger(__name__)
@@ -43,17 +40,11 @@ class SystemStatusViewSet(viewsets.ViewSet):
         permission_classes=[],
     )
     def celery_status(self, request):
-        """
-        Check the status of the celery queue
-        Get the status from the cache if it exists, otherwise update the cache
-        """
-        celery_status = get_redis_value(CELERY_STATUS)
-
-        if celery_status is None:
-            celery_status = refresh_cache(CELERY_STATUS, get_celery_status)
+        celery_status = get_redis_value(CELERY_STATUS, {})
 
         if celery_status.get("celery_is_running"):
             return Response({"status": "celery is completing tasks"})
+
         return Response(
             {"status": "celery queue is not circulating"},
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -66,14 +57,11 @@ class SystemStatusViewSet(viewsets.ViewSet):
         permission_classes=[],
     )
     def scheduler_status(self, request):
-        """
-        Check the status of the celery beat queue
-        Get the status from the cache if it exists, otherwise update the cache
-        """
-        scheduler_status = get_redis_value(SCHEDULER_STATUS)
+        scheduler_status = get_redis_value(SCHEDULER_STATUS, {})
 
         if scheduler_status is not None:
             return Response({"status": "scheduler is completing tasks"})
+
         return Response(
             {"status": "scheduler queue is not circulating"},
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -86,17 +74,11 @@ class SystemStatusViewSet(viewsets.ViewSet):
         permission_classes=[],
     )
     def database_status(self, request):
-        """
-        Check the status of the celery queue
-        Get the status from the cache if it exists, otherwise update the cache
-        """
-        db_status = get_redis_value(DATABASE_STATUS)
-
-        if db_status is None:
-            db_status = refresh_cache(DATABASE_STATUS, check_database_running)
+        db_status = get_redis_value(DATABASE_STATUS, {})
 
         if db_status.get("database_is_running"):
             return Response({"status": "database is running"})
+
         return Response(
             {"status": "cannot connect to database"},
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
