@@ -18,5 +18,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(remove_pending_emails),
+        migrations.RunPython(
+            remove_pending_emails, reverse_code=migrations.RunPython.noop
+        ),
     ]
