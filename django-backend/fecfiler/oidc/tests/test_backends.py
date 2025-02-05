@@ -4,6 +4,8 @@ from django.core.exceptions import SuspiciousOperation
 from django.test import RequestFactory, TestCase
 from fecfiler.oidc.backends import OIDCAuthenticationBackend
 from fecfiler.oidc.utils import idp_base64_encode_left_128_bits_of_str
+from fecfiler.user.models import User
+from fecfiler.committee_accounts.models import Membership, CommitteeAccount
 
 import json
 
@@ -332,3 +334,65 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         self.backend.UserModel.objects.create_user = Mock()
         retval = self.backend.authenticate(request=auth_request, nonce=test_nonce_value)
         self.assertIsNotNone(retval)
+
+    @patch("fecfiler.oidc.backends.requests")
+    @patch("fecfiler.oidc.backends.jwk")
+    @patch("fecfiler.oidc.backends.jwt")
+    @patch("fecfiler.oidc.backends.jws")
+    @patch("fecfiler.oidc.backends.len")
+    def test_authenticate_payload_update_user(
+        self,
+        len_mock,
+        jws_mock,
+        jwt_mock,
+        jwk_mock,
+        requests_mock,
+    ):
+        test_email = "test_email"
+        test_username = "test_username"
+        test_code = "test_code_that_a_fair_length"
+        test_access_token = "test_access_token"
+        test_nonce_value = "test_nonce_value"
+        test_at_hash_value = idp_base64_encode_left_128_bits_of_str(test_access_token)
+        test_c_hash_value = idp_base64_encode_left_128_bits_of_str(test_code)
+        test_jws_payload = json.dumps(
+            {
+                "nonce": test_nonce_value,
+                "at_hash": test_at_hash_value,
+                "c_hash": test_c_hash_value,
+            }
+        ).encode()
+
+        test_user = User.objects.create(email="old_email", username=test_username)
+        committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        pending_membership = Membership.objects.create(
+            pending_email="test_email", committee_account=committee
+        )
+
+        post_json_mock = Mock(status_code=200)
+        post_json_mock.json.return_value = {
+            "id_token": "id_token",
+            "access_token": test_access_token,
+        }
+
+        get_json_mock = Mock(status_code=200)
+        get_json_mock.json.side_effect = [{"sub": test_username, "email": test_email}]
+
+        requests_mock.post.return_value = post_json_mock
+        requests_mock.get.return_value = get_json_mock
+        jws_mock.JWS.return_value.payload = test_jws_payload
+        len_mock.return_value = 1
+
+        auth_request = RequestFactory().get("/foo", {"code": test_code, "state": "bar"})
+
+        self.assertEqual(User.objects.filter(email="old_email").count(), 1)
+        self.assertEqual(User.objects.filter(email=test_email).count(), 0)
+        retval = self.backend.authenticate(request=auth_request, nonce=test_nonce_value)
+        self.assertIsNotNone(retval)
+
+        self.assertEqual(User.objects.filter(email="old_email").count(), 0)
+        self.assertEqual(User.objects.filter(email=test_email).count(), 1)
+
+        pending_membership.refresh_from_db()
+        self.assertEqual(pending_membership.pending_email, None)
+        self.assertEqual(pending_membership.user, test_user)

@@ -2,6 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 import uuid
 from fecfiler.user.managers import UserManager
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class User(AbstractUser):
@@ -19,3 +22,29 @@ class User(AbstractUser):
     security_consent_exp_date = models.DateField(null=True, blank=True)
 
     objects = UserManager()
+
+    def update_email(self, new_email):
+        old_email = self.email
+        self.email = new_email
+        self.save()
+        logger.info(f"Updated user email: {old_email} -> {new_email}")
+
+        self.redeem_pending_memberships()
+
+    def redeem_pending_memberships(self):
+        from fecfiler.committee_accounts.models import Membership  # no circular import
+
+        pending_memberships = list(
+            Membership.objects.filter(user=None, pending_email__iexact=self.email)
+        )
+
+        for pending_membership in pending_memberships:
+            pending_membership.user = self
+            pending_membership.pending_email = None
+            pending_membership.save()
+
+        redeemed_count = len(pending_memberships)
+        if redeemed_count > 0:
+            logger.info(f"Redeemed {redeemed_count} pending memberships - {self.email}")
+
+        return redeemed_count
