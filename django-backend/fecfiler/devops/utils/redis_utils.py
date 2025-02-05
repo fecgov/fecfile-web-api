@@ -10,13 +10,13 @@ else:
     raise SystemError("SYSTEM_STATUS_CACHE_BACKEND is not set")
 
 
-def get_redis_value(key):
+def get_redis_value(key, fallback=None):
     """
     Get value from redis and parse the json.
     If they value is falsy ("", None), return None
     """
     value = redis_instance.get(key)
-    return json.loads(value) if value else None
+    return json.loads(value) if value else fallback
 
 
 def set_redis_value(key, value, age):

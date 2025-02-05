@@ -10,24 +10,33 @@ logger = structlog.get_logger(__name__)
 
 
 SCHEDULER_STATUS = "SCHEDULER_STATUS"
+CELERY_STATUS = "CELERY_STATUS"
 DATABASE_STATUS = "DATABASE_STATUS"
 INITIAL_DB_SIZE = "INITIAL_DB_SIZE"
 
 
 @shared_task
-def get_database_status_report():
-    set_redis_value(
-        SCHEDULER_STATUS, {"scheduler_is_running": True}, age=SYSTEM_STATUS_CACHE_AGE
-    )
+def get_devops_status_report():
+    scheduler_running = {"scheduler_is_running": True}
+    set_redis_value(SCHEDULER_STATUS, scheduler_running, age=SYSTEM_STATUS_CACHE_AGE)
+    logger.info(scheduler_running)
+
+    celery_running = {"celery_is_running": True}  # If this task runs, celery is working
+    set_redis_value(CELERY_STATUS, celery_running, age=SYSTEM_STATUS_CACHE_AGE)
+    logger.info(celery_running)
+
+    db_running = check_database_running()
+    set_redis_value(DATABASE_STATUS, db_running, age=SYSTEM_STATUS_CACHE_AGE)
+    logger.info(db_running)
 
     db_connections_results = get_database_connections()
     logger.info(db_connections_results)
 
-    db_size = get_database_size()
+    db_size = check_database_size()
     log_database_size(db_size)
 
 
-def get_database_size():
+def check_database_size():
     sql = "SELECT pg_database_size( current_database() );"
 
     results = None
@@ -134,18 +143,4 @@ def check_database_running():
         )
         status_data = cursor.fetchone()
 
-    db_running = {"database_is_running": status_data is not None}
-    set_redis_value(DATABASE_STATUS, **db_running, age=SYSTEM_STATUS_CACHE_AGE)
-    return db_running
-
-
-def get_celery_status():
-    """
-    Run a debug task and wait form it to complete (for 30s max)
-    If the task completes, the queue is being circulated
-    """
-    # rigging this to be true because we can't turn off the pingdom check.
-    # it seems like this celery task is locking the queue somehow.  will
-    # need to investigate further.
-    # return {"celery_is_running": True}
-    return {"celery_is_running": debug_task.delay().wait(timeout=30, interval=1)}
+    return {"database_is_running": status_data is not None}
