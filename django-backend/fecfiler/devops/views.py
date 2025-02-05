@@ -92,9 +92,6 @@ class SystemStatusViewSet(viewsets.ViewSet):
         """
         db_status = get_redis_value(DATABASE_STATUS)
 
-        if db_status is None:
-            db_status = refresh_cache(DATABASE_STATUS, check_database_running)
-
         if db_status.get("database_is_running"):
             return Response({"status": "database is running"})
         return Response(

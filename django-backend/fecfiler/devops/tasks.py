@@ -10,6 +10,7 @@ logger = structlog.get_logger(__name__)
 
 
 SCHEDULER_STATUS = "SCHEDULER_STATUS"
+DATABASE_STATUS = "DATABASE_STATUS"
 INITIAL_DB_SIZE = "INITIAL_DB_SIZE"
 
 
@@ -64,9 +65,9 @@ def log_database_size(nbytes):
 
         seconds_in_a_day = timedelta(days=1).total_seconds()
         days_since_logged = logged_time_delta.total_seconds() / seconds_in_a_day
-        logged_time_delta_pretty = round(days_since_logged, 2)
+        logged_time_delta_pretty = round(days_since_logged, 3)
 
-        size_delta_pretty = round(logged_ngbytes_delta, 2)
+        size_delta_pretty = round(logged_ngbytes_delta, 5)
         log_dict[
             "db_growth"
         ] = f"{size_delta_pretty} GB in the last {logged_time_delta_pretty} days"
@@ -132,7 +133,10 @@ def check_database_running():
             "select * from pg_stat_activity where datname = current_database()"
         )
         status_data = cursor.fetchone()
-    return {"database_is_running": status_data is not None}
+
+    db_running = {"database_is_running": status_data is not None}
+    set_redis_value(DATABASE_STATUS, **db_running, age=SYSTEM_STATUS_CACHE_AGE)
+    return db_running
 
 
 def get_celery_status():
