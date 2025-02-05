@@ -114,9 +114,9 @@ fecfiler.devops.tests.test\_status\_views.SystemStatusViewTest
       ~SystemStatusViewTest.subTest
       ~SystemStatusViewTest.tearDown
       ~SystemStatusViewTest.tearDownClass
-      ~SystemStatusViewTest.test_get_celery_status
-      ~SystemStatusViewTest.test_get_database_satus
+      ~SystemStatusViewTest.test_check_database_running
       ~SystemStatusViewTest.test_get_redis_value
+      ~SystemStatusViewTest.test_status_report
       ~SystemStatusViewTest.test_update_status_cache
    
    

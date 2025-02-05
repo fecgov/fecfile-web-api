@@ -1,0 +1,6 @@
+fecfiler.devops.tasks.get\_database\_connections
+================================================
+
+.. currentmodule:: fecfiler.devops.tasks
+
+.. autofunction:: get_database_connections

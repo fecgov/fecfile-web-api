@@ -1,6 +1,6 @@
-fecfiler.devops.tasks.get\_celery\_status
+fecfiler.devops.tasks.log\_database\_size
 =========================================
 
 .. currentmodule:: fecfiler.devops.tasks
 
-.. autofunction:: get_celery_status
+.. autofunction:: log_database_size

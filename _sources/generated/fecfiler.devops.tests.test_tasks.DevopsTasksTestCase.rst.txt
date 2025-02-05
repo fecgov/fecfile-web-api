@@ -115,6 +115,9 @@ fecfiler.devops.tests.test\_tasks.DevopsTasksTestCase
       ~DevopsTasksTestCase.tearDown
       ~DevopsTasksTestCase.tearDownClass
       ~DevopsTasksTestCase.test_get_database_connections
+      ~DevopsTasksTestCase.test_get_db_size
+      ~DevopsTasksTestCase.test_get_db_status_report
+      ~DevopsTasksTestCase.test_log_db_size
    
    
 

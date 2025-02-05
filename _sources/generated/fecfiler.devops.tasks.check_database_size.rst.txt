@@ -1,6 +1,6 @@
-fecfiler.devops.tasks.get\_database\_status
+fecfiler.devops.tasks.check\_database\_size
 ===========================================
 
 .. currentmodule:: fecfiler.devops.tasks
 
-.. autofunction:: get_database_status
+.. autofunction:: check_database_size

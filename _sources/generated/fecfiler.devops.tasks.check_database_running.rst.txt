@@ -1,0 +1,6 @@
+fecfiler.devops.tasks.check\_database\_running
+==============================================
+
+.. currentmodule:: fecfiler.devops.tasks
+
+.. autofunction:: check_database_running

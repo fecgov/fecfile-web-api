@@ -66,8 +66,8 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.as_view" title="fecfiler.devops.views.SystemStatusViewSet.as_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_view</span></code></a>([actions])</p></td>
 <td><p>Because of the way class based views create a closure around the instantiated view, we need to totally reimplement <cite>.as_view</cite>, and slightly modify the view function that is created and returned.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.celery_status" title="fecfiler.devops.views.SystemStatusViewSet.celery_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">celery_status</span></code></a>(request)</p></td>
-<td><p>Check the status of the celery queue Get the status from the cache if it exists, otherwise update the cache</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">celery_status</span></code>(request)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.check_object_permissions" title="fecfiler.devops.views.SystemStatusViewSet.check_object_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_object_permissions</span></code></a>(request, obj)</p></td>
 <td><p>Check if the request should be permitted for a given object.</p></td>
@@ -78,8 +78,8 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.check_throttles" title="fecfiler.devops.views.SystemStatusViewSet.check_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_throttles</span></code></a>(request)</p></td>
 <td><p>Check if request should be throttled.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.database_status" title="fecfiler.devops.views.SystemStatusViewSet.database_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">database_status</span></code></a>(request)</p></td>
-<td><p>Check the status of the celery queue Get the status from the cache if it exists, otherwise update the cache</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">database_status</span></code>(request)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.determine_version" title="fecfiler.devops.views.SystemStatusViewSet.determine_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_version</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>If versioning is being used, then determine any API version for the incoming request.</p></td>
@@ -168,8 +168,8 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.reverse_action" title="fecfiler.devops.views.SystemStatusViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
 <td><p>Reverse the action for the given <cite>url_name</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.scheduler_status" title="fecfiler.devops.views.SystemStatusViewSet.scheduler_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scheduler_status</span></code></a>(request)</p></td>
-<td><p>Check the status of the celery beat queue Get the status from the cache if it exists, otherwise update the cache</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">scheduler_status</span></code>(request)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.setup" title="fecfiler.devops.views.SystemStatusViewSet.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Initialize attributes shared by all view methods.</p></td>
@@ -250,13 +250,6 @@ and slightly modify the view function that is created and returned.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.devops.views.SystemStatusViewSet.celery_status">
-<span class="sig-name descname"><span class="pre">celery_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.devops.views.SystemStatusViewSet.celery_status" title="Link to this definition">¶</a></dt>
-<dd><p>Check the status of the celery queue
-Get the status from the cache if it exists, otherwise update the cache</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.devops.views.SystemStatusViewSet.check_object_permissions">
 <span class="sig-name descname"><span class="pre">check_object_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.devops.views.SystemStatusViewSet.check_object_permissions" title="Link to this definition">¶</a></dt>
 <dd><p>Check if the request should be permitted for a given object.
@@ -275,13 +268,6 @@ Raises an appropriate exception if the request is not permitted.</p>
 <span class="sig-name descname"><span class="pre">check_throttles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.devops.views.SystemStatusViewSet.check_throttles" title="Link to this definition">¶</a></dt>
 <dd><p>Check if request should be throttled.
 Raises an appropriate exception if the request is throttled.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.devops.views.SystemStatusViewSet.database_status">
-<span class="sig-name descname"><span class="pre">database_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.devops.views.SystemStatusViewSet.database_status" title="Link to this definition">¶</a></dt>
-<dd><p>Check the status of the celery queue
-Get the status from the cache if it exists, otherwise update the cache</p>
 </dd></dl>
 
 <dl class="py method">
@@ -473,13 +459,6 @@ will instead be performed lazily, the first time either
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.devops.views.SystemStatusViewSet.scheduler_status">
-<span class="sig-name descname"><span class="pre">scheduler_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.devops.views.SystemStatusViewSet.scheduler_status" title="Link to this definition">¶</a></dt>
-<dd><p>Check the status of the celery beat queue
-Get the status from the cache if it exists, otherwise update the cache</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.devops.views.SystemStatusViewSet.setup">
 <span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.devops.views.SystemStatusViewSet.setup" title="Link to this definition">¶</a></dt>
 <dd><p>Initialize attributes shared by all view methods.</p>
@@ -532,11 +511,9 @@ Get the status from the cache if it exists, otherwise update the cache</p>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.__init__"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.__init__()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.allowed_methods"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.allowed_methods</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.as_view"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.as_view()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.celery_status"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.celery_status()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.check_object_permissions"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.check_object_permissions()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.check_permissions"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.check_permissions()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.check_throttles"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.check_throttles()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.database_status"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.database_status()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.determine_version"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.determine_version()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.dispatch"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.dispatch()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.finalize_response"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.finalize_response()</span></code></a></li>
@@ -566,7 +543,6 @@ Get the status from the cache if it exists, otherwise update the cache</p>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.perform_content_negotiation"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.perform_content_negotiation()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.permission_denied"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.permission_denied()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.reverse_action"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.reverse_action()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.scheduler_status"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.scheduler_status()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.setup"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.setup()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.devops.views.SystemStatusViewSet.throttled"><code class="docutils literal notranslate"><span class="pre">SystemStatusViewSet.throttled()</span></code></a></li>
 </ul>

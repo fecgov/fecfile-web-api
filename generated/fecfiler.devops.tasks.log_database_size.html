@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>fecfiler.devops.tasks.get_celery_status &#8212; FECFile Web API  documentation</title>
+    <title>fecfiler.devops.tasks.log_database_size &#8212; FECFile Web API  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
@@ -13,8 +13,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.devops.tasks.get_database_status" href="fecfiler.devops.tasks.get_database_status.html" />
-    <link rel="prev" title="fecfiler.devops.tasks" href="fecfiler.devops.tasks.html" />
+    <link rel="next" title="fecfiler.devops.tests" href="fecfiler.devops.tests.html" />
+    <link rel="prev" title="fecfiler.devops.tasks.get_database_connections" href="fecfiler.devops.tasks.get_database_connections.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -32,14 +32,12 @@
 
           <div class="body" role="main">
             
-  <section id="fecfiler-devops-tasks-get-celery-status">
-<h1>fecfiler.devops.tasks.get_celery_status<a class="headerlink" href="#fecfiler-devops-tasks-get-celery-status" title="Link to this heading">¶</a></h1>
+  <section id="fecfiler-devops-tasks-log-database-size">
+<h1>fecfiler.devops.tasks.log_database_size<a class="headerlink" href="#fecfiler-devops-tasks-log-database-size" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="fecfiler.devops.tasks.get_celery_status">
-<span class="sig-prename descclassname"><span class="pre">fecfiler.devops.tasks.</span></span><span class="sig-name descname"><span class="pre">get_celery_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.devops.tasks.get_celery_status" title="Link to this definition">¶</a></dt>
-<dd><p>Run a debug task and wait form it to complete (for 30s max)
-If the task completes, the queue is being circulated</p>
-</dd></dl>
+<dt class="sig sig-object py" id="fecfiler.devops.tasks.log_database_size">
+<span class="sig-prename descclassname"><span class="pre">fecfiler.devops.tasks.</span></span><span class="sig-name descname"><span class="pre">log_database_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nbytes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.devops.tasks.log_database_size" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </section>
 
@@ -71,11 +69,13 @@ If the task completes, the queue is being circulated</p>
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.devops.html">fecfiler.devops</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.management.html">fecfiler.devops.management</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.devops.tasks.html">fecfiler.devops.tasks</a><ul class="current">
-<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.devops.tasks.get_celery_status</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="#fecfiler.devops.tasks.get_celery_status"><code class="docutils literal notranslate"><span class="pre">get_celery_status()</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tasks.check_database_running.html">fecfiler.devops.tasks.check_database_running</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tasks.check_database_size.html">fecfiler.devops.tasks.check_database_size</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tasks.get_database_connections.html">fecfiler.devops.tasks.get_database_connections</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.devops.tasks.log_database_size</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.devops.tasks.log_database_size"><code class="docutils literal notranslate"><span class="pre">log_database_size()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tasks.get_database_status.html">fecfiler.devops.tasks.get_database_status</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.tests.html">fecfiler.devops.tests</a></li>
@@ -117,8 +117,8 @@ If the task completes, the queue is being circulated</p>
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.devops.html">fecfiler.devops</a><ul>
   <li><a href="fecfiler.devops.tasks.html">fecfiler.devops.tasks</a><ul>
-      <li>Previous: <a href="fecfiler.devops.tasks.html" title="previous chapter">fecfiler.devops.tasks</a></li>
-      <li>Next: <a href="fecfiler.devops.tasks.get_database_status.html" title="next chapter">fecfiler.devops.tasks.get_database_status</a></li>
+      <li>Previous: <a href="fecfiler.devops.tasks.get_database_connections.html" title="previous chapter">fecfiler.devops.tasks.get_database_connections</a></li>
+      <li>Next: <a href="fecfiler.devops.tests.html" title="next chapter">fecfiler.devops.tests</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -156,7 +156,7 @@ If the task completes, the queue is being circulated</p>
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
-      <a href="../_sources/generated/fecfiler.devops.tasks.get_celery_status.rst.txt"
+      <a href="../_sources/generated/fecfiler.devops.tasks.log_database_size.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

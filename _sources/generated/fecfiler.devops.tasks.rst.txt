@@ -17,8 +17,10 @@ fecfiler.devops.tasks
    .. autosummary::
       :toctree:                                          
    
-      get_celery_status
-      get_database_status
+      check_database_running
+      check_database_size
+      get_database_connections
+      log_database_size
    
    
 

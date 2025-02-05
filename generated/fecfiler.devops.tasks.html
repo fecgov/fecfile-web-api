@@ -13,7 +13,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.devops.tasks.get_celery_status" href="fecfiler.devops.tasks.get_celery_status.html" />
+    <link rel="next" title="fecfiler.devops.tasks.check_database_running" href="fecfiler.devops.tasks.check_database_running.html" />
     <link rel="prev" title="fecfiler.devops.management" href="fecfiler.devops.management.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -37,11 +37,17 @@
 <p class="rubric">Functions</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.devops.tasks.get_celery_status.html#fecfiler.devops.tasks.get_celery_status" title="fecfiler.devops.tasks.get_celery_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_celery_status</span></code></a>()</p></td>
-<td><p>Run a debug task and wait form it to complete (for 30s max) If the task completes, the queue is being circulated</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.devops.tasks.get_database_status.html#fecfiler.devops.tasks.get_database_status" title="fecfiler.devops.tasks.get_database_status"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_database_status</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.devops.tasks.check_database_running.html#fecfiler.devops.tasks.check_database_running" title="fecfiler.devops.tasks.check_database_running"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_database_running</span></code></a>()</p></td>
 <td><p>Query the pg_stat_activity table to look for our current database.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.devops.tasks.check_database_size.html#fecfiler.devops.tasks.check_database_size" title="fecfiler.devops.tasks.check_database_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_database_size</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.devops.tasks.get_database_connections.html#fecfiler.devops.tasks.get_database_connections" title="fecfiler.devops.tasks.get_database_connections"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_database_connections</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.devops.tasks.log_database_size.html#fecfiler.devops.tasks.log_database_size" title="fecfiler.devops.tasks.log_database_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log_database_size</span></code></a>(nbytes)</p></td>
+<td><p></p></td>
 </tr>
 </tbody>
 </table>
@@ -75,8 +81,10 @@
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.devops.html">fecfiler.devops</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.management.html">fecfiler.devops.management</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.devops.tasks</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tasks.get_celery_status.html">fecfiler.devops.tasks.get_celery_status</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tasks.get_database_status.html">fecfiler.devops.tasks.get_database_status</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tasks.check_database_running.html">fecfiler.devops.tasks.check_database_running</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tasks.check_database_size.html">fecfiler.devops.tasks.check_database_size</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tasks.get_database_connections.html">fecfiler.devops.tasks.get_database_connections</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tasks.log_database_size.html">fecfiler.devops.tasks.log_database_size</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.tests.html">fecfiler.devops.tests</a></li>
@@ -118,7 +126,7 @@
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.devops.html">fecfiler.devops</a><ul>
       <li>Previous: <a href="fecfiler.devops.management.html" title="previous chapter">fecfiler.devops.management</a></li>
-      <li>Next: <a href="fecfiler.devops.tasks.get_celery_status.html" title="next chapter">fecfiler.devops.tasks.get_celery_status</a></li>
+      <li>Next: <a href="fecfiler.devops.tasks.check_database_running.html" title="next chapter">fecfiler.devops.tasks.check_database_running</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
