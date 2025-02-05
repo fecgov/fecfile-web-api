@@ -335,7 +335,6 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         retval = self.backend.authenticate(request=auth_request, nonce=test_nonce_value)
         self.assertIsNotNone(retval)
 
-
     @patch("fecfiler.oidc.backends.requests")
     @patch("fecfiler.oidc.backends.jwk")
     @patch("fecfiler.oidc.backends.jwt")
@@ -367,10 +366,9 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         test_user = User.objects.create(email="old_email", username=test_username)
         committee = CommitteeAccount.objects.create(committee_id="C00000000")
         pending_membership = Membership.objects.create(
-            pending_email = "test_email",
+            pending_email="test_email",
             committee_account=committee
         )
-
 
         post_json_mock = Mock(status_code=200)
         post_json_mock.json.return_value = {
@@ -380,7 +378,7 @@ class OIDCAuthenticationBackendTestCase(TestCase):
 
         get_json_mock = Mock(status_code=200)
         get_json_mock.json.side_effect = [
-            {"sub": test_username, "email": test_email,}
+            {"sub": test_username, "email": test_email}
         ]
 
         requests_mock.post.return_value = post_json_mock
