@@ -105,7 +105,7 @@ class OIDCAuthenticationBackend(ModelBackend):
             user.email = claims.get("email")
         else:
             # otherwise we match the user on email, so update the username
-            logger.info("Existing user found with matching email, " \
+            logger.info("Existing user found with matching email, "
                         "updating existing username.")
             user.username = username
         user.save()
