@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "fecfiler.devops",
     "fecfiler.mock_oidc_provider",
     "fecfiler.cash_on_hand",
+    "fecfiler.openapi",
 ]
 
 MIDDLEWARE = [
@@ -91,7 +92,7 @@ MIDDLEWARE = [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["templates", "static/templates"],
+        "DIRS": ["fecfiler/openapi/templates", "static/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
