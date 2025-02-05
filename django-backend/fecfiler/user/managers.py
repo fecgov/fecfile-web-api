@@ -6,21 +6,13 @@ logger = structlog.get_logger(__name__)
 
 class UserManager(AbstractUserManager):
     def create_user(self, user_id, **obj_data):
-        from fecfiler.committee_accounts.models import Membership
 
         new_user = super().create_user(user_id, **obj_data)
-        pending_memberships = Membership.objects.filter(
-            user=None, pending_email__iexact=obj_data["email"]
-        )
 
         logger.info(
-            f"""New User Created: {
-                obj_data['email']} - {pending_memberships.count()
-            } Pending Memberships"""
+            f"New User Created: {obj_data['email']}"
         )
 
-        for new_membership in pending_memberships:
-            new_membership.user = new_user
-            new_membership.save()
+        new_user.redeem_pending_memberships()
 
         return new_user
