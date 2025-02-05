@@ -40,4 +40,3 @@ class SystemStatusViewTest(TestCase):
         get_devops_status_report()
         self.assertIsNotNone(get_redis_value(CELERY_STATUS))
         self.assertIsNotNone(get_redis_value(SCHEDULER_STATUS))
-
