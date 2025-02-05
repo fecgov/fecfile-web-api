@@ -340,7 +340,7 @@ class OIDCAuthenticationBackendTestCase(TestCase):
     @patch("fecfiler.oidc.backends.jwt")
     @patch("fecfiler.oidc.backends.jws")
     @patch("fecfiler.oidc.backends.len")
-    def test_authenticate_payload_update_user(
+    def test_authenticate_payload_update_user_email(
         self,
         len_mock,
         jws_mock,
@@ -366,7 +366,7 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         test_user = User.objects.create(email="old_email", username=test_username)
         committee = CommitteeAccount.objects.create(committee_id="C00000000")
         pending_membership = Membership.objects.create(
-            pending_email="test_email", committee_account=committee
+            pending_email=test_email, committee_account=committee
         )
 
         post_json_mock = Mock(status_code=200)
@@ -396,3 +396,66 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         pending_membership.refresh_from_db()
         self.assertEqual(pending_membership.pending_email, None)
         self.assertEqual(pending_membership.user, test_user)
+
+    @patch("fecfiler.oidc.backends.requests")
+    @patch("fecfiler.oidc.backends.jwk")
+    @patch("fecfiler.oidc.backends.jwt")
+    @patch("fecfiler.oidc.backends.jws")
+    @patch("fecfiler.oidc.backends.len")
+    def test_authenticate_payload_update_user_username(
+        self,
+        len_mock,
+        jws_mock,
+        jwt_mock,
+        jwk_mock,
+        requests_mock,
+    ):
+        existing_email = "existing_email"
+        existing_username = "old_username"
+        test_username = "new_username"
+        test_code = "test_code_that_a_fair_length"
+        test_access_token = "test_access_token"
+        test_nonce_value = "test_nonce_value"
+        test_at_hash_value = idp_base64_encode_left_128_bits_of_str(test_access_token)
+        test_c_hash_value = idp_base64_encode_left_128_bits_of_str(test_code)
+        test_jws_payload = json.dumps(
+            {
+                "nonce": test_nonce_value,
+                "at_hash": test_at_hash_value,
+                "c_hash": test_c_hash_value,
+            }
+        ).encode()
+
+        existing_user = User.objects.create(email=existing_email, username=existing_username)
+        committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        pending_membership = Membership.objects.create(
+            pending_email=existing_email, committee_account=committee
+        )
+
+        post_json_mock = Mock(status_code=200)
+        post_json_mock.json.return_value = {
+            "id_token": "id_token",
+            "access_token": test_access_token,
+        }
+
+        get_json_mock = Mock(status_code=200)
+        get_json_mock.json.side_effect = [{"sub": test_username, "email": existing_email}]
+
+        requests_mock.post.return_value = post_json_mock
+        requests_mock.get.return_value = get_json_mock
+        jws_mock.JWS.return_value.payload = test_jws_payload
+        len_mock.return_value = 1
+
+        auth_request = RequestFactory().get("/foo", {"code": test_code, "state": "bar"})
+
+        self.assertEqual(User.objects.filter(username=existing_username).count(), 1)
+        self.assertEqual(User.objects.filter(username=test_username).count(), 0)
+        retval = self.backend.authenticate(request=auth_request, nonce=test_nonce_value)
+        self.assertIsNotNone(retval)
+
+        self.assertEqual(User.objects.filter(username=existing_username).count(), 0)
+        self.assertEqual(User.objects.filter(username=test_username).count(), 1)
+
+        pending_membership.refresh_from_db()
+        self.assertEqual(pending_membership.pending_email, None)
+        self.assertEqual(pending_membership.user, existing_user)
