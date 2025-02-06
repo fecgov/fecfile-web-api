@@ -74,6 +74,8 @@ class DotFECForm24TestCase(TestCase):
         self.assertEqual(self.split_row[14], "Junior")
 
     def test_date_signed(self):
-        today = datetime.now(timezone.utc)
+        """Because date_signed is timezoned to the server
+        the test date needs to be in the same timezone"""
+        today = datetime.now()
         formatted_date = today.strftime("%Y%m%d")
         self.assertEqual(self.split_row[15], formatted_date)
