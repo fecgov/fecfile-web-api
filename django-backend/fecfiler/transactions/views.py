@@ -441,9 +441,7 @@ def stringify_queryset(qs):
 def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_id):
     if transaction.is_loan_repayment() is True:
         current_loan_read_model_dict = (
-            Transaction.objects.transaction_view()
-            .objects.values()
-            .get(pk=transaction.loan_id)
+            Transaction.objects.transaction_view().values().get(pk=transaction.loan_id)
         )
         current_loan_balance = current_loan_read_model_dict["loan_balance"]
         original_loan_id = current_loan_read_model_dict.get(
@@ -465,9 +463,7 @@ def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_i
 def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_id):
     if transaction.is_debt_repayment() is True:
         current_debt_read_model_dict = (
-            Transaction.objects.transaction_view()
-            .objects.values()
-            .get(pk=transaction.debt_id)
+            Transaction.objects.transaction_view().values().get(pk=transaction.debt_id)
         )
         current_debt_balance = current_debt_read_model_dict["balance_at_close"]
         original_debt_id = current_debt_read_model_dict["debt_id"]
