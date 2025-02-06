@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from django.test import RequestFactory, TestCase, override_settings
 from rest_framework.test import force_authenticate
 

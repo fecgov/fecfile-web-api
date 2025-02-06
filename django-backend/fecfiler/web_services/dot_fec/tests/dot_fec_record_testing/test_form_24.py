@@ -5,7 +5,7 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form24
-from datetime import datetime, timezone
+from datetime import datetime
 from fecfiler.web_services.models import UploadSubmission
 import structlog
 
