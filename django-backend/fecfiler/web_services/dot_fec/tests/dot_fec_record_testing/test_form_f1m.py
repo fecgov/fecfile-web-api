@@ -5,7 +5,7 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form1m
-from datetime import datetime, timezone
+from datetime import datetime
 from fecfiler.contacts.models import Contact
 from fecfiler.web_services.models import UploadSubmission
 import structlog
@@ -256,6 +256,8 @@ class DotFECForm1MTestCase(TestCase):
         self.assertEqual(self.split_row[69], "Junior")
 
     def test_date_signed(self):
-        today = datetime.now(timezone.utc)
+        """Because date_signed is timezoned to the server
+        the test date needs to be in the same timezone"""
+        today = datetime.now()
         formatted_date = today.strftime("%Y%m%d")
         self.assertEqual(self.split_row[70], formatted_date)
