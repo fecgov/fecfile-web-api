@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0015\_merge\_transaction\_triggers.update\_can\_unamend
+========================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0015_merge_transaction_triggers
+
+.. autofunction:: update_can_unamend

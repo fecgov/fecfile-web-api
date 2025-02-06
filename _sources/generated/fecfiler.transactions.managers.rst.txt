@@ -24,7 +24,6 @@ fecfiler.transactions.managers
    
       Schedule
       TransactionManager
-      TransactionViewManager
    
    
 

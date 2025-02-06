@@ -12,14 +12,6 @@ fecfiler.transactions.models
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      get_committee_view_name
-      get_read_model
-   
    
 
    

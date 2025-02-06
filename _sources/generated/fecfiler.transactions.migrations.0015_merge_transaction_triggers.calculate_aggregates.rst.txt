@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0015\_merge\_transaction\_triggers.calculate\_aggregates
+=========================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0015_merge_transaction_triggers
+
+.. autofunction:: calculate_aggregates

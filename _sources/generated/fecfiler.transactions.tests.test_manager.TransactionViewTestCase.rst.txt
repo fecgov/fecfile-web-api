@@ -121,9 +121,9 @@ fecfiler.transactions.tests.test\_manager.TransactionViewTestCase
       ~TransactionViewTestCase.test_line_label
       ~TransactionViewTestCase.test_loan_payment_to_date
       ~TransactionViewTestCase.test_refund_aggregate
+      ~TransactionViewTestCase.test_transaction_parent
       ~TransactionViewTestCase.test_transaction_view
       ~TransactionViewTestCase.test_transaction_view_list_with_grandparent
-      ~TransactionViewTestCase.test_transaction_view_parent
    
    
 

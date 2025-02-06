@@ -1,0 +1,34 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.transactions.migrations.0014\_drop\_transaction\_view
+==============================================================
+
+.. automodule:: fecfiler.transactions.migrations.0014_drop_transaction_view
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

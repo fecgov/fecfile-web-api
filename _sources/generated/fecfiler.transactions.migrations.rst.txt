@@ -44,4 +44,6 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0011_transaction_can_delete
    fecfiler.transactions.migrations.0012_alter_transactions_blocking_reports
    fecfiler.transactions.migrations.0013_transaction_itemized_and_associated_triggers
+   fecfiler.transactions.migrations.0014_drop_transaction_view
+   fecfiler.transactions.migrations.0015_merge_transaction_triggers
 

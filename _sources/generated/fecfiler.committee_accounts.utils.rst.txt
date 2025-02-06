@@ -21,7 +21,6 @@ fecfiler.committee\_accounts.utils
       check_email_allowed_to_create_committee_account
       check_email_match
       create_committee_account
-      create_committee_view
       get_committee_account_data
       get_committee_account_data_from_efo
       get_committee_account_data_from_redis

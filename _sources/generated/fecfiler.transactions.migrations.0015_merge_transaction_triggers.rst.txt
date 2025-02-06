@@ -1,0 +1,57 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.transactions.migrations.0015\_merge\_transaction\_triggers
+===================================================================
+
+.. automodule:: fecfiler.transactions.migrations.0015_merge_transaction_triggers
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      after_transactions_transaction
+      before_transactions_transaction
+      calculate_aggregates
+      create_triggers
+      drop_old_functions
+      drop_old_triggers
+      handle_parent_itemization
+      process_itemization
+      reverse_after_transactions_transaction
+      reverse_calculate_aggregates
+      reverse_create_triggers
+      reverse_drop_old_functions
+      reverse_drop_old_triggers
+      reverse_handle_parent_itemization
+      reverse_process_itemization
+      reverse_update_can_unamend
+      update_can_unamend
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

@@ -20,7 +20,8 @@ fecfiler.transactions.managers.TransactionManager
    .. autosummary::
    
       ~TransactionManager.INCURRED_PRIOR_CLAUSE
-      ~TransactionManager.LOAN_KEY_CLAUSE
+      ~TransactionManager.LINE_LABEL_CLAUSE
+      ~TransactionManager.ORDER_KEY_CLAUSE
       ~TransactionManager.PAYMENT_AMOUNT_CLAUSE
       ~TransactionManager.PAYMENT_PRIOR_CLAUSE
       ~TransactionManager.SCHEDULE_CLAUSE
@@ -103,12 +104,17 @@ fecfiler.transactions.managers.TransactionManager
 
    .. autosummary::
    
+      ~TransactionManager.A
       ~TransactionManager.AMOUNT_CLAUSE
+      ~TransactionManager.A_11
+      ~TransactionManager.B
       ~TransactionManager.BACK_REFERENCE_CLAUSE
       ~TransactionManager.BACK_REFERENCE_NAME_CLAUSE
+      ~TransactionManager.C
+      ~TransactionManager.D
       ~TransactionManager.DATE_CLAUSE
       ~TransactionManager.DISPLAY_NAME_CLAUSE
-      ~TransactionManager.EFFECTIVE_AMOUNT_CLAUSE
+      ~TransactionManager.E
       ~TransactionManager.FORM_TYPE_CLAUSE
       ~TransactionManager.auto_created
       ~TransactionManager.creation_counter

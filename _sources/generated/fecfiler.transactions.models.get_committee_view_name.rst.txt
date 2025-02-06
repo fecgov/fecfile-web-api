@@ -1,6 +1,0 @@
-fecfiler.transactions.models.get\_committee\_view\_name
-=======================================================
-
-.. currentmodule:: fecfiler.transactions.models
-
-.. autofunction:: get_committee_view_name

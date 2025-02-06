@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0015\_merge\_transaction\_triggers.before\_transactions\_transaction
+=====================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0015_merge_transaction_triggers
+
+.. autofunction:: before_transactions_transaction
