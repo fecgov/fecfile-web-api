@@ -9,7 +9,7 @@ from fecfiler.reports.models import Report
 import json
 from copy import deepcopy
 from fecfiler.transactions.views import TransactionViewSet, TransactionOrderingFilter
-from fecfiler.transactions.models import Transaction, get_read_model
+from fecfiler.transactions.models import Transaction
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import (
@@ -672,7 +672,7 @@ class TransactionViewsTestCase(TestCase):
             self.committee, "2025-04-01", "2025-06-30", {}
         )
         test_q2_carried_over_loan = (
-            get_read_model(self.committee.id)
+            Transaction.objects.transaction_view()
             .objects.filter(reports__id=test_q2_report_2025.id, loan_id=test_loan.id)
             .get()
         )
@@ -692,7 +692,7 @@ class TransactionViewsTestCase(TestCase):
             self.committee, "2025-07-01", "2025-09-30", {}
         )
         test_q3_carried_over_loan = (
-            get_read_model(self.committee.id)
+            Transaction.objects.transaction_view()
             .objects.filter(reports__id=test_q3_report_2025.id, loan_id=test_loan.id)
             .get()
         )
@@ -710,7 +710,7 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            get_read_model(self.committee.id)
+            Transaction.objects.transaction_view()
             .objects.get(pk=test_q2_carried_over_loan.id)
             .loan_balance,
             0.00,
@@ -750,7 +750,7 @@ class TransactionViewsTestCase(TestCase):
             self.committee, "2025-04-01", "2025-06-30", {}
         )
         test_q2_carried_over_debt = (
-            get_read_model(self.committee.id)
+            Transaction.objects.transaction_view()
             .objects.filter(reports__id=test_q2_report_2025.id, debt_id=test_debt.id)
             .get()
         )
@@ -770,7 +770,7 @@ class TransactionViewsTestCase(TestCase):
             self.committee, "2025-07-01", "2025-09-30", {}
         )
         test_q3_carried_over_debt = (
-            get_read_model(self.committee.id)
+            Transaction.objects.transaction_view()
             .objects.filter(reports__id=test_q3_report_2025.id, debt_id=test_debt.id)
             .get()
         )
@@ -788,7 +788,7 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            get_read_model(self.committee.id)
+            Transaction.objects.transaction_view()
             .objects.get(pk=test_q2_carried_over_debt.id)
             .balance_at_close,
             0.00,
