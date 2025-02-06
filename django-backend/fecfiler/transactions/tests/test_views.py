@@ -9,9 +9,8 @@ from fecfiler.reports.models import Report
 import json
 from copy import deepcopy
 from fecfiler.transactions.views import TransactionViewSet, TransactionOrderingFilter
-from fecfiler.transactions.models import Transaction, get_read_model
+from fecfiler.transactions.models import Transaction
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import (
     create_test_committee_contact,
@@ -44,7 +43,6 @@ class TransactionViewsTestCase(TestCase):
         self.factory = RequestFactory()
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.user = User.objects.create(email="test@fec.gov", username="gov")
-        create_committee_view(self.committee.id)
         self.q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.q2_report = create_form3x(self.committee, "2024-02-02", "2024-03-01", {})
         self.contact_1 = create_test_individual_contact(
@@ -674,8 +672,8 @@ class TransactionViewsTestCase(TestCase):
             self.committee, "2025-04-01", "2025-06-30", {}
         )
         test_q2_carried_over_loan = (
-            get_read_model(self.committee.id)
-            .objects.filter(reports__id=test_q2_report_2025.id, loan_id=test_loan.id)
+            Transaction.objects.transaction_view()
+            .filter(reports__id=test_q2_report_2025.id, loan_id=test_loan.id)
             .get()
         )
         self.assertEqual(test_q2_carried_over_loan.loan_balance, 900.00)
@@ -694,8 +692,8 @@ class TransactionViewsTestCase(TestCase):
             self.committee, "2025-07-01", "2025-09-30", {}
         )
         test_q3_carried_over_loan = (
-            get_read_model(self.committee.id)
-            .objects.filter(reports__id=test_q3_report_2025.id, loan_id=test_loan.id)
+            Transaction.objects.transaction_view()
+            .filter(reports__id=test_q3_report_2025.id, loan_id=test_loan.id)
             .get()
         )
         self.assertEqual(test_q3_carried_over_loan.loan_balance, 750.00)
@@ -712,8 +710,8 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            get_read_model(self.committee.id)
-            .objects.get(pk=test_q2_carried_over_loan.id)
+            Transaction.objects.transaction_view()
+            .get(pk=test_q2_carried_over_loan.id)
             .loan_balance,
             0.00,
         )
@@ -752,8 +750,8 @@ class TransactionViewsTestCase(TestCase):
             self.committee, "2025-04-01", "2025-06-30", {}
         )
         test_q2_carried_over_debt = (
-            get_read_model(self.committee.id)
-            .objects.filter(reports__id=test_q2_report_2025.id, debt_id=test_debt.id)
+            Transaction.objects.transaction_view()
+            .filter(reports__id=test_q2_report_2025.id, debt_id=test_debt.id)
             .get()
         )
         self.assertEqual(test_q2_carried_over_debt.balance_at_close, Decimal(1100.00))
@@ -772,8 +770,8 @@ class TransactionViewsTestCase(TestCase):
             self.committee, "2025-07-01", "2025-09-30", {}
         )
         test_q3_carried_over_debt = (
-            get_read_model(self.committee.id)
-            .objects.filter(reports__id=test_q3_report_2025.id, debt_id=test_debt.id)
+            Transaction.objects.transaction_view()
+            .filter(reports__id=test_q3_report_2025.id, debt_id=test_debt.id)
             .get()
         )
         self.assertEqual(test_q3_carried_over_debt.balance_at_close, 800.00)
@@ -790,8 +788,8 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
-            get_read_model(self.committee.id)
-            .objects.get(pk=test_q2_carried_over_debt.id)
+            Transaction.objects.transaction_view()
+            .get(pk=test_q2_carried_over_debt.id)
             .balance_at_close,
             0.00,
         )

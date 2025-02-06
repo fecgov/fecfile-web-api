@@ -4,15 +4,13 @@ from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 
 
 class UserModelTestCase(TestCase):
-    fixtures = ["test_committee_accounts"]
+
+    def setUp(self):
+        self.committee_account = CommitteeAccount.objects.create(committee_id="C87654321")
 
     def test_redeem_pending_membership(self):
-        committee_account = CommitteeAccount.objects.create(
-            committee_id="C87654321",
-        )
-
         pending_membership = Membership.objects.create(
-            committee_account=committee_account,
+            committee_account=self.committee_account,
             role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
             pending_email="test_1234@test.com",
         )
