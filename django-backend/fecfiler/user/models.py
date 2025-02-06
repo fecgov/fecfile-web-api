@@ -23,6 +23,14 @@ class User(AbstractUser):
 
     objects = UserManager()
 
+    def update_username(self, new_username):
+        old_username = self.username
+        self.username = new_username
+        self.save()
+        logger.info(f"Updated username: {old_username} -> {new_username}")
+
+        self.redeem_pending_memberships()
+
     def update_email(self, new_email):
         old_email = self.email
         self.email = new_email
