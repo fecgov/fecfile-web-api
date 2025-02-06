@@ -62,6 +62,7 @@ fecfiler.user.models.User
       ~User.set_unusable_password
       ~User.unique_error_message
       ~User.update_email
+      ~User.update_username
       ~User.validate_constraints
       ~User.validate_unique
    

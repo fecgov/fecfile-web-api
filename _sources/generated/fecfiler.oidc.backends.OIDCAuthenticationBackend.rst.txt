@@ -24,6 +24,7 @@ fecfiler.oidc.backends.OIDCAuthenticationBackend
       ~OIDCAuthenticationBackend.create_user
       ~OIDCAuthenticationBackend.filter_users_by_claims
       ~OIDCAuthenticationBackend.get_all_permissions
+      ~OIDCAuthenticationBackend.get_email
       ~OIDCAuthenticationBackend.get_group_permissions
       ~OIDCAuthenticationBackend.get_idp_unique_id_value
       ~OIDCAuthenticationBackend.get_or_create_user
