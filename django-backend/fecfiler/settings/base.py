@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "fecfiler.devops",
     "fecfiler.mock_oidc_provider",
     "fecfiler.cash_on_hand",
+    "fecfiler.openapi",
 ]
 
 MIDDLEWARE = [
@@ -91,7 +92,7 @@ MIDDLEWARE = [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["templates", "static/templates"],
+        "DIRS": ["fecfiler/openapi/templates", "static/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -330,7 +331,7 @@ CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorag
 
 CELERY_BEAT_SCHEDULE = {
     "print-db-stats": {
-        "task": "fecfiler.devops.tasks.get_database_connections",
+        "task": "fecfiler.devops.tasks.get_devops_status_report",
         "schedule": 60.0,
         "args": (),
         "options": {

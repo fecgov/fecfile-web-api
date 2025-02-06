@@ -1,4 +1,4 @@
-from django.db import transaction as db_transaction
+from django.db import transaction as db_transaction, models
 from rest_framework import pagination
 from rest_framework.filters import OrderingFilter
 
@@ -348,7 +348,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         children and grandchildren transactions with any changes to the committee name
         """
         update_dependent_children(transaction_instance)
-
+        delete_carried_forward_loans_if_needed(transaction_instance, committee_id)
+        delete_carried_forward_debts_if_needed(transaction_instance, committee_id)
         return self.queryset.get(id=transaction_instance.id)
 
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
@@ -435,3 +436,45 @@ def stringify_queryset(qs):
         s = cursor.mogrify(sql, params)
     conn.close()
     return s
+
+
+def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_id):
+    if transaction.is_loan_repayment() is True:
+        current_loan_read_model_dict = (
+            get_read_model(committee_id).objects.values().get(pk=transaction.loan_id)
+        )
+        current_loan_balance = current_loan_read_model_dict["loan_balance"]
+        original_loan_id = current_loan_read_model_dict.get(
+            "loan_id", current_loan_read_model_dict.get("id")
+        )
+        if current_loan_balance == 0:
+            current_report = transaction.reports.filter(form_3x__isnull=False).first()
+            future_reports = current_report.get_future_in_progress_reports()
+            transactions_to_delete = list(
+                Transaction.objects.filter(
+                    loan_id=original_loan_id,
+                    reports__id__in=models.Subquery(future_reports.values("id")),
+                )
+            )
+            for transaction_to_delete in transactions_to_delete:
+                transaction_to_delete.delete()
+
+
+def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_id):
+    if transaction.is_debt_repayment() is True:
+        current_debt_read_model_dict = (
+            get_read_model(committee_id).objects.values().get(pk=transaction.debt_id)
+        )
+        current_debt_balance = current_debt_read_model_dict["balance_at_close"]
+        original_debt_id = current_debt_read_model_dict["debt_id"]
+        if current_debt_balance == 0:
+            current_report = transaction.reports.filter(form_3x__isnull=False).first()
+            future_reports = current_report.get_future_in_progress_reports()
+            transactions_to_delete = list(
+                Transaction.objects.filter(
+                    debt_id=original_debt_id,
+                    reports__id__in=models.Subquery(future_reports.values("id")),
+                )
+            )
+            for transaction_to_delete in transactions_to_delete:
+                transaction_to_delete.delete()

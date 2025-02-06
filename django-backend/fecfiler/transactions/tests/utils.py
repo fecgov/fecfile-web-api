@@ -127,7 +127,12 @@ def create_debt(
         committee,
         contact_1=contact,
         report=report,
-        schedule_data={"incurred_amount": incurred_amount},
+        schedule_data={
+            "incurred_amount": incurred_amount,
+            "report_coverage_from_date": (
+                report.coverage_from_date if report is not None else None
+            ),
+        },
         transaction_data={"_form_type": form_type},
     )
 
