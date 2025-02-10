@@ -31,6 +31,7 @@ developer = [
     "delete_committee_reports",
     # users
     "reset_security_consent_date",
+    "disable_user"
 ]
 
 if __name__ == "__main__":
