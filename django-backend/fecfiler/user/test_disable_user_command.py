@@ -1,4 +1,3 @@
-from unittest.mock import patch
 from django.test import TestCase
 from fecfiler.user.models import User
 from django.core.management import call_command
