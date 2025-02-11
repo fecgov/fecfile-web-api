@@ -640,7 +640,64 @@ class TransactionViewsTestCase(TestCase):
             "JF Memo: None (Partnership attributions do not meet itemization threshold)",
         )
 
-    def test_delete_carried_forward_loan_on_create_repayment(self):
+    def test_delete_carried_forward_loan_on_repayment_to_orignal_loan(self):
+        """Paying off a loan in the original report should delete any carried forward
+        copies in future reports"""
+        # create q1 and associated loan
+        q1_report = create_form3x(self.committee, "2025-01-01", "2025-03-31", {})
+        original_loan = create_loan(
+            self.committee,
+            self.test_ind_contact,
+            "1000.00",
+            "2025-12-31",
+            "6%",
+            form_type="SC/10",
+            loan_incurred_date="2025-01-01",
+            report=q1_report,
+        )
+        create_schedule_b(
+            "LOAN_REPAYMENT_MADE",
+            self.committee,
+            self.test_ind_contact,
+            "2025-01-02",
+            "100.00",
+            loan_id=original_loan.id,
+            report=q1_report,
+        )
+
+        # create q2 and confirm loan carry forward
+        q2_report = create_form3x(self.committee, "2025-04-01", "2025-06-30", {})
+        q2_carried_over_loan = (
+            Transaction.objects.transaction_view()
+            .filter(reports__id=q2_report.id, loan_id=original_loan.id)
+            .get()
+        )
+        self.assertEqual(q2_carried_over_loan.loan_balance, 900.00)
+
+        # create q3 and confirm loan carry forward
+        q3_report = create_form3x(self.committee, "2025-07-01", "2025-09-30", {})
+        q3_carried_over_loan = (
+            Transaction.objects.transaction_view()
+            .filter(reports__id=q3_report.id, loan_id=original_loan.id)
+            .get()
+        )
+        self.assertEqual(q3_carried_over_loan.loan_balance, 900.00)
+
+        # make a repayment in q1 and confirm q2 and q3 carry forward loans are deleted
+        q1_loan_repayment = self.create_loan_repayment_payload(
+            original_loan,
+            q1_report,
+            "2025-01-03",
+            900.00,
+        )
+        response = TransactionViewSet().create(self.post_request(q1_loan_repayment))
+        self.assertEqual(response.status_code, 200)
+
+        # confirm q2 and q3 carry forward loans are deleted
+        self.assertTrue(Transaction.all_objects.get(id=q2_carried_over_loan.id).deleted)
+        self.assertTrue(Transaction.all_objects.get(id=q3_carried_over_loan.id).deleted)
+
+    def test_delete_carried_forward_loan_on_repayment_to_carried_forward_loan(self):
         """Paying off a loan in one report should delete any carried forward
         copies in future reports"""
         # create q1 and associated loan
@@ -678,7 +735,7 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(test_q2_carried_over_loan.loan_balance, 900.00)
 
-        # create q3 and confirm loan carry forward
+        # make repayment in q2
         create_schedule_b(
             "LOAN_REPAYMENT_MADE",
             self.committee,
@@ -688,6 +745,8 @@ class TransactionViewsTestCase(TestCase):
             loan_id=test_q2_carried_over_loan.id,
             report=test_q2_report_2025,
         )
+
+        # create q3 and confirm loan carry forward
         test_q3_report_2025 = create_form3x(
             self.committee, "2025-07-01", "2025-09-30", {}
         )
@@ -722,7 +781,60 @@ class TransactionViewsTestCase(TestCase):
             Transaction.all_objects.get(pk=test_q2_carried_over_loan.id).deleted
         )
 
-    def test_delete_carried_forward_debt_on_create_repayment(self):
+    def test_delete_carried_forward_debt_on_repayment_to_orignal_debt(self):
+        """Paying off a debt in the original report should delete any carried forward
+        copies in future reports"""
+        # create q1 and associated debt
+        q1_report = create_form3x(self.committee, "2025-01-01", "2025-03-31", {})
+        original_debt = create_debt(
+            self.committee,
+            self.test_org_contact,
+            "1000.00",
+            report=q1_report,
+        )
+        create_schedule_b(
+            "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
+            self.committee,
+            self.test_org_contact,
+            "2025-01-02",
+            Decimal("100.00"),
+            debt_id=original_debt.id,
+            report=q1_report,
+        )
+
+        # create q2 and confirm debt carry forward
+        q2_report = create_form3x(self.committee, "2025-04-01", "2025-06-30", {})
+        q2_carried_over_debt = (
+            Transaction.objects.transaction_view()
+            .filter(reports__id=q2_report.id, debt_id=original_debt.id)
+            .get()
+        )
+        self.assertEqual(q2_carried_over_debt.balance_at_close, 900.00)
+
+        # create q3 and confirm debt carry forward
+        q3_report = create_form3x(self.committee, "2025-07-01", "2025-09-30", {})
+        q3_carried_over_debt = (
+            Transaction.objects.transaction_view()
+            .filter(reports__id=q3_report.id, debt_id=original_debt.id)
+            .get()
+        )
+        self.assertEqual(q3_carried_over_debt.balance_at_close, 900.00)
+
+        # make a repayment in q1 and confirm q2 and q3 carry forward debts are deleted
+        q1_debt_repayment = self.create_debt_repayment_payload(
+            original_debt,
+            q1_report,
+            "2025-01-03",
+            900.00,
+        )
+        response = TransactionViewSet().create(self.post_request(q1_debt_repayment))
+        self.assertEqual(response.status_code, 200)
+
+        # confirm q2 and q3 carry forward debts are deleted
+        self.assertTrue(Transaction.all_objects.get(id=q2_carried_over_debt.id).deleted)
+        self.assertTrue(Transaction.all_objects.get(id=q3_carried_over_debt.id).deleted)
+
+    def test_delete_carried_forward_debt_on_repayment_to_carried_forward_debt(self):
         """Paying off a debt in one report should delete any carried forward
         copies in future reports"""
         # create q1 and associated debt
@@ -756,7 +868,7 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(test_q2_carried_over_debt.balance_at_close, Decimal(1100.00))
 
-        # create q3 and confirm debt carry forward
+        # make repayment in q2
         create_schedule_b(
             "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
             self.committee,
@@ -766,6 +878,8 @@ class TransactionViewsTestCase(TestCase):
             debt_id=test_q2_carried_over_debt.id,
             report=test_q2_report_2025,
         )
+
+        # create q3 and confirm debt carry forward
         test_q3_report_2025 = create_form3x(
             self.committee, "2025-07-01", "2025-09-30", {}
         )
