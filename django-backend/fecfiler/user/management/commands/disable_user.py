@@ -13,10 +13,10 @@ class Command(BaseCommand):
                 help='Flag to instead (re-)enable the user.')
 
     def handle(self, *args, **options):
-        User = get_user_model()
+        user_model = get_user_model()
 
         try:
-            user = User.objects.get(email=options['email'])
+            user = user_model.objects.get(email=options['email'])
         except User.DoesNotExist:
             raise CommandError('User does not exist')
 
