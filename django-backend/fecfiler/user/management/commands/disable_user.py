@@ -9,7 +9,7 @@ class Command(BaseCommand):
         parser.add_argument('email', type=str,
                 help='The email address of the user to be disabled/enabled.')
         # add an --enable flag that defaults to false if not found
-        parser.add_argument('-d', '--enable', action='store_true',
+        parser.add_argument('-e', '--enable', action='store_true',
                 help='Flag to instead (re-)enable the user.')
 
     def handle(self, *args, **options):
