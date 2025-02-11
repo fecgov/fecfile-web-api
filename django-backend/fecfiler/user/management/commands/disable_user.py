@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
         try:
             user = user_model.objects.get(email=options['email'])
-        except User.DoesNotExist:
+        except user_model.DoesNotExist:
             raise CommandError('User does not exist')
 
         user.is_active = options['enable']
