@@ -409,6 +409,6 @@ MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
 
-ENABLE_DEVELOPER_COMMANDS = get_boolean_from_string(
-    env.get_credential("ENABLE_DEVELOPER_COMMANDS", "False")
+ENABLE_RESTRICTED_COMMANDS = get_boolean_from_string(
+    env.get_credential("ENABLE_RESTRICTEDR_COMMANDS", "False")
 )
