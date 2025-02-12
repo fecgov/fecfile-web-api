@@ -19,6 +19,7 @@ allowed_commands = [
     "gen_and_stage_login_dot_gov_cert",
     "install_login_dot_gov_cert",
     "update_creds_service",
+    "disable_user",
 ]
 restricted_commands = [
     "loaddata",
@@ -31,7 +32,6 @@ restricted_commands = [
     "delete_committee_reports",
     # users
     "reset_security_consent_date",
-    "disable_user"
 ]
 
 if __name__ == "__main__":
