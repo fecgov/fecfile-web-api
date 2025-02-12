@@ -6,7 +6,7 @@ from fecfiler import settings
 
 logger = structlog.get_logger(__name__)
 
-core = [
+allowed_commands = [
     "help",
     "migrate",
     "lintmigrations",
@@ -19,8 +19,9 @@ core = [
     "gen_and_stage_login_dot_gov_cert",
     "install_login_dot_gov_cert",
     "update_creds_service",
+    "disable_user",
 ]
-developer = [
+restricted_commands = [
     "loaddata",
     "test",
     "shell",
@@ -35,8 +36,8 @@ developer = [
 
 if __name__ == "__main__":
     subcommand = sys.argv[1]
-    if subcommand in core or (
-        settings.ENABLE_DEVELOPER_COMMANDS and subcommand in developer
+    if subcommand in allowed_commands or (
+        settings.ENABLE_RESTRICTED_COMMANDS and subcommand in restricted_commands
     ):
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fecfiler.settings")
         from django.core.management import execute_from_command_line
