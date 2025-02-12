@@ -119,7 +119,6 @@ fecfiler.committee\_accounts.test\_utils.CommitteeAccountsUtilsTest
       ~CommitteeAccountsUtilsTest.test_create_committee_account_case_insensitive
       ~CommitteeAccountsUtilsTest.test_create_committee_account_existing
       ~CommitteeAccountsUtilsTest.test_create_committee_account_mismatch_email
-      ~CommitteeAccountsUtilsTest.test_create_committee_account_unauthorized_email
       ~CommitteeAccountsUtilsTest.test_email_matching_case_insensitive
       ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_test_efo_PAC
       ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_test_efo_PTY

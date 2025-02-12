@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>fecfiler.user.management.commands.disable_user.Command &#8212; FECFile Web API  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fecfiler.user.management.commands.reset_security_consent_date" href="fecfiler.user.management.commands.reset_security_consent_date.html" />
+    <link rel="prev" title="fecfiler.user.management.commands.disable_user" href="fecfiler.user.management.commands.disable_user.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="fecfiler-user-management-commands-disable-user-command">
+<h1>fecfiler.user.management.commands.disable_user.Command<a class="headerlink" href="#fecfiler-user-management-commands-disable-user-command" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.user.management.commands.disable_user.</span></span><span class="sig-name descname"><span class="pre">Command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stdout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stderr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCommand</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stdout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stderr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.__init__" title="fecfiler.user.management.commands.disable_user.Command.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([stdout, stderr, no_color, force_color])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.add_arguments" title="fecfiler.user.management.commands.disable_user.Command.add_arguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_arguments</span></code></a>(parser)</p></td>
+<td><p>Entry point for subclassed commands to add custom arguments.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.add_base_argument" title="fecfiler.user.management.commands.disable_user.Command.add_base_argument"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_base_argument</span></code></a>(parser, *args, **kwargs)</p></td>
+<td><p>Call the parser's add_argument() method, suppressing the help text according to BaseCommand.suppressed_base_arguments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.check" title="fecfiler.user.management.commands.disable_user.Command.check"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check</span></code></a>([app_configs, tags, ...])</p></td>
+<td><p>Use the system check framework to validate entire Django project.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.check_migrations" title="fecfiler.user.management.commands.disable_user.Command.check_migrations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_migrations</span></code></a>()</p></td>
+<td><p>Print a warning if the set of migrations on disk don't match the migrations in the database.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.create_parser" title="fecfiler.user.management.commands.disable_user.Command.create_parser"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_parser</span></code></a>(prog_name, subcommand, **kwargs)</p></td>
+<td><p>Create and return the <code class="docutils literal notranslate"><span class="pre">ArgumentParser</span></code> which will be used to parse the arguments to this command.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.execute" title="fecfiler.user.management.commands.disable_user.Command.execute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">execute</span></code></a>(*args, **options)</p></td>
+<td><p>Try to execute this command, performing system checks if needed (as controlled by the <code class="docutils literal notranslate"><span class="pre">requires_system_checks</span></code> attribute, except if force-skipped).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.get_version" title="fecfiler.user.management.commands.disable_user.Command.get_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_version</span></code></a>()</p></td>
+<td><p>Return the Django version, which should be correct for all built-in Django commands.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.handle" title="fecfiler.user.management.commands.disable_user.Command.handle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle</span></code></a>(*args, **options)</p></td>
+<td><p>The actual logic of the command.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.print_help" title="fecfiler.user.management.commands.disable_user.Command.print_help"><code class="xref py py-obj docutils literal notranslate"><span class="pre">print_help</span></code></a>(prog_name, subcommand)</p></td>
+<td><p>Print the help message for this command, derived from <code class="docutils literal notranslate"><span class="pre">self.usage()</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.run_from_argv" title="fecfiler.user.management.commands.disable_user.Command.run_from_argv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run_from_argv</span></code></a>(argv)</p></td>
+<td><p>Set up any environment changes requested (e.g., Python path and Django settings), then run this command.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">base_stealth_options</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">help</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">output_transaction</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">requires_migrations_checks</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">requires_system_checks</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">stealth_options</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">suppressed_base_arguments</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command.add_arguments">
+<span class="sig-name descname"><span class="pre">add_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command.add_arguments" title="Link to this definition">¶</a></dt>
+<dd><p>Entry point for subclassed commands to add custom arguments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command.add_base_argument">
+<span class="sig-name descname"><span class="pre">add_base_argument</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command.add_base_argument" title="Link to this definition">¶</a></dt>
+<dd><p>Call the parser’s add_argument() method, suppressing the help text
+according to BaseCommand.suppressed_base_arguments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command.check">
+<span class="sig-name descname"><span class="pre">check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_configs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_num_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_deployment_checks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">40</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">databases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command.check" title="Link to this definition">¶</a></dt>
+<dd><p>Use the system check framework to validate entire Django project.
+Raise CommandError for any serious message (error or critical errors).
+If there are only light messages (like warnings), print them to stderr
+and don’t raise an exception.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command.check_migrations">
+<span class="sig-name descname"><span class="pre">check_migrations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command.check_migrations" title="Link to this definition">¶</a></dt>
+<dd><p>Print a warning if the set of migrations on disk don’t match the
+migrations in the database.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command.create_parser">
+<span class="sig-name descname"><span class="pre">create_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prog_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcommand</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command.create_parser" title="Link to this definition">¶</a></dt>
+<dd><p>Create and return the <code class="docutils literal notranslate"><span class="pre">ArgumentParser</span></code> which will be used to
+parse the arguments to this command.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command.execute" title="Link to this definition">¶</a></dt>
+<dd><p>Try to execute this command, performing system checks if needed (as
+controlled by the <code class="docutils literal notranslate"><span class="pre">requires_system_checks</span></code> attribute, except if
+force-skipped).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command.get_version">
+<span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command.get_version" title="Link to this definition">¶</a></dt>
+<dd><p>Return the Django version, which should be correct for all built-in
+Django commands. User-supplied commands can override this method to
+return their own version.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command.handle">
+<span class="sig-name descname"><span class="pre">handle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command.handle" title="Link to this definition">¶</a></dt>
+<dd><p>The actual logic of the command. Subclasses must implement
+this method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command.print_help">
+<span class="sig-name descname"><span class="pre">print_help</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prog_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcommand</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command.print_help" title="Link to this definition">¶</a></dt>
+<dd><p>Print the help message for this command, derived from
+<code class="docutils literal notranslate"><span class="pre">self.usage()</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.management.commands.disable_user.Command.run_from_argv">
+<span class="sig-name descname"><span class="pre">run_from_argv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.management.commands.disable_user.Command.run_from_argv" title="Link to this definition">¶</a></dt>
+<dd><p>Set up any environment changes requested (e.g., Python path
+and Django settings), then run this command. If the
+command raises a <code class="docutils literal notranslate"><span class="pre">CommandError</span></code>, intercept it and print it sensibly
+to stderr. If the <code class="docutils literal notranslate"><span class="pre">--traceback</span></code> option is present or the raised
+<code class="docutils literal notranslate"><span class="pre">Exception</span></code> is not <code class="docutils literal notranslate"><span class="pre">CommandError</span></code>, raise it.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FECFile Web API</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.cash_on_hand.html">fecfiler.cash_on_hand</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.dcf_importer.html">fecfiler.dcf_importer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.devops.html">fecfiler.devops</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.feedback.html">fecfiler.feedback</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.middleware.html">fecfiler.middleware</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.mock_oidc_provider.html">fecfiler.mock_oidc_provider</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.oidc.html">fecfiler.oidc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.openapi.html">fecfiler.openapi</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.reports.html">fecfiler.reports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.routers.html">fecfiler.routers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.s3.html">fecfiler.s3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.settings.html">fecfiler.settings</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.shared.html">fecfiler.shared</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.test_runner.html">fecfiler.test_runner</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.transactions.html">fecfiler.transactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.urls.html">fecfiler.urls</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.user.html">fecfiler.user</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="fecfiler.user.management.html">fecfiler.user.management</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="fecfiler.user.management.commands.html">fecfiler.user.management.commands</a><ul class="current">
+<li class="toctree-l6 current"><a class="reference internal" href="fecfiler.user.management.commands.disable_user.html">fecfiler.user.management.commands.disable_user</a><ul class="current">
+<li class="toctree-l7 current"><a class="current reference internal" href="#">fecfiler.user.management.commands.disable_user.Command</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.__init__"><code class="docutils literal notranslate"><span class="pre">Command.__init__()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.add_arguments"><code class="docutils literal notranslate"><span class="pre">Command.add_arguments()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.add_base_argument"><code class="docutils literal notranslate"><span class="pre">Command.add_base_argument()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.check"><code class="docutils literal notranslate"><span class="pre">Command.check()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.check_migrations"><code class="docutils literal notranslate"><span class="pre">Command.check_migrations()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.create_parser"><code class="docutils literal notranslate"><span class="pre">Command.create_parser()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.execute"><code class="docutils literal notranslate"><span class="pre">Command.execute()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.get_version"><code class="docutils literal notranslate"><span class="pre">Command.get_version()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.handle"><code class="docutils literal notranslate"><span class="pre">Command.handle()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.print_help"><code class="docutils literal notranslate"><span class="pre">Command.print_help()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#fecfiler.user.management.commands.disable_user.Command.run_from_argv"><code class="docutils literal notranslate"><span class="pre">Command.run_from_argv()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.user.management.commands.reset_security_consent_date.html">fecfiler.user.management.commands.reset_security_consent_date</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.user.managers.html">fecfiler.user.managers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.user.migrations.html">fecfiler.user.migrations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.user.models.html">fecfiler.user.models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.user.serializers.html">fecfiler.user.serializers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.user.test_disable_user_command.html">fecfiler.user.test_disable_user_command</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.user.test_models.html">fecfiler.user.test_models</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.user.test_reset_security_consent_date_command.html">fecfiler.user.test_reset_security_consent_date_command</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.user.test_views.html">fecfiler.user.test_views</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.user.urls.html">fecfiler.user.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.user.views.html">fecfiler.user.views</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.utils.html">fecfiler.utils</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.validation.html">fecfiler.validation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.web_services.html">fecfiler.web_services</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.wsgi.html">fecfiler.wsgi</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="../api.html">API</a><ul>
+  <li><a href="fecfiler.html">fecfiler</a><ul>
+  <li><a href="fecfiler.user.html">fecfiler.user</a><ul>
+  <li><a href="fecfiler.user.management.html">fecfiler.user.management</a><ul>
+  <li><a href="fecfiler.user.management.commands.html">fecfiler.user.management.commands</a><ul>
+  <li><a href="fecfiler.user.management.commands.disable_user.html">fecfiler.user.management.commands.disable_user</a><ul>
+      <li>Previous: <a href="fecfiler.user.management.commands.disable_user.html" title="previous chapter">fecfiler.user.management.commands.disable_user</a></li>
+      <li>Next: <a href="fecfiler.user.management.commands.reset_security_consent_date.html" title="next chapter">fecfiler.user.management.commands.reset_security_consent_date</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/generated/fecfiler.user.management.commands.disable_user.Command.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

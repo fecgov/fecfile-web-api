@@ -31,5 +31,6 @@ fecfiler.user.management.commands
    :template: custom-module-template.rst                 
    :recursive:
 
+   fecfiler.user.management.commands.disable_user
    fecfiler.user.management.commands.reset_security_consent_date
 
