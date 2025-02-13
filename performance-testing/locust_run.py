@@ -12,6 +12,7 @@ import locust_data_generator
 TEST_USER = os.environ.get("LOCAL_TEST_USER")
 TEST_PWD = os.environ.get("LOCAL_TEST_PWD")
 SESSION_ID = os.environ.get("OIDC_SESSION_ID")
+CSRF_TOKEN = os.environ.get("CSRF_TOKEN")
 
 # seconds
 TIMEOUT = 30  # seconds
@@ -27,7 +28,7 @@ SINGLE_TO_TRIPLE_RATIO = float(
 SCHEDULES = ["A"]  # Further schedules to be implemented in the future
 
 # Avoid "Too many open files" error
-resource.setrlimit(resource.RLIMIT_NOFILE, (10000, 999999))
+# resource.setrlimit(resource.RLIMIT_NOFILE, (10000, 999999))
 
 
 def get_json_data(name):
@@ -54,44 +55,48 @@ class Tasks(TaskSet):
     def on_start(self):
         if "fec.gov" in self.client.base_url:
             self.client.headers = {
-                "cookie": f"sessionid={SESSION_ID};",
+                "cookie": f"sessionid={SESSION_ID}; csrftoken={CSRF_TOKEN};",
                 "user-agent": "Locust testing",
+                "x-csrftoken": CSRF_TOKEN,
+                "Origin": self.client.base_url,
             }
-            self.report_ids = self.fetch_values("reports", "id")
-            self.contacts = self.scrape_endpoint("contacts")
         else:
             self.login_via_mock_oidc()
-            committees = self.fetch_values("committees", "id")
-            committee_uuid = committees[0]
-            print("committee_uuid", committee_uuid)
-            activate_response = self.client.post(
-                f"/api/v1/committees/{committee_uuid}/activate/"
-            )
-            print("activate_response.status_code", activate_response.status_code)
-            report_count = self.fetch_count("reports")
-            contact_count = self.fetch_count("contacts")
-            transaction_count = self.fetch_count("transactions")
-            if report_count < WANTED_REPORTS:
-                logging.info("Not enough reports, creating some")
-                self.create_reports(WANTED_REPORTS - report_count)
-            if contact_count < WANTED_CONTACTS:
-                logging.info("Not enough contacts, creating some")
-                self.create_contacts(WANTED_CONTACTS - contact_count)
 
-            self.report_ids = self.fetch_values("reports", "id")
-            logging.info(f"Report ids {self.report_ids}")
-            self.contacts = self.scrape_endpoint("contacts")
-            if transaction_count < WANTED_TRANSACTIONS:
-                logging.info("Not enough transactions, creating some")
-                difference = WANTED_TRANSACTIONS - transaction_count
-                singles_needed = math.ceil(difference * SINGLE_TO_TRIPLE_RATIO)
-                triples_needed = math.ceil(difference * (1 - SINGLE_TO_TRIPLE_RATIO))
-                self.create_single_transactions(singles_needed)
-                self.create_triple_transactions(triples_needed)
+        committees = self.fetch_values("committees", "id")
+        committee_uuid = committees[0]
+        activate_response = self.client.post(
+            f"api/v1/committees/{committee_uuid}/activate/",
+            headers=self.client.headers
+        )
+
+        if activate_response.status_code != 200:
+            return
+
+        report_count = self.fetch_count("reports")
+        contact_count = self.fetch_count("contacts")
+        transaction_count = self.fetch_count("transactions")
+        if report_count < WANTED_REPORTS:
+            logging.info("Not enough reports, creating some")
+            self.create_reports(WANTED_REPORTS - report_count)
+        if contact_count < WANTED_CONTACTS:
+            logging.info("Not enough contacts, creating some")
+            self.create_contacts(WANTED_CONTACTS - contact_count)
+
+        self.report_ids = self.fetch_values("reports", "id")
+        logging.info(f"Report ids {self.report_ids}")
+        self.contacts = self.scrape_endpoint("contacts")
+        if transaction_count < WANTED_TRANSACTIONS:
+            logging.info("Not enough transactions, creating some")
+            difference = WANTED_TRANSACTIONS - transaction_count
+            singles_needed = math.ceil(difference * SINGLE_TO_TRIPLE_RATIO)
+            triples_needed = math.ceil(difference * (1 - SINGLE_TO_TRIPLE_RATIO))
+            self.create_single_transactions(singles_needed)
+            self.create_triple_transactions(triples_needed)
 
     def login_via_mock_oidc(self):
         authenticate_response = self.client.get(
-            "/api/v1/oidc/authenticate", allow_redirects=False
+            "/api/v1/oidc/authenticate/", allow_redirects=False
         )
         authorize_response = self.client.get(
             authenticate_response._next.url.removeprefix("http://localhost:8080"),
@@ -237,7 +242,8 @@ class Tasks(TaskSet):
         page = 1
         response = self.get_page(endpoint)
         if response.status_code == 200:
-            results = response.json().get("results", [])
+            json = response.json()
+            results = json.get("results", [])
         while response.status_code == 200 and response.json()["next"] is not None:
             results += response.json().get("results", [])
             page += 1
@@ -248,10 +254,9 @@ class Tasks(TaskSet):
     def get_page(self, endpoint, page=1):
         params = {
             "page": page,
-            "ordering": "form_type",
         }
         return self.client.get(
-            f"/api/v1/{endpoint}", params=params, name=f"preload_{endpoint}_ids"
+            f"/api/v1/{endpoint}/", params=params, name=f"preload_{endpoint}_ids"
         )
 
     @task
@@ -280,20 +285,21 @@ class Tasks(TaskSet):
 
     @task
     def load_transactions(self):
-        report_id = random.choice(self.report_ids)
-        schedules = random.choice(SCHEDULES)
-        params = {
-            "page": 1,
-            "ordering": "form_type",
-            "schedules": schedules,
-            "report_id": report_id,
-        }
-        self.client.get(
-            "/api/v1/transactions/",
-            name="load_transactions",
-            timeout=TIMEOUT,
-            params=params,
-        )
+        if len(self.report_ids) > 0:
+            report_id = random.choice(self.report_ids)
+            schedules = random.choice(SCHEDULES)
+            params = {
+                "page": 1,
+                "ordering": "form_type",
+                "schedules": schedules,
+                "report_id": report_id,
+            }
+            self.client.get(
+                "/api/v1/transactions/",
+                name="load_transactions",
+                timeout=TIMEOUT,
+                params=params,
+            )
 
 
 class Swarm(user.HttpUser):
