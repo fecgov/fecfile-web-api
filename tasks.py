@@ -13,7 +13,7 @@ MIGRATOR_APP_NAME = "fecfile-api-migrator"  # THE APP WITH THIS NAME WILL GET DE
 WEB_SERVICES_NAME = "fecfile-web-services"
 SCHEDULER_NAME = "fecfile-scheduler"
 PROXY_NAME = "fecfile-api-proxy"
-ORG_NAME = "fec-fecfileonline-prototyping"
+ORG_NAME = "fec-fecfile"
 
 
 def _resolve_rule(repo, branch):
