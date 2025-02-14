@@ -5,7 +5,6 @@ from fecfiler.transactions.schedule_c2.views import save_hook as c2_hook
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.models import Transaction
 from fecfiler.reports.models import Report
-from fecfiler.committee_accounts.utils import create_committee_view
 
 
 class ScheduleC2ViewsTestCase(TestCase):
@@ -14,7 +13,6 @@ class ScheduleC2ViewsTestCase(TestCase):
     ]
 
     def setUp(self):
-        create_committee_view("11111111-2222-3333-4444-555555555555")
         self.form3x = Form3X()
         self.form3x.save()
         self.report_1 = Report(

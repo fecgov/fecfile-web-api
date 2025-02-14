@@ -3,9 +3,8 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import serialize_instance
 from fecfiler.web_services.dot_fec.dot_fec_composer import compose_report
 from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form24
-from datetime import datetime, timezone
+from datetime import datetime
 from fecfiler.web_services.models import UploadSubmission
 import structlog
 
@@ -15,7 +14,6 @@ logger = structlog.get_logger(__name__)
 class DotFECForm24TestCase(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
 
         self.f24 = create_form24(
             self.committee,
@@ -74,6 +72,8 @@ class DotFECForm24TestCase(TestCase):
         self.assertEqual(self.split_row[14], "Junior")
 
     def test_date_signed(self):
-        today = datetime.now(timezone.utc)
+        """Because date_signed is timezoned to the server
+        the test date needs to be in the same timezone"""
+        today = datetime.now()
         formatted_date = today.strftime("%Y%m%d")
         self.assertEqual(self.split_row[15], formatted_date)

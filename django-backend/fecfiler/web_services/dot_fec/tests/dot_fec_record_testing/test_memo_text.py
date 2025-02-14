@@ -1,5 +1,4 @@
 from django.test import TestCase
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.web_services.dot_fec.dot_fec_serializer import serialize_instance, FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x, create_form99, create_report_memo
@@ -15,7 +14,6 @@ class DotFECTextRecordsTestCase(TestCase):
 
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
         coverage_from = datetime.strptime("2024-01-01", "%Y-%m-%d")
         coverage_through = datetime.strptime("2024-02-01", "%Y-%m-%d")
         self.f3x = create_form3x(

@@ -1,11 +1,10 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from django.test import RequestFactory, TestCase, override_settings
 from rest_framework.test import force_authenticate
 
 from fecfiler.web_services.views import WebServicesViewSet
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.cash_on_hand.tests.utils import create_cash_on_hand_yearly
 from fecfiler.reports.tests.utils import (
     create_form3x,
@@ -24,7 +23,6 @@ class WebServicesViewSetTest(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.user = User.objects.create(email="test@fec.gov", username="gov")
-        create_committee_view(self.committee.id)
         self.committee.members.add(self.user)
         self.factory = RequestFactory()
         self.view = WebServicesViewSet()
@@ -143,7 +141,10 @@ class WebServicesViewSetTest(TestCase):
         report.refresh_from_db()
         # assert that summary was caclulated
         self.assertEqual(report.form_3x.L8_cash_on_hand_at_close_period, 1)
-        now = datetime.now(timezone.utc).date()
+
+        """ Because date_signed is timezoned to the server
+        the test date needs to be in the same timezone"""
+        now = datetime.now().date()
         self.assertEqual(report.date_signed, now)
 
         """view does not recalculate summary if report is not dirty"""

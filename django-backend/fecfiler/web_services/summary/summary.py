@@ -1,5 +1,5 @@
 from decimal import Decimal
-from fecfiler.transactions.models import get_read_model
+from fecfiler.transactions.models import Transaction
 from fecfiler.reports.models import Report
 from fecfiler.cash_on_hand.models import CashOnHandYearly
 from django.db.models import Q, Sum
@@ -62,9 +62,9 @@ class SummaryService:
         return column_a, column_b
 
     def calculate_summary_column_a(self):
-        transaction_view_model = get_read_model(self.report.committee_account_id)
-        report_transactions = transaction_view_model.objects.filter(
-            reports__id=self.report.id
+        report_transactions = Transaction.objects.transaction_view().filter(
+            reports__id=self.report.id,
+            committee_account__id=self.report.committee_account.id,
         )
         column_a = report_transactions.aggregate(
             line_11ai=self.get_line("SA11AI"),
@@ -163,8 +163,7 @@ class SummaryService:
         report_date = self.report.coverage_through_date
         report_year = report_date.year
 
-        transaction_view_model = get_read_model(self.report.committee_account_id)
-        ytd_transactions = transaction_view_model.objects.filter(
+        ytd_transactions = Transaction.objects.transaction_view().filter(
             committee_account=committee,
             date__year=report_year,
             date__lte=report_date,

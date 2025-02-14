@@ -3,7 +3,6 @@ from .serializers import MemoTextSerializer
 from fecfiler.user.models import User
 from rest_framework.request import Request, HttpRequest
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.reports.tests.utils import create_form3x
 
 
@@ -12,7 +11,6 @@ class MemoTextSerializerTestCase(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.user = User.objects.create(email="test@fec.gov", username="gov")
-        create_committee_view(self.committee.id)
         q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
 
         self.valid_memo_text = {

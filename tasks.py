@@ -13,13 +13,7 @@ MIGRATOR_APP_NAME = "fecfile-api-migrator"  # THE APP WITH THIS NAME WILL GET DE
 WEB_SERVICES_NAME = "fecfile-web-services"
 SCHEDULER_NAME = "fecfile-scheduler"
 PROXY_NAME = "fecfile-api-proxy"
-ORG_NAME = "fec-fecfileonline-prototyping"
-
-MANIFEST_LABEL = {
-    APP_NAME: "api",
-    WEB_SERVICES_NAME: "web-services",
-    SCHEDULER_NAME: "scheduler",
-}
+ORG_NAME = "fec-fecfile"
 
 
 def _resolve_rule(repo, branch):
@@ -92,7 +86,7 @@ def _login_to_cf(ctx, space):
 
 
 def _do_deploy(ctx, space, app):
-    manifest_filename = f"manifests/manifest-{space}-{MANIFEST_LABEL.get(app)}.yml"
+    manifest_filename = f"manifests/manifest-{space}.yml"
     existing_deploy = ctx.run(f"cf app {app}", echo=True, warn=True)
     print("\n")
 
@@ -179,7 +173,7 @@ def _run_migrations(ctx, space):
     print("Running migrations...")
 
     # Start migrator app
-    manifest_filename = f"manifests/manifest-{space}-migrator.yml"
+    manifest_filename = f"manifests/manifest-{space}.yml"
     migrator = ctx.run(
         f"cf push {MIGRATOR_APP_NAME} -f {manifest_filename}",
         echo=True,

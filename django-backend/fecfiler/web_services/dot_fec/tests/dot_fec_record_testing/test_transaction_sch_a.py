@@ -1,10 +1,9 @@
 from django.test import TestCase
-from fecfiler.committee_accounts.utils import create_committee_view
 from fecfiler.web_services.dot_fec.dot_fec_serializer import serialize_instance, FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.transactions.tests.utils import create_schedule_a, create_transaction_memo
-from fecfiler.transactions.models import get_read_model
+from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.utils import add_schedule_a_contact_fields
 from fecfiler.contacts.tests.utils import (
     create_test_candidate_contact,
@@ -22,7 +21,6 @@ class DotFECSchARecordsTestCase(TestCase):
 
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        create_committee_view(self.committee.id)
         coverage_from = datetime.strptime("2024-01-01", "%Y-%m-%d")
         coverage_through = datetime.strptime("2024-02-01", "%Y-%m-%d")
         self.f3x = create_form3x(
@@ -157,12 +155,14 @@ class DotFECSchARecordsTestCase(TestCase):
         trans_donor_id = trans_donor.id
         create_transaction_memo(self.committee, trans_donor, "TRANSACTION_MEMO_TEXT")
 
-        transaction_view_model = get_read_model(self.committee.id)
-        self.transaction_com = transaction_view_model.objects.get(id=trans_com_id)
-        self.transaction_org = transaction_view_model.objects.get(id=trans_org_id)
-        self.transaction_ind = transaction_view_model.objects.get(id=trans_ind_id)
-        self.transaction_agg = transaction_view_model.objects.get(id=trans_agg_id)
-        self.transaction_donor = transaction_view_model.objects.get(id=trans_donor_id)
+        transaction_view_model = Transaction.objects.transaction_view().filter(
+            committee_account__id=self.committee.id,
+        )
+        self.transaction_com = transaction_view_model.get(id=trans_com_id)
+        self.transaction_org = transaction_view_model.get(id=trans_org_id)
+        self.transaction_ind = transaction_view_model.get(id=trans_ind_id)
+        self.transaction_agg = transaction_view_model.get(id=trans_agg_id)
+        self.transaction_donor = transaction_view_model.get(id=trans_donor_id)
         add_schedule_a_contact_fields(self.transaction_com)
         add_schedule_a_contact_fields(self.transaction_org)
         add_schedule_a_contact_fields(self.transaction_ind)
