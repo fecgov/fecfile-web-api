@@ -220,3 +220,19 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         member = self.get_object()
         member.delete()
         return HttpResponse("Member removed")
+
+    def update(self, request, *args, **kwargs):
+        committee_uuid = request.session["committee_uuid"]
+        role = (
+            Membership.objects.filter(
+                user=request.user, committee_account_id=committee_uuid
+            )
+            .values_list("role", flat=True)
+            .first()
+        )
+        if role != Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR:
+            return Response(
+                "You don't have permission to perform this action.",
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        return super().update(request, *args, **kwargs)
