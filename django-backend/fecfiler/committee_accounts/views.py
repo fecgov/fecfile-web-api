@@ -233,6 +233,6 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         if role != Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR:
             return Response(
                 "You don't have permission to perform this action.",
-                status=status.HTTP_403_FORBIDDEN,
+                status=status.HTTP_401_UNAUTHORIZED,
             )
         return super().update(request, *args, **kwargs)
