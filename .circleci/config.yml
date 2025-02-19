@@ -246,6 +246,8 @@ workflows:
             branches:
               only: /develop|release\/sprint-[\.\d]+|main/
       - deploy-job:
+          requires:
+            - test
           filters:
             branches:
               only: /develop|release\/sprint-[\.\d]+|main/
