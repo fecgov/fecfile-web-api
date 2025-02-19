@@ -248,7 +248,7 @@ workflows:
       - deploy-job:
           filters:
             branches:
-              only: /feature\/1908-testing-in-dev2|release\/sprint-[\.\d]+|main/
+              only: /develop|release\/sprint-[\.\d]+|main/
       - docs-build:
           requires:
             - test
