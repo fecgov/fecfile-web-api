@@ -26,7 +26,6 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 choices=[
                     ("COMMITTEE_ADMINISTRATOR", "Committee Administrator"),
-                    ("REVIEWER", "Reviewer"),
                     ("MANAGER", "Manager"),
                 ],
                 max_length=25,

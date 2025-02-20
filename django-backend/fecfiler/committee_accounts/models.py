@@ -53,7 +53,6 @@ class CommitteeOwnedModel(models.Model):
 class Membership(CommitteeOwnedModel):
     class CommitteeRole(models.TextChoices):
         COMMITTEE_ADMINISTRATOR = "COMMITTEE_ADMINISTRATOR"
-        REVIEWER = "REVIEWER"
         MANAGER = "MANAGER"
 
     id = models.UUIDField(

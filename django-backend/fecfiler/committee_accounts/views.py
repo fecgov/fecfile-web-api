@@ -206,7 +206,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         new_member.save()
 
         member_type = "existing user" if user else "pending membership for"
-        logger.info(f'Added {member_type} "{email}" to committee {committee}')
+        logger.info(f'Added {member_type} "{email}" to committee {committee} as {role}')
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
 
@@ -235,4 +235,16 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 "You don't have permission to perform this action.",
                 status=status.HTTP_401_UNAUTHORIZED,
             )
+
+        existing_member = self.get_object()
+        email = existing_member.email
+        old_role = existing_member.role
+        committee = existing_member.committee_account
+        # member updates
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        new_role = request.data.get("role")
+        logger.info(
+            f'Updating role of "{email}" in committee {committee} from {old_role} to {new_role}'
+        )
         return super().update(request, *args, **kwargs)
