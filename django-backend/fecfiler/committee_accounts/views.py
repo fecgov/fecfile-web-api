@@ -238,7 +238,6 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
         existing_member = self.get_object()
         email = existing_member.email
-        old_role = existing_member.role
         committee = existing_member.committee_account
         # member updates
         serializer = self.get_serializer(data=request.data)
