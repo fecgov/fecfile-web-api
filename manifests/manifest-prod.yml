@@ -1,6 +1,6 @@
 ---
 defaults: &defaults
-  instances: 0
+  instances: 1
   stack: cflinuxfs4
   buildpacks:
     - python_buildpack
@@ -40,11 +40,13 @@ applications:
       - route: fecfile-web-api-prod.apps.internal
     command: bin/run-api.sh
     memory: 2G
+    instances: 4
   - name: fecfile-web-services
     <<: *defaults
     no-route: true
     health-check-type: process
     command: bin/run-celery-worker.sh
+    instances: 4
   - name: fecfile-api-migrator
     <<: *defaults
     command: bin/run-api.sh
