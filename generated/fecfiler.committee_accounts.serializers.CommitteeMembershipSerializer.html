@@ -37,7 +37,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.committee_accounts.serializers.</span></span><span class="sig-name descname"><span class="pre">CommitteeMembershipSerializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Serializer</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer.html#fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer" title="fecfiler.committee_accounts.serializers.CommitteeOwnedSerializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommitteeOwnedSerializer</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data=&lt;class</span> <span class="pre">'rest_framework.fields.empty'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.__init__" title="Link to this definition">¶</a></dt>
@@ -52,29 +52,83 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.bind" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.bind"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bind</span></code></a>(field_name, parent)</p></td>
 <td><p>Initializes the field name and parent for the field instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code>(validated_data)</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_field" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_field</span></code></a>(field_name, info, model_class, ...)</p></td>
+<td><p>Return a two tuple of (cls, kwargs) to build a serializer field with.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.fail" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.fail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fail</span></code></a>(key, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_nested_field" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_nested_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_nested_field</span></code></a>(field_name, ...)</p></td>
+<td><p>Create nested fields for forward and reverse relationships.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_property_field" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_property_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_property_field</span></code></a>(field_name, model_class)</p></td>
+<td><p>Create a read only field for model methods and properties.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_relational_field" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_relational_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_relational_field</span></code></a>(field_name, relation_info)</p></td>
+<td><p>Create fields for forward and reverse relationships.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_standard_field" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_standard_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_standard_field</span></code></a>(field_name, model_field)</p></td>
+<td><p>Create regular model fields.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_unknown_field" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_unknown_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_unknown_field</span></code></a>(field_name, model_class)</p></td>
+<td><p>Raise an error on any unknown fields.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_url_field" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_url_field"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_url_field</span></code></a>(field_name, model_class)</p></td>
+<td><p>Create a field representing the object's own URL.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.create" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.create"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code></a>(validated_data)</p></td>
+<td><p>We have a bit of extra checking around this in order to provide descriptive messages when something goes wrong, but this method is essentially just:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.fail" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.fail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fail</span></code></a>(key, **kwargs)</p></td>
 <td><p>A helper method that simply raises a validation error.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_attribute" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_attribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_attribute</span></code></a>(instance)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_attribute" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_attribute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_attribute</span></code></a>(instance)</p></td>
 <td><p>Given the <em>outgoing</em> object instance, return the primitive value that should be used for this field.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_committee_uuid</span></code>()</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_default" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_default"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default</span></code></a>()</p></td>
 <td><p>Return the default value to use when validating data if no input is provided for this field.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_default_field_names" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_default_field_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_default_field_names</span></code></a>(declared_fields, ...)</p></td>
+<td><p>Return the default list of field names that will be used if the <cite>Meta.fields</cite> option is not specified.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_email</span></code>(instance)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_extra_kwargs" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_extra_kwargs</span></code></a>()</p></td>
+<td><p>Return a dictionary mapping field names to a dictionary of additional keyword arguments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_field_names" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_field_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_field_names</span></code></a>(declared_fields, info)</p></td>
+<td><p>Returns the list of all field names that should be created when instantiating this serializer class.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_fields" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_fields"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_fields</span></code></a>()</p></td>
-<td><p>Returns a dictionary of {field_name: field_instance}.</p></td>
+<td><p>Return the dict of field names -&gt; field instances that should be used for <cite>self.fields</cite> when instantiating the serializer.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_initial" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_initial</span></code></a>()</p></td>
 <td><p>Return a value to use when the field is being returned as a primitive value, without any object instance.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_validators" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_validators</span></code></a>()</p></td>
-<td><p>Returns a list of validator callables.</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_name</span></code>(instance)</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_value" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_value</span></code></a>(dictionary)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_for_date_validators" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_for_date_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unique_for_date_validators</span></code></a>()</p></td>
+<td><p>Determine a default set of validators for the following constraints:</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_together_constraints" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_together_constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unique_together_constraints</span></code></a>(model)</p></td>
+<td><p>Returns iterator of (fields, queryset), each entry describes an unique together constraint on <cite>fields</cite> in <cite>queryset</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_together_validators" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_together_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unique_together_validators</span></code></a>()</p></td>
+<td><p>Determine a default set of validators for any unique_together constraints.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_uniqueness_extra_kwargs" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_uniqueness_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_uniqueness_extra_kwargs</span></code></a>(field_names, ...)</p></td>
+<td><p>Return any additional field options that need to be included as a result of uniqueness constraints on the model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_validators" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_validators</span></code></a>()</p></td>
+<td><p>Determine the set of validators to use when instantiating serializer.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_value" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_value</span></code></a>(dictionary)</p></td>
 <td><p>Given the <em>incoming</em> primitive data, return the value for this field that should be validated and transformed to a native value.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.include_extra_kwargs" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.include_extra_kwargs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">include_extra_kwargs</span></code></a>(kwargs, extra_kwargs)</p></td>
+<td><p>Include any 'extra_kwargs' that have been included for this field, possibly removing any incompatible existing keyword arguments.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_valid</span></code>(*[, raise_exception])</p></td>
 <td><p></p></td>
@@ -95,7 +149,7 @@
 <td><p>Similar to Python's built in <cite>dictionary[key] = value</cite>, but takes a list of nested keys instead of a single key.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.to_internal_value" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.to_internal_value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_internal_value</span></code></a>(data)</p></td>
-<td><p>Dict of native values &lt;- Dict of primitive datatypes.</p></td>
+<td><p>Extract committee_id from request to assign the corresponding CommitteeAccount as the owner of the object</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.to_representation" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.to_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_representation</span></code></a>(instance)</p></td>
 <td><p>Object instance -&gt; Dict of primitive datatypes.</p></td>
@@ -138,6 +192,12 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.root" title="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.root"><code class="xref py py-obj docutils literal notranslate"><span class="pre">root</span></code></a></p></td>
 <td><p>Returns the top-level serializer for this field.</p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">serializer_field_mapping</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">url_field_name</span></code></p></td>
+<td><p></p></td>
+</tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">validated_data</span></code></p></td>
 <td><p></p></td>
 </tr>
@@ -153,10 +213,75 @@
 Called when a field is added to the parent serializer instance.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_field">
+<span class="sig-name descname"><span class="pre">build_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nested_depth</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_field" title="Link to this definition">¶</a></dt>
+<dd><p>Return a two tuple of (cls, kwargs) to build a serializer field with.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_nested_field">
+<span class="sig-name descname"><span class="pre">build_nested_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relation_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nested_depth</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_nested_field" title="Link to this definition">¶</a></dt>
+<dd><p>Create nested fields for forward and reverse relationships.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_property_field">
+<span class="sig-name descname"><span class="pre">build_property_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_class</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_property_field" title="Link to this definition">¶</a></dt>
+<dd><p>Create a read only field for model methods and properties.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_relational_field">
+<span class="sig-name descname"><span class="pre">build_relational_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relation_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_relational_field" title="Link to this definition">¶</a></dt>
+<dd><p>Create fields for forward and reverse relationships.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_standard_field">
+<span class="sig-name descname"><span class="pre">build_standard_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_field</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_standard_field" title="Link to this definition">¶</a></dt>
+<dd><p>Create regular model fields.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_unknown_field">
+<span class="sig-name descname"><span class="pre">build_unknown_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_class</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_unknown_field" title="Link to this definition">¶</a></dt>
+<dd><p>Raise an error on any unknown fields.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_url_field">
+<span class="sig-name descname"><span class="pre">build_url_field</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_class</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_url_field" title="Link to this definition">¶</a></dt>
+<dd><p>Create a field representing the object’s own URL.</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.context">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">context</span></span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.context" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the context as passed to the root serializer on initialization.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.create">
+<span class="sig-name descname"><span class="pre">create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validated_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.create" title="Link to this definition">¶</a></dt>
+<dd><p>We have a bit of extra checking around this in order to provide
+descriptive messages when something goes wrong, but this method is
+essentially just:</p>
+<blockquote>
+<div><p>return ExampleModel.objects.create(<a href="#id1"><span class="problematic" id="id2">**</span></a>validated_data)</p>
+</div></blockquote>
+<p>If there are many to many fields present on the instance then they
+cannot be set until the model is instantiated, in which case the
+implementation is like so:</p>
+<blockquote>
+<div><p>example_relationship = validated_data.pop(‘example_relationship’)
+instance = ExampleModel.objects.create(<a href="#id3"><span class="problematic" id="id4">**</span></a>validated_data)
+instance.example_relationship = example_relationship
+return instance</p>
+</div></blockquote>
+<p>The default implementation also does not handle nested relationships.
+If you want to support writable nested relationships you’ll need
+to write an explicit <cite>.create()</cite> method.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -200,9 +325,33 @@ validated data for this field.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_default_field_names">
+<span class="sig-name descname"><span class="pre">get_default_field_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">declared_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_default_field_names" title="Link to this definition">¶</a></dt>
+<dd><p>Return the default list of field names that will be used if the
+<cite>Meta.fields</cite> option is not specified.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_extra_kwargs">
+<span class="sig-name descname"><span class="pre">get_extra_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_extra_kwargs" title="Link to this definition">¶</a></dt>
+<dd><p>Return a dictionary mapping field names to a dictionary of
+additional keyword arguments.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_field_names">
+<span class="sig-name descname"><span class="pre">get_field_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">declared_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">info</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_field_names" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the list of all field names that should be created when
+instantiating this serializer class. This is based on the default
+set of fields, but also takes into account the <cite>Meta.fields</cite> or
+<cite>Meta.exclude</cite> options if they have been specified.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_fields">
 <span class="sig-name descname"><span class="pre">get_fields</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_fields" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a dictionary of {field_name: field_instance}.</p>
+<dd><p>Return the dict of field names -&gt; field instances that should be
+used for <cite>self.fields</cite> when instantiating the serializer.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -213,9 +362,42 @@ value, without any object instance.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_for_date_validators">
+<span class="sig-name descname"><span class="pre">get_unique_for_date_validators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_for_date_validators" title="Link to this definition">¶</a></dt>
+<dd><p>Determine a default set of validators for the following constraints:</p>
+<ul class="simple">
+<li><p>unique_for_date</p></li>
+<li><p>unique_for_month</p></li>
+<li><p>unique_for_year</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_together_constraints">
+<span class="sig-name descname"><span class="pre">get_unique_together_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_together_constraints" title="Link to this definition">¶</a></dt>
+<dd><p>Returns iterator of (fields, queryset), each entry describes an unique together
+constraint on <cite>fields</cite> in <cite>queryset</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_together_validators">
+<span class="sig-name descname"><span class="pre">get_unique_together_validators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_together_validators" title="Link to this definition">¶</a></dt>
+<dd><p>Determine a default set of validators for any unique_together constraints.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_uniqueness_extra_kwargs">
+<span class="sig-name descname"><span class="pre">get_uniqueness_extra_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">field_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">declared_fields</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_uniqueness_extra_kwargs" title="Link to this definition">¶</a></dt>
+<dd><p>Return any additional field options that need to be included as a
+result of uniqueness constraints on the model. This is returned as
+a two-tuple of:</p>
+<p>(‘dict of updated extra kwargs’, ‘mapping of hidden fields’)</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_validators">
 <span class="sig-name descname"><span class="pre">get_validators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_validators" title="Link to this definition">¶</a></dt>
-<dd><p>Returns a list of validator callables.</p>
+<dd><p>Determine the set of validators to use when instantiating serializer.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -223,6 +405,13 @@ value, without any object instance.</p>
 <span class="sig-name descname"><span class="pre">get_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_value" title="Link to this definition">¶</a></dt>
 <dd><p>Given the <em>incoming</em> primitive data, return the value for this field
 that should be validated and transformed to a native value.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.include_extra_kwargs">
+<span class="sig-name descname"><span class="pre">include_extra_kwargs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kwargs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.include_extra_kwargs" title="Link to this definition">¶</a></dt>
+<dd><p>Include any ‘extra_kwargs’ that have been included for this field,
+possibly removing any incompatible existing keyword arguments.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -236,10 +425,10 @@ which are passed to the child.</p>
 and child classes in order to try to cover the general case. If you’re
 overriding this method you’ll probably want something much simpler, eg:</p>
 <p>&#64;classmethod
-def many_init(cls, <a href="#id1"><span class="problematic" id="id2">*</span></a>args, <a href="#id3"><span class="problematic" id="id4">**</span></a>kwargs):</p>
+def many_init(cls, <a href="#id5"><span class="problematic" id="id6">*</span></a>args, <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs):</p>
 <blockquote>
 <div><p>kwargs[‘child’] = cls()
-return CustomListSerializer(<a href="#id5"><span class="problematic" id="id6">*</span></a>args, <a href="#id7"><span class="problematic" id="id8">**</span></a>kwargs)</p>
+return CustomListSerializer(<a href="#id9"><span class="problematic" id="id10">*</span></a>args, <a href="#id11"><span class="problematic" id="id12">**</span></a>kwargs)</p>
 </div></blockquote>
 </dd></dl>
 
@@ -263,6 +452,18 @@ be coerced into an error dictionary with a ‘non_fields_error’ key.</p>
 <dd><p>Add read_only fields with defaults to value before running validators.</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.serializer_related_to_field">
+<span class="sig-name descname"><span class="pre">serializer_related_to_field</span></span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.serializer_related_to_field" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">SlugRelatedField</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.serializer_url_field">
+<span class="sig-name descname"><span class="pre">serializer_url_field</span></span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.serializer_url_field" title="Link to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">HyperlinkedIdentityField</span></code></p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.set_value">
 <span class="sig-name descname"><span class="pre">set_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.set_value" title="Link to this definition">¶</a></dt>
@@ -276,7 +477,8 @@ set_value({‘a’: 1}, [‘x’, ‘y’], 2) -&gt; {‘a’: 1, ‘x’: {‘y
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.to_internal_value">
 <span class="sig-name descname"><span class="pre">to_internal_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.to_internal_value" title="Link to this definition">¶</a></dt>
-<dd><p>Dict of native values &lt;- Dict of primitive datatypes.</p>
+<dd><p>Extract committee_id from request to assign the corresponding
+CommitteeAccount as the owner of the object</p>
 </dd></dl>
 
 <dl class="py method">
@@ -336,20 +538,38 @@ have validation applied as normal.</p></li>
 <li class="toctree-l6"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer</span></code></a><ul>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.__init__"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.__init__()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.bind"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.bind()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_field"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.build_field()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_nested_field"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.build_nested_field()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_property_field"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.build_property_field()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_relational_field"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.build_relational_field()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_standard_field"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.build_standard_field()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_unknown_field"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.build_unknown_field()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.build_url_field"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.build_url_field()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.context"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.context</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.create"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.create()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.default_empty_html"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.default_empty_html</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.fail"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.fail()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.fields"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.fields</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_attribute"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_attribute()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_default"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_default()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_default_field_names"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_default_field_names()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_extra_kwargs"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_extra_kwargs()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_field_names"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_field_names()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_fields"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_fields()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_initial"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_initial()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_for_date_validators"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_unique_for_date_validators()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_together_constraints"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_unique_together_constraints()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_unique_together_validators"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_unique_together_validators()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_uniqueness_extra_kwargs"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_uniqueness_extra_kwargs()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_validators"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_validators()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.get_value"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.get_value()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.include_extra_kwargs"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.include_extra_kwargs()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.many_init"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.many_init()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.root"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.root</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.run_validation"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.run_validation()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.run_validators"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.run_validators()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.serializer_related_to_field"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.serializer_related_to_field</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.serializer_url_field"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.serializer_url_field</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.set_value"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.set_value()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.to_internal_value"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.to_internal_value()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.serializers.CommitteeMembershipSerializer.to_representation"><code class="docutils literal notranslate"><span class="pre">CommitteeMembershipSerializer.to_representation()</span></code></a></li>

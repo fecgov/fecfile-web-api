@@ -21,14 +21,32 @@ fecfiler.committee\_accounts.serializers.CommitteeMembershipSerializer
    
       ~CommitteeMembershipSerializer.__init__
       ~CommitteeMembershipSerializer.bind
+      ~CommitteeMembershipSerializer.build_field
+      ~CommitteeMembershipSerializer.build_nested_field
+      ~CommitteeMembershipSerializer.build_property_field
+      ~CommitteeMembershipSerializer.build_relational_field
+      ~CommitteeMembershipSerializer.build_standard_field
+      ~CommitteeMembershipSerializer.build_unknown_field
+      ~CommitteeMembershipSerializer.build_url_field
       ~CommitteeMembershipSerializer.create
       ~CommitteeMembershipSerializer.fail
       ~CommitteeMembershipSerializer.get_attribute
+      ~CommitteeMembershipSerializer.get_committee_uuid
       ~CommitteeMembershipSerializer.get_default
+      ~CommitteeMembershipSerializer.get_default_field_names
+      ~CommitteeMembershipSerializer.get_email
+      ~CommitteeMembershipSerializer.get_extra_kwargs
+      ~CommitteeMembershipSerializer.get_field_names
       ~CommitteeMembershipSerializer.get_fields
       ~CommitteeMembershipSerializer.get_initial
+      ~CommitteeMembershipSerializer.get_name
+      ~CommitteeMembershipSerializer.get_unique_for_date_validators
+      ~CommitteeMembershipSerializer.get_unique_together_constraints
+      ~CommitteeMembershipSerializer.get_unique_together_validators
+      ~CommitteeMembershipSerializer.get_uniqueness_extra_kwargs
       ~CommitteeMembershipSerializer.get_validators
       ~CommitteeMembershipSerializer.get_value
+      ~CommitteeMembershipSerializer.include_extra_kwargs
       ~CommitteeMembershipSerializer.is_valid
       ~CommitteeMembershipSerializer.many_init
       ~CommitteeMembershipSerializer.run_validation
@@ -57,6 +75,8 @@ fecfiler.committee\_accounts.serializers.CommitteeMembershipSerializer
       ~CommitteeMembershipSerializer.fields
       ~CommitteeMembershipSerializer.initial
       ~CommitteeMembershipSerializer.root
+      ~CommitteeMembershipSerializer.serializer_field_mapping
+      ~CommitteeMembershipSerializer.url_field_name
       ~CommitteeMembershipSerializer.validated_data
       ~CommitteeMembershipSerializer.validators
    
