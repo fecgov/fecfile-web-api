@@ -2,7 +2,8 @@ from django.db import connection
 from celery import shared_task
 from datetime import datetime, timedelta
 from .utils.redis_utils import set_redis_value, get_redis_value
-from fecfiler.settings import SYSTEM_STATUS_CACHE_AGE
+from fecfiler.settings import SYSTEM_STATUS_CACHE_AGE, AWS_STORAGE_BUCKET_NAME
+from fecfiler.s3 import S3_SESSION
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -33,6 +34,17 @@ def get_devops_status_report():
 
     db_size = check_database_size()
     log_database_size(db_size)
+
+    log_s3_bucket_size()
+
+
+def log_s3_bucket_size():
+    if S3_SESSION:
+        total_size = 0
+        bucket = S3_SESSION.Bucket(AWS_STORAGE_BUCKET_NAME)
+        for object in bucket.objects.all():
+            total_size += object.size
+        print("S3 total size: " + str(total_size))
 
 
 def check_database_size():
@@ -66,19 +78,19 @@ def log_database_size(nbytes):
     if logged_db_size is not None:
         logged_nbytes = logged_db_size[0]
         logged_timestring = logged_db_size[1]
-        logged_timestamp = datetime.strptime(logged_timestring, '%Y%m%d%H%M%S')
+        logged_timestamp = datetime.strptime(logged_timestring, "%Y%m%d%H%M%S")
 
         logged_time_delta = timestamp - logged_timestamp
-        logged_ngbytes_delta = (nbytes - logged_nbytes) / (1024 ** 3)
+        logged_ngbytes_delta = (nbytes - logged_nbytes) / (1024**3)
 
         seconds_in_a_day = timedelta(days=1).total_seconds()
         days_since_logged = logged_time_delta.total_seconds() / seconds_in_a_day
         logged_time_delta_pretty = round(days_since_logged, 3)
 
         size_delta_pretty = round(logged_ngbytes_delta, 5)
-        log_dict[
-            "db_growth"
-        ] = f"{size_delta_pretty} GB in the last {logged_time_delta_pretty} days"
+        log_dict["db_growth"] = (
+            f"{size_delta_pretty} GB in the last {logged_time_delta_pretty} days"
+        )
 
         if days_since_logged >= 1 and logged_ngbytes_delta > 0:
             gb_per_day = logged_ngbytes_delta / days_since_logged
@@ -88,7 +100,7 @@ def log_database_size(nbytes):
             log_dict["db_est_days_to_full"] = days_till_full_pretty
     else:
         set_redis_value(
-            INITIAL_DB_SIZE, [nbytes, timestamp.strftime('%Y%m%d%H%M%S')], None
+            INITIAL_DB_SIZE, [nbytes, timestamp.strftime("%Y%m%d%H%M%S")], None
         )
 
     logger.info(log_dict)
