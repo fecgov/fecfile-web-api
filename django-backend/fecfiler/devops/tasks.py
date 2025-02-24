@@ -44,7 +44,7 @@ def log_s3_bucket_size():
         bucket = S3_SESSION.Bucket(AWS_STORAGE_BUCKET_NAME)
         for object in bucket.objects.all():
             total_size += object.size
-        print("S3 total size: " + str(total_size))
+        print("S3 bucket size: " + str(total_size))
 
 
 def check_database_size():
