@@ -30,17 +30,20 @@ class DotFECTextRecordsTestCase(TestCase):
             },
         )
 
-        contact_1 = create_test_individual_contact(
+        self.contact_1 = create_test_individual_contact(
             "last name", "First name", self.committee.id
         )
+
+    def create_rows(self, itemized: bool):
         self.transaction = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
             self.committee,
-            contact_1,
+            self.contact_1,
             datetime.strptime("2024-01-03", "%Y-%m-%d"),
             "1.00",
             "GENERAL",
             "SA11AI",
+            itemized=itemized,
         )
 
         self.f3x_memo = create_report_memo(
@@ -63,27 +66,30 @@ class DotFECTextRecordsTestCase(TestCase):
             FS_STR
         )
 
-    def test_record_name(self):
+    def test_unitemized_model(self):
+        self.create_rows(False)
+        # Test Record names
         self.assertEqual(self.f3x_row[0], "TEXT")
         self.assertEqual(self.f99_row[0], "TEXT")
         self.assertEqual(self.transaction_row[0], "TEXT")
-
-    def test_committee_id(self):
-        self.assertEqual(self.f3x_row[1], self.committee.committee_id)
-        self.assertEqual(self.f99_row[1], self.committee.committee_id)
-        self.assertEqual(self.transaction_row[1], self.committee.committee_id)
-
-    def test_row_contains_report_info(self):
+        # Test committee ID
         self.assertEqual(self.f3x_row[2], "REPORT_MEMO_TEXT1")
         self.assertEqual(self.f3x_row[4], self.f3x.form_type)
         self.assertEqual(self.f99_row[2], "REPORT_MEMO_TEXT1")
         self.assertEqual(self.f99_row[4], self.f99.form_type)
-
-    def test_row_contains_transaction_info(self):
+        # Test row contains report info
+        self.assertEqual(self.f3x_row[2], "REPORT_MEMO_TEXT1")
+        self.assertEqual(self.f3x_row[4], self.f3x.form_type)
+        self.assertEqual(self.f99_row[2], "REPORT_MEMO_TEXT1")
+        self.assertEqual(self.f99_row[4], self.f99.form_type)
+        # Test row contains transaction info
         self.assertEqual(self.transaction_row[3], self.transaction.transaction_id)
-        self.assertEqual(self.transaction_row[4], self.transaction.form_type)
-
-    def test_row_contains_text4000(self):
+        self.assertEqual(self.transaction_row[4], "SA11AII")
+        # Test row contains text 400
         self.assertEqual(self.f3x_row[5], "F3X_MEMO_TEXT")
         self.assertEqual(self.f99_row[5], "F99_MEMO_TEXT")
         self.assertEqual(self.transaction_row[5], "TRANSACTION_MEMO_TEXT")
+
+    def test_itemized_model(self):
+        self.create_rows(True)
+        self.assertEqual(self.transaction_row[4], "SA11AI")
