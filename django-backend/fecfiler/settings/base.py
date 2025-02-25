@@ -343,9 +343,9 @@ CELERY_BEAT_SCHEDULE = {
 """FEC Webload settings
 """
 MOCK_EFO_FILING = get_boolean_from_string(env.get_credential("MOCK_EFO_FILING", "False"))
-FEC_FILING_API = env.get_credential("FEC_FILING_API")
-if not MOCK_EFO_FILING and FEC_FILING_API is None:
-    raise Exception("FEC_FILING_API must be set if MOCK_EFO_FILING is False")
+EFO_FILING_API = env.get_credential("EFO_FILING_API")
+if not MOCK_EFO_FILING and EFO_FILING_API is None:
+    raise Exception("EFO_FILING_API must be set if MOCK_EFO_FILING is False")
 FEC_FILING_API_KEY = env.get_credential("FEC_FILING_API_KEY")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 

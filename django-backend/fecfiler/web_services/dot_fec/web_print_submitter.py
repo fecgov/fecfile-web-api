@@ -3,7 +3,7 @@ from uuid import uuid4 as uuid
 from abc import ABC, abstractmethod
 from zeep import Client
 from fecfiler.web_services.models import FECStatus, BaseSubmission
-from fecfiler.settings import FEC_FILING_API_KEY, FEC_FILING_API
+from fecfiler.settings import FEC_FILING_API_KEY, EFO_FILING_API
 
 import structlog
 
@@ -26,7 +26,7 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
     """Submitter class for submitting .FEC files to EFO's web print service"""
 
     def __init__(self):
-        self.fec_soap_client = Client(f"{FEC_FILING_API}/webprint/services/print?wsdl")
+        self.fec_soap_client = Client(f"{EFO_FILING_API}/webprint/services/print?wsdl")
 
     def submit(self, email, dot_fec_bytes):
         response = self.fec_soap_client.service.print(

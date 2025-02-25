@@ -5,7 +5,7 @@ from zeep import Client
 from abc import ABC, abstractmethod
 from fecfiler.web_services.models import FECStatus, BaseSubmission
 from fecfiler.settings import (
-    FEC_FILING_API,
+    EFO_FILING_API,
     FEC_FILING_API_KEY,
     FEC_AGENCY_ID,
 )
@@ -56,7 +56,7 @@ class EFODotFECSubmitter(DotFECSubmitter):
     """Submitter class for submitting .FEC files to EFO's webload service"""
 
     def __init__(self) -> None:
-        self.fec_soap_client = Client(f"{FEC_FILING_API}/webload/services/upload?wsdl")
+        self.fec_soap_client = Client(f"{EFO_FILING_API}/webload/services/upload?wsdl")
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)

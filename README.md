@@ -51,7 +51,7 @@ To integrate with EFO, set the following environment variables:
 ```
 # Test EFO Services (for test filings):
 export MOCK_EFO_FILING=False
-export FEC_FILING_API="EFO_get_this_from_team_member"
+export EFO_FILING_API="EFO_get_this_from_team_member"
 export FEC_FILING_API_KEY="EFO_get_this_from_team_member"
 ```
 
