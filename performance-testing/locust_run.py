@@ -1,5 +1,4 @@
 import os
-import resource
 import logging
 import random
 import json
@@ -26,9 +25,6 @@ SINGLE_TO_TRIPLE_RATIO = float(
 )
 
 SCHEDULES = ["A"]  # Further schedules to be implemented in the future
-
-# Avoid "Too many open files" error
-# resource.setrlimit(resource.RLIMIT_NOFILE, (10000, 999999))
 
 
 def get_json_data(name):
