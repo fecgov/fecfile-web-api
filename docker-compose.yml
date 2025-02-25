@@ -52,7 +52,7 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
-      MOCK_EFO: True
+      MOCK_EFO_FILING: True
       FEC_FILING_API:
       FEC_FILING_API_KEY:
       FEC_AGENCY_ID:
@@ -93,7 +93,7 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
-      MOCK_EFO: True
+      MOCK_EFO_FILING: True
       FEC_FILING_API:
       FEC_FILING_API_KEY:
       FEC_AGENCY_ID:
@@ -140,7 +140,7 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
-      MOCK_EFO: True
+      MOCK_EFO_FILING: True
       FEC_FILING_API:
       FEC_FILING_API_KEY:
       FEC_AGENCY_ID:
