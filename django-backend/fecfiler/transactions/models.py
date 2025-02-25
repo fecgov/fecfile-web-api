@@ -14,6 +14,7 @@ from fecfiler.transactions.schedule_c1.models import ScheduleC1
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
+from fecfiler.transactions.schedule_f.models import ScheduleF
 
 import uuid
 import structlog
@@ -137,6 +138,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     schedule_e = models.ForeignKey(
         ScheduleE, on_delete=models.CASCADE, null=True, blank=True
     )
+    schedule_f = models.ForeignKey(
+        ScheduleF, on_delete=models.CASCADE, null=True, blank=True
+    )
 
     # Calculated fields
     aggregate = models.DecimalField(
@@ -201,15 +205,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         return self.committee_account.committee_id
 
     def get_schedule(self):
-        for schedule_key in [
-            "schedule_a",
-            "schedule_b",
-            "schedule_c",
-            "schedule_c1",
-            "schedule_c2",
-            "schedule_d",
-            "schedule_e",
-        ]:
+        for schedule_key in TABLE_TO_SCHEDULE.keys():
             if getattr(self, schedule_key, None):
                 return getattr(self, schedule_key)
 
@@ -305,6 +301,7 @@ TABLE_TO_SCHEDULE = {
     "schedule_c2": Schedule.C2,
     "schedule_d": Schedule.D,
     "schedule_e": Schedule.E,
+    "schedule_f": Schedule.F,
 }
 
 SCHEDULE_TO_TABLE = {
@@ -315,6 +312,7 @@ SCHEDULE_TO_TABLE = {
     Schedule.C2: "schedule_c2",
     Schedule.D: "schedule_d",
     Schedule.E: "schedule_e",
+    Schedule.F: "schedule_f",
 }
 
 COUPLED_TRANSACTION_TYPES = [

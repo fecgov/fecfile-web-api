@@ -53,6 +53,7 @@ class TransactionManager(SoftDeleteManager):
         "schedule_c__loan_incurred_date",
         "schedule_e__disbursement_date",
         "schedule_e__dissemination_date",
+        "schedule_f__expenditure_date",
     )
 
     AMOUNT_CLAUSE = Coalesce(
@@ -63,6 +64,7 @@ class TransactionManager(SoftDeleteManager):
         "schedule_e__expenditure_amount",
         "debt__schedule_d__incurred_amount",
         "schedule_d__incurred_amount",
+        "schedule_f__expenditure_amount",
     )
 
     BACK_REFERENCE_CLAUSE = Coalesce(
@@ -291,6 +293,7 @@ class TransactionManager(SoftDeleteManager):
     C = ["SC/9", "SC/10"]
     D = ["SD9", "SD10"]
     E = ["SE"]
+    F = ["SF"]
 
     def LINE_LABEL_CLAUSE(self):  # noqa: N802
         label_map = {
@@ -316,3 +319,4 @@ class Schedule(Enum):
     C1 = Value("C2")
     D = Value("D")
     E = Value("E")
+    F = Value("F")
