@@ -114,11 +114,9 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_memo\_text
       ~DotFECTextRecordsTestCase.subTest
       ~DotFECTextRecordsTestCase.tearDown
       ~DotFECTextRecordsTestCase.tearDownClass
-      ~DotFECTextRecordsTestCase.test_committee_id
-      ~DotFECTextRecordsTestCase.test_record_name
-      ~DotFECTextRecordsTestCase.test_row_contains_report_info
-      ~DotFECTextRecordsTestCase.test_row_contains_text4000
-      ~DotFECTextRecordsTestCase.test_row_contains_transaction_info
+      ~DotFECTextRecordsTestCase.test_f3x_memo
+      ~DotFECTextRecordsTestCase.test_f99_memo
+      ~DotFECTextRecordsTestCase.test_transaction_memo
    
    
 

@@ -334,20 +334,14 @@ not have a method with the specified name.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text.DotFECTextRecordsTestCase.tearDownClass" title="fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text.DotFECTextRecordsTestCase.tearDownClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDownClass</span></code></a>()</p></td>
 <td><p>Hook method for deconstructing the class fixture after running all tests in the class.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_committee_id</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_f3x_memo</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_record_name</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_f99_memo</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_row_contains_report_info</span></code>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_row_contains_text4000</span></code>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_row_contains_transaction_info</span></code>()</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text.DotFECTextRecordsTestCase.test_transaction_memo" title="fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text.DotFECTextRecordsTestCase.test_transaction_memo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_transaction_memo</span></code></a>()</p></td>
+<td><p>create a transaction and memo set the form type of the transaction to SA11AII (unitemized) but mark the transaction as itemized.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1063,6 +1057,17 @@ block, allowing further test code to be executed.</p>
 <dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text.DotFECTextRecordsTestCase.test_transaction_memo">
+<span class="sig-name descname"><span class="pre">test_transaction_memo</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text.DotFECTextRecordsTestCase.test_transaction_memo" title="Link to this definition">¶</a></dt>
+<dd><p>create a transaction and memo
+set the form type of the transaction to SA11AII (unitemized)
+but mark the transaction as itemized.  The queryset used should spit out
+a form type of SA11AI (itemized) instead of SA11AII
+This is important to test because if the correct queryset isn’t used
+the form type in the memo will say SA11AII instead of SA11AI</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1198,6 +1203,7 @@ block, allowing further test code to be executed.</p>
 <li class="toctree-l10"><a class="reference internal" href="#fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text.DotFECTextRecordsTestCase.subTest"><code class="docutils literal notranslate"><span class="pre">DotFECTextRecordsTestCase.subTest()</span></code></a></li>
 <li class="toctree-l10"><a class="reference internal" href="#fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text.DotFECTextRecordsTestCase.tearDown"><code class="docutils literal notranslate"><span class="pre">DotFECTextRecordsTestCase.tearDown()</span></code></a></li>
 <li class="toctree-l10"><a class="reference internal" href="#fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text.DotFECTextRecordsTestCase.tearDownClass"><code class="docutils literal notranslate"><span class="pre">DotFECTextRecordsTestCase.tearDownClass()</span></code></a></li>
+<li class="toctree-l10"><a class="reference internal" href="#fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_memo_text.DotFECTextRecordsTestCase.test_transaction_memo"><code class="docutils literal notranslate"><span class="pre">DotFECTextRecordsTestCase.test_transaction_memo()</span></code></a></li>
 </ul>
 </li>
 </ul>
