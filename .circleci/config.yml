@@ -244,13 +244,13 @@ workflows:
       - trigger-e2e-test-pipeline:
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|test|main/
+              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - deploy-job:
           requires:
             - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|test|main/
+              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
           requires:
             - test
