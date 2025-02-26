@@ -52,19 +52,6 @@ class CommitteeAccountsUtilsTest(TestCase):
                 user=self.other_user,
             )
 
-    def test_create_committee_account_unauthorized_email(self):
-        with patch("fecfiler.committee_accounts.utils.settings") as settings:
-            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
-            self.assertRaisesMessage(
-                Exception,
-                self.create_error_message,
-                create_committee_account,
-                committee_id="C12345678",
-                user=User.objects.create(
-                    email="test@unauthorized_domain.com", username="unauthorized_domeain"
-                ),
-            )
-
     def test_create_committee_account_case_insensitive(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"

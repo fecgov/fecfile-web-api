@@ -34,31 +34,6 @@ def get_response_for_bad_committee_source_config():
     return response
 
 
-def check_email_allowed_to_create_committee_account(email):
-    """
-    Check if the provided email is allowed to create a committee based on domain
-    or exception list.
-
-    Args:
-        email (str): The email to be checked.
-
-    Returns:
-        boolean True if email is allowed, False otherwise.
-    """
-    allowed_domains = ["fec.gov"]
-    allowed_emails = settings.CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST
-    if email:
-        email_to_check = email.lower()
-        split_email = email_to_check.split("@")
-        if len(split_email) == 2:
-            domain = split_email[1]
-            if domain and domain in allowed_domains:
-                return True
-        if email_to_check in allowed_emails:
-            return True
-    return False
-
-
 def check_email_match(email, f1_emails):
     """
     Check if the provided email matches any of the committee emails.
@@ -93,9 +68,6 @@ def check_can_create_committee_account(committee_id, user):
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if existing_account:
         failure_reason = f"Committee account {committee_id} already created"
-
-    if not check_email_allowed_to_create_committee_account(email):
-        failure_reason = f"Email {email} is not allowed to create a committee account"
 
     if failure_reason:
         logger.error(f"Failure to create committee account: {failure_reason}")
