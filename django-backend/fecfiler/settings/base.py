@@ -409,12 +409,8 @@ STAGE_OPEN_FEC_API_KEY = env.get_credential("STAGE_OPEN_FEC_API_KEY")
 """MOCK OPENFEC settings"""
 MOCK_OPENFEC_REDIS_URL = env.get_credential("REDIS_URL")
 
-CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST = env.get_credential(
-    "CREATE_COMMITTEE_ACCOUNT_ALLOWED_EMAIL_LIST", []
-)
-
 TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
 
-ENABLE_DEVELOPER_COMMANDS = get_boolean_from_string(
-    env.get_credential("ENABLE_DEVELOPER_COMMANDS", "False")
+ENABLE_RESTRICTED_COMMANDS = get_boolean_from_string(
+    env.get_credential("ENABLE_RESTRICTED_COMMANDS", "False")
 )

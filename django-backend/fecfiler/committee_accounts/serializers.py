@@ -1,68 +1,25 @@
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from django.contrib.sessions.exceptions import SuspiciousSession
-from rest_framework import serializers, relations
+from rest_framework.relations import PrimaryKeyRelatedField
+from rest_framework.serializers import ModelSerializer, ChoiceField, SerializerMethodField
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
-class CommitteeAccountSerializer(serializers.ModelSerializer):
+class CommitteeAccountSerializer(ModelSerializer):
     class Meta:
         model = CommitteeAccount
         fields = "__all__"
 
 
-class CommitteeMembershipSerializer(serializers.Serializer):
-    role = serializers.ChoiceField(choices=Membership.CommitteeRole)
-
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-
-        if instance.user is not None:
-            representation.update(
-                {
-                    "id": instance.id,
-                    "email": instance.user.email,
-                    "username": instance.user.username,
-                    "name": f"{instance.user.last_name}, {instance.user.first_name}",
-                }
-            )
-        else:
-            representation.update(
-                {
-                    "id": instance.id,
-                    "email": instance.pending_email,
-                    "username": "",
-                    "name": "",
-                }
-            )
-
-        representation["is_active"] = instance.user is not None
-        return representation
-
-    class Meta:
-        model = Membership
-
-        fields = [
-            f.name
-            for f in Membership._meta.get_fields()
-            if f.name not in ["deleted", "user", "pending_email"]
-        ] + ["name", "email"]
-        read_only_fields = [
-            "id",
-            "created",
-        ]
-
-
-class CommitteeOwnedSerializer(serializers.ModelSerializer):
+class CommitteeOwnedSerializer(ModelSerializer):
     """Serializer for CommitteeOwnedModel
     Inherit this to assign the user's committee as the object's
     owning CommitteeAccount
     """
 
-    committee_account = relations.PrimaryKeyRelatedField(
-        queryset=CommitteeAccount.objects.all()
-    )
+    committee_account = PrimaryKeyRelatedField(queryset=CommitteeAccount.objects.all())
 
     def to_internal_value(self, data):
         """Extract committee_id from request to assign the corresponding
@@ -77,3 +34,47 @@ class CommitteeOwnedSerializer(serializers.ModelSerializer):
         if not get_committee_uuid:
             raise SuspiciousSession("session has invalid committee_uuid")
         return get_committee_uuid
+
+
+class CommitteeMembershipSerializer(CommitteeOwnedSerializer):
+    role = ChoiceField(choices=Membership.CommitteeRole)
+    name = SerializerMethodField()
+    email = SerializerMethodField()
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        representation.update(
+            {
+                "id": instance.id,
+                "email": self.get_email(instance),
+                "username": instance.user.username if instance.user else "",
+                "name": self.get_name(instance),
+                "is_active": instance.user is not None,
+            }
+        )
+
+        return representation
+
+    class Meta:
+        model = Membership
+        fields = [
+            f.name
+            for f in Membership._meta.get_fields()
+            if f.name not in ["deleted", "user", "pending_email"]
+        ] + [
+            "name",
+            "email",
+        ]  # This is now valid
+
+        read_only_fields = ["id", "created"]
+
+    def get_name(self, instance):
+        return (
+            f"{instance.user.last_name}, {instance.user.first_name}"
+            if instance.user
+            else ""
+        )
+
+    def get_email(self, instance):
+        return instance.user.email if instance.user else instance.pending_email
