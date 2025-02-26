@@ -6,7 +6,7 @@ from abc import ABC, abstractmethod
 from fecfiler.web_services.models import FECStatus, BaseSubmission
 from fecfiler.settings import (
     EFO_FILING_API,
-    FEC_FILING_API_KEY,
+    EFO_FILING_API_KEY,
     FEC_AGENCY_ID,
 )
 import structlog
@@ -30,7 +30,7 @@ class DotFECSubmitter(ABC):
         json_obj = {
             "committee_id": dot_fec_record.report.committee_account.committee_id,
             "password": e_filing_password,
-            "api_key": FEC_FILING_API_KEY,
+            "api_key": EFO_FILING_API_KEY,
             "email_1": dot_fec_record.report.confirmation_email_1,
             "email_2": dot_fec_record.report.confirmation_email_2,
             "agency_id": FEC_AGENCY_ID,

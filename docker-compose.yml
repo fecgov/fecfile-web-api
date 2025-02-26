@@ -54,7 +54,7 @@ services:
       CELERY_WORKER_STORAGE:
       MOCK_EFO_FILING: True
       EFO_FILING_API:
-      FEC_FILING_API_KEY:
+      EFO_FILING_API_KEY:
       FEC_AGENCY_ID:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
@@ -95,7 +95,7 @@ services:
       CELERY_WORKER_STORAGE:
       MOCK_EFO_FILING: True
       EFO_FILING_API:
-      FEC_FILING_API_KEY:
+      EFO_FILING_API_KEY:
       FEC_AGENCY_ID:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
@@ -142,7 +142,7 @@ services:
       CELERY_WORKER_STORAGE:
       MOCK_EFO_FILING: True
       EFO_FILING_API:
-      FEC_FILING_API_KEY:
+      EFO_FILING_API_KEY:
       FEC_AGENCY_ID:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/

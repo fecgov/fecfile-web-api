@@ -3,7 +3,7 @@ from uuid import uuid4 as uuid
 from abc import ABC, abstractmethod
 from zeep import Client
 from fecfiler.web_services.models import FECStatus, BaseSubmission
-from fecfiler.settings import FEC_FILING_API_KEY, EFO_FILING_API
+from fecfiler.settings import EFO_FILING_API_KEY, EFO_FILING_API
 
 import structlog
 
@@ -30,7 +30,7 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
 
     def submit(self, email, dot_fec_bytes):
         response = self.fec_soap_client.service.print(
-            FEC_FILING_API_KEY, email, dot_fec_bytes
+            EFO_FILING_API_KEY, email, dot_fec_bytes
         )
         logger.debug(f"FEC upload response: {response}")
         return response
