@@ -20,6 +20,6 @@ class Tasks(TaskSet):
 class Swarm(user.HttpUser):
     tasks = [Tasks]
     wait_time = between(
-        POLLING_INTERVAL-POLLING_DEVIATION,
-        POLLING_INTERVAL+POLLING_DEVIATION
+        POLLING_INTERVAL - POLLING_DEVIATION,
+        POLLING_INTERVAL + POLLING_DEVIATION
     )
