@@ -57,6 +57,7 @@ fecfiler.devops.views.SystemStatusViewSet
       ~SystemStatusViewSet.reverse_action
       ~SystemStatusViewSet.scheduler_status
       ~SystemStatusViewSet.setup
+      ~SystemStatusViewSet.status
       ~SystemStatusViewSet.throttled
    
    

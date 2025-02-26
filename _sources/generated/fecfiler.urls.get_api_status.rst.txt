@@ -1,6 +1,0 @@
-fecfiler.urls.get\_api\_status
-==============================
-
-.. currentmodule:: fecfiler.urls
-
-.. autofunction:: get_api_status

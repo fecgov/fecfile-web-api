@@ -12,13 +12,6 @@ fecfiler.urls
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      get_api_status
-   
    
 
    
