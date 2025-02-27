@@ -20,7 +20,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   redis:
-    image: redis:6.2-alpine
+    image: redis:7.0-alpine
     ports:
       - "6379:6379"
     command: redis-server
@@ -191,6 +191,7 @@ services:
       LOCAL_TEST_USER:
       LOCAL_TEST_PWD:
       OIDC_SESSION_ID:
+      CSRF_TOKEN:
 
   locust-follower:
     image: locustio/locust
@@ -202,3 +203,4 @@ services:
       LOCAL_TEST_USER:
       LOCAL_TEST_PWD:
       OIDC_SESSION_ID:
+      CSRF_TOKEN:
