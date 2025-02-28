@@ -3,22 +3,13 @@ from django.forms.models import model_to_dict
 from fecfiler.utils import save_copy
 from django.db.models import Q
 from decimal import Decimal
+from ..utils import add_org_ind_contact
 
 
 def add_schedule_d_contact_fields(instance, representation=None):
     data = {}
     if instance.contact_1:
-        data["creditor_organization_name"] = instance.contact_1.name
-        data["creditor_last_name"] = instance.contact_1.last_name
-        data["creditor_first_name"] = instance.contact_1.first_name
-        data["creditor_middle_name"] = instance.contact_1.middle_name
-        data["creditor_prefix"] = instance.contact_1.prefix
-        data["creditor_suffix"] = instance.contact_1.suffix
-        data["creditor_street_1"] = instance.contact_1.street_1
-        data["creditor_street_2"] = instance.contact_1.street_2
-        data["creditor_city"] = instance.contact_1.city
-        data["creditor_state"] = instance.contact_1.state
-        data["creditor_zip"] = instance.contact_1.zip
+        add_org_ind_contact(data, instance.contact_1, "creditor")
 
     if representation:
         representation.update(data)

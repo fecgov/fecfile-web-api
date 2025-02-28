@@ -22,6 +22,7 @@ from fecfiler.transactions.schedule_c1.serializers import ScheduleC1Serializer
 from fecfiler.transactions.schedule_c2.serializers import ScheduleC2Serializer
 from fecfiler.transactions.schedule_d.serializers import ScheduleDSerializer
 from fecfiler.transactions.schedule_e.serializers import ScheduleESerializer
+from fecfiler.transactions.schedule_f.serializers import ScheduleFSerializer
 from fecfiler.transactions.schedule_a.utils import add_schedule_a_contact_fields
 from fecfiler.transactions.schedule_b.utils import add_schedule_b_contact_fields
 from fecfiler.transactions.schedule_c.utils import add_schedule_c_contact_fields
@@ -29,6 +30,7 @@ from fecfiler.transactions.schedule_c1.utils import add_schedule_c1_contact_fiel
 from fecfiler.transactions.schedule_c2.utils import add_schedule_c2_contact_fields
 from fecfiler.transactions.schedule_d.utils import add_schedule_d_contact_fields
 from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
+from fecfiler.transactions.schedule_f.utils import add_schedule_f_contact_fields
 
 from fecfiler.reports.report_code_label import get_report_code_label
 import structlog
@@ -45,6 +47,7 @@ SCHEDULE_SERIALIZERS = dict(
     C2=ScheduleC2Serializer,
     D=ScheduleDSerializer,
     E=ScheduleESerializer,
+    F=ScheduleFSerializer,
 )
 
 REATTRIBUTED = "REATTRIBUTED"
@@ -156,85 +159,25 @@ class TransactionSerializer(
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        schedule_a = representation.pop("schedule_a")
-        schedule_b = representation.pop("schedule_b")
-        schedule_c = representation.pop("schedule_c")
-        schedule_c1 = representation.pop("schedule_c1")
-        schedule_c2 = representation.pop("schedule_c2")
-        schedule_d = representation.pop("schedule_d")
-        schedule_e = representation.pop("schedule_e")
 
-        if schedule_a:
-            representation["contribution_aggregate"] = representation.get("aggregate")
-            add_schedule_a_contact_fields(instance, representation)
-
-            # For REATTRIBUTED transactions, calculate the amount that has
-            # been reattributed for the transaction
-            if instance.schedule_a.reattribution_redesignation_tag == REATTRIBUTED:
-                total = (
-                    instance.reatt_redes_associations.filter(
-                        schedule_a__reattribution_redesignation_tag=REATTRIBUTION_TO
-                    ).aggregate(Sum("schedule_a__contribution_amount"))[
-                        "schedule_a__contribution_amount__sum"
-                    ]
-                    or 0.0
-                )
-                representation["reatt_redes_total"] = str(total)
-
-            for property in schedule_a:
-                if not representation.get(property):
-                    representation[property] = schedule_a[property]
-        if schedule_b:
-            representation["aggregate_amount"] = representation.get("aggregate")
-            add_schedule_b_contact_fields(instance, representation)
-
-            # For REDESIGNATED transactions, calculate the amount that has
-            # been redesignated for the transaction
-            if instance.schedule_b.reattribution_redesignation_tag == REDESIGNATED:
-                total = (
-                    instance.reatt_redes_associations.filter(
-                        schedule_b__reattribution_redesignation_tag=REDESIGNATION_TO
-                    ).aggregate(Sum("schedule_b__expenditure_amount"))[
-                        "schedule_b__expenditure_amount__sum"
-                    ]
-                    or 0.0
-                )
-                representation["reatt_redes_total"] = str(total)
-
-            for property in schedule_b:
-                if not representation.get(property):
-                    representation[property] = schedule_b[property]
-        if schedule_c:
-            add_schedule_c_contact_fields(instance, representation)
-            loan_agreement = instance.transaction_set.filter(
-                transaction_type_identifier="C1_LOAN_AGREEMENT"
-            ).first()
-            representation["loan_agreement_id"] = (
-                loan_agreement.id if loan_agreement else None
-            )
-            for property in schedule_c:
-                if not representation.get(property):
-                    representation[property] = schedule_c[property]
-        if schedule_c1:
-            add_schedule_c1_contact_fields(instance, representation)
-            for property in schedule_c1:
-                if not representation.get(property):
-                    representation[property] = schedule_c1[property]
-        if schedule_c2:
-            add_schedule_c2_contact_fields(instance, representation)
-            for property in schedule_c2:
-                if not representation.get(property):
-                    representation[property] = schedule_c2[property]
-        if schedule_d:
-            add_schedule_d_contact_fields(instance, representation)
-            for property in schedule_d:
-                if not representation.get(property):
-                    representation[property] = schedule_d[property]
-        if schedule_e:
-            add_schedule_e_contact_fields(instance, representation)
-            for property in schedule_e:
-                if not representation.get(property):
-                    representation[property] = schedule_e[property]
+        self.handle_schedule_a(instance, representation)
+        self.handle_schedule_b(instance, representation)
+        self.handle_schedule_c(instance, representation)
+        self.handle_generic_schedule(
+            instance, representation, "schedule_c1", add_schedule_c1_contact_fields
+        )
+        self.handle_generic_schedule(
+            instance, representation, "schedule_c2", add_schedule_c2_contact_fields
+        )
+        self.handle_generic_schedule(
+            instance, representation, "schedule_d", add_schedule_d_contact_fields
+        )
+        self.handle_generic_schedule(
+            instance, representation, "schedule_e", add_schedule_e_contact_fields
+        )
+        self.handle_generic_schedule(
+            instance, representation, "schedule_f", add_schedule_f_contact_fields
+        )
 
         # because form_type is a dynamic field
         representation["form_type"] = instance.form_type
@@ -310,6 +253,80 @@ class TransactionSerializer(
         )
         super().validate(data_to_validate)
         return data
+
+    def handle_schedule_a(self, instance, representation):
+        schedule_a = representation.pop("schedule_a")
+        if not schedule_a:
+            return
+        representation["contribution_aggregate"] = representation.get("aggregate")
+        add_schedule_a_contact_fields(instance, representation)
+
+        # For REATTRIBUTED transactions, calculate the amount that has
+        # been reattributed for the transaction
+        if instance.schedule_a.reattribution_redesignation_tag == REATTRIBUTED:
+            total = (
+                instance.reatt_redes_associations.filter(
+                    schedule_a__reattribution_redesignation_tag=REATTRIBUTION_TO
+                ).aggregate(Sum("schedule_a__contribution_amount"))[
+                    "schedule_a__contribution_amount__sum"
+                ]
+                or 0.0
+            )
+            representation["reatt_redes_total"] = str(total)
+
+        for property in schedule_a:
+            if not representation.get(property):
+                representation[property] = schedule_a[property]
+
+    def handle_schedule_b(self, instance, representation):
+        schedule_b = representation.pop("schedule_b")
+        if not schedule_b:
+            return
+        representation["aggregate_amount"] = representation.get("aggregate")
+        add_schedule_b_contact_fields(instance, representation)
+
+        # For REDESIGNATED transactions, calculate the amount that has
+        # been redesignated for the transaction
+        if instance.schedule_b.reattribution_redesignation_tag == REDESIGNATED:
+            total = (
+                instance.reatt_redes_associations.filter(
+                    schedule_b__reattribution_redesignation_tag=REDESIGNATION_TO
+                ).aggregate(Sum("schedule_b__expenditure_amount"))[
+                    "schedule_b__expenditure_amount__sum"
+                ]
+                or 0.0
+            )
+            representation["reatt_redes_total"] = str(total)
+
+        for property in schedule_b:
+            if not representation.get(property):
+                representation[property] = schedule_b[property]
+
+    def handle_schedule_c(self, instance, representation):
+        schedule_c = representation.pop("schedule_c")
+        if not schedule_c:
+            return
+        add_schedule_c_contact_fields(instance, representation)
+        loan_agreement = instance.transaction_set.filter(
+            transaction_type_identifier="C1_LOAN_AGREEMENT"
+        ).first()
+        representation["loan_agreement_id"] = (
+            loan_agreement.id if loan_agreement else None
+        )
+        for property in schedule_c:
+            if not representation.get(property):
+                representation[property] = schedule_c[property]
+
+    def handle_generic_schedule(
+        self, instance, representation, schedule_name, add_fields
+    ):
+        schedule = representation.pop(schedule_name)
+        if not schedule:
+            return
+        add_fields(instance, representation)
+        for property in schedule:
+            if not representation.get(property):
+                representation[property] = schedule[property]
 
 
 class TransactionReportSerializer(CommitteeOwnedSerializer):
