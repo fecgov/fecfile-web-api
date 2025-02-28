@@ -42,8 +42,8 @@ services:
       - redis
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL:
-      FECFILE_TEST_DB_NAME:
+      DATABASE_URL: postgres://postgres:postgres@db/postgres
+      FECFILE_TEST_DB_NAME: postgres
       DJANGO_SETTINGS_MODULE: fecfiler.settings.local
       DJANGO_SECRET_KEY:
       FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
@@ -53,7 +53,7 @@ services:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
       MOCK_EFO_FILING: True
-      EFO_FILING_API:
+      EFO_FILING_API: https://efoservices.stage.efo.fec.gov
       EFO_FILING_API_KEY:
       FEC_AGENCY_ID:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
@@ -83,8 +83,8 @@ services:
       - redis
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL:
-      FECFILE_TEST_DB_NAME:
+      DATABASE_URL: postgres://postgres:postgres@db/postgres
+      FECFILE_TEST_DB_NAME: postgres
       DJANGO_SETTINGS_MODULE: fecfiler.settings.local
       DJANGO_SECRET_KEY:
       FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
@@ -123,8 +123,8 @@ services:
       - redis
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL:
-      FECFILE_TEST_DB_NAME:
+      DATABASE_URL: postgres://postgres:postgres@db/postgres
+      FECFILE_TEST_DB_NAME: postgres
       DJANGO_SETTINGS_MODULE: fecfiler.settings.local
       DJANGO_SECRET_KEY:
       FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
@@ -141,7 +141,7 @@ services:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
       MOCK_EFO_FILING: True
-      EFO_FILING_API:
+      EFO_FILING_API: https://efoservices.stage.efo.fec.gov
       EFO_FILING_API_KEY:
       FEC_AGENCY_ID:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
