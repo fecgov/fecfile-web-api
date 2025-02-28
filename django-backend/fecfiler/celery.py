@@ -56,9 +56,3 @@ app.autodiscover_tasks()
 class CeleryStorageType(Enum):
     AWS = "aws"
     LOCAL = "local"
-
-
-@app.task(bind=True)
-def debug_task(self):
-    logger.debug(f"Request: {self.request!r}")
-    return True
