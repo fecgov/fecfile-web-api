@@ -1,34 +1,44 @@
-from django.db import models
-import uuid
+from uuid import uuid4
+from django.db.models import (
+    TextField,
+    ForeignKey,
+    BooleanField,
+    DecimalField,
+    CASCADE,
+    DateField,
+    UUIDField,
+    Model,
+)
 
 
-class ScheduleF(models.Model):
-    id = models.UUIDField(
-        default=uuid.uuid4,
+class ScheduleF(Model):
+    id = UUIDField(
+        default=uuid4,
         editable=False,
         primary_key=True,
         serialize=False,
         unique=True,
     )
-
-    has_filer_been_designated = models.BooleanField(null=True, blank=True)
-    designating_committee_account = models.ForeignKey(
-        "committee_accounts.CommitteeAccount", on_delete=models.CASCADE, null=True
+    filer_designated_to_make_coordianted_expenditures = BooleanField(
+        null=True, blank=True
     )
-    designating_committee_name = models.TextField(blank=True)
+    designating_committee_account = ForeignKey(
+        "committee_accounts.CommitteeAccount", on_delete=CASCADE, null=True
+    )
+    designating_committee_name = TextField(blank=True)
 
-    expenditure_date = models.DateField(null=True, blank=True)
-    expenditure_amount = models.DecimalField(
+    expenditure_date = DateField(null=True, blank=True)
+    expenditure_amount = DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
-    aggregate_general_elec_expended = models.DecimalField(
+    aggregate_general_elec_expended = DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
-    expenditure_purpose_descrip = models.TextField(blank=True)
+    expenditure_purpose_descrip = TextField(blank=True)
 
-    category_code = models.TextField(blank=True)
+    category_code = TextField(blank=True)
 
-    memo_text_description = models.TextField(blank=True)
+    memo_text_description = TextField(blank=True)
 
     @property
     def designating_committee_id_number(self):

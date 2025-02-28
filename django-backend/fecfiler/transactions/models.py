@@ -15,6 +15,7 @@ from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.transactions.schedule_f.models import ScheduleF
+from fecfiler.contacts.models import Contact
 
 import uuid
 import structlog
@@ -95,19 +96,19 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    contact_1 = models.ForeignKey(
+    contact_1: Contact = models.ForeignKey(
         "contacts.Contact",
         on_delete=models.CASCADE,
         related_name="contact_1_transaction_set",
         null=True,
     )
-    contact_2 = models.ForeignKey(
+    contact_2: Contact = models.ForeignKey(
         "contacts.Contact",
         on_delete=models.CASCADE,
         related_name="contact_2_transaction_set",
         null=True,
     )
-    contact_3 = models.ForeignKey(
+    contact_3: Contact = models.ForeignKey(
         "contacts.Contact",
         on_delete=models.CASCADE,
         related_name="contact_3_transaction_set",

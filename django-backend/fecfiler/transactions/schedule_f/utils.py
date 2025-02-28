@@ -1,12 +1,14 @@
 from ..utils import add_org_ind_contact, add_candidate_contact, add_committee_contact
+from fecfiler.transactions.models import Transaction
 
 
-def add_schedule_f_contact_fields(instance, representation=None):
+def add_schedule_f_contact_fields(instance: Transaction, representation=None):
     data = {}
     if instance.contact_1:
         add_org_ind_contact(data, instance.contact_1, "payee")
     if instance.contact_2:
         add_candidate_contact(data, instance.contact_2, "payee", False)
+        data["payee_committee_id_number"] = instance.contact_2.committee_account.id
     if instance.contact_3:
         add_committee_contact(data, instance.contact_3, "subordinate")
 

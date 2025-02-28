@@ -7,9 +7,8 @@ from fecfiler.transactions.schedule_b.managers import (
 )
 from fecfiler.transactions.schedule_c.managers import line_labels as line_labels_c
 from fecfiler.transactions.schedule_d.managers import line_labels as line_labels_d
-from fecfiler.transactions.schedule_e.managers import (
-    line_labels as line_labels_e,
-)
+from fecfiler.transactions.schedule_e.managers import line_labels as line_labels_e
+from fecfiler.transactions.schedule_f.managers import line_labels as line_labels_f
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
     OuterRef,
@@ -45,6 +44,7 @@ class TransactionManager(SoftDeleteManager):
             When(schedule_c2__isnull=False, then=Schedule.C2.value),
             When(schedule_d__isnull=False, then=Schedule.D.value),
             When(schedule_e__isnull=False, then=Schedule.E.value),
+            When(schedule_f__isnull=False, then=Schedule.F.value),
         )
 
     DATE_CLAUSE = Coalesce(
@@ -302,6 +302,7 @@ class TransactionManager(SoftDeleteManager):
             **line_labels_c,
             **line_labels_d,
             **line_labels_e,
+            **line_labels_f,
         }
         return Case(
             *[

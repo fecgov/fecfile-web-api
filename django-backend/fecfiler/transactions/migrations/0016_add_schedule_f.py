@@ -26,7 +26,10 @@ class Migration(migrations.Migration):
                         unique=True,
                     ),
                 ),
-                ("has_filer_been_designated", models.BooleanField(blank=True, null=True)),
+                (
+                    "filer_designated_to_make_coordianted_expenditures",
+                    models.BooleanField(blank=True, null=True),
+                ),
                 ("designating_committee_name", models.TextField(blank=True)),
                 ("expenditure_date", models.DateField(blank=True, null=True)),
                 (

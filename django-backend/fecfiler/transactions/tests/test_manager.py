@@ -61,6 +61,7 @@ class TransactionViewTestCase(TestCase):
             self.committee,
             self.contact_1,
             None,
+            None,
             "GENERAL",
             {
                 "contribution_date": "2024-01-01",
@@ -73,6 +74,7 @@ class TransactionViewTestCase(TestCase):
             ScheduleA,
             self.committee,
             self.contact_1,
+            None,
             None,
             "GENERAL",
             {
