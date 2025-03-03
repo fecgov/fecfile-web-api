@@ -23,17 +23,6 @@ PRODUCTION_PAC_COMMITTEE_TYPES = ["O", "U", "D", "N", "Q", "V", "W"]
 PRODUCTION_QUALIFIED_COMMITTEES = ["Q", "W", "Y"]
 
 
-def get_response_for_bad_committee_source_config():
-    error_message = f"""FLAG__COMMITTEE_DATA_SOURCE improperly configured: {
-        settings.FLAG__COMMITTEE_DATA_SOURCE
-    }"""
-    response = Response()
-    response.status_code = 500
-    response.content = error_message
-    logger.exception(Exception(error_message))
-    return response
-
-
 def check_email_match(email, f1_emails):
     """
     Check if the provided email matches any of the committee emails.
@@ -60,9 +49,7 @@ def check_email_match(email, f1_emails):
 def check_can_create_committee_account(committee_id, user):
     email = user.email
 
-    committee = get_committee_account_data(committee_id)
-    committee_emails = committee.get("email", "")
-
+    committee_emails = get_committee_emails(committee_id)
     failure_reason = check_email_match(email, committee_emails)
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
@@ -90,20 +77,94 @@ def create_committee_account(committee_id, user):
     return account
 
 
+def get_committee_emails(committee_id):
+    match settings.FLAG__COMMITTEE_DATA_SOURCE:
+        case "PRODUCTION":
+            emails = get_production_committee_emails(committee_id)
+        case "TEST":
+            emails = get_test_committee_emails(committee_id)
+        case "MOCKED":
+            emails = get_mocked_committee_emails(committee_id)
+    return emails
+
+
 def get_committee_account_data(committee_id):
     match settings.FLAG__COMMITTEE_DATA_SOURCE:
         case "PRODUCTION":
-            committee = get_committee_account_data_from_efo(committee_id)
+            committee = get_production_committee_data(committee_id)
         case "TEST":
-            committee = get_committee_account_data_from_test_efo(committee_id)
+            committee = get_test_committee_data(committee_id)
         case "MOCKED":
-            committee = get_committee_account_data_from_redis(committee_id)
+            committee = get_mocked_committee_data(committee_id)
     return committee
 
 
-def get_committee_account_data_from_efo(committee_id):
-    # To be verified in https://fecgov.atlassian.net/browse/FECFILE-1706
-    committee_data = query_production_efo(committee_id)
+"""
+FEC API methods
+"""
+
+
+def query_fec_api(endpoint, params):
+    """Shared method to query an EFO API"""
+    headers = {"Content-Type": "application/json"}
+    response = requests.get(endpoint, headers=headers, params=params)
+    response_data = response.json()
+    committee_results = response_data.get("results", [])
+    return committee_results[0] if committee_results else None
+
+
+def query_multiple_endpoints(endpoints, params):
+    """Queries multiple endpoints and returns the first successful response"""
+    for endpoint in endpoints:
+        response = query_fec_api(endpoint, params)
+        if response:
+            return response
+    return None
+
+
+"""
+Production FEC
+"""
+
+
+def get_production_committee_raw_first(committee_id):
+    """Queries the production FEC API for committee data
+    First tries raw endpoint and then falls back to processed endpoint
+    """
+    raw_and_processed_endpoints = [
+        f"{settings.PRODUCTION_OPEN_FEC_API}efile/form1/",
+        f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/",
+    ]
+    params = {
+        "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
+        "committee_id": committee_id,
+    }
+    return query_multiple_endpoints(raw_and_processed_endpoints, params)
+
+
+def get_production_committee_processed_first(committee_id):
+    """Queries the production FEC API for committee data
+    First tries processed endpoint and then falls back to raw endpoint
+    """
+    processed_and_raw_endpoints = [
+        f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/",
+        f"{settings.PRODUCTION_OPEN_FEC_API}efile/form1/",
+    ]
+    params = {
+        "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
+        "committee_id": committee_id,
+    }
+    return query_multiple_endpoints(processed_and_raw_endpoints, params)
+
+
+def get_production_committee_emails(committee_id):
+    """"""
+    committee = get_production_committee_raw_first(committee_id)
+    return committee.get("email", "") if committee else ""
+
+
+def get_production_committee_data(committee_id):
+    committee_data = get_production_committee_processed_first(committee_id)
     if committee_data is None:
         return None
 
@@ -136,47 +197,38 @@ def is_production_efo_pac(committee_data):
     return committee_data.get("committee_type") in PRODUCTION_PAC_COMMITTEE_TYPES
 
 
-def query_production_efo(committee_id):
-    """Queries the production EFO API for committee data
-    First tries raw endpoint and then falls back to processed endpoint
+"""
+Test FEC
+"""
+
+
+def get_committee_from_test_fec(committee_id):
     """
-    raw_and_processed_endpoints = [
-        f"{settings.PRODUCTION_OPEN_FEC_API}efile/form1/",
-        f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/",
-    ]
-
-    params = {
-        "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
-        "committee_id": committee_id,
-    }
-    for endpoint in raw_and_processed_endpoints:
-        committee_data = query_efo_api(endpoint, params)
-        if committee_data:
-            return committee_data
-    return None
-
-
-def query_efo_api(endpoint, params):
-    """Shared method to query an EFO API"""
-    headers = {"Content-Type": "application/json"}
-    response = requests.get(endpoint, headers=headers, params=params)
-    response_data = response.json()
-    committee_results = response_data.get("results", [])
-    return committee_results[0] if committee_results else None
-
-
-def get_committee_account_data_from_test_efo(committee_id):
-    """
-    Retrieves committee data from the test EFO API.
-    derives committee_type_label, isPTY, isPAC, qualified, filing_frequency,
-    and maps some fields to their names as prod has them
+    Retrieves committee data from test efo using the fec API.
     """
     params = {
         "api_key": settings.STAGE_OPEN_FEC_API_KEY,
         "committee_id": committee_id,
     }
     endpoint = f"{settings.STAGE_OPEN_FEC_API}efile/test-form1/"
-    committee_data = query_efo_api(endpoint, params)
+    committee_data = query_fec_api(endpoint, params)
+    return committee_data if committee_data is not None else None
+
+
+def get_test_committee_emails(committee_id):
+    committee = get_committee_from_test_fec(committee_id)
+    return committee.get("email", "") if committee else ""
+
+
+def get_test_committee_data(committee_id):
+    """
+    Retrieves committee data from test efo using the fec API.
+    Derives committee_type_label, isPTY, isPAC, qualified, filing_frequency,
+    and maps some fields to their names as prod has them
+    """
+    committee_data = get_committee_from_test_fec(committee_id)
+
+    print(f"AHOY {committee_data}")
     if committee_data is None:
         return None
 
@@ -215,7 +267,17 @@ def is_test_efo_pty(committee_data):
     return committee_data.get("committee_type") == "D"
 
 
-def get_committee_account_data_from_redis(committee_id):
+"""
+Mock
+"""
+
+
+def get_mocked_committee_emails(committee_id):
+    committee = get_mocked_committee_data(committee_id)
+    return committee.get("email", "") if committee else ""
+
+
+def get_mocked_committee_data(committee_id):
     if redis_instance:
         committee_data = redis_instance.get(COMMITTEE_DATA_REDIS_KEY) or ""
         committees = json.loads(committee_data) or []
