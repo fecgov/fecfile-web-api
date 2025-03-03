@@ -211,6 +211,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     Example usage: invoke deploy --space dev
     """
+    ctx.run(f"cf version", echo=True)
 
     if help:
         _print_help_text()
