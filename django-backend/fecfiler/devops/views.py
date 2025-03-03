@@ -83,3 +83,13 @@ class SystemStatusViewSet(viewsets.ViewSet):
             {"status": "cannot connect to database"},
             status=status.HTTP_503_SERVICE_UNAVAILABLE,
         )
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="status",
+        permission_classes=[],
+    )
+    def status(self, request):
+        # Can't reasonably send 500 error if API isn't running
+        return Response({"status": "API is running"})
