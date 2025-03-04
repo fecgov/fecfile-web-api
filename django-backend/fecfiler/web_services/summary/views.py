@@ -16,8 +16,12 @@ class SummaryViewSet(viewsets.ViewSet):
     retrieve their statuses and results
     """
 
+    serializer_class = ReportIdSerializer
+
     @action(
-        detail=False, methods=["post"], url_path="calculate-summary",
+        detail=False,
+        methods=["post"],
+        url_path="calculate-summary",
     )
     def calculate_summary(self, request):
         """ """

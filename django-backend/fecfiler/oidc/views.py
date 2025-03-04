@@ -28,7 +28,7 @@ from fecfiler.settings import (
     OIDC_ACR_VALUES,
     LOGIN_REDIRECT_URL,
 )
-
+from drf_spectacular.utils import extend_schema
 from .utils import (
     add_oidc_nonce_to_session,
     handle_oidc_callback_error,
@@ -44,6 +44,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
+@extend_schema(exclude=True)
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def login_redirect(request):
@@ -57,6 +58,7 @@ def login_redirect(request):
     return redirect
 
 
+@extend_schema(exclude=True)
 @api_view(["GET"])
 @require_http_methods(["GET"])
 @permission_classes([])
@@ -67,6 +69,7 @@ def logout_redirect(request):
     return response
 
 
+@extend_schema(exclude=True)
 @api_view(["GET"])
 @authentication_classes([])
 @permission_classes([])
@@ -94,6 +97,7 @@ def oidc_authenticate(request):
     return response
 
 
+@extend_schema(exclude=True)
 @api_view(["GET"])
 @authentication_classes([])
 @permission_classes([])
@@ -114,6 +118,7 @@ def oidc_callback(request):
         return HttpResponseServerError()
 
 
+@extend_schema(exclude=True)
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def oidc_logout(request):

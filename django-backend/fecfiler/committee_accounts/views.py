@@ -10,7 +10,7 @@ from fecfiler.committee_accounts.utils import (
     create_committee_account,
     get_committee_account_data,
 )
-
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
@@ -38,6 +38,13 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         user = self.request.user
         return CommitteeAccount.objects.filter(members=user)
 
+    @extend_schema(
+        request=CommitteeAccountSerializer,
+        responses=CommitteeAccountSerializer,
+        parameters=[
+            OpenApiParameter(name="id", type=str, location=OpenApiParameter.PATH)
+        ],
+    )
     @action(detail=True, methods=["post"])
     def activate(self, request, pk):
         committee = self.get_object()

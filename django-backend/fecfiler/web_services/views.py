@@ -16,6 +16,7 @@ from .renderers import DotFECRenderer
 from .web_service_storage import get_file
 from .models import DotFEC, UploadSubmission, WebPrintSubmission
 from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
+from drf_spectacular.utils import extend_schema
 from celery.result import AsyncResult
 import structlog
 
@@ -28,6 +29,16 @@ class WebServicesViewSet(viewsets.ViewSet):
     retrieve thier statuses and results
     """
 
+    """Return the appropriate serializer class for the action."""
+
+    def get_serializer_class(self):
+        if self.action == "create_dot_fec":
+            return ReportIdSerializer
+        elif self.action == "submit_to_fec":
+            return SubmissionRequestSerializer
+        elif self.action == "submit_to_webprint":
+            return ReportIdSerializer
+
     @action(
         detail=False,
         methods=["post"],
@@ -37,7 +48,9 @@ class WebServicesViewSet(viewsets.ViewSet):
         """Create a .FEC file and store it
         Currently only useful for testing purposes
         """
-        serializer = ReportIdSerializer(data=request.data, context={"request": request})
+        serializer = self.get_serializer_class()(
+            data=request.data, context={"request": request}
+        )
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         report_id = serializer.validated_data["report_id"]
@@ -54,6 +67,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         logger.debug(f"Status from create_dot_fec report {report_id}: {task.status}")
         return Response({"file_name": file_name, "task_id": task.task_id})
 
+    @extend_schema(exclude=True)
     @action(
         detail=False,
         methods=["get"],
@@ -65,6 +79,7 @@ class WebServicesViewSet(viewsets.ViewSet):
             return Response({"done": True, "id": res.get()})
         return Response({"done": False})
 
+    @extend_schema(exclude=True)
     @action(
         detail=False,
         methods=["get"],
@@ -95,7 +110,7 @@ class WebServicesViewSet(viewsets.ViewSet):
     )
     def submit_to_fec(self, request):
         """Create a signed .FEC, store it, and submit it to FEC Webload"""
-        serializer = SubmissionRequestSerializer(
+        serializer = self.get_serializer_class()(
             data=request.data, context={"request": request}
         )
         if not serializer.is_valid():
@@ -144,7 +159,9 @@ class WebServicesViewSet(viewsets.ViewSet):
     )
     def submit_to_webprint(self, request):
         """Create an unsigned .FEC, store it, and submit it to FEC WebPrint"""
-        serializer = ReportIdSerializer(data=request.data, context={"request": request})
+        serializer = self.get_serializer_class()(
+            data=request.data, context={"request": request}
+        )
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

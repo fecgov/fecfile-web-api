@@ -2,11 +2,8 @@ import structlog
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .tasks import (
-    DATABASE_STATUS,
-    CELERY_STATUS,
-    SCHEDULER_STATUS
-)
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from .tasks import DATABASE_STATUS, CELERY_STATUS, SCHEDULER_STATUS
 
 from .utils.redis_utils import get_redis_value
 
@@ -14,6 +11,12 @@ from .utils.redis_utils import get_redis_value
 logger = structlog.get_logger(__name__)
 
 
+@extend_schema_view(
+    celery_status=extend_schema(exclude=True),
+    scheduler_status=extend_schema(exclude=True),
+    database_status=extend_schema(exclude=True),
+    status=extend_schema(exclude=True),
+)
 class SystemStatusViewSet(viewsets.ViewSet):
     """
     A viewset that provides actions to check the status of the system
