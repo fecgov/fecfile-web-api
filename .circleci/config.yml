@@ -145,7 +145,7 @@ jobs:
           command: |
             mkdir -p $HOME/bin
             export PATH=$HOME/bin:$PATH
-            curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&version=7.3.0" | tar xzv -C $HOME/bin
+            curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&version=7.8.0" | tar xzv -C $HOME/bin
 
       - run:
           name: Deploy API
