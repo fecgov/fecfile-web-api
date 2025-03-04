@@ -12,7 +12,8 @@ logger = structlog.get_logger(__name__)
 SCHEDULER_STATUS = "SCHEDULER_STATUS"
 CELERY_STATUS = "CELERY_STATUS"
 DATABASE_STATUS = "DATABASE_STATUS"
-INITIAL_DB_SIZE = "INITIAL_DB_SIZE"
+LOGGED_DB_SIZE_REDIS_KEY = "LOGGED_DB_SIZE_REDIS_KEY"
+LOGGED_S3_SIZE_REDIS_KEY = "LOGGED_S3_SIZE_REDIS_KEY"
 
 
 @shared_task
@@ -38,15 +39,6 @@ def get_devops_status_report():
     log_s3_bucket_size()
 
 
-def log_s3_bucket_size():
-    if S3_SESSION:
-        total_size = 0
-        bucket = S3_SESSION.Bucket(AWS_STORAGE_BUCKET_NAME)
-        for object in bucket.objects.all():
-            total_size += object.size
-        logger.info("S3 bucket size (MB): " + str(round(total_size / 1024 / 1024, 2)))
-
-
 def check_database_size():
     sql = "SELECT pg_database_size( current_database() );"
 
@@ -59,48 +51,78 @@ def check_database_size():
         return results[0][0]
 
 
-def log_database_size(nbytes):
-    ngbytes = nbytes / (1024**3)
-    capacity = 1024  # in GB
-    pct_full = (ngbytes / capacity) * 100
+def log_database_size(current_size_bytes):
+    resource_label = "database"
+    capacity_gbytes = 1024
+    logged_size_redis_key = LOGGED_DB_SIZE_REDIS_KEY
+    return log_resource_size(
+        resource_label, current_size_bytes, capacity_gbytes, logged_size_redis_key
+    )
 
-    size_pretty = f"{round(ngbytes, 2)} GB / {capacity} GB ({round(pct_full, 2)}%)"
+
+def log_s3_bucket_size():
+    resource_label = "s3_bucket"
+    capacity_gbytes = 5000
+    logged_size_redis_key = LOGGED_S3_SIZE_REDIS_KEY
+    current_size_bytes = 0
+    bucket = S3_SESSION.Bucket(AWS_STORAGE_BUCKET_NAME)
+    for object in bucket.objects.all():
+        current_size_bytes += object.size
+    return log_resource_size(
+        resource_label, current_size_bytes, capacity_gbytes, logged_size_redis_key
+    )
+
+
+def log_resource_size(
+    resource_label,
+    current_size_bytes,
+    capacity_gbytes,
+    logged_size_redis_key,
+):
+    ngbytes = current_size_bytes / (1024**3)
+    pct_full = (ngbytes / capacity_gbytes) * 100
+
+    size_pretty = f"{round(ngbytes, 2)} GB / {capacity_gbytes} GB ({round(pct_full, 2)}%)"
 
     log_dict = {
-        "db_size_gb": ngbytes,
-        "db_size_pretty": size_pretty,
-        "db_growth": None,
-        "db_est_days_to_full": None,
+        resource_label: {
+            "current_size_gb": ngbytes,
+            "current_size_pretty": size_pretty,
+            "growth": None,
+            "est_days_to_full": None,
+        }
     }
 
     timestamp = datetime.now()
-    logged_db_size = get_redis_value(INITIAL_DB_SIZE)
-    if logged_db_size is not None:
-        logged_nbytes = logged_db_size[0]
-        logged_timestring = logged_db_size[1]
+    logged_size = get_redis_value(logged_size_redis_key)
+    if logged_size is not None:
+        logged_nbytes = logged_size[0]
+        logged_timestring = logged_size[1]
         logged_timestamp = datetime.strptime(logged_timestring, "%Y%m%d%H%M%S")
 
         logged_time_delta = timestamp - logged_timestamp
-        logged_ngbytes_delta = (nbytes - logged_nbytes) / (1024**3)
+        logged_ngbytes_delta = (current_size_bytes - logged_nbytes) / (1024**3)
 
         seconds_in_a_day = timedelta(days=1).total_seconds()
         days_since_logged = logged_time_delta.total_seconds() / seconds_in_a_day
         logged_time_delta_pretty = round(days_since_logged, 3)
 
         size_delta_pretty = round(logged_ngbytes_delta, 5)
-        log_dict["db_growth"] = (
-            f"{size_delta_pretty} GB in the last {logged_time_delta_pretty} days"
-        )
+        log_dict[resource_label][
+            "growth"
+        ] = f"{size_delta_pretty} GB in the last {logged_time_delta_pretty} days"
 
         if days_since_logged >= 1 and logged_ngbytes_delta > 0:
             gb_per_day = logged_ngbytes_delta / days_since_logged
-            space_remaining = capacity - ngbytes
+            space_remaining = capacity_gbytes - ngbytes
             days_till_full = space_remaining / gb_per_day
             days_till_full_pretty = round(days_till_full, 2)
-            log_dict["db_est_days_to_full"] = days_till_full_pretty
+            log_dict[resource_label]["est_days_to_full"] = days_till_full_pretty
     else:
         set_redis_value(
-            INITIAL_DB_SIZE, [nbytes, timestamp.strftime("%Y%m%d%H%M%S")], None
+            logged_size_redis_key,
+            [current_size_bytes, timestamp.strftime("%Y%m%d%H%M%S")],
+            None,
         )
 
     logger.info(log_dict)
