@@ -2,12 +2,10 @@ from django.test import TestCase
 from fecfiler.committee_accounts.utils import (
     create_committee_account,
     check_email_match,
-    get_committee_from_test_fec,
     get_committee_account_data,
     get_committee_emails,
     get_production_committee_emails,
     get_test_committee_emails,
-    get_mocked_committee_emails,
 )
 
 from fecfiler.user.models import User

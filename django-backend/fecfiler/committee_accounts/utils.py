@@ -2,7 +2,6 @@ import logging
 import requests
 import re
 from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
 from .models import CommitteeAccount, Membership
 
 from fecfiler import settings
@@ -120,7 +119,8 @@ Production FEC
 
 def get_production_committee_emails(committee_id):
     """
-    First query the raw endpoint, if no raw data is available, query the processed endpoint
+    First query the raw endpoint,
+    if no raw data is available, query the processed endpoint
     """
     committee_data = get_raw_committee_data(committee_id)
 
@@ -132,7 +132,8 @@ def get_production_committee_emails(committee_id):
 
 def get_production_committee_data(committee_id):
     """
-    First query the processed endpoint, if no processed data is available, query the raw endpoint
+    First query the processed endpoint,
+    if no processed data is available, query the raw endpoint
     """
     # first try processed endpoint
     committee_data = get_processed_committee_data(committee_id)
