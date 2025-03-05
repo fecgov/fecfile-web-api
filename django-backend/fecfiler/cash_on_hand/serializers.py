@@ -1,8 +1,8 @@
 from .models import CashOnHandYearly
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class CashOnHandYearlySerializer(CommitteeOwnedSerializer):

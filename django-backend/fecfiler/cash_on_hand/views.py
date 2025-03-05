@@ -3,9 +3,9 @@ from rest_framework.decorators import action
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .serializers import CashOnHandYearlySerializer
 from .models import CashOnHandYearly
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class CashOnHandYearlyViewSet(CommitteeOwnedViewMixin):

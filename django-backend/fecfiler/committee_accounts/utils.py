@@ -1,4 +1,3 @@
-import logging
 import requests
 import re
 from rest_framework.exceptions import ValidationError
@@ -8,8 +7,9 @@ from .models import CommitteeAccount, Membership
 from fecfiler import settings
 import redis
 import json
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 COMMITTEE_DATA_REDIS_KEY = "COMMITTEE_DATA"
