@@ -118,6 +118,7 @@ fecfiler.devops.tests.test\_tasks.DevopsTasksTestCase
       ~DevopsTasksTestCase.test_get_db_size
       ~DevopsTasksTestCase.test_get_db_status_report
       ~DevopsTasksTestCase.test_log_db_size
+      ~DevopsTasksTestCase.test_log_s3_bucket_size
    
    
 

@@ -1,0 +1,6 @@
+fecfiler.devops.tasks.log\_resource\_size
+=========================================
+
+.. currentmodule:: fecfiler.devops.tasks
+
+.. autofunction:: log_resource_size

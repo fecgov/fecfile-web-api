@@ -1,0 +1,6 @@
+fecfiler.devops.tasks.log\_s3\_bucket\_size
+===========================================
+
+.. currentmodule:: fecfiler.devops.tasks
+
+.. autofunction:: log_s3_bucket_size
