@@ -25,6 +25,20 @@ class CommitteeAccountsUtilsTest(TestCase):
             self.other_user = User.objects.create(email="test@fec.com", username="com")
             self.create_error_message = "could not create committee account"
 
+    def mock_requests_get(self, mock_requests, responses):
+        mock_requests.get = Mock()
+        mock_requests.get.side_effect = (
+            responses if isinstance(responses, list) else [responses]
+        )
+
+    def mock_response(self, status_code, committee_data):
+        mock_response = Mock()
+        mock_response.status_code = status_code
+        mock_response.json.return_value = {
+            "results": [committee_data] if committee_data else []
+        }
+        return mock_response
+
     # create_committee_account
 
     def test_create_committee_account(self):
@@ -105,7 +119,7 @@ class CommitteeAccountsUtilsTest(TestCase):
     GET COMMITTEE EMAILS
     """
 
-    def test_get_emails_enfironments(self):
+    def test_get_emails_environments(self):
         with (
             patch("fecfiler.committee_accounts.utils.settings") as settings,
             patch(
@@ -162,27 +176,28 @@ class CommitteeAccountsUtilsTest(TestCase):
                 ],
             )
             production_emails = get_production_committee_emails("C12345678")
-            self.assertEqual(production_emails, "")
+            self.assertEqual(production_emails, None)
+
+    def test_get_test_committee_emails(self):
+        with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
+            test_committee_data = {
+                "email": "list_of_emails",
+            }
+            self.mock_requests_get(
+                mock_requests, self.mock_response(200, test_committee_data)
+            )
+            test_emails = get_test_committee_emails("C12345678")
+            self.assertEqual(test_emails, "list_of_emails")
+            # test when the endpoint has no data
+            self.mock_requests_get(mock_requests, self.mock_response(200, None))
+            test_emails = get_test_committee_emails("C12345678")
+            self.assertEqual(test_emails, "")
 
     """
     RETRIEVE COMMITTEE DATA TESTS
     """
 
-    def mock_requests_get(self, mock_requests, responses):
-        mock_requests.get = Mock()
-        mock_requests.get.side_effect = (
-            responses if isinstance(responses, list) else [responses]
-        )
-
-    def mock_response(self, status_code, committee_data):
-        mock_response = Mock()
-        mock_response.status_code = status_code
-        mock_response.json.return_value = {
-            "results": [committee_data] if committee_data else []
-        }
-        return mock_response
-
-    def test_get_committee_account_data_from_test_efo_PAC(self):  # noqa N802
+    def test_get_committee_account_data_from_test_PAC(self):  # noqa N802
         with (
             patch("fecfiler.committee_accounts.utils.requests") as mock_requests,
             patch("fecfiler.committee_accounts.utils.settings") as settings,
@@ -197,7 +212,7 @@ class CommitteeAccountsUtilsTest(TestCase):
                 "committee_name": "Committee Name",
             }
             self.mock_requests_get(
-                mock_requests, 200, self.mock_response(200, test_efo_committee_data)
+                mock_requests, self.mock_response(200, test_efo_committee_data)
             )
             committee_account_data = get_committee_account_data("C12345678")
 
@@ -215,7 +230,7 @@ class CommitteeAccountsUtilsTest(TestCase):
             )
             self.assertEqual(committee_account_data.get("street_1"), "Committee Street 1")
 
-    def test_get_committee_account_data_from_test_efo_PTY(self):  # noqa N802
+    def test_get_committee_account_data_from_test_PTY(self):  # noqa N802
         with (
             patch("fecfiler.committee_accounts.utils.requests") as mock_requests,
             patch("fecfiler.committee_accounts.utils.settings") as settings,
@@ -230,7 +245,7 @@ class CommitteeAccountsUtilsTest(TestCase):
                 "committee_name": "Committee Name",
             }
             self.mock_requests_get(
-                mock_requests, 200, self.mock_response(test_efo_committee_data)
+                mock_requests, self.mock_response(200, test_efo_committee_data)
             )
             committee_account_data = get_committee_account_data("C12345678")
 
@@ -247,3 +262,57 @@ class CommitteeAccountsUtilsTest(TestCase):
                 committee_account_data.get("treasurer_name_1"), "Treasurer First"
             )
             self.assertEqual(committee_account_data.get("street_1"), "Committee Street 1")
+
+    def test_get_committee_account_data_from_production_processed(self):
+        with (
+            patch("fecfiler.committee_accounts.utils.requests") as mock_requests,
+            patch("fecfiler.committee_accounts.utils.settings") as settings,
+        ):
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
+            production_committee_data = {
+                "committee_id": "C12345678",
+                "email": "email",
+                "committee_type": "Q",
+                "committee_type_full": "Qualified Leadership PAC",
+                "committee_designation": "D",
+            }
+            self.mock_requests_get(
+                mock_requests, self.mock_response(200, production_committee_data)
+            )
+            committee_account_data = get_committee_account_data("C12345678")
+            self.assertEqual(
+                committee_account_data.get("committee_type_label"),
+                "Qualified Leadership PAC",
+            )
+            self.assertEqual(committee_account_data.get("isPAC"), True)
+            self.assertEqual(committee_account_data.get("isPTY"), False)
+            self.assertEqual(committee_account_data.get("qualified"), True)
+
+    def test_get_committee_account_data_from_production_raw(self):
+        with (
+            patch("fecfiler.committee_accounts.utils.requests") as mock_requests,
+            patch("fecfiler.committee_accounts.utils.settings") as settings,
+        ):
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
+            production_committee_data = {
+                "committee_id": "C12345678",
+                "email": "email",
+                "committee_type": "D",
+                "committee_designation": "D",
+            }
+            # no response in processed endpoint and data in raw endpoint
+            self.mock_requests_get(
+                mock_requests,
+                [
+                    self.mock_response(200, None),
+                    self.mock_response(200, production_committee_data),
+                ],
+            )
+            committee_account_data = get_committee_account_data("C12345678")
+            self.assertEqual(
+                committee_account_data.get("committee_type_label"),
+                "Party - Qualified - Unauthorized",
+            )
+            self.assertEqual(committee_account_data.get("isPAC"), False)
+            self.assertEqual(committee_account_data.get("isPTY"), True)
+            self.assertEqual(committee_account_data.get("qualified"), True)

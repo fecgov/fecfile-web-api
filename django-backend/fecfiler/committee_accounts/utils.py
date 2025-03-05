@@ -113,74 +113,90 @@ def query_fec_api(endpoint, params):
     return committee_results[0] if committee_results else None
 
 
-def query_multiple_endpoints(endpoints, params):
-    """Queries multiple endpoints and returns the first successful response"""
-    for endpoint in endpoints:
-        response = query_fec_api(endpoint, params)
-        if response:
-            return response
-    return None
-
-
 """
 Production FEC
 """
 
 
-def get_production_committee_raw_first(committee_id):
-    """Queries the production FEC API for committee data
-    First tries raw endpoint and then falls back to processed endpoint
-    """
-    raw_and_processed_endpoints = [
-        f"{settings.PRODUCTION_OPEN_FEC_API}efile/form1/",
-        f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/",
-    ]
-    params = {
-        "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
-        "committee_id": committee_id,
-    }
-    return query_multiple_endpoints(raw_and_processed_endpoints, params)
-
-
-def get_production_committee_processed_first(committee_id):
-    """Queries the production FEC API for committee data
-    First tries processed endpoint and then falls back to raw endpoint
-    """
-    processed_and_raw_endpoints = [
-        f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/",
-        f"{settings.PRODUCTION_OPEN_FEC_API}efile/form1/",
-    ]
-    params = {
-        "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
-        "committee_id": committee_id,
-    }
-    return query_multiple_endpoints(processed_and_raw_endpoints, params)
-
-
 def get_production_committee_emails(committee_id):
-    """"""
-    committee = get_production_committee_raw_first(committee_id)
-    return committee.get("email", "") if committee else ""
+    """
+    First query the raw endpoint, if no raw data is available, query the processed endpoint
+    """
+    committee_data = get_raw_committee_data(committee_id)
+
+    if committee_data is None:
+        committee_data = get_processed_committee_data(committee_id)
+
+    return committee_data.get("email", None) if committee_data else None
 
 
 def get_production_committee_data(committee_id):
-    committee_data = get_production_committee_processed_first(committee_id)
+    """
+    First query the processed endpoint, if no processed data is available, query the raw endpoint
+    """
+    # first try processed endpoint
+    committee_data = get_processed_committee_data(committee_id)
+
     if committee_data is None:
-        return None
+        # if no processed data, try raw endpoint
+        committee_data = get_raw_committee_data(committee_id)
 
-    # Committee Type Label
-    committee_data["committee_type_label"] = committee_data.get(
-        "committee_type_full", None
+    return committee_data
+
+
+def get_processed_committee_data(committee_id):
+
+    params = {
+        "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
+        "committee_id": committee_id,
+    }
+    committee_data = query_fec_api(
+        f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/", params
     )
 
-    # PAC/PTY
-    committee_data["isPTY"] = is_production_efo_pty(committee_data)
-    committee_data["isPAC"] = is_production_efo_pac(committee_data)
+    if committee_data:
+        # Committee Type Label
+        committee_data["committee_type_label"] = committee_data.get(
+            "committee_type_full", None
+        )
 
-    # Qualified
-    committee_data["qualified"] = (
-        committee_data.get("committee_type") in PRODUCTION_QUALIFIED_COMMITTEES
+        # PAC/PTY
+        committee_data["isPTY"] = is_production_efo_pty(committee_data)
+        committee_data["isPAC"] = is_production_efo_pac(committee_data)
+
+        # Qualified
+        committee_data["qualified"] = (
+            committee_data.get("committee_type") in PRODUCTION_QUALIFIED_COMMITTEES
+        )
+
+    return committee_data
+
+
+def get_raw_committee_data(committee_id):
+    params = {
+        "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
+        "committee_id": committee_id,
+    }
+    committee_data = query_fec_api(
+        f"{settings.PRODUCTION_OPEN_FEC_API}efile/form1/", params
     )
+
+    if committee_data:
+        """For now we're just using the same logic as alpha"""
+        committee_data["isPTY"] = is_test_efo_pty(committee_data)
+        committee_data["isPAC"] = not committee_data["isPTY"]
+
+        # Committee type label
+        committee_data["committee_type_label"] = (
+            f'{"Party" if committee_data["isPTY"] else "PAC"} - Qualified - Unauthorized'
+        )
+        # Qualified
+        committee_data["qualified"] = True
+
+        # Filing Frequency
+        committee_data["filing_frequency"] = "Q"
+
+        committee_data = convert_raw_to_processed(committee_data)
 
     return committee_data
 
@@ -227,39 +243,24 @@ def get_test_committee_data(committee_id):
     and maps some fields to their names as prod has them
     """
     committee_data = get_committee_from_test_fec(committee_id)
+    if committee_data:
 
-    print(f"AHOY {committee_data}")
-    if committee_data is None:
-        return None
+        # PAC/PTY
+        committee_data["isPTY"] = is_test_efo_pty(committee_data)
+        committee_data["isPAC"] = not committee_data["isPTY"]
 
-    # PAC/PTY
-    committee_data["isPTY"] = is_test_efo_pty(committee_data)
-    committee_data["isPAC"] = not committee_data["isPTY"]
+        # Committee type label
+        committee_data["committee_type_label"] = (
+            f'{"Party" if committee_data["isPTY"] else "PAC"} - Qualified - Unauthorized'
+        )
+        # Qualified
+        committee_data["qualified"] = True
 
-    # Committee type label
-    committee_data["committee_type_label"] = (
-        f'{"Party" if committee_data["isPTY"] else "PAC"} - Qualified - Unauthorized'
-    )
-    # Qualified
-    committee_data["qualified"] = True
+        # Filing Frequency
+        committee_data["filing_frequency"] = "Q"
 
-    # Filing Frequency
-    committee_data["filing_frequency"] = "Q"
+        committee_data = convert_raw_to_processed(committee_data)
 
-    # map some fields to their names as prod has them
-    committee_data["name"] = committee_data.get("committee_name", None)
-    committee_data["treasurer_name_1"] = committee_data.get("treasurer_first_name", None)
-    committee_data["treasurer_name_2"] = committee_data.get("treasurer_last_name", None)
-    committee_data["treasurer_name_middle"] = committee_data.get(
-        "treasurer_middle_name", None
-    )
-    committee_data["treasurer_street_1"] = committee_data.get("treasurer_str1", None)
-    committee_data["treasurer_street_2"] = committee_data.get("treasurer_str2", None)
-    committee_data["street_1"] = committee_data.get("committee_str1", None)
-    committee_data["street_2"] = committee_data.get("committee_str2", None)
-    committee_data["city"] = committee_data.get("committee_city", None)
-    committee_data["state"] = committee_data.get("committee_state", None)
-    committee_data["zip"] = committee_data.get("committee_zip", None)
     return committee_data
 
 
@@ -290,3 +291,31 @@ def get_mocked_committee_data(committee_id):
             None,
         )
         return committee
+
+
+"""
+Shared
+"""
+
+
+def convert_raw_to_processed(committee_data):
+    """
+    Converts field names used in raw endpoint to ones used in processed endpoint
+    """
+
+    # map some fields to their names as prod has them
+    committee_data["name"] = committee_data.get("committee_name", None)
+    committee_data["treasurer_name_1"] = committee_data.get("treasurer_first_name", None)
+    committee_data["treasurer_name_2"] = committee_data.get("treasurer_last_name", None)
+    committee_data["treasurer_name_middle"] = committee_data.get(
+        "treasurer_middle_name", None
+    )
+    committee_data["treasurer_street_1"] = committee_data.get("treasurer_str1", None)
+    committee_data["treasurer_street_2"] = committee_data.get("treasurer_str2", None)
+    committee_data["street_1"] = committee_data.get("committee_str1", None)
+    committee_data["street_2"] = committee_data.get("committee_str2", None)
+    committee_data["city"] = committee_data.get("committee_city", None)
+    committee_data["state"] = committee_data.get("committee_state", None)
+    committee_data["zip"] = committee_data.get("committee_zip", None)
+
+    return committee_data
