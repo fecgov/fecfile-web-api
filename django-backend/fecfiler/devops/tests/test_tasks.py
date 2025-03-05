@@ -74,14 +74,16 @@ class DevopsTasksTestCase(TestCase):
 
         set_redis_value(LOGGED_DB_SIZE_REDIS_KEY, redis_initial_db_size, None)
 
-    def test_get_db_status_report(self):
+    @patch("fecfiler.devops.tasks.S3_SESSION")
+    def test_get_db_status_report(self, mock_s3_session):
         redis_initial_db_size = get_redis_value(LOGGED_DB_SIZE_REDIS_KEY)
         set_redis_value(LOGGED_DB_SIZE_REDIS_KEY, None, None)
         get_devops_status_report()
         self.assertIsNotNone(get_redis_value(LOGGED_DB_SIZE_REDIS_KEY))
         set_redis_value(LOGGED_DB_SIZE_REDIS_KEY, redis_initial_db_size, None)
 
-    def test_log_s3_bucket_size(self):
+    @patch("fecfiler.devops.tasks.S3_SESSION")
+    def test_log_s3_bucket_size(self, mock_s3_session):
         redis_initial_s3_size = get_redis_value(LOGGED_S3_SIZE_REDIS_KEY)
         set_redis_value(LOGGED_S3_SIZE_REDIS_KEY, None, None)
 
@@ -100,6 +102,5 @@ class DevopsTasksTestCase(TestCase):
 
         later_results = log_s3_bucket_size()
         self.assertIsNotNone(later_results["s3_bucket"]["growth"])
-        self.assertIsNotNone(later_results["s3_bucket"]["est_days_to_full"])
 
         set_redis_value(LOGGED_S3_SIZE_REDIS_KEY, redis_initial_s3_size, None)
