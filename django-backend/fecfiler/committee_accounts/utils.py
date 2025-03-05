@@ -184,15 +184,13 @@ def get_raw_committee_data(committee_id):
 
     if committee_data:
         """For now we're just using the same logic as alpha"""
-        committee_data["isPTY"] = is_test_efo_pty(committee_data)
-        committee_data["isPAC"] = not committee_data["isPTY"]
+        committee_data["isPTY"] = True
+        committee_data["isPAC"] = True
 
         # Committee type label
-        committee_data["committee_type_label"] = (
-            f'{"Party" if committee_data["isPTY"] else "PAC"} - Qualified - Unauthorized'
-        )
+        committee_data["committee_type_label"] = " - Non-qualified"
         # Qualified
-        committee_data["qualified"] = True
+        committee_data["qualified"] = False
 
         # Filing Frequency
         committee_data["filing_frequency"] = "Q"
@@ -291,6 +289,21 @@ def get_mocked_committee_data(committee_id):
             ),
             None,
         )
+        # Testing PROD VERSION
+        if committee:
+            """For now we're just using the same logic as alpha"""
+            committee["isPTY"] = True
+            committee["isPAC"] = True
+
+            # Committee type label
+            committee["committee_type_label"] = " - Non-qualified"
+            # Qualified
+            committee["qualified"] = False
+
+            # Filing Frequency
+            committee["filing_frequency"] = "Q"
+
+            committee = convert_raw_to_processed(committee_data)
         return committee
 
 
