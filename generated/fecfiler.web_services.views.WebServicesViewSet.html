@@ -125,55 +125,58 @@ keyword arguments, and other things.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_renderers" title="fecfiler.web_services.views.WebServicesViewSet.get_renderers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderers</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of renderers that this view can use.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_throttles" title="fecfiler.web_services.views.WebServicesViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
-<td><p>Instantiates and returns the list of throttles that this view uses.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_view_description" title="fecfiler.web_services.views.WebServicesViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
-<td><p>Return some descriptive text for the view, as used in OPTIONS responses and in the browsable API.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_view_name" title="fecfiler.web_services.views.WebServicesViewSet.get_view_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_name</span></code></a>()</p></td>
-<td><p>Return the view name, as used in OPTIONS responses and in the browsable API.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.handle_exception" title="fecfiler.web_services.views.WebServicesViewSet.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a>(exc)</p></td>
-<td><p>Handle any exception that occurs, by returning an appropriate response, or re-raising the error.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.http_method_not_allowed" title="fecfiler.web_services.views.WebServicesViewSet.http_method_not_allowed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">http_method_not_allowed</span></code></a>(request, *args, **kwargs)</p></td>
-<td><p>If <cite>request.method</cite> does not correspond to a handler method, determine what kind of exception to raise.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.initial" title="fecfiler.web_services.views.WebServicesViewSet.initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></a>(request, *args, **kwargs)</p></td>
-<td><p>Runs anything that needs to occur prior to calling the method handler.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.initialize_request" title="fecfiler.web_services.views.WebServicesViewSet.initialize_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_request</span></code></a>(request, *args, **kwargs)</p></td>
-<td><p>Set the <cite>.action</cite> attribute on the view, depending on the request method.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.options" title="fecfiler.web_services.views.WebServicesViewSet.options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code></a>(request, *args, **kwargs)</p></td>
-<td><p>Handler method for HTTP 'OPTIONS' request.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.perform_authentication" title="fecfiler.web_services.views.WebServicesViewSet.perform_authentication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_authentication</span></code></a>(request)</p></td>
-<td><p>Perform authentication on the incoming request.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.perform_content_negotiation" title="fecfiler.web_services.views.WebServicesViewSet.perform_content_negotiation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_content_negotiation</span></code></a>(request[, force])</p></td>
-<td><p>Determine which renderer and media type to use render the response.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.permission_denied" title="fecfiler.web_services.views.WebServicesViewSet.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
-<td><p>If request is not permitted, determine what kind of exception to raise.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_class</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.reverse_action" title="fecfiler.web_services.views.WebServicesViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_throttles" title="fecfiler.web_services.views.WebServicesViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
+<td><p>Instantiates and returns the list of throttles that this view uses.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_view_description" title="fecfiler.web_services.views.WebServicesViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
+<td><p>Return some descriptive text for the view, as used in OPTIONS responses and in the browsable API.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.get_view_name" title="fecfiler.web_services.views.WebServicesViewSet.get_view_name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_name</span></code></a>()</p></td>
+<td><p>Return the view name, as used in OPTIONS responses and in the browsable API.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.handle_exception" title="fecfiler.web_services.views.WebServicesViewSet.handle_exception"><code class="xref py py-obj docutils literal notranslate"><span class="pre">handle_exception</span></code></a>(exc)</p></td>
+<td><p>Handle any exception that occurs, by returning an appropriate response, or re-raising the error.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.http_method_not_allowed" title="fecfiler.web_services.views.WebServicesViewSet.http_method_not_allowed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">http_method_not_allowed</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p>If <cite>request.method</cite> does not correspond to a handler method, determine what kind of exception to raise.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.initial" title="fecfiler.web_services.views.WebServicesViewSet.initial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initial</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p>Runs anything that needs to occur prior to calling the method handler.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.initialize_request" title="fecfiler.web_services.views.WebServicesViewSet.initialize_request"><code class="xref py py-obj docutils literal notranslate"><span class="pre">initialize_request</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p>Set the <cite>.action</cite> attribute on the view, depending on the request method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.options" title="fecfiler.web_services.views.WebServicesViewSet.options"><code class="xref py py-obj docutils literal notranslate"><span class="pre">options</span></code></a>(request, *args, **kwargs)</p></td>
+<td><p>Handler method for HTTP 'OPTIONS' request.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.perform_authentication" title="fecfiler.web_services.views.WebServicesViewSet.perform_authentication"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_authentication</span></code></a>(request)</p></td>
+<td><p>Perform authentication on the incoming request.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.perform_content_negotiation" title="fecfiler.web_services.views.WebServicesViewSet.perform_content_negotiation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">perform_content_negotiation</span></code></a>(request[, force])</p></td>
+<td><p>Determine which renderer and media type to use render the response.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.permission_denied" title="fecfiler.web_services.views.WebServicesViewSet.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
+<td><p>If request is not permitted, determine what kind of exception to raise.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">raise_uncaught_exception</span></code>(exc)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.reverse_action" title="fecfiler.web_services.views.WebServicesViewSet.reverse_action"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reverse_action</span></code></a>(url_name, *args, **kwargs)</p></td>
 <td><p>Reverse the action for the given <cite>url_name</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.setup" title="fecfiler.web_services.views.WebServicesViewSet.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.setup" title="fecfiler.web_services.views.WebServicesViewSet.setup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setup</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>Initialize attributes shared by all view methods.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.submit_to_fec" title="fecfiler.web_services.views.WebServicesViewSet.submit_to_fec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_to_fec</span></code></a>(request)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.submit_to_fec" title="fecfiler.web_services.views.WebServicesViewSet.submit_to_fec"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_to_fec</span></code></a>(request)</p></td>
 <td><p>Create a signed .FEC, store it, and submit it to FEC Webload</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.submit_to_webprint" title="fecfiler.web_services.views.WebServicesViewSet.submit_to_webprint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_to_webprint</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.submit_to_webprint" title="fecfiler.web_services.views.WebServicesViewSet.submit_to_webprint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">submit_to_webprint</span></code></a>(request)</p></td>
 <td><p>Create an unsigned .FEC, store it, and submit it to FEC WebPrint</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.throttled" title="fecfiler.web_services.views.WebServicesViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.web_services.views.WebServicesViewSet.throttled" title="fecfiler.web_services.views.WebServicesViewSet.throttled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">throttled</span></code></a>(request, wait)</p></td>
 <td><p>If request is throttled, determine what kind of exception to raise.</p></td>
 </tr>
 </tbody>

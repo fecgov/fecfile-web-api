@@ -44,6 +44,7 @@ fecfiler.web\_services.views.WebServicesViewSet
       ~WebServicesViewSet.get_permissions
       ~WebServicesViewSet.get_renderer_context
       ~WebServicesViewSet.get_renderers
+      ~WebServicesViewSet.get_serializer_class
       ~WebServicesViewSet.get_throttles
       ~WebServicesViewSet.get_view_description
       ~WebServicesViewSet.get_view_name
