@@ -62,7 +62,7 @@ class Tasks(TaskSet):
         committees = self.fetch_values("committees", "id")
         committee_uuid = committees[0]
         activate_response = self.client.post(
-            f"api/v1/committees/{committee_uuid}/activate/",
+            f"/api/v1/committees/{committee_uuid}/activate/",
             headers=self.client.headers
         )
 
@@ -92,7 +92,7 @@ class Tasks(TaskSet):
 
     def login_via_mock_oidc(self):
         authenticate_response = self.client.get(
-            "/api/v1/oidc/authenticate/", allow_redirects=False
+            "/api/v1/oidc/authenticate", allow_redirects=False
         )
         authorize_response = self.client.get(
             authenticate_response._next.url.removeprefix("http://localhost:8080"),
@@ -251,13 +251,13 @@ class Tasks(TaskSet):
         params = {
             "page": page,
         }
-        return self.client.get(
-            f"/api/v1/{endpoint}/", params=params, name=f"preload_{endpoint}_ids"
+        return self.client_get(
+            f"/api/v1/{endpoint}", params=params, name=f"preload_{endpoint}_ids"
         )
 
     @task
     def celery_test(self):
-        self.client.get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
+        self.client_get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
 
     @task
     def load_contacts(self):
@@ -265,7 +265,7 @@ class Tasks(TaskSet):
             "page": 1,
             "ordering": "form_type",
         }
-        self.client.get(
+        self.client_get(
             "/api/v1/contacts/", name="load_contacts", timeout=TIMEOUT, params=params
         )
 
@@ -275,7 +275,7 @@ class Tasks(TaskSet):
             "page": 1,
             "ordering": "form_type",
         }
-        self.client.get(
+        self.client_get(
             "/api/v1/reports/", name="load_reports", timeout=TIMEOUT, params=params
         )
 
@@ -284,19 +284,26 @@ class Tasks(TaskSet):
         if len(self.report_ids) > 0:
             report_id = random.choice(self.report_ids)
             schedules = random.choice(SCHEDULES)
+            print(f"\n\n\nREPORT ID: {report_id}\n{self.report_ids}\n\n\n")
             params = {
                 "page": 1,
                 "ordering": "form_type",
                 "schedules": schedules,
                 "report_id": report_id,
             }
-            self.client.get(
+            self.client_get(
                 "/api/v1/transactions/",
                 name="load_transactions",
                 timeout=TIMEOUT,
                 params=params,
             )
 
+    def client_get(self, *args, **kwargs):
+        kwargs["catch_response"] = True
+        with self.client.get(*args, **kwargs) as response:
+            if response.status_code != 200:
+                response.failure(f"Non-200 Response: {response.status_code}")
+            return response
 
 class Swarm(user.HttpUser):
     tasks = [Tasks]
