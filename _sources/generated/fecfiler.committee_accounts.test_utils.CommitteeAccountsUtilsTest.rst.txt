@@ -104,6 +104,7 @@ fecfiler.committee\_accounts.test\_utils.CommitteeAccountsUtilsTest
       ~CommitteeAccountsUtilsTest.failUnlessRaises
       ~CommitteeAccountsUtilsTest.id
       ~CommitteeAccountsUtilsTest.mock_requests_get
+      ~CommitteeAccountsUtilsTest.mock_response
       ~CommitteeAccountsUtilsTest.modify_settings
       ~CommitteeAccountsUtilsTest.run
       ~CommitteeAccountsUtilsTest.setUp
@@ -120,8 +121,13 @@ fecfiler.committee\_accounts.test\_utils.CommitteeAccountsUtilsTest
       ~CommitteeAccountsUtilsTest.test_create_committee_account_existing
       ~CommitteeAccountsUtilsTest.test_create_committee_account_mismatch_email
       ~CommitteeAccountsUtilsTest.test_email_matching_case_insensitive
-      ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_test_efo_PAC
-      ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_test_efo_PTY
+      ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_production_processed
+      ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_production_raw
+      ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_test_PAC
+      ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_test_PTY
+      ~CommitteeAccountsUtilsTest.test_get_emails_environments
+      ~CommitteeAccountsUtilsTest.test_get_production_committee_emails
+      ~CommitteeAccountsUtilsTest.test_get_test_committee_emails
       ~CommitteeAccountsUtilsTest.test_match_comma
       ~CommitteeAccountsUtilsTest.test_match_semicolon
       ~CommitteeAccountsUtilsTest.test_no_f1_email

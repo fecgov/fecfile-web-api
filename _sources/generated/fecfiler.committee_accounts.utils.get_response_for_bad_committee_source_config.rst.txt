@@ -1,6 +1,0 @@
-fecfiler.committee\_accounts.utils.get\_response\_for\_bad\_committee\_source\_config
-=====================================================================================
-
-.. currentmodule:: fecfiler.committee_accounts.utils
-
-.. autofunction:: get_response_for_bad_committee_source_config

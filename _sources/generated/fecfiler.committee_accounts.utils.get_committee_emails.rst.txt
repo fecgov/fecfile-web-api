@@ -1,6 +1,6 @@
-fecfiler.committee\_accounts.utils.query\_production\_efo
+fecfiler.committee\_accounts.utils.get\_committee\_emails
 =========================================================
 
 .. currentmodule:: fecfiler.committee_accounts.utils
 
-.. autofunction:: query_production_efo
+.. autofunction:: get_committee_emails

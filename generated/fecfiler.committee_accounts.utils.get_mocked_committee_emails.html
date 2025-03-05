@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>fecfiler.committee_accounts.utils.query_production_efo &#8212; FECFile Web API  documentation</title>
+    <title>fecfiler.committee_accounts.utils.get_mocked_committee_emails &#8212; FECFile Web API  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
@@ -13,8 +13,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.committee_accounts.views" href="fecfiler.committee_accounts.views.html" />
-    <link rel="prev" title="fecfiler.committee_accounts.utils.query_efo_api" href="fecfiler.committee_accounts.utils.query_efo_api.html" />
+    <link rel="next" title="fecfiler.committee_accounts.utils.get_processed_committee_data" href="fecfiler.committee_accounts.utils.get_processed_committee_data.html" />
+    <link rel="prev" title="fecfiler.committee_accounts.utils.get_mocked_committee_data" href="fecfiler.committee_accounts.utils.get_mocked_committee_data.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -32,14 +32,12 @@
 
           <div class="body" role="main">
             
-  <section id="fecfiler-committee-accounts-utils-query-production-efo">
-<h1>fecfiler.committee_accounts.utils.query_production_efo<a class="headerlink" href="#fecfiler-committee-accounts-utils-query-production-efo" title="Link to this heading">¶</a></h1>
+  <section id="fecfiler-committee-accounts-utils-get-mocked-committee-emails">
+<h1>fecfiler.committee_accounts.utils.get_mocked_committee_emails<a class="headerlink" href="#fecfiler-committee-accounts-utils-get-mocked-committee-emails" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="fecfiler.committee_accounts.utils.query_production_efo">
-<span class="sig-prename descclassname"><span class="pre">fecfiler.committee_accounts.utils.</span></span><span class="sig-name descname"><span class="pre">query_production_efo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">committee_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.utils.query_production_efo" title="Link to this definition">¶</a></dt>
-<dd><p>Queries the production EFO API for committee data
-First tries raw endpoint and then falls back to processed endpoint</p>
-</dd></dl>
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.utils.get_mocked_committee_emails">
+<span class="sig-prename descclassname"><span class="pre">fecfiler.committee_accounts.utils.</span></span><span class="sig-name descname"><span class="pre">get_mocked_committee_emails</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">committee_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.utils.get_mocked_committee_emails" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </section>
 
@@ -81,20 +79,26 @@ First tries raw endpoint and then falls back to processed endpoint</p>
 <li class="toctree-l4 current"><a class="reference internal" href="fecfiler.committee_accounts.utils.html">fecfiler.committee_accounts.utils</a><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.check_can_create_committee_account.html">fecfiler.committee_accounts.utils.check_can_create_committee_account</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.check_email_match.html">fecfiler.committee_accounts.utils.check_email_match</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.convert_raw_to_processed.html">fecfiler.committee_accounts.utils.convert_raw_to_processed</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.create_committee_account.html">fecfiler.committee_accounts.utils.create_committee_account</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data.html">fecfiler.committee_accounts.utils.get_committee_account_data</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data_from_efo.html">fecfiler.committee_accounts.utils.get_committee_account_data_from_efo</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data_from_redis.html">fecfiler.committee_accounts.utils.get_committee_account_data_from_redis</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_account_data_from_test_efo.html">fecfiler.committee_accounts.utils.get_committee_account_data_from_test_efo</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_response_for_bad_committee_source_config.html">fecfiler.committee_accounts.utils.get_response_for_bad_committee_source_config</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_emails.html">fecfiler.committee_accounts.utils.get_committee_emails</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_committee_from_test_fec.html">fecfiler.committee_accounts.utils.get_committee_from_test_fec</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_mocked_committee_data.html">fecfiler.committee_accounts.utils.get_mocked_committee_data</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.committee_accounts.utils.get_mocked_committee_emails</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.committee_accounts.utils.get_mocked_committee_emails"><code class="docutils literal notranslate"><span class="pre">get_mocked_committee_emails()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_processed_committee_data.html">fecfiler.committee_accounts.utils.get_processed_committee_data</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_production_committee_data.html">fecfiler.committee_accounts.utils.get_production_committee_data</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_production_committee_emails.html">fecfiler.committee_accounts.utils.get_production_committee_emails</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_raw_committee_data.html">fecfiler.committee_accounts.utils.get_raw_committee_data</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_test_committee_data.html">fecfiler.committee_accounts.utils.get_test_committee_data</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.get_test_committee_emails.html">fecfiler.committee_accounts.utils.get_test_committee_emails</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.is_production_efo_pac.html">fecfiler.committee_accounts.utils.is_production_efo_pac</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.is_production_efo_pty.html">fecfiler.committee_accounts.utils.is_production_efo_pty</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.is_test_efo_pty.html">fecfiler.committee_accounts.utils.is_test_efo_pty</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.query_efo_api.html">fecfiler.committee_accounts.utils.query_efo_api</a></li>
-<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.committee_accounts.utils.query_production_efo</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="#fecfiler.committee_accounts.utils.query_production_efo"><code class="docutils literal notranslate"><span class="pre">query_production_efo()</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.utils.query_fec_api.html">fecfiler.committee_accounts.utils.query_fec_api</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.views.html">fecfiler.committee_accounts.views</a></li>
@@ -136,8 +140,8 @@ First tries raw endpoint and then falls back to processed endpoint</p>
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a><ul>
   <li><a href="fecfiler.committee_accounts.utils.html">fecfiler.committee_accounts.utils</a><ul>
-      <li>Previous: <a href="fecfiler.committee_accounts.utils.query_efo_api.html" title="previous chapter">fecfiler.committee_accounts.utils.query_efo_api</a></li>
-      <li>Next: <a href="fecfiler.committee_accounts.views.html" title="next chapter">fecfiler.committee_accounts.views</a></li>
+      <li>Previous: <a href="fecfiler.committee_accounts.utils.get_mocked_committee_data.html" title="previous chapter">fecfiler.committee_accounts.utils.get_mocked_committee_data</a></li>
+      <li>Next: <a href="fecfiler.committee_accounts.utils.get_processed_committee_data.html" title="next chapter">fecfiler.committee_accounts.utils.get_processed_committee_data</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -175,7 +179,7 @@ First tries raw endpoint and then falls back to processed endpoint</p>
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
-      <a href="../_sources/generated/fecfiler.committee_accounts.utils.query_production_efo.rst.txt"
+      <a href="../_sources/generated/fecfiler.committee_accounts.utils.get_mocked_committee_emails.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

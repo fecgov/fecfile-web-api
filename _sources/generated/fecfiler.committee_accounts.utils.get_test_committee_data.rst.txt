@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.get\_test\_committee\_data
+=============================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils
+
+.. autofunction:: get_test_committee_data

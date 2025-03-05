@@ -19,17 +19,23 @@ fecfiler.committee\_accounts.utils
    
       check_can_create_committee_account
       check_email_match
+      convert_raw_to_processed
       create_committee_account
       get_committee_account_data
-      get_committee_account_data_from_efo
-      get_committee_account_data_from_redis
-      get_committee_account_data_from_test_efo
-      get_response_for_bad_committee_source_config
+      get_committee_emails
+      get_committee_from_test_fec
+      get_mocked_committee_data
+      get_mocked_committee_emails
+      get_processed_committee_data
+      get_production_committee_data
+      get_production_committee_emails
+      get_raw_committee_data
+      get_test_committee_data
+      get_test_committee_emails
       is_production_efo_pac
       is_production_efo_pty
       is_test_efo_pty
-      query_efo_api
-      query_production_efo
+      query_fec_api
    
    
 

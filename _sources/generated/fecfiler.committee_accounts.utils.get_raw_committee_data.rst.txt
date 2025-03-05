@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.get\_raw\_committee\_data
+============================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils
+
+.. autofunction:: get_raw_committee_data
