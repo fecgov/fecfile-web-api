@@ -8,9 +8,13 @@ def add_schedule_f_contact_fields(instance: Transaction, representation=None):
         add_org_ind_contact(data, instance.contact_1, "payee")
     if instance.contact_2:
         add_candidate_contact(data, instance.contact_2, "payee", False)
-        data["payee_committee_id_number"] = instance.contact_2.committee_account.id
     if instance.contact_3:
-        add_committee_contact(data, instance.contact_3, "subordinate")
+        data["payee_committee_id_number"] = instance.contact_3.committee_id
+    if instance.contact_4:
+        data["designating_committee_id_number"] = instance.contact_4.committee_id
+        data["designating_committee_name"] = instance.contact_4.name
+    if instance.contact_5:
+        add_committee_contact(data, instance.contact_5, "subordinate")
 
     if representation:
         representation.update(data)

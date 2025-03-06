@@ -114,6 +114,18 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         related_name="contact_3_transaction_set",
         null=True,
     )
+    contact_4: Contact = models.ForeignKey(
+        "contacts.Contact",
+        on_delete=models.CASCADE,
+        related_name="contact_4_transaction_set",
+        null=True,
+    )
+    contact_5: Contact = models.ForeignKey(
+        "contacts.Contact",
+        on_delete=models.CASCADE,
+        related_name="contact_5_transaction_set",
+        null=True,
+    )
     memo_text = models.ForeignKey(
         "memo_text.MemoText", on_delete=models.CASCADE, null=True
     )

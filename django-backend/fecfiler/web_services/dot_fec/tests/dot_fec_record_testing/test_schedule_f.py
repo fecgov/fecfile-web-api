@@ -35,65 +35,87 @@ class DotFECScheduleFTestCase(TestCase):
         self.f3x.upload_submission = upload_submission
         self.f3x.save()
 
-        self.contact_2 = create_test_candidate_contact(
-            "last name",
-            "first name",
+        self.candidate_contact = create_test_candidate_contact(
+            "candidate last name",
+            "candidate first name",
             self.committee.id,
             "H8MA03131",
             "S",
             "AK",
             "01",
             {
-                "street_1": "Steet 1",
-                "street_2": "Steet 2",
-                "city": "City",
-                "state": "State",
-                "zip": "Zip",
-                "middle_name": "middle name",
-                "prefix": "Sir",
-                "suffix": "jr",
+                "street_1": "candidate Steet 1",
+                "street_2": "candidate Steet 2",
+                "city": "candidate City",
+                "state": "candidate State",
+                "zip": "candidate Zip",
+                "middle_name": "candidate middle name",
+                "prefix": "candidate Sir",
+                "suffix": "candidate jr",
             },
         )
 
-        self.contact_3 = create_test_committee_contact(
-            "Test Committee",
-            self.committee.id,
+        self.candidate_committee = create_test_committee_contact(
+            "Candidate Committee",
+            "C87654321",
             self.committee.id,
             {
-                "street_1": "Steet 1",
-                "street_2": "Steet 2",
-                "city": "City",
-                "state": "State",
-                "zip": "Zip",
+                "street_1": "Candidate Committee Steet 1",
+                "street_2": "Candidate Committee Steet 2",
+                "city": "Candidate Committee City",
+                "state": "Candidate Committee State",
+                "zip": "Candidate Committee Zip",
+            },
+        )
+
+        self.designating_committee = create_test_committee_contact(
+            "Designating Committee",
+            "C12345678",
+            self.committee.id,
+        )
+
+        self.subordinate_committee = create_test_committee_contact(
+            "Subordinate Committee",
+            "C55555555",
+            self.committee.id,
+            {
+                "street_1": "Subordinate Committee Steet 1",
+                "street_2": "Subordinate Committee Steet 2",
+                "city": "Subordinate Committee City",
+                "state": "Subordinate Committee State",
+                "zip": "Subordinate Committee Zip",
             },
         )
 
     def test_ind_form(self):
         contact_1 = create_test_individual_contact(
-            "last name",
-            "first name",
+            "payee last name",
+            "payee first name",
             self.committee.id,
             {
-                "street_1": "Steet 1",
-                "street_2": "Steet 2",
-                "city": "City",
-                "state": "State",
-                "zip": "Zip",
+                "middle_name": "payee middle name",
+                "prefix": "payee Sir",
+                "suffix": "payee jr",
+                "street_1": "payee Steet 1",
+                "street_2": "payee Steet 2",
+                "city": "payee City",
+                "state": "payee State",
+                "zip": "payee Zip",
             },
         )
 
         transaction = create_schedule_f(
-            "INDIVIDUAL_RECEIPT",
+            "COORDINATED_PARTY_EXPENDITURE",
             self.committee,
             contact_1,
-            self.contact_2,
-            self.contact_3,
+            contact_2=self.candidate_contact,
+            contact_3=self.candidate_committee,
+            contact_4=self.designating_committee,
+            contact_5=self.subordinate_committee,
             schedule_data={
                 "expenditure_date": "2024-01-04",
                 "expenditure_amount": "250.00",
                 "filer_designated_to_make_coordianted_expenditures": True,
-                "designating_committee_account": self.committee,
-                "designating_committee_name": "DESIGNATING NAME",
                 "aggregate_general_elec_expended": Decimal(500.00),
                 "expenditure_purpose_descrip": "TEST DESCRIP",
                 "category_code": "CODE",
@@ -111,26 +133,26 @@ class DotFECScheduleFTestCase(TestCase):
             "test org",
             self.committee.id,
             {
-                "street_1": "Steet 1",
-                "street_2": "Steet 2",
-                "city": "City",
-                "state": "State",
-                "zip": "Zip",
+                "street_1": "org Steet 1",
+                "street_2": "org Steet 2",
+                "city": "org City",
+                "state": "org State",
+                "zip": "org Zip",
             },
         )
 
         transaction = create_schedule_f(
-            "INDIVIDUAL_RECEIPT",
+            "COORDINATED_PARTY_EXPENDITURE",
             self.committee,
             contact_1,
-            self.contact_2,
-            self.contact_3,
+            contact_2=self.candidate_contact,
+            contact_3=self.candidate_committee,
+            contact_4=self.designating_committee,
+            contact_5=self.subordinate_committee,
             schedule_data={
                 "expenditure_date": "2024-01-04",
                 "expenditure_amount": "250.00",
                 "filer_designated_to_make_coordianted_expenditures": True,
-                "designating_committee_account": self.committee,
-                "designating_committee_name": "DESIGNATING NAME",
                 "aggregate_general_elec_expended": Decimal(500.00),
                 "expenditure_purpose_descrip": "TEST DESCRIP",
                 "category_code": "CODE",
@@ -174,37 +196,40 @@ class DotFECScheduleFTestCase(TestCase):
         )
         self.assertEqual(
             self.split_row[field_to_num["designating_committee_id_number"]],
-            self.committee.committee_id,
+            self.designating_committee.committee_id,
         )
         self.assertEqual(
             self.split_row[field_to_num["designating_committee_name"]],
-            transaction.schedule_f.designating_committee_name,
+            self.designating_committee.name,
         )
 
         self.assertEqual(
             self.split_row[field_to_num["subordinate_committee_id_number"]],
-            str(self.contact_3.committee_id),
+            str(self.subordinate_committee.committee_id),
         )
         self.assertEqual(
             self.split_row[field_to_num["subordinate_committee_name"]],
-            self.contact_3.name,
+            self.subordinate_committee.name,
         )
         self.assertEqual(
             self.split_row[field_to_num["subordinate_street_1"]],
-            self.contact_3.street_1,
+            self.subordinate_committee.street_1,
         )
         self.assertEqual(
             self.split_row[field_to_num["subordinate_street_2"]],
-            self.contact_3.street_2,
+            self.subordinate_committee.street_2,
         )
         self.assertEqual(
-            self.split_row[field_to_num["subordinate_city"]], self.contact_3.city
+            self.split_row[field_to_num["subordinate_city"]],
+            self.subordinate_committee.city,
         )
         self.assertEqual(
-            self.split_row[field_to_num["subordinate_state"]], self.contact_3.state
+            self.split_row[field_to_num["subordinate_state"]],
+            self.subordinate_committee.state,
         )
         self.assertEqual(
-            self.split_row[field_to_num["subordinate_zip"]], self.contact_3.zip
+            self.split_row[field_to_num["subordinate_zip"]],
+            self.subordinate_committee.zip,
         )
 
         self.assertEqual(
@@ -232,15 +257,19 @@ class DotFECScheduleFTestCase(TestCase):
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_middle_name"]],
-            transaction.contact_1.middle_name or "",
+            (
+                transaction.contact_1.middle_name
+                if transaction.contact_1.type == "IND"
+                else ""
+            ),
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_prefix"]],
-            transaction.contact_1.prefix or "",
+            transaction.contact_1.prefix if transaction.contact_1.type == "IND" else "",
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_suffix"]],
-            transaction.contact_1.suffix or "",
+            transaction.contact_1.suffix if transaction.contact_1.type == "IND" else "",
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_street_1"]], transaction.contact_1.street_1
@@ -281,43 +310,43 @@ class DotFECScheduleFTestCase(TestCase):
 
         self.assertEqual(
             self.split_row[field_to_num["payee_committee_id_number"]],
-            str(self.contact_2.committee_account.id),
+            str(self.candidate_committee.committee_id),
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_candidate_id_number"]],
-            self.contact_2.candidate_id,
+            self.candidate_contact.candidate_id,
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_candidate_last_name"]],
-            self.contact_2.last_name,
+            self.candidate_contact.last_name,
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_candidate_first_name"]],
-            self.contact_2.first_name,
+            self.candidate_contact.first_name,
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_candidate_middle_name"]],
-            self.contact_2.middle_name or "",
+            self.candidate_contact.middle_name or "",
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_candidate_prefix"]],
-            self.contact_2.prefix or "",
+            self.candidate_contact.prefix or "",
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_candidate_suffix"]],
-            self.contact_2.suffix or "",
+            self.candidate_contact.suffix or "",
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_candidate_office"]],
-            self.contact_2.candidate_office,
+            self.candidate_contact.candidate_office,
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_candidate_state"]],
-            self.contact_2.candidate_state,
+            self.candidate_contact.candidate_state,
         )
         self.assertEqual(
             self.split_row[field_to_num["payee_candidate_district"]],
-            self.contact_2.candidate_district,
+            self.candidate_contact.candidate_district,
         )
 
         self.assertEqual(
@@ -326,7 +355,7 @@ class DotFECScheduleFTestCase(TestCase):
         )
         self.assertEqual(
             self.split_row[field_to_num["memo_text_description"]],
-            transaction.schedule_f.memo_text_description or "",
+            transaction.schedule_f.memo_text_description,
         )
 
 

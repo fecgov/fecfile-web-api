@@ -22,10 +22,6 @@ class ScheduleF(Model):
     filer_designated_to_make_coordianted_expenditures = BooleanField(
         null=True, blank=True
     )
-    designating_committee_account = ForeignKey(
-        "committee_accounts.CommitteeAccount", on_delete=CASCADE, null=True
-    )
-    designating_committee_name = TextField(blank=True)
 
     expenditure_date = DateField(null=True, blank=True)
     expenditure_amount = DecimalField(
@@ -39,13 +35,6 @@ class ScheduleF(Model):
     category_code = TextField(blank=True)
 
     memo_text_description = TextField(blank=True)
-
-    @property
-    def designating_committee_id_number(self):
-        if not self.designating_committee_account:
-            return None
-
-        return self.designating_committee_account.committee_id
 
     def get_transaction(self):
         return self.transaction_set.first()

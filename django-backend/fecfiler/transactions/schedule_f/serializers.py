@@ -3,6 +3,7 @@ from fecfiler.transactions.schedule_f.models import ScheduleF
 from fecfiler.shared.utilities import get_model_data
 
 
+# Payee organization or individual
 CONTACT_1_FIELDS = [
     "payee_organization_name",
     "payee_last_name",
@@ -19,6 +20,7 @@ CONTACT_1_FIELDS = [
     "payee_occupation",
 ]
 
+# candidate who the CE is on behalf of
 CONTACT_2_FIELDS = [
     "payee_candidate_id_number",
     "payee_candidate_last_name",
@@ -35,7 +37,19 @@ CONTACT_2_FIELDS = [
     "payee_candidate_occupation",
 ]
 
+# candidate committee that the CE is on behalf of
 CONTACT_3_FIELDS = [
+    "payee_committee_id_number",
+]
+
+# designating committee
+CONTACT_4_FIELDS = [
+    "designating_committee_id_number",
+    "designating_committee_name",
+]
+
+# subordinate committee
+CONTACT_5_FIELDS = [
     "subordinate_committee_id_number",
     "subordinate_committee_name",
     "subordinate_street_1",
@@ -62,5 +76,7 @@ class ScheduleFSerializer(ModelSerializer):
             + CONTACT_1_FIELDS
             + CONTACT_2_FIELDS
             + CONTACT_3_FIELDS
+            + CONTACT_4_FIELDS
+            + CONTACT_5_FIELDS
         )
         model = ScheduleF

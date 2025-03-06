@@ -1,17 +1,12 @@
 from fecfiler.transactions.models import Transaction
 from fecfiler.contacts.models import Contact
-from fecfiler.committee_accounts.models import CommitteeAccount
 
 
-def get_test_transaction(
-    transaction_type_identifier="INDIVIDUAL_RECEIPT",
-    committee: CommitteeAccount | None = None,
-):
+def get_test_transaction(transaction_type_identifier="INDIVIDUAL_RECEIPT"):
 
     return Transaction(
         transaction_type_identifier=transaction_type_identifier,
         contact_1=Contact(
-            committee_account=committee,
             candidate_id="1 candidate id",
             committee_id="1 committee id",
             name="1 name",
@@ -34,7 +29,6 @@ def get_test_transaction(
             country="1 country",
         ),
         contact_2=Contact(
-            committee_account=committee,
             candidate_id="2 candidate id",
             committee_id="2 committee id",
             name="2 name",
@@ -57,7 +51,6 @@ def get_test_transaction(
             country="2 country",
         ),
         contact_3=Contact(
-            committee_account=committee,
             candidate_id="3 candidate id",
             committee_id="3 committee id",
             name="3 name",
@@ -78,5 +71,18 @@ def get_test_transaction(
             candidate_district="3 candidate district",
             telephone="3 telephone",
             country="3 country",
+        ),
+        contact_4=Contact(
+            committee_id="4 committee id",
+            name="4 name",
+        ),
+        contact_5=Contact(
+            committee_id="5 committee id",
+            name="5 name",
+            street_1="5 street 1",
+            street_2="5 street 2",
+            city="5 city",
+            state="5 state",
+            zip="5 zip",
         ),
     )
