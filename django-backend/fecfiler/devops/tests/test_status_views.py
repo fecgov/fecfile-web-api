@@ -3,7 +3,7 @@ from ..tasks import (
     check_database_running,
     get_devops_status_report,
     CELERY_STATUS,
-    SCHEDULER_STATUS
+    SCHEDULER_STATUS,
 )
 from ..utils.redis_utils import (
     get_redis_value,
@@ -11,6 +11,7 @@ from ..utils.redis_utils import (
     redis_instance,
 )
 import json
+from unittest.mock import patch
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
@@ -34,7 +35,8 @@ class SystemStatusViewTest(TestCase):
         redis_instance.delete(key)
         self.assertIsNone(get_redis_value(key))
 
-    def test_status_report(self):
+    @patch("fecfiler.devops.tasks.S3_SESSION")
+    def test_status_report(self, mock_s3_session):
         self.assertIsNone(get_redis_value(CELERY_STATUS))
         self.assertIsNone(get_redis_value(SCHEDULER_STATUS))
         get_devops_status_report()

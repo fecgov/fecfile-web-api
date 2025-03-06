@@ -1010,6 +1010,7 @@ class TransactionModelTestCase(TestCase):
             amount="60.00",
             report=self.q1_report,
             parent_id=partnership_jf_transfer_memo_90.id,
+            itemized=True,
         )
 
         jf_transfer_100.refresh_from_db()

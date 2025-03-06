@@ -145,7 +145,7 @@ jobs:
           command: |
             mkdir -p $HOME/bin
             export PATH=$HOME/bin:$PATH
-            curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&version=7.3.0" | tar xzv -C $HOME/bin
+            curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&version=7.8.0" | tar xzv -C $HOME/bin
 
       - run:
           name: Deploy API
@@ -244,13 +244,13 @@ workflows:
       - trigger-e2e-test-pipeline:
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|test|main/
+              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - deploy-job:
           requires:
             - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|test|main/
+              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
           requires:
             - test

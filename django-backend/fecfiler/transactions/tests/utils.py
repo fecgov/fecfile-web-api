@@ -1,3 +1,6 @@
+from datetime import datetime
+from decimal import Decimal
+from uuid import UUID
 from django.db.models import Model
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
@@ -7,24 +10,27 @@ from fecfiler.transactions.schedule_c1.models import ScheduleC1
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
+from fecfiler.transactions.schedule_f.models import ScheduleF
 from fecfiler.contacts.models import Contact
 from fecfiler.reports.models import ReportTransaction
 from fecfiler.memo_text.models import MemoText
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.reports.models import Report
 
 
 def create_schedule_a(
-    type,
-    committee,
-    contact,
-    date,
-    amount,
-    group="GENERAL",
-    form_type="SA11I",
-    memo_code=False,
-    itemized=None,
-    report=None,
-    parent_id=None,
-    purpose_description=None,
+    type: str,
+    committee: CommitteeAccount,
+    contact: Contact | None,
+    date: str | None,
+    amount: str | int | float,
+    group: str = "GENERAL",
+    form_type: str = "SA11I",
+    memo_code: bool = False,
+    itemized: bool | None = None,
+    report: Report | None = None,
+    parent_id: UUID | None = None,
+    purpose_description: str | None = None,
 ):
     transaction_data = {
         "_form_type": form_type,
@@ -50,17 +56,17 @@ def create_schedule_a(
 
 
 def create_schedule_b(
-    type,
-    committee,
-    contact,
-    date,
-    amount,
-    group="GENERAL",
-    form_type="SB",
-    memo_code=False,
-    report=None,
-    loan_id=None,
-    debt_id=None,
+    type: str,
+    committee: CommitteeAccount,
+    contact: Contact,
+    date: str,
+    amount: str,
+    group: str = "GENERAL",
+    form_type: str = "SB",
+    memo_code: bool = False,
+    report: Report | None = None,
+    loan_id: UUID | None = None,
+    debt_id: UUID | None = None,
 ):
     return create_test_transaction(
         type,
@@ -80,16 +86,16 @@ def create_schedule_b(
 
 
 def create_ie(
-    committee,
+    committee: CommitteeAccount,
     contact: Contact,
-    disbursement_date,
-    dissemination_date,
-    date_signed,
-    amount,
-    code,
+    disbursement_date: str,
+    dissemination_date: str,
+    date_signed: str,
+    amount: str,
+    code: str,
     candidate: Contact,
-    memo_code=False,
-    report=None,
+    memo_code: bool = False,
+    report: Report | None = None,
 ):
     return create_test_transaction(
         "INDEPENDENT_EXPENDITURE",
@@ -114,12 +120,12 @@ def create_ie(
 
 
 def create_debt(
-    committee,
-    contact,
-    incurred_amount,
-    form_type="SD9",
-    type="DEBT_OWED_BY_COMMITTEE",
-    report=None,
+    committee: CommitteeAccount,
+    contact: Contact,
+    incurred_amount: Decimal,
+    form_type: str = "SD9",
+    type: str = "DEBT_OWED_BY_COMMITTEE",
+    report: Report | None = None,
 ):
     return create_test_transaction(
         type,
@@ -138,16 +144,16 @@ def create_debt(
 
 
 def create_loan(
-    committee,
-    contact,
-    loan_amount,
-    loan_due_date,
-    loan_interest_rate,
-    secured=False,
-    type="LOAN_RECEIVED_FROM_INDIVIDUAL",
-    form_type="SC/9",
-    loan_incurred_date=None,
-    report=None,
+    committee: CommitteeAccount,
+    contact: Contact,
+    loan_amount: Decimal,
+    loan_due_date: str | datetime,
+    loan_interest_rate: str,
+    secured: bool = False,
+    type: str = "LOAN_RECEIVED_FROM_INDIVIDUAL",
+    form_type: str = "SC/9",
+    loan_incurred_date: str | datetime | None = None,
+    report: Report | None = None,
 ):
     report_coverage_through_date = report.coverage_through_date if report else None
     return create_test_transaction(
@@ -169,14 +175,14 @@ def create_loan(
 
 
 def create_loan_from_bank(
-    committee,
-    contact,
-    loan_amount,
-    loan_due_date,
-    loan_interest_rate,
-    secured=False,
-    loan_incurred_date=None,
-    report=None,
+    committee: CommitteeAccount,
+    contact: Contact,
+    loan_amount: Decimal,
+    loan_due_date: datetime | str,
+    loan_interest_rate: str,
+    secured: bool = False,
+    loan_incurred_date: datetime | str | None = None,
+    report: Report | None = None,
 ):
     loan = create_loan(
         committee,
@@ -227,16 +233,52 @@ def create_loan_from_bank(
     return loan, loan_receipt, loan_agreement, guarantor
 
 
+def create_schedule_f(
+    type: str,
+    committee: CommitteeAccount,
+    contact_1: Contact | None,
+    contact_2: Contact | None,
+    contact_3: Contact | None,
+    contact_4: Contact | None,
+    contact_5: Contact | None,
+    group: str = "GENERAL",
+    form_type: str = "SF",
+    memo_code: bool = False,
+    schedule_data=None,
+    report: Report | None = None,
+):
+    return create_test_transaction(
+        type,
+        ScheduleF,
+        committee,
+        contact_1=contact_1,
+        contact_2=contact_2,
+        contact_3=contact_3,
+        contact_4=contact_4,
+        contact_5=contact_5,
+        group=group,
+        report=report,
+        schedule_data=schedule_data,
+        transaction_data={
+            "_form_type": form_type,
+            "memo_code": memo_code,
+        },
+    )
+
+
 def create_test_transaction(
-    type,
-    schedule,
-    committee,
-    contact_1=None,
-    contact_2=None,
-    group=None,
+    type: str,
+    schedule: Model,
+    committee: CommitteeAccount,
+    contact_1: Contact | None = None,
+    contact_2: Contact | None = None,
+    contact_3: Contact | None = None,
+    contact_4: Contact | None = None,
+    contact_5: Contact | None = None,
+    group: str | None = None,
     schedule_data=None,
     transaction_data=None,
-    report=None,
+    report: Report | None = None,
 ):
     schedule_object = create_schedule(schedule, schedule_data)
     transaction = Transaction.objects.create(
@@ -244,6 +286,9 @@ def create_test_transaction(
         committee_account=committee,
         contact_1=contact_1,
         contact_2=contact_2,
+        contact_3=contact_3,
+        contact_4=contact_4,
+        contact_5=contact_5,
         aggregation_group=group,
         entity_type=getattr(contact_1, "type", None),
         **{SCHEDULE_CLASS_TO_FIELD[schedule]: schedule_object},
@@ -258,14 +303,16 @@ def create_schedule(schedule: Model, data):
     return schedule.objects.create(**data)
 
 
-def create_report_transaction(report, transaction):
+def create_report_transaction(report: Report, transaction: Transaction):
     if transaction and report:
         return ReportTransaction.objects.create(
             report_id=report.id, transaction_id=transaction.id
         )
 
 
-def create_transaction_memo(committee_account, transaction, text4000):
+def create_transaction_memo(
+    committee_account: CommitteeAccount, transaction: Transaction, text4000: str
+):
     return MemoText.objects.create(
         rec_type="TEXT",
         text4000=text4000,
@@ -282,4 +329,5 @@ SCHEDULE_CLASS_TO_FIELD = {
     ScheduleC2: "schedule_c2",
     ScheduleD: "schedule_d",
     ScheduleE: "schedule_e",
+    ScheduleF: "schedule_f",
 }

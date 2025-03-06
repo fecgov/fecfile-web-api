@@ -220,7 +220,7 @@ class CommitteeViewSetTest(TestCase):
             request.user = self.user
             request.query_params = {"committee_id": "C12345678"}
             with patch(
-                "fecfiler.committee_accounts.utils.get_committee_account_data_from_redis"
+                "fecfiler.committee_accounts.utils.get_mocked_committee_data"
             ) as mock_committee:
                 mock_committee.return_value = {
                     "name": "TEST",

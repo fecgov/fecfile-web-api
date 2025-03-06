@@ -61,6 +61,7 @@ class CommitteeAccountTestCase(TestCase):
             "ScheduleC2",
             "ScheduleD",
             "ScheduleE",
+            "ScheduleF",
             "DotFEC",
             "UploadSubmission",
             "WebPrintSubmission",
