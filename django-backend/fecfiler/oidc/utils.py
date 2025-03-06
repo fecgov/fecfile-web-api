@@ -9,8 +9,6 @@ the original version can be found on Github:
 https://github.com/mozilla/mozilla-django-oidc/blob/main/mozilla_django_oidc/utils.py
 https://github.com/mozilla/mozilla-django-oidc/blob/main/mozilla_django_oidc/views.py
 """
-
-import logging
 import time
 import base64
 import hashlib
@@ -25,8 +23,9 @@ from fecfiler.settings import (
     FFAPI_TIMEOUT_COOKIE_NAME,
     OIDC_MAX_STATES,
 )
+import structlog
 
-LOGGER = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 def handle_oidc_callback_request(request):
@@ -82,7 +81,7 @@ def add_oidc_nonce_to_session(request, state, nonce):
     # If the number of State/Nonce combinations reaches a certain threshold,
     # remove the oldest state by finding out which element has the oldest "add_on" time.
     if len(request.session["oidc_states"]) >= OIDC_MAX_STATES:
-        LOGGER.info(
+        logger.info(
             'User has more than {} "oidc_states" in their session, '
             "deleting the oldest one!".format(OIDC_MAX_STATES)
         )

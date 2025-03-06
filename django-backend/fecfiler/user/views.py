@@ -3,9 +3,9 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.decorators import action
 from .serializers import CurrentUserSerializer, session_security_consented_key
 from datetime import date, timedelta
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class UserViewSet(

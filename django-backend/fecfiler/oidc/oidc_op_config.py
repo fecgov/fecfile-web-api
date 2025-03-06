@@ -1,10 +1,11 @@
-import logging
 import requests
 from fecfiler.settings import (
     OIDC_OP_AUTODISCOVER_ENDPOINT,
 )
+import structlog
 
-LOGGER = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
+
 
 OIDC_OP_CONFIG = None
 

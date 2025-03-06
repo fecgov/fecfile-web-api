@@ -2,9 +2,9 @@ from .models import User
 from fecfiler.committee_accounts.models import Membership
 from rest_framework.serializers import BooleanField, ModelSerializer
 from datetime import date
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 session_security_consented_key = "session_security_consented"
 
