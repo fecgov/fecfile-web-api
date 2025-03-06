@@ -118,6 +118,8 @@ class ContactSerializer(
                 "contact_1_transaction_set",
                 "contact_2_transaction_set",
                 "contact_3_transaction_set",
+                "contact_4_transaction_set",
+                "contact_5_transaction_set",
                 "contact_affiliated_transaction_set",
                 "contact_candidate_I_transaction_set",
                 "contact_candidate_II_transaction_set",
