@@ -305,6 +305,7 @@ class Tasks(TaskSet):
                 response.failure(f"Non-200 Response: {response.status_code}")
             return response
 
+
 class Swarm(user.HttpUser):
     tasks = [Tasks]
     wait_time = between(1.5, 4)
