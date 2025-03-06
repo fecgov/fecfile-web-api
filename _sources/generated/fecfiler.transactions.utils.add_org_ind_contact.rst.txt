@@ -1,0 +1,6 @@
+fecfiler.transactions.utils.add\_org\_ind\_contact
+==================================================
+
+.. currentmodule:: fecfiler.transactions.utils
+
+.. autofunction:: add_org_ind_contact

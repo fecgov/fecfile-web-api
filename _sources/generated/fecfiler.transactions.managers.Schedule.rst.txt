@@ -30,5 +30,6 @@ fecfiler.transactions.managers.Schedule
       ~Schedule.C1
       ~Schedule.D
       ~Schedule.E
+      ~Schedule.F
    
    

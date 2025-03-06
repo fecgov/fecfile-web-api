@@ -1,0 +1,6 @@
+fecfiler.transactions.utils.add\_candidate\_contact
+===================================================
+
+.. currentmodule:: fecfiler.transactions.utils
+
+.. autofunction:: add_candidate_contact

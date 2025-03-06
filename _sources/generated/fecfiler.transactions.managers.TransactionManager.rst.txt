@@ -115,6 +115,7 @@ fecfiler.transactions.managers.TransactionManager
       ~TransactionManager.DATE_CLAUSE
       ~TransactionManager.DISPLAY_NAME_CLAUSE
       ~TransactionManager.E
+      ~TransactionManager.F
       ~TransactionManager.FORM_TYPE_CLAUSE
       ~TransactionManager.auto_created
       ~TransactionManager.creation_counter

@@ -48,6 +48,10 @@ fecfiler.transactions.serializers.TransactionSerializer
       ~TransactionSerializer.get_validation_candidate
       ~TransactionSerializer.get_validators
       ~TransactionSerializer.get_value
+      ~TransactionSerializer.handle_generic_schedule
+      ~TransactionSerializer.handle_schedule_a
+      ~TransactionSerializer.handle_schedule_b
+      ~TransactionSerializer.handle_schedule_c
       ~TransactionSerializer.ignore_fields
       ~TransactionSerializer.include_extra_kwargs
       ~TransactionSerializer.is_valid

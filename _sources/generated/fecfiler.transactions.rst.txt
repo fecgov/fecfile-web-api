@@ -43,10 +43,12 @@ fecfiler.transactions
    fecfiler.transactions.schedule_c2
    fecfiler.transactions.schedule_d
    fecfiler.transactions.schedule_e
+   fecfiler.transactions.schedule_f
    fecfiler.transactions.serializers
    fecfiler.transactions.signals
    fecfiler.transactions.tests
    fecfiler.transactions.transaction_dependencies
    fecfiler.transactions.urls
+   fecfiler.transactions.utils
    fecfiler.transactions.views
 

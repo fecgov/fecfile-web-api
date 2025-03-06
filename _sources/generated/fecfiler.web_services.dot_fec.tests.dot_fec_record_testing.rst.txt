@@ -44,5 +44,6 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing
    fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_schedule_c2
    fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_schedule_d
    fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_schedule_e
+   fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_schedule_f
    fecfiler.web_services.dot_fec.tests.dot_fec_record_testing.test_transaction_sch_a
 

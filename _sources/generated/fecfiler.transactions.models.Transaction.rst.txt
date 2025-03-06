@@ -75,6 +75,10 @@ fecfiler.transactions.models.Transaction
       ~Transaction.contact_2_id
       ~Transaction.contact_3
       ~Transaction.contact_3_id
+      ~Transaction.contact_4
+      ~Transaction.contact_4_id
+      ~Transaction.contact_5
+      ~Transaction.contact_5_id
       ~Transaction.created
       ~Transaction.debt
       ~Transaction.debt_associations
@@ -117,6 +121,8 @@ fecfiler.transactions.models.Transaction
       ~Transaction.schedule_d_id
       ~Transaction.schedule_e
       ~Transaction.schedule_e_id
+      ~Transaction.schedule_f
+      ~Transaction.schedule_f_id
       ~Transaction.transaction_id
       ~Transaction.transaction_set
       ~Transaction.transaction_type_identifier

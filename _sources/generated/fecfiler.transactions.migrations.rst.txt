@@ -46,4 +46,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0013_transaction_itemized_and_associated_triggers
    fecfiler.transactions.migrations.0014_drop_transaction_view
    fecfiler.transactions.migrations.0015_merge_transaction_triggers
+   fecfiler.transactions.migrations.0016_schedulef_transaction_contact_4_and_more
 

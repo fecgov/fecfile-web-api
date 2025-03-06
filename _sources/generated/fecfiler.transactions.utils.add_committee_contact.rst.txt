@@ -1,0 +1,6 @@
+fecfiler.transactions.utils.add\_committee\_contact
+===================================================
+
+.. currentmodule:: fecfiler.transactions.utils
+
+.. autofunction:: add_committee_contact

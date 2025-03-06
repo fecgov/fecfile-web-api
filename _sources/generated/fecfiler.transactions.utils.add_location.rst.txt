@@ -1,0 +1,6 @@
+fecfiler.transactions.utils.add\_location
+=========================================
+
+.. currentmodule:: fecfiler.transactions.utils
+
+.. autofunction:: add_location
