@@ -1,10 +1,8 @@
 from uuid import uuid4
 from django.db.models import (
     TextField,
-    ForeignKey,
     BooleanField,
     DecimalField,
-    CASCADE,
     DateField,
     UUIDField,
     Model,
