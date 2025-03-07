@@ -309,8 +309,8 @@ class CommitteeAccountsUtilsTest(TestCase):
             committee_account_data = get_committee_account_data("C12345678")
             self.assertEqual(
                 committee_account_data.get("committee_type_label"),
-                "Party - Qualified - Unauthorized",
+                "Non-qualified",
             )
-            self.assertEqual(committee_account_data.get("isPAC"), False)
+            self.assertEqual(committee_account_data.get("isPAC"), True)
             self.assertEqual(committee_account_data.get("isPTY"), True)
-            self.assertEqual(committee_account_data.get("qualified"), True)
+            self.assertEqual(committee_account_data.get("qualified"), False)

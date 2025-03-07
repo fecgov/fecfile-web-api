@@ -188,7 +188,7 @@ def get_raw_committee_data(committee_id):
         committee_data["isPAC"] = True
 
         # Committee type label
-        committee_data["committee_type_label"] = " - Non-qualified"
+        committee_data["committee_type_label"] = "Non-qualified"
         # Qualified
         committee_data["qualified"] = False
 
@@ -289,21 +289,7 @@ def get_mocked_committee_data(committee_id):
             ),
             None,
         )
-        # Testing PROD VERSION
-        if committee:
-            """For now we're just using the same logic as alpha"""
-            committee["isPTY"] = True
-            committee["isPAC"] = True
 
-            # Committee type label
-            committee["committee_type_label"] = " - Non-qualified"
-            # Qualified
-            committee["qualified"] = False
-
-            # Filing Frequency
-            committee["filing_frequency"] = "Q"
-
-            committee = convert_raw_to_processed(committee_data)
         return committee
 
 
