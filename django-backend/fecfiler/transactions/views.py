@@ -237,7 +237,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         if transaction_id:
             transaction = self.get_queryset().get(id=transaction_id)
             query = query.filter(
-                Q(created__lte=transaction.created) or ~Q(date=transaction.date)
+                Q(created__lt=transaction.created) | ~Q(date=date)
             )
 
         query = query.order_by("-date", "-created")
