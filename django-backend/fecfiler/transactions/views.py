@@ -246,7 +246,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         previous_transaction = query.first()
 
         if previous_transaction:
-            if original_transaction and original_transaction.date < previous_transaction.date:
+            if original_transaction and (
+                original_transaction.date < previous_transaction.date
+                or (
+                    original_transaction.date == previous_transaction.date
+                    and original_transaction.created < previous_transaction.created
+                )
+            ):
                 previous_transaction.aggregate -= original_transaction.amount
             serializer = self.get_serializer(previous_transaction)
             return Response(data=serializer.data)

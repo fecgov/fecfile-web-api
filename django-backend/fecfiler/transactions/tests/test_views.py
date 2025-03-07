@@ -313,6 +313,41 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
+    def test_get_entity_date_leapfrogging(self):
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+        view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
+
+        first_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_3,
+            "2023-01-12",
+            "153.00",
+        )
+
+        second_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_3,
+            "2023-01-12",
+            "47.00",
+        )
+
+        response = view_set.previous_transaction_by_entity(
+            self.post_request(
+                {},
+                {
+                    "transaction_id": first_transaction.id,
+                    "contact_1_id": str(self.contact_3.id),
+                    "date": "2023-01-15",
+                    "aggregation_group": "GENERAL",
+                },
+            )
+        )
+        self.assertEqual(response.data['id'], str(second_transaction.id))
+        self.assertEqual(response.data['aggregate'], '47.00')
+
     def test_get_previous_election(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
