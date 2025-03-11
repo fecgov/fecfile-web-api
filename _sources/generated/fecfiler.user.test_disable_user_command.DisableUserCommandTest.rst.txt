@@ -114,7 +114,8 @@ fecfiler.user.test\_disable\_user\_command.DisableUserCommandTest
       ~DisableUserCommandTest.subTest
       ~DisableUserCommandTest.tearDown
       ~DisableUserCommandTest.tearDownClass
-      ~DisableUserCommandTest.test_disable_user
+      ~DisableUserCommandTest.test_disable_user_email
+      ~DisableUserCommandTest.test_disable_user_uuid
    
    
 
