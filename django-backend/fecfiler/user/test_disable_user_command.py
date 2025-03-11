@@ -29,13 +29,13 @@ class DisableUserCommandTest(TestCase):
     def test_disable_user_uuid(self):
         user_model = get_user_model()
 
-        # get the test user
+        # get the test user by username
         user = user_model.objects.get(username=self.test_user.username)
         self.assertTrue(user.is_active)
 
-        # disable the test user
+        # disable the test user by id
         try:
-            call_command("disable_user", uuid=user.username)
+            call_command("disable_user", uuid=user.id)
         except Exception as e:
             print(f"Error running command: {e}")
 

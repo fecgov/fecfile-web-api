@@ -22,7 +22,7 @@ class Command(BaseCommand):
         try:
             # if they use both arguments, prefer UUID
             if options['uuid'] is not None:
-                user = user_model.objects.get(username=options['uuid'])
+                user = user_model.objects.get(id=options['uuid'])
             else:
                 user = user_model.objects.get(email=options['email'])
         except user_model.DoesNotExist:
@@ -32,6 +32,6 @@ class Command(BaseCommand):
         user.save()
 
         self.stdout.write(self.style.SUCCESS(
-            f'The is_active flag for user [{user.username} | {user.email}] '
+            f'The is_active flag for user [{user.id} | {user.email}] '
             f'set to: {user.is_active}'
         ))
