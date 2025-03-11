@@ -7,7 +7,8 @@ from django.contrib.auth import get_user_model
 class DisableUserCommandTest(TestCase):
 
     def setUp(self):
-        self.test_user = User.objects.create(id="fec10000-70dd-1335-aaaa-d4d10fecf113", email="test@fec.gov", username="gov")
+        self.test_user = User.objects.create(id="fec10000-70dd-1335-aaaa-d4d10fecf113",
+                                             email="test@fec.gov", username="gov")
 
     def test_disable_user_email(self):
         user_model = get_user_model()
