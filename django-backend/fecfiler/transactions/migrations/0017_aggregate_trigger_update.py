@@ -41,6 +41,8 @@ BEGIN
     END IF;
 
     SELECT LEAST(old_date, new_date) INTO earlier_date;
+    RAISE WARNING 'Old date: (%)', old_date;
+    RAISE WARNING 'new date: (%)', new_date;
 
     EXECUTE '
         UPDATE transactions_transaction AS t
