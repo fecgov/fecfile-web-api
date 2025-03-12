@@ -234,16 +234,26 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 Q(contact_2__candidate_state=state),
                 Q(contact_2__candidate_district=district),
             )
+
+        original_transaction = None
         if transaction_id:
-            transaction = self.get_queryset().get(id=transaction_id)
+            original_transaction = self.get_queryset().get(id=transaction_id)
             query = query.filter(
-                Q(created__lt=transaction.created) | ~Q(date=date)
+                Q(created__lt=original_transaction.created) | ~Q(date=date)
             )
 
         query = query.order_by("-date", "-created")
         previous_transaction = query.first()
 
         if previous_transaction:
+            if original_transaction and (
+                original_transaction.date < previous_transaction.date
+                or (
+                    original_transaction.date == previous_transaction.date
+                    and original_transaction.created < previous_transaction.created
+                )
+            ):
+                previous_transaction.aggregate -= original_transaction.amount
             serializer = self.get_serializer(previous_transaction)
             return Response(data=serializer.data)
 
