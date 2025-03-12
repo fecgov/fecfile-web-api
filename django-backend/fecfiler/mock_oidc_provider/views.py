@@ -13,7 +13,7 @@ from rest_framework.decorators import (
 
 from fecfiler.oidc.utils import idp_base64_encode_left_128_bits_of_str
 from fecfiler.settings import MOCK_OIDC_PROVIDER_CACHE
-
+from drf_spectacular.utils import extend_schema
 from jwcrypto import jwk
 import structlog
 from uuid import uuid4
@@ -38,6 +38,7 @@ test_username = "c34867d9-3a41-43ff-ae25-ca498f64b52d"
 test_email = "test@test.com"
 
 
+@extend_schema(exclude=True)
 @api_view(["GET"])
 @authentication_classes([])
 @permission_classes([])
@@ -54,6 +55,7 @@ def discovery(request):
     return JsonResponse(retval)
 
 
+@extend_schema(exclude=True)
 @api_view(["GET"])
 @authentication_classes([])
 @permission_classes([])
@@ -65,6 +67,7 @@ def certs(request):
     return JsonResponse(retval)
 
 
+@extend_schema(exclude=True)
 @api_view(["GET"])
 @authentication_classes([])
 @permission_classes([])
@@ -94,6 +97,7 @@ def authorize(request):
     return HttpResponseRedirect(retval)
 
 
+@extend_schema(exclude=True)
 @api_view(["POST"])
 @authentication_classes([])
 @permission_classes([])
@@ -143,6 +147,7 @@ def token(request):
     return JsonResponse(retval)
 
 
+@extend_schema(exclude=True)
 @api_view(["GET"])
 @authentication_classes([])
 @permission_classes([])
@@ -167,6 +172,7 @@ def userinfo(request):
     return JsonResponse(retval)
 
 
+@extend_schema(exclude=True)
 @api_view(["GET"])
 @authentication_classes([])
 @permission_classes([])

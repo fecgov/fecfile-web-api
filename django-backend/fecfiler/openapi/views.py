@@ -1,7 +1,9 @@
 from drf_spectacular.views import SpectacularSwaggerView
+from drf_spectacular.utils import extend_schema, extend_schema_view
 import secrets
 
 
+@extend_schema_view(get=extend_schema(exclude=True))
 class FecfileSpectacularSwaggerView(SpectacularSwaggerView):
 
     def get(self, request, *args, **kwargs):

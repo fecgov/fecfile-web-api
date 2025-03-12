@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from rest_framework.serializers import CharField
-import logging
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.getLogger(__name__)
 
 
 class FeedbackSerializer(serializers.Serializer):

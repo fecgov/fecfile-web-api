@@ -1,0 +1,66 @@
+{
+  "form_type": {},
+  "filer_committee_id_number": {},
+  "transaction_id_number": {
+    "path": "transaction_id"
+  },
+  "back_reference_tran_id_number": {},
+  "back_reference_sched_name": {},
+  "filer_designated_to_make_coordianted_expenditures": {
+    "path": "schedule_f.filer_designated_to_make_coordianted_expenditures",
+    "serializer": "BOOLEAN_YN"
+  },
+  "designating_committee_id_number": {},
+  "designating_committee_name": {},
+  "subordinate_committee_id_number": {},
+  "subordinate_committee_name": {},
+  "subordinate_street_1": {},
+  "subordinate_street_2": {},
+  "subordinate_city": {},
+  "subordinate_state": {},
+  "subordinate_zip": {},
+  "entity_type": {},
+  "payee_organization_name": {},
+  "payee_last_name": {},
+  "payee_first_name": {},
+  "payee_middle_name": {},
+  "payee_prefix": {},
+  "payee_suffix": {},
+  "payee_street_1": {},
+  "payee_street_2": {},
+  "payee_city": {},
+  "payee_state": {},
+  "payee_zip": {},
+  "expenditure_date": {
+    "serializer": "DATE",
+    "path": "schedule_f.expenditure_date"
+  },
+  "expenditure_amount": {
+    "path": "schedule_f.expenditure_amount"
+  },
+  "aggregate_general_elec_expended": {
+    "path": "schedule_f.aggregate_general_elec_expended"
+  },
+  "expenditure_purpose_descrip": {
+    "path": "schedule_f.expenditure_purpose_descrip"
+  },
+  "category_code": {
+    "path": "schedule_f.category_code"
+  },
+  "payee_committee_id_number": {},
+  "payee_candidate_id_number": {},
+  "payee_candidate_last_name": {},
+  "payee_candidate_first_name": {},
+  "payee_candidate_middle_name": {},
+  "payee_candidate_prefix": {},
+  "payee_candidate_suffix": {},
+  "payee_candidate_office": {},
+  "payee_candidate_state": {},
+  "payee_candidate_district": {},
+  "memo_code": {
+    "serializer": "BOOLEAN_X"
+  },
+  "memo_text_description": {
+    "path": "schedule_f.memo_text_description"
+  }
+}

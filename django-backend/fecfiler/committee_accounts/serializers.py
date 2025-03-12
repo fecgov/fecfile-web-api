@@ -2,6 +2,8 @@ from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer, ChoiceField, SerializerMethodField
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -69,6 +71,7 @@ class CommitteeMembershipSerializer(CommitteeOwnedSerializer):
 
         read_only_fields = ["id", "created"]
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_name(self, instance):
         return (
             f"{instance.user.last_name}, {instance.user.first_name}"
@@ -76,5 +79,6 @@ class CommitteeMembershipSerializer(CommitteeOwnedSerializer):
             else ""
         )
 
+    @extend_schema_field(OpenApiTypes.STR)
     def get_email(self, instance):
         return instance.user.email if instance.user else instance.pending_email

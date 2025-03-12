@@ -12,6 +12,8 @@ logger = structlog.get_logger(__name__)
 
 
 class FeedbackViewSet(viewsets.ViewSet):
+    serializer_class = FeedbackSerializer
+
     @action(
         detail=False,
         methods=["post"],

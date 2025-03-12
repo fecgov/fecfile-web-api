@@ -4,8 +4,10 @@ from ..tasks import (
     get_database_connections,
     check_database_size,
     log_database_size,
+    log_s3_bucket_size,
     get_devops_status_report,
-    INITIAL_DB_SIZE
+    LOGGED_DB_SIZE_REDIS_KEY,
+    LOGGED_S3_SIZE_REDIS_KEY,
 )
 from ..utils.redis_utils import get_redis_value, set_redis_value
 from django.test import TestCase
@@ -49,30 +51,56 @@ class DevopsTasksTestCase(TestCase):
         self.assertGreater(check_database_size(), 0)
 
     def test_log_db_size(self):
-        redis_initial_db_size = get_redis_value(INITIAL_DB_SIZE)
-        set_redis_value(INITIAL_DB_SIZE, None, None)
+        redis_initial_db_size = get_redis_value(LOGGED_DB_SIZE_REDIS_KEY)
+        set_redis_value(LOGGED_DB_SIZE_REDIS_KEY, None, None)
 
         ten_gb = 10 * 1024**3
         results = log_database_size(ten_gb)
-        self.assertEqual(results["db_size_gb"], 10.0)
+        self.assertEqual(results["database"]["current_size_gb"], 10.0)
 
-        stored_db_size = get_redis_value(INITIAL_DB_SIZE)[0]
+        stored_db_size = get_redis_value(LOGGED_DB_SIZE_REDIS_KEY)[0]
         self.assertEqual(stored_db_size, ten_gb)
 
         timestamp = datetime.now() - timedelta(days=10)
         set_redis_value(
-            INITIAL_DB_SIZE, [2 * 1024**3, timestamp.strftime('%Y%m%d%H%M%S')], None
+            LOGGED_DB_SIZE_REDIS_KEY,
+            [2 * 1024**3, timestamp.strftime("%Y%m%d%H%M%S")],
+            None,
         )
 
         later_results = log_database_size(ten_gb)
-        self.assertIsNotNone(later_results["db_growth"])
-        self.assertIsNotNone(later_results["db_est_days_to_full"])
+        self.assertIsNotNone(later_results["database"]["growth"])
+        self.assertIsNotNone(later_results["database"]["est_days_to_full"])
 
-        set_redis_value(INITIAL_DB_SIZE, redis_initial_db_size, None)
+        set_redis_value(LOGGED_DB_SIZE_REDIS_KEY, redis_initial_db_size, None)
 
-    def test_get_db_status_report(self):
-        redis_initial_db_size = get_redis_value(INITIAL_DB_SIZE)
-        set_redis_value(INITIAL_DB_SIZE, None, None)
+    @patch("fecfiler.devops.tasks.S3_SESSION")
+    def test_get_db_status_report(self, mock_s3_session):
+        redis_initial_db_size = get_redis_value(LOGGED_DB_SIZE_REDIS_KEY)
+        set_redis_value(LOGGED_DB_SIZE_REDIS_KEY, None, None)
         get_devops_status_report()
-        self.assertIsNotNone(get_redis_value(INITIAL_DB_SIZE))
-        set_redis_value(INITIAL_DB_SIZE, redis_initial_db_size, None)
+        self.assertIsNotNone(get_redis_value(LOGGED_DB_SIZE_REDIS_KEY))
+        set_redis_value(LOGGED_DB_SIZE_REDIS_KEY, redis_initial_db_size, None)
+
+    @patch("fecfiler.devops.tasks.S3_SESSION")
+    def test_log_s3_bucket_size(self, mock_s3_session):
+        redis_initial_s3_size = get_redis_value(LOGGED_S3_SIZE_REDIS_KEY)
+        set_redis_value(LOGGED_S3_SIZE_REDIS_KEY, None, None)
+
+        results = log_s3_bucket_size()
+        self.assertGreaterEqual(results["s3_bucket"]["current_size_gb"], 0)
+
+        stored_db_size = get_redis_value(LOGGED_S3_SIZE_REDIS_KEY)[0]
+        self.assertGreaterEqual(stored_db_size, 0)
+
+        timestamp = datetime.now() - timedelta(days=10)
+        set_redis_value(
+            LOGGED_S3_SIZE_REDIS_KEY,
+            [100, timestamp.strftime("%Y%m%d%H%M%S")],
+            None,
+        )
+
+        later_results = log_s3_bucket_size()
+        self.assertIsNotNone(later_results["s3_bucket"]["growth"])
+
+        set_redis_value(LOGGED_S3_SIZE_REDIS_KEY, redis_initial_s3_size, None)
