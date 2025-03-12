@@ -8,7 +8,7 @@ def generate_form_3x(count=1, collision_maximum=1000):
         ["Q1", "01-01", "03-31"],
         ["Q2", "04-01", "06-30"],
         ["Q3", "07-01", "09-30"],
-        ["Q4", "10-01", "12-31"]
+        ["YE", "10-01", "12-31"]
     ]
     form_3x_list = []
     dates_taken = set()
