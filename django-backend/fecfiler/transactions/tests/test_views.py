@@ -51,6 +51,9 @@ class TransactionViewsTestCase(TestCase):
         self.contact_2 = create_test_candidate_contact(
             "last name", "First name", self.committee.id, "H8MA03131", "S", "AK", "01"
         )
+        self.contact_3 = create_test_individual_contact(
+            "last name", "First name", self.committee.id,
+        )
         self.transaction = create_ie(
             self.committee,
             self.contact_1,
@@ -256,6 +259,55 @@ class TransactionViewsTestCase(TestCase):
                     "contact_1_id": str(self.contact_1.id),
                     "date": "2024-09-20",
                     "aggregation_group": "GENERAL_DISBURSEMENT",
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_get_previous_entity_same_day(self):
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+        view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
+
+        first_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_3,
+            "2023-01-12",
+            "153.00",
+        )
+
+        second_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_3,
+            "2023-01-12",
+            "47.00",
+        )
+
+        self.assertGreater(second_transaction.created, first_transaction.created)
+
+        response = view_set.previous_transaction_by_entity(
+            self.post_request(
+                {},
+                {
+                    "transaction_id": str(second_transaction.id),
+                    "contact_1_id": str(self.contact_3.id),
+                    "date": "2023-01-12",
+                    "aggregation_group": "GENERAL",
+                },
+            )
+        )
+        self.assertEqual(response.data["id"], str(first_transaction.id))
+
+        response = view_set.previous_transaction_by_entity(
+            self.post_request(
+                {},
+                {
+                    "transaction_id": first_transaction.id,
+                    "contact_1_id": str(self.contact_3.id),
+                    "date": "2023-01-12",
+                    "aggregation_group": "GENERAL",
                 },
             )
         )

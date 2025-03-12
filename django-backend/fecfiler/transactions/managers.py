@@ -7,9 +7,8 @@ from fecfiler.transactions.schedule_b.managers import (
 )
 from fecfiler.transactions.schedule_c.managers import line_labels as line_labels_c
 from fecfiler.transactions.schedule_d.managers import line_labels as line_labels_d
-from fecfiler.transactions.schedule_e.managers import (
-    line_labels as line_labels_e,
-)
+from fecfiler.transactions.schedule_e.managers import line_labels as line_labels_e
+from fecfiler.transactions.schedule_f.managers import line_labels as line_labels_f
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
     OuterRef,
@@ -45,6 +44,7 @@ class TransactionManager(SoftDeleteManager):
             When(schedule_c2__isnull=False, then=Schedule.C2.value),
             When(schedule_d__isnull=False, then=Schedule.D.value),
             When(schedule_e__isnull=False, then=Schedule.E.value),
+            When(schedule_f__isnull=False, then=Schedule.F.value),
         )
 
     DATE_CLAUSE = Coalesce(
@@ -53,6 +53,7 @@ class TransactionManager(SoftDeleteManager):
         "schedule_c__loan_incurred_date",
         "schedule_e__disbursement_date",
         "schedule_e__dissemination_date",
+        "schedule_f__expenditure_date",
     )
 
     AMOUNT_CLAUSE = Coalesce(
@@ -63,6 +64,7 @@ class TransactionManager(SoftDeleteManager):
         "schedule_e__expenditure_amount",
         "debt__schedule_d__incurred_amount",
         "schedule_d__incurred_amount",
+        "schedule_f__expenditure_amount",
     )
 
     BACK_REFERENCE_CLAUSE = Coalesce(
@@ -291,6 +293,7 @@ class TransactionManager(SoftDeleteManager):
     C = ["SC/9", "SC/10"]
     D = ["SD9", "SD10"]
     E = ["SE"]
+    F = ["SF"]
 
     def LINE_LABEL_CLAUSE(self):  # noqa: N802
         label_map = {
@@ -299,6 +302,7 @@ class TransactionManager(SoftDeleteManager):
             **line_labels_c,
             **line_labels_d,
             **line_labels_e,
+            **line_labels_f,
         }
         return Case(
             *[
@@ -316,3 +320,4 @@ class Schedule(Enum):
     C1 = Value("C2")
     D = Value("D")
     E = Value("E")
+    F = Value("F")

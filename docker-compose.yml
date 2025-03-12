@@ -20,7 +20,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   redis:
-    image: redis:6.2-alpine
+    image: redis:7.0-alpine
     ports:
       - "6379:6379"
     command: redis-server
@@ -42,8 +42,8 @@ services:
       - redis
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL:
-      FECFILE_TEST_DB_NAME:
+      DATABASE_URL: postgres://postgres:postgres@db/postgres
+      FECFILE_TEST_DB_NAME: postgres
       DJANGO_SETTINGS_MODULE: fecfiler.settings.local
       DJANGO_SECRET_KEY:
       FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
@@ -52,9 +52,9 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
-      MOCK_EFO: True
-      FEC_FILING_API:
-      FEC_FILING_API_KEY:
+      MOCK_EFO_FILING: True
+      EFO_FILING_API: https://efoservices.stage.efo.fec.gov
+      EFO_FILING_API_KEY:
       FEC_AGENCY_ID:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
@@ -83,8 +83,8 @@ services:
       - redis
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL:
-      FECFILE_TEST_DB_NAME:
+      DATABASE_URL: postgres://postgres:postgres@db/postgres
+      FECFILE_TEST_DB_NAME: postgres
       DJANGO_SETTINGS_MODULE: fecfiler.settings.local
       DJANGO_SECRET_KEY:
       FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
@@ -93,9 +93,9 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
-      MOCK_EFO: True
-      FEC_FILING_API:
-      FEC_FILING_API_KEY:
+      MOCK_EFO_FILING: True
+      EFO_FILING_API: https://efoservices.stage.efo.fec.gov
+      EFO_FILING_API_KEY:
       FEC_AGENCY_ID:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
@@ -123,8 +123,8 @@ services:
       - redis
     environment:
       REDIS_URL: redis://redis:6379
-      DATABASE_URL:
-      FECFILE_TEST_DB_NAME:
+      DATABASE_URL: postgres://postgres:postgres@db/postgres
+      FECFILE_TEST_DB_NAME: postgres
       DJANGO_SETTINGS_MODULE: fecfiler.settings.local
       DJANGO_SECRET_KEY:
       FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
@@ -140,9 +140,9 @@ services:
       AWS_STORAGE_BUCKET_NAME:
       AWS_REGION:
       CELERY_WORKER_STORAGE:
-      MOCK_EFO: True
-      FEC_FILING_API:
-      FEC_FILING_API_KEY:
+      MOCK_EFO_FILING: True
+      EFO_FILING_API: https://efoservices.stage.efo.fec.gov
+      EFO_FILING_API_KEY:
       FEC_AGENCY_ID:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
@@ -191,6 +191,7 @@ services:
       LOCAL_TEST_USER:
       LOCAL_TEST_PWD:
       OIDC_SESSION_ID:
+      CSRF_TOKEN:
 
   locust-follower:
     image: locustio/locust
@@ -202,3 +203,4 @@ services:
       LOCAL_TEST_USER:
       LOCAL_TEST_PWD:
       OIDC_SESSION_ID:
+      CSRF_TOKEN:

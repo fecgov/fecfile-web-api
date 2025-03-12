@@ -19,11 +19,12 @@ defaults: &defaults
     LOGOUT_REDIRECT_URL: https://stage-api.fecfile.fec.gov/api/v1/oidc/logout-redirect
     PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
     STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
-    FEC_FILING_API: https://efoservices.stage.efo.fec.gov
+    EFO_FILING_API: https://efoservices.stage.efo.fec.gov
     FEC_AGENCY_ID: FEC
     SESSION_COOKIE_AGE: 64800
     BP_PIP_VERSION: latest
     LOG_FORMAT: KEY_VALUE
+    MOCK_EFO_FILING: False
     SYSTEM_STATUS_CACHE_AGE: 60
     INITIAL_POLLING_INTERVAL: 10
     INITIAL_POLLING_DURATION: 900

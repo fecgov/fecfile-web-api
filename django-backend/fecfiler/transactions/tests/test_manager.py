@@ -60,22 +60,20 @@ class TransactionViewTestCase(TestCase):
             ScheduleA,
             self.committee,
             self.contact_1,
-            None,
-            "GENERAL",
-            {
+            group="GENERAL",
+            schedule_data={
                 "contribution_date": "2024-01-01",
                 "contribution_amount": "100.00",
             },
-            {"force_unaggregated": True},
+            transaction_data={"force_unaggregated": True},
         )
         create_test_transaction(
             "INDIVIDUAL_RECEIPT",
             ScheduleA,
             self.committee,
             self.contact_1,
-            None,
-            "GENERAL",
-            {
+            group="GENERAL",
+            schedule_data={
                 "contribution_date": "2024-01-02",
                 "contribution_amount": "200.00",
             },
