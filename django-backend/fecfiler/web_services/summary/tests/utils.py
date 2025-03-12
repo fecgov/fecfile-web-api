@@ -4,6 +4,7 @@ from fecfiler.transactions.tests.utils import (
     create_schedule_a,
     create_loan,
     create_debt,
+    create_schedule_f,
 )
 from fecfiler.reports.tests.utils import create_form3x
 from datetime import datetime
@@ -763,3 +764,20 @@ def gen_schedule_e(transaction_data, f3x, committee, contact, candidate):
             data["memo_code"],
         )
         sche.reports.add(f3x)
+
+
+def gen_schedule_f(transaction_data, f3x, committee, contact):
+    for data in transaction_data:
+        schf = create_schedule_f(
+            data["type"],
+            committee,
+            contact,
+            data["date"],
+            data["amount"],
+            data["group"],
+            data["form_type"],
+            data["memo_code"],
+        )
+
+        schf.reports.add(f3x)
+        schf.save()
