@@ -8,6 +8,13 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunSQL(
+            """
+            DROP FUNCTION IF EXISTS calculate_entity_aggregates;
+            DROP FUNCTION IF EXISTS calculate_calendar_ytd_per_election_office;
+            DROP FUNCTION IF EXISTS calculate_aggregates;
+            """
+        ),
         migrations.RunSQL("""
 CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
     txn RECORD, sql_committee_id text, old_date date, new_date date
@@ -32,8 +39,8 @@ BEGIN
         WHERE
             id = txn.schedule_b_id;
     END IF;
-	
-	SELECT MIN(old_date, new_date) INTO earlier_date;
+
+    SELECT LEAST(old_date, new_date) INTO earlier_date;
 
     EXECUTE '
         UPDATE transactions_transaction AS t
@@ -136,7 +143,7 @@ BEGIN
     FROM transactions_schedulee
     WHERE id = txn.schedule_e_id;
 	
-	SELECT MIN(old_date, new_date) INTO earlier_date;
+    SELECT LEAST(old_date, new_date) INTO earlier_date;
 
     SELECT
         candidate_office,
@@ -245,42 +252,42 @@ BEGIN
 
     IF OLD.schedule_a_id IS NOT NULL THEN
         SELECT
-            COALESCE(contribution_date, '') INTO old_date
+            contribution_date INTO old_date
         FROM
             transactions_schedulea
         WHERE
             id = OLD.schedule_a_id;
     ELSIF OLD.schedule_b_id IS NOT NULL THEN
         SELECT
-            COALESCE(expenditure_date, '') INTO old_date
+            expenditure_date INTO old_date
         FROM
             transactions_scheduleb
         WHERE
             id = OLD.schedule_b_id;
     ELSIF OLD.schedule_e_id IS NOT NULL THEN
         SELECT
-            COALESCE(disbursement_date, dissemination_date, '') INTO old_date
+            COALESCE(disbursement_date, dissemination_date) INTO old_date
         FROM transactions_schedulee
         WHERE id = OLD.schedule_e_id;
     END IF;
 
     IF NEW.schedule_a_id IS NOT NULL THEN
         SELECT
-            COALESCE(contribution_date, '') INTO new_date
+            contribution_date INTO new_date
         FROM
             transactions_schedulea
         WHERE
             id = NEW.schedule_a_id;
     ELSIF NEW.schedule_b_id IS NOT NULL THEN
         SELECT
-            COALESCE(expenditure_date, '') INTO new_date
+            expenditure_date INTO new_date
         FROM
             transactions_scheduleb
         WHERE
             id = NEW.schedule_b_id;
     ELSIF NEW.schedule_e_id IS NOT NULL THEN
         SELECT
-            COALESCE(disbursement_date, dissemination_date, '') INTO new_date
+            COALESCE(disbursement_date, dissemination_date) INTO new_date
         FROM transactions_schedulee
         WHERE id = NEW.schedule_e_id;
     END IF;
@@ -317,4 +324,101 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 """
-        )]
+        ),
+        migrations.RunSQL(
+"""
+CREATE OR REPLACE FUNCTION calculate_aggregates(
+    OLD RECORD,
+    NEW RECORD,
+    TG_OP TEXT
+)
+RETURNS RECORD AS $$
+DECLARE
+    sql_committee_id TEXT;
+    new_date DATE;
+    old_date DATE;
+BEGIN
+    sql_committee_id := REPLACE(NEW.committee_account_id::TEXT, '-', '_');
+
+    -- If schedule_c2_id or schedule_d_id is not null, stop processing
+    IF NEW.schedule_c2_id IS NOT NULL OR NEW.schedule_d_id IS NOT NULL
+    THEN
+        RETURN NEW;
+    END IF;
+
+    IF OLD.schedule_a_id IS NOT NULL THEN
+        SELECT
+            contribution_date INTO old_date
+        FROM
+            transactions_schedulea
+        WHERE
+            id = OLD.schedule_a_id;
+    ELSIF OLD.schedule_b_id IS NOT NULL THEN
+        SELECT
+            expenditure_date INTO old_date
+        FROM
+            transactions_scheduleb
+        WHERE
+            id = OLD.schedule_b_id;
+    ELSIF OLD.schedule_e_id IS NOT NULL THEN
+        SELECT
+            COALESCE(disbursement_date, dissemination_date) INTO old_date
+        FROM transactions_schedulee
+        WHERE id = OLD.schedule_e_id;
+    END IF;
+
+    IF NEW.schedule_a_id IS NOT NULL THEN
+        SELECT
+            contribution_date INTO new_date
+        FROM
+            transactions_schedulea
+        WHERE
+            id = NEW.schedule_a_id;
+    ELSIF NEW.schedule_b_id IS NOT NULL THEN
+        SELECT
+            expenditure_date INTO new_date
+        FROM
+            transactions_scheduleb
+        WHERE
+            id = NEW.schedule_b_id;
+    ELSIF NEW.schedule_e_id IS NOT NULL THEN
+        SELECT
+            COALESCE(disbursement_date, dissemination_date) INTO new_date
+        FROM transactions_schedulee
+        WHERE id = NEW.schedule_e_id;
+    END IF;
+
+    IF NEW.schedule_a_id IS NOT NULL OR NEW.schedule_b_id IS NOT NULL
+    THEN
+        PERFORM calculate_entity_aggregates(NEW, sql_committee_id, old_date, new_date);
+        IF TG_OP = 'UPDATE'
+            AND NEW.contact_1_id <> OLD.contact_1_id
+        THEN
+            PERFORM calculate_entity_aggregates(OLD, sql_committee_id, old_date, new_date);
+        END IF;
+    END IF;
+
+    IF NEW.schedule_c_id IS NOT NULL
+        OR NEW.schedule_c1_id IS NOT NULL
+        OR NEW.transaction_type_identifier = 'LOAN_REPAYMENT_MADE'
+    THEN
+        PERFORM calculate_loan_payment_to_date(NEW, sql_committee_id);
+    END IF;
+
+    IF NEW.schedule_e_id IS NOT NULL
+    THEN
+        PERFORM calculate_calendar_ytd_per_election_office(
+            NEW, sql_committee_id, old_date, new_date);
+        IF TG_OP = 'UPDATE'
+        THEN
+            PERFORM calculate_calendar_ytd_per_election_office(
+                OLD, sql_committee_id, old_date, new_date);
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+"""
+        )
+    ]
