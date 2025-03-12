@@ -234,6 +234,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 Q(contact_2__candidate_state=state),
                 Q(contact_2__candidate_district=district),
             )
+        if transaction_id:
+            transaction = self.get_queryset().get(id=transaction_id)
+            query = query.filter(
+                Q(created__lt=transaction.created) | ~Q(date=date)
+            )
+
         query = query.order_by("-date", "-created")
         previous_transaction = query.first()
 
