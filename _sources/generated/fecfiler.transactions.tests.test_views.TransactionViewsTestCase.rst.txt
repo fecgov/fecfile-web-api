@@ -131,6 +131,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.test_destroy_with_dependent_parent
       ~TransactionViewsTestCase.test_get_previous_election
       ~TransactionViewsTestCase.test_get_previous_entity
+      ~TransactionViewsTestCase.test_get_previous_entity_same_day
       ~TransactionViewsTestCase.test_get_queryset
       ~TransactionViewsTestCase.test_inherited_election_aggregate
       ~TransactionViewsTestCase.test_multi_sorting
