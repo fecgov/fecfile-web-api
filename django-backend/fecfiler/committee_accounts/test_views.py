@@ -1,4 +1,6 @@
 from uuid import UUID
+from rest_framework.status import HTTP_400_BAD_REQUEST
+from rest_framework.test import APIClient
 from django.test import RequestFactory, TestCase
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.committee_accounts.views import (
@@ -20,6 +22,12 @@ class CommitteeMemberViewSetTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
         self.factory = RequestFactory()
+        self.committee = CommitteeAccount.objects.filter(
+            id="11111111-2222-3333-4444-555555555555"
+        ).first()
+
+        client = APIClient()
+        client.force_authenticate(user=self.user)
 
     def tearDown(self):
         Membership.objects.all().delete()
@@ -27,6 +35,31 @@ class CommitteeMemberViewSetTest(TestCase):
         CommitteeAccount.objects.all().delete()
 
     def test_remove_member(self):
+        manager = User.objects.create_user(
+            email="admin1@admin.com", user_id="5e3c145f-a813-46c7-af5a-5739304acc27"
+        )
+        manager_membership = Membership.objects.create(
+            user=manager,
+            role=Membership.CommitteeRole.MANAGER,
+            committee_account=self.committee,
+        )
+        view = CommitteeMembershipViewSet()
+        request = self.factory.get(
+            f"/api/v1/committee-members/{manager_membership.id}/remove-member"
+        )
+        request.user = self.user
+        request.session = {
+            "committee_uuid": self.committee.id,
+            "committee_id": self.committee.committee_id,
+        }
+        request.method = "DELETE"
+        request.query_params = dict()
+        view.kwargs = {"pk": manager_membership.id}
+        view.request = request
+        response = view.remove_member(request, manager_membership.id)
+        self.assertEqual(response.status_code, 200)
+
+    def test_cannot_delete_self(self):
         membership_uuid = UUID("136a21f2-66fe-4d56-89e9-0d1d4612741c")
         view = CommitteeMembershipViewSet()
         request = self.factory.get(
@@ -34,23 +67,26 @@ class CommitteeMemberViewSetTest(TestCase):
         )
         request.user = self.user
         request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
+            "committee_uuid": self.committee.id,
+            "committee_id": self.committee.committee_id,
         }
         request.method = "DELETE"
         request.query_params = dict()
         view.kwargs = {"pk": membership_uuid}
         view.request = request
         response = view.remove_member(request, membership_uuid)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data["error"], "You cannot remove yourself from the committee."
+        )
 
     def test_add_pending_membership(self):
         view = CommitteeMembershipViewSet()
         request = self.factory.get("/api/v1/committee-members/add-member")
         request.user = self.user
         request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
+            "committee_uuid": self.committee.id,
+            "committee_id": self.committee.committee_id,
         }
         request.method = "POST"
         request.data = {
@@ -75,8 +111,8 @@ class CommitteeMemberViewSetTest(TestCase):
         request = self.factory.get("/api/v1/committee-members/add-member")
         request.user = self.user
         request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
+            "committee_uuid": self.committee.id,
+            "committee_id": self.committee.committee_id,
         }
         request.method = "POST"
         request.data = {
@@ -98,8 +134,8 @@ class CommitteeMemberViewSetTest(TestCase):
         request = self.factory.get("/api/v1/committee-members/add-member")
         request.user = self.user
         request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
+            "committee_uuid": self.committee.id,
+            "committee_id": self.committee.committee_id,
         }
         request.method = "POST"
         request.data = {
@@ -118,8 +154,8 @@ class CommitteeMemberViewSetTest(TestCase):
         request = self.factory.get("/api/v1/committee-members/add-member")
         request.user = self.user
         request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
+            "committee_uuid": self.committee.id,
+            "committee_id": self.committee.committee_id,
         }
         request.method = "POST"
 
