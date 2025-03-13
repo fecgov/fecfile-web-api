@@ -684,6 +684,82 @@ def generate_data(committee, contact, f3x, schedules):
         ]
 
         gen_schedule_e(sch_e_transactions, other_f3x, committee, contact, candidate)
+
+    if "f" in schedules:
+        sch_f_transactions = [
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": 65,
+                "designated_filer": False,
+                "aggregate_expended": "65.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": False,
+            },
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": 15,
+                "designated_filer": False,
+                "aggregate_expended": "80.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": False,
+            },
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": 20,
+                "designated_filer": False,
+                "aggregate_expended": "100.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": True,
+            },
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE_VOID",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": 70,
+                "designated_filer": False,
+                "aggregate_expended": "10.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": False,
+            },
+        ]
+        gen_schedule_f(sch_f_transactions, f3x, committee, contact)
+
+        sch_f_transactions = [
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": 50,
+                "designated_filer": False,
+                "aggregate_expended": "50.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": False,
+            },
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE_VOID",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": 10,
+                "designated_filer": False,
+                "aggregate_expended": "40.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": False,
+            },
+        ]
+        gen_schedule_f(sch_f_transactions, other_f3x, committee, contact)
+
     return debt
 
 
@@ -772,11 +848,18 @@ def gen_schedule_f(transaction_data, f3x, committee, contact):
             data["type"],
             committee,
             contact,
-            data["date"],
-            data["amount"],
-            data["group"],
-            data["form_type"],
+            "GENERAL"
+            "SF",
             data["memo_code"],
+            {
+                "expenditure_date": data["expenditure_date"],
+                "expenditure_amount": data["expenditure_amount"],
+                "filer_designated_to_make_coordinated_expenditures": data["designated_filer"],
+                "aggregate_general_elec_expended": data["aggregate_expended"],
+                "expenditure_purpose_descrip": data["expenditure_purpose"],
+                "category_code": data["category_code"],
+                "memo_text_description": data["memo_text"],
+            },
         )
 
         schf.reports.add(f3x)
