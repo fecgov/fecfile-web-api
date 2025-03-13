@@ -206,12 +206,14 @@ def is_production_efo_pty(committee_data):
     designation = committee_data.get("designation", None)
     committee_type = committee_data.get("committee_type", None)
     return designation is not None and (
-        committee_type == "Y" or (committee_type == "X" and designation != "U")
-    )
+        committee_type == "Y" or committee_type == "X")
 
 
 def is_production_efo_pac(committee_data):
-    return committee_data.get("committee_type") in PRODUCTION_PAC_COMMITTEE_TYPES
+    designation = committee_data.get("designation", None)
+    committee_type = committee_data.get("committee_type", None)
+    return committee_type in PRODUCTION_PAC_COMMITTEE_TYPES or (
+        committee_type == "X" and designation == "U")
 
 
 """
