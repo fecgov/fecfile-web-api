@@ -272,7 +272,7 @@ class CommitteeAccountsUtilsTest(TestCase):
                 "email": "email",
                 "committee_type": "Q",
                 "committee_type_full": "Qualified Leadership PAC",
-                "committee_designation": "D",
+                "designation": "D",
             }
             self.mock_requests_get(
                 mock_requests, self.mock_response(200, production_committee_data)
@@ -286,6 +286,31 @@ class CommitteeAccountsUtilsTest(TestCase):
             self.assertEqual(committee_account_data.get("isPTY"), False)
             self.assertEqual(committee_account_data.get("qualified"), True)
 
+    def test_get_committee_account_data_from_production_processed_pac_pty(self):
+        with (
+            patch("fecfiler.committee_accounts.utils.requests") as mock_requests,
+            patch("fecfiler.committee_accounts.utils.settings") as settings,
+        ):
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
+            production_committee_data = {
+                "committee_id": "C12345678",
+                "email": "email",
+                "committee_type": "X",
+                "committee_type_full": "Party - Non-qualified",
+                "designation": "U",
+            }
+            self.mock_requests_get(
+                mock_requests, self.mock_response(200, production_committee_data)
+            )
+            committee_account_data = get_committee_account_data("C12345678")
+            self.assertEqual(
+                committee_account_data.get("committee_type_label"),
+                "Party - Non-qualified",
+            )
+            self.assertEqual(committee_account_data.get("isPAC"), True)
+            self.assertEqual(committee_account_data.get("isPTY"), True)
+            self.assertEqual(committee_account_data.get("qualified"), False)
+
     def test_get_committee_account_data_from_production_raw(self):
         with (
             patch("fecfiler.committee_accounts.utils.requests") as mock_requests,
@@ -296,7 +321,7 @@ class CommitteeAccountsUtilsTest(TestCase):
                 "committee_id": "C12345678",
                 "email": "email",
                 "committee_type": "D",
-                "committee_designation": "D",
+                "designation": "D",
             }
             # no response in processed endpoint and data in raw endpoint
             self.mock_requests_get(
