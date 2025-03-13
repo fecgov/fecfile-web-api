@@ -241,12 +241,10 @@ def create_schedule_f(
     contact_3: Contact | None,
     contact_4: Contact | None,
     contact_5: Contact | None,
-    date: str | datetime | None,
-    amount: str | int | float,
     group: str = "GENERAL",
     form_type: str = "SF",
     memo_code: bool = False,
-    purpose_description: str | None = None,
+    schedule_data=None,
     report: Report | None = None,
 ):
     return create_test_transaction(
@@ -260,11 +258,7 @@ def create_schedule_f(
         contact_5=contact_5,
         group=group,
         report=report,
-        schedule_data={
-            "expenditure_date": date,
-            "expenditure_amount": amount,
-            "expenditure_purpose_descrip": purpose_description,
-        },
+        schedule_data=schedule_data,
         transaction_data={
             "_form_type": form_type,
             "memo_code": memo_code,
