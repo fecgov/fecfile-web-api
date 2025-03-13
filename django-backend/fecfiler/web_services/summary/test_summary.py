@@ -30,7 +30,7 @@ class F3XReportTestCase(TestCase):
             report_code="12C",
         )
         self.debt = generate_data(
-            self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e"]
+            self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e", "f"]
         )
         summary_service = SummaryService(f3x)
         summary_a, _ = summary_service.calculate_summary_columns()
