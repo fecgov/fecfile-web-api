@@ -225,7 +225,12 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
     )
     def remove_member(self, request, pk: UUID):
         member: Membership = self.get_object()
+        committee_id = request.session["committee_id"]
         if member.user == request.user:
+            logger.info(
+                f"{request.user.email} attempted to remove themselves "
+                f"from committee {committee_id}"
+            )
             return Response(
                 {"error": "You cannot remove yourself from the committee."}, status=400
             )
@@ -233,8 +238,13 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         # Call the model's delete method (which already checks the admin count)
         try:
             member.delete()
+            logger.info(
+                f"{request.user.email} removed {member.email} "
+                f"from committee {committee_id}"
+            )
             return Response({"success": "Membership removed."})
         except ValidationError as e:
+            logger.info(f"{str(e)}")
             return Response({"error": str(e)}, status=400)
 
     def update(self, request, *args, **kwargs):
