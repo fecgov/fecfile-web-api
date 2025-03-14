@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
-from django.db.models import Q
+from django.db.models import Q, F
+from django.db.models.functions import Coalesce
 from fecfiler.transactions.transaction_dependencies import (
     update_dependent_children,
     update_dependent_parent,
@@ -135,6 +136,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 | Q(contact_2=contact_id)
                 | Q(contact_3=contact_id)
             )
+
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -274,16 +276,33 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         if transaction_data.get("form_type"):
             transaction_data["_form_type"] = transaction_data["form_type"]
 
+        # Original values used to manually trigger aggregate recalculation when the date changes
+        original_instance = None
+        original_date = None
+        original_contact_1 = None
+        original_contact_2 = None
+        original_election_code = None
+
         is_existing = "id" in transaction_data
         if is_existing:
-            transaction_instance = Transaction.objects.get(pk=transaction_data["id"])
+            original_instance = Transaction.objects.get(pk=transaction_data["id"])
+            if original_instance is not None:
+                original_date = original_instance.get_date()
+                original_contact_1 = original_instance.contact_1
+                original_contact_2 = original_instance.contact_2
+                original_election_code = getattr(
+                    original_instance.get_schedule(),
+                    "election_code",
+                    None
+                )
+
             transaction_serializer = TransactionSerializer(
-                transaction_instance,
+                original_instance,
                 data=transaction_data,
                 context={"request": request},
             )
             schedule_serializer = SCHEDULE_SERIALIZERS.get(schedule)(
-                transaction_instance.get_schedule(), data=transaction_data
+                original_instance.get_schedule(), data=transaction_data
             )
         else:
             transaction_serializer = TransactionSerializer(
@@ -366,6 +385,49 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         update_dependent_children(transaction_instance)
         delete_carried_forward_loans_if_needed(transaction_instance, committee_id)
         delete_carried_forward_debts_if_needed(transaction_instance, committee_id)
+
+        # Set the earlier date in order to detect that a transaction has moved *forward* in time
+        logger.info(f"\n\n\nORIGINAL TRANSACTION: {original_instance}")
+        logger.info(f"\nORIGINAL DATE: {original_date}")
+        if original_date and original_date < schedule_instance.get_date():
+            transactions_after_original = Transaction.objects.get_queryset().filter(
+                Q(date__year=original_date.year),
+                Q(contact_1=original_contact_1),
+                Q(date__gt=original_date)
+                | Q(date=original_date, created__gt=original_instance.created),
+            ).order_by("date")
+
+            election_entities = transactions_after_original[:0]
+            if original_contact_2 is not None:
+                election_entities = transactions_after_original.filter(
+                    Q(
+                        contact_2__candidate_district=original_contact_2.candidate_district,
+                        contact_2__candidate_office=original_contact_2.candidate_office,
+                        contact_2__candidate_state=original_contact_2.candidate_state
+                    ),
+                    ~Q(
+                        schedule_a__isnull=False, schedule_a__election_code=original_election_code
+                    ),
+                    ~Q(
+                        schedule_b__isnull=False, schedule_b__election_code=original_election_code
+                    ),
+                    ~Q(
+                        schedule_c__isnull=False, schedule_c__election_code=original_election_code
+                    ),
+                    ~Q(
+                        schedule_e__isnull=False, schedule_e__election_code=original_election_code
+                    ),
+                )
+
+            non_election_entities = transactions_after_original.difference(election_entities)
+            for_manual_recalculation = non_election_entities[:1].union(election_entities[:1])
+
+            for to_recalculate in for_manual_recalculation:
+                # By saving this transaction, we trigger aggregate recalculation
+                # on this and subsequent transactions
+                to_recalculate.save()
+            logger.info("TRANSACTION DATE CHANGE EVENT END\n\n\n")
+
         return self.queryset.get(id=transaction_instance.id)
 
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
