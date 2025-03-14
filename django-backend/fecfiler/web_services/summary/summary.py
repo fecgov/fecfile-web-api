@@ -81,6 +81,7 @@ class SummaryService:
             line_22=self.get_line("SB22"),
             line_23=self.get_line("SB23"),
             line_24=self.get_line("SE"),
+            line_25=self.get_line("SF"),
             line_26=self.get_line("SB26"),
             line_27=self.get_line("SB27"),
             line_28a=self.get_line("SB28A"),
@@ -107,7 +108,6 @@ class SummaryService:
         column_a["line_21c"] = (
             column_a["line_21ai"] + column_a["line_21aii"] + column_a["line_21b"]
         )
-        column_a["line_25"] = Decimal(0)  # Stubbed out until a future ticket
         column_a["line_28d"] = (
             column_a["line_28a"] + column_a["line_28b"] + column_a["line_28c"]
         )
