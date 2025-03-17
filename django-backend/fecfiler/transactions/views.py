@@ -7,8 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
-from django.db.models import Q, F
-from django.db.models.functions import Coalesce
+from django.db.models import Q
 from fecfiler.transactions.transaction_dependencies import (
     update_dependent_children,
     update_dependent_parent,
@@ -276,7 +275,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         if transaction_data.get("form_type"):
             transaction_data["_form_type"] = transaction_data["form_type"]
 
-        # Original values used to manually trigger aggregate recalculation when the date changes
+        # Original values used to manually trigger aggregate recalculation
         original_instance = None
         original_date = None
         original_contact_1 = None
@@ -386,7 +385,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         delete_carried_forward_loans_if_needed(transaction_instance, committee_id)
         delete_carried_forward_debts_if_needed(transaction_instance, committee_id)
 
-        # Set the earlier date in order to detect that a transaction has moved *forward* in time
+        # Set the earlier date in order to detect when a transaction has moved forward
         if original_date and original_date < schedule_instance.get_date():
             transactions_after_original = Transaction.objects.get_queryset().filter(
                 Q(date__year=original_date.year),
@@ -397,28 +396,41 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
             election_entities = transactions_after_original[:0]
             if original_contact_2 is not None:
+                # Capturing these in variables to cut down on line width
+                original_district = original_contact_2.candidate_district
+                original_office = original_contact_2.candidate_office
+                original_state = original_contact_2.candidate_state
+
                 election_entities = transactions_after_original.filter(
                     Q(
-                        contact_2__candidate_district=original_contact_2.candidate_district,
-                        contact_2__candidate_office=original_contact_2.candidate_office,
-                        contact_2__candidate_state=original_contact_2.candidate_state
+                        contact_2__candidate_district=original_district,
+                        contact_2__candidate_office=original_office,
+                        contact_2__candidate_state=original_state
                     ),
                     ~Q(
-                        schedule_a__isnull=False, schedule_a__election_code=original_election_code
+                        schedule_a__isnull=False,
+                        schedule_a__election_code=original_election_code
                     ),
                     ~Q(
-                        schedule_b__isnull=False, schedule_b__election_code=original_election_code
+                        schedule_b__isnull=False,
+                        schedule_b__election_code=original_election_code
                     ),
                     ~Q(
-                        schedule_c__isnull=False, schedule_c__election_code=original_election_code
+                        schedule_c__isnull=False,
+                        schedule_c__election_code=original_election_code
                     ),
                     ~Q(
-                        schedule_e__isnull=False, schedule_e__election_code=original_election_code
+                        schedule_e__isnull=False,
+                        schedule_e__election_code=original_election_code
                     ),
                 )
 
-            non_election_entities = transactions_after_original.difference(election_entities)
-            for_manual_recalculation = non_election_entities[:1].union(election_entities[:1])
+            non_election_entities = transactions_after_original.difference(
+                election_entities
+            )
+            for_manual_recalculation = non_election_entities[:1].union(
+                election_entities[:1]
+            )
 
             for to_recalculate in for_manual_recalculation:
                 # By saving this transaction, we trigger aggregate recalculation
