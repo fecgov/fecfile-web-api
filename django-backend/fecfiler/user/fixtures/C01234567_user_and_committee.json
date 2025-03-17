@@ -34,6 +34,23 @@
         }
     },
     {
+        "model": "user.user",
+        "pk": "fb20ffc3-285e-448e-9e56-9ca1fd43e7d3",
+        "fields": {
+            "password": "pbkdf2_sha256$260000$8lcKqWHCEOwOMqtzTV6oDr$/fvcNuEmdyOaEpKjISOJuwngn5enhl3uSaEDI7N+RNk=",
+            "is_superuser": false,
+            "email": "test3@fec.gov",
+            "username": "b8667af1-9e81-46db-b1e9-0a3479aedf08",
+            "first_name": "First3",
+            "last_name": "Last3",
+            "last_login": "2022-05-02T13:44:07.324Z",
+            "is_staff": false,
+            "is_active": true,
+            "date_joined": "2020-09-28T15:22:56.477Z",
+            "security_consent_exp_date": "2025-03-12"
+        }
+    },
+    {
         "model": "committee_accounts.CommitteeAccount",
         "pk": "11111111-2222-3333-4444-555555555555",
         "fields": {
@@ -61,6 +78,18 @@
             "role": "COMMITTEE_ADMINISTRATOR",
             "committee_account_id": "11111111-2222-3333-4444-555555555555",
             "user_id": "c5533f3f-9b00-4949-96f1-d56cfe03ceb1",
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.Membership",
+        "pk": "f99822eb-896c-433d-b2ca-8f8e2a0456e9",
+        "fields": {
+            "role": "MANAGER",
+            "committee_account_id": "11111111-2222-3333-4444-555555555555",
+            "user_id": "fb20ffc3-285e-448e-9e56-9ca1fd43e7d3",
             "pending_email": null,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z"
