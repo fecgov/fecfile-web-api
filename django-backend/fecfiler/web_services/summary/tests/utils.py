@@ -791,7 +791,7 @@ def generate_data(committee, contact, f3x, schedules):
         sch_f_transactions = [
             {
                 "type": "COORDINATED_PARTY_EXPENDITURE",
-                "expenditure_date": "2005-01-30",
+                "expenditure_date": "2005-01-01",
                 "expenditure_amount": 50,
                 "allow_filer": True,
                 "aggregate_expended": "50.00",
@@ -802,7 +802,7 @@ def generate_data(committee, contact, f3x, schedules):
             },
             {
                 "type": "COORDINATED_PARTY_EXPENDITURE_VOID",
-                "expenditure_date": "2005-01-30",
+                "expenditure_date": "2005-01-01",
                 "expenditure_amount": 10,
                 "allow_filer": True,
                 "aggregate_expended": "40.00",
