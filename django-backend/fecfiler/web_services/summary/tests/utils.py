@@ -765,13 +765,13 @@ def generate_data(committee, contact, f3x, schedules):
             {
                 "type": "COORDINATED_PARTY_EXPENDITURE_VOID",
                 "expenditure_date": "2005-01-30",
-                "expenditure_amount": 20,
+                "expenditure_amount": -20,
                 "allow_filer": True,
                 "aggregate_expended": "60.00",
                 "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
                 "category_code": "CODE",
                 "memo_text": "TEST MEMO DESCRIPTION",
-                "memo_code": True,
+                "memo_code": False,
             },
             {
                 "type": "COORDINATED_PARTY_EXPENDITURE",
@@ -783,6 +783,17 @@ def generate_data(committee, contact, f3x, schedules):
                 "category_code": "CODE",
                 "memo_text": "TEST MEMO DESCRIPTION",
                 "memo_code": False,
+            },
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": 17,
+                "allow_filer": True,
+                "aggregate_expended": "150.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": True,
             },
         ]
         gen_schedule_f(sch_f_transactions, f3x, committee, contact,
@@ -803,7 +814,7 @@ def generate_data(committee, contact, f3x, schedules):
             {
                 "type": "COORDINATED_PARTY_EXPENDITURE_VOID",
                 "expenditure_date": "2005-01-30",
-                "expenditure_amount": 10,
+                "expenditure_amount": -10,
                 "allow_filer": True,
                 "aggregate_expended": "40.00",
                 "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
