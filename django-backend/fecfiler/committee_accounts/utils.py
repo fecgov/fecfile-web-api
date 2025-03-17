@@ -184,15 +184,13 @@ def get_raw_committee_data(committee_id):
 
     if committee_data:
         """For now we're just using the same logic as alpha"""
-        committee_data["isPTY"] = is_test_efo_pty(committee_data)
-        committee_data["isPAC"] = not committee_data["isPTY"]
+        committee_data["isPTY"] = True
+        committee_data["isPAC"] = True
 
         # Committee type label
-        committee_data["committee_type_label"] = (
-            f'{"Party" if committee_data["isPTY"] else "PAC"} - Qualified - Unauthorized'
-        )
+        committee_data["committee_type_label"] = "Non-qualified"
         # Qualified
-        committee_data["qualified"] = True
+        committee_data["qualified"] = False
 
         # Filing Frequency
         committee_data["filing_frequency"] = "Q"
@@ -206,12 +204,14 @@ def is_production_efo_pty(committee_data):
     designation = committee_data.get("designation", None)
     committee_type = committee_data.get("committee_type", None)
     return designation is not None and (
-        committee_type == "Y" or (committee_type == "X" and designation != "U")
-    )
+        committee_type == "Y" or committee_type == "X")
 
 
 def is_production_efo_pac(committee_data):
-    return committee_data.get("committee_type") in PRODUCTION_PAC_COMMITTEE_TYPES
+    designation = committee_data.get("designation", None)
+    committee_type = committee_data.get("committee_type", None)
+    return committee_type in PRODUCTION_PAC_COMMITTEE_TYPES or (
+        committee_type == "X" and designation == "U")
 
 
 """
@@ -291,6 +291,7 @@ def get_mocked_committee_data(committee_id):
             ),
             None,
         )
+
         return committee
 
 
