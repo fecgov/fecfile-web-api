@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameField(
-            model_name="ScheduleF",
+            model_name="schedulef",
             old_name="filer_designated_to_make_coordianted_expenditures",
             new_name="filer_designated_to_make_coordinated_expenditures",
         ),
