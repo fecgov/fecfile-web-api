@@ -765,7 +765,7 @@ def generate_data(committee, contact, f3x, schedules):
             {
                 "type": "COORDINATED_PARTY_EXPENDITURE_VOID",
                 "expenditure_date": "2005-01-30",
-                "expenditure_amount": 20,
+                "expenditure_amount": -20,
                 "allow_filer": True,
                 "aggregate_expended": "60.00",
                 "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
@@ -803,7 +803,7 @@ def generate_data(committee, contact, f3x, schedules):
             {
                 "type": "COORDINATED_PARTY_EXPENDITURE_VOID",
                 "expenditure_date": "2005-01-01",
-                "expenditure_amount": 10,
+                "expenditure_amount": -10,
                 "allow_filer": True,
                 "aggregate_expended": "40.00",
                 "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
