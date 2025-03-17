@@ -387,8 +387,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         delete_carried_forward_debts_if_needed(transaction_instance, committee_id)
 
         # Set the earlier date in order to detect that a transaction has moved *forward* in time
-        logger.info(f"\n\n\nORIGINAL TRANSACTION: {original_instance}")
-        logger.info(f"\nORIGINAL DATE: {original_date}")
         if original_date and original_date < schedule_instance.get_date():
             transactions_after_original = Transaction.objects.get_queryset().filter(
                 Q(date__year=original_date.year),
@@ -426,7 +424,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 # By saving this transaction, we trigger aggregate recalculation
                 # on this and subsequent transactions
                 to_recalculate.save()
-            logger.info("TRANSACTION DATE CHANGE EVENT END\n\n\n")
 
         return self.queryset.get(id=transaction_instance.id)
 

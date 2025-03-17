@@ -52,7 +52,15 @@ class TransactionViewsTestCase(TestCase):
             "last name", "First name", self.committee.id, "H8MA03131", "S", "AK", "01"
         )
         self.contact_3 = create_test_individual_contact(
-            "last name", "First name", self.committee.id,
+            "last name",
+            "First name",
+            self.committee.id,
+            {
+                "street_1":"Test St",
+                "city":"Testville",
+                "state":"IL",
+                "zip":"12345"
+            }
         )
         self.transaction = create_ie(
             self.committee,
@@ -347,6 +355,33 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(response.data['id'], str(second_transaction.id))
         self.assertEqual(response.data['aggregate'], '47.00')
+
+        transaction_data = {
+            **self.transaction_serializer.to_representation(first_transaction),
+            **{
+                "contribution_date": "2023-01-15",
+                "schedule_id": "A",
+                "schema_name": "INDIVIDUAL_RECEIPT",
+                "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
+            },
+        }
+
+        """
+        'form_type': [ErrorDetail(string="'SA11I' is not one of ['SA11AI', 'SA11AII']", code='invalid')],
+        'transaction_type_identifier': [ErrorDetail(string="'INDIVIDUAL_RECEIPT' was expected", code='invalid')],
+        'contributor_street_1': [ErrorDetail(string="None is not of type 'string'", code='invalid')],
+        'contributor_city': [ErrorDetail(string="None is not of type 'string'", code='invalid')],
+        'contributor_state': [ErrorDetail(string="None is not of type 'string'", code='invalid')],
+        'contributor_zip': [ErrorDetail(string="None is not of type 'string'", code='invalid')]
+        """
+
+        view_set.save_transaction(
+            transaction_data,
+            view_set.request
+        )
+
+        saved_transaction = view_set.get_queryset().get(id=first_transaction.id)
+        self.assertEqual(str(saved_transaction.aggregate), '200.00')
 
     def test_get_previous_election(self):
         view_set = TransactionViewSet()
