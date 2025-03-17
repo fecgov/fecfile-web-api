@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "filer_designated_to_make_coordinated_expenditures",
+                    "filer_designated_to_make_coordianted_expenditures",
                     models.BooleanField(blank=True, null=True),
                 ),
                 ("expenditure_date", models.DateField(blank=True, null=True)),
