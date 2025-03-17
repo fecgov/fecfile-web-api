@@ -21,7 +21,7 @@ defaults: &defaults
     STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
     EFO_FILING_API: https://efoservices.fec.gov
     FEC_AGENCY_ID: FEC
-    SESSION_COOKIE_AGE: 64800
+    SESSION_COOKIE_AGE: 3600  # Value in seconds (1 hour)
     BP_PIP_VERSION: latest
     LOG_FORMAT: KEY_VALUE
     MOCK_EFO_FILING: False

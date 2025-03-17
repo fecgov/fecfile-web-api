@@ -796,13 +796,21 @@ def generate_data(committee, contact, f3x, schedules):
                 "memo_code": True,
             },
         ]
-        gen_schedule_f(sch_f_transactions, f3x, committee, contact,
-                       contact_2, contact_3, contact_4, contact_5)
+        gen_schedule_f(
+            sch_f_transactions,
+            f3x,
+            committee,
+            contact,
+            contact_2,
+            contact_3,
+            contact_4,
+            contact_5,
+        )
 
         sch_f_transactions = [
             {
                 "type": "COORDINATED_PARTY_EXPENDITURE",
-                "expenditure_date": "2005-01-30",
+                "expenditure_date": "2005-01-01",
                 "expenditure_amount": 50,
                 "allow_filer": True,
                 "aggregate_expended": "50.00",
@@ -813,7 +821,7 @@ def generate_data(committee, contact, f3x, schedules):
             },
             {
                 "type": "COORDINATED_PARTY_EXPENDITURE_VOID",
-                "expenditure_date": "2005-01-30",
+                "expenditure_date": "2005-01-01",
                 "expenditure_amount": -10,
                 "allow_filer": True,
                 "aggregate_expended": "40.00",
@@ -823,8 +831,16 @@ def generate_data(committee, contact, f3x, schedules):
                 "memo_code": False,
             },
         ]
-        gen_schedule_f(sch_f_transactions, other_f3x, committee, contact,
-                       contact_2, contact_3, contact_4, contact_5)
+        gen_schedule_f(
+            sch_f_transactions,
+            other_f3x,
+            committee,
+            contact,
+            contact_2,
+            contact_3,
+            contact_4,
+            contact_5,
+        )
 
     return debt
 
@@ -908,8 +924,16 @@ def gen_schedule_e(transaction_data, f3x, committee, contact, candidate):
         sche.reports.add(f3x)
 
 
-def gen_schedule_f(transaction_data, f3x, committee, contact_1,
-                   contact_2, contact_3, contact_4, contact_5):
+def gen_schedule_f(
+    transaction_data,
+    f3x,
+    committee,
+    contact_1,
+    contact_2,
+    contact_3,
+    contact_4,
+    contact_5,
+):
     for data in transaction_data:
         schf = create_schedule_f(
             data["type"],
