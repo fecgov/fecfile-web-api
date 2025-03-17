@@ -56,10 +56,10 @@ class TransactionViewsTestCase(TestCase):
             "First name",
             self.committee.id,
             {
-                "street_1":"Test St",
-                "city":"Testville",
-                "state":"IL",
-                "zip":"12345"
+                "street_1": "Test St",
+                "city": "Testville",
+                "state": "IL",
+                "zip": "12345"
             }
         )
         self.transaction = create_ie(

@@ -35,7 +35,7 @@ class ScheduleB(models.Model):
 
     def get_transaction(self):
         return self.transaction_set.first()
-    
+
     def get_date(self):
         return self.expenditure_date
 
