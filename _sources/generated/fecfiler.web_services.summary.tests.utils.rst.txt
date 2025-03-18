@@ -22,6 +22,7 @@ fecfiler.web\_services.summary.tests.utils
       gen_schedule_c
       gen_schedule_d
       gen_schedule_e
+      gen_schedule_f
       generate_data
    
    
