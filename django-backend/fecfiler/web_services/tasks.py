@@ -1,6 +1,5 @@
 from datetime import datetime
 import math
-import json
 from celery import shared_task
 from fecfiler.web_services.models import (
     BaseSubmission,
