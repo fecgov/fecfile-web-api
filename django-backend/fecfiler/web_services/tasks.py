@@ -1,7 +1,9 @@
 from datetime import datetime
 import math
+import json
 from celery import shared_task
 from fecfiler.web_services.models import (
+    BaseSubmission,
     DotFEC,
     UploadSubmission,
     WebPrintSubmission,
@@ -277,11 +279,16 @@ def calculate_polling_interval(attempts):
         raise ValueError("Polling attempts exceeded the maximum allowed.")
 
 
-def resolve_final_submission_state(submission):
+def resolve_final_submission_state(submission: BaseSubmission):
     new_state = (
         FECSubmissionState.SUCCEEDED
         if submission.fec_status in [FECStatus.COMPLETED.value, FECStatus.ACCEPTED.value]
         else FECSubmissionState.FAILED
     )
+
     submission.save_state(new_state)
+
+    if new_state == FECSubmissionState.FAILED:
+        submission.log_submission_failure_state()
+
     return submission.id
