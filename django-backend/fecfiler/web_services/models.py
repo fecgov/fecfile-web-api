@@ -158,14 +158,14 @@ class BaseSubmission(models.Model):
         if self.dot_fec is not None:
             file_name = self.dot_fec.file_name
             if self.dot_fec.report is not None:
-                report_id = self.dot_fec.report.id
+                report_id = str(self.dot_fec.report.id)
                 if self.dot_fec.report.committee_account is not None:
-                    committee_uuid = self.dot_fec.report.committee_account.id
+                    committee_uuid = str(self.dot_fec.report.committee_account.id)
 
         submission_state = {"efo_submission_failure": {
             "submission_id": str(self.id),
-            "report_id": str(report_id),
-            "committee_uuid": str(committee_uuid),
+            "report_id": report_id,
+            "committee_uuid": committee_uuid,
             "dot_fec_filename": file_name,
             "fecfile_task_state": self.fecfile_task_state,
             "fecfile_polling_attempts": self.fecfile_polling_attempts,
