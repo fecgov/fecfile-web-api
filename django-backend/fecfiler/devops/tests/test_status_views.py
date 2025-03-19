@@ -12,7 +12,6 @@ from ..utils.redis_utils import (
 )
 from fecfiler.settings import SYSTEM_STATUS_CACHE_AGE
 import json
-from unittest.mock import patch
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
