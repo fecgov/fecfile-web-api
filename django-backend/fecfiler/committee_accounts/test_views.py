@@ -10,6 +10,7 @@ from fecfiler.user.models import User
 from unittest.mock import Mock, patch
 from fecfiler.routers import get_all_routers
 import structlog
+from rest_framework.test import force_authenticate
 
 logger = structlog.get_logger(__name__)
 
@@ -154,6 +155,69 @@ class CommitteeMemberViewSetTest(TestCase):
             response.data,
             "This email is taken by an existing membership to this committee",
         )
+
+    def test_update_membership_unauthorized(self):
+        request = self.factory.put(
+            "/api/v1/committee-members/5e4ae4ff-60da-4522-a588-ccd97e124b01/",
+            {
+                "id": "5e4ae4ff-60da-4522-a588-ccd97e124b01",
+                "email": "test2@fec.gov",
+                "username": "",
+                "first_name": "",
+                "last_name": "",
+                "role": "MANAGER",
+                "is_active": "true",
+                "committee_account": "11111111-2222-3333-4444-555555555555",
+                "created": "2025-03-06T15:27:17.313246-05:00",
+                "updated": "2025-03-06T15:27:17.313259-05:00",
+                "name": "",
+            },
+            "application/json",
+        )
+        request.session = {
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
+        }
+        unauthorized_user = User.objects.get(id="fb20ffc3-285e-448e-9e56-9ca1fd43e7d3")
+        force_authenticate(request, unauthorized_user)
+        response = CommitteeMembershipViewSet.as_view({"put": "update"})(
+            request, pk="5e4ae4ff-60da-4522-a588-ccd97e124b01"
+        )
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(
+            response.data, "You don't have permission to perform this action."
+        )
+
+    def test_update_membership_happy_path(self):
+        request = self.factory.put(
+            "/api/v1/committee-members/5e4ae4ff-60da-4522-a588-ccd97e124b01/",
+            {
+                "id": "5e4ae4ff-60da-4522-a588-ccd97e124b01",
+                "email": "test2@fec.gov",
+                "username": "",
+                "first_name": "",
+                "last_name": "",
+                "role": "MANAGER",
+                "is_active": "true",
+                "committee_account": "11111111-2222-3333-4444-555555555555",
+                "created": "2025-03-06T15:27:17.313246-05:00",
+                "updated": "2025-03-06T15:27:17.313259-05:00",
+                "name": "",
+            },
+            "application/json",
+        )
+        request.session = {
+            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
+            "committee_id": "C01234567",
+        }
+        force_authenticate(request, self.user)
+        response = CommitteeMembershipViewSet.as_view({"put": "update"})(
+            request, pk="5e4ae4ff-60da-4522-a588-ccd97e124b01"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["email"], "test2@fec.gov")
+        self.assertEqual(response.data["is_active"], True)
+        self.assertEqual(response.data["role"], Membership.CommitteeRole.MANAGER)
 
 
 class CommitteeViewSetTest(TestCase):
