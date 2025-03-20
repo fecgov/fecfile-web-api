@@ -36,6 +36,7 @@ fecfiler.web\_services.models.UploadSubmission
       ~UploadSubmission.get_next_by_updated
       ~UploadSubmission.get_previous_by_created
       ~UploadSubmission.get_previous_by_updated
+      ~UploadSubmission.log_submission_failure_state
       ~UploadSubmission.mark_task_completed
       ~UploadSubmission.prepare_database_save
       ~UploadSubmission.refresh_from_db
