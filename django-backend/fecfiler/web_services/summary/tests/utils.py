@@ -4,10 +4,15 @@ from fecfiler.transactions.tests.utils import (
     create_schedule_a,
     create_loan,
     create_debt,
+    create_schedule_f,
 )
 from fecfiler.reports.tests.utils import create_form3x
 from datetime import datetime
 from fecfiler.contacts.models import Contact
+from fecfiler.contacts.tests.utils import (
+    create_test_committee_contact,
+    create_test_candidate_contact,
+)
 
 sc10 = "SC/10"
 
@@ -683,6 +688,160 @@ def generate_data(committee, contact, f3x, schedules):
         ]
 
         gen_schedule_e(sch_e_transactions, other_f3x, committee, contact, candidate)
+
+    if "f" in schedules:
+        contact_2 = create_test_candidate_contact(
+            "candidate last name",
+            "candidate first name",
+            committee.id,
+            "H8MA03131",
+            "S",
+            "AK",
+            "01",
+            {
+                "street_1": "candidate Steet 1",
+                "street_2": "candidate Steet 2",
+                "city": "candidate City",
+                "state": "candidate State",
+                "zip": "candidate Zip",
+                "middle_name": "candidate middle name",
+                "prefix": "candidate Sir",
+                "suffix": "candidate jr",
+            },
+        )
+        contact_3 = create_test_committee_contact(
+            "Candidate Committee",
+            "C87654321",
+            committee.id,
+            {
+                "street_1": "Candidate Committee Steet 1",
+                "street_2": "Candidate Committee Steet 2",
+                "city": "Candidate Committee City",
+                "state": "Candidate Committee State",
+                "zip": "Candidate Committee Zip",
+            },
+        )
+        contact_4 = create_test_committee_contact(
+            "Designating Committee",
+            "C12345678",
+            committee.id,
+        )
+        contact_5 = create_test_committee_contact(
+            "Subordinate Committee",
+            "C55555555",
+            committee.id,
+            {
+                "street_1": "Subordinate Committee Steet 1",
+                "street_2": "Subordinate Committee Steet 2",
+                "city": "Subordinate Committee City",
+                "state": "Subordinate Committee State",
+                "zip": "Subordinate Committee Zip",
+            },
+        )
+
+        sch_f_transactions = [
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": 65,
+                "allow_filer": True,
+                "aggregate_expended": "65.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": False,
+            },
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": 15,
+                "allow_filer": True,
+                "aggregate_expended": "80.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": False,
+            },
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE_VOID",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": -20,
+                "allow_filer": True,
+                "aggregate_expended": "60.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": False,
+            },
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": 73,
+                "allow_filer": True,
+                "aggregate_expended": "133.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": False,
+            },
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE",
+                "expenditure_date": "2005-01-30",
+                "expenditure_amount": 17,
+                "allow_filer": True,
+                "aggregate_expended": "150.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": True,
+            },
+        ]
+        gen_schedule_f(
+            sch_f_transactions,
+            f3x,
+            committee,
+            contact,
+            contact_2,
+            contact_3,
+            contact_4,
+            contact_5,
+        )
+
+        sch_f_transactions = [
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE",
+                "expenditure_date": "2005-01-01",
+                "expenditure_amount": 50,
+                "allow_filer": True,
+                "aggregate_expended": "50.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": False,
+            },
+            {
+                "type": "COORDINATED_PARTY_EXPENDITURE_VOID",
+                "expenditure_date": "2005-01-01",
+                "expenditure_amount": -10,
+                "allow_filer": True,
+                "aggregate_expended": "40.00",
+                "expenditure_purpose": "TEST PURPOSE DESCRIPTION",
+                "category_code": "CODE",
+                "memo_text": "TEST MEMO DESCRIPTION",
+                "memo_code": False,
+            },
+        ]
+        gen_schedule_f(
+            sch_f_transactions,
+            other_f3x,
+            committee,
+            contact,
+            contact_2,
+            contact_3,
+            contact_4,
+            contact_5,
+        )
+
     return debt
 
 
@@ -763,3 +922,38 @@ def gen_schedule_e(transaction_data, f3x, committee, contact, candidate):
             data["memo_code"],
         )
         sche.reports.add(f3x)
+
+
+def gen_schedule_f(
+    transaction_data,
+    f3x,
+    committee,
+    contact_1,
+    contact_2,
+    contact_3,
+    contact_4,
+    contact_5,
+):
+    for data in transaction_data:
+        schf = create_schedule_f(
+            data["type"],
+            committee,
+            contact_1,
+            contact_2,
+            contact_3,
+            contact_4,
+            contact_5,
+            memo_code=data["memo_code"],
+            schedule_data={
+                "expenditure_date": data["expenditure_date"],
+                "expenditure_amount": data["expenditure_amount"],
+                "filer_designated_to_make_coordinated_expenditures": data["allow_filer"],
+                "aggregate_general_elec_expended": data["aggregate_expended"],
+                "expenditure_purpose_descrip": data["expenditure_purpose"],
+                "category_code": data["category_code"],
+                "memo_text_description": data["memo_text"],
+            },
+        )
+
+        schf.reports.add(f3x)
+        schf.save()

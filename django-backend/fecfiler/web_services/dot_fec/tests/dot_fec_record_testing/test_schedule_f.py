@@ -115,7 +115,7 @@ class DotFECScheduleFTestCase(TestCase):
             schedule_data={
                 "expenditure_date": "2024-01-04",
                 "expenditure_amount": "250.00",
-                "filer_designated_to_make_coordianted_expenditures": True,
+                "filer_designated_to_make_coordinated_expenditures": True,
                 "aggregate_general_elec_expended": Decimal(500.00),
                 "expenditure_purpose_descrip": "TEST DESCRIP",
                 "category_code": "CODE",
@@ -152,7 +152,7 @@ class DotFECScheduleFTestCase(TestCase):
             schedule_data={
                 "expenditure_date": "2024-01-04",
                 "expenditure_amount": "250.00",
-                "filer_designated_to_make_coordianted_expenditures": True,
+                "filer_designated_to_make_coordinated_expenditures": True,
                 "aggregate_general_elec_expended": Decimal(500.00),
                 "expenditure_purpose_descrip": "TEST DESCRIP",
                 "category_code": "CODE",
@@ -190,7 +190,7 @@ class DotFECScheduleFTestCase(TestCase):
 
         self.assertEqual(
             self.split_row[
-                field_to_num["filer_designated_to_make_coordianted_expenditures"]
+                field_to_num["filer_designated_to_make_coordinated_expenditures"]
             ],
             "Y",
         )
@@ -365,7 +365,7 @@ field_to_num = {
     "transaction_id_number": 2,
     "back_reference_tran_id_number": 3,
     "back_reference_sched_name": 4,
-    "filer_designated_to_make_coordianted_expenditures": 5,
+    "filer_designated_to_make_coordinated_expenditures": 5,
     "designating_committee_id_number": 6,
     "designating_committee_name": 7,
     "subordinate_committee_id_number": 8,
