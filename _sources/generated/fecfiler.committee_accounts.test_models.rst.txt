@@ -23,6 +23,7 @@ fecfiler.committee\_accounts.test\_models
       :template: custom-class-template.rst               
    
       CommitteeAccountTestCase
+      MembershipTestCase
    
    
 

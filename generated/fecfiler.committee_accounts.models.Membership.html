@@ -70,8 +70,8 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">date_error_message</span></code>(lookup_type, field_name, ...)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">delete</span></code>([using, keep_parents])</p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.models.Membership.delete" title="fecfiler.committee_accounts.models.Membership.delete"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delete</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Prevent deletion of a COMMITTEE_ADMINISTRATOR if there are 2 or fewer on the account.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">from_db</span></code>(db, field_names, values)</p></td>
 <td><p></p></td>
@@ -214,6 +214,13 @@ of all validation errors if any occur.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.models.Membership.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.models.Membership.delete" title="Link to this definition">¶</a></dt>
+<dd><p>Prevent deletion of a COMMITTEE_ADMINISTRATOR
+if there are 2 or fewer on the account.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.committee_accounts.models.Membership.full_clean">
 <span class="sig-name descname"><span class="pre">full_clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_unique</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.models.Membership.full_clean" title="Link to this definition">¶</a></dt>
 <dd><p>Call clean_fields(), clean(), validate_unique(), and
@@ -328,6 +335,7 @@ failed.</p>
 </li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.models.Membership.clean"><code class="docutils literal notranslate"><span class="pre">Membership.clean()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.models.Membership.clean_fields"><code class="docutils literal notranslate"><span class="pre">Membership.clean_fields()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.models.Membership.delete"><code class="docutils literal notranslate"><span class="pre">Membership.delete()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.models.Membership.full_clean"><code class="docutils literal notranslate"><span class="pre">Membership.full_clean()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.models.Membership.get_deferred_fields"><code class="docutils literal notranslate"><span class="pre">Membership.get_deferred_fields()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.models.Membership.refresh_from_db"><code class="docutils literal notranslate"><span class="pre">Membership.refresh_from_db()</span></code></a></li>
