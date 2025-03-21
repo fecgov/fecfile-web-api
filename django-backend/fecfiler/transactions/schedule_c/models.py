@@ -29,5 +29,8 @@ class ScheduleC(models.Model):
     def get_transaction(self):
         return self.transaction_set.first()
 
+    def get_date(self):
+        return self.loan_incurred_date
+
     class Meta:
         app_label = "transactions"

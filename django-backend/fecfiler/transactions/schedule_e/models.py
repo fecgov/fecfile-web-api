@@ -33,5 +33,11 @@ class ScheduleE(models.Model):
     def get_transaction(self):
         return self.transaction_set.first()
 
+    def get_date(self):
+        if self.disbursement_date is not None:
+            return self.disbursement_date
+        else:
+            return self.dissemination_date
+
     class Meta:
         app_label = "transactions"

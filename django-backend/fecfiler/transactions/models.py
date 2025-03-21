@@ -222,6 +222,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             if getattr(self, schedule_key, None):
                 return getattr(self, schedule_key)
 
+    def get_date(self):
+        schedule = self.get_schedule()
+        if schedule is not None:
+            return schedule.get_date()
+
     def is_loan_repayment(self):
         return self.loan is not None and self.schedule_c is None
 

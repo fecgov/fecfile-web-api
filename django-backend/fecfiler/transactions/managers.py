@@ -33,7 +33,7 @@ but are called different names"""
 class TransactionManager(SoftDeleteManager):
 
     def get_queryset(self):
-        return super().get_queryset()
+        return super().get_queryset().annotate(date=self.DATE_CLAUSE)
 
     def SCHEDULE_CLAUSE(self):  # noqa: N802
         return Case(

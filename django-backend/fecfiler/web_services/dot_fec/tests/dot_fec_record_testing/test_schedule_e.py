@@ -138,7 +138,7 @@ class DotFECScheduleETestCase(TestCase):
 
     def test_back_reference(self):
         self.assertEqual(self.split_row[3], self.transaction.transaction_id)
-        self.assertEqual(self.split_row[4], "SA11I")
+        self.assertEqual(self.split_row[4], "SA11AI")
 
     def test_entity_type(self):
         self.assertEqual(self.split_row[5], "IND")
