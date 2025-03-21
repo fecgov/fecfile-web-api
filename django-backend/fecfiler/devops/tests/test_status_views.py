@@ -10,8 +10,8 @@ from ..utils.redis_utils import (
     set_redis_value,
     redis_instance,
 )
+from fecfiler.settings import SYSTEM_STATUS_CACHE_AGE
 import json
-from unittest.mock import patch
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
@@ -35,10 +35,13 @@ class SystemStatusViewTest(TestCase):
         redis_instance.delete(key)
         self.assertIsNone(get_redis_value(key))
 
-    @patch("fecfiler.devops.tasks.S3_SESSION")
-    def test_status_report(self, mock_s3_session):
+    def test_status_report(self):
+        set_redis_value(CELERY_STATUS, None, age=SYSTEM_STATUS_CACHE_AGE)
+        set_redis_value(SCHEDULER_STATUS, None, age=SYSTEM_STATUS_CACHE_AGE)
+
         self.assertIsNone(get_redis_value(CELERY_STATUS))
         self.assertIsNone(get_redis_value(SCHEDULER_STATUS))
+
         get_devops_status_report()
         self.assertIsNotNone(get_redis_value(CELERY_STATUS))
         self.assertIsNotNone(get_redis_value(SCHEDULER_STATUS))

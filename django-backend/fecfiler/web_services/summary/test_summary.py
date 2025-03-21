@@ -30,7 +30,7 @@ class F3XReportTestCase(TestCase):
             report_code="12C",
         )
         self.debt = generate_data(
-            self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e"]
+            self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e", "f"]
         )
         summary_service = SummaryService(f3x)
         summary_a, _ = summary_service.calculate_summary_columns()
@@ -71,6 +71,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(summary_a["line_22"], Decimal("22.00"))
         self.assertEqual(summary_a["line_23"], Decimal("14.00"))
         self.assertEqual(summary_a["line_24"], Decimal("151.00"))
+        self.assertEqual(summary_a["line_25"], Decimal("133.00"))
         self.assertEqual(summary_a["line_26"], Decimal("44.00"))
         self.assertEqual(summary_a["line_27"], Decimal("31.00"))
         self.assertEqual(summary_a["line_28a"], Decimal("101.50"))
@@ -110,7 +111,7 @@ class F3XReportTestCase(TestCase):
             + Decimal("22.00")  # line_22
             + Decimal("14.00")  # line_23
             + Decimal("151.00")  # line_24
-            + Decimal("0")  # line_25
+            + Decimal("133.00")  # line_25
             + Decimal("44.00")  # line_26
             + Decimal("31.00")  # line_27
             + Decimal(101.50 + 201.50 + 301.50)  # line_28d
@@ -131,7 +132,7 @@ class F3XReportTestCase(TestCase):
             report_code="12C",
         )
         self.debt = generate_data(
-            self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e"]
+            self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e", "f"]
         )
         summary_service = SummaryService(f3x)
         _, summary_b = summary_service.calculate_summary_columns()
@@ -152,7 +153,7 @@ class F3XReportTestCase(TestCase):
             + Decimal("122.00")  # line_22
             + Decimal("64.00")  # line_23
             + Decimal("296.00")  # line_24
-            + Decimal("0")  # line_25
+            + Decimal("173.00")  # line_25
             + Decimal("61.00")  # line_26
             + Decimal("41.00")  # line_27
             + Decimal(1101.50 + 2201.50 + 3301.50)  # line_28d
@@ -185,6 +186,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(summary_b["line_22"], Decimal("122.00"))
         self.assertEqual(summary_b["line_23"], Decimal("64.00"))
         self.assertEqual(summary_b["line_24"], Decimal("296.00"))
+        self.assertEqual(summary_b["line_25"], Decimal("173.00"))
         self.assertEqual(summary_b["line_26"], Decimal("61.00"))
         self.assertEqual(summary_b["line_27"], Decimal("41.00"))
         self.assertEqual(summary_b["line_28a"], Decimal("1101.50"))

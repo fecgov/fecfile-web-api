@@ -6,8 +6,8 @@
   },
   "back_reference_tran_id_number": {},
   "back_reference_sched_name": {},
-  "filer_designated_to_make_coordianted_expenditures": {
-    "path": "schedule_f.filer_designated_to_make_coordianted_expenditures",
+  "filer_designated_to_make_coordinated_expenditures": {
+    "path": "schedule_f.filer_designated_to_make_coordinated_expenditures",
     "serializer": "BOOLEAN_YN"
   },
   "designating_committee_id_number": {},

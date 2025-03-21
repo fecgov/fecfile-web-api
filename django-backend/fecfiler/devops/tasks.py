@@ -36,7 +36,8 @@ def get_devops_status_report():
     db_size = check_database_size()
     log_database_size(db_size)
 
-    log_s3_bucket_size()
+    if S3_SESSION is not None:
+        log_s3_bucket_size()
 
 
 def check_database_size():

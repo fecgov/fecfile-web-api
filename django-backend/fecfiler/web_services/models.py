@@ -151,6 +151,33 @@ class BaseSubmission(models.Model):
         else:
             logger.warning("task completed but no created timestamp")
 
+    def log_submission_failure_state(self):
+        file_name = None
+        report_id = None
+        committee_uuid = None
+        if self.dot_fec is not None:
+            file_name = self.dot_fec.file_name
+            if self.dot_fec.report is not None:
+                report_id = str(self.dot_fec.report.id)
+                if self.dot_fec.report.committee_account is not None:
+                    committee_uuid = str(self.dot_fec.report.committee_account.id)
+
+        submission_state = {"efo_submission_failure": {
+            "submission_id": str(self.id),
+            "report_id": report_id,
+            "committee_uuid": committee_uuid,
+            "dot_fec_filename": file_name,
+            "fecfile_task_state": self.fecfile_task_state,
+            "fecfile_polling_attempts": self.fecfile_polling_attempts,
+            "fecfile_error": self.fecfile_error,
+            "fec_submission_id": self.fec_submission_id,
+            "fec_status": self.fec_status,
+            "fec_message": self.fec_message,
+            "task_completed": str(self.task_completed)
+        }}
+
+        logger.warning(json.dumps(submission_state))
+
     class Meta:
         abstract = True
 
