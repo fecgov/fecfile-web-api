@@ -330,7 +330,7 @@ CELERY_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "web_services/dot_fec/ou
 CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorageType.AWS)
 
 CELERY_BEAT_SCHEDULE = {
-    "print-db-stats": {
+    "essential-services-status-check": {
         "task": "fecfiler.devops.tasks.get_devops_status_report",
         "schedule": 30.0,
         "args": (),
