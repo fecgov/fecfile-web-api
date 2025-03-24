@@ -3,6 +3,7 @@ from django.db import models
 from django.core.validators import RegexValidator
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.user.models import User
+from django.core.exceptions import ValidationError
 
 COMMITTEE_ID_REGEX = RegexValidator(r"^C[0-9]{8}$", "invalid committee id format")
 
@@ -70,3 +71,22 @@ class Membership(CommitteeOwnedModel):
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def delete(self, *args, **kwargs):
+        """
+        Prevent deletion of a COMMITTEE_ADMINISTRATOR
+        if there are 2 or fewer on the account.
+        """
+        if self.role == self.CommitteeRole.COMMITTEE_ADMINISTRATOR:
+            admin_count = Membership.objects.filter(
+                committee_account=self.committee_account,
+                role=self.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            ).count()
+
+            if admin_count < 3:
+                raise ValidationError(
+                    "Cannot delete a COMMITTEE_ADMINISTRATOR "
+                    "when there are 2 or fewer remaining."
+                )
+
+        super().delete(*args, **kwargs)

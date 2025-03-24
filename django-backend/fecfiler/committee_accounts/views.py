@@ -10,13 +10,13 @@ from fecfiler.committee_accounts.utils import (
     create_committee_account,
     get_committee_account_data,
 )
+from django.core.exceptions import ValidationError
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
 import structlog
-from django.http import HttpResponse
 
 logger = structlog.get_logger(__name__)
 
@@ -224,9 +224,28 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         url_name="remove_member",
     )
     def remove_member(self, request, pk: UUID):
-        member = self.get_object()
-        member.delete()
-        return HttpResponse("Member removed")
+        member: Membership = self.get_object()
+        committee_id = request.session["committee_id"]
+        if member.user == request.user:
+            logger.info(
+                f"{request.user.email} attempted to remove themselves "
+                f"from committee {committee_id}"
+            )
+            return Response(
+                {"error": "You cannot remove yourself from the committee."}, status=400
+            )
+
+        # Call the model's delete method (which already checks the admin count)
+        try:
+            member.delete()
+            logger.info(
+                f"{request.user.email} removed {member.email} "
+                f"from committee {committee_id}"
+            )
+            return Response({"success": "Membership removed."})
+        except ValidationError as e:
+            logger.info(f"{str(e)}")
+            return Response({"error": str(e)}, status=400)
 
     def update(self, request, *args, **kwargs):
         committee_uuid = request.session["committee_uuid"]
