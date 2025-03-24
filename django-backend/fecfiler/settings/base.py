@@ -332,10 +332,11 @@ CELERY_WORKER_STORAGE = env.get_credential("CELERY_WORKER_STORAGE", CeleryStorag
 CELERY_BEAT_SCHEDULE = {
     "print-db-stats": {
         "task": "fecfiler.devops.tasks.get_devops_status_report",
-        "schedule": 60.0,
+        "schedule": 30.0,
         "args": (),
         "options": {
             "expires": 15.0,
+            "priority": 1,  # 0-9; 0 is the highest priority; 5 is the default
         },
     },
 }
