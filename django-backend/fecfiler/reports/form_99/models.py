@@ -16,7 +16,7 @@ class Form99(models.Model):
         unique=True,
     )
 
-    text_code = models.TextField(null=True, blank=True)
+    text_code = models.TextField(null=False, blank=False, default="")
     message_text = models.TextField(null=True, blank=True)
 
     class Meta:
