@@ -49,7 +49,11 @@ class Form99Serializer(ReportSerializer):
     class Meta(ReportSerializer.Meta):
         fields = (
             ReportSerializer.Meta.get_fields()
-            + [f.name for f in Form99._meta.get_fields() if f.name not in ["report"]]
+            + [
+                f.name
+                for f in Form99._meta.get_fields()
+                if f.name not in ["report", "text_code_2"]
+            ]
             + ["fields_to_validate"]
         )
 
