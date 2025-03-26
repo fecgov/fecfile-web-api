@@ -397,36 +397,40 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 | Q(date=original_date, created__gt=original_instance.created),
             ).order_by("date")
 
+            # Default election_entities to an empty queryset
             election_entities = transactions_after_original[:0]
+
             if original_contact_2 is not None:
                 # Capturing these in variables to cut down on line width
                 original_district = original_contact_2.candidate_district
                 original_office = original_contact_2.candidate_office
                 original_state = original_contact_2.candidate_state
 
-                election_entities = transactions_after_original.filter(
+                election_entities = Transaction.objects.get_queryset().filter(
                     Q(
                         contact_2__candidate_district=original_district,
                         contact_2__candidate_office=original_office,
                         contact_2__candidate_state=original_state
                     ),
-                    ~Q(
+                    Q(date__gt=original_date)
+                    | Q(date=original_date, created__gt=original_instance.created),
+                    Q(
                         schedule_a__isnull=False,
                         schedule_a__election_code=original_election_code
-                    ),
-                    ~Q(
+                    )
+                    | Q(
                         schedule_b__isnull=False,
                         schedule_b__election_code=original_election_code
-                    ),
-                    ~Q(
+                    )
+                    | Q(
                         schedule_c__isnull=False,
                         schedule_c__election_code=original_election_code
-                    ),
-                    ~Q(
+                    )
+                    | Q(
                         schedule_e__isnull=False,
                         schedule_e__election_code=original_election_code
                     ),
-                )
+                ).order_by("date")
 
             non_election_entities = transactions_after_original.difference(
                 election_entities
