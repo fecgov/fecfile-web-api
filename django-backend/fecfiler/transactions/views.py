@@ -257,7 +257,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 if previous_transaction.aggregate is not None:
                     previous_transaction.aggregate -= original_transaction.amount
                 if previous_transaction.calendar_ytd_per_election_office is not None:
-                    previous_transaction.calendar_ytd_per_election_office -= original_transaction.amount
+                    previous_transaction.calendar_ytd_per_election_office -= original_transaction.amount  # noqa: E501
             serializer = self.get_serializer(previous_transaction)
             return Response(data=serializer.data)
 
