@@ -72,6 +72,16 @@ class TransactionViewsTestCase(TestCase):
             "C2012",
             self.contact_2,
         )
+        self.transaction_2 = create_ie(
+            self.committee,
+            self.contact_1,
+            "2023-01-22",
+            "2023-01-25",
+            "2023-01-25",
+            "147.00",
+            "C2012",
+            self.contact_2,
+        )
         self.payloads = json.load(
             open("fecfiler/transactions/fixtures/view_payloads.json")
         )
@@ -234,9 +244,9 @@ class TransactionViewsTestCase(TestCase):
 
         view_set = TransactionViewSet()
         view_set.request = self.post_request({}, {"schedules": "A,B,C,C2,D,E"})
-        self.assertEqual(view_set.get_queryset().count(), 12)
+        self.assertEqual(view_set.get_queryset().count(), 13)
         view_set.request = self.post_request({}, {"schedules": "A,B,D,E"})
-        self.assertEqual(view_set.get_queryset().count(), 10)
+        self.assertEqual(view_set.get_queryset().count(), 11)
         view_set.request = self.post_request({}, {"schedules": ""})
         self.assertEqual(view_set.get_queryset().count(), 0)
 
@@ -555,7 +565,29 @@ class TransactionViewsTestCase(TestCase):
         response = view_set.previous_transaction_by_election(view_set.request)
         transaction = response.data
 
-        self.assertEqual(transaction.get("date"), "2023-01-12")
+        self.assertEqual(transaction.get("date"), "2023-01-22")
+
+    def test_get_previous_election_leapfrogging(self):
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+
+        view_set.request = self.post_request(
+            {},
+            {
+                "transaction_id": self.transaction.id,
+                "date": "2023-10-31",
+                "aggregation_group": "INDEPENDENT_EXPENDITURE",
+                "election_code": "C2012",
+                "candidate_office": "S",
+                "candidate_state": "AK",
+                "candidate_district": "01",
+            },
+        )
+        response = view_set.previous_transaction_by_election(view_set.request)
+        transaction = response.data
+
+        self.assertEqual(transaction.get("date"), "2023-01-22")
+        self.assertEqual(transaction.get("calendar_ytd_per_election_office"), "147.00")
 
     def test_inherited_election_aggregate(self):
         request = self.factory.get(f"/api/v1/transactions/{self.transaction.id}/")
