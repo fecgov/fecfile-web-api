@@ -391,6 +391,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         # Set the earlier date in order to detect when a transaction has moved forward
         if original_date and original_date < schedule_instance.get_date():
             transactions_after_original = Transaction.objects.get_queryset().filter(
+                ~Q(id=original_instance.id),
                 Q(date__year=original_date.year),
                 Q(contact_1=original_contact_1),
                 Q(date__gt=original_date)
@@ -407,6 +408,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 original_state = original_contact_2.candidate_state
 
                 election_entities = Transaction.objects.get_queryset().filter(
+                    ~Q(id=original_instance.id),
                     Q(
                         contact_2__candidate_district=original_district,
                         contact_2__candidate_office=original_office,
