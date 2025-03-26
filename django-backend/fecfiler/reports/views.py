@@ -17,6 +17,9 @@ logger = structlog.get_logger(__name__)
 
 
 version_labels = {
+    "F3N": "Original",
+    "F3A": "Amendment",
+    "F3T": "Termination",
     "F3XN": "Original",
     "F3XA": "Amendment",
     "F3XT": "Termination",
@@ -30,6 +33,9 @@ version_labels = {
 form_type_ordering = {
     "F1MN": 10,
     "F1MA": 10,
+    "F3N": 20,
+    "F3A": 20,
+    "F3T": 20,
     "F3XN": 20,
     "F3XA": 20,
     "F3XT": 20,
@@ -115,8 +121,10 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         report_type_filters = self.request.query_params.get("report_type")
         if report_type_filters is not None:
             report_type_list = report_type_filters.split(",")
-            # All transactions are included by default, here we remove those
+            # All reports are included by default, here we remove those
             # that are not identified in the schedules query param
+            if "f3" not in report_type_list:
+                queryset = queryset.filter(form_3__isnull=True)
             if "f3x" not in report_type_list:
                 queryset = queryset.filter(form_3x__isnull=True)
             if "f24" not in report_type_list:

@@ -1,4 +1,4 @@
-from django.db import models
+from django.db.models import Q, Subquery
 from django.forms.models import model_to_dict
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_d.utils import carry_forward_debt
@@ -17,7 +17,9 @@ def save_hook(transaction: Transaction, is_existing):
 
 
 def create_in_future_reports(transaction):
-    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    current_report = transaction.reports.filter(
+        Q(form_3x__isnull=False) | Q(form_3__isnull=False)
+    ).first()
     future_reports = current_report.get_future_in_progress_reports()
     transaction_copy = copy.deepcopy(transaction)
     logger.info(
@@ -29,8 +31,11 @@ def create_in_future_reports(transaction):
 
 
 def update_in_future_reports(transaction):
-    future_reports = transaction.reports.filter(
-        form_3x__isnull=False).first().get_future_in_progress_reports()
+    future_reports = (
+        transaction.reports.filter(Q(form_3x__isnull=False) | Q(form_3__isnull=False))
+        .first()
+        .get_future_in_progress_reports()
+    )
 
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
     # model_to_dict doesn't copy id
@@ -38,7 +43,7 @@ def update_in_future_reports(transaction):
     del transaction_copy["loan"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
-        reports__in=models.Subquery(future_reports.values("id")),
+        reports__in=Subquery(future_reports.values("id")),
     )
     transactions_to_update.update(**transaction_copy)
 
@@ -47,7 +52,7 @@ def update_in_future_reports(transaction):
     # this report
     del schedule_d_copy["incurred_amount"]
     schedule_ds_to_update = ScheduleD.objects.filter(
-        transaction__schedule_d_id__in=models.Subquery(
+        transaction__schedule_d_id__in=Subquery(
             transactions_to_update.values("schedule_d_id")
         )
     )

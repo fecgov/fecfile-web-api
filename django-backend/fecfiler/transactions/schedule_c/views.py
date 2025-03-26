@@ -1,4 +1,4 @@
-from django.db import models
+from django.db.models import Q, Subquery
 from django.forms.models import model_to_dict
 from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.transactions.schedule_c.utils import carry_forward_loan
@@ -16,7 +16,9 @@ def save_hook(transaction: Transaction, is_existing):
 
 
 def create_in_future_reports(transaction: Transaction):
-    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    current_report = transaction.reports.filter(
+        Q(form_3x__isnull=False) | Q(form_3__isnull=False)
+    ).first()
     future_reports = current_report.get_future_in_progress_reports()
     transaction_copy = copy.deepcopy(transaction)
     for report in future_reports:
@@ -24,7 +26,9 @@ def create_in_future_reports(transaction: Transaction):
 
 
 def update_in_future_reports(transaction: Transaction):
-    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    current_report = transaction.reports.filter(
+        Q(form_3x__isnull=False) | Q(form_3__isnull=False)
+    ).first()
     future_reports = current_report.get_future_in_progress_reports()
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
     # model_to_dict doesn't copy id
@@ -32,13 +36,13 @@ def update_in_future_reports(transaction: Transaction):
     del transaction_copy["loan"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
-        reports__id__in=models.Subquery(future_reports.values("id")),
+        reports__id__in=Subquery(future_reports.values("id")),
     )
     transactions_to_update.update(**transaction_copy)
 
     schedule_c_copy = copy.deepcopy(model_to_dict(transaction.schedule_c))
     schedule_cs_to_update = ScheduleC.objects.filter(
-        transaction__schedule_c_id__in=models.Subquery(
+        transaction__schedule_c_id__in=Subquery(
             transactions_to_update.values("schedule_c_id")
         )
     )
@@ -55,7 +59,7 @@ def update_memo_text_in_future_reports(
     memo_text_id = transaction_data.get("memo_text_id")
     if not memo_text_id:
         for memo_text in MemoText.objects.filter(
-            transaction__memo_text_id__in=models.Subquery(
+            transaction__memo_text_id__in=Subquery(
                 transactions_to_update.values("memo_text_id")
             )
         ):
@@ -63,7 +67,7 @@ def update_memo_text_in_future_reports(
         transactions_to_update.update(**{"memo_text_id": None})
     else:
         MemoText.objects.filter(
-            transaction__memo_text_id__in=models.Subquery(
+            transaction__memo_text_id__in=Subquery(
                 transactions_to_update.values("memo_text_id")
             )
         ).update(**{"text4000": transaction.memo_text.text4000})

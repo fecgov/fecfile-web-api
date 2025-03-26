@@ -236,9 +236,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             )
         if transaction_id:
             transaction = self.get_queryset().get(id=transaction_id)
-            query = query.filter(
-                Q(created__lt=transaction.created) | ~Q(date=date)
-            )
+            query = query.filter(Q(created__lt=transaction.created) | ~Q(date=date))
 
         query = query.order_by("-date", "-created")
         previous_transaction = query.first()
@@ -450,7 +448,9 @@ def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_i
         current_loan_balance = current_loan.loan_balance
         original_loan_id = current_loan.loan_id or current_loan.id
         if current_loan_balance == 0:
-            current_report = transaction.reports.filter(form_3x__isnull=False).first()
+            current_report = transaction.reports.filter(
+                Q(form_3x__isnull=False) | Q(form_3__isnull=False)
+            ).first()
             future_reports = current_report.get_future_in_progress_reports()
             transactions_to_delete = list(
                 Transaction.objects.filter(
@@ -468,7 +468,9 @@ def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_i
         current_debt_balance = current_debt.balance_at_close
         original_debt_id = current_debt.debt_id or current_debt.id
         if current_debt_balance == 0:
-            current_report = transaction.reports.filter(form_3x__isnull=False).first()
+            current_report = transaction.reports.filter(
+                Q(form_3x__isnull=False) | Q(form_3__isnull=False)
+            ).first()
             future_reports = current_report.get_future_in_progress_reports()
             transactions_to_delete = list(
                 Transaction.objects.filter(

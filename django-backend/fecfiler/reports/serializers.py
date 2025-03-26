@@ -11,6 +11,7 @@ from fecfiler.web_services.serializers import (
 )
 from fecfiler.contacts.serializers import ContactSerializer
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
+from fecfiler.reports.form_3.models import Form3
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
@@ -19,6 +20,12 @@ from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
 import structlog
 
 logger = structlog.get_logger(__name__)
+
+
+class ReportForm3Serializer(ModelSerializer):
+    class Meta:
+        fields = [f.name for f in Form3._meta.get_fields() if f.name not in ["report"]]
+        model = Form3
 
 
 class ReportForm3XSerializer(ModelSerializer):
@@ -97,6 +104,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     report_code_label = CharField(read_only=True)
     version_label = CharField(read_only=True)
 
+    form_3 = ReportForm3Serializer(required=False)
     form_3x = ReportForm3XSerializer(required=False)
     form_24 = ReportForm24Serializer(required=False)
     form_99 = ReportForm99Serializer(required=False)
@@ -104,10 +112,16 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
 
     def to_representation(self, instance: Report, depth=0):
         representation = super().to_representation(instance)
+        form_3 = representation.pop("form_3") or []
         form_3x = representation.pop("form_3x") or []
         form_24 = representation.pop("form_24") or []
         form_99 = representation.pop("form_99") or []
         form_1m = representation.pop("form_1m") or []
+        if form_3:
+            representation["report_type"] = "F3"
+            for property in form_3:
+                if not representation.get(property):
+                    representation[property] = form_3[property]
         if form_3x:
             representation["report_type"] = "F3X"
             for property in form_3x:
