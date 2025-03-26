@@ -17,7 +17,7 @@ class ScheduleF(Model):
         serialize=False,
         unique=True,
     )
-    filer_designated_to_make_coordianted_expenditures = BooleanField(
+    filer_designated_to_make_coordinated_expenditures = BooleanField(
         null=True, blank=True
     )
 
