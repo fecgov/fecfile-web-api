@@ -34,6 +34,7 @@ CONTACT_2_FIELDS = [
 # candidate committee that the CE is on behalf of
 CONTACT_3_FIELDS = [
     "payee_committee_id_number",
+    "payee_committee_name",
 ]
 
 # designating committee
@@ -79,6 +80,7 @@ class ScheduleFSerializer(ModelSerializer):
     payee_candidate_district = CharField(required=False, allow_null=True)
     # Contact 3
     payee_committee_id_number = CharField(required=False, allow_null=True)
+    payee_committee_name = CharField(required=False, allow_null=True)
     # Contact 4
     designating_committee_id_number = CharField(required=False, allow_null=True)
     designating_committee_name = CharField(required=False, allow_null=True)
