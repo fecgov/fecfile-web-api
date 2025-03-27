@@ -103,7 +103,7 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
         committee_uuid = self.get_committee_uuid()
         committee_id = self.get_committee_id()
         structlog.contextvars.bind_contextvars(
-            committee_id=committee_id, committee_uuid=committee_id
+            committee_id=committee_id, committee_uuid=committee_uuid
         )
         return super().get_queryset().filter(committee_account_id=committee_uuid)
 
