@@ -7,4 +7,8 @@ known_first_party = ["fecfiler", "locust_data_generator"]
 
 [tool.deptry.per_rule_ignores]
 DEP001 = ["locust"]
-DEP002 = ["gunicorn", "django-deprecate-fields", "django-migration-linter"]
+DEP002 = [
+    "gunicorn",
+    "django-deprecate-fields",
+    "django-migration-linter"
+]
