@@ -417,18 +417,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     Q(date__gt=original_date)
                     | Q(date=original_date, created__gt=original_instance.created),
                     Q(
-                        schedule_a__isnull=False,
-                        schedule_a__election_code=original_election_code
-                    )
-                    | Q(
-                        schedule_b__isnull=False,
-                        schedule_b__election_code=original_election_code
-                    )
-                    | Q(
-                        schedule_c__isnull=False,
-                        schedule_c__election_code=original_election_code
-                    )
-                    | Q(
                         schedule_e__isnull=False,
                         schedule_e__election_code=original_election_code
                     ),
