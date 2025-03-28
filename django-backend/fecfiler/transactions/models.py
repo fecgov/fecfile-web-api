@@ -21,6 +21,7 @@ import uuid
 import structlog
 
 logger = structlog.get_logger(__name__)
+CONTACT = "contacts.Contact"
 
 
 class Transaction(SoftDeleteModel, CommitteeOwnedModel):
@@ -97,31 +98,31 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     contact_1: Contact = models.ForeignKey(
-        "contacts.Contact",
+        CONTACT,
         on_delete=models.CASCADE,
         related_name="contact_1_transaction_set",
         null=True,
     )
     contact_2: Contact = models.ForeignKey(
-        "contacts.Contact",
+        CONTACT,
         on_delete=models.CASCADE,
         related_name="contact_2_transaction_set",
         null=True,
     )
     contact_3: Contact = models.ForeignKey(
-        "contacts.Contact",
+        CONTACT,
         on_delete=models.CASCADE,
         related_name="contact_3_transaction_set",
         null=True,
     )
     contact_4: Contact = models.ForeignKey(
-        "contacts.Contact",
+        CONTACT,
         on_delete=models.CASCADE,
         related_name="contact_4_transaction_set",
         null=True,
     )
     contact_5: Contact = models.ForeignKey(
-        "contacts.Contact",
+        CONTACT,
         on_delete=models.CASCADE,
         related_name="contact_5_transaction_set",
         null=True,
@@ -230,77 +231,87 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
     def save(self, *args, **kwargs):
         if self.memo_text:
-            self.memo_text.transaction_uuid = self.id
-            self.memo_text.save()
+            if self.memo_text.text4000 is None or self.memo_text.text4000 == "":
+                self.memo_text.hard_delete()
+                self.memo_text = None
+            else:
+                self.memo_text.transaction_uuid = self.id
+                self.memo_text.save()
         super(Transaction, self).save(*args, **kwargs)
 
     def delete(self):
         if not self.can_delete:
-            raise Exception("Transaction cannot be deleted")
+            raise AttributeError("Transaction cannot be deleted")
         if not self.deleted:
             super(Transaction, self).delete()
+            self.delete_children()
+            self.delete_debts()
+            self.delete_loans()
+            self.delete_reattribution_redesigntations()
+            self.delete_coupled_transactions()
+            if self.memo_text:
+                self.memo_text.delete()
 
-            # child transactions
-            child_transactions = Transaction.objects.filter(parent_transaction=self)
-            for child in child_transactions:
-                child.delete()
+    def delete_children(self):
+        child_transactions = Transaction.objects.filter(parent_transaction=self)
+        for child in child_transactions:
+            child.delete()
 
-            # transactions related to this debt
-            # delete any carry forwards or repayments related to this debt
-            debt_carry_forwards_and_repayments = Transaction.objects.filter(debt=self)
-            for carry_forward_or_repayment in debt_carry_forwards_and_repayments:
-                carry_forward_or_repayment.delete()
+    # transactions related to this debt
+    # delete any carry forwards or repayments related to this debt
+    def delete_debts(self):
+        debt_carry_forwards_and_repayments = Transaction.objects.filter(debt=self)
+        for carry_forward_or_repayment in debt_carry_forwards_and_repayments:
+            carry_forward_or_repayment.delete()
 
-            # transactions related to a loan
-            # delete any carry forwards or repayments related to this loan
-            loan_carry_forwards_and_repayments = Transaction.objects.filter(loan=self)
-            for carry_forward_or_repayment in loan_carry_forwards_and_repayments:
-                carry_forward_or_repayment.delete()
+    # transactions related to a loan
+    # delete any carry forwards or repayments related to this loan
+    def delete_loans(self):
+        loan_carry_forwards_and_repayments = Transaction.objects.filter(loan=self)
+        for carry_forward_or_repayment in loan_carry_forwards_and_repayments:
+            carry_forward_or_repayment.delete()
 
-            """
-            REATTRIBUTION/REDESIGNATION
-            """
-            # If this is a reattribution/redesignation 'from' transaction,
-            # delete the 'to' transaction
-            if (
-                self.schedule_a
-                and self.schedule_a.reattribution_redesignation_tag == "REATTRIBUTED_FROM"
-            ) or (
-                self.schedule_b
-                and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATED_FROM"
-            ):
-                self.parent_transaction.delete()
+    # REATTRIBUTION/REDESIGNATION
+    # If this is a reattribution/redesignation 'from' transaction,
+    # delete the 'to' transaction
+    def delete_reattribution_redesigntations(self):
+        if (
+            self.schedule_a
+            and self.schedule_a.reattribution_redesignation_tag == "REATTRIBUTED_FROM"
+        ) or (
+            self.schedule_b
+            and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATED_FROM"
+        ):
+            self.parent_transaction.delete()
 
-            # If this reattribution/redesignation is tied to a copy of
-            # the original transaction, delete the copy
-            if self.reatt_redes and (
-                (
-                    self.reatt_redes.schedule_a
-                    and self.reatt_redes.schedule_a.reattribution_redesignation_tag
-                    == "REATTRIBUTED"
-                )
-                or (
-                    self.reatt_redes.schedule_b
-                    and self.reatt_redes.schedule_b.reattribution_redesignation_tag
-                    == "REDESIGNATED"
-                )
-            ):
-                self.reatt_redes.delete()
-
-            # Delete any reattribution/redesignation transactions
-            # related to this transaction (copy/from/to)"
-            reatributions_and_redesignations = Transaction.objects.filter(
-                reatt_redes=self
+        # If this reattribution/redesignation is tied to a copy of
+        # the original transaction, delete the copy
+        if self.reatt_redes and (
+            (
+                self.reatt_redes.schedule_a
+                and self.reatt_redes.schedule_a.reattribution_redesignation_tag
+                == "REATTRIBUTED"
             )
-            for reatribuiton_or_redesignation in reatributions_and_redesignations:
-                reatribuiton_or_redesignation.delete()
+            or (
+                self.reatt_redes.schedule_b
+                and self.reatt_redes.schedule_b.reattribution_redesignation_tag
+                == "REDESIGNATED"
+            )
+        ):
+            self.reatt_redes.delete()
 
-            # coupled transactions
-            if (
-                self.parent_transaction
-                and self.transaction_type_identifier in COUPLED_TRANSACTION_TYPES
-            ):
-                self.parent_transaction.delete()
+        # Delete any reattribution/redesignation transactions
+        # related to this transaction (copy/from/to)"
+        reatributions_and_redesignations = Transaction.objects.filter(reatt_redes=self)
+        for reatribuiton_or_redesignation in reatributions_and_redesignations:
+            reatribuiton_or_redesignation.delete()
+
+    def delete_coupled_transactions(self):
+        if (
+            self.parent_transaction
+            and self.transaction_type_identifier in COUPLED_TRANSACTION_TYPES
+        ):
+            self.parent_transaction.delete()
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
