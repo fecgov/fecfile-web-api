@@ -3,6 +3,7 @@ from django.test import TestCase
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.models import Transaction
+from fecfiler.memo_text.models import MemoText
 from fecfiler.contacts.tests.utils import (
     create_test_committee_contact,
     create_test_individual_contact,
@@ -672,6 +673,34 @@ class TransactionModelTestCase(TestCase):
         self.assertIsNotNone(reatt_pull_forward.deleted)
         self.assertIsNotNone(reattribution_to.deleted)
         self.assertIsNotNone(reattribution_from.deleted)
+
+    def test_transaction_and_memo_text_soft_delete(self):
+        memo_text = MemoText.objects.create(text4000="Test")
+        self.partnership_receipt.memo_text = memo_text
+        self.partnership_receipt.save()
+        self.partnership_receipt.refresh_from_db()
+        memo_text.refresh_from_db()
+
+        self.assertIsNone(self.partnership_receipt.deleted)
+        self.assertIsNone(memo_text.deleted)
+
+        self.partnership_receipt.delete()
+
+        self.partnership_receipt.refresh_from_db()
+        memo_text.refresh_from_db()
+
+        self.assertIsNotNone(self.partnership_receipt.deleted)
+        self.assertIsNotNone(memo_text.deleted)
+
+    def test_hard_delete_memo_when_empty(self):
+        memo_text = MemoText.objects.create(text4000="Test")
+        self.partnership_receipt.memo_text = memo_text
+        self.partnership_receipt.save()
+        self.assertTrue(MemoText.objects.filter(id=memo_text.id).exists())
+
+        self.partnership_receipt.memo_text.text4000 = ""
+        self.partnership_receipt.save()
+        self.assertFalse(MemoText.objects.filter(id=memo_text.id).exists())
 
     def test_can_delete_loan(self):
         self.loan.refresh_from_db()
