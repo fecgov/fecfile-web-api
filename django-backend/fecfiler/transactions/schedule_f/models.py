@@ -30,9 +30,11 @@ class ScheduleF(Model):
     )
     expenditure_purpose_descrip = TextField(blank=True)
 
-    category_code = TextField(blank=True)
+    category_code = TextField(null=True, blank=True)
 
-    memo_text_description = TextField(blank=True)
+    general_election_year = TextField(blank=True)
+
+    memo_text_description = TextField(null=True, blank=True)
 
     def get_transaction(self):
         return self.transaction_set.first()
