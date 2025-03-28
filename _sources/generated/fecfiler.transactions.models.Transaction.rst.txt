@@ -28,6 +28,11 @@ fecfiler.transactions.models.Transaction
       ~Transaction.clean_fields
       ~Transaction.date_error_message
       ~Transaction.delete
+      ~Transaction.delete_children
+      ~Transaction.delete_coupled_transactions
+      ~Transaction.delete_debts
+      ~Transaction.delete_loans
+      ~Transaction.delete_reattribution_redesigntations
       ~Transaction.from_db
       ~Transaction.full_clean
       ~Transaction.get_ancestor_transactions

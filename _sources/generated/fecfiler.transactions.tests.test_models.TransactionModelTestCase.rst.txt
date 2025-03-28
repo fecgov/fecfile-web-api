@@ -131,8 +131,10 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.test_delete_transaction_with_children
       ~TransactionModelTestCase.test_get_children
       ~TransactionModelTestCase.test_get_transaction_family
+      ~TransactionModelTestCase.test_hard_delete_memo_when_empty
       ~TransactionModelTestCase.test_itemization_with_parent_child_disbursement
       ~TransactionModelTestCase.test_tier3_itemization
+      ~TransactionModelTestCase.test_transaction_and_memo_text_soft_delete
    
    
 
