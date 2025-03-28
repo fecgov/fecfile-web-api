@@ -25,7 +25,7 @@ def create_schedule_a(
     date: str | None,
     amount: str | int | float,
     group: str = "GENERAL",
-    form_type: str = "SA11I",
+    form_type: str = "SA11AI",
     memo_code: bool = False,
     itemized: bool | None = None,
     report: Report | None = None,
