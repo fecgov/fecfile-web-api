@@ -1,0 +1,42 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.reports.migrations.0012\_alter\_form99\_text\_code
+===========================================================
+
+.. automodule:: fecfiler.reports.migrations.0012_alter_form99_text_code
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      copy_text_code_2_to_text_code
+      copy_text_code_to_text_code_2
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

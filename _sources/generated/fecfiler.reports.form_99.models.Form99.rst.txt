@@ -55,5 +55,6 @@ fecfiler.reports.form\_99.models.Form99
       ~Form99.pk
       ~Form99.report_set
       ~Form99.text_code
+      ~Form99.text_code_2
    
    

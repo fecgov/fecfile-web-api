@@ -1,0 +1,6 @@
+fecfiler.reports.migrations.0012\_alter\_form99\_text\_code.copy\_text\_code\_to\_text\_code\_2
+===============================================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.0012_alter_form99_text_code
+
+.. autofunction:: copy_text_code_to_text_code_2
