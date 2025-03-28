@@ -101,7 +101,13 @@ class Form3(models.Model):
         null=True, blank=True, max_digits=11, decimal_places=2
     )
     L19a_loan_repayments_of_loans_made_or_guaranteed_by_candidate_period = (
-        models.DecimalField(null=True, blank=True, max_digits=11, decimal_places=2)
+        models.DecimalField(
+            null=True,
+            blank=True,
+            max_digits=11,
+            decimal_places=2,
+            db_column="l19a_period",
+        )
     )
     L19b_loan_repayments_of_all_other_loans_period = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
@@ -209,7 +215,9 @@ class Form3(models.Model):
         null=True, blank=True, max_digits=11, decimal_places=2
     )
     L19a_loan_repayments_of_loans_made_or_guaranteed_by_candidate_ytd = (
-        models.DecimalField(null=True, blank=True, max_digits=11, decimal_places=2)
+        models.DecimalField(
+            null=True, blank=True, max_digits=11, decimal_places=2, db_column="l19a_ytd"
+        )
     )
     L19b_loan_repayments_of_all_other_loans_ytd = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
