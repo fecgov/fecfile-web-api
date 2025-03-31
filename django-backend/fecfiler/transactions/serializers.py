@@ -73,7 +73,6 @@ class TransactionSerializer(
     schedule_c2 = ScheduleC2Serializer(read_only=True)
     schedule_d = ScheduleDSerializer(read_only=True)
     schedule_e = ScheduleESerializer(read_only=True)
-    schedule_f = ScheduleFSerializer(read_only=True)
 
     contact_1_id = UUIDField(required=False, allow_null=True)
     contact_1 = ContactSerializer(read_only=True)
@@ -81,10 +80,6 @@ class TransactionSerializer(
     contact_2 = ContactSerializer(read_only=True)
     contact_3_id = UUIDField(required=False, allow_null=True)
     contact_3 = ContactSerializer(read_only=True)
-    contact_4_id = UUIDField(required=False, allow_null=True)
-    contact_4 = ContactSerializer(read_only=True)
-    contact_5_id = UUIDField(required=False, allow_null=True)
-    contact_5 = ContactSerializer(read_only=True)
 
     back_reference_tran_id_number = CharField(
         required=False, allow_null=True, read_only=True
@@ -137,8 +132,6 @@ class TransactionSerializer(
                 "contact_1_id",
                 "contact_2_id",
                 "contact_3_id",
-                "contact_4_id",
-                "contact_5_id",
                 "memo_text_id",
                 "back_reference_tran_id_number",
                 "back_reference_sched_name",
