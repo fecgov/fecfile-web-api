@@ -48,4 +48,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0015_merge_transaction_triggers
    fecfiler.transactions.migrations.0016_schedulef_transaction_contact_4_and_more
    fecfiler.transactions.migrations.0017_schedulef_coordianted_to_coordinated
+   fecfiler.transactions.migrations.0018_schedulef_general_election_year_and_more
 
