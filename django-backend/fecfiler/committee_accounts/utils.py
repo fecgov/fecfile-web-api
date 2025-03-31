@@ -41,7 +41,7 @@ def check_email_match(email, f1_emails):
         f1_email_lowercase = f1_emails.lower()
         f1_emails = re.split(r"[;,]", f1_email_lowercase)
         if email.lower() not in f1_emails:
-            return f"Email {email} does not match committee email"
+            return f"Email does not match committee email"
     return None
 
 

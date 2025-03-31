@@ -228,7 +228,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         committee_id = request.session["committee_id"]
         if member.user == request.user:
             logger.info(
-                f"{request.user.email} attempted to remove themselves "
+                f"{request.user.id} attempted to remove themselves "
                 f"from committee {committee_id}"
             )
             return Response(
@@ -239,7 +239,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         try:
             member.delete()
             logger.info(
-                f"{request.user.email} removed {member.email} "
+                f"{request.user.id} removed {member.id} "
                 f"from committee {committee_id}"
             )
             return Response({"success": "Membership removed."})
