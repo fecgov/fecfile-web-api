@@ -134,8 +134,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 Q(contact_1=contact_id)
                 | Q(contact_2=contact_id)
                 | Q(contact_3=contact_id)
-                | Q(contact_4=contact_id)
-                | Q(contact_5=contact_id)
             )
         return queryset
 
@@ -238,7 +236,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             )
         if transaction_id:
             transaction = self.get_queryset().get(id=transaction_id)
-            query = query.filter(Q(created__lt=transaction.created) | ~Q(date=date))
+            query = query.filter(
+                Q(created__lt=transaction.created) | ~Q(date=date)
+            )
 
         query = query.order_by("-date", "-created")
         previous_transaction = query.first()
@@ -287,13 +287,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             contact_key: create_or_update_contact(
                 transaction_data, contact_key, committee_id
             )
-            for contact_key in [
-                "contact_1",
-                "contact_2",
-                "contact_3",
-                "contact_4",
-                "contact_5",
-            ]
+            for contact_key in ["contact_1", "contact_2", "contact_3"]
             if contact_key in transaction_data
         }
         transaction_serializer.is_valid(raise_exception=True)
