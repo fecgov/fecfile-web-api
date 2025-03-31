@@ -272,6 +272,6 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         serializer.is_valid(raise_exception=True)
         new_role = request.data.get("role")
         logger.info(
-            f'Updating role for "{user_id}" in committee {committee} to {new_role}'
+            f'Updating role for User "{user_id}" in committee {committee} to {new_role}'
         )
         return super().update(request, *args, **kwargs)
