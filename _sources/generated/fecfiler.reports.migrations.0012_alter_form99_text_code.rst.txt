@@ -12,14 +12,6 @@ fecfiler.reports.migrations.0012\_alter\_form99\_text\_code
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:                                          
-   
-      copy_text_code_2_to_text_code
-      copy_text_code_to_text_code_2
-   
    
 
    
