@@ -68,9 +68,10 @@ class FeedbackViewSet(viewsets.ViewSet):
             return Response("Invalid CSP Violation Report", status=400)
 
         try:
-            report_str = json.dumps(request.data)
-            report_obj = json.loads(report_str)  # 
-            logger.info({"CSP Failure": report_obj})
+            logger.info({"CSP Failure": request.data})
             return Response("Received CSP Violation Report", status=200)
-        except json.JSONDecodeError:
-            return Response("Failed to process CSP Violation Report", status=422)
+        except Exception as error:
+            logger.error(
+                f"An error occurred while processing CSP Violation Report: {str(error)}"
+            )
+            raise error
