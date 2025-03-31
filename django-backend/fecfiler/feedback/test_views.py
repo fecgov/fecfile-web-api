@@ -6,6 +6,7 @@ from fecfiler.user.models import User
 from github3 import GitHub
 from github3.repos import Repository
 from rest_framework.test import APIClient
+from fecfiler.feedback.views import FeedbackViewSet
 
 
 class UserViewSetTest(TestCase):
@@ -47,3 +48,41 @@ class UserViewSetTest(TestCase):
         self.assertTrue("&lt;b&gt;test_location&lt;/b&gt;" in body_content)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {"status": "feedback submitted"})
+
+    @mock.patch("fecfiler.feedback.views.logger")
+    def test_csp_report_happy_path(self, mock_logger):
+        factory = RequestFactory()
+        view = FeedbackViewSet()
+
+        request = factory.post(
+            "/api/v1/feedback/csp-report",
+        )
+        request.data = {"type": "csp-violation"}
+        response = view.log_csp_report(request)
+        self.assertEqual(response.status_code, 200)
+        mock_logger.info.assert_called_with({"CSP Failure": request.data})
+
+    @mock.patch("fecfiler.feedback.views.logger")
+    def test_csp_report_no_data(self, mock_logger):
+        factory = RequestFactory()
+        view = FeedbackViewSet()
+
+        request = factory.post(
+            "/api/v1/feedback/csp-report",
+        )
+        response = view.log_csp_report(request)
+        self.assertEqual(response.status_code, 400)
+        mock_logger.info.assert_not_called()
+
+    @mock.patch("fecfiler.feedback.views.logger")
+    def test_csp_report_invalid_data(self, mock_logger):
+        factory = RequestFactory()
+        view = FeedbackViewSet()
+
+        request = factory.post(
+            "/api/v1/feedback/csp-report",
+        )
+        request.data = {"type": 2}
+        response = view.log_csp_report(request)
+        self.assertEqual(response.status_code, 400)
+        mock_logger.info.assert_not_called()
