@@ -56,7 +56,6 @@ fecfiler.transactions.schedule\_f.models.ScheduleF
       ~ScheduleF.expenditure_date
       ~ScheduleF.expenditure_purpose_descrip
       ~ScheduleF.filer_designated_to_make_coordinated_expenditures
-      ~ScheduleF.general_election_year
       ~ScheduleF.id
       ~ScheduleF.memo_text_description
       ~ScheduleF.objects
