@@ -212,8 +212,8 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         new_member = Membership(**membership_args)
         new_member.save()
 
-        member_type = "existing user" if user else "pending membership for"
-        logger.info(f'Added {member_type} "{email}" to committee {committee} as {role}')
+        member_type = f'existing user {user.id} to' if user else "pending membership for"
+        logger.info(f'User {request.user.id} added {member_type} committee {committee} as {role}')
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
 
@@ -263,11 +263,13 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
             )
 
         existing_member = self.get_object()
-        email = existing_member.email
+        user_id = existing_member.id
         committee = existing_member.committee_account
         # member updates
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_role = request.data.get("role")
-        logger.info(f'Updating role of "{email}" in committee {committee} to {new_role}')
+        logger.info(
+            f'Updating role for "{user_id}" in committee {committee} to {new_role}'
+        )
         return super().update(request, *args, **kwargs)

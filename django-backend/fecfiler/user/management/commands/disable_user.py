@@ -32,6 +32,5 @@ class Command(BaseCommand):
         user.save()
 
         self.stdout.write(self.style.SUCCESS(
-            f'The is_active flag for user [{user.id} | {user.email}] '
-            f'set to: {user.is_active}'
+            f'The is_active flag for user {user.id} has been set to: {user.is_active}'
         ))
