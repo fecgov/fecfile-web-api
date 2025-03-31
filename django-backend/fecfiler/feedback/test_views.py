@@ -75,7 +75,7 @@ class UserViewSetTest(TestCase):
         mock_logger.info.assert_not_called()
 
     @mock.patch("fecfiler.feedback.views.logger")
-    def test_csp_report_invalid_data(self, mock_logger):
+    def test_csp_report_invalid_type(self, mock_logger):
         factory = RequestFactory()
         view = FeedbackViewSet()
 
