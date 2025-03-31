@@ -1,4 +1,3 @@
-import json
 import github3
 import structlog
 from fecfiler.settings import FECFILE_GITHUB_TOKEN
