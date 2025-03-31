@@ -212,8 +212,10 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         new_member = Membership(**membership_args)
         new_member.save()
 
-        member_type = f'existing user {user.id} to' if user else "pending membership for"
-        logger.info(f'User {request.user.id} added {member_type} committee {committee} as {role}')
+        action = f'existing user {user.id} to' if user else "pending membership for"
+        logger.info(
+            f'User {request.user.id} added {action} committee {committee} as {role}'
+        )
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
 
