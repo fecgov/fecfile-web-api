@@ -10,6 +10,7 @@ def add_schedule_f_contact_fields(instance: Transaction, representation=None):
         add_candidate_contact(data, instance.contact_2, "payee", False)
     if instance.contact_3:
         data["payee_committee_id_number"] = instance.contact_3.committee_id
+        data["payee_committee_name"] = instance.contact_3.name
     if instance.contact_4:
         data["designating_committee_id_number"] = instance.contact_4.committee_id
         data["designating_committee_name"] = instance.contact_4.name
