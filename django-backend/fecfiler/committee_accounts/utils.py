@@ -56,7 +56,7 @@ def check_can_create_committee_account(committee_id, user):
         failure_reason = f"Committee account {committee_id} already created"
 
     if failure_reason:
-        logger.error(f"Failure to create committee account: {failure_reason}")
+        logger.error(f"User {user.id} failed to create committee account: {failure_reason}")
         return False
 
     return True
