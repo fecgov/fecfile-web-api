@@ -1,20 +1,6 @@
 from django.db import migrations, models
 
 
-def copy_text_code_to_text_code_2(apps, schema_editor):
-    form_99 = apps.get_model("reports", "Form99")
-    for form in form_99.objects.all():
-        form.text_code_2 = form.text_code or ""
-        form.save(update_fields=["text_code_2"])
-
-
-def copy_text_code_2_to_text_code(apps, schema_editor):
-    form_99 = apps.get_model("reports", "Form99")
-    for form in form_99.objects.all():
-        form.text_code = form.text_code_2
-        form.save(update_fields=["text_code"])
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -26,20 +12,17 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="form99",
             name="text_code_2",
-            field=models.TextField(),
-        ),
-        migrations.RunPython(
-            copy_text_code_to_text_code_2,
-            reverse_code=copy_text_code_2_to_text_code,
+            field=models.TextField(db_default=""),
         ),
         migrations.RunSQL(
             sql="""
-                ALTER TABLE reports_form99 ALTER COLUMN text_code_2 SET NOT NULL;
+                UPDATE reports_form99 SET text_code_2 = COALESCE(text_code, '');
                 ALTER TABLE reports_form99 ALTER COLUMN text_code SET DEFAULT '';
+                ALTER TABLE reports_form99 ALTER COLUMN text_code_2 SET NOT NULL;
             """,
             reverse_sql="""
-                ALTER TABLE reports_form99 ALTER COLUMN text_code_2 DROP NOT NULL;
                 ALTER TABLE reports_form99 ALTER COLUMN text_code_2 DROP DEFAULT;
+                ALTER TABLE reports_form99 ALTER COLUMN text_code_2 DROP NOT NULL;
             """,
             state_operations=[
                 migrations.AlterField(
