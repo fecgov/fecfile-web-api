@@ -240,10 +240,16 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         # Call the model's delete method (which already checks the admin count)
         try:
             member.delete()
-            logger.info(
-                f"{request.user.id} removed {member.id} "
-                f"from committee {committee_id}"
-            )
+            if member.user is not None:
+                logger.info(
+                    f"{request.user.id} removed user {member.user.id} "
+                    f"from committee {committee_id}"
+                )
+            else:
+                logger.info(
+                    f"{request.user.id} removed pending membership {member.id} "
+                    f"from committee {committee_id}"
+                )
             return Response({"success": "Membership removed."})
         except ValidationError as e:
             logger.info(f"{str(e)}")
@@ -265,13 +271,22 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
             )
 
         existing_member = self.get_object()
-        user_id = existing_member.id
         committee = existing_member.committee_account
         # member updates
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_role = request.data.get("role")
+
+        member_string = ""
+        if existing_member.user is not None:
+            user_id = existing_member.user.id
+            member_string = f'user {user_id}'
+        else:
+            membership_id = existing_member.id
+            member_string = f'pending membership {membership_id}'
+
         logger.info(
-            f'Updating role for user "{user_id}" in committee {committee} to {new_role}'
+            f'Updating role for {member_string} in committee {committee} to {new_role}'
         )
+
         return super().update(request, *args, **kwargs)
