@@ -67,7 +67,7 @@ class FeedbackViewSet(viewsets.ViewSet):
             return Response("Invalid CSP Violation Report", status=400)
 
         try:
-            logger.info({"CSP Failure": request.data})
+            logger.warning({"CSP Failure": request.data})
             return Response("Received CSP Violation Report", status=200)
         except Exception as error:
             logger.error(
