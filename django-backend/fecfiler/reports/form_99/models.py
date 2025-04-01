@@ -17,7 +17,14 @@ class Form99(models.Model):
     )
 
     text_code = models.TextField(null=True, blank=True)
+    text_code_2 = models.TextField(null=False, blank=False, default="", db_default="")
     message_text = models.TextField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.text_code:
+            self.text_code = ""
+        self.text_code_2 = self.text_code
+        super().save(*args, **kwargs)
 
     class Meta:
         app_label = "reports"
