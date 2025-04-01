@@ -114,6 +114,9 @@ fecfiler.feedback.test\_views.UserViewSetTest
       ~UserViewSetTest.subTest
       ~UserViewSetTest.tearDown
       ~UserViewSetTest.tearDownClass
+      ~UserViewSetTest.test_csp_report_happy_path
+      ~UserViewSetTest.test_csp_report_invalid_type
+      ~UserViewSetTest.test_csp_report_no_data
       ~UserViewSetTest.test_submit_feedback_happy_path
    
    

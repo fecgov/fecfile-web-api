@@ -47,6 +47,7 @@ fecfiler.feedback.views.FeedbackViewSet
       ~FeedbackViewSet.http_method_not_allowed
       ~FeedbackViewSet.initial
       ~FeedbackViewSet.initialize_request
+      ~FeedbackViewSet.log_csp_report
       ~FeedbackViewSet.options
       ~FeedbackViewSet.perform_authentication
       ~FeedbackViewSet.perform_content_negotiation
