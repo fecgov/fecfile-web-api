@@ -49,7 +49,7 @@ class CommitteeAccountTestCase(TestCase):
             "Session",
             "CommitteeAccount",
             "Membership",
-            "form3",
+            "Form3",
             "Form3X",
             "Form24",
             "Form99",
