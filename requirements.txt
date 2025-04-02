@@ -1,7 +1,7 @@
 boto3==1.35.72
 celery==5.4.0
 cfenv==0.5.3
-cryptography==44.0.0
+cryptography==44.0.1
 dj_database_url==2.3.0
 django-cors-headers==4.6.0
 django-deprecate-fields==0.2.1
@@ -10,7 +10,7 @@ django-structlog==9.0.0
 Django==5.1.7
 djangorestframework==3.15.2
 drf-spectacular==0.27.2
-git+https://github.com/fecgov/fecfile-validate@9d18cc19b457232d056e44a26ce9d0ce7c38aea1#egg=fecfile_validate&subdirectory=fecfile_validate_python
+git+https://github.com/fecgov/fecfile-validate@41cb8476d9b3fc56ebf2b2b9baf439065c902f5e#egg=fecfile_validate&subdirectory=fecfile_validate_python
 github3.py==4.0.1
 GitPython==3.1.43
 gunicorn==23.0.0

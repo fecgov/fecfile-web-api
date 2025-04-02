@@ -32,10 +32,9 @@ class User(AbstractUser):
         self.redeem_pending_memberships()
 
     def update_email(self, new_email):
-        old_email = self.email
         self.email = new_email
         self.save()
-        logger.info(f"Updated user email: {old_email} -> {new_email}")
+        logger.info(f"Updated email for user {self.id}")
 
         self.redeem_pending_memberships()
 
@@ -53,6 +52,8 @@ class User(AbstractUser):
 
         redeemed_count = len(pending_memberships)
         if redeemed_count > 0:
-            logger.info(f"Redeemed {redeemed_count} pending memberships - {self.email}")
+            logger.info(
+                f"Redeemed {redeemed_count} pending memberships for user {self.id}"
+            )
 
         return redeemed_count

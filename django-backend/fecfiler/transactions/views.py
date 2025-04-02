@@ -134,6 +134,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 Q(contact_1=contact_id)
                 | Q(contact_2=contact_id)
                 | Q(contact_3=contact_id)
+                | Q(contact_4=contact_id)
+                | Q(contact_5=contact_id)
             )
         return queryset
 
@@ -285,7 +287,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             contact_key: create_or_update_contact(
                 transaction_data, contact_key, committee_id
             )
-            for contact_key in ["contact_1", "contact_2", "contact_3"]
+            for contact_key in [
+                "contact_1",
+                "contact_2",
+                "contact_3",
+                "contact_4",
+                "contact_5",
+            ]
             if contact_key in transaction_data
         }
         transaction_serializer.is_valid(raise_exception=True)
