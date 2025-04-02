@@ -212,8 +212,10 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         new_member = Membership(**membership_args)
         new_member.save()
 
-        member_type = "existing user" if user else "pending membership for"
-        logger.info(f'Added {member_type} "{email}" to committee {committee} as {role}')
+        action = f'existing user {user.id} to' if user else "pending membership for"
+        logger.info(
+            f'User {request.user.id} added {action} committee {committee} as {role}'
+        )
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
 
@@ -228,7 +230,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         committee_id = request.session["committee_id"]
         if member.user == request.user:
             logger.info(
-                f"{request.user.email} attempted to remove themselves "
+                f"{request.user.id} attempted to remove themselves "
                 f"from committee {committee_id}"
             )
             return Response(
@@ -238,10 +240,16 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         # Call the model's delete method (which already checks the admin count)
         try:
             member.delete()
-            logger.info(
-                f"{request.user.email} removed {member.email} "
-                f"from committee {committee_id}"
-            )
+            if member.user is not None:
+                logger.info(
+                    f"{request.user.id} removed user {member.user.id} "
+                    f"from committee {committee_id}"
+                )
+            else:
+                logger.info(
+                    f"{request.user.id} removed pending membership {member.id} "
+                    f"from committee {committee_id}"
+                )
             return Response({"success": "Membership removed."})
         except ValidationError as e:
             logger.info(f"{str(e)}")
@@ -263,11 +271,22 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
             )
 
         existing_member = self.get_object()
-        email = existing_member.email
         committee = existing_member.committee_account
         # member updates
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_role = request.data.get("role")
-        logger.info(f'Updating role of "{email}" in committee {committee} to {new_role}')
+
+        member_string = ""
+        if existing_member.user is not None:
+            user_id = existing_member.user.id
+            member_string = f'user {user_id}'
+        else:
+            membership_id = existing_member.id
+            member_string = f'pending membership {membership_id}'
+
+        logger.info(
+            f'Updating role for {member_string} in committee {committee} to {new_role}'
+        )
+
         return super().update(request, *args, **kwargs)
