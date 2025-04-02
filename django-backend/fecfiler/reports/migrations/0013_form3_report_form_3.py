@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("reports", "0011_remove_form3x_cash_on_hand_date"),
+        ("reports", "0012_alter_form99_text_code"),
     ]
 
     operations = [
