@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
         ("reports", "0012_alter_form99_text_code"),
     ]
 
+    l19a_field = "L19a_loan_repayments_of_loans_made_or_guaranteed_by_candidate_period"
     operations = [
         migrations.CreateModel(
             name="Form3",
@@ -185,7 +186,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "L19a_loan_repayments_of_loans_made_or_guaranteed_by_candidate_period",
+                    l19a_field,
                     models.DecimalField(
                         blank=True,
                         db_column="l19a_period",
