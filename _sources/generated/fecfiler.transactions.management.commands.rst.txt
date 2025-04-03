@@ -24,12 +24,3 @@ fecfiler.transactions.management.commands
 
 
 
-.. rubric:: Modules
-
-.. autosummary::
-   :toctree:
-   :template: custom-module-template.rst                 
-   :recursive:
-
-   fecfiler.transactions.management.commands.stuff_db
-

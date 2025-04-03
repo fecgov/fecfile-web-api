@@ -23,6 +23,7 @@ fecfiler.reports.managers.ReportType
 
    .. autosummary::
    
+      ~ReportType.F3
       ~ReportType.F3X
       ~ReportType.F24
       ~ReportType.F99

@@ -76,6 +76,8 @@ fecfiler.reports.models.Report
       ~Report.form_1m_id
       ~Report.form_24
       ~Report.form_24_id
+      ~Report.form_3
+      ~Report.form_3_id
       ~Report.form_3x
       ~Report.form_3x_id
       ~Report.form_99

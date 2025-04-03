@@ -24,6 +24,7 @@ fecfiler.reports.serializers
    
       ReportForm1MSerializer
       ReportForm24Serializer
+      ReportForm3Serializer
       ReportForm3XSerializer
       ReportForm99Serializer
       ReportSerializer
