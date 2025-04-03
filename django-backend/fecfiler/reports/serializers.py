@@ -17,9 +17,15 @@ from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
+from rest_framework.serializers import ValidationError
 import structlog
 
 logger = structlog.get_logger(__name__)
+
+
+COVERAGE_DATE_REPORT_CODE_COLLISION = ValidationError(
+    {"report_code": ["Collision with existing report_code and year"]}
+)
 
 
 class ReportForm3Serializer(ModelSerializer):
