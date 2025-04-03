@@ -5,6 +5,7 @@ from django.db import models, transaction as db_transaction
 from django.db.models import Q
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
+from .form_3.models import Form3
 from .form_3x.models import Form3X
 from .form_24.models import Form24
 from .form_99.models import Form99
@@ -74,6 +75,7 @@ class Report(CommitteeOwnedModel):
         blank=True,
     )
 
+    form_3 = models.ForeignKey(Form3, on_delete=models.CASCADE, null=True, blank=True)
     form_3x = models.ForeignKey(Form3X, on_delete=models.CASCADE, null=True, blank=True)
     form_24 = models.ForeignKey(Form24, on_delete=models.CASCADE, null=True, blank=True)
     form_99 = models.ForeignKey(Form99, on_delete=models.CASCADE, null=True, blank=True)
@@ -173,6 +175,7 @@ class Report(CommitteeOwnedModel):
 
 
 TABLE_TO_FORM = {
+    "form_3": "F3",
     "form_3x": "F3X",
     "form_24": "F24",
     "form_99": "F99",
@@ -180,6 +183,7 @@ TABLE_TO_FORM = {
 }
 
 FORMS_TO_CALCULATE = [
+    "F3",
     "F3X",
 ]
 

@@ -41,6 +41,7 @@ class ReportManager(Manager):
             .get_queryset()
             .annotate(
                 report_type=Case(
+                    When(form_3__isnull=False, then=ReportType.F3.value),
                     When(form_3x__isnull=False, then=ReportType.F3X.value),
                     When(form_24__isnull=False, then=ReportType.F24.value),
                     When(form_99__isnull=False, then=ReportType.F99.value),
@@ -54,6 +55,7 @@ class ReportManager(Manager):
 
 
 class ReportType(Enum):
+    F3 = Value("F3")
     F3X = Value("F3X")
     F24 = Value("F24")
     F99 = Value("F99")
