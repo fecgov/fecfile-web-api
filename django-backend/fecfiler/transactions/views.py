@@ -411,7 +411,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             )
 
             # Default next_transactions_by_election the same queryset as entities
-            next_transactions_by_election = next_transactions_by_entity[0:]
+            next_transactions_by_election = next_transactions_by_entity[:0]
 
             if original_contact_2 is not None:
                 # Capturing these in variables to cut down on line width
