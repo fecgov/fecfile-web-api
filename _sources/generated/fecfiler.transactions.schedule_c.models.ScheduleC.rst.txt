@@ -31,6 +31,7 @@ fecfiler.transactions.schedule\_c.models.ScheduleC
       ~ScheduleC.from_db
       ~ScheduleC.full_clean
       ~ScheduleC.get_constraints
+      ~ScheduleC.get_date
       ~ScheduleC.get_deferred_fields
       ~ScheduleC.get_transaction
       ~ScheduleC.prepare_database_save

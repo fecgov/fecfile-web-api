@@ -129,7 +129,11 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_orignal_loan
       ~TransactionViewsTestCase.test_destroy
       ~TransactionViewsTestCase.test_destroy_with_dependent_parent
+      ~TransactionViewsTestCase.test_get_entity_date_leapfrogging
+      ~TransactionViewsTestCase.test_get_entity_date_leapfrogging_and_contact_change
+      ~TransactionViewsTestCase.test_get_entity_move_date_backwards
       ~TransactionViewsTestCase.test_get_previous_election
+      ~TransactionViewsTestCase.test_get_previous_election_leapfrogging
       ~TransactionViewsTestCase.test_get_previous_entity
       ~TransactionViewsTestCase.test_get_previous_entity_same_day
       ~TransactionViewsTestCase.test_get_queryset
