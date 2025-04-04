@@ -259,7 +259,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 if previous_transaction.aggregate is not None:
                     previous_transaction.aggregate -= original_transaction.amount
                 if previous_transaction.calendar_ytd_per_election_office is not None:
-                    previous_transaction.calendar_ytd_per_election_office -= original_transaction.amount  # noqa: E501
+                    previous_transaction.calendar_ytd_per_election_office -= (
+                        original_transaction.amount
+                    )  # noqa: E501
             serializer = self.get_serializer(previous_transaction)
             return Response(data=serializer.data)
 
@@ -295,9 +297,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 original_contact_1 = original_instance.contact_1
                 original_contact_2 = original_instance.contact_2
                 original_election_code = getattr(
-                    original_instance.get_schedule(),
-                    "election_code",
-                    None
+                    original_instance.get_schedule(), "election_code", None
                 )
 
             transaction_serializer = TransactionSerializer(
@@ -398,16 +398,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         # Set the earlier date in order to detect when a transaction has moved forward
         if original_date and original_date < schedule_instance.get_date():
-            transactions_after_original = Transaction.objects.get_queryset().filter(
-                ~Q(id=original_instance.id),
-                Q(date__year=original_date.year),
-                Q(contact_1=original_contact_1),
-                Q(date__gt=original_date)
-                | Q(date=original_date, created__gt=original_instance.created),
-            ).order_by("date")
+            next_transactions_by_entity = (
+                Transaction.objects.get_queryset()
+                .filter(
+                    ~Q(id=original_instance.id),
+                    Q(date__year=original_date.year),
+                    Q(contact_1=original_contact_1),
+                    Q(date__gt=original_date)
+                    | Q(date=original_date, created__gt=original_instance.created),
+                )
+                .order_by("date")
+            )
 
-            # Default election_entities to an empty queryset
-            election_entities = transactions_after_original[:0]
+            # Default next_transactions_by_election the same queryset as entities
+            next_transactions_by_election = next_transactions_by_entity[0:]
 
             if original_contact_2 is not None:
                 # Capturing these in variables to cut down on line width
@@ -415,26 +419,31 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 original_office = original_contact_2.candidate_office
                 original_state = original_contact_2.candidate_state
 
-                election_entities = Transaction.objects.get_queryset().filter(
-                    ~Q(id=original_instance.id),
-                    Q(
-                        contact_2__candidate_district=original_district,
-                        contact_2__candidate_office=original_office,
-                        contact_2__candidate_state=original_state
-                    ),
-                    Q(date__gt=original_date)
-                    | Q(date=original_date, created__gt=original_instance.created),
-                    Q(
-                        schedule_e__isnull=False,
-                        schedule_e__election_code=original_election_code
-                    ),
-                ).order_by("date")
+                next_transactions_by_election = (
+                    Transaction.objects.get_queryset()
+                    .filter(
+                        ~Q(id=original_instance.id),
+                        Q(
+                            contact_2__candidate_district=original_district,
+                            contact_2__candidate_office=original_office,
+                            contact_2__candidate_state=original_state,
+                        ),
+                        Q(date__gt=original_date)
+                        | Q(date=original_date, created__gt=original_instance.created),
+                        Q(
+                            schedule_e__isnull=False,
+                            schedule_e__election_code=original_election_code,
+                        ),
+                    )
+                    .order_by("date")
+                )
 
-            non_election_entities = transactions_after_original.difference(
-                election_entities
+            # excluding transactions that are already in the next_transactions_by_election queryset
+            next_transactions_by_entity = next_transactions_by_entity.difference(
+                next_transactions_by_election
             )
-            for_manual_recalculation = non_election_entities[:1].union(
-                election_entities[:1]
+            for_manual_recalculation = next_transactions_by_entity[:1].union(
+                next_transactions_by_election[:1]
             )
 
             for to_recalculate in for_manual_recalculation:
