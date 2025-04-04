@@ -438,7 +438,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     .order_by("date")
                 )
 
-            # excluding transactions that are already in the next_transactions_by_election queryset
+            """excluding transactions that are already in 
+            the next_transactions_by_election queryset"""
             next_transactions_by_entity = next_transactions_by_entity.difference(
                 next_transactions_by_election
             )
