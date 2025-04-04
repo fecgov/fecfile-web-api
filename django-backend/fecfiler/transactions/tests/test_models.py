@@ -13,6 +13,7 @@ from fecfiler.contacts.tests.utils import (
 from .utils import (
     create_schedule_a,
     create_schedule_b,
+    create_ie,
     create_debt,
     create_loan,
     create_loan_from_bank,
@@ -1187,6 +1188,59 @@ class TransactionModelTestCase(TestCase):
         tier2.refresh_from_db()
         self.assertFalse(tier1.itemized)
         self.assertFalse(tier2.itemized)
+
+    def test_election_aggregates_accross_committees(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C99999999")
+        individual = create_test_individual_contact("ind", "ividual", other_committee.id)
+        candidate = create_test_candidate_contact(
+            "cand", "idate", other_committee.id, "P99999999", "S", "AK", "01"
+        )
+
+        other_ie = create_ie(
+            other_committee,
+            individual,
+            "2024-01-01",
+            "2024-01-01",
+            "2024-01-01",
+            "999",
+            "G2024",
+            candidate,
+        )
+
+        our_ie = create_ie(
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            "2024-01-02",
+            "2024-01-02",
+            "1000",
+            "G2024",
+            self.contact_2,
+        )
+        our_ie.refresh_from_db()
+
+        # our IE should not include the aggregate of the other committee's IE
+        self.assertEqual(our_ie._calendar_ytd_per_election_office, Decimal("1000.00"))
+
+        our_later_ie = create_ie(
+            self.committee,
+            self.contact_1,
+            "2024-01-03",
+            "2024-01-03",
+            "2024-01-03",
+            "1000",
+            "G2024",
+            self.contact_2,
+        )
+
+        our_later_ie.refresh_from_db()
+
+        """ our later IE should include our first ie but not the other
+        committee's IE"
+        """
+        self.assertEqual(
+            our_later_ie._calendar_ytd_per_election_office, Decimal("2000.00")
+        )
 
 
 def undelete(transaction):
