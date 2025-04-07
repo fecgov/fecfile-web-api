@@ -1196,7 +1196,7 @@ class TransactionModelTestCase(TestCase):
             "cand", "idate", other_committee.id, "P99999999", "S", "AK", "01"
         )
 
-        other_ie = create_ie(
+        create_ie(
             other_committee,
             individual,
             "2024-01-01",
