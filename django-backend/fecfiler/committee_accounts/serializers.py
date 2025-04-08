@@ -91,6 +91,9 @@ class CommitteeManagementEventSerializer(CommitteeOwnedSerializer):
             f.name
             for f in CommitteeManagementEvent._meta.get_fields()
             if f.name not in ["deleted"]
+        ] + [
+            "created",
+            "event"
         ]
 
         read_only_fields = ["id", "created", "user_uuid", "event"]

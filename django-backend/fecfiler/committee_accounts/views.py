@@ -313,7 +313,18 @@ class CommitteeManagementEventViewSet(CommitteeOwnedViewMixin, viewsets.ModelVie
     filter_backends = [filters.OrderingFilter]
     ordering = ["created"]
 
-    queryset = Membership.objects.all()
+    queryset = CommitteeManagementEvent.objects.all()
 
     def get_queryset(self):
         return super().get_queryset()
+
+    """
+    def list(self, request, *args, **kwargs):
+        serializer = CommitteeManagementEventSerializer()
+        response = super(CommitteeManagementEventViewSet, self).list(request, *args, **kwargs)
+        response.data["results"] = [
+            serializer.to_representation(event)
+            for event in list(self.get_queryset())
+        ]
+        return response
+    """
