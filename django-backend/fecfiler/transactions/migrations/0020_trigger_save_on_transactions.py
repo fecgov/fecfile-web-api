@@ -1,4 +1,4 @@
-from django.db import migrations
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     def trigger_save_on_transactions(apps, schema_editor):
         transactions = apps.get_model("transactions", "transaction")
-        transactions.objects.update()
+        transactions.objects.update(id=models.F('id'))
 
     operations = [
         migrations.RunPython(trigger_save_on_transactions, migrations.RunPython.noop),
