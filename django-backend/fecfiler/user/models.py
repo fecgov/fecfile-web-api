@@ -46,9 +46,7 @@ class User(AbstractUser):
         )
 
         for pending_membership in pending_memberships:
-            pending_membership.user = self
-            pending_membership.pending_email = None
-            pending_membership.save()
+            pending_membership.redeem(self)
 
         redeemed_count = len(pending_memberships)
         if redeemed_count > 0:

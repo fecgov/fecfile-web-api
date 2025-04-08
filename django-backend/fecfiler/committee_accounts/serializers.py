@@ -1,4 +1,4 @@
-from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.committee_accounts.models import CommitteeAccount, CommitteeManagementEvent, Membership
 from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer, ChoiceField, SerializerMethodField
@@ -82,3 +82,15 @@ class CommitteeMembershipSerializer(CommitteeOwnedSerializer):
     @extend_schema_field(OpenApiTypes.STR)
     def get_email(self, instance):
         return instance.user.email if instance.user else instance.pending_email
+
+
+class CommitteeManagementEventSerializer(CommitteeOwnedSerializer):
+    class Meta:
+        model = CommitteeManagementEvent
+        fields = [
+            f.name
+            for f in CommitteeManagementEvent._meta.get_fields()
+            if f.name not in ["deleted"]
+        ]
+
+        read_only_fields = ["id", "created", "user_uuid", "event"]

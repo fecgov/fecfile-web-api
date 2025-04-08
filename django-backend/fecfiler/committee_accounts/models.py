@@ -4,6 +4,9 @@ from django.core.validators import RegexValidator
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.user.models import User
 from django.core.exceptions import ValidationError
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 COMMITTEE_ID_REGEX = RegexValidator(r"^C[0-9]{8}$", "invalid committee id format")
 
@@ -51,6 +54,28 @@ class CommitteeOwnedModel(models.Model):
         abstract = True
 
 
+class CommitteeManagementEvent(CommitteeOwnedModel):
+    id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        primary_key=True,
+        serialize=False,
+        unique=True,
+    )
+    user_uuid = models.UUIDField(editable=False)
+    event = models.TextField(editable=False)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+
+    def save(self, **kwargs):
+        from_db = CommitteeManagementEvent.objects.filter(id=self.id)
+
+        if len(from_db) == 0:
+            logger.info(self.event)
+            super().save()
+        else:
+            raise ValueError("Cannot update CommitteeManagementEvent objects")
+
+
 class Membership(CommitteeOwnedModel):
     class CommitteeRole(models.TextChoices):
         COMMITTEE_ADMINISTRATOR = "COMMITTEE_ADMINISTRATOR"
@@ -71,6 +96,24 @@ class Membership(CommitteeOwnedModel):
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def redeem(self, user):
+        if self.user is not None:
+            raise ValueError("Cannot redeem a non-pending membership")
+        if user is None:
+            raise ValueError("Cannot redeem pending membership with null user")
+
+        event_message = f"Pending membership for {self.pending_email} redeemed by user {user.id}"
+        CommitteeManagementEvent.objects.create(
+            committee_account=self.committee_account,
+            user_uuid=user.id,
+            event=event_message,
+        )
+
+        self.user = user
+        self.pending_email = None
+        self.save()
+
 
     def delete(self, *args, **kwargs):
         """

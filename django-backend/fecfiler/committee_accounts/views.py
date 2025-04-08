@@ -4,7 +4,7 @@ from rest_framework import filters, viewsets, mixins, pagination, status
 from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.committee_accounts.models import CommitteeAccount, CommitteeManagementEvent, Membership
 from fecfiler.committee_accounts.utils import (
     check_can_create_committee_account,
     create_committee_account,
@@ -12,7 +12,7 @@ from fecfiler.committee_accounts.utils import (
 )
 from django.core.exceptions import ValidationError
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
+from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer, CommitteeManagementEventSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
@@ -52,7 +52,6 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             return Response("Committee could not be activated", status=403)
         request.session["committee_id"] = str(committee.committee_id)
         request.session["committee_uuid"] = str(committee.id)
-
         return Response("Committee activated")
 
     @action(detail=False, methods=["get"])
@@ -164,6 +163,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
     def add_member(self, request):
         committee_uuid = self.request.session["committee_uuid"]
         committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
+        committee_id = committee.committee_id 
 
         email = request.data.get("email", None)
         role = request.data.get("role", None)
@@ -212,9 +212,16 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         new_member = Membership(**membership_args)
         new_member.save()
 
-        action = f'existing user {user.id} to' if user else "pending membership for"
-        logger.info(
-            f'User {request.user.id} added {action} committee {committee} as {role}'
+        action = ""
+        if user:
+            action = f'existing user {user.id} to'
+        else:
+            action = f'pending membership "{email}" for'
+
+        CommitteeManagementEvent.objects.create(
+            event=f'User {request.user.id} added {action} committee {committee_id} as {role}',
+            committee_account=committee,
+            user_uuid=request.user.id
         )
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
@@ -228,10 +235,12 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
     def remove_member(self, request, pk: UUID):
         member: Membership = self.get_object()
         committee_id = request.session["committee_id"]
+        committee = CommitteeAccount.objects.get(id=request.session["committee_uuid"])
         if member.user == request.user:
-            logger.info(
-                f"{request.user.id} attempted to remove themselves "
-                f"from committee {committee_id}"
+            CommitteeManagementEvent.objects.create(
+                event=f"{request.user.id} attempted to remove themselves from committee {committee_id}",
+                committee_account=committee,
+                user_uuid=request.user.id
             )
             return Response(
                 {"error": "You cannot remove yourself from the committee."}, status=400
@@ -239,17 +248,20 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
         # Call the model's delete method (which already checks the admin count)
         try:
-            member.delete()
+            user_type = ""
             if member.user is not None:
-                logger.info(
-                    f"{request.user.id} removed user {member.user.id} "
-                    f"from committee {committee_id}"
-                )
+                user_type = f"user {member.user.id}"
             else:
-                logger.info(
-                    f"{request.user.id} removed pending membership {member.id} "
-                    f"from committee {committee_id}"
-                )
+                user_type = f'pending membership "{member.pending_email}"'
+
+            CommitteeManagementEvent.objects.create(
+                event=f'User {request.user.id} removed {user_type} from committee {committee.committee_id}',
+                committee_account=committee,
+                user_uuid=request.user.id
+            )
+
+            member.delete()
+
             return Response({"success": "Membership removed."})
         except ValidationError as e:
             logger.info(f"{str(e)}")
@@ -285,8 +297,23 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
             membership_id = existing_member.id
             member_string = f'pending membership {membership_id}'
 
-        logger.info(
-            f'Updating role for {member_string} in committee {committee} to {new_role}'
+        event_message = f'Updating role for {member_string} in committee {committee} to {new_role}'
+        logger.info(event_message)
+        CommitteeManagementEvent.objects.create(
+            committee_account=committee,
+            user_uuid=request.user.id,
+            event=event_message
         )
 
         return super().update(request, *args, **kwargs)
+
+
+class CommitteeManagementEventViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
+    serializer_class = CommitteeManagementEventSerializer
+    filter_backends = [filters.OrderingFilter]
+    ordering = ["created"]
+
+    queryset = Membership.objects.all()
+
+    def get_queryset(self):
+        return super().get_queryset()
