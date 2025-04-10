@@ -60,6 +60,7 @@ services:
             LOG_FORMAT:
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
+            FEC_FORMAT_VERSION: 8.4
         deploy:
             resources:
                 limits:
@@ -101,6 +102,7 @@ services:
             LOG_FORMAT:
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
+            FEC_FORMAT_VERSION: 8.4
         deploy:
             resources:
                 limits:
@@ -157,6 +159,7 @@ services:
             SECONDARY_POLLING_INTERVAL: 3600
             SECONDARY_POLLING_DURATION: 86400
             ENABLE_RESTRICTED_COMMANDS: True
+            FEC_FORMAT_VERSION: 8.4
 
             # ---- FEATURE FLAGS ----
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED

@@ -33,6 +33,7 @@ defaults: &defaults
     # ---- FEATURE FLAGS ----
     FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are TEST and PRODUCTION
     ENABLE_RESTRICTED_COMMANDS: True
+    FEC_FORMAT_VERSION: 8.4
 
 applications:
   - name: fecfile-web-api
