@@ -66,6 +66,8 @@ class ContactSerializer(
                             Q(contact_1_id=OuterRef("id"))
                             | Q(contact_2_id=OuterRef("id"))
                             | Q(contact_3_id=OuterRef("id"))
+                            | Q(contact_4_id=OuterRef("id"))
+                            | Q(contact_5_id=OuterRef("id"))
                         )
                     )
                 )

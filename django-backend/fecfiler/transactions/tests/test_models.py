@@ -3,6 +3,7 @@ from django.test import TestCase
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.models import Transaction
+from fecfiler.memo_text.models import MemoText
 from fecfiler.contacts.tests.utils import (
     create_test_committee_contact,
     create_test_individual_contact,
@@ -12,6 +13,7 @@ from fecfiler.contacts.tests.utils import (
 from .utils import (
     create_schedule_a,
     create_schedule_b,
+    create_ie,
     create_debt,
     create_loan,
     create_loan_from_bank,
@@ -673,6 +675,34 @@ class TransactionModelTestCase(TestCase):
         self.assertIsNotNone(reattribution_to.deleted)
         self.assertIsNotNone(reattribution_from.deleted)
 
+    def test_transaction_and_memo_text_soft_delete(self):
+        memo_text = MemoText.objects.create(text4000="Test")
+        self.partnership_receipt.memo_text = memo_text
+        self.partnership_receipt.save()
+        self.partnership_receipt.refresh_from_db()
+        memo_text.refresh_from_db()
+
+        self.assertIsNone(self.partnership_receipt.deleted)
+        self.assertIsNone(memo_text.deleted)
+
+        self.partnership_receipt.delete()
+
+        self.partnership_receipt.refresh_from_db()
+        memo_text.refresh_from_db()
+
+        self.assertIsNotNone(self.partnership_receipt.deleted)
+        self.assertIsNotNone(memo_text.deleted)
+
+    def test_hard_delete_memo_when_empty(self):
+        memo_text = MemoText.objects.create(text4000="Test")
+        self.partnership_receipt.memo_text = memo_text
+        self.partnership_receipt.save()
+        self.assertTrue(MemoText.objects.filter(id=memo_text.id).exists())
+
+        self.partnership_receipt.memo_text.text4000 = ""
+        self.partnership_receipt.save()
+        self.assertFalse(MemoText.objects.filter(id=memo_text.id).exists())
+
     def test_can_delete_loan(self):
         self.loan.refresh_from_db()
         self.loan_made.refresh_from_db()
@@ -1158,6 +1188,59 @@ class TransactionModelTestCase(TestCase):
         tier2.refresh_from_db()
         self.assertFalse(tier1.itemized)
         self.assertFalse(tier2.itemized)
+
+    def test_election_aggregates_accross_committees(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C99999999")
+        individual = create_test_individual_contact("ind", "ividual", other_committee.id)
+        candidate = create_test_candidate_contact(
+            "cand", "idate", other_committee.id, "P99999999", "S", "AK", "01"
+        )
+
+        create_ie(
+            other_committee,
+            individual,
+            "2024-01-01",
+            "2024-01-01",
+            "2024-01-01",
+            "999",
+            "G2024",
+            candidate,
+        )
+
+        our_ie = create_ie(
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            "2024-01-02",
+            "2024-01-02",
+            "1000",
+            "G2024",
+            self.contact_2,
+        )
+        our_ie.refresh_from_db()
+
+        # our IE should not include the aggregate of the other committee's IE
+        self.assertEqual(our_ie._calendar_ytd_per_election_office, Decimal("1000.00"))
+
+        our_later_ie = create_ie(
+            self.committee,
+            self.contact_1,
+            "2024-01-03",
+            "2024-01-03",
+            "2024-01-03",
+            "1000",
+            "G2024",
+            self.contact_2,
+        )
+
+        our_later_ie.refresh_from_db()
+
+        """ our later IE should include our first ie but not the other
+        committee's IE"
+        """
+        self.assertEqual(
+            our_later_ie._calendar_ytd_per_election_office, Decimal("2000.00")
+        )
 
 
 def undelete(transaction):

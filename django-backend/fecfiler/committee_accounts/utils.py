@@ -41,7 +41,7 @@ def check_email_match(email, f1_emails):
         f1_email_lowercase = f1_emails.lower()
         f1_emails = re.split(r"[;,]", f1_email_lowercase)
         if email.lower() not in f1_emails:
-            return f"Email {email} does not match committee email"
+            return "Email does not match committee email"
     return None
 
 
@@ -56,7 +56,9 @@ def check_can_create_committee_account(committee_id, user):
         failure_reason = f"Committee account {committee_id} already created"
 
     if failure_reason:
-        logger.error(f"Failure to create committee account: {failure_reason}")
+        logger.error(
+            f"User {user.id} failed to create committee account: {failure_reason}"
+        )
         return False
 
     return True

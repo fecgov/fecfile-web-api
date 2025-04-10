@@ -46,7 +46,7 @@ report_code_label_case = Case(
 
 
 def get_report_code_label(report: Report):
-    if report.form_3x:
+    if report.form_3x or report.form_3:
         return report_code_label_mapping[report.report_code]
     if report.form_24:
         return f"{report.form_24.report_type_24_48} HOUR"
