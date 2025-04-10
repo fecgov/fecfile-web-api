@@ -1,6 +1,0 @@
-fecfiler.settings.base.FEC\_AGENCY\_ID
-======================================
-
-.. currentmodule:: fecfiler.settings.base
-
-.. autodata:: FEC_AGENCY_ID

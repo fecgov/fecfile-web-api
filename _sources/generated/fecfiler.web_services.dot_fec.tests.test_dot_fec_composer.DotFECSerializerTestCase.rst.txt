@@ -117,6 +117,7 @@ fecfiler.web\_services.dot\_fec.tests.test\_dot\_fec\_composer.DotFECSerializerT
       ~DotFECSerializerTestCase.test_add_row_to_content
       ~DotFECSerializerTestCase.test_compose_dot_fec
       ~DotFECSerializerTestCase.test_f99
+      ~DotFECSerializerTestCase.test_missing_fec_format_version_raises_error
       ~DotFECSerializerTestCase.test_row_contains_aggregate
    
    

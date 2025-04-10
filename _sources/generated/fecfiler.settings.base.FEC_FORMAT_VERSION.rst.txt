@@ -1,0 +1,6 @@
+fecfiler.settings.base.FEC\_FORMAT\_VERSION
+===========================================
+
+.. currentmodule:: fecfiler.settings.base
+
+.. autodata:: FEC_FORMAT_VERSION
