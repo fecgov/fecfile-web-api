@@ -10,7 +10,7 @@ class UserManager(AbstractUserManager):
         new_user = super().create_user(user_id, **obj_data)
 
         logger.info(
-            f"New User Created: {obj_data['email']}"
+            f"New User Created: {new_user.id}"
         )
 
         new_user.redeem_pending_memberships()

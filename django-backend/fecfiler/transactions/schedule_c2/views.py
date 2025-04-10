@@ -1,4 +1,4 @@
-from django.db import models
+from django.db.models import Q, Subquery
 from fecfiler.transactions.models import Transaction
 from django.forms.models import model_to_dict
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
@@ -15,7 +15,9 @@ def save_hook(transaction: Transaction, is_existing):
 
 
 def create_in_future_reports(transaction):
-    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    current_report = transaction.reports.filter(
+        Q(form_3x__isnull=False) | Q(form_3__isnull=False)
+    ).first()
     future_reports = current_report.get_future_in_progress_reports()
     for report in future_reports:
         loan_query = Transaction.objects.filter(
@@ -28,7 +30,9 @@ def create_in_future_reports(transaction):
 
 
 def update_in_future_reports(transaction):
-    current_report = transaction.reports.filter(form_3x__isnull=False).first()
+    current_report = transaction.reports.filter(
+        Q(form_3x__isnull=False) | Q(form_3__isnull=False)
+    ).first()
     future_reports = current_report.get_future_in_progress_reports()
 
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
@@ -36,13 +40,13 @@ def update_in_future_reports(transaction):
     del transaction_copy["reports"]
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
-        reports__id__in=models.Subquery(future_reports.values("id")),
+        reports__id__in=Subquery(future_reports.values("id")),
     )
     transactions_to_update.update(**transaction_copy)
 
     schedule_c2_copy = copy.deepcopy(model_to_dict(transaction.schedule_c2))
     schedule_c2s_to_update = ScheduleC2.objects.filter(
-        transaction__schedule_c2_id__in=models.Subquery(
+        transaction__schedule_c2_id__in=Subquery(
             transactions_to_update.values("schedule_c2_id")
         )
     )

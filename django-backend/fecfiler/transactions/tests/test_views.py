@@ -52,7 +52,15 @@ class TransactionViewsTestCase(TestCase):
             "last name", "First name", self.committee.id, "H8MA03131", "S", "AK", "01"
         )
         self.contact_3 = create_test_individual_contact(
-            "last name", "First name", self.committee.id,
+            "last name",
+            "First name",
+            self.committee.id,
+            {
+                "street_1": "Test St",
+                "city": "Testville",
+                "state": "IL",
+                "zip": "12345"
+            }
         )
         self.transaction = create_ie(
             self.committee,
@@ -61,6 +69,16 @@ class TransactionViewsTestCase(TestCase):
             "2023-01-15",
             "2023-01-15",
             "153.00",
+            "C2012",
+            self.contact_2,
+        )
+        self.transaction_2 = create_ie(
+            self.committee,
+            self.contact_1,
+            "2023-01-22",
+            "2023-01-25",
+            "2023-01-25",
+            "147.00",
             "C2012",
             self.contact_2,
         )
@@ -226,9 +244,9 @@ class TransactionViewsTestCase(TestCase):
 
         view_set = TransactionViewSet()
         view_set.request = self.post_request({}, {"schedules": "A,B,C,C2,D,E"})
-        self.assertEqual(view_set.get_queryset().count(), 12)
+        self.assertEqual(view_set.get_queryset().count(), 13)
         view_set.request = self.post_request({}, {"schedules": "A,B,D,E"})
-        self.assertEqual(view_set.get_queryset().count(), 10)
+        self.assertEqual(view_set.get_queryset().count(), 11)
         view_set.request = self.post_request({}, {"schedules": ""})
         self.assertEqual(view_set.get_queryset().count(), 0)
 
@@ -313,6 +331,197 @@ class TransactionViewsTestCase(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
+    def test_get_entity_date_leapfrogging(self):
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+        view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
+
+        first_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_3,
+            "2023-01-12",
+            "153.00",
+        )
+
+        second_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_3,
+            "2023-01-12",
+            "47.00",
+        )
+
+        response = view_set.previous_transaction_by_entity(
+            self.post_request(
+                {},
+                {
+                    "transaction_id": first_transaction.id,
+                    "contact_1_id": str(self.contact_3.id),
+                    "date": "2023-01-15",
+                    "aggregation_group": "GENERAL",
+                },
+            )
+        )
+        self.assertEqual(response.data['id'], str(second_transaction.id))
+        self.assertEqual(response.data['aggregate'], '47.00')
+
+        transaction_data = {
+            **self.transaction_serializer.to_representation(first_transaction),
+            **{
+                "contribution_date": "2023-01-15",
+                "schedule_id": "A",
+                "schema_name": "INDIVIDUAL_RECEIPT",
+                "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
+            },
+        }
+
+        view_set.save_transaction(
+            transaction_data,
+            view_set.request
+        )
+
+        saved_transaction = view_set.get_queryset().get(id=first_transaction.id)
+        self.assertEqual(str(saved_transaction.aggregate), '200.00')
+
+    def test_get_entity_date_leapfrogging_and_contact_change(self):
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+        view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
+
+        first_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_3,
+            "2023-01-12",
+            "153.00",
+        )
+
+        second_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_3,
+            "2023-01-15",
+            "47.00",
+        )
+
+        third_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_2,
+            "2023-01-20",
+            "25.00",
+        )
+
+        first_transaction.contact_1 = self.contact_2
+
+        transaction_data = {
+            **self.transaction_serializer.to_representation(first_transaction),
+            **{
+                "contribution_date": "2023-01-18",
+                "schedule_id": "A",
+                "schema_name": "INDIVIDUAL_RECEIPT",
+                "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
+                "contributor_street_1": "Test",
+                "contributor_city": "Testville",
+                "contributor_state": "IL",
+                "contributor_zip": "12345"
+            },
+        }
+
+        view_set.save_transaction(
+            transaction_data,
+            view_set.request
+        )
+
+        first_transaction.refresh_from_db()
+        second_transaction.refresh_from_db()
+        third_transaction.refresh_from_db()
+
+        self.assertEqual(str(first_transaction.aggregate), '153.00')
+        self.assertEqual(str(second_transaction.aggregate), '47.00')
+        self.assertEqual(str(third_transaction.aggregate), '178.00')
+
+    def test_get_entity_move_date_backwards(self):
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+        view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
+
+        first_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_3,
+            "2023-01-12",
+            "153.00",
+        )
+
+        second_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_3,
+            "2023-01-15",
+            "47.00",
+        )
+
+        third_transaction = create_schedule_a(
+            "IND",
+            self.committee,
+            self.contact_3,
+            "2023-01-18",
+            "25.00",
+        )
+
+        response = view_set.previous_transaction_by_entity(
+            self.post_request(
+                {},
+                {
+                    "transaction_id": first_transaction.id,
+                    "contact_1_id": str(self.contact_3.id),
+                    "date": "2023-01-15",
+                    "aggregation_group": "GENERAL",
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+        transaction_data = {
+            **self.transaction_serializer.to_representation(third_transaction),
+            **{
+                "contribution_date": "2023-01-10",
+                "schedule_id": "A",
+                "schema_name": "INDIVIDUAL_RECEIPT",
+                "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
+            },
+        }
+
+        view_set.save_transaction(
+            transaction_data,
+            view_set.request
+        )
+
+        saved_transaction = view_set.get_queryset().get(id=first_transaction.id)
+        self.assertEqual(str(saved_transaction.aggregate), '178.00')
+        response = view_set.previous_transaction_by_entity(
+            self.post_request(
+                {},
+                {
+                    "transaction_id": first_transaction.id,
+                    "contact_1_id": str(self.contact_3.id),
+                    "date": "2023-01-15",
+                    "aggregation_group": "GENERAL",
+                },
+            )
+        )
+        self.assertEqual(response.data['id'], str(third_transaction.id))
+
+        first_transaction.refresh_from_db()
+        second_transaction.refresh_from_db()
+        third_transaction.refresh_from_db()
+
+        self.assertEqual(str(first_transaction.aggregate), '178.00')
+        self.assertEqual(str(second_transaction.aggregate), '225.00')
+        self.assertEqual(str(third_transaction.aggregate), '25.00')
+
     def test_get_previous_election(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
@@ -356,7 +565,29 @@ class TransactionViewsTestCase(TestCase):
         response = view_set.previous_transaction_by_election(view_set.request)
         transaction = response.data
 
-        self.assertEqual(transaction.get("date"), "2023-01-12")
+        self.assertEqual(transaction.get("date"), "2023-01-22")
+
+    def test_get_previous_election_leapfrogging(self):
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+
+        view_set.request = self.post_request(
+            {},
+            {
+                "transaction_id": self.transaction.id,
+                "date": "2023-10-31",
+                "aggregation_group": "INDEPENDENT_EXPENDITURE",
+                "election_code": "C2012",
+                "candidate_office": "S",
+                "candidate_state": "AK",
+                "candidate_district": "01",
+            },
+        )
+        response = view_set.previous_transaction_by_election(view_set.request)
+        transaction = response.data
+
+        self.assertEqual(transaction.get("date"), "2023-01-22")
+        self.assertEqual(transaction.get("calendar_ytd_per_election_office"), "147.00")
 
     def test_inherited_election_aggregate(self):
         request = self.factory.get(f"/api/v1/transactions/{self.transaction.id}/")

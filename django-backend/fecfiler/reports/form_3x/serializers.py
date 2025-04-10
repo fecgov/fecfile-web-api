@@ -1,12 +1,14 @@
 from django.db import transaction
 from fecfiler.reports.models import Report
 from fecfiler.reports.form_3x.models import Form3X
-from fecfiler.reports.serializers import ReportSerializer
+from fecfiler.reports.serializers import (
+    ReportSerializer,
+    COVERAGE_DATE_REPORT_CODE_COLLISION,
+)
 from fecfiler.shared.utilities import get_model_data
 from django.db.models import Q
 from rest_framework.serializers import (
     CharField,
-    ValidationError,
     DecimalField,
     DateField,
     BooleanField,
@@ -14,10 +16,6 @@ from rest_framework.serializers import (
 import structlog
 
 logger = structlog.get_logger(__name__)
-
-COVERAGE_DATE_REPORT_CODE_COLLISION = ValidationError(
-    {"report_code": ["Collision with existing report_code and year"]}
-)
 
 
 class Form3XSerializer(ReportSerializer):

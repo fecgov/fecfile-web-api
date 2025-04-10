@@ -134,7 +134,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 Q(contact_1=contact_id)
                 | Q(contact_2=contact_id)
                 | Q(contact_3=contact_id)
+                | Q(contact_4=contact_id)
+                | Q(contact_5=contact_id)
             )
+
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -234,16 +237,31 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 Q(contact_2__candidate_state=state),
                 Q(contact_2__candidate_district=district),
             )
+
+        original_transaction = None
         if transaction_id:
-            transaction = self.get_queryset().get(id=transaction_id)
+            original_transaction = self.get_queryset().get(id=transaction_id)
             query = query.filter(
-                Q(created__lt=transaction.created) | ~Q(date=date)
+                Q(created__lt=original_transaction.created) | ~Q(date=date)
             )
 
         query = query.order_by("-date", "-created")
         previous_transaction = query.first()
 
         if previous_transaction:
+            if original_transaction and (
+                original_transaction.date < previous_transaction.date
+                or (
+                    original_transaction.date == previous_transaction.date
+                    and original_transaction.created < previous_transaction.created
+                )
+            ):
+                if previous_transaction.aggregate is not None:
+                    previous_transaction.aggregate -= original_transaction.amount
+                if previous_transaction.calendar_ytd_per_election_office is not None:
+                    previous_transaction.calendar_ytd_per_election_office -= (
+                        original_transaction.amount
+                    )  # noqa: E501
             serializer = self.get_serializer(previous_transaction)
             return Response(data=serializer.data)
 
@@ -264,16 +282,31 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         if transaction_data.get("form_type"):
             transaction_data["_form_type"] = transaction_data["form_type"]
 
+        # Original values used to manually trigger aggregate recalculation
+        original_instance = None
+        original_date = None
+        original_contact_1 = None
+        original_contact_2 = None
+        original_election_code = None
+
         is_existing = "id" in transaction_data
         if is_existing:
-            transaction_instance = Transaction.objects.get(pk=transaction_data["id"])
+            original_instance = Transaction.objects.get(pk=transaction_data["id"])
+            if original_instance is not None:
+                original_date = original_instance.get_date()
+                original_contact_1 = original_instance.contact_1
+                original_contact_2 = original_instance.contact_2
+                original_election_code = getattr(
+                    original_instance.get_schedule(), "election_code", None
+                )
+
             transaction_serializer = TransactionSerializer(
-                transaction_instance,
+                original_instance,
                 data=transaction_data,
                 context={"request": request},
             )
             schedule_serializer = SCHEDULE_SERIALIZERS.get(schedule)(
-                transaction_instance.get_schedule(), data=transaction_data
+                original_instance.get_schedule(), data=transaction_data
             )
         else:
             transaction_serializer = TransactionSerializer(
@@ -287,7 +320,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             contact_key: create_or_update_contact(
                 transaction_data, contact_key, committee_id
             )
-            for contact_key in ["contact_1", "contact_2", "contact_3"]
+            for contact_key in [
+                "contact_1",
+                "contact_2",
+                "contact_3",
+                "contact_4",
+                "contact_5",
+            ]
             if contact_key in transaction_data
         }
         transaction_serializer.is_valid(raise_exception=True)
@@ -356,6 +395,63 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         update_dependent_children(transaction_instance)
         delete_carried_forward_loans_if_needed(transaction_instance, committee_id)
         delete_carried_forward_debts_if_needed(transaction_instance, committee_id)
+
+        # Set the earlier date in order to detect when a transaction has moved forward
+        if original_date and original_date < schedule_instance.get_date():
+            next_transactions_by_entity = (
+                Transaction.objects.get_queryset()
+                .filter(
+                    ~Q(id=original_instance.id),
+                    Q(date__year=original_date.year),
+                    Q(contact_1=original_contact_1),
+                    Q(date__gt=original_date)
+                    | Q(date=original_date, created__gt=original_instance.created),
+                )
+                .order_by("date")
+            )
+
+            # Default next_transactions_by_election the same queryset as entities
+            next_transactions_by_election = next_transactions_by_entity[:0]
+
+            if original_contact_2 is not None:
+                # Capturing these in variables to cut down on line width
+                original_district = original_contact_2.candidate_district
+                original_office = original_contact_2.candidate_office
+                original_state = original_contact_2.candidate_state
+
+                next_transactions_by_election = (
+                    Transaction.objects.get_queryset()
+                    .filter(
+                        ~Q(id=original_instance.id),
+                        Q(
+                            contact_2__candidate_district=original_district,
+                            contact_2__candidate_office=original_office,
+                            contact_2__candidate_state=original_state,
+                        ),
+                        Q(date__gt=original_date)
+                        | Q(date=original_date, created__gt=original_instance.created),
+                        Q(
+                            schedule_e__isnull=False,
+                            schedule_e__election_code=original_election_code,
+                        ),
+                    )
+                    .order_by("date")
+                )
+
+            """excluding transactions that are already in
+            the next_transactions_by_election queryset"""
+            next_transactions_by_entity = next_transactions_by_entity.difference(
+                next_transactions_by_election
+            )
+            for_manual_recalculation = next_transactions_by_entity[:1].union(
+                next_transactions_by_election[:1]
+            )
+
+            for to_recalculate in for_manual_recalculation:
+                # By saving this transaction, we trigger aggregate recalculation
+                # on this and subsequent transactions
+                to_recalculate.save()
+
         return self.queryset.get(id=transaction_instance.id)
 
     @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
@@ -450,7 +546,9 @@ def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_i
         current_loan_balance = current_loan.loan_balance
         original_loan_id = current_loan.loan_id or current_loan.id
         if current_loan_balance == 0:
-            current_report = transaction.reports.filter(form_3x__isnull=False).first()
+            current_report = transaction.reports.filter(
+                Q(form_3x__isnull=False) | Q(form_3__isnull=False)
+            ).first()
             future_reports = current_report.get_future_in_progress_reports()
             transactions_to_delete = list(
                 Transaction.objects.filter(
@@ -468,7 +566,9 @@ def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_i
         current_debt_balance = current_debt.balance_at_close
         original_debt_id = current_debt.debt_id or current_debt.id
         if current_debt_balance == 0:
-            current_report = transaction.reports.filter(form_3x__isnull=False).first()
+            current_report = transaction.reports.filter(
+                Q(form_3x__isnull=False) | Q(form_3__isnull=False)
+            ).first()
             future_reports = current_report.get_future_in_progress_reports()
             transactions_to_delete = list(
                 Transaction.objects.filter(

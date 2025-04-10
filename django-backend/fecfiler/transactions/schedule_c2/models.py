@@ -17,5 +17,8 @@ class ScheduleC2(models.Model):
     def get_transaction(self):
         return self.transaction_set.first()
 
+    def get_date(self):
+        return None
+
     class Meta:
         app_label = "transactions"

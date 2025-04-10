@@ -52,3 +52,25 @@ class FeedbackViewSet(viewsets.ViewSet):
         except Exception as error:
             logger.error(f"An error occured while submitting feedback: {str(error)}")
             raise error
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="csp-report",
+    )
+    def log_csp_report(self, request):
+        if (
+            not hasattr(request, "data")
+            or request.data is None
+            or request.data.get("type") != "csp-violation"
+        ):
+            return Response("Invalid CSP Violation Report", status=400)
+
+        try:
+            logger.warning({"CSP Failure": request.data})
+            return Response("Received CSP Violation Report", status=200)
+        except Exception as error:
+            logger.error(
+                f"An error occurred while processing CSP Violation Report: {str(error)}"
+            )
+            raise error
