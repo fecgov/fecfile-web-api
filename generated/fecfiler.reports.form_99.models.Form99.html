@@ -92,7 +92,7 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_99.models.Form99.refresh_from_db" title="fecfiler.reports.form_99.models.Form99.refresh_from_db"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refresh_from_db</span></code></a>([using, fields, from_queryset])</p></td>
 <td><p>Reload field values from the database.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_99.models.Form99.save" title="fecfiler.reports.form_99.models.Form99.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_99.models.Form99.save" title="fecfiler.reports.form_99.models.Form99.save"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save</span></code></a>(*args[, force_insert, force_update, ...])</p></td>
 <td><p>Save the current instance.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_99.models.Form99.save_base" title="fecfiler.reports.form_99.models.Form99.save_base"><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_base</span></code></a>([raw, force_insert, force_update, ...])</p></td>
@@ -131,9 +131,6 @@
 <td><p>Accessor to the related objects manager on the reverse side of a many-to-one relation.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">text_code</span></code></p></td>
-<td><p>A wrapper for a deferred-loading field.</p></td>
-</tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">text_code_2</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
 </tbody>
@@ -210,7 +207,7 @@ of the field will call this method.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.reports.form_99.models.Form99.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.reports.form_99.models.Form99.save" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_insert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_update</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.reports.form_99.models.Form99.save" title="Link to this definition">¶</a></dt>
 <dd><p>Save the current instance. Override this in a subclass if you want to
 control the saving process.</p>
 <p>The ‘force_insert’ and ‘force_update’ parameters can be used to insist
