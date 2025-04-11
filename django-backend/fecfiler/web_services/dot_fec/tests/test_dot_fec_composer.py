@@ -1,7 +1,9 @@
+from unittest.mock import patch
 from django.test import TestCase
 from fecfiler.web_services.dot_fec.dot_fec_composer import (
     compose_dot_fec,
     add_row_to_content,
+    compose_header,
 )
 from fecfiler.web_services.dot_fec.dot_fec_serializer import (
     serialize_instance,
@@ -12,6 +14,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x, create_form99, create_report_memo
 from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.contacts.tests.utils import create_test_individual_contact
+from django.core.exceptions import ImproperlyConfigured
 from datetime import datetime
 
 
@@ -119,3 +122,9 @@ class DotFECSerializerTestCase(TestCase):
             "[BEGINTEXT]\r\n\nBEHOLD! A large text string"
             + "\nwith new lines\r\n[ENDTEXT]\r\n",
         )
+
+    @patch("fecfiler.web_services.dot_fec.dot_fec_composer.FEC_FORMAT_VERSION", None)
+    def test_missing_fec_format_version_raises_error(self):
+        with self.assertRaises(ImproperlyConfigured) as cm:
+            compose_header(self.f3x.id)
+        self.assertIn("FEC_FORMAT_VERSION is not set", str(cm.exception))

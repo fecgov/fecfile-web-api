@@ -3,9 +3,9 @@ from fecfiler.memo_text.models import MemoText
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.managers import Schedule
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ImproperlyConfigured
 from .dot_fec_serializer import serialize_instance, CRLF_STR
-from fecfiler.settings import OUTPUT_TEST_INFO_IN_DOT_FEC
+from fecfiler.settings import OUTPUT_TEST_INFO_IN_DOT_FEC, FEC_FORMAT_VERSION
 from fecfiler.transactions.schedule_a.utils import add_schedule_a_contact_fields
 from fecfiler.transactions.schedule_b.utils import add_schedule_b_contact_fields
 from fecfiler.transactions.schedule_c.utils import add_schedule_c_contact_fields
@@ -108,11 +108,14 @@ def compose_header(report_id):
     report_result = Report.objects.filter(id=report_id)
     if report_result.exists():
         report = report_result.first()
+        if not FEC_FORMAT_VERSION:
+            raise ImproperlyConfigured("FEC_FORMAT_VERSION is not set in settings.")
         logger.info(f"composing header: {report_id}")
+
         return Header(
             "HDR",
             "FEC",
-            "8.4",
+            FEC_FORMAT_VERSION,
             "FECFile Online",
             "0.0.1",
             report.report_id,
