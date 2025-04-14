@@ -69,9 +69,6 @@ def create_dot_fec(
         submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
 
-    if submission is None:
-        raise ValueError("No UploadSubmission or WebPrintSubmission object found!")
-
     try:
         file_content = compose_dot_fec(report_id)
         if file_name is None:
@@ -84,7 +81,9 @@ def create_dot_fec(
         dot_fec_record.save()
 
     except Exception:
-        submission.save_error("Creating .FEC failed")
+        logger.error("Creating .FEC failed")
+        if submission is not None:
+            submission.save_error("Creating .FEC failed")
         return None
 
     if upload_submission_id:
