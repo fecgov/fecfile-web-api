@@ -188,7 +188,7 @@ services:
             - '8089:8089'
         volumes:
             - ./:/mnt/locust
-        command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api:8080
+        command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
         profiles: [locust]
         environment:
             LOCAL_TEST_USER:
