@@ -62,9 +62,9 @@ class TransactionManager(SoftDeleteManager):
         "schedule_c__loan_amount",
         "schedule_c2__guaranteed_amount",
         "schedule_e__expenditure_amount",
+        "schedule_f__expenditure_amount",
         "debt__schedule_d__incurred_amount",
         "schedule_d__incurred_amount",
-        "schedule_f__expenditure_amount",
     )
 
     BACK_REFERENCE_CLAUSE = Coalesce(
