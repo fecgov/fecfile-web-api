@@ -1262,10 +1262,6 @@ class TransactionViewsTestCase(TestCase):
         schedule_f_debt_repayment_payload["contact_1_id"] = debt_representation[
             "contact_1_id"
         ]
-        # schedule_f_debt_repayment_payload["contact_2"] = self.contact_2
-        # schedule_f_debt_repayment_payload["contact_2_id"] = self.contact_2.id
-        # schedule_f_debt_repayment_payload["contact_3"] = self.test_com_contact
-        # schedule_f_debt_repayment_payload["contact_3_id"] = self.test_com_contact.id
         schedule_f_debt_repayment_payload["debt"] = debt_representation
         schedule_f_debt_repayment_payload["debt_id"] = debt_representation["id"]
         schedule_f_debt_repayment_payload["report_ids"] = [str(report.id)]
