@@ -90,6 +90,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.countTestCases
       ~TransactionViewsTestCase.create_debt_repayment_payload
       ~TransactionViewsTestCase.create_loan_repayment_payload
+      ~TransactionViewsTestCase.create_schedule_f_debt_repayment_payload
       ~TransactionViewsTestCase.create_trans_from_data
       ~TransactionViewsTestCase.debug
       ~TransactionViewsTestCase.defaultTestResult
@@ -123,6 +124,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.test_add_transaction_family_to_report_from_child
       ~TransactionViewsTestCase.test_add_transaction_family_to_report_from_parent
       ~TransactionViewsTestCase.test_add_transaction_to_report
+      ~TransactionViewsTestCase.test_create_schedule_f_debt_repayment
       ~TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_carried_forward_debt
       ~TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_orignal_debt
       ~TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_carried_forward_loan
