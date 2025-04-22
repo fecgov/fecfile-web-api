@@ -1,4 +1,7 @@
 from django.db import migrations
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class Migration(migrations.Migration):
@@ -14,11 +17,11 @@ class Migration(migrations.Migration):
 
         # Update transactions for each committee
         for committee in committees.objects.all():
-            print("Committee:", committee.committee_id)
+            logger.info(f"Committee:{committee.committee_id}")
 
             # For each contact, update the first schedule A transaction
             for contact in contacts.objects.filter(committee_account=committee):
-                print("Contact:", contact)
+                logger.info(f"Contact: {contact.id}")
                 first_schedule_a = (
                     transactions.objects.filter(
                         schedule_a__isnull=False,
@@ -28,9 +31,8 @@ class Migration(migrations.Migration):
                     .order_by("schedule_a__contribution_date", "created")
                     .first()
                 )
-                print("First Schedule A:", first_schedule_a)
                 if first_schedule_a:
-                    print("Saving first schedule A")
+                    logger.info(f"Saving first Schedule A: {first_schedule_a.id}")
                     first_schedule_a.save()
 
             # Election Aggregates
@@ -44,7 +46,7 @@ class Migration(migrations.Migration):
                 "schedule_e__election_code",
             )
             for election in elections:
-                print("Election:", election)
+                logger.info("Finding first schedule E for election")
                 first_schedule_e = (
                     transactions.objects.filter(
                         schedule_e__isnull=False,
@@ -64,9 +66,8 @@ class Migration(migrations.Migration):
                     )
                     .first()
                 )
-                print("First Schedule E:", first_schedule_e)
                 if first_schedule_e:
-                    print("Saving first schedule E")
+                    logger.info(f"Saving first Schedule E: {first_schedule_e.id}")
                     first_schedule_e.save()
 
     operations = [
