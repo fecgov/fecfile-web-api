@@ -122,9 +122,20 @@ def stage_login_dot_gov_pk(
 def stage_login_dot_gov_cert(x509_cert: Certificate):
     try:
         x509_cert_bytes = x509_cert_to_bytes(x509_cert)
-        filename = f"public_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}.crt"
+        filename = (
+            f"gen_x509_pk_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}.crt"
+        )
         s3_object = S3_SESSION.Object(AWS_STORAGE_BUCKET_NAME, filename)
         s3_object.put(Body=x509_cert_bytes)
         logger.info(f"Cert saved as {filename}")
     except Exception:
         raise Exception("Failed stage login dot gov cert")
+
+
+def cleanup_login_dot_gov_certs():
+    try:
+        logger.info("Cleaning up certs")
+        bucket = S3_SESSION.Bucket(AWS_STORAGE_BUCKET_NAME)
+        bucket.objects.filter(Prefix="gen_x509_pk_").delete()
+    except Exception as e:
+        raise Exception("Failed cleanup login dot x509 certs") from e

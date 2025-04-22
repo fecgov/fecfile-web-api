@@ -6,6 +6,7 @@ from fecfiler.devops.utils.login_dot_gov_cert_utils import (
     gen_and_stage_login_dot_gov_cert,
     install_login_dot_gov_cert,
     backout_login_dot_gov_cert,
+    cleanup_login_dot_gov_certs,
 )
 from django.core import management
 
@@ -215,4 +216,27 @@ class LoginDotGovUtilsTestCase(TestCase):
         test_bytes = b"test_bytes"
         x509_cert_to_bytes_mock.return_value = test_bytes
         stage_login_dot_gov_cert(x509_mock)
+        self.assertEqual(True, True)
+
+    # cleanup_login_dot_gov_certs
+
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.S3_SESSION.Bucket")
+    def test_cleanup_login_dot_gov_certs_throws_exception(
+        self,
+        s3_session_bucket_mock,
+    ):
+        s3_session_bucket_mock.side_effect = Exception("FAIL")
+
+        with self.assertRaisesMessage(
+            Exception,
+            "Failed cleanup login dot x509 certs",
+        ):
+            cleanup_login_dot_gov_certs()
+
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.S3_SESSION.Bucket")
+    def test_cleanup_login_dot_gov_certs_happy_path(
+        self,
+        s3_session_bucket_mock,
+    ):
+        cleanup_login_dot_gov_certs()
         self.assertEqual(True, True)
