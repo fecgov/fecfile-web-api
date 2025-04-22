@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 "schedule_e__election_code",
             )
             for election in elections:
-                logger.info(f"Finding first schedule E for election")
+                logger.info("Finding first schedule E for election")
                 first_schedule_e = (
                     transactions.objects.filter(
                         schedule_e__isnull=False,
