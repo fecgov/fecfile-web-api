@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
 
             # For each contact, update the first schedule A transaction
             for contact in contacts.objects.filter(committee_account=committee):
-                logger.info(f"Contact: {contact}")
+                logger.info(f"Contact: {contact.id}")
                 first_schedule_a = (
                     transactions.objects.filter(
                         schedule_a__isnull=False,
@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                     .order_by("schedule_a__contribution_date", "created")
                     .first()
                 )
-                logger.info(f"First Schedule A: {first_schedule_a}")
+                logger.info(f"First Schedule A: {first_schedule_a.id}")
                 if first_schedule_a:
                     logger.info(f"Saving first schedule A")
                     first_schedule_a.save()
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
                 "schedule_e__election_code",
             )
             for election in elections:
-                logger.info(f"Election: {election}")
+                logger.info(f"Finding first schedule E for election")
                 first_schedule_e = (
                     transactions.objects.filter(
                         schedule_e__isnull=False,
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
                     )
                     .first()
                 )
-                logger.info(f"First Schedule E: {first_schedule_e}")
+                logger.info(f"First Schedule E: {first_schedule_e.id}")
                 if first_schedule_e:
                     logger.info(f"Saving first schedule E")
                     first_schedule_e.save()
