@@ -31,9 +31,8 @@ class Migration(migrations.Migration):
                     .order_by("schedule_a__contribution_date", "created")
                     .first()
                 )
-                logger.info(f"First Schedule A: {first_schedule_a.id}")
                 if first_schedule_a:
-                    logger.info(f"Saving first schedule A")
+                    logger.info(f"Saving first Schedule A: {first_schedule_a.id}")
                     first_schedule_a.save()
 
             # Election Aggregates
@@ -67,9 +66,8 @@ class Migration(migrations.Migration):
                     )
                     .first()
                 )
-                logger.info(f"First Schedule E: {first_schedule_e.id}")
                 if first_schedule_e:
-                    logger.info(f"Saving first schedule E")
+                    logger.info(f"Saving first Schedule E: {first_schedule_e.id}")
                     first_schedule_e.save()
 
     operations = [
