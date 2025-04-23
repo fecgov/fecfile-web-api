@@ -295,7 +295,7 @@ def get_logging_config(log_format=LINE):
             },
             "django.db.backends": {
                 "handlers": ["cloud"],
-                "level": "INFO",
+                "level": "DEBUG",
             },
         }
 
