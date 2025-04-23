@@ -60,7 +60,7 @@ services:
             LOG_FORMAT:
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
-            FEC_FORMAT_VERSION: 8.4
+            FEC_FORMAT_VERSION: 8.5
         deploy:
             resources:
                 limits:
@@ -102,7 +102,7 @@ services:
             LOG_FORMAT:
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
-            FEC_FORMAT_VERSION: 8.4
+            FEC_FORMAT_VERSION: 8.5
         deploy:
             resources:
                 limits:
@@ -159,7 +159,7 @@ services:
             SECONDARY_POLLING_INTERVAL: 3600
             SECONDARY_POLLING_DURATION: 86400
             ENABLE_RESTRICTED_COMMANDS: True
-            FEC_FORMAT_VERSION: 8.4
+            FEC_FORMAT_VERSION: 8.5
 
             # ---- FEATURE FLAGS ----
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
@@ -189,24 +189,26 @@ services:
         volumes:
             - ./:/mnt/locust
         command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api:8080
-        profiles: [locust]
+        profiles: [ locust ]
         environment:
             LOCAL_TEST_USER:
             LOCAL_TEST_PWD:
             OIDC_SESSION_ID:
             CSRF_TOKEN:
 
+
     locust-follower:
         image: locustio/locust
         volumes:
             - ./:/mnt/locust
         command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
-        profiles: [locust]
+        profiles: [ locust ]
         environment:
             LOCAL_TEST_USER:
             LOCAL_TEST_PWD:
             OIDC_SESSION_ID:
             CSRF_TOKEN:
+
 
     locust-leader-app:
         image: locustio/locust
@@ -215,11 +217,11 @@ services:
         volumes:
             - ./:/mnt/locust
         command: -f /mnt/locust/performance-testing/locust_run_app.py --master -H https://dev.fecfile.fec.gov
-        profiles: [locust-app]
+        profiles: [ locust-app ]
 
     locust-follower-app:
         image: locustio/locust
         volumes:
             - ./:/mnt/locust
         command: -f /mnt/locust/performance-testing/locust_run_app.py --worker --master-host locust-leader-app -L DEBUG
-        profiles: [locust-app]
+        profiles: [ locust-app ]
