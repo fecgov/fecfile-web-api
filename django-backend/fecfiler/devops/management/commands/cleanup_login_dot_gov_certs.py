@@ -5,7 +5,7 @@ from fecfiler.devops.utils.login_dot_gov_cert_utils import cleanup_login_dot_gov
 class Command(BaseCommand):
     help = "Cleanup certificates"
 
-    def handle(self):
+    def handle(self, *args, **options):
         try:
             self.stdout.write(
                 self.style.NOTICE("STARTING cleanup_login_dot_gov_certs command")
