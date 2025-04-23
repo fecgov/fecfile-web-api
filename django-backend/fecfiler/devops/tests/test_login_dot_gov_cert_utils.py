@@ -220,12 +220,12 @@ class LoginDotGovUtilsTestCase(TestCase):
 
     # cleanup_login_dot_gov_certs
 
-    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.S3_SESSION.Bucket")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.S3_SESSION")
     def test_cleanup_login_dot_gov_certs_throws_exception(
         self,
-        s3_session_bucket_mock,
+        s3_session_mock,
     ):
-        s3_session_bucket_mock.side_effect = Exception("FAIL")
+        s3_session_mock.Bucket.side_effect = Exception("FAIL")
 
         with self.assertRaisesMessage(
             Exception,
@@ -233,10 +233,10 @@ class LoginDotGovUtilsTestCase(TestCase):
         ):
             cleanup_login_dot_gov_certs()
 
-    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.S3_SESSION.Bucket")
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.S3_SESSION")
     def test_cleanup_login_dot_gov_certs_happy_path(
         self,
-        s3_session_bucket_mock,
+        s3_session_mock,
     ):
         cleanup_login_dot_gov_certs()
         self.assertEqual(True, True)
