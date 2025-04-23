@@ -238,6 +238,7 @@ jobs:
 workflows:
   primary: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
+      - test
       # This job is triggered whenever a commit is made to the dev/stage/test/prod branches.
       # It kicks off the e2e-test pipeline in the fecfile-web-app project.
       - trigger-e2e-test-pipeline:
@@ -245,10 +246,14 @@ workflows:
             branches:
               only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - deploy-job:
+          requires:
+            - test
           filters:
             branches:
-              only: /feature\/2113|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
+          requires:
+            - test
           filters:
             branches:
               only: develop
