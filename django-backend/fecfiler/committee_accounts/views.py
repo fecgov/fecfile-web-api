@@ -108,13 +108,13 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
         return super().get_queryset().filter(committee_account_id=committee_uuid)
 
     def get_committee_uuid(self):
-        committee_uuid = self.request.session["committee_uuid"]
+        committee_uuid = self.request.session.get("committee_uuid")
         if not committee_uuid:
             raise SuspiciousSession("session has invalid committee_uuid")
         return committee_uuid
 
     def get_committee_id(self):
-        committee_id = self.request.session["committee_id"]
+        committee_id = self.request.session.get("committee_id")
         if not committee_id:
             raise SuspiciousSession("session has invalid committee_id")
         return committee_id
