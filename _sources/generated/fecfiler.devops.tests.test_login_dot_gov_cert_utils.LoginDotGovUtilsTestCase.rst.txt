@@ -116,6 +116,8 @@ fecfiler.devops.tests.test\_login\_dot\_gov\_cert\_utils.LoginDotGovUtilsTestCas
       ~LoginDotGovUtilsTestCase.tearDownClass
       ~LoginDotGovUtilsTestCase.test_backout_login_dot_gov_cert_happy_path
       ~LoginDotGovUtilsTestCase.test_backout_login_dot_gov_cert_throws_exception
+      ~LoginDotGovUtilsTestCase.test_cleanup_login_dot_gov_certs_happy_path
+      ~LoginDotGovUtilsTestCase.test_cleanup_login_dot_gov_certs_throws_exception
       ~LoginDotGovUtilsTestCase.test_gen_and_stage_login_dot_gov_cert_happy_path
       ~LoginDotGovUtilsTestCase.test_gen_and_stage_login_dot_gov_cert_throws_exception
       ~LoginDotGovUtilsTestCase.test_install_login_dot_gov_cert_happy_path

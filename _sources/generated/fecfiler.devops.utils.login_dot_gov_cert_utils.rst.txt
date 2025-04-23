@@ -18,6 +18,7 @@ fecfiler.devops.utils.login\_dot\_gov\_cert\_utils
       :toctree:                                          
    
       backout_login_dot_gov_cert
+      cleanup_login_dot_gov_certs
       gen_and_stage_login_dot_gov_cert
       install_login_dot_gov_cert
       stage_login_dot_gov_cert
