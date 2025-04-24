@@ -38,8 +38,8 @@ Run the script with the `-h` flag for additional information.
 
 ## Setup - Additional steps for remote testing
 
-1. Set an additional environment variable:
-- `OIDC_SESSION_ID`
+1. Set an additional environment variables:
+- `OIDC_SESSION_ID` and `CSRF_TOKEN`
   - Used to log locust followers into the remote testing environment as part of testing
   - You can get the value for this by logging into the desired testing environment with cloud.gov
  and retrieving the session ID from any subsequent request header.
@@ -50,7 +50,7 @@ Run the script with the `-h` flag for additional information.
 
 ## Running Tests
 
-1. Run the command `docker-compose --profile locust up` to spin up the testing environment
+1. Run the command `docker compose up -d --profile locust` to spin up the testing environment
 - (Optional) Scale up using docker by adding `--scale locust-follower=4` to the end
 
 2. Go to http://localhost:8089/ in your browser of choice to run tests.
