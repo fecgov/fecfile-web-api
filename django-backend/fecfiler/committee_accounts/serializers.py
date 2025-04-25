@@ -32,7 +32,7 @@ class CommitteeOwnedSerializer(ModelSerializer):
 
     def get_committee_uuid(self):
         request = self.context["request"]
-        get_committee_uuid = request.session["committee_uuid"]
+        get_committee_uuid = request.session.get("committee_uuid")
         if not get_committee_uuid:
             raise SuspiciousSession("session has invalid committee_uuid")
         return get_committee_uuid

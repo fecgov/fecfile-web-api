@@ -100,10 +100,9 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
     """
 
     def get_queryset(self):
-        # TODO: Combine into get_session_data()
         committee_uuid = self.get_committee_uuid()
         committee_id = self.get_committee_id()
-        session_id = self.get_session_id()
+        session_id = self.request.session.session_key
         structlog.contextvars.bind_contextvars(
             committee_id=committee_id,
             committee_uuid=committee_uuid,
@@ -122,13 +121,6 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
         if not committee_id:
             raise SuspiciousSession("session has invalid committee_id")
         return committee_id
-
-    def get_session_id(self):
-        # TODO: add failing test for old [] method
-        session_id = self.request.session.session_key
-        if not session_id:
-            raise SuspiciousSession("session has invalid session_id")
-        return session_id
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
