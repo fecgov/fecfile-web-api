@@ -236,6 +236,9 @@ def get_logging_config(log_format=LINE):
                         colors=True, exception_formatter=structlog.dev.rich_traceback
                     ),
                 ],
+                "foreign_pre_chain": [
+                    structlog.contextvars.merge_contextvars,
+                ],
             },
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
@@ -245,6 +248,9 @@ def get_logging_config(log_format=LINE):
                     structlog.processors.KeyValueRenderer(
                         key_order=["level", "event", "logger"]
                     ),
+                ],
+                "foreign_pre_chain": [
+                    structlog.contextvars.merge_contextvars,
                 ],
             },
         },
@@ -272,6 +278,10 @@ def get_logging_config(log_format=LINE):
                 "handlers": ["console"],
                 "level": "DEBUG",
             },
+            "django.db.backends": {
+                "handlers": ["console"],
+                "level": "DEBUG",
+            },
         }
     else:
         logging_config["loggers"] = {
@@ -282,6 +292,10 @@ def get_logging_config(log_format=LINE):
             "fecfiler": {
                 "handlers": ["cloud"],
                 "level": "INFO",
+            },
+            "django.db.backends": {
+                "handlers": ["cloud"],
+                "level": "DEBUG",
             },
         }
 
