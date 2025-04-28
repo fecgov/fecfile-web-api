@@ -28,6 +28,7 @@ KEY_VALUE = "KEY_VALUE"
 APPEND_SLASH = False
 
 LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
+ENABLE_PL_SQL_LOGGING = env.get_credential("ENABLE_PL_SQL_LOGGING", False)
 
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
@@ -278,11 +279,12 @@ def get_logging_config(log_format=LINE):
                 "handlers": ["console"],
                 "level": "DEBUG",
             },
-            "django.db.backends": {
+        }
+        if ENABLE_PL_SQL_LOGGING == True:
+            logging_config["loggers"]["django.db.backends"] = {
                 "handlers": ["console"],
                 "level": "DEBUG",
-            },
-        }
+            }
     else:
         logging_config["loggers"] = {
             "django_structlog": {
@@ -292,10 +294,6 @@ def get_logging_config(log_format=LINE):
             "fecfiler": {
                 "handlers": ["cloud"],
                 "level": "INFO",
-            },
-            "django.db.backends": {
-                "handlers": ["cloud"],
-                "level": "DEBUG",
             },
         }
 
