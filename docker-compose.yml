@@ -58,6 +58,7 @@ services:
             FEC_AGENCY_ID:
             OUTPUT_TEST_INFO_IN_DOT_FEC:
             LOG_FORMAT:
+            ENABLE_PL_SQL_LOGGING: False # DEBUG logging must also be set to True to see output
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
             FEC_FORMAT_VERSION: 8.4
@@ -100,6 +101,7 @@ services:
             FEC_AGENCY_ID:
             OUTPUT_TEST_INFO_IN_DOT_FEC:
             LOG_FORMAT:
+            ENABLE_PL_SQL_LOGGING: False # DEBUG logging must also be set to True to see output
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
             FEC_FORMAT_VERSION: 8.4
@@ -152,6 +154,7 @@ services:
             STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
             STAGE_OPEN_FEC_API_KEY: DEMO_KEY
             LOG_FORMAT:
+            ENABLE_PL_SQL_LOGGING: False # DEBUG logging must also be set to True to see output
             FECFILE_GITHUB_TOKEN:
             OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
             INITIAL_POLLING_INTERVAL: 10
