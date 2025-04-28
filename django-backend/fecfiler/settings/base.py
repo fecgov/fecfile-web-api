@@ -280,7 +280,7 @@ def get_logging_config(log_format=LINE):
                 "level": "DEBUG",
             },
         }
-        if ENABLE_PL_SQL_LOGGING == True:
+        if ENABLE_PL_SQL_LOGGING is True:
             logging_config["loggers"]["django.db.backends"] = {
                 "handlers": ["console"],
                 "level": "DEBUG",
