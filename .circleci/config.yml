@@ -247,7 +247,7 @@ workflows:
       - deploy-job:
           filters:
             branches:
-              only: /add-request_id-to-sql-logging|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
           filters:
             branches:
