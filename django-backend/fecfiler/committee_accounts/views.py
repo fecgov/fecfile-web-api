@@ -311,7 +311,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 class CommitteeManagementEventViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     serializer_class = CommitteeManagementEventSerializer
     filter_backends = [filters.OrderingFilter]
-    ordering = ["created"]
+    ordering = ["-created"]
 
     queryset = CommitteeManagementEvent.objects.all()
 
