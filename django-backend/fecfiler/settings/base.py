@@ -28,6 +28,7 @@ KEY_VALUE = "KEY_VALUE"
 APPEND_SLASH = False
 
 LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
+# SECURITY WARNING: for local logging only - do not enable in any cloud.gov environments!
 ENABLE_PL_SQL_LOGGING = get_boolean_from_string(
     env.get_credential("ENABLE_PL_SQL_LOGGING", "False")
 )
