@@ -6,37 +6,35 @@ logger = structlog.get_logger(__name__)
 base_uri = "https://api.fr.cloud.gov/v3"
 
 
-def retrieve_credentials(token, space_name, service_instance_name):
+def retrieve_credentials(token, organization_name, space_name, service_instance_name):
     try:
-        logger.info(f"Retrieving guid for space_name {space_name}")
-        space_guid = get_space_guid(token, space_name)
-
         logger.info(f"Retrieving guid for service_instance_name {service_instance_name}")
-        service_instance_guid = get_service_instance_guid(
-            token, space_guid, service_instance_name
+        service_instance_guid = get_service_instance_guid_from_names(
+            token, organization_name, space_name, service_instance_name
         )
 
         logger.info(f"Retrieving creds for service_instance_guid {service_instance_guid}")
         return get_credentials_by_guid(token, service_instance_guid)
     except Exception as e:
         raise Exception(
-            "FAILED to retrieve credentials for space_name "
-            f"{space_name} service_instance_name {service_instance_name}"
+            "FAILED to retrieve credentials for "
+            f"organization_name {organization_name} "
+            f"space_name {space_name} "
+            f"service_instance_name {service_instance_name}"
         ) from e
 
 
-def update_credentials(token, space_name, service_instance_name, credentials_dict):
+def update_credentials(
+    token, organization_name, space_name, service_instance_name, credentials_dict
+):
     try:
-        logger.info(f"Retrieving guid for space_name {space_name}")
-        space_guid = get_space_guid(token, space_name)
-
         logger.info(f"Retrieving guid for service_instance_name {service_instance_name}")
-        service_instance_guid = get_service_instance_guid(
-            token, space_guid, service_instance_name
+        service_instance_guid = get_service_instance_guid_from_names(
+            token, organization_name, space_name, service_instance_name
         )
 
         logger.info(f"Retrieving creds for service_instance_guid {service_instance_guid}")
-        creds = retrieve_credentials(token, space_name, service_instance_name)
+        creds = get_credentials_by_guid(token, service_instance_guid)
 
         logger.info("Merging creds")
         merged_creds = merge_credentials(creds, credentials_dict)
@@ -45,8 +43,10 @@ def update_credentials(token, space_name, service_instance_name, credentials_dic
         update_credentials_for_service(token, service_instance_guid, merged_creds)
     except Exception as e:
         raise Exception(
-            "FAILED to update credentials for space_name "
-            f"{space_name} service_instance_name {service_instance_name}"
+            "FAILED to update credentials for "
+            f"organization_name {organization_name} "
+            f"space_name {space_name} "
+            f"service_instance_name {service_instance_name}"
         ) from e
 
 
@@ -54,6 +54,29 @@ def get_auth_header(token):
     return {
         "Authorization": token,
     }
+
+
+def get_organization_guid(token, organization_name):
+    try:
+        organization_guid = ""
+        data = {
+            "names": [
+                organization_name,
+            ]
+        }
+        url = f"{base_uri}/organizations"
+        response = requests.get(url, params=data, headers=get_auth_header(token))
+        response.raise_for_status()
+        response_json = response.json()
+        if response_json["resources"][0]["name"] == organization_name:
+            organization_guid = response_json["resources"][0]["guid"]
+        if organization_guid == "":
+            raise Exception("Organization guid not found in response")
+        return organization_guid
+    except Exception:
+        raise Exception(
+            f"Failed to retrieve guid for organization_name {organization_name}"
+        )
 
 
 def get_space_guid(token, space_name):
@@ -77,7 +100,34 @@ def get_space_guid(token, space_name):
         raise Exception(f"Failed to retrieve guid for space_name {space_name}")
 
 
-def get_service_instance_guid(token, space_guid, service_instance_name):
+def get_service_instance_guid_from_names(
+    token, organization_name, space_name, service_instance_name
+):
+    try:
+        logger.info(f"Retrieving guid for organization_name {organization_name}")
+        organization_guid = get_organization_guid(token, organization_name)
+
+        logger.info(f"Retrieving guid for space_name {space_name}")
+        space_guid = get_space_guid(token, space_name)
+
+        logger.info(f"Retrieving guid for service_instance_name {service_instance_name}")
+        service_instance_guid = get_service_instance_guid(
+            token, organization_guid, space_guid, service_instance_name
+        )
+
+        return service_instance_guid
+    except Exception:
+        raise Exception(
+            "Failed to retrieve service_instance_guid by names for "
+            f"{organization_name} organization_name "
+            f"{space_name} space_name "
+            f"{service_instance_name} service_instance_name"
+        )
+
+
+def get_service_instance_guid(
+    token, organization_guid, space_guid, service_instance_name
+):
     try:
         service_instance_guid = ""
         data = {
@@ -86,6 +136,9 @@ def get_service_instance_guid(token, space_guid, service_instance_name):
             ],
             "space_guids": [
                 space_guid,
+            ],
+            "organization_guids": [
+                organization_guid,
             ],
         }
         url = f"{base_uri}/service_instances"
@@ -99,8 +152,10 @@ def get_service_instance_guid(token, space_guid, service_instance_name):
         return service_instance_guid
     except Exception:
         raise Exception(
-            "Failed to retrieve guid for service_instance_name "
-            f"{service_instance_name} space_guid {space_guid}"
+            "Failed to retrieve service_instance_guid by guids for "
+            f"{organization_guid} organization_guid "
+            f"{space_guid} space_guid "
+            f"{service_instance_name} service_instance_name"
         )
 
 

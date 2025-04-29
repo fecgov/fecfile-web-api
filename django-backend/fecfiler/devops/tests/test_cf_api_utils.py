@@ -1,7 +1,9 @@
 from django.test import TestCase, RequestFactory
 from unittest.mock import Mock, patch
 from fecfiler.devops.utils.cf_api_utils import (
+    get_organization_guid,
     get_space_guid,
+    get_service_instance_guid_from_names,
     get_service_instance_guid,
     get_credentials_by_guid,
     merge_credentials,
@@ -24,6 +26,7 @@ class CfApiUtilsTestCase(TestCase):
         get_space_guid_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
@@ -31,21 +34,29 @@ class CfApiUtilsTestCase(TestCase):
 
         with self.assertRaisesMessage(
             Exception,
-            "FAILED to retrieve credentials for space_name "
-            f"{test_space_name} service_instance_name {test_service_instance_name}",
+            "FAILED to retrieve credentials for "
+            f"organization_name {test_organization_name} "
+            f"space_name {test_space_name} "
+            f"service_instance_name {test_service_instance_name}",
         ):
-            retrieve_credentials(test_token, test_space_name, test_service_instance_name)
+            retrieve_credentials(
+                test_token,
+                test_organization_name,
+                test_space_name,
+                test_service_instance_name,
+            )
 
     @patch("fecfiler.devops.utils.cf_api_utils.get_space_guid")
-    @patch("fecfiler.devops.utils.cf_api_utils.get_service_instance_guid")
+    @patch("fecfiler.devops.utils.cf_api_utils.get_service_instance_guid_from_names")
     @patch("fecfiler.devops.utils.cf_api_utils.get_credentials_by_guid")
     def test_retrieve_credentials_happy_path(
         self,
         get_credentials_by_guid_mock,
-        get_service_instance_guid_mock,
+        get_service_instance_guid_from_names_mock,
         get_space_guid_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
@@ -54,11 +65,16 @@ class CfApiUtilsTestCase(TestCase):
         mock_credentials = {"testkey1": "testval1"}
 
         get_space_guid_mock.return_value = mock_space_guid
-        get_service_instance_guid_mock.return_value = mock_service_instance_guid
+        get_service_instance_guid_from_names_mock.return_value = (
+            mock_service_instance_guid
+        )
         get_credentials_by_guid_mock.return_value = mock_credentials
 
         actual_retval = retrieve_credentials(
-            test_token, test_space_name, test_service_instance_name
+            test_token,
+            test_organization_name,
+            test_space_name,
+            test_service_instance_name,
         )
         self.assertEqual(actual_retval, mock_credentials)
 
@@ -70,6 +86,7 @@ class CfApiUtilsTestCase(TestCase):
         get_space_guid_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
         mock_credentials = {"testkey1": "testval1"}
@@ -78,27 +95,34 @@ class CfApiUtilsTestCase(TestCase):
 
         with self.assertRaisesMessage(
             Exception,
-            "FAILED to update credentials for space_name "
-            f"{test_space_name} service_instance_name {test_service_instance_name}",
+            "FAILED to update credentials for "
+            f"organization_name {test_organization_name} "
+            f"space_name {test_space_name} "
+            f"service_instance_name {test_service_instance_name}",
         ):
             update_credentials(
-                test_token, test_space_name, test_service_instance_name, mock_credentials
+                test_token,
+                test_organization_name,
+                test_space_name,
+                test_service_instance_name,
+                mock_credentials,
             )
 
     @patch("fecfiler.devops.utils.cf_api_utils.get_space_guid")
-    @patch("fecfiler.devops.utils.cf_api_utils.get_service_instance_guid")
-    @patch("fecfiler.devops.utils.cf_api_utils.retrieve_credentials")
+    @patch("fecfiler.devops.utils.cf_api_utils.get_service_instance_guid_from_names")
+    @patch("fecfiler.devops.utils.cf_api_utils.get_credentials_by_guid")
     @patch("fecfiler.devops.utils.cf_api_utils.merge_credentials")
     @patch("fecfiler.devops.utils.cf_api_utils.update_credentials_for_service")
     def test_update_credentials_happy_path(
         self,
         update_credentials_for_service_mock,
         merge_credentials_mock,
-        retrieve_credentials_mock,
-        get_service_instance_guid_mock,
+        get_credentials_by_guid_mock,
+        get_service_instance_guid_from_names_mock,
         get_space_guid_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
@@ -107,14 +131,62 @@ class CfApiUtilsTestCase(TestCase):
         mock_credentials = {"testkey1": "testval1"}
 
         get_space_guid_mock.return_value = mock_space_guid
-        get_service_instance_guid_mock.return_value = mock_service_instance_guid
-        retrieve_credentials_mock.return_value = mock_credentials
+        get_service_instance_guid_from_names_mock.return_value = (
+            mock_service_instance_guid
+        )
+        get_credentials_by_guid_mock.return_value = mock_credentials
         merge_credentials_mock.return_value = mock_credentials
 
         update_credentials(
-            test_token, test_space_name, test_service_instance_name, mock_credentials
+            test_token,
+            test_organization_name,
+            test_space_name,
+            test_service_instance_name,
+            mock_credentials,
         )
         self.assertEqual(True, True)
+
+    # get_organization_guid
+
+    def test_get_organization_guid_throws_exception(self):
+        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+            test_token = "test_token"
+            test_organization_name = "test_organization_name"
+            mock_requests.get.side_effect = Exception("FAIL")
+            with self.assertRaisesMessage(
+                Exception,
+                f"Failed to retrieve guid for organization_name {test_organization_name}",
+            ):
+                get_organization_guid(test_token, test_organization_name)
+
+    def test_get_organization_guid_empty_response(self):
+        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+            test_token = "test_token"
+            test_organization_name = "test_organization_name"
+            test_guid = ""
+            mock_requests.get.return_value = mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = {
+                "resources": [{"name": test_organization_name, "guid": test_guid}]
+            }
+            with self.assertRaisesMessage(
+                Exception,
+                f"Failed to retrieve guid for organization_name {test_organization_name}",
+            ):
+                get_organization_guid(test_token, test_organization_name)
+
+    def test_get_organization_guid_happy_path(self):
+        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+            test_token = "test_token"
+            test_organization_name = "test_organization_name"
+            test_guid = "fd1ab0ac-691e-4755-9703-f6e0401e7b7a"
+            mock_requests.get.return_value = mock_response = Mock()
+            mock_response.status_code = 200
+            mock_response.json.return_value = {
+                "resources": [{"name": test_organization_name, "guid": test_guid}]
+            }
+            response = get_organization_guid(test_token, test_organization_name)
+            self.assertEqual(response, test_guid)
 
     # get_space_guid
 
@@ -156,26 +228,108 @@ class CfApiUtilsTestCase(TestCase):
             response = get_space_guid(test_token, test_space_name)
             self.assertEqual(response, test_guid)
 
+    # get_service_instance_guid_from_names
+
+    def test_get_service_instance_guid_from_names_throws_exception(self):
+        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+            test_token = "test_token"
+            test_organization_name = "test_organization_name"
+            test_space_name = "test_space_name"
+            test_service_instance_name = "test_service_instance_name"
+            mock_requests.get.side_effect = Exception("FAIL")
+            with self.assertRaisesMessage(
+                Exception,
+                "Failed to retrieve service_instance_guid by names for "
+                f"{test_organization_name} organization_name "
+                f"{test_space_name} space_name "
+                f"{test_service_instance_name} service_instance_name",
+            ):
+                get_service_instance_guid_from_names(
+                    test_token,
+                    test_organization_name,
+                    test_space_name,
+                    test_service_instance_name,
+                )
+
+    def test_get_service_instance_guid_from_names_happy_path(self):
+        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+            test_token = "test_token"
+            test_organization_name = "test_organization_name"
+            test_organization_guid = "c7773c33-e79d-483c-b90c-18ab6fa7b226"
+            test_space_name = "test_space_name"
+            test_space_guid = "9f820152-5633-4321-85dd-57e332771589"
+            test_service_instance_name = "test_service_instance_name"
+            test_service_instance_guid = "4430868a-a2b8-44a8-ae74-dea2e02d0225"
+
+            get_organization_guid_mock_response = Mock()
+            get_organization_guid_mock_response.status_code = 200
+            get_organization_guid_mock_response.json.return_value = {
+                "resources": [
+                    {
+                        "name": test_organization_name,
+                        "guid": test_organization_guid,
+                    }
+                ]
+            }
+
+            get_space_guid_mock_response = Mock()
+            get_space_guid_mock_response.status_code = 200
+            get_space_guid_mock_response.json.return_value = {
+                "resources": [{"name": test_space_name, "guid": test_space_guid}]
+            }
+
+            get_service_instance_guid_mock_response = Mock()
+            get_service_instance_guid_mock_response = Mock()
+            get_service_instance_guid_mock_response.status_code = 200
+            get_service_instance_guid_mock_response.json.return_value = {
+                "resources": [
+                    {
+                        "name": test_service_instance_name,
+                        "guid": test_service_instance_guid,
+                    }
+                ]
+            }
+
+            mock_requests.get.side_effect = [
+                get_organization_guid_mock_response,
+                get_space_guid_mock_response,
+                get_service_instance_guid_mock_response,
+            ]
+            response = get_service_instance_guid_from_names(
+                test_token,
+                test_organization_name,
+                test_space_name,
+                test_service_instance_name,
+            )
+            self.assertEqual(response, test_service_instance_guid)
+
     # get_service_instance_guid
 
     def test_get_service_instance_guid_throws_exception(self):
         with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
             test_token = "test_token"
+            test_organization_guid = "7b9734d0-caf0-4c03-9b0c-063c0a9e0c30"
             test_space_guid = "fd1ab0ac-691e-4755-9703-f6e0401e7b7a"
             test_service_instance_name = "test_service_instance_name"
             mock_requests.get.side_effect = Exception("FAIL")
             with self.assertRaisesMessage(
                 Exception,
-                "Failed to retrieve guid for service_instance_name "
-                f"{test_service_instance_name} space_guid {test_space_guid}",
+                "Failed to retrieve service_instance_guid by guids for "
+                f"{test_organization_guid} organization_guid "
+                f"{test_space_guid} space_guid "
+                f"{test_service_instance_name} service_instance_name",
             ):
                 get_service_instance_guid(
-                    test_token, test_space_guid, test_service_instance_name
+                    test_token,
+                    test_organization_guid,
+                    test_space_guid,
+                    test_service_instance_name,
                 )
 
     def test_get_service_instance_guid_empty_response(self):
         with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
             test_token = "test_token"
+            test_organization_guid = "7b9734d0-caf0-4c03-9b0c-063c0a9e0c30"
             test_space_guid = "fd1ab0ac-691e-4755-9703-f6e0401e7b7a"
             test_service_instance_name = "test_service_instance_name"
             test_guid = ""
@@ -186,16 +340,22 @@ class CfApiUtilsTestCase(TestCase):
             }
             with self.assertRaisesMessage(
                 Exception,
-                "Failed to retrieve guid for service_instance_name "
-                f"{test_service_instance_name} space_guid {test_space_guid}",
+                "Failed to retrieve service_instance_guid by guids for "
+                f"{test_organization_guid} organization_guid "
+                f"{test_space_guid} space_guid "
+                f"{test_service_instance_name} service_instance_name",
             ):
                 get_service_instance_guid(
-                    test_token, test_space_guid, test_service_instance_name
+                    test_token,
+                    test_organization_guid,
+                    test_space_guid,
+                    test_service_instance_name,
                 )
 
     def test_get_service_instance_guid_happy_path(self):
         with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
             test_token = "test_token"
+            test_organization_guid = "7b9734d0-caf0-4c03-9b0c-063c0a9e0c30"
             test_space_guid = "fd1ab0ac-691e-4755-9703-f6e0401e7b7a"
             test_service_instance_name = "test_service_instance_name"
             test_guid = "4430868a-a2b8-44a8-ae74-dea2e02d0225"
@@ -205,7 +365,10 @@ class CfApiUtilsTestCase(TestCase):
                 "resources": [{"name": test_service_instance_name, "guid": test_guid}]
             }
             response = get_service_instance_guid(
-                test_token, test_space_guid, test_service_instance_name
+                test_token,
+                test_organization_guid,
+                test_space_guid,
+                test_service_instance_name,
             )
             self.assertEqual(response, test_guid)
 
