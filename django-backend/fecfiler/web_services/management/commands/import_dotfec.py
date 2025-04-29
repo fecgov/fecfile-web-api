@@ -90,7 +90,11 @@ class Command(BaseCommand):
     # returns as a tuple: transaction, schedule_a
     def create_transaction(self, row):
         keys_to_skip = [
-            "filer_committee_id_number"
+            "filer_committee_id_number",
+            "donor_committee_fec_id",
+            "donor_committee_name",
+            "back_reference_tran_id_number",
+            "back_reference_sched_name"
 		]
         committee_account = CommitteeAccount.objects.get(id="c94c5d1a-9e73-464d-ad72-b73b5d8667a9")
         sch_a_cols = SCH_A_SCHEMA.keys()
@@ -160,6 +164,7 @@ class Command(BaseCommand):
     def create_memo_transaction(self, row, transaction):
         memo_text = self.create_memo_text(row)
         transaction.memo_text = memo_text
+        transaction.save()
         return memo_text
 
     # Creates a valid MemoText object from a row, associating it to the file's report
@@ -217,6 +222,9 @@ class Command(BaseCommand):
                 report, form_3x = self.create_report(row)
                 self.records["report"] = report
                 self.records["form_3x"] = form_3x
+                form_3x.save()
+                report.form_3x = form_3x
+                report.save()
 
             # Handle Schedule A Transactions (just Individual Receipts)
             elif row[0] == "SA11AI":
@@ -224,12 +232,18 @@ class Command(BaseCommand):
                 transaction, sch_a = self.create_transaction(row)
                 transaction.schedule_a = sch_a
 
+                transaction.contact_1.save()
+                sch_a.save()
+                transaction.schedule_a = sch_a
+                transaction.save()
+                transaction.reports.set([self.records["report"]])
+
                 # Check to see if the new transaction has a parent
                 child_transaction = False
                 for trans in self.records["transactions"]:
                     if trans.transaction_id == row[3]:
                         child_transaction = True
-                        trans.children.append(transaction)
+                        trans.transaction_set.set([transaction])
 
                 # Only add top-level transactions to the records
                 # (the current implementation cannot handle grandchildren)
@@ -255,20 +269,10 @@ class Command(BaseCommand):
         print(
             "Creating records:\n"
             "1 new report\n"
-            f"{len(self.records['memos'])} report-level memo(s)\n"
+            f"{len(self.records['memos'])} new memo(s)\n"
             f"{len(self.records['contacts'])} new contacts(s)\n"
             f"{len(self.records['transactions'])} new top-level transaction(s)\n"
         )
 
-        self.records["form_3x"].save()
-        self.records["report"].form_3x = self.records["form_3x"]
-        self.records["report"].save()
-
         for memo_text in self.records["memos"]:
             memo_text.save()
-
-        for transaction in self.records["transactions"]:
-            transaction.contact_1.save()
-            transaction.schedule_a.save()
-            transaction.save()
-            transaction.reports.set([self.records["report"]])
