@@ -279,7 +279,6 @@ class CfApiUtilsTestCase(TestCase):
             }
 
             get_service_instance_guid_mock_response = Mock()
-            get_service_instance_guid_mock_response = Mock()
             get_service_instance_guid_mock_response.status_code = 200
             get_service_instance_guid_mock_response.json.return_value = {
                 "resources": [
