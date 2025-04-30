@@ -14,6 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='transaction',
             name='reports',
-            field=models.ManyToManyField(related_name='transactions', through='reports.ReportTransaction', through_fields=['transaction', 'report'], to='reports.report'),
+            field=models.ManyToManyField(
+                related_name='transactions',
+                through='reports.ReportTransaction',
+                through_fields=['transaction', 'report'],
+                to='reports.report'
+            ),
         ),
     ]

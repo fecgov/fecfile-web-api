@@ -15,6 +15,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='committeeaccount',
             name='members',
-            field=models.ManyToManyField(through='committee_accounts.Membership', through_fields=('committee_account', 'user'), to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(
+                through='committee_accounts.Membership',
+                through_fields=('committee_account', 'user'),
+                to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]
