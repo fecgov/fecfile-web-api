@@ -87,13 +87,13 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_no_f1_email(self):
         result = check_email_match("email3@example.com", None)
-        self.assertEqual(result, "No email provided in F1")
+        self.assertEqual(result, "no email provided in F1")
 
     def test_no_match(self):
         f1_emails = "email1@example.com;email2@example.com"
         result = check_email_match("email3@example.com", f1_emails)
         self.assertEqual(
-            result, "Email does not match committee email"
+            result, "email does not match committee email"
         )
 
     def test_match_semicolon(self):
