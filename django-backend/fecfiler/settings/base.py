@@ -29,6 +29,7 @@ APPEND_SLASH = False
 
 LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
 # SECURITY WARNING: for local logging only - do not enable in any cloud.gov environments!
+# Django DEBUG base.py setting must also be set to True to see SQL output
 ENABLE_PL_SQL_LOGGING = get_boolean_from_string(
     env.get_credential("ENABLE_PL_SQL_LOGGING", "False")
 )
