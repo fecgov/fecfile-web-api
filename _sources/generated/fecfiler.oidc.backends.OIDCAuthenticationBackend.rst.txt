@@ -20,6 +20,13 @@ fecfiler.oidc.backends.OIDCAuthenticationBackend
    .. autosummary::
    
       ~OIDCAuthenticationBackend.__init__
+      ~OIDCAuthenticationBackend.aauthenticate
+      ~OIDCAuthenticationBackend.aget_all_permissions
+      ~OIDCAuthenticationBackend.aget_group_permissions
+      ~OIDCAuthenticationBackend.aget_user
+      ~OIDCAuthenticationBackend.aget_user_permissions
+      ~OIDCAuthenticationBackend.ahas_module_perms
+      ~OIDCAuthenticationBackend.ahas_perm
       ~OIDCAuthenticationBackend.authenticate
       ~OIDCAuthenticationBackend.create_user
       ~OIDCAuthenticationBackend.filter_users_by_claims

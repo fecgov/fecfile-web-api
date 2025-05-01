@@ -26,6 +26,7 @@ fecfiler.user.management.commands.disable\_user.Command
       ~Command.check_migrations
       ~Command.create_parser
       ~Command.execute
+      ~Command.get_check_kwargs
       ~Command.get_version
       ~Command.handle
       ~Command.print_help

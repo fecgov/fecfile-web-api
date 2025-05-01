@@ -26,11 +26,14 @@ fecfiler.user.managers.UserManager
       ~UserManager.acontains
       ~UserManager.acount
       ~UserManager.acreate
+      ~UserManager.acreate_superuser
+      ~UserManager.acreate_user
       ~UserManager.aearliest
       ~UserManager.aexists
       ~UserManager.aexplain
       ~UserManager.afirst
       ~UserManager.aget
+      ~UserManager.aget_by_natural_key
       ~UserManager.aget_or_create
       ~UserManager.aggregate
       ~UserManager.ain_bulk

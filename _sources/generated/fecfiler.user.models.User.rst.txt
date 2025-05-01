@@ -22,6 +22,12 @@ fecfiler.user.models.User
       ~User.__init__
       ~User.acheck_password
       ~User.adelete
+      ~User.aget_all_permissions
+      ~User.aget_group_permissions
+      ~User.aget_user_permissions
+      ~User.ahas_module_perms
+      ~User.ahas_perm
+      ~User.ahas_perms
       ~User.arefresh_from_db
       ~User.asave
       ~User.check

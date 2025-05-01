@@ -107,7 +107,7 @@
 <td><p>Determine a default set of validators for the following constraints:</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.serializers.TransactionReportSerializer.get_unique_together_constraints" title="fecfiler.transactions.serializers.TransactionReportSerializer.get_unique_together_constraints"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unique_together_constraints</span></code></a>(model)</p></td>
-<td><p>Returns iterator of (fields, queryset), each entry describes an unique together constraint on <cite>fields</cite> in <cite>queryset</cite>.</p></td>
+<td><p>Returns iterator of (fields, queryset, condition_fields, condition), each entry describes an unique together constraint on <cite>fields</cite> in <cite>queryset</cite> with respect of constraint's <cite>condition</cite>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.serializers.TransactionReportSerializer.get_unique_together_validators" title="fecfiler.transactions.serializers.TransactionReportSerializer.get_unique_together_validators"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_unique_together_validators</span></code></a>()</p></td>
 <td><p>Determine a default set of validators for any unique_together constraints.</p></td>
@@ -369,8 +369,9 @@ value, without any object instance.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.transactions.serializers.TransactionReportSerializer.get_unique_together_constraints">
 <span class="sig-name descname"><span class="pre">get_unique_together_constraints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.serializers.TransactionReportSerializer.get_unique_together_constraints" title="Link to this definition">¶</a></dt>
-<dd><p>Returns iterator of (fields, queryset), each entry describes an unique together
-constraint on <cite>fields</cite> in <cite>queryset</cite>.</p>
+<dd><p>Returns iterator of (fields, queryset, condition_fields, condition),
+each entry describes an unique together constraint on <cite>fields</cite> in <cite>queryset</cite>
+with respect of constraint’s <cite>condition</cite>.</p>
 </dd></dl>
 
 <dl class="py method">

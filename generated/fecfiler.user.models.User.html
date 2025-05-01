@@ -55,6 +55,24 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">adelete</span></code>([using, keep_parents])</p></td>
 <td><p></p></td>
 </tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">aget_all_permissions</span></code>([obj])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.models.User.aget_group_permissions" title="fecfiler.user.models.User.aget_group_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aget_group_permissions</span></code></a>([obj])</p></td>
+<td><p>See get_group_permissions()</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.models.User.aget_user_permissions" title="fecfiler.user.models.User.aget_user_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aget_user_permissions</span></code></a>([obj])</p></td>
+<td><p>See get_user_permissions()</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.models.User.ahas_module_perms" title="fecfiler.user.models.User.ahas_module_perms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ahas_module_perms</span></code></a>(app_label)</p></td>
+<td><p>See has_module_perms()</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.models.User.ahas_perm" title="fecfiler.user.models.User.ahas_perm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ahas_perm</span></code></a>(perm[, obj])</p></td>
+<td><p>See has_perm()</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.user.models.User.ahas_perms" title="fecfiler.user.models.User.ahas_perms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ahas_perms</span></code></a>(perm_list[, obj])</p></td>
+<td><p>See has_perms()</p></td>
+</tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">arefresh_from_db</span></code>([using, fields, from_queryset])</p></td>
 <td><p></p></td>
 </tr>
@@ -293,6 +311,36 @@ set self.__traceback__ to tb and return self.</p>
 <dt class="sig sig-object py" id="fecfiler.user.models.User.acheck_password">
 <em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">acheck_password</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">raw_password</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.acheck_password" title="Link to this definition">¶</a></dt>
 <dd><p>See check_password().</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.models.User.aget_group_permissions">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">aget_group_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.aget_group_permissions" title="Link to this definition">¶</a></dt>
+<dd><p>See get_group_permissions()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.models.User.aget_user_permissions">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">aget_user_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.aget_user_permissions" title="Link to this definition">¶</a></dt>
+<dd><p>See get_user_permissions()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.models.User.ahas_module_perms">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ahas_module_perms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.ahas_module_perms" title="Link to this definition">¶</a></dt>
+<dd><p>See has_module_perms()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.models.User.ahas_perm">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ahas_perm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.ahas_perm" title="Link to this definition">¶</a></dt>
+<dd><p>See has_perm()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.user.models.User.ahas_perms">
+<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ahas_perms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">perm_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.ahas_perms" title="Link to this definition">¶</a></dt>
+<dd><p>See has_perms()</p>
 </dd></dl>
 
 <dl class="py method">
@@ -547,6 +595,11 @@ failed.</p>
 </ul>
 </li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.acheck_password"><code class="docutils literal notranslate"><span class="pre">User.acheck_password()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.aget_group_permissions"><code class="docutils literal notranslate"><span class="pre">User.aget_group_permissions()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.aget_user_permissions"><code class="docutils literal notranslate"><span class="pre">User.aget_user_permissions()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.ahas_module_perms"><code class="docutils literal notranslate"><span class="pre">User.ahas_module_perms()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.ahas_perm"><code class="docutils literal notranslate"><span class="pre">User.ahas_perm()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.ahas_perms"><code class="docutils literal notranslate"><span class="pre">User.ahas_perms()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.check_password"><code class="docutils literal notranslate"><span class="pre">User.check_password()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.clean"><code class="docutils literal notranslate"><span class="pre">User.clean()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.clean_fields"><code class="docutils literal notranslate"><span class="pre">User.clean_fields()</span></code></a></li>

@@ -51,4 +51,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0018_schedulef_general_election_year_and_more
    fecfiler.transactions.migrations.0019_aggregate_committee_controls
    fecfiler.transactions.migrations.0020_trigger_save_on_transactions
+   fecfiler.transactions.migrations.0021_alter_transaction_reports
 

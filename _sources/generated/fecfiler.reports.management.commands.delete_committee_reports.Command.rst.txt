@@ -28,6 +28,7 @@ fecfiler.reports.management.commands.delete\_committee\_reports.Command
       ~Command.delete_committee_contacts
       ~Command.delete_committee_reports
       ~Command.execute
+      ~Command.get_check_kwargs
       ~Command.get_version
       ~Command.handle
       ~Command.print_help
