@@ -14,6 +14,7 @@ allowed_commands = [
     "showmigrations",
     # DEVOPS COMMANDS #
     "backout_login_dot_gov_cert",
+    "cleanup_login_dot_gov_certs",
     "clear_fallback_django_keys",
     "gen_and_install_django_key",
     "gen_and_stage_login_dot_gov_cert",

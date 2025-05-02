@@ -60,6 +60,7 @@ services:
             LOG_FORMAT:
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
+            FEC_FORMAT_VERSION: 8.4
         deploy:
             resources:
                 limits:
@@ -101,6 +102,7 @@ services:
             LOG_FORMAT:
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
+            FEC_FORMAT_VERSION: 8.4
         deploy:
             resources:
                 limits:
@@ -157,6 +159,7 @@ services:
             SECONDARY_POLLING_INTERVAL: 3600
             SECONDARY_POLLING_DURATION: 86400
             ENABLE_RESTRICTED_COMMANDS: True
+            FEC_FORMAT_VERSION: 8.4
 
             # ---- FEATURE FLAGS ----
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
@@ -185,7 +188,7 @@ services:
             - '8089:8089'
         volumes:
             - ./:/mnt/locust
-        command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api:8080
+        command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
         profiles: [locust]
         environment:
             LOCAL_TEST_USER:

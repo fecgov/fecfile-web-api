@@ -354,6 +354,7 @@ if not MOCK_EFO_FILING:
     if EFO_FILING_API_KEY is None:
         raise Exception("EFO_FILING_API_KEY must be set if MOCK_EFO_FILING is False")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
+FEC_FORMAT_VERSION = env.get_credential("FEC_FORMAT_VERSION")
 
 """EFO POLLING SETTINGS
 """

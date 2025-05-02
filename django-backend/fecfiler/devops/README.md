@@ -30,6 +30,14 @@ This command can be executed as follows:
 cf rt fecfile-web-api --command 'python django-backend/manage.py backout_login_dot_gov_cert "<token>" <cf_space> <cf_creds_service_name>'
 ```
 
+### cleanup_login_dot_gov_certs.py
+This command is used to cleanup old login dot gov public certs on S3 after verification of the newly installed public certificate and corresponding pk.
+
+This command can be executed as follows:
+```
+cf rt fecfile-web-api --command 'python django-backend/manage.py cleanup_login_dot_gov_certs "<token>"'
+```
+
 ### update_creds_service.py
 This command is used to update the creds service with a json structure of key/value pairs.
 

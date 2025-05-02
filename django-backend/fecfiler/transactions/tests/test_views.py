@@ -55,12 +55,7 @@ class TransactionViewsTestCase(TestCase):
             "last name",
             "First name",
             self.committee.id,
-            {
-                "street_1": "Test St",
-                "city": "Testville",
-                "state": "IL",
-                "zip": "12345"
-            }
+            {"street_1": "Test St", "city": "Testville", "state": "IL", "zip": "12345"},
         )
         self.transaction = create_ie(
             self.committee,
@@ -363,8 +358,8 @@ class TransactionViewsTestCase(TestCase):
                 },
             )
         )
-        self.assertEqual(response.data['id'], str(second_transaction.id))
-        self.assertEqual(response.data['aggregate'], '47.00')
+        self.assertEqual(response.data["id"], str(second_transaction.id))
+        self.assertEqual(response.data["aggregate"], "47.00")
 
         transaction_data = {
             **self.transaction_serializer.to_representation(first_transaction),
@@ -372,17 +367,14 @@ class TransactionViewsTestCase(TestCase):
                 "contribution_date": "2023-01-15",
                 "schedule_id": "A",
                 "schema_name": "INDIVIDUAL_RECEIPT",
-                "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
+                "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             },
         }
 
-        view_set.save_transaction(
-            transaction_data,
-            view_set.request
-        )
+        view_set.save_transaction(transaction_data, view_set.request)
 
         saved_transaction = view_set.get_queryset().get(id=first_transaction.id)
-        self.assertEqual(str(saved_transaction.aggregate), '200.00')
+        self.assertEqual(str(saved_transaction.aggregate), "200.00")
 
     def test_get_entity_date_leapfrogging_and_contact_change(self):
         view_set = TransactionViewSet()
@@ -425,22 +417,19 @@ class TransactionViewsTestCase(TestCase):
                 "contributor_street_1": "Test",
                 "contributor_city": "Testville",
                 "contributor_state": "IL",
-                "contributor_zip": "12345"
+                "contributor_zip": "12345",
             },
         }
 
-        view_set.save_transaction(
-            transaction_data,
-            view_set.request
-        )
+        view_set.save_transaction(transaction_data, view_set.request)
 
         first_transaction.refresh_from_db()
         second_transaction.refresh_from_db()
         third_transaction.refresh_from_db()
 
-        self.assertEqual(str(first_transaction.aggregate), '153.00')
-        self.assertEqual(str(second_transaction.aggregate), '47.00')
-        self.assertEqual(str(third_transaction.aggregate), '178.00')
+        self.assertEqual(str(first_transaction.aggregate), "153.00")
+        self.assertEqual(str(second_transaction.aggregate), "47.00")
+        self.assertEqual(str(third_transaction.aggregate), "178.00")
 
     def test_get_entity_move_date_backwards(self):
         view_set = TransactionViewSet()
@@ -490,17 +479,14 @@ class TransactionViewsTestCase(TestCase):
                 "contribution_date": "2023-01-10",
                 "schedule_id": "A",
                 "schema_name": "INDIVIDUAL_RECEIPT",
-                "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
+                "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             },
         }
 
-        view_set.save_transaction(
-            transaction_data,
-            view_set.request
-        )
+        view_set.save_transaction(transaction_data, view_set.request)
 
         saved_transaction = view_set.get_queryset().get(id=first_transaction.id)
-        self.assertEqual(str(saved_transaction.aggregate), '178.00')
+        self.assertEqual(str(saved_transaction.aggregate), "178.00")
         response = view_set.previous_transaction_by_entity(
             self.post_request(
                 {},
@@ -512,15 +498,15 @@ class TransactionViewsTestCase(TestCase):
                 },
             )
         )
-        self.assertEqual(response.data['id'], str(third_transaction.id))
+        self.assertEqual(response.data["id"], str(third_transaction.id))
 
         first_transaction.refresh_from_db()
         second_transaction.refresh_from_db()
         third_transaction.refresh_from_db()
 
-        self.assertEqual(str(first_transaction.aggregate), '178.00')
-        self.assertEqual(str(second_transaction.aggregate), '225.00')
-        self.assertEqual(str(third_transaction.aggregate), '25.00')
+        self.assertEqual(str(first_transaction.aggregate), "178.00")
+        self.assertEqual(str(second_transaction.aggregate), "225.00")
+        self.assertEqual(str(third_transaction.aggregate), "25.00")
 
     def test_get_previous_election(self):
         view_set = TransactionViewSet()
@@ -1197,6 +1183,34 @@ class TransactionViewsTestCase(TestCase):
             Transaction.all_objects.get(pk=test_q2_carried_over_debt.id).deleted
         )
 
+    def test_create_schedule_f_debt_repayment(self):
+        """Making a schedule f debt repayment should reduce the balance accordingly"""
+        # create q1 and associated debt
+        test_q1_report_2025 = create_form3x(
+            self.committee, "2025-01-01", "2025-03-31", {}
+        )
+        test_debt = create_debt(
+            self.committee,
+            self.test_org_contact,
+            "1000.00",
+            report=test_q1_report_2025,
+        )
+        # pay off debt on q2 and confirm q3 carry foward debt deleted
+        test_schedule_f_debt_repayment = self.create_schedule_f_debt_repayment_payload(
+            test_debt,
+            test_q1_report_2025,
+            "2025-04-03",
+            150.00,
+        )
+        response = TransactionViewSet().create(
+            self.post_request(test_schedule_f_debt_repayment)
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            Transaction.objects.transaction_view().get(pk=test_debt.id).balance_at_close,
+            850.00,
+        )
+
     def create_loan_repayment_payload(
         self,
         loan: Transaction,
@@ -1232,3 +1246,25 @@ class TransactionViewsTestCase(TestCase):
         debt_repayment_payload["expenditure_date"] = repayment_date
         debt_repayment_payload["expenditure_amount"] = repayment_amount
         return debt_repayment_payload
+
+    def create_schedule_f_debt_repayment_payload(
+        self,
+        debt: Transaction,
+        report: Report,
+        repayment_date: str,
+        repayment_amount: int,
+    ):
+        debt_representation = self.transaction_serializer.to_representation(debt)
+        schedule_f_debt_repayment_payload = deepcopy(
+            self.payloads["COORDINATED_PARTY_EXPENDITURE"]
+        )
+        schedule_f_debt_repayment_payload["contact_1"] = debt_representation["contact_1"]
+        schedule_f_debt_repayment_payload["contact_1_id"] = debt_representation[
+            "contact_1_id"
+        ]
+        schedule_f_debt_repayment_payload["debt"] = debt_representation
+        schedule_f_debt_repayment_payload["debt_id"] = debt_representation["id"]
+        schedule_f_debt_repayment_payload["report_ids"] = [str(report.id)]
+        schedule_f_debt_repayment_payload["expenditure_date"] = repayment_date
+        schedule_f_debt_repayment_payload["expenditure_amount"] = repayment_amount
+        return schedule_f_debt_repayment_payload
