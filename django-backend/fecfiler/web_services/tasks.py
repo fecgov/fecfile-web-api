@@ -61,12 +61,14 @@ def create_dot_fec(
     force_write_to_disk=False,
     file_name=None,
 ):
+    submission = None
     if upload_submission_id:
         submission = UploadSubmission.objects.get(id=upload_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
     if webprint_submission_id:
         submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
+
     try:
         file_content = compose_dot_fec(report_id)
         if file_name is None:
@@ -77,10 +79,11 @@ def create_dot_fec(
         store_file(file_content, file_name, force_write_to_disk)
         dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
         dot_fec_record.save()
-
-    except Exception:
-        submission.save_error("Creating .FEC failed")
-        return None
+    except Exception as e:
+        logger.error(f"Creating .FEC for report {report_id} failed: {e}")
+        if submission is not None:
+            submission.save_error("Creating .FEC failed")
+        raise e
 
     if upload_submission_id:
         UploadSubmission.objects.filter(id=upload_submission_id).update(
