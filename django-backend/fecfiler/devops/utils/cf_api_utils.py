@@ -73,10 +73,10 @@ def get_organization_guid(token, organization_name):
         if organization_guid == "":
             raise Exception("Organization guid not found in response")
         return organization_guid
-    except Exception:
+    except Exception as e:
         raise Exception(
             f"Failed to retrieve guid for organization_name {organization_name}"
-        )
+        ) from e
 
 
 def get_space_guid(token, space_name):
@@ -96,8 +96,8 @@ def get_space_guid(token, space_name):
         if space_guid == "":
             raise Exception("Space guid not found in response")
         return space_guid
-    except Exception:
-        raise Exception(f"Failed to retrieve guid for space_name {space_name}")
+    except Exception as e:
+        raise Exception(f"Failed to retrieve guid for space_name {space_name}") from e
 
 
 def get_service_instance_guid_from_names(
@@ -116,13 +116,13 @@ def get_service_instance_guid_from_names(
         )
 
         return service_instance_guid
-    except Exception:
+    except Exception as e:
         raise Exception(
             "Failed to retrieve service_instance_guid by names for "
             f"{organization_name} organization_name "
             f"{space_name} space_name "
             f"{service_instance_name} service_instance_name"
-        )
+        ) from e
 
 
 def get_service_instance_guid(
@@ -150,13 +150,13 @@ def get_service_instance_guid(
         if service_instance_guid == "":
             raise Exception("Service instance guid not found in response")
         return service_instance_guid
-    except Exception:
+    except Exception as e:
         raise Exception(
             "Failed to retrieve service_instance_guid by guids for "
             f"{organization_guid} organization_guid "
             f"{space_guid} space_guid "
             f"{service_instance_name} service_instance_name"
-        )
+        ) from e
 
 
 def get_credentials_by_guid(token, service_instance_guid):
@@ -166,11 +166,11 @@ def get_credentials_by_guid(token, service_instance_guid):
         response.raise_for_status()
         creds = response.json()
         return creds
-    except Exception:
+    except Exception as e:
         raise Exception(
             "Failed to retrieve creds for service_instance_guid "
             f"{service_instance_guid}"
-        )
+        ) from e
 
 
 def merge_credentials(creds, update_data):
@@ -184,7 +184,7 @@ def update_credentials_for_service(token, service_instance_guid, creds):
         url = f"{base_uri}/service_instances/{service_instance_guid}"
         response = requests.patch(url, json=creds, headers=headers)
         response.raise_for_status()
-    except Exception:
+    except Exception as e:
         raise Exception(
             "Failed to patch creds for service_instance_guid " f"{service_instance_guid}"
-        )
+        ) from e

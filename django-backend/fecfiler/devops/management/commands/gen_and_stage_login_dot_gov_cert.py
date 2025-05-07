@@ -2,6 +2,9 @@ from django.core.management.base import BaseCommand
 from fecfiler.devops.utils.login_dot_gov_cert_utils import (
     gen_and_stage_login_dot_gov_cert,
 )
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class Command(BaseCommand):
@@ -20,18 +23,12 @@ class Command(BaseCommand):
             cf_space_name = options["cf_space_name"]
             cf_service_instance_name = options["cf_service_instance_name"]
 
-            self.stdout.write(
-                self.style.NOTICE("STARTING gen_and_stage_login_dot_gov_cert command")
-            )
+            logger.info("STARTING gen_and_stage_login_dot_gov_cert command")
             gen_and_stage_login_dot_gov_cert(
                 cf_token, cf_organization_name, cf_space_name, cf_service_instance_name
             )
-            self.stdout.write(
-                self.style.NOTICE("FINISHED gen_and_stage_login_dot_gov_cert command")
-            )
-        except Exception:
-            self.stdout.write(
-                self.style.ERROR(
-                    "FAILED to execute gen_and_stage_login_dot_gov_cert command"
-                )
+            logger.info("FINISHED gen_and_stage_login_dot_gov_cert command")
+        except Exception as e:
+            logger.error(
+                f"FAILED to execute gen_and_stage_login_dot_gov_cert command: {e}"
             )

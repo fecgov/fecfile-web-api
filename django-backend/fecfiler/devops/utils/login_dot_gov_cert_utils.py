@@ -137,8 +137,8 @@ def stage_login_dot_gov_pk(
             cf_service_instance_name,
             creds_to_update,
         )
-    except Exception:
-        raise Exception("Failed stage login dot gov pk")
+    except Exception as e:
+        raise Exception("Failed stage login dot gov pk") from e
 
 
 def stage_login_dot_gov_cert(x509_cert: Certificate):
@@ -150,8 +150,8 @@ def stage_login_dot_gov_cert(x509_cert: Certificate):
         s3_object = S3_SESSION.Object(AWS_STORAGE_BUCKET_NAME, filename)
         s3_object.put(Body=x509_cert_bytes)
         logger.info(f"Cert saved as {filename}")
-    except Exception:
-        raise Exception("Failed stage login dot gov cert")
+    except Exception as e:
+        raise Exception("Failed stage login dot gov cert") from e
 
 
 def cleanup_login_dot_gov_certs():
