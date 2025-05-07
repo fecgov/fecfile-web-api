@@ -1,4 +1,5 @@
 from fecfiler.contacts.models import Contact
+from django.db.models import Q
 
 
 def add_org_ind_contact(data, contact: Contact, identifier: str):
@@ -37,3 +38,47 @@ def add_location(data, contact: Contact, identifier: str):
     data[f"{identifier}_city"] = contact.city
     data[f"{identifier}_state"] = contact.state
     data[f"{identifier}_zip"] = contact.zip
+
+def filter_for_previous_transactions(
+    queryset,
+    transaction_id,
+    date,
+    aggregation_group,
+    contact_1_id=None,
+    contact_2_id=None,
+    election_code=None,
+    election_year=None,
+    office=None,
+    state=None,
+    district=None,
+):
+    query = queryset.filter(
+        ~Q(id=transaction_id or None),
+        Q(date__year=date.year),
+        Q(date__lte=date),
+        Q(aggregation_group=aggregation_group),
+    )
+    if contact_1_id:
+        query = query.filter(Q(contact_1_id=contact_1_id))
+    elif contact_2_id:
+        query = query.filter(
+            Q(contact_2_id=contact_2_id),
+            Q(schedule_f__general_election_year=election_year)
+        )
+    else:
+        query = query.filter(
+            Q(schedule_e__election_code=election_code),
+            Q(contact_2__candidate_office=office),
+            Q(contact_2__candidate_state=state),
+            Q(contact_2__candidate_district=district),
+        )
+
+    original_transaction = None
+    if transaction_id:
+        original_transaction = queryset.get(id=transaction_id)
+        query = query.filter(
+            Q(created__lt=original_transaction.created) | ~Q(date=date)
+        )
+
+    query = query.order_by("-date", "-created")
+    return query

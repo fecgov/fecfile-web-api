@@ -22,6 +22,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
+from fecfiler.transactions.utils import filter_for_previous_transactions
 from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
@@ -207,46 +208,58 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
         return self.get_previous(
-            id, date, aggregation_group, None, election_code, office, state, district
+            id, date, aggregation_group, None, None, election_code, None, office, state, district
         )
+
+    @action(detail=False, methods=["get"], url_path=r"previous/payee-candidate")
+    def previous_transaction_by_payee_candidate(self, request):
+        """Retrieves transaction that comes before this transactions,
+        while being in the same group for aggregation"""
+        transaction_id = request.query_params.get("transaction_id", None)
+        try:
+            contact_2_id = request.query_params["contact_2_id"]
+            date = request.query_params["date"]
+            aggregation_group = request.query_params["aggregation_group"]
+            election_year = request.query_params["election_year"]
+        except Exception:
+            message = "contact_2_id, date, aggregation_group, and election_year are required params"
+            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+        return self.get_previous(transaction_id, date, aggregation_group, None, contact_2_id, None, election_year)
 
     def get_previous(
         self,
         transaction_id,
         date,
         aggregation_group,
-        contact_id=None,
+        contact_1_id=None,
+        contact_2_id=None,
         election_code=None,
+        election_year=None,
         office=None,
         state=None,
         district=None,
     ):
         date = datetime.fromisoformat(date)
-        query = self.get_queryset().filter(
-            ~Q(id=transaction_id or None),
-            Q(date__year=date.year),
-            Q(date__lte=date),
-            Q(aggregation_group=aggregation_group),
+        queryset = self.get_queryset()
+        previous_transactions = filter_for_previous_transactions(
+            queryset,
+            transaction_id,
+            date,
+            aggregation_group,
+            contact_1_id,
+            contact_2_id,
+            election_code,
+            election_year,
+            office,
+            state,
+            district,
         )
-        if contact_id:
-            query = query.filter(Q(contact_1_id=contact_id))
-        else:
-            query = query.filter(
-                Q(schedule_e__election_code=election_code),
-                Q(contact_2__candidate_office=office),
-                Q(contact_2__candidate_state=state),
-                Q(contact_2__candidate_district=district),
-            )
+        previous_transaction = previous_transactions.first()
 
         original_transaction = None
         if transaction_id:
-            original_transaction = self.get_queryset().get(id=transaction_id)
-            query = query.filter(
-                Q(created__lt=original_transaction.created) | ~Q(date=date)
-            )
-
-        query = query.order_by("-date", "-created")
-        previous_transaction = query.first()
+            original_transaction = queryset.get(id=transaction_id)
 
         if previous_transaction:
             if original_transaction and (
@@ -262,6 +275,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     previous_transaction.calendar_ytd_per_election_office -= (
                         original_transaction.amount
                     )  # noqa: E501
+            print("SERIALIZING!")
             serializer = self.get_serializer(previous_transaction)
             return Response(data=serializer.data)
 
@@ -288,6 +302,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         original_contact_1 = None
         original_contact_2 = None
         original_election_code = None
+        original_election_year = None
 
         is_existing = "id" in transaction_data
         if is_existing:
@@ -298,6 +313,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 original_contact_2 = original_instance.contact_2
                 original_election_code = getattr(
                     original_instance.get_schedule(), "election_code", None
+                )
+                original_election_year = getattr(
+                    original_instance.get_schedule(), "general_election_year", None
                 )
 
             transaction_serializer = TransactionSerializer(
@@ -367,6 +385,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             f"linked to report(s): {', '.join(report_ids)}"
         )
 
+        # Manually trigger aggregate recalculation
+        # ---- Currently Schedule F only
+        if transaction_instance.schedule_f is not None:
+            self.recalculate_schedule_f_aggregates(transaction_instance)
+
         get_save_hook(transaction_instance)(
             transaction_instance,
             is_existing,
@@ -420,7 +443,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 original_state = original_contact_2.candidate_state
 
                 next_transactions_by_election = (
-                    Transaction.objects.get_queryset()
+                    self.get_queryset()
                     .filter(
                         ~Q(id=original_instance.id),
                         Q(
@@ -437,6 +460,22 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     )
                     .order_by("date")
                 )
+
+            # Handle date leap-frogging just for Schedule F transactions
+            if original_contact_2 is not None and original_election_year:
+                leapfrogged_sch_f_transactions = self.get_queryset().filter(
+                    ~Q(id=original_instance.id),
+                    Q(
+                        contact_2_id=original_contact_2.id,
+                        schedule_f__isnull=False,
+                        schedule_f__general_election_year=original_election_year,
+                    ),
+                    Q(date__gt=original_date)
+                    | Q(date=original_date, created__gt=original_instance.created),
+                ).order_by("date")
+
+                to_recalculate = leapfrogged_sch_f_transactions.first()
+                self.recalculate_schedule_f_aggregates(to_recalculate)
 
             """excluding transactions that are already in
             the next_transactions_by_election queryset"""
@@ -507,6 +546,43 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         transaction.reports.remove(report)
         return Response("Transaction removed from report")
+
+
+    def recalculate_schedule_f_aggregates(self, transaction):
+        shared_entity_transactions = self.get_queryset().filter(
+            date__year=transaction.date.year,
+            contact_2=transaction.contact_2,
+            aggregation_group=transaction.aggregation_group,
+            schedule_f__isnull=False,
+            schedule_f__general_election_year=transaction.schedule_f.general_election_year
+        )
+
+        previous_transactions = filter_for_previous_transactions(
+            shared_entity_transactions,
+            transaction.id,
+            transaction.date,
+            transaction.aggregation_group,
+            None,
+            transaction.contact_2.id,
+            None,
+            transaction.schedule_f.general_election_year
+        )
+
+        # Exclude the transactions that are prior to the given transaction
+        to_update = shared_entity_transactions.difference(
+            previous_transactions
+        ).order_by("date", "created")
+
+        previous_transaction = previous_transactions.first()
+        for trans in to_update:
+            previous_aggregate = 0
+            if previous_transaction:
+                previous_aggregate = previous_transaction.aggregate
+
+            trans.aggregate = trans.schedule_f.expenditure_amount + previous_aggregate
+            trans.save()
+
+            previous_transaction = trans
 
 
 def noop(transaction, is_existing):
