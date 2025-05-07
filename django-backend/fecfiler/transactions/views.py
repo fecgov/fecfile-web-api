@@ -393,8 +393,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         # Manually trigger aggregate recalculation
         # ---- Currently Schedule F only
         if transaction_instance.schedule_f is not None:
-            from_db = self.get_queryset().get(id=transaction_instance.id)
-            self.recalculate_schedule_f_aggregates(from_db)
+            from_db = self.get_queryset().filter(id=transaction_instance.id).first()
+            if from_db is not None:
+                self.recalculate_schedule_f_aggregates(from_db)
 
         for child_transaction_data in children:
             if type(child_transaction_data) is str:

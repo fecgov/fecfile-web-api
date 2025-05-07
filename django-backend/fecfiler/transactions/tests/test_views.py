@@ -1202,7 +1202,7 @@ class TransactionViewsTestCase(TestCase):
             "2025-04-03",
             150.00,
         )
-        response = TransactionViewSet().create(
+        response = self.view.create(
             self.post_request(test_schedule_f_debt_repayment)
         )
         self.assertEqual(response.status_code, 200)
