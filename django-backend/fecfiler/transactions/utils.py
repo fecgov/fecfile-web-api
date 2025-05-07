@@ -39,6 +39,7 @@ def add_location(data, contact: Contact, identifier: str):
     data[f"{identifier}_state"] = contact.state
     data[f"{identifier}_zip"] = contact.zip
 
+
 def filter_for_previous_transactions(
     queryset,
     transaction_id,

@@ -208,7 +208,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
         return self.get_previous(
-            id, date, aggregation_group, None, None, election_code, None, office, state, district
+            id,
+            date,
+            aggregation_group,
+            None, None,
+            election_code,
+            None,
+            office, state, district
         )
 
     @action(detail=False, methods=["get"], url_path=r"previous/payee-candidate")
@@ -222,10 +228,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             aggregation_group = request.query_params["aggregation_group"]
             general_election_year = request.query_params["general_election_year"]
         except Exception:
-            message = "contact_2_id, date, aggregation_group, and general_election_year are required params"
+            message = "contact_2_id, date, aggregation_group, and "
+            "general_election_year are required params"
+
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-        return self.get_previous(transaction_id, date, aggregation_group, None, contact_2_id, None, general_election_year)
+        return self.get_previous(
+            transaction_id,
+            date,
+            aggregation_group,
+            None,
+            contact_2_id,
+            None,
+            general_election_year
+        )
 
     def get_previous(
         self,
@@ -275,7 +291,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     previous_transaction.calendar_ytd_per_election_office -= (
                         original_transaction.amount
                     )  # noqa: E501
-            print("SERIALIZING!")
             serializer = self.get_serializer(previous_transaction)
             return Response(data=serializer.data)
 
@@ -550,7 +565,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction.reports.remove(report)
         return Response("Transaction removed from report")
 
-
     def recalculate_schedule_f_aggregates(self, transaction):
         shared_entity_transactions = self.get_queryset().filter(
             date__year=transaction.date.year,
@@ -571,14 +585,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             transaction.schedule_f.general_election_year
         )
 
-        print("\n\n\nPrevious transactions:", previous_transactions.count())
-
         # Exclude the transactions that are prior to the given transaction
         to_update = shared_entity_transactions.difference(
             previous_transactions
         ).order_by("date", "created")
-
-        print("To update:", to_update.count())
 
         previous_transaction = previous_transactions.first()
         for trans in to_update:
@@ -587,7 +597,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 previous_aggregate = previous_transaction.aggregate
 
             trans.aggregate = trans.schedule_f.expenditure_amount + previous_aggregate
-            print(trans.schedule_f.expenditure_date, '-', trans.schedule_f.expenditure_amount, trans.aggregate, "\n\n\n")
             trans.save()
 
             previous_transaction = trans

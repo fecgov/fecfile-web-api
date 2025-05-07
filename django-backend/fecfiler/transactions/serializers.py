@@ -326,7 +326,9 @@ class TransactionSerializer(
         schedule_f = representation.pop("schedule_f")
         if not schedule_f:
             return
-        representation["aggregate_general_elec_expended"] = representation.get("aggregate")
+        representation[
+            "aggregate_general_elec_expended"
+        ] = representation.get("aggregate")
 
         add_schedule_f_contact_fields(instance, representation)
 
