@@ -30,5 +30,5 @@ class Command(BaseCommand):
             logger.info("FINISHED gen_and_stage_login_dot_gov_cert command")
         except Exception as e:
             logger.error(
-                f"FAILED to execute gen_and_stage_login_dot_gov_cert command: {e}"
+                "FAILED to execute gen_and_stage_login_dot_gov_cert command", exc_info=e
             )
