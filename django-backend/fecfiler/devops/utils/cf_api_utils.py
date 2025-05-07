@@ -79,13 +79,16 @@ def get_organization_guid(token, organization_name):
         ) from e
 
 
-def get_space_guid(token, space_name):
+def get_space_guid(token, space_name, organization_guid):
     try:
         space_guid = ""
         data = {
             "names": [
                 space_name,
-            ]
+            ],
+            "organization_guids": [
+                organization_guid,
+            ],
         }
         url = f"{base_uri}/spaces"
         response = requests.get(url, params=data, headers=get_auth_header(token))
@@ -108,7 +111,7 @@ def get_service_instance_guid_from_names(
         organization_guid = get_organization_guid(token, organization_name)
 
         logger.info(f"Retrieving guid for space_name {space_name}")
-        space_guid = get_space_guid(token, space_name)
+        space_guid = get_space_guid(token, space_name, organization_guid)
 
         logger.info(f"Retrieving guid for service_instance_name {service_instance_name}")
         service_instance_guid = get_service_instance_guid(

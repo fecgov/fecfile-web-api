@@ -194,16 +194,18 @@ class CfApiUtilsTestCase(TestCase):
         with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
             test_token = "test_token"
             test_space_name = "test_space_name"
+            test_organization_guid = "4baa2f2b-a5db-49fb-bbc3-330a7a5fada8"
             mock_requests.get.side_effect = Exception("FAIL")
             with self.assertRaisesMessage(
                 Exception, f"Failed to retrieve guid for space_name {test_space_name}"
             ):
-                get_space_guid(test_token, test_space_name)
+                get_space_guid(test_token, test_space_name, test_organization_guid)
 
     def test_get_space_guid_empty_response(self):
         with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
             test_token = "test_token"
             test_space_name = "test_space_name"
+            test_organization_guid = "4baa2f2b-a5db-49fb-bbc3-330a7a5fada8"
             test_guid = ""
             mock_requests.get.return_value = mock_response = Mock()
             mock_response.status_code = 200
@@ -213,19 +215,20 @@ class CfApiUtilsTestCase(TestCase):
             with self.assertRaisesMessage(
                 Exception, f"Failed to retrieve guid for space_name {test_space_name}"
             ):
-                get_space_guid(test_token, test_space_name)
+                get_space_guid(test_token, test_space_name, test_organization_guid)
 
     def test_get_space_guid_happy_path(self):
         with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
             test_token = "test_token"
             test_space_name = "test_space_name"
+            test_organization_guid = "4baa2f2b-a5db-49fb-bbc3-330a7a5fada8"
             test_guid = "fd1ab0ac-691e-4755-9703-f6e0401e7b7a"
             mock_requests.get.return_value = mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "resources": [{"name": test_space_name, "guid": test_guid}]
             }
-            response = get_space_guid(test_token, test_space_name)
+            response = get_space_guid(test_token, test_space_name, test_organization_guid)
             self.assertEqual(response, test_guid)
 
     # get_service_instance_guid_from_names
