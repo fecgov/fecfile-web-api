@@ -220,12 +220,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             contact_2_id = request.query_params["contact_2_id"]
             date = request.query_params["date"]
             aggregation_group = request.query_params["aggregation_group"]
-            election_year = request.query_params["election_year"]
+            general_election_year = request.query_params["general_election_year"]
         except Exception:
-            message = "contact_2_id, date, aggregation_group, and election_year are required params"
+            message = "contact_2_id, date, aggregation_group, and general_election_year are required params"
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-        return self.get_previous(transaction_id, date, aggregation_group, None, contact_2_id, None, election_year)
+        return self.get_previous(transaction_id, date, aggregation_group, None, contact_2_id, None, general_election_year)
 
     def get_previous(
         self,
