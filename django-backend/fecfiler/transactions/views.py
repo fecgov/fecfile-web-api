@@ -385,15 +385,16 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             f"linked to report(s): {', '.join(report_ids)}"
         )
 
-        # Manually trigger aggregate recalculation
-        # ---- Currently Schedule F only
-        if transaction_instance.schedule_f is not None:
-            self.recalculate_schedule_f_aggregates(transaction_instance)
-
         get_save_hook(transaction_instance)(
             transaction_instance,
             is_existing,
         )
+
+        # Manually trigger aggregate recalculation
+        # ---- Currently Schedule F only
+        if transaction_instance.schedule_f is not None:
+            from_db = self.get_queryset().get(id=transaction_instance.id)
+            self.recalculate_schedule_f_aggregates(from_db)
 
         for child_transaction_data in children:
             if type(child_transaction_data) is str:
@@ -475,7 +476,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 ).order_by("date")
 
                 to_recalculate = leapfrogged_sch_f_transactions.first()
-                self.recalculate_schedule_f_aggregates(to_recalculate)
+                if to_recalculate is not None:
+                    self.recalculate_schedule_f_aggregates(to_recalculate)
 
             """excluding transactions that are already in
             the next_transactions_by_election queryset"""
@@ -568,10 +570,14 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             transaction.schedule_f.general_election_year
         )
 
+        print("\n\n\nPrevious transactions:", previous_transactions.count())
+
         # Exclude the transactions that are prior to the given transaction
         to_update = shared_entity_transactions.difference(
             previous_transactions
         ).order_by("date", "created")
+
+        print("To update:", to_update.count())
 
         previous_transaction = previous_transactions.first()
         for trans in to_update:
@@ -580,6 +586,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 previous_aggregate = previous_transaction.aggregate
 
             trans.aggregate = trans.schedule_f.expenditure_amount + previous_aggregate
+            print(trans.schedule_f.expenditure_date, '-', trans.schedule_f.expenditure_amount, trans.aggregate, "\n\n\n")
             trans.save()
 
             previous_transaction = trans

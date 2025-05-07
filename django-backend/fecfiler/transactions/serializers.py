@@ -170,6 +170,7 @@ class TransactionSerializer(
         self.handle_schedule_a(instance, representation)
         self.handle_schedule_b(instance, representation)
         self.handle_schedule_c(instance, representation)
+        self.handle_schedule_f(instance, representation)
         self.handle_generic_schedule(
             instance, representation, "schedule_c1", add_schedule_c1_contact_fields
         )
@@ -181,9 +182,6 @@ class TransactionSerializer(
         )
         self.handle_generic_schedule(
             instance, representation, "schedule_e", add_schedule_e_contact_fields
-        )
-        self.handle_generic_schedule(
-            instance, representation, "schedule_f", add_schedule_f_contact_fields
         )
 
         # because form_type is a dynamic field
@@ -323,6 +321,18 @@ class TransactionSerializer(
         for property in schedule_c:
             if not representation.get(property):
                 representation[property] = schedule_c[property]
+
+    def handle_schedule_f(self, instance, representation):
+        schedule_f = representation.pop("schedule_f")
+        if not schedule_f:
+            return
+        representation["aggregate_general_elec_expended"] = representation.get("aggregate")
+
+        add_schedule_f_contact_fields(instance, representation)
+
+        for property in schedule_f:
+            if not representation.get(property):
+                representation[property] = schedule_f[property]
 
     def handle_generic_schedule(
         self, instance, representation, schedule_name, add_fields

@@ -52,6 +52,9 @@ def filter_for_previous_transactions(
     state=None,
     district=None,
 ):
+    print("DUMP QUERYSET for ", date)
+    for transaction in queryset:
+        print(transaction.date)
     query = queryset.filter(
         ~Q(id=transaction_id or None),
         Q(date__year=date.year),
