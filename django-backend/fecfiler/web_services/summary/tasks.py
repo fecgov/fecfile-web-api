@@ -1,6 +1,6 @@
 from enum import Enum
 from celery import shared_task
-from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
+from fecfiler.reports.models import Report, FORMS_TO_CALCULATE, Q
 from fecfiler.reports.form_3x.summary import calculate_summary as calculate_summary_3x
 from fecfiler.reports.form_3.summary import calculate_summary as calculate_summary_3
 
@@ -32,7 +32,8 @@ def calculate_summary(report_id):
         return primary_report.id
 
     reports_to_recalculate = Report.objects.filter(
-        committee_account=primary_report.committee_account, form_3x__isnull=False
+        Q(form_3x__isnull=False) | Q(form_3__isnull=False),
+        committee_account=primary_report.committee_account,
     ).order_by("coverage_through_date")
     calculation_token = uuid.uuid4()
     reports_to_recalculate.update(
