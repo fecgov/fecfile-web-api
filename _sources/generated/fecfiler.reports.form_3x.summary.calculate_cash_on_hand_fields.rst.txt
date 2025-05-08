@@ -1,0 +1,6 @@
+fecfiler.reports.form\_3x.summary.calculate\_cash\_on\_hand\_fields
+===================================================================
+
+.. currentmodule:: fecfiler.reports.form_3x.summary
+
+.. autofunction:: calculate_cash_on_hand_fields

@@ -1,0 +1,6 @@
+fecfiler.reports.form\_3x.summary.calculate\_summary
+====================================================
+
+.. currentmodule:: fecfiler.reports.form_3x.summary
+
+.. autofunction:: calculate_summary

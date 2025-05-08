@@ -1,0 +1,6 @@
+fecfiler.reports.form\_3x.summary.calculate\_summary\_column\_a
+===============================================================
+
+.. currentmodule:: fecfiler.reports.form_3x.summary
+
+.. autofunction:: calculate_summary_column_a
