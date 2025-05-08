@@ -76,7 +76,7 @@ class MockDotFECSubmitter(DotFECSubmitter):
         return json.dumps(
             {
                 "submission_id": "fake_submission_id",
-                "status": FECStatus.REJECTED.value,
+                "status": FECStatus.ACCEPTED.value,
                 "message": "We didn't really send anything to FEC",
                 "report_id": fec_report_id or str(uuid()),
             }
