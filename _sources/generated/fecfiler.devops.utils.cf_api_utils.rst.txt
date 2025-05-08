@@ -19,7 +19,9 @@ fecfiler.devops.utils.cf\_api\_utils
    
       get_auth_header
       get_credentials_by_guid
+      get_organization_guid
       get_service_instance_guid
+      get_service_instance_guid_from_names
       get_space_guid
       merge_credentials
       retrieve_credentials

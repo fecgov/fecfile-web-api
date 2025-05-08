@@ -116,7 +116,12 @@ fecfiler.devops.tests.test\_cf\_api\_utils.CfApiUtilsTestCase
       ~CfApiUtilsTestCase.tearDownClass
       ~CfApiUtilsTestCase.test_get_credentials_by_guid_happy_path
       ~CfApiUtilsTestCase.test_get_credentials_by_guid_throws_exception
+      ~CfApiUtilsTestCase.test_get_organization_guid_empty_response
+      ~CfApiUtilsTestCase.test_get_organization_guid_happy_path
+      ~CfApiUtilsTestCase.test_get_organization_guid_throws_exception
       ~CfApiUtilsTestCase.test_get_service_instance_guid_empty_response
+      ~CfApiUtilsTestCase.test_get_service_instance_guid_from_names_happy_path
+      ~CfApiUtilsTestCase.test_get_service_instance_guid_from_names_throws_exception
       ~CfApiUtilsTestCase.test_get_service_instance_guid_happy_path
       ~CfApiUtilsTestCase.test_get_service_instance_guid_throws_exception
       ~CfApiUtilsTestCase.test_get_space_guid_empty_response

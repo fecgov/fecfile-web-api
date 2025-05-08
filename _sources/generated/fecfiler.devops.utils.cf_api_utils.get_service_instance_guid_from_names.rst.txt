@@ -1,0 +1,6 @@
+fecfiler.devops.utils.cf\_api\_utils.get\_service\_instance\_guid\_from\_names
+==============================================================================
+
+.. currentmodule:: fecfiler.devops.utils.cf_api_utils
+
+.. autofunction:: get_service_instance_guid_from_names
