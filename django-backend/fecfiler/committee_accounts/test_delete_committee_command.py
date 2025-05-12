@@ -20,33 +20,33 @@ class CommitteeAccountsViewsTest(TestCase):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
-            self.assertEquals(account.committee_id, "C12345678")
+            self.assertEqual(account.committee_id, "C12345678")
             report = account.report_set.create()
             transaction = report.transactions.create(committee_account=account)
             transaction.contact_1 = Contact.objects.create(committee_account=account)
             transaction.save()
-            self.assertEquals(
+            self.assertEqual(
                 Report.objects.filter(committee_account=account).count(),
                 1
             )
-            self.assertEquals(
+            self.assertEqual(
                 Transaction.objects.filter(committee_account=account).count(),
                 1
             )
-            self.assertEquals(
+            self.assertEqual(
                 Contact.objects.filter(committee_account=account).count(),
                 1
             )
             call_command("delete_committee_account", "C12345678")
-            self.assertEquals(
+            self.assertEqual(
                 Report.objects.filter(committee_account=account).count(),
                 0
             )
-            self.assertEquals(
+            self.assertEqual(
                 Transaction.objects.filter(committee_account=account).count(),
                 0
             )
-            self.assertEquals(
+            self.assertEqual(
                 Contact.objects.filter(committee_account=account).count(),
                 0
             )

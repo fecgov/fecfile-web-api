@@ -43,13 +43,13 @@ class CommitteeAccountsUtilsTest(TestCase):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
-            self.assertEquals(account.committee_id, "C12345678")
+            self.assertEqual(account.committee_id, "C12345678")
 
     def test_create_committee_account_existing(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
-            self.assertEquals(account.committee_id, "C12345678")
+            self.assertEqual(account.committee_id, "C12345678")
             self.assertRaisesMessage(
                 Exception,
                 self.create_error_message,
@@ -74,7 +74,7 @@ class CommitteeAccountsUtilsTest(TestCase):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             self.test_user.email = self.test_user.email.upper()
             account = create_committee_account("C12345678", self.test_user)
-            self.assertEquals(account.committee_id, "C12345678")
+            self.assertEqual(account.committee_id, "C12345678")
             self.assertRaisesMessage(
                 Exception,
                 self.create_error_message,

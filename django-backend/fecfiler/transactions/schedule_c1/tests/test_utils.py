@@ -15,8 +15,8 @@ class ScheduleC1UtilsTestCase(TestCase):
 
         add_schedule_c1_contact_fields(instance, representation)
 
-        self.assertEquals(
+        self.assertEqual(
             representation['transaction_type_identifier'], 'C1_LOAN_AGREEMENT'
         )
-        self.assertEquals(representation['lender_organization_name'], '1 name')
-        self.assertEquals(representation['lender_zip'], '1 zip')
+        self.assertEqual(representation['lender_organization_name'], '1 name')
+        self.assertEqual(representation['lender_zip'], '1 zip')

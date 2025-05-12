@@ -15,8 +15,8 @@ class ScheduleCUtilsTestCase(TestCase):
 
         add_schedule_c_contact_fields(instance, representation)
 
-        self.assertEquals(
+        self.assertEqual(
             representation['transaction_type_identifier'], 'LOAN_RECEIVED_FROM_INDIVIDUAL'
         )
-        self.assertEquals(representation['lender_last_name'], '1 last name')
-        self.assertEquals(representation['lender_candidate_last_name'], '2 last name')
+        self.assertEqual(representation['lender_last_name'], '1 last name')
+        self.assertEqual(representation['lender_candidate_last_name'], '2 last name')
