@@ -25,7 +25,6 @@ from fecfiler.transactions.tests.utils import (
     create_loan,
     create_debt,
     create_ie,
-    create_schedule_f,
     gen_schedule_f_request_data,
 )
 from fecfiler.transactions.serializers import TransactionSerializer
