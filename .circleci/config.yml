@@ -5,7 +5,7 @@ version: 2.1
 # See: https://circleci.com/docs/2.0/orb-intro/
 orbs:
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
-  python: circleci/python@1.2
+  python: circleci/python@3.1.0
   browser-tools: circleci/browser-tools@1.2.3
   node: circleci/node@5.0.2
 
