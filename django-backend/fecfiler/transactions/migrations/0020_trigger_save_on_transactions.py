@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
         ("transactions", "0019_aggregate_committee_controls"),
     ]
 
-    def trigger_save_on_transactions(apps, schema_editor):
+    def trigger_save_on_transactions(apps, schema_editor):  # noqa: N805
         transactions = apps.get_model("transactions", "transaction")
         committees = apps.get_model("committee_accounts", "committeeaccount")
         contacts = apps.get_model("contacts", "contact")
