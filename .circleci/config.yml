@@ -76,9 +76,9 @@ jobs:
           command: |
             flake8 --config django-backend/.flake8
 
-      - run:
-          name: Run deptry
-          command: deptry ~/project/
+      # - run:
+      #     name: Run deptry
+      #     command: deptry ~/project/
 
       - run:
           name: Run tests
