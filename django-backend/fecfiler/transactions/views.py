@@ -228,8 +228,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             aggregation_group = request.query_params["aggregation_group"]
             general_election_year = request.query_params["general_election_year"]
         except Exception:
-            message = "contact_2_id, date, aggregation_group, and "
-            "general_election_year are required params"
+            message = (
+                "contact_2_id, date, aggregation_group, and "
+                "general_election_year are required params"
+            )
 
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
@@ -436,6 +438,23 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         delete_carried_forward_loans_if_needed(transaction_instance, committee_id)
         delete_carried_forward_debts_if_needed(transaction_instance, committee_id)
 
+        # Handle changing general_election_year for Schedule F transactions
+        if original_election_year is not None and original_election_year != transaction_instance.schedule_f.general_election_year:
+            leapfrogged_sch_f_transactions = self.get_queryset().filter(
+                ~Q(id=original_instance.id),
+                Q(
+                    contact_2_id=original_contact_2.id,
+                    schedule_f__isnull=False,
+                    schedule_f__general_election_year=original_election_year,
+                ),
+                Q(date__gt=original_date)
+                | Q(date=original_date, created__gt=original_instance.created),
+            ).order_by("date")
+
+            to_recalculate = leapfrogged_sch_f_transactions.first()
+            if to_recalculate is not None:
+                self.recalculate_schedule_f_aggregates(to_recalculate)
+
         # Set the earlier date in order to detect when a transaction has moved forward
         if original_date and original_date < schedule_instance.get_date():
             next_transactions_by_entity = (
@@ -494,20 +513,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 to_recalculate = leapfrogged_sch_f_transactions.first()
                 if to_recalculate is not None:
                     self.recalculate_schedule_f_aggregates(to_recalculate)
+                    return self.queryset.get(id=transaction_instance.id)
 
-            """excluding transactions that are already in
-            the next_transactions_by_election queryset"""
-            next_transactions_by_entity = next_transactions_by_entity.difference(
-                next_transactions_by_election
-            )
-            for_manual_recalculation = next_transactions_by_entity[:1].union(
-                next_transactions_by_election[:1]
-            )
+            next_entity = next_transactions_by_entity.first()
+            next_election = next_transactions_by_election.first()
 
-            for to_recalculate in for_manual_recalculation:
-                # By saving this transaction, we trigger aggregate recalculation
-                # on this and subsequent transactions
-                to_recalculate.save()
+            if next_entity is not None:
+                next_entity.save()
+            if next_election is not None:
+                next_election.save()
 
         return self.queryset.get(id=transaction_instance.id)
 
@@ -571,7 +585,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             contact_2=transaction.contact_2,
             aggregation_group=transaction.aggregation_group,
             schedule_f__isnull=False,
-            schedule_f__general_election_year=transaction.schedule_f.general_election_year
+            schedule_f__general_election_year=transaction.schedule_f.general_election_year,
         )
 
         previous_transactions = filter_for_previous_transactions(

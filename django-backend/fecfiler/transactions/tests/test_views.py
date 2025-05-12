@@ -1,4 +1,5 @@
 from decimal import Decimal
+from unittest.mock import patch
 from django.test import TestCase
 from django.test.client import RequestFactory
 from rest_framework import status
@@ -24,6 +25,8 @@ from fecfiler.transactions.tests.utils import (
     create_loan,
     create_debt,
     create_ie,
+    create_schedule_f,
+    gen_schedule_f_request_data,
 )
 from fecfiler.transactions.serializers import TransactionSerializer
 import structlog
@@ -46,7 +49,12 @@ class TransactionViewsTestCase(TestCase):
         self.q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.q2_report = create_form3x(self.committee, "2024-02-02", "2024-03-01", {})
         self.contact_1 = create_test_individual_contact(
-            "last name", "First name", self.committee.id
+            "last name", "First name", self.committee.id, {
+                "street_1": "123 test street",
+                "city": "testville",
+                "state": "AK",
+                "zip": "12345",
+            }
         )
         self.contact_2 = create_test_candidate_contact(
             "last name", "First name", self.committee.id, "H8MA03131", "S", "AK", "01"
@@ -54,6 +62,12 @@ class TransactionViewsTestCase(TestCase):
         self.contact_3 = create_test_individual_contact(
             "last name",
             "First name",
+            self.committee.id,
+            {"street_1": "Test St", "city": "Testville", "state": "IL", "zip": "12345"},
+        )
+        self.contact_comm = create_test_committee_contact(
+            "TEST COMMITTEES UNITED",
+            "C12344321",
             self.committee.id,
             {"street_1": "Test St", "city": "Testville", "state": "IL", "zip": "12345"},
         )
@@ -1268,3 +1282,135 @@ class TransactionViewsTestCase(TestCase):
         schedule_f_debt_repayment_payload["expenditure_date"] = repayment_date
         schedule_f_debt_repayment_payload["expenditure_amount"] = repayment_amount
         return schedule_f_debt_repayment_payload
+
+    def test_schedule_f_aggregation(self):
+        report = create_form3x(
+            self.committee, "2023-01-01", "2023-03-31",{},report_code="Q1"
+        )
+        contact_org = create_test_organization_contact(
+            "Testerson Inc.",
+            self.committee.id,
+            {
+                "city": "Testville",
+                "country": "USA",
+                "state": "AK",
+                "street_1": "1234 Test Ln",
+                "street_2": None,
+                "telephone": None,
+                "zip": "12345"
+            }
+        )
+        contact_can = create_test_candidate_contact(
+            "Testerson",
+            "Philip",
+            self.committee.id,
+            "S6MT00162",
+            "S",
+            "MT",
+            None,
+            {
+                "city": "HELENA",
+                "country": "USA",
+                "employer": None,
+                "middle_name": None,
+                "occupation": None,
+                "prefix": None,
+                "state": "MT",
+                "street_1": "PO BOX 1135",
+                "street_2": None,
+                "suffix": None,
+                "telephone": None,
+                "zip": "59624"
+            }
+        )
+        contact_com = create_test_committee_contact(
+            "Testersons United",
+            "C12344321",
+            self.committee.id,
+            {
+                "city": "BILLINGS",
+                "country": "USA",
+                "state": "MT",
+                "street_1": "PO BOX 558",
+                "telephone": "+1 3144010501",
+                "zip": "59103"
+        })
+
+        transaction_1_data = gen_schedule_f_request_data(
+            str(report.id),
+            "153.00",
+            "2024-01-12",
+            "2022",
+            contact_org,
+            contact_can,
+            contact_com
+        )
+        transaction_2_data = gen_schedule_f_request_data(
+            str(report.id),
+            "47.00",
+            "2024-01-13",
+            "2022",
+            contact_org,
+            contact_can,
+            contact_com
+        )
+
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+        view_set.request = self.post_request(transaction_1_data)
+
+        # Test standard aggregation
+        transaction_1 = view_set.save_transaction(transaction_1_data, view_set.request)
+        transaction_2 = view_set.save_transaction(transaction_2_data, view_set.request)
+
+        self.assertEqual(transaction_1.aggregate, 153.00)
+        self.assertEqual(transaction_2.aggregate, 200.00)
+
+        # Test leapfrogging forward
+        move_transaction_1_data = {
+            **transaction_1_data,
+            "expenditure_date": "2024-01-15",
+            "id": transaction_1.id
+        }
+
+        transaction_1 = view_set.save_transaction(move_transaction_1_data, view_set.request)
+        transaction_2.refresh_from_db()
+
+        self.assertEqual(transaction_1.aggregate, 200.00)
+        self.assertEqual(transaction_2.aggregate, 47.00)
+
+        # Test leapfrogging backward
+        move_transaction_1_again_data = {
+            **move_transaction_1_data,
+            "expenditure_date": "2024-01-10",
+        }
+
+        transaction_1 = view_set.save_transaction(move_transaction_1_again_data, view_set.request)
+        transaction_2.refresh_from_db()
+
+        self.assertEqual(transaction_1.aggregate, 153.00)
+        self.assertEqual(transaction_2.aggregate, 200.00)
+
+        # Test change GE year
+        change_ge_transaction_1_data = {
+            **move_transaction_1_again_data,
+            "general_election_year": "1999",
+        }
+
+        transaction_1 = view_set.save_transaction(change_ge_transaction_1_data, view_set.request)
+        transaction_2.refresh_from_db()
+
+        self.assertEqual(transaction_1.aggregate, 153.00)
+        self.assertEqual(transaction_2.aggregate, 47.00)
+
+        # Test change GE year back
+        change_ge_transaction_1_back_data = {
+            **move_transaction_1_again_data,
+            "general_election_year": "2022",
+        }
+
+        transaction_1 = view_set.save_transaction(change_ge_transaction_1_back_data, view_set.request)
+        transaction_2.refresh_from_db()
+
+        self.assertEqual(transaction_1.aggregate, 153.00)
+        self.assertEqual(transaction_2.aggregate, 200.00)
