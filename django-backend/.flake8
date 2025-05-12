@@ -1,6 +1,8 @@
 [flake8]
 max-line-length = 90
-exclude = site-packages
+extend-exclude =
+    site-packages,
+    .cci_pycache,
 ignore =
     # line break before binary operator
     W503,
