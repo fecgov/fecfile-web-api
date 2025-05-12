@@ -9,7 +9,11 @@ from fecfiler.transactions.serializers import (
     REDESIGNATED,
 )
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.transactions.tests.utils import create_schedule_a, create_schedule_b, create_schedule_f
+from fecfiler.transactions.tests.utils import (
+	create_schedule_a,
+	create_schedule_b,
+	create_schedule_f
+)
 
 
 class TransactionSerializerBaseTestCase(TestCase):
@@ -90,9 +94,16 @@ class TransactionSerializerBaseTestCase(TestCase):
 
     def test_schedule_f_serialization(self):
         transaction = create_schedule_f(
-            "COORDINATED_PARTY_EXPENDITURE", self.committee, None, None, None, None, None, schedule_data={
+            "COORDINATED_PARTY_EXPENDITURE",
+            self.committee,
+            None,
+            None,
+            None,
+            None,
+            None,
+            schedule_data={
                 "expenditure_amount": 40,
-            } 
+            }
         )
         transaction.aggregate = 62
 

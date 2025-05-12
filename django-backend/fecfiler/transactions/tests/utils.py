@@ -334,7 +334,9 @@ SCHEDULE_CLASS_TO_FIELD = {
 }
 
 
-def gen_schedule_f_request_data(report_uuid, amount, date, election_year, contact_1, contact_2, contact_3):
+def gen_schedule_f_request_data(
+    report_uuid, amount, date, election_year, contact_1, contact_2, contact_3
+):
     contact_serializer = ContactSerializer()
     return {
         "aggregate": None,

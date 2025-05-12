@@ -1,5 +1,4 @@
 from decimal import Decimal
-from unittest.mock import patch
 from django.test import TestCase
 from django.test.client import RequestFactory
 from rest_framework import status
@@ -1284,7 +1283,7 @@ class TransactionViewsTestCase(TestCase):
 
     def test_schedule_f_aggregation(self):
         report = create_form3x(
-            self.committee, "2023-01-01", "2023-03-31",{},report_code="Q1"
+            self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
         )
         contact_org = create_test_organization_contact(
             "Testerson Inc.",
@@ -1333,7 +1332,8 @@ class TransactionViewsTestCase(TestCase):
                 "street_1": "PO BOX 558",
                 "telephone": "+1 3144010501",
                 "zip": "59103"
-        })
+            }
+        )
 
         transaction_1_data = gen_schedule_f_request_data(
             str(report.id),
@@ -1372,7 +1372,10 @@ class TransactionViewsTestCase(TestCase):
             "id": transaction_1.id
         }
 
-        transaction_1 = view_set.save_transaction(move_transaction_1_data, view_set.request)
+        transaction_1 = view_set.save_transaction(
+            move_transaction_1_data,
+            view_set.request
+        )
         transaction_2.refresh_from_db()
 
         self.assertEqual(transaction_1.aggregate, 200.00)
@@ -1384,7 +1387,10 @@ class TransactionViewsTestCase(TestCase):
             "expenditure_date": "2024-01-10",
         }
 
-        transaction_1 = view_set.save_transaction(move_transaction_1_again_data, view_set.request)
+        transaction_1 = view_set.save_transaction(
+            move_transaction_1_again_data,
+            view_set.request
+        )
         transaction_2.refresh_from_db()
 
         self.assertEqual(transaction_1.aggregate, 153.00)
@@ -1396,7 +1402,10 @@ class TransactionViewsTestCase(TestCase):
             "general_election_year": "1999",
         }
 
-        transaction_1 = view_set.save_transaction(change_ge_transaction_1_data, view_set.request)
+        transaction_1 = view_set.save_transaction(
+            change_ge_transaction_1_data,
+            view_set.request
+        )
         transaction_2.refresh_from_db()
 
         self.assertEqual(transaction_1.aggregate, 153.00)
@@ -1408,7 +1417,10 @@ class TransactionViewsTestCase(TestCase):
             "general_election_year": "2022",
         }
 
-        transaction_1 = view_set.save_transaction(change_ge_transaction_1_back_data, view_set.request)
+        transaction_1 = view_set.save_transaction(
+            change_ge_transaction_1_back_data,
+            view_set.request
+        )
         transaction_2.refresh_from_db()
 
         self.assertEqual(transaction_1.aggregate, 153.00)

@@ -439,7 +439,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         delete_carried_forward_debts_if_needed(transaction_instance, committee_id)
 
         # Handle changing general_election_year for Schedule F transactions
-        if original_election_year is not None and original_election_year != transaction_instance.schedule_f.general_election_year:
+        if (
+            original_election_year is not None
+            and original_election_year != transaction_instance.schedule_f.general_election_year  # noqa: E501
+        ):
             leapfrogged_sch_f_transactions = self.get_queryset().filter(
                 ~Q(id=original_instance.id),
                 Q(
@@ -585,7 +588,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             contact_2=transaction.contact_2,
             aggregation_group=transaction.aggregation_group,
             schedule_f__isnull=False,
-            schedule_f__general_election_year=transaction.schedule_f.general_election_year,
+            schedule_f__general_election_year=transaction.schedule_f.general_election_year,  # noqa: E501
         )
 
         previous_transactions = filter_for_previous_transactions(
