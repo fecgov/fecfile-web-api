@@ -10,9 +10,9 @@ from fecfiler.transactions.serializers import (
 )
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.tests.utils import (
-	create_schedule_a,
-	create_schedule_b,
-	create_schedule_f
+    create_schedule_a,
+    create_schedule_b,
+    create_schedule_f
 )
 
 
