@@ -1,6 +1,9 @@
 [flake8]
 max-line-length = 90
 ignore =
-    W503,  # line break before binary operator
-    E128,  # continuation line under-indented for visual indent
-    E124,  # closing bracket does not match visual indentation
+    # line break before binary operator
+    W503,
+     # continuation line under-indented for visual indent
+    E128,
+    # closing bracket does not match visual indentation
+    E124,

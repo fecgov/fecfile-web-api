@@ -118,9 +118,8 @@ def log_polling_notice(attempts):
         duration_string = f"{duration_in_minutes} minutes(s)"
 
     logger.info(
-        f"""Submission queued for processing.  Polling every {
-        interval} seconds for {
-        MAX_ATTEMPTS} attempts over {duration_string}"""
+        f"Submission queued for processing.  Polling every {interval} seconds"
+        f" for {MAX_ATTEMPTS} attempts over {duration_string}"
     )
 
 

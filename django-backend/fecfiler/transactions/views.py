@@ -201,7 +201,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             if office == Contact.CandidateOffice.HOUSE and not district:
                 raise Exception()
         except Exception:
-            message = """date, aggregate_group, election_code, and candidate_office are required params.
+            message = """date, aggregate_group, election_code, and candidate_office are \
+                required params.
             candidate_state is required for HOUSE and SENATE.
             candidate_district is required for HOUSE"""
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
