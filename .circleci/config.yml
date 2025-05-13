@@ -250,7 +250,7 @@ workflows:
             - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|feature\/2218-cookie-collision|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
           requires:
             - test
