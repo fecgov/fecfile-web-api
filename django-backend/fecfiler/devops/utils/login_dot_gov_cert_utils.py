@@ -28,13 +28,14 @@ logger = structlog.get_logger(__name__)
 
 def backout_login_dot_gov_cert(
     cf_token: str,
+    cf_organization_name: str,
     cf_space_name: str,
     cf_service_instance_name: str,
 ):
     try:
         logger.info("Retrieving current creds")
         current_creds = retrieve_credentials(
-            cf_token, cf_space_name, cf_service_instance_name
+            cf_token, cf_organization_name, cf_space_name, cf_service_instance_name
         )
 
         logger.info("Backing out creds")
@@ -43,7 +44,11 @@ def backout_login_dot_gov_cert(
             "OIDC_RP_CLIENT_SECRET": current_creds["OIDC_RP_CLIENT_SECRET_BACKUP"],
         }
         update_credentials(
-            cf_token, cf_space_name, cf_service_instance_name, updated_keys
+            cf_token,
+            cf_organization_name,
+            cf_space_name,
+            cf_service_instance_name,
+            updated_keys,
         )
     except Exception as e:
         raise Exception("Failed backout login dot gov cert") from e
@@ -51,13 +56,14 @@ def backout_login_dot_gov_cert(
 
 def install_login_dot_gov_cert(
     cf_token: str,
+    cf_organization_name: str,
     cf_space_name: str,
     cf_service_instance_name: str,
 ):
     try:
         logger.info("Retrieving current creds")
         current_creds = retrieve_credentials(
-            cf_token, cf_space_name, cf_service_instance_name
+            cf_token, cf_organization_name, cf_space_name, cf_service_instance_name
         )
 
         logger.info("Updating creds")
@@ -66,7 +72,11 @@ def install_login_dot_gov_cert(
             "OIDC_RP_CLIENT_SECRET": current_creds["OIDC_RP_CLIENT_SECRET_STAGING"],
         }
         update_credentials(
-            cf_token, cf_space_name, cf_service_instance_name, updated_keys
+            cf_token,
+            cf_organization_name,
+            cf_space_name,
+            cf_service_instance_name,
+            updated_keys,
         )
     except Exception as e:
         raise Exception("Failed install login dot gov cert") from e
@@ -74,6 +84,7 @@ def install_login_dot_gov_cert(
 
 def gen_and_stage_login_dot_gov_cert(
     cf_token: str,
+    cf_organization_name: str,
     cf_space_name: str,
     cf_service_instance_name: str,
 ):
@@ -98,13 +109,20 @@ def gen_and_stage_login_dot_gov_cert(
         stage_login_dot_gov_cert(x509_cert)
 
         logger.info("Staging login.gov pk")
-        stage_login_dot_gov_pk(cf_token, cf_space_name, cf_service_instance_name, rsa_pk)
+        stage_login_dot_gov_pk(
+            cf_token,
+            cf_organization_name,
+            cf_space_name,
+            cf_service_instance_name,
+            rsa_pk,
+        )
     except Exception as e:
         raise Exception("Failed to generate and stage cert") from e
 
 
 def stage_login_dot_gov_pk(
     cf_token: str,
+    cf_organization_name: str,
     cf_space_name: str,
     cf_service_instance_name: str,
     rsa_pk: rsa.RSAPrivateKey,
@@ -113,10 +131,14 @@ def stage_login_dot_gov_pk(
         rsa_pk_creds_bytes = rsa_pk_to_bytes(rsa_pk)
         creds_to_update = {"OIDC_RP_CLIENT_SECRET_STAGING": rsa_pk_creds_bytes.decode()}
         update_credentials(
-            cf_token, cf_space_name, cf_service_instance_name, creds_to_update
+            cf_token,
+            cf_organization_name,
+            cf_space_name,
+            cf_service_instance_name,
+            creds_to_update,
         )
-    except Exception:
-        raise Exception("Failed stage login dot gov pk")
+    except Exception as e:
+        raise Exception("Failed stage login dot gov pk") from e
 
 
 def stage_login_dot_gov_cert(x509_cert: Certificate):
@@ -128,8 +150,8 @@ def stage_login_dot_gov_cert(x509_cert: Certificate):
         s3_object = S3_SESSION.Object(AWS_STORAGE_BUCKET_NAME, filename)
         s3_object.put(Body=x509_cert_bytes)
         logger.info(f"Cert saved as {filename}")
-    except Exception:
-        raise Exception("Failed stage login dot gov cert")
+    except Exception as e:
+        raise Exception("Failed stage login dot gov cert") from e
 
 
 def cleanup_login_dot_gov_certs():

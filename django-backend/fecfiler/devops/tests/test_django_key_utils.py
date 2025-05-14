@@ -20,6 +20,7 @@ class DjangoKeyUtilsTestCase(TestCase):
         retrieve_credentials_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
@@ -30,7 +31,10 @@ class DjangoKeyUtilsTestCase(TestCase):
             "Failed to generate and install django key",
         ):
             gen_and_install_django_key(
-                test_token, test_space_name, test_service_instance_name
+                test_token,
+                test_organization_name,
+                test_space_name,
+                test_service_instance_name,
             )
 
     @patch("fecfiler.devops.utils.django_key_utils.retrieve_credentials")
@@ -41,12 +45,14 @@ class DjangoKeyUtilsTestCase(TestCase):
         retrieve_credentials_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
         management.call_command(
             "gen_and_install_django_key",
             test_token,
+            test_organization_name,
             test_space_name,
             test_service_instance_name,
         )
@@ -61,6 +67,7 @@ class DjangoKeyUtilsTestCase(TestCase):
         update_credentials_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
@@ -71,7 +78,10 @@ class DjangoKeyUtilsTestCase(TestCase):
             "Failed to clear fallback django keys",
         ):
             clear_fallback_django_keys(
-                test_token, test_space_name, test_service_instance_name
+                test_token,
+                test_organization_name,
+                test_space_name,
+                test_service_instance_name,
             )
 
     @patch("fecfiler.devops.utils.django_key_utils.update_credentials")
@@ -80,18 +90,21 @@ class DjangoKeyUtilsTestCase(TestCase):
         update_credentials_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
         management.call_command(
             "clear_fallback_django_keys",
             test_token,
+            test_organization_name,
             test_space_name,
             test_service_instance_name,
         )
 
         update_credentials_mock.assert_called_once_with(
             test_token,
+            test_organization_name,
             test_space_name,
             test_service_instance_name,
             {"DJANGO_SECRET_KEY_FALLBACKS": []},

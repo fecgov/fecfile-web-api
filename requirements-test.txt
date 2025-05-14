@@ -1,6 +1,6 @@
 coverage==6.3
 deptry==0.21.1
-flake8==4.0.1
+flake8==7.2.0
 liccheck==0.6.2
 rich==13.9.4
 sphinx==7.2.6
