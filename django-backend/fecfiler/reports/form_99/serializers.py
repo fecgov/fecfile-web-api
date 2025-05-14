@@ -13,6 +13,7 @@ class Form99Serializer(ReportSerializer):
     schema_name = "F99"
 
     text_code = CharField(required=False, allow_null=True)
+    filing_frequency = CharField(required=False, allow_null=True)
     message_text = CharField(required=False, allow_null=True)
 
     def to_internal_value(self, data):
