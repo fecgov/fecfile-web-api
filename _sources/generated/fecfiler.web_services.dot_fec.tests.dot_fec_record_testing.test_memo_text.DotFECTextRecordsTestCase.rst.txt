@@ -94,6 +94,7 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_memo\_text
       ~DotFECTextRecordsTestCase.doCleanups
       ~DotFECTextRecordsTestCase.ensure_connection_patch_method
       ~DotFECTextRecordsTestCase.enterClassContext
+      ~DotFECTextRecordsTestCase.enterContext
       ~DotFECTextRecordsTestCase.fail
       ~DotFECTextRecordsTestCase.failIf
       ~DotFECTextRecordsTestCase.failIfAlmostEqual

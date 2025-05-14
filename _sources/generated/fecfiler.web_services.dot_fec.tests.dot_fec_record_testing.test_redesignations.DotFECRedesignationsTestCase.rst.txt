@@ -94,6 +94,7 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_redesignat
       ~DotFECRedesignationsTestCase.doCleanups
       ~DotFECRedesignationsTestCase.ensure_connection_patch_method
       ~DotFECRedesignationsTestCase.enterClassContext
+      ~DotFECRedesignationsTestCase.enterContext
       ~DotFECRedesignationsTestCase.fail
       ~DotFECRedesignationsTestCase.failIf
       ~DotFECRedesignationsTestCase.failIfAlmostEqual

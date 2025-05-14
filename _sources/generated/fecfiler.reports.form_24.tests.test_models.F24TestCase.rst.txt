@@ -94,6 +94,7 @@ fecfiler.reports.form\_24.tests.test\_models.F24TestCase
       ~F24TestCase.doCleanups
       ~F24TestCase.ensure_connection_patch_method
       ~F24TestCase.enterClassContext
+      ~F24TestCase.enterContext
       ~F24TestCase.fail
       ~F24TestCase.failIf
       ~F24TestCase.failIfAlmostEqual

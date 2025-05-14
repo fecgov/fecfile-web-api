@@ -94,6 +94,7 @@ fecfiler.web\_services.test\_tasks.PollingTasksTestCase
       ~PollingTasksTestCase.doCleanups
       ~PollingTasksTestCase.ensure_connection_patch_method
       ~PollingTasksTestCase.enterClassContext
+      ~PollingTasksTestCase.enterContext
       ~PollingTasksTestCase.fail
       ~PollingTasksTestCase.failIf
       ~PollingTasksTestCase.failIfAlmostEqual

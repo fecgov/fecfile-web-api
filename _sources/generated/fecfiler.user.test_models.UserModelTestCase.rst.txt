@@ -94,6 +94,7 @@ fecfiler.user.test\_models.UserModelTestCase
       ~UserModelTestCase.doCleanups
       ~UserModelTestCase.ensure_connection_patch_method
       ~UserModelTestCase.enterClassContext
+      ~UserModelTestCase.enterContext
       ~UserModelTestCase.fail
       ~UserModelTestCase.failIf
       ~UserModelTestCase.failIfAlmostEqual

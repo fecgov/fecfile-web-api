@@ -94,6 +94,7 @@ fecfiler.transactions.schedule\_a.tests.test\_utils.ScheduleAUtilsTestCase
       ~ScheduleAUtilsTestCase.doCleanups
       ~ScheduleAUtilsTestCase.ensure_connection_patch_method
       ~ScheduleAUtilsTestCase.enterClassContext
+      ~ScheduleAUtilsTestCase.enterContext
       ~ScheduleAUtilsTestCase.fail
       ~ScheduleAUtilsTestCase.failIf
       ~ScheduleAUtilsTestCase.failIfAlmostEqual

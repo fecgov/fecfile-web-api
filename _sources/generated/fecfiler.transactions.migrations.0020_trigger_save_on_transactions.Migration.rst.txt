@@ -23,7 +23,6 @@ fecfiler.transactions.migrations.0020\_trigger\_save\_on\_transactions.Migration
       ~Migration.apply
       ~Migration.mutate_state
       ~Migration.suggest_name
-      ~Migration.trigger_save_on_transactions
       ~Migration.unapply
    
    

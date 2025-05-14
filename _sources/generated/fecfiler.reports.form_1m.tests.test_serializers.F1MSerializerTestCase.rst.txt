@@ -94,6 +94,7 @@ fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
       ~F1MSerializerTestCase.doCleanups
       ~F1MSerializerTestCase.ensure_connection_patch_method
       ~F1MSerializerTestCase.enterClassContext
+      ~F1MSerializerTestCase.enterContext
       ~F1MSerializerTestCase.fail
       ~F1MSerializerTestCase.failIf
       ~F1MSerializerTestCase.failIfAlmostEqual

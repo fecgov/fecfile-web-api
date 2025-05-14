@@ -94,6 +94,7 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_24.D
       ~DotFECForm24TestCase.doCleanups
       ~DotFECForm24TestCase.ensure_connection_patch_method
       ~DotFECForm24TestCase.enterClassContext
+      ~DotFECForm24TestCase.enterContext
       ~DotFECForm24TestCase.fail
       ~DotFECForm24TestCase.failIf
       ~DotFECForm24TestCase.failIfAlmostEqual

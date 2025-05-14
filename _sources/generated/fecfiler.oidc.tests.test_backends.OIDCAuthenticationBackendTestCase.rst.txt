@@ -94,6 +94,7 @@ fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
       ~OIDCAuthenticationBackendTestCase.doCleanups
       ~OIDCAuthenticationBackendTestCase.ensure_connection_patch_method
       ~OIDCAuthenticationBackendTestCase.enterClassContext
+      ~OIDCAuthenticationBackendTestCase.enterContext
       ~OIDCAuthenticationBackendTestCase.fail
       ~OIDCAuthenticationBackendTestCase.failIf
       ~OIDCAuthenticationBackendTestCase.failIfAlmostEqual

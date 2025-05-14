@@ -94,6 +94,7 @@ fecfiler.web\_services.dot\_fec.tests.test\_dot\_fec\_submitter.DotFECSubmitterT
       ~DotFECSubmitterTestCase.doCleanups
       ~DotFECSubmitterTestCase.ensure_connection_patch_method
       ~DotFECSubmitterTestCase.enterClassContext
+      ~DotFECSubmitterTestCase.enterContext
       ~DotFECSubmitterTestCase.fail
       ~DotFECSubmitterTestCase.failIf
       ~DotFECSubmitterTestCase.failIfAlmostEqual

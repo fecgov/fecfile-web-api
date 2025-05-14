@@ -94,6 +94,7 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_schedule\_
       ~DotFECScheduleFTestCase.doCleanups
       ~DotFECScheduleFTestCase.ensure_connection_patch_method
       ~DotFECScheduleFTestCase.enterClassContext
+      ~DotFECScheduleFTestCase.enterContext
       ~DotFECScheduleFTestCase.fail
       ~DotFECScheduleFTestCase.failIf
       ~DotFECScheduleFTestCase.failIfAlmostEqual

@@ -94,6 +94,7 @@ fecfiler.shared.test\_logging.LoggingTestCase
       ~LoggingTestCase.doCleanups
       ~LoggingTestCase.ensure_connection_patch_method
       ~LoggingTestCase.enterClassContext
+      ~LoggingTestCase.enterContext
       ~LoggingTestCase.fail
       ~LoggingTestCase.failIf
       ~LoggingTestCase.failIfAlmostEqual

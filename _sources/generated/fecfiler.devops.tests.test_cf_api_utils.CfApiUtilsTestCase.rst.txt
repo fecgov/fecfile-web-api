@@ -94,6 +94,7 @@ fecfiler.devops.tests.test\_cf\_api\_utils.CfApiUtilsTestCase
       ~CfApiUtilsTestCase.doCleanups
       ~CfApiUtilsTestCase.ensure_connection_patch_method
       ~CfApiUtilsTestCase.enterClassContext
+      ~CfApiUtilsTestCase.enterContext
       ~CfApiUtilsTestCase.fail
       ~CfApiUtilsTestCase.failIf
       ~CfApiUtilsTestCase.failIfAlmostEqual

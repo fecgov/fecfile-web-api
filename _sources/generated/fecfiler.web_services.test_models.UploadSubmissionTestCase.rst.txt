@@ -94,6 +94,7 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.doCleanups
       ~UploadSubmissionTestCase.ensure_connection_patch_method
       ~UploadSubmissionTestCase.enterClassContext
+      ~UploadSubmissionTestCase.enterContext
       ~UploadSubmissionTestCase.fail
       ~UploadSubmissionTestCase.failIf
       ~UploadSubmissionTestCase.failIfAlmostEqual

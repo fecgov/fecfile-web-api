@@ -94,6 +94,7 @@ fecfiler.user.test\_reset\_security\_consent\_date\_command.ResetSecurityConsent
       ~ResetSecurityConsentDateCommandTest.doCleanups
       ~ResetSecurityConsentDateCommandTest.ensure_connection_patch_method
       ~ResetSecurityConsentDateCommandTest.enterClassContext
+      ~ResetSecurityConsentDateCommandTest.enterContext
       ~ResetSecurityConsentDateCommandTest.fail
       ~ResetSecurityConsentDateCommandTest.failIf
       ~ResetSecurityConsentDateCommandTest.failIfAlmostEqual

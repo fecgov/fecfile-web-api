@@ -94,6 +94,7 @@ fecfiler.devops.tests.test\_tasks.DevopsTasksTestCase
       ~DevopsTasksTestCase.doCleanups
       ~DevopsTasksTestCase.ensure_connection_patch_method
       ~DevopsTasksTestCase.enterClassContext
+      ~DevopsTasksTestCase.enterContext
       ~DevopsTasksTestCase.fail
       ~DevopsTasksTestCase.failIf
       ~DevopsTasksTestCase.failIfAlmostEqual

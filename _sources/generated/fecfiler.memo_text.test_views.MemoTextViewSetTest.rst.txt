@@ -94,6 +94,7 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.doCleanups
       ~MemoTextViewSetTest.ensure_connection_patch_method
       ~MemoTextViewSetTest.enterClassContext
+      ~MemoTextViewSetTest.enterContext
       ~MemoTextViewSetTest.fail
       ~MemoTextViewSetTest.failIf
       ~MemoTextViewSetTest.failIfAlmostEqual

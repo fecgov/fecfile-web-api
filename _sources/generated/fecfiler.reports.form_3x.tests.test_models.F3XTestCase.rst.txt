@@ -94,6 +94,7 @@ fecfiler.reports.form\_3x.tests.test\_models.F3XTestCase
       ~F3XTestCase.doCleanups
       ~F3XTestCase.ensure_connection_patch_method
       ~F3XTestCase.enterClassContext
+      ~F3XTestCase.enterContext
       ~F3XTestCase.fail
       ~F3XTestCase.failIf
       ~F3XTestCase.failIfAlmostEqual

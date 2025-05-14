@@ -94,6 +94,7 @@ fecfiler.devops.tests.test\_status\_views.SystemStatusViewTest
       ~SystemStatusViewTest.doCleanups
       ~SystemStatusViewTest.ensure_connection_patch_method
       ~SystemStatusViewTest.enterClassContext
+      ~SystemStatusViewTest.enterContext
       ~SystemStatusViewTest.fail
       ~SystemStatusViewTest.failIf
       ~SystemStatusViewTest.failIfAlmostEqual

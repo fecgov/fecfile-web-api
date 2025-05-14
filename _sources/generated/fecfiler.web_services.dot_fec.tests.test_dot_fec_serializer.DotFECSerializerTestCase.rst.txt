@@ -94,6 +94,7 @@ fecfiler.web\_services.dot\_fec.tests.test\_dot\_fec\_serializer.DotFECSerialize
       ~DotFECSerializerTestCase.doCleanups
       ~DotFECSerializerTestCase.ensure_connection_patch_method
       ~DotFECSerializerTestCase.enterClassContext
+      ~DotFECSerializerTestCase.enterContext
       ~DotFECSerializerTestCase.fail
       ~DotFECSerializerTestCase.failIf
       ~DotFECSerializerTestCase.failIfAlmostEqual

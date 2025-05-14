@@ -94,6 +94,7 @@ fecfiler.reports.form\_3x.tests.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.doCleanups
       ~F3XSerializerTestCase.ensure_connection_patch_method
       ~F3XSerializerTestCase.enterClassContext
+      ~F3XSerializerTestCase.enterContext
       ~F3XSerializerTestCase.fail
       ~F3XSerializerTestCase.failIf
       ~F3XSerializerTestCase.failIfAlmostEqual

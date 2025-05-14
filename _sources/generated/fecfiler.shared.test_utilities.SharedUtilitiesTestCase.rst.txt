@@ -94,6 +94,7 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.doCleanups
       ~SharedUtilitiesTestCase.ensure_connection_patch_method
       ~SharedUtilitiesTestCase.enterClassContext
+      ~SharedUtilitiesTestCase.enterContext
       ~SharedUtilitiesTestCase.fail
       ~SharedUtilitiesTestCase.failIf
       ~SharedUtilitiesTestCase.failIfAlmostEqual

@@ -94,6 +94,7 @@ fecfiler.committee\_accounts.test\_load\_committee\_data.LoadTestDataCommandTest
       ~LoadTestDataCommandTest.doCleanups
       ~LoadTestDataCommandTest.ensure_connection_patch_method
       ~LoadTestDataCommandTest.enterClassContext
+      ~LoadTestDataCommandTest.enterContext
       ~LoadTestDataCommandTest.fail
       ~LoadTestDataCommandTest.failIf
       ~LoadTestDataCommandTest.failIfAlmostEqual

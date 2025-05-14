@@ -94,6 +94,7 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.doCleanups
       ~TransactionModelTestCase.ensure_connection_patch_method
       ~TransactionModelTestCase.enterClassContext
+      ~TransactionModelTestCase.enterContext
       ~TransactionModelTestCase.fail
       ~TransactionModelTestCase.failIf
       ~TransactionModelTestCase.failIfAlmostEqual

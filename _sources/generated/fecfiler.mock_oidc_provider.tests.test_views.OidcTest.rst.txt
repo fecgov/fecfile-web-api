@@ -94,6 +94,7 @@ fecfiler.mock\_oidc\_provider.tests.test\_views.OidcTest
       ~OidcTest.doCleanups
       ~OidcTest.ensure_connection_patch_method
       ~OidcTest.enterClassContext
+      ~OidcTest.enterContext
       ~OidcTest.fail
       ~OidcTest.failIf
       ~OidcTest.failIfAlmostEqual

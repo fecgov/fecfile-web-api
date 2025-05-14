@@ -94,6 +94,7 @@ fecfiler.devops.tests.test\_django\_key\_utils.DjangoKeyUtilsTestCase
       ~DjangoKeyUtilsTestCase.doCleanups
       ~DjangoKeyUtilsTestCase.ensure_connection_patch_method
       ~DjangoKeyUtilsTestCase.enterClassContext
+      ~DjangoKeyUtilsTestCase.enterContext
       ~DjangoKeyUtilsTestCase.fail
       ~DjangoKeyUtilsTestCase.failIf
       ~DjangoKeyUtilsTestCase.failIfAlmostEqual

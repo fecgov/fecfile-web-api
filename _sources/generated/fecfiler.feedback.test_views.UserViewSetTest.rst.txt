@@ -94,6 +94,7 @@ fecfiler.feedback.test\_views.UserViewSetTest
       ~UserViewSetTest.doCleanups
       ~UserViewSetTest.ensure_connection_patch_method
       ~UserViewSetTest.enterClassContext
+      ~UserViewSetTest.enterContext
       ~UserViewSetTest.fail
       ~UserViewSetTest.failIf
       ~UserViewSetTest.failIfAlmostEqual

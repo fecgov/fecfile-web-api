@@ -94,6 +94,7 @@ fecfiler.contacts.tests.test\_serializers.ContactSerializerTestCase
       ~ContactSerializerTestCase.doCleanups
       ~ContactSerializerTestCase.ensure_connection_patch_method
       ~ContactSerializerTestCase.enterClassContext
+      ~ContactSerializerTestCase.enterContext
       ~ContactSerializerTestCase.fail
       ~ContactSerializerTestCase.failIf
       ~ContactSerializerTestCase.failIfAlmostEqual

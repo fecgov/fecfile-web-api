@@ -21,6 +21,54 @@ fecfiler.web\_services.models.FECStatus
    
       ~FECStatus.get_terminal_statuses
       ~FECStatus.get_terminal_statuses_strings
+      ~FECStatus.__init__
+      ~FECStatus.capitalize
+      ~FECStatus.casefold
+      ~FECStatus.center
+      ~FECStatus.count
+      ~FECStatus.encode
+      ~FECStatus.endswith
+      ~FECStatus.expandtabs
+      ~FECStatus.find
+      ~FECStatus.format
+      ~FECStatus.format_map
+      ~FECStatus.index
+      ~FECStatus.isalnum
+      ~FECStatus.isalpha
+      ~FECStatus.isascii
+      ~FECStatus.isdecimal
+      ~FECStatus.isdigit
+      ~FECStatus.isidentifier
+      ~FECStatus.islower
+      ~FECStatus.isnumeric
+      ~FECStatus.isprintable
+      ~FECStatus.isspace
+      ~FECStatus.istitle
+      ~FECStatus.isupper
+      ~FECStatus.join
+      ~FECStatus.ljust
+      ~FECStatus.lower
+      ~FECStatus.lstrip
+      ~FECStatus.maketrans
+      ~FECStatus.partition
+      ~FECStatus.removeprefix
+      ~FECStatus.removesuffix
+      ~FECStatus.replace
+      ~FECStatus.rfind
+      ~FECStatus.rindex
+      ~FECStatus.rjust
+      ~FECStatus.rpartition
+      ~FECStatus.rsplit
+      ~FECStatus.rstrip
+      ~FECStatus.split
+      ~FECStatus.splitlines
+      ~FECStatus.startswith
+      ~FECStatus.strip
+      ~FECStatus.swapcase
+      ~FECStatus.title
+      ~FECStatus.translate
+      ~FECStatus.upper
+      ~FECStatus.zfill
    
    
 

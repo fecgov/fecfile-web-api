@@ -94,6 +94,7 @@ fecfiler.reports.form\_3x.tests.test\_views.Form3XViewSetTest
       ~Form3XViewSetTest.doCleanups
       ~Form3XViewSetTest.ensure_connection_patch_method
       ~Form3XViewSetTest.enterClassContext
+      ~Form3XViewSetTest.enterContext
       ~Form3XViewSetTest.fail
       ~Form3XViewSetTest.failIf
       ~Form3XViewSetTest.failIfAlmostEqual

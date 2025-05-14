@@ -94,6 +94,7 @@ fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
       ~MemoTextSerializerTestCase.doCleanups
       ~MemoTextSerializerTestCase.ensure_connection_patch_method
       ~MemoTextSerializerTestCase.enterClassContext
+      ~MemoTextSerializerTestCase.enterContext
       ~MemoTextSerializerTestCase.fail
       ~MemoTextSerializerTestCase.failIf
       ~MemoTextSerializerTestCase.failIfAlmostEqual

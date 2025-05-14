@@ -94,6 +94,7 @@ fecfiler.reports.form\_1m.tests.test\_models.F1MTestCase
       ~F1MTestCase.doCleanups
       ~F1MTestCase.ensure_connection_patch_method
       ~F1MTestCase.enterClassContext
+      ~F1MTestCase.enterContext
       ~F1MTestCase.fail
       ~F1MTestCase.failIf
       ~F1MTestCase.failIfAlmostEqual

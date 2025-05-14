@@ -94,6 +94,7 @@ fecfiler.committee\_accounts.test\_delete\_committee\_command.CommitteeAccountsV
       ~CommitteeAccountsViewsTest.doCleanups
       ~CommitteeAccountsViewsTest.ensure_connection_patch_method
       ~CommitteeAccountsViewsTest.enterClassContext
+      ~CommitteeAccountsViewsTest.enterContext
       ~CommitteeAccountsViewsTest.fail
       ~CommitteeAccountsViewsTest.failIf
       ~CommitteeAccountsViewsTest.failIfAlmostEqual

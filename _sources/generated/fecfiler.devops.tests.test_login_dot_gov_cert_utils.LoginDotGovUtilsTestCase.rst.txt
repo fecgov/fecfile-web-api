@@ -94,6 +94,7 @@ fecfiler.devops.tests.test\_login\_dot\_gov\_cert\_utils.LoginDotGovUtilsTestCas
       ~LoginDotGovUtilsTestCase.doCleanups
       ~LoginDotGovUtilsTestCase.ensure_connection_patch_method
       ~LoginDotGovUtilsTestCase.enterClassContext
+      ~LoginDotGovUtilsTestCase.enterContext
       ~LoginDotGovUtilsTestCase.fail
       ~LoginDotGovUtilsTestCase.failIf
       ~LoginDotGovUtilsTestCase.failIfAlmostEqual

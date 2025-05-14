@@ -99,6 +99,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.doCleanups
       ~TransactionViewsTestCase.ensure_connection_patch_method
       ~TransactionViewsTestCase.enterClassContext
+      ~TransactionViewsTestCase.enterContext
       ~TransactionViewsTestCase.fail
       ~TransactionViewsTestCase.failIf
       ~TransactionViewsTestCase.failIfAlmostEqual

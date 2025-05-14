@@ -12,6 +12,13 @@ fecfiler.transactions.migrations.0020\_trigger\_save\_on\_transactions
 
    
    
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      trigger_save_on_transactions
+   
    
 
    

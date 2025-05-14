@@ -94,6 +94,7 @@ fecfiler.memo\_text.test\_models.MemoTextTestCase
       ~MemoTextTestCase.doCleanups
       ~MemoTextTestCase.ensure_connection_patch_method
       ~MemoTextTestCase.enterClassContext
+      ~MemoTextTestCase.enterContext
       ~MemoTextTestCase.fail
       ~MemoTextTestCase.failIf
       ~MemoTextTestCase.failIfAlmostEqual

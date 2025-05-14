@@ -94,6 +94,7 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.doCleanups
       ~TransactionSerializerBaseTestCase.ensure_connection_patch_method
       ~TransactionSerializerBaseTestCase.enterClassContext
+      ~TransactionSerializerBaseTestCase.enterContext
       ~TransactionSerializerBaseTestCase.fail
       ~TransactionSerializerBaseTestCase.failIf
       ~TransactionSerializerBaseTestCase.failIfAlmostEqual

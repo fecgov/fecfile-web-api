@@ -94,6 +94,7 @@ fecfiler.cash\_on\_hand.tests.test\_models.CashOnHandYearlyTestCase
       ~CashOnHandYearlyTestCase.doCleanups
       ~CashOnHandYearlyTestCase.ensure_connection_patch_method
       ~CashOnHandYearlyTestCase.enterClassContext
+      ~CashOnHandYearlyTestCase.enterContext
       ~CashOnHandYearlyTestCase.fail
       ~CashOnHandYearlyTestCase.failIf
       ~CashOnHandYearlyTestCase.failIfAlmostEqual

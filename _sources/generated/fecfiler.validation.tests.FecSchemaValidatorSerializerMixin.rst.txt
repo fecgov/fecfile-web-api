@@ -94,6 +94,7 @@ fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.doCleanups
       ~FecSchemaValidatorSerializerMixin.ensure_connection_patch_method
       ~FecSchemaValidatorSerializerMixin.enterClassContext
+      ~FecSchemaValidatorSerializerMixin.enterContext
       ~FecSchemaValidatorSerializerMixin.fail
       ~FecSchemaValidatorSerializerMixin.failIf
       ~FecSchemaValidatorSerializerMixin.failIfAlmostEqual

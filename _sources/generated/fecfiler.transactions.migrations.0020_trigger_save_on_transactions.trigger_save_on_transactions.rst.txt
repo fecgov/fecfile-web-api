@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0020\_trigger\_save\_on\_transactions.trigger\_save\_on\_transactions
+======================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0020_trigger_save_on_transactions
+
+.. autofunction:: trigger_save_on_transactions

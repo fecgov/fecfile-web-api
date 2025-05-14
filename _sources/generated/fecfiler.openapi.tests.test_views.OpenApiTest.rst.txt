@@ -94,6 +94,7 @@ fecfiler.openapi.tests.test\_views.OpenApiTest
       ~OpenApiTest.doCleanups
       ~OpenApiTest.ensure_connection_patch_method
       ~OpenApiTest.enterClassContext
+      ~OpenApiTest.enterContext
       ~OpenApiTest.fail
       ~OpenApiTest.failIf
       ~OpenApiTest.failIfAlmostEqual

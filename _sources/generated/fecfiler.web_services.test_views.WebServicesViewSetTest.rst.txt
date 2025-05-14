@@ -94,6 +94,7 @@ fecfiler.web\_services.test\_views.WebServicesViewSetTest
       ~WebServicesViewSetTest.doCleanups
       ~WebServicesViewSetTest.ensure_connection_patch_method
       ~WebServicesViewSetTest.enterClassContext
+      ~WebServicesViewSetTest.enterContext
       ~WebServicesViewSetTest.fail
       ~WebServicesViewSetTest.failIf
       ~WebServicesViewSetTest.failIfAlmostEqual

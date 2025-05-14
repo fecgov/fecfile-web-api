@@ -15,6 +15,59 @@ fecfiler.web\_services.models.FECSubmissionState
    .. automethod:: __init__
 
    
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FECSubmissionState.__init__
+      ~FECSubmissionState.capitalize
+      ~FECSubmissionState.casefold
+      ~FECSubmissionState.center
+      ~FECSubmissionState.count
+      ~FECSubmissionState.encode
+      ~FECSubmissionState.endswith
+      ~FECSubmissionState.expandtabs
+      ~FECSubmissionState.find
+      ~FECSubmissionState.format
+      ~FECSubmissionState.format_map
+      ~FECSubmissionState.index
+      ~FECSubmissionState.isalnum
+      ~FECSubmissionState.isalpha
+      ~FECSubmissionState.isascii
+      ~FECSubmissionState.isdecimal
+      ~FECSubmissionState.isdigit
+      ~FECSubmissionState.isidentifier
+      ~FECSubmissionState.islower
+      ~FECSubmissionState.isnumeric
+      ~FECSubmissionState.isprintable
+      ~FECSubmissionState.isspace
+      ~FECSubmissionState.istitle
+      ~FECSubmissionState.isupper
+      ~FECSubmissionState.join
+      ~FECSubmissionState.ljust
+      ~FECSubmissionState.lower
+      ~FECSubmissionState.lstrip
+      ~FECSubmissionState.maketrans
+      ~FECSubmissionState.partition
+      ~FECSubmissionState.removeprefix
+      ~FECSubmissionState.removesuffix
+      ~FECSubmissionState.replace
+      ~FECSubmissionState.rfind
+      ~FECSubmissionState.rindex
+      ~FECSubmissionState.rjust
+      ~FECSubmissionState.rpartition
+      ~FECSubmissionState.rsplit
+      ~FECSubmissionState.rstrip
+      ~FECSubmissionState.split
+      ~FECSubmissionState.splitlines
+      ~FECSubmissionState.startswith
+      ~FECSubmissionState.strip
+      ~FECSubmissionState.swapcase
+      ~FECSubmissionState.title
+      ~FECSubmissionState.translate
+      ~FECSubmissionState.upper
+      ~FECSubmissionState.zfill
+   
    
 
    

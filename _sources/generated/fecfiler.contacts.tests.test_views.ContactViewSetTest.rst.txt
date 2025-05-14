@@ -94,6 +94,7 @@ fecfiler.contacts.tests.test\_views.ContactViewSetTest
       ~ContactViewSetTest.doCleanups
       ~ContactViewSetTest.ensure_connection_patch_method
       ~ContactViewSetTest.enterClassContext
+      ~ContactViewSetTest.enterContext
       ~ContactViewSetTest.fail
       ~ContactViewSetTest.failIf
       ~ContactViewSetTest.failIfAlmostEqual

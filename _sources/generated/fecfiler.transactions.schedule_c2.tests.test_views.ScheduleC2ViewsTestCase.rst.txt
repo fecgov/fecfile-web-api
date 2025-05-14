@@ -94,6 +94,7 @@ fecfiler.transactions.schedule\_c2.tests.test\_views.ScheduleC2ViewsTestCase
       ~ScheduleC2ViewsTestCase.doCleanups
       ~ScheduleC2ViewsTestCase.ensure_connection_patch_method
       ~ScheduleC2ViewsTestCase.enterClassContext
+      ~ScheduleC2ViewsTestCase.enterContext
       ~ScheduleC2ViewsTestCase.fail
       ~ScheduleC2ViewsTestCase.failIf
       ~ScheduleC2ViewsTestCase.failIfAlmostEqual

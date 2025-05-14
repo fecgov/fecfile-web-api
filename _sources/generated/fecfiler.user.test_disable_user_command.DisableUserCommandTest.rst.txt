@@ -94,6 +94,7 @@ fecfiler.user.test\_disable\_user\_command.DisableUserCommandTest
       ~DisableUserCommandTest.doCleanups
       ~DisableUserCommandTest.ensure_connection_patch_method
       ~DisableUserCommandTest.enterClassContext
+      ~DisableUserCommandTest.enterContext
       ~DisableUserCommandTest.fail
       ~DisableUserCommandTest.failIf
       ~DisableUserCommandTest.failIfAlmostEqual

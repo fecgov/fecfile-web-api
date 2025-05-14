@@ -94,6 +94,7 @@ fecfiler.committee\_accounts.test\_models.MembershipTestCase
       ~MembershipTestCase.doCleanups
       ~MembershipTestCase.ensure_connection_patch_method
       ~MembershipTestCase.enterClassContext
+      ~MembershipTestCase.enterContext
       ~MembershipTestCase.fail
       ~MembershipTestCase.failIf
       ~MembershipTestCase.failIfAlmostEqual

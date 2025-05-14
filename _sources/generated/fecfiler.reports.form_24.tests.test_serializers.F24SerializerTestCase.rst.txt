@@ -94,6 +94,7 @@ fecfiler.reports.form\_24.tests.test\_serializers.F24SerializerTestCase
       ~F24SerializerTestCase.doCleanups
       ~F24SerializerTestCase.ensure_connection_patch_method
       ~F24SerializerTestCase.enterClassContext
+      ~F24SerializerTestCase.enterContext
       ~F24SerializerTestCase.fail
       ~F24SerializerTestCase.failIf
       ~F24SerializerTestCase.failIfAlmostEqual

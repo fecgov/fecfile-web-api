@@ -94,6 +94,7 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.doCleanups
       ~TasksTestCase.ensure_connection_patch_method
       ~TasksTestCase.enterClassContext
+      ~TasksTestCase.enterContext
       ~TasksTestCase.fail
       ~TasksTestCase.failIf
       ~TasksTestCase.failIfAlmostEqual

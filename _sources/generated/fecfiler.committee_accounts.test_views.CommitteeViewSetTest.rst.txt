@@ -94,6 +94,7 @@ fecfiler.committee\_accounts.test\_views.CommitteeViewSetTest
       ~CommitteeViewSetTest.doCleanups
       ~CommitteeViewSetTest.ensure_connection_patch_method
       ~CommitteeViewSetTest.enterClassContext
+      ~CommitteeViewSetTest.enterContext
       ~CommitteeViewSetTest.fail
       ~CommitteeViewSetTest.failIf
       ~CommitteeViewSetTest.failIfAlmostEqual
