@@ -7,19 +7,23 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("cf_token", type=str)
+        parser.add_argument("cf_organization_name", type=str)
         parser.add_argument("cf_space_name", type=str)
         parser.add_argument("cf_service_instance_name", type=str)
 
     def handle(self, *args, **options):
         try:
             cf_token = options["cf_token"]
+            cf_organization_name = options["cf_organization_name"]
             cf_space_name = options["cf_space_name"]
             cf_service_instance_name = options["cf_service_instance_name"]
 
             self.stdout.write(
                 self.style.NOTICE("STARTING clear_fallback_django_keys command")
             )
-            clear_fallback_django_keys(cf_token, cf_space_name, cf_service_instance_name)
+            clear_fallback_django_keys(
+                cf_token, cf_organization_name, cf_space_name, cf_service_instance_name
+            )
             self.stdout.write(
                 self.style.NOTICE("FINISHED clear_fallback_django_keys command")
             )
