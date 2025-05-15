@@ -28,6 +28,11 @@ KEY_VALUE = "KEY_VALUE"
 APPEND_SLASH = False
 
 LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
+# SECURITY WARNING: for local logging only - do not enable in any cloud.gov environments!
+# Django DEBUG base.py setting must also be set to True to see SQL output
+ENABLE_PL_SQL_LOGGING = get_boolean_from_string(
+    env.get_credential("ENABLE_PL_SQL_LOGGING", "False")
+)
 
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
@@ -225,6 +230,7 @@ def get_logging_config(log_format=LINE):
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.dict_tracebacks,
                     structlog.processors.JSONRenderer(),
                 ],
             },
@@ -232,19 +238,27 @@ def get_logging_config(log_format=LINE):
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.dict_tracebacks,
                     structlog.dev.ConsoleRenderer(
                         colors=True, exception_formatter=structlog.dev.rich_traceback
                     ),
+                ],
+                "foreign_pre_chain": [
+                    structlog.contextvars.merge_contextvars,
                 ],
             },
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.dict_tracebacks,
                     structlog.processors.ExceptionRenderer(),
                     structlog.processors.KeyValueRenderer(
                         key_order=["level", "event", "logger"]
                     ),
+                ],
+                "foreign_pre_chain": [
+                    structlog.contextvars.merge_contextvars,
                 ],
             },
         },
@@ -273,6 +287,11 @@ def get_logging_config(log_format=LINE):
                 "level": "DEBUG",
             },
         }
+        if ENABLE_PL_SQL_LOGGING is True:
+            logging_config["loggers"]["django.db.backends"] = {
+                "handlers": ["console"],
+                "level": "DEBUG",
+            }
     else:
         logging_config["loggers"] = {
             "django_structlog": {

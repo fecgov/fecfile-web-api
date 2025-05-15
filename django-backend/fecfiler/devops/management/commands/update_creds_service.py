@@ -8,6 +8,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("cf_token", type=str)
+        parser.add_argument("cf_organization_name", type=str)
         parser.add_argument("cf_space_name", type=str)
         parser.add_argument("cf_service_instance_name", type=str)
         parser.add_argument("credentials_dict", type=json.loads)
@@ -15,13 +16,18 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             cf_token = options["cf_token"]
+            cf_organization_name = options["cf_organization_name"]
             cf_space_name = options["cf_space_name"]
             cf_service_instance_name = options["cf_service_instance_name"]
             credentials_dict = options["credentials_dict"]
 
             self.stdout.write(self.style.NOTICE("STARTING update_creds_service command"))
             update_credentials(
-                cf_token, cf_space_name, cf_service_instance_name, credentials_dict
+                cf_token,
+                cf_organization_name,
+                cf_space_name,
+                cf_service_instance_name,
+                credentials_dict,
             )
             self.stdout.write(self.style.NOTICE("FINISHED update_creds_service command"))
         except Exception:

@@ -270,7 +270,9 @@ class TransactionViewTestCase(TestCase):
                 ie["contact"],
             )
 
-        view = Transaction.objects.filter(committee_account__id=self.committee.id)
+        view = Transaction.objects.filter(
+            committee_account__id=self.committee.id
+        ).order_by("date")
 
         self.assertEqual(view[0]._calendar_ytd_per_election_office, Decimal("123.45"))
         self.assertEqual(view[1]._calendar_ytd_per_election_office, Decimal("1.00"))

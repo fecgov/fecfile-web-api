@@ -36,12 +36,12 @@ def check_email_match(email, f1_emails):
         returns a string indicating the mismatch. Otherwise, returns None.
     """
     if not f1_emails:
-        return "No email provided in F1"
+        return "no email provided in F1"
     else:
         f1_email_lowercase = f1_emails.lower()
         f1_emails = re.split(r"[;,]", f1_email_lowercase)
         if email.lower() not in f1_emails:
-            return "Email does not match committee email"
+            return "email does not match committee email"
     return None
 
 
@@ -53,11 +53,12 @@ def check_can_create_committee_account(committee_id, user):
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if existing_account:
-        failure_reason = f"Committee account {committee_id} already created"
+        failure_reason = "account already created"
 
     if failure_reason:
         logger.error(
-            f"User {user.id} failed to create committee account: {failure_reason}"
+            f"User {user.email} failed to create committee account "
+            f"{committee_id}: {failure_reason}"
         )
         return False
 
@@ -73,6 +74,10 @@ def create_committee_account(committee_id, user):
         committee_account=account,
         user=user,
         role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+    )
+
+    logger.info(
+        f"User {user.email} successfully created committee account {committee_id}"
     )
 
     return account
