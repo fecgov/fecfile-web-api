@@ -133,6 +133,7 @@ services:
             DJANGO_SECRET_KEY:
             FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
             MOCK_OIDC_PROVIDER: True
+            FFAPI_TIMEOUT_COOKIE_NAME: ffapi_timeout_local
             OIDC_RP_CLIENT_ID:
             OIDC_RP_CLIENT_SECRET:
             LOGIN_REDIRECT_SERVER_URL: http://localhost:8080/api/v1/oidc/login-redirect

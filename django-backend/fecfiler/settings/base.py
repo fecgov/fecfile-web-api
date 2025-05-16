@@ -175,7 +175,7 @@ OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
 
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 FFAPI_LOGIN_DOT_GOV_COOKIE_NAME = "ffapi_login_dot_gov"
-FFAPI_TIMEOUT_COOKIE_NAME = "ffapi_timeout"
+FFAPI_TIMEOUT_COOKIE_NAME = env.get_credential("FFAPI_TIMEOUT_COOKIE_NAME")
 
 LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
 LOGIN_REDIRECT_CLIENT_URL = env.get_credential("LOGIN_REDIRECT_CLIENT_URL")
