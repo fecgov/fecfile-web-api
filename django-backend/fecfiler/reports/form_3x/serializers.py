@@ -1,5 +1,5 @@
 from django.db import transaction
-from fecfiler.reports.models import Report
+from fecfiler.reports.models import Report, ReportTransaction
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.serializers import (
     ReportSerializer,
@@ -13,9 +13,18 @@ from rest_framework.serializers import (
     DateField,
     BooleanField,
 )
+from rest_framework.serializers import ValidationError
 import structlog
 
 logger = structlog.get_logger(__name__)
+
+COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS = ValidationError(
+    {
+        "coverage_from_date_and_coverage_to_date": [
+            "Coverage date(s) exclude existing transaction(s) for report"
+        ]
+    }
+)
 
 
 class Form3XSerializer(ReportSerializer):
@@ -348,6 +357,19 @@ class Form3XSerializer(ReportSerializer):
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
+            report_transactions = list(
+                ReportTransaction.objects.filter(
+                    ~Q(transaction__memo_code=True),
+                    report_id=instance.id,
+                )
+            )
+            for report_transaction in report_transactions:
+                transaction_date = report_transaction.transaction.get_date()
+                if (
+                    transaction_date < self.validated_data["coverage_from_date"]
+                    or transaction_date > self.validated_data["coverage_through_date"]
+                ):
+                    raise COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS
             for attr, value in validated_data.items():
                 if attr != "id":
                     setattr(instance.form_3x, attr, value)
