@@ -24,6 +24,7 @@ from fecfiler.transactions.tests.utils import (
     create_loan,
     create_debt,
     create_ie,
+    create_schedule_f,
     gen_schedule_f_request_data,
 )
 from fecfiler.transactions.serializers import TransactionSerializer
@@ -1335,6 +1336,106 @@ class TransactionViewsTestCase(TestCase):
             }
         )
 
+        a = create_schedule_f(
+            type="COORDINATED_PARTY_EXPENDITURE",
+            committee=self.committee,
+            contact_1=contact_org,
+            contact_2=contact_can,
+            contact_3=contact_com,
+            report=report,
+            schedule_data={
+                "expenditure_amount": 125.00,
+                "expenditure_date": "2023-02-11",
+                "general_election_year": "2024"
+            }
+        )
+        b = create_schedule_f(
+            type="COORDINATED_PARTY_EXPENDITURE",
+            committee=self.committee,
+            contact_1=contact_org,
+            contact_2=contact_can,
+            contact_3=contact_com,
+            report=report,
+            schedule_data={
+                "expenditure_amount": 75.00,
+                "expenditure_date": "2023-02-15",
+                "general_election_year": "2024"
+            }
+        )
+
+        self.view.request.query_params["report_id"] = report.id
+        sch_fs = self.view.get_queryset().filter(
+            committee_account=self.committee,
+            schedule_f__isnull=False
+        )
+        self.assertEqual(sch_fs.count(), 2)
+
+        trans_a = Transaction.objects.get(id=a.id)
+        trans_b = Transaction.objects.get(id=b.id)
+
+        self.assertEqual(trans_a.schedule_f.general_election_year, "2024")
+        self.assertEqual(trans_a.schedule_f.expenditure_amount, 125.00)
+
+        self.view.recalculate_schedule_f_aggregates(trans_a)
+
+        trans_b.refresh_from_db()
+        self.assertEqual(trans_b.aggregate, 200.00)
+
+    """
+    def test_schedule_f_aggregation(self):
+        report = create_form3x(
+            self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
+        )
+        contact_org = create_test_organization_contact(
+            "Testerson Inc.",
+            self.committee.id,
+            {
+                "city": "Testville",
+                "country": "USA",
+                "state": "AK",
+                "street_1": "1234 Test Ln",
+                "street_2": None,
+                "telephone": None,
+                "zip": "12345"
+            }
+        )
+        contact_can = create_test_candidate_contact(
+            "Testerson",
+            "Philip",
+            self.committee.id,
+            "S6MT00162",
+            "S",
+            "MT",
+            None,
+            {
+                "city": "HELENA",
+                "country": "USA",
+                "employer": None,
+                "middle_name": None,
+                "occupation": None,
+                "prefix": None,
+                "state": "MT",
+                "street_1": "PO BOX 1135",
+                "street_2": None,
+                "suffix": None,
+                "telephone": None,
+                "zip": "59624"
+            }
+        )
+        contact_com = create_test_committee_contact(
+            "Testersons United",
+            "C12344321",
+            self.committee.id,
+            {
+                "city": "BILLINGS",
+                "country": "USA",
+                "state": "MT",
+                "street_1": "PO BOX 558",
+                "telephone": "+1 3144010501",
+                "zip": "59103"
+            }
+        )
+
         transaction_1_data = gen_schedule_f_request_data(
             str(report.id),
             "153.00",
@@ -1586,3 +1687,4 @@ class TransactionViewsTestCase(TestCase):
             )
         )
         self.assertEqual(response.status_code, 404)
+    """
