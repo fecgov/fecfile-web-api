@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
-from django.db.models import Q
+from django.db.models import Q, Subquery, OuterRef, Sum, F, Value, DecimalField
 from fecfiler.transactions.transaction_dependencies import (
     update_dependent_children,
     update_dependent_parent,
@@ -602,11 +602,50 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             transaction.schedule_f.general_election_year
         )
 
+        to_update = shared_entity_transactions.filter(
+            Q(id=transaction.id)
+            | Q(date__gt=transaction.date)
+            | Q(Q(date=transaction.date) & Q(created__gt=transaction.created))
+        ).order_by("date", "created")
+
+        """
         # Exclude the transactions that are prior to the given transaction
         to_update = shared_entity_transactions.difference(
             previous_transactions
         ).order_by("date", "created")
+        """
 
+        if len(to_update) == 0:
+            raise ReferenceError("Sch F Aggregation: no starting transaction found")
+
+        previous_transaction = previous_transactions.first()
+        previous_aggregate = 0
+        if previous_transaction:
+            previous_aggregate = previous_transaction.aggregate
+
+        aggregate_clause = (
+            self.get_queryset().filter(
+                Q(id=OuterRef("id"))
+                # These two lines result in a SQL error
+                | Q(date__lt=OuterRef("date"))
+                | Q(Q(date=OuterRef("date")) & Q(created__lt=OuterRef("created")))
+            )
+            .annotate(
+                sum=Sum("amount")
+            )
+            .filter(Q(id=OuterRef("id")))
+            .values("sum")
+        )
+
+        summed = to_update.annotate(sum=previous_aggregate+Subquery(aggregate_clause))
+
+        for t in summed:
+            print(t.date, t.amount, t.sum)
+
+        summed.update(
+            aggregate=F("sum")
+        )
+        """
         previous_transaction = previous_transactions.first()
         for trans in to_update:
             previous_aggregate = 0
@@ -617,6 +656,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             trans.save()
 
             previous_transaction = trans
+        """
 
 
 def noop(transaction, is_existing):

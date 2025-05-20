@@ -1372,12 +1372,14 @@ class TransactionViewsTestCase(TestCase):
             "id": transaction_1.id
         }
 
+        print("THIS TEST")
         transaction_1 = view_set.save_transaction(
             move_transaction_1_data,
             view_set.request
         )
         transaction_2.refresh_from_db()
 
+        print(input())
         self.assertEqual(transaction_1.aggregate, 200.00)
         self.assertEqual(transaction_2.aggregate, 47.00)
 
