@@ -359,6 +359,7 @@ class Form3XSerializer(ReportSerializer):
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
+            # Check if there are any transactions that fall outside the coverage dates
             transactions_outside_coverage_dates = ReportTransaction.objects.filter(
                 ~Q(transaction__memo_code=True),
                 self.get_transaction_date_outside_coverage_dates_clause(),
@@ -367,6 +368,7 @@ class Form3XSerializer(ReportSerializer):
             ).count()
             if transactions_outside_coverage_dates > 0:
                 raise COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS
+
             for attr, value in validated_data.items():
                 if attr != "id":
                     setattr(instance.form_3x, attr, value)
@@ -398,35 +400,24 @@ class Form3XSerializer(ReportSerializer):
         return super().validate(data)
 
     def get_transaction_date_outside_coverage_dates_clause(self):
+        """Returns a clause that checks if the transaction date is outside
+        the coverage dates for the report.
+        """
+        from_date = self.validated_data["coverage_from_date"]
+        through_date = self.validated_data["coverage_through_date"]
         return Q(
             Q(
                 Q(transaction__schedule_a__isnull=False),
                 Q(
-                    Q(
-                        transaction__schedule_a__contribution_date__lt=self.validated_data[  # noqa: E501
-                            "coverage_from_date"
-                        ]
-                    )
-                    | Q(
-                        transaction__schedule_a__contribution_date__gt=self.validated_data[  # noqa: E501
-                            "coverage_through_date"
-                        ]
-                    )
+                    Q(transaction__schedule_a__contribution_date__lt=from_date)
+                    | Q(transaction__schedule_a__contribution_date__gt=through_date)
                 ),
             )
             | Q(
                 Q(transaction__schedule_b__isnull=False),
                 Q(
-                    Q(
-                        transaction__schedule_b__expenditure_date__lt=self.validated_data[  # noqa: E501
-                            "coverage_from_date"
-                        ]
-                    )
-                    | Q(
-                        transaction__schedule_b__expenditure_date__gt=self.validated_data[  # noqa: E501
-                            "coverage_through_date"
-                        ]
-                    )
+                    Q(transaction__schedule_b__expenditure_date__lt=from_date)
+                    | Q(transaction__schedule_b__expenditure_date__gt=through_date)
                 ),
             )
             | Q(
@@ -435,61 +426,29 @@ class Form3XSerializer(ReportSerializer):
                     transaction__loan_id__isnull=True,
                 ),
                 Q(
-                    Q(
-                        transaction__schedule_c__loan_incurred_date__lt=self.validated_data[  # noqa: E501
-                            "coverage_from_date"
-                        ]
-                    )
-                    | Q(
-                        transaction__schedule_c__loan_incurred_date__gt=self.validated_data[  # noqa: E501
-                            "coverage_through_date"
-                        ]
-                    )
+                    Q(transaction__schedule_c__loan_incurred_date__lt=from_date)
+                    | Q(transaction__schedule_c__loan_incurred_date__gt=through_date)
                 ),
             )
             | Q(
                 Q(transaction__schedule_e__isnull=False),
                 Q(
-                    Q(
-                        transaction__schedule_e__disbursement_date__lt=self.validated_data[  # noqa: E501
-                            "coverage_from_date"
-                        ]
-                    )
-                    | Q(
-                        transaction__schedule_e__disbursement_date__gt=self.validated_data[  # noqa: E501
-                            "coverage_through_date"
-                        ]
-                    )
+                    Q(transaction__schedule_e__disbursement_date__lt=from_date)
+                    | Q(transaction__schedule_e__disbursement_date__gt=through_date)
                 ),
             )
             | Q(
                 Q(transaction__schedule_e__isnull=False),
                 Q(
-                    Q(
-                        transaction__schedule_e__dissemination_date__lt=self.validated_data[  # noqa: E501
-                            "coverage_from_date"
-                        ]
-                    )
-                    | Q(
-                        transaction__schedule_e__dissemination_date__gt=self.validated_data[  # noqa: E501
-                            "coverage_through_date"
-                        ]
-                    )
+                    Q(transaction__schedule_e__dissemination_date__lt=from_date)
+                    | Q(transaction__schedule_e__dissemination_date__gt=through_date)
                 ),
             )
             | Q(
                 Q(transaction__schedule_f__isnull=False),
                 Q(
-                    Q(
-                        transaction__schedule_f__expenditure_date__lt=self.validated_data[
-                            "coverage_from_date"
-                        ]
-                    )
-                    | Q(
-                        transaction__schedule_f__expenditure_date__gt=self.validated_data[
-                            "coverage_through_date"
-                        ]
-                    )
+                    Q(transaction__schedule_f__expenditure_date__lt=from_date)
+                    | Q(transaction__schedule_f__expenditure_date__gt=through_date)
                 ),
             )
         )
