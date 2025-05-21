@@ -153,11 +153,13 @@ fecfiler.reports.form\_3x.models.Form3X
       ~Form3X.change_of_address
       ~Form3X.date_of_election
       ~Form3X.election_code
+      ~Form3X.filing_frequency
       ~Form3X.id
       ~Form3X.objects
       ~Form3X.pk
       ~Form3X.qualified_committee
       ~Form3X.report_set
+      ~Form3X.report_type_category
       ~Form3X.state_of_election
    
    
