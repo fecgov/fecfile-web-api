@@ -362,6 +362,7 @@ class Form3XSerializer(ReportSerializer):
             report_transactions = list(
                 ReportTransaction.objects.filter(
                     ~Q(transaction__memo_code=True),
+                    transaction__deleted=None,
                     report_id=instance.id,
                 )
             )
