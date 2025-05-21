@@ -403,12 +403,12 @@ class Form3XSerializer(ReportSerializer):
                 Q(transaction__schedule_a__isnull=False),
                 Q(
                     Q(
-                        transaction__schedule_a__contribution_date__lt=self.validated_data[
+                        transaction__schedule_a__contribution_date__lt=self.validated_data[  # noqa: E501
                             "coverage_from_date"
                         ]
                     )
                     | Q(
-                        transaction__schedule_a__contribution_date__gt=self.validated_data[
+                        transaction__schedule_a__contribution_date__gt=self.validated_data[  # noqa: E501
                             "coverage_through_date"
                         ]
                     )
@@ -418,12 +418,12 @@ class Form3XSerializer(ReportSerializer):
                 Q(transaction__schedule_b__isnull=False),
                 Q(
                     Q(
-                        transaction__schedule_b__expenditure_date__lt=self.validated_data[
+                        transaction__schedule_b__expenditure_date__lt=self.validated_data[  # noqa: E501
                             "coverage_from_date"
                         ]
                     )
                     | Q(
-                        transaction__schedule_b__expenditure_date__gt=self.validated_data[
+                        transaction__schedule_b__expenditure_date__gt=self.validated_data[  # noqa: E501
                             "coverage_through_date"
                         ]
                     )
@@ -436,12 +436,12 @@ class Form3XSerializer(ReportSerializer):
                 ),
                 Q(
                     Q(
-                        transaction__schedule_c__loan_incurred_date__lt=self.validated_data[
+                        transaction__schedule_c__loan_incurred_date__lt=self.validated_data[  # noqa: E501
                             "coverage_from_date"
                         ]
                     )
                     | Q(
-                        transaction__schedule_c__loan_incurred_date__gt=self.validated_data[
+                        transaction__schedule_c__loan_incurred_date__gt=self.validated_data[  # noqa: E501
                             "coverage_through_date"
                         ]
                     )
@@ -451,12 +451,12 @@ class Form3XSerializer(ReportSerializer):
                 Q(transaction__schedule_e__isnull=False),
                 Q(
                     Q(
-                        transaction__schedule_e__disbursement_date__lt=self.validated_data[
+                        transaction__schedule_e__disbursement_date__lt=self.validated_data[  # noqa: E501
                             "coverage_from_date"
                         ]
                     )
                     | Q(
-                        transaction__schedule_e__disbursement_date__gt=self.validated_data[
+                        transaction__schedule_e__disbursement_date__gt=self.validated_data[  # noqa: E501
                             "coverage_through_date"
                         ]
                     )
@@ -466,12 +466,12 @@ class Form3XSerializer(ReportSerializer):
                 Q(transaction__schedule_e__isnull=False),
                 Q(
                     Q(
-                        transaction__schedule_e__dissemination_date__lt=self.validated_data[
+                        transaction__schedule_e__dissemination_date__lt=self.validated_data[  # noqa: E501
                             "coverage_from_date"
                         ]
                     )
                     | Q(
-                        transaction__schedule_e__dissemination_date__gt=self.validated_data[
+                        transaction__schedule_e__dissemination_date__gt=self.validated_data[  # noqa: E501
                             "coverage_through_date"
                         ]
                     )
