@@ -18,6 +18,7 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.feedback.urls")),
     re_path(BASE_V1_URL, include("fecfiler.oidc.urls")),
     re_path(BASE_V1_URL, include("fecfiler.cash_on_hand.urls")),
+    re_path(r"^silk/", include("silk.urls", namespace="silk")),
     path("", RedirectView.as_view(url="/api/docs/")),
     re_path(r"", include("fecfiler.devops.urls")),
 ]

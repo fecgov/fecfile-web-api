@@ -5,6 +5,7 @@ from fecfiler.utils import save_copy
 from django.db.models import Q
 from decimal import Decimal
 from ..utils import add_org_ind_contact, add_candidate_contact
+from silk.profiling.profiler import silk_profile
 
 
 def add_schedule_c_contact_fields(instance, representation=None):
@@ -22,6 +23,7 @@ def add_schedule_c_contact_fields(instance, representation=None):
             setattr(instance, k, v)
 
 
+@silk_profile(name="carry_forward_loans")
 def carry_forward_loans(report):
     if report.previous_report:
         loans_to_carry_forward = Transaction.objects.transaction_view().filter(
@@ -36,6 +38,7 @@ def carry_forward_loans(report):
             carry_forward_loan(loan, report)
 
 
+@silk_profile(name="carry_forward_loan")
 def carry_forward_loan(loan, report):
     # force evaluation of lazy query. if not, the loan.children
     # will be a different queryset after the copy is saved

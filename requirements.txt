@@ -22,3 +22,6 @@ redis==4.5.5
 requests==2.32.3
 structlog==25.3.0
 zeep==4.2.1
+django-silk==5.1.0
+static3==0.7.0
+dj-static==0.0.6

@@ -2,6 +2,7 @@ from fecfiler.transactions.models import Transaction
 from django.forms.models import model_to_dict
 from fecfiler.utils import save_copy
 from ..utils import add_org_ind_contact
+from silk.profiling.profiler import silk_profile
 
 
 def add_schedule_c2_contact_fields(instance, representation=None):
@@ -20,6 +21,7 @@ def add_schedule_c2_contact_fields(instance, representation=None):
             setattr(instance, k, v)
 
 
+@silk_profile(name="carry_forward_guarantors")
 def carry_forward_guarantor(report, new_loan, guarantor):
     save_copy(
         Transaction(

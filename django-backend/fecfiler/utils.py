@@ -2,6 +2,8 @@ from rest_framework.exceptions import ValidationError
 from django.http import HttpResponseServerError
 from fecfiler.oidc.utils import delete_user_logged_in_cookies
 from rest_framework.views import exception_handler
+
+from silk.profiling.profiler import silk_profile
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -35,6 +37,7 @@ def custom_exception_handler(exc, context):
     return response
 
 
+@silk_profile(name="save_copy")
 def save_copy(instance, data={}, links={}):
     if instance:
         for field, value in data.items():
