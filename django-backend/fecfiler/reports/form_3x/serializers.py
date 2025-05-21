@@ -30,6 +30,8 @@ COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS = ValidationError(
 class Form3XSerializer(ReportSerializer):
     schema_name = "F3X"
 
+    filing_frequency = CharField(required=False, allow_null=True)
+    report_type_category = CharField(required=False, allow_null=True)
     change_of_address = BooleanField(required=False, allow_null=True)
     election_code = CharField(required=False, allow_null=True)
     date_of_election = DateField(required=False, allow_null=True)
