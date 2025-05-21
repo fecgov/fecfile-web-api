@@ -1282,7 +1282,6 @@ class TransactionViewsTestCase(TestCase):
         schedule_f_debt_repayment_payload["expenditure_amount"] = repayment_amount
         return schedule_f_debt_repayment_payload
 
-
     def test_schedule_f_aggregation(self):
         report = create_form3x(
             self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
