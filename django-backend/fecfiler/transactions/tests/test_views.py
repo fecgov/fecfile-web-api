@@ -1282,6 +1282,7 @@ class TransactionViewsTestCase(TestCase):
         schedule_f_debt_repayment_payload["expenditure_amount"] = repayment_amount
         return schedule_f_debt_repayment_payload
 
+
     def test_schedule_f_aggregation(self):
         report = create_form3x(
             self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
@@ -1335,6 +1336,7 @@ class TransactionViewsTestCase(TestCase):
                 "zip": "59103"
             }
         )
+        self.view.request.query_params["report_id"] = report.id
 
         a = create_schedule_f(
             type="COORDINATED_PARTY_EXPENDITURE",
@@ -1363,13 +1365,6 @@ class TransactionViewsTestCase(TestCase):
             }
         )
 
-        self.view.request.query_params["report_id"] = report.id
-        sch_fs = self.view.get_queryset().filter(
-            committee_account=self.committee,
-            schedule_f__isnull=False
-        )
-        self.assertEqual(sch_fs.count(), 2)
-
         trans_a = Transaction.objects.get(id=a.id)
         trans_b = Transaction.objects.get(id=b.id)
 
@@ -1381,8 +1376,7 @@ class TransactionViewsTestCase(TestCase):
         trans_b.refresh_from_db()
         self.assertEqual(trans_b.aggregate, 200.00)
 
-    """
-    def test_schedule_f_aggregation(self):
+    def test_schedule_f_aggregation_edge_cases(self):
         report = create_form3x(
             self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
         )
@@ -1473,14 +1467,12 @@ class TransactionViewsTestCase(TestCase):
             "id": transaction_1.id
         }
 
-        print("THIS TEST")
         transaction_1 = view_set.save_transaction(
             move_transaction_1_data,
             view_set.request
         )
         transaction_2.refresh_from_db()
 
-        print(input())
         self.assertEqual(transaction_1.aggregate, 200.00)
         self.assertEqual(transaction_2.aggregate, 47.00)
 
@@ -1687,4 +1679,3 @@ class TransactionViewsTestCase(TestCase):
             )
         )
         self.assertEqual(response.status_code, 404)
-    """
