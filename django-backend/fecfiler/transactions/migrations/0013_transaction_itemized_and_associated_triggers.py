@@ -9,10 +9,10 @@ import uuid
 
 
 def populate_over_two_hundred_types(apps, schema_editor):
-    OverTwoHundredTypesScheduleA = apps.get_model(
+    OverTwoHundredTypesScheduleA = apps.get_model(  # noqa: N806
         "transactions", "OverTwoHundredTypesScheduleA"
     )
-    OverTwoHundredTypesScheduleB = apps.get_model(
+    OverTwoHundredTypesScheduleB = apps.get_model(  # noqa: N806
         "transactions", "OverTwoHundredTypesScheduleB"
     )
     scha_types_to_create = [
