@@ -43,6 +43,10 @@ def date_serializer(model_instance, field_name, mapping):
     return date.strftime("%Y%m%d") if date else ""
 
 
+def fixed_value_serializer(_model, _field, mapping):
+    return mapping.get("value", "")
+
+
 date_formats = [
     "%Y-%m-%d %H:%M:%S",  # "2024-01-10 00:00:00"
     "%m/%d/%Y",  # "01/02/2024"
@@ -88,6 +92,7 @@ FIELD_SERIALIZERS = {
     "BOOLEAN_YN": boolean_yn_serializer,
     "DATE": date_serializer,
     "TEXT_TO_DATE": text_to_date_serializer,
+    "FIXED_VALUE": fixed_value_serializer,
     None: default_serializer,
 }
 

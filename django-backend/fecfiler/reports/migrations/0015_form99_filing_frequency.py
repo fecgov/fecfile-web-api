@@ -6,6 +6,7 @@ from django.db import migrations, models
 def form_99_add_default_text_code(apps, schema_editor):
     Report = apps.get_model("reports", "Report")  # noqa
     reports_to_update = Report.objects.filter(
+        models.Q(form_99__isnull=False),
         models.Q(form_99__text_code__isnull=True)
         | models.Q(form_99__text_code="")
     )
