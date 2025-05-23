@@ -33,6 +33,7 @@ class DotFECSerializerTestCase(TestCase):
         self.f99 = create_form99(
             self.committee,
             {
+                "filing_frequency": "Q",
                 "text_code": "ABC",
                 "message_text": "\nBEHOLD! A large text string\nwith new lines",
             },
@@ -115,7 +116,9 @@ class DotFECSerializerTestCase(TestCase):
         content = compose_dot_fec(self.f99.id)
         split_content = content.split("\n")
         split_report_row = split_content[1].split(FS_STR)
-        self.assertEqual(split_report_row[14], "ABC\r")
+        self.assertEqual(split_report_row[14], "ABC")
+        self.assertEqual(split_report_row[15], "Q")
+        self.assertEqual(split_report_row[16], "\r")
         free_text = content[content.find("[BEGINTEXT]"):]
         self.assertEqual(
             free_text,
