@@ -16,7 +16,7 @@ class F1MTestCase(TestCase):
         self.valid_form_1m.save()
         form_1m_from_db = Form1M.objects.get(committee_type="X")
         self.assertIsInstance(form_1m_from_db, Form1M)
-        self.assertEquals(
+        self.assertEqual(
             form_1m_from_db.affiliated_date_form_f1_filed, datetime.date(2023, 11, 7)
         )
         form_1m_from_db.delete()
