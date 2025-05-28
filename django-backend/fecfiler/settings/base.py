@@ -365,7 +365,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     "delete_expired_s3_objects": {
         "task": "fecfiler.devops.tasks.delete_expired_s3_objects",
-        "schedule": 30.0,
+        "schedule": 86400.0,  # Once per day
         "args": (),
         "options": {
             "expires": 15.0,
