@@ -106,7 +106,7 @@ jobs:
           name: SonarCloud
           command: |
             set -e
-            VERSION=5.0.1.3006
+            VERSION=7.1.0.4889
             if [ -z "$SONAR_TOKEN" ]; then
                  echo "You must set SONAR_TOKEN environemnt variable"
                  exit 1
