@@ -90,6 +90,12 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         return response
 
     def add_committee_account_data(self, committee_account):
+        x = 2
+        y = 2
+        z = x + y
+        print("these are some changes I need to add")
+        print("to test the coverage functionality fix in")
+        print("sonarcloud" + z)
         committee_data = get_committee_account_data(committee_account["committee_id"])
         return {**committee_account, **(committee_data or {})}
 
@@ -212,9 +218,9 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         new_member = Membership(**membership_args)
         new_member.save()
 
-        action = f'existing user {user.id} to' if user else "pending membership for"
+        action = f"existing user {user.id} to" if user else "pending membership for"
         logger.info(
-            f'User {request.user.id} added {action} committee {committee} as {role}'
+            f"User {request.user.id} added {action} committee {committee} as {role}"
         )
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
@@ -280,13 +286,13 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         member_string = ""
         if existing_member.user is not None:
             user_id = existing_member.user.id
-            member_string = f'user {user_id}'
+            member_string = f"user {user_id}"
         else:
             membership_id = existing_member.id
-            member_string = f'pending membership {membership_id}'
+            member_string = f"pending membership {membership_id}"
 
         logger.info(
-            f'Updating role for {member_string} in committee {committee} to {new_role}'
+            f"Updating role for {member_string} in committee {committee} to {new_role}"
         )
 
         return super().update(request, *args, **kwargs)
