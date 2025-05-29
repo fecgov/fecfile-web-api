@@ -81,6 +81,12 @@ jobs:
           command: deptry ~/project/
 
       - run:
+          name: Run tests
+          # Use built-in Django test module
+          command: coverage run --source='.' --rcfile=.coveragerc manage.py test fecfiler.transactions.tests.test_models.TransactionModelTestCase
+          working_directory: ~/project/django-backend/
+
+      - run:
           name: setup coverage dir
           command: mkdir ~/project/coverage-reports
 
