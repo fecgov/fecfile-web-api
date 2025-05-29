@@ -126,11 +126,16 @@ jobs:
             chmod +x $SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner
             chmod +x $SCANNER_DIRECTORY/$SS_DIR/jre/bin/java
             $SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner
+            mkdir -p /tmp/sonar_report
+            cp /home/circleci/project/coverage-reports/coverage.xml /tmp/sonar_report
           environment:
             SONARQUBE_SCANNER_PARAMS: '{"sonar.host.url":"https://sonarcloud.io"}'
       - save_cache:
           key: v1-sonarcloud-scanner-7.1.0.4889
           paths: /tmp/cache/scanner
+      - store_artifacts:
+          path: /tmp/sonar_report
+          destination: sonar_report
 
   deploy-job:
     docker:
