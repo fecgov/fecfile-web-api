@@ -83,7 +83,7 @@ jobs:
       - run:
           name: Run tests
           # Use built-in Django test module
-          command: coverage run --source='.' --rcfile=.coveragerc manage.py test fecfiler.transactions.tests.test_models.TransactionModelTestCase
+          command: coverage run --source='.' --rcfile=.coveragerc manage.py test
           working_directory: ~/project/django-backend/
 
       - run:
