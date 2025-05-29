@@ -1,6 +1,0 @@
-fecfiler.settings.base.AWS\_REGION
-==================================
-
-.. currentmodule:: fecfiler.settings.base
-
-.. autodata:: AWS_REGION

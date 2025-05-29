@@ -1,0 +1,6 @@
+fecfiler.settings.base.S3\_OBJECTS\_MAX\_AGE\_DAYS
+==================================================
+
+.. currentmodule:: fecfiler.settings.base
+
+.. autodata:: S3_OBJECTS_MAX_AGE_DAYS
