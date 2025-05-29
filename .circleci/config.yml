@@ -101,7 +101,7 @@ jobs:
           command: mkdir -p /tmp/cache/scanner
       - restore_cache:
           keys:
-            - v1-sonarcloud-scanner-5.0.1.3006
+            - v1-sonarcloud-scanner-7.1.0.4889
       - run:
           name: SonarCloud
           command: |
@@ -114,19 +114,22 @@ jobs:
             SCANNER_DIRECTORY=/tmp/cache/scanner
             export SONAR_USER_HOME=$SCANNER_DIRECTORY/.sonar
             OS="linux"
+            SUFFIX="$VERSION-$OS-x64"
+            SS_DIR="sonar-scanner-$SUFFIX"
+            SS_FILENAME="sonar-scanner-cli-$SUFFIX.zip"
             echo $SONAR_USER_HOME
-            if [[ ! -x "$SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/bin/sonar-scanner" ]]; then
-              curl -Ol https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$VERSION-$OS.zip
-              unzip -qq -o sonar-scanner-cli-$VERSION-$OS.zip -d $SCANNER_DIRECTORY
+            if [[ ! -x "$SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner" ]]; then
+              curl -Ol https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/$SS_FILENAME
+              unzip -qq -o $SS_FILENAME -d $SCANNER_DIRECTORY
             fi
 
-            chmod +x $SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/bin/sonar-scanner
-            chmod +x $SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/jre/bin/java
-            $SCANNER_DIRECTORY/sonar-scanner-$VERSION-$OS/bin/sonar-scanner
+            chmod +x $SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner
+            chmod +x $SCANNER_DIRECTORY/$SS_DIR/jre/bin/java
+            $SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner
           environment:
             SONARQUBE_SCANNER_PARAMS: '{"sonar.host.url":"https://sonarcloud.io"}'
       - save_cache:
-          key: v1-sonarcloud-scanner-5.0.1.3006
+          key: v1-sonarcloud-scanner-7.1.0.4889
           paths: /tmp/cache/scanner
 
   deploy-job:
