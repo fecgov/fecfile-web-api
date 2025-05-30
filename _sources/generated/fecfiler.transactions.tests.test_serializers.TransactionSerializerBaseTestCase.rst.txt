@@ -24,13 +24,10 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.addCleanup
       ~TransactionSerializerBaseTestCase.addTypeEqualityFunc
       ~TransactionSerializerBaseTestCase.assertAlmostEqual
-      ~TransactionSerializerBaseTestCase.assertAlmostEquals
       ~TransactionSerializerBaseTestCase.assertContains
       ~TransactionSerializerBaseTestCase.assertCountEqual
-      ~TransactionSerializerBaseTestCase.assertDictContainsSubset
       ~TransactionSerializerBaseTestCase.assertDictEqual
       ~TransactionSerializerBaseTestCase.assertEqual
-      ~TransactionSerializerBaseTestCase.assertEquals
       ~TransactionSerializerBaseTestCase.assertFalse
       ~TransactionSerializerBaseTestCase.assertFieldOutput
       ~TransactionSerializerBaseTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.assertMultiLineEqual
       ~TransactionSerializerBaseTestCase.assertNoLogs
       ~TransactionSerializerBaseTestCase.assertNotAlmostEqual
-      ~TransactionSerializerBaseTestCase.assertNotAlmostEquals
       ~TransactionSerializerBaseTestCase.assertNotContains
       ~TransactionSerializerBaseTestCase.assertNotEqual
-      ~TransactionSerializerBaseTestCase.assertNotEquals
       ~TransactionSerializerBaseTestCase.assertNotIn
       ~TransactionSerializerBaseTestCase.assertNotInHTML
       ~TransactionSerializerBaseTestCase.assertNotIsInstance
       ~TransactionSerializerBaseTestCase.assertNotRegex
-      ~TransactionSerializerBaseTestCase.assertNotRegexpMatches
       ~TransactionSerializerBaseTestCase.assertNumQueries
       ~TransactionSerializerBaseTestCase.assertQuerySetEqual
       ~TransactionSerializerBaseTestCase.assertRaises
       ~TransactionSerializerBaseTestCase.assertRaisesMessage
       ~TransactionSerializerBaseTestCase.assertRaisesRegex
-      ~TransactionSerializerBaseTestCase.assertRaisesRegexp
       ~TransactionSerializerBaseTestCase.assertRedirects
       ~TransactionSerializerBaseTestCase.assertRegex
-      ~TransactionSerializerBaseTestCase.assertRegexpMatches
       ~TransactionSerializerBaseTestCase.assertSequenceEqual
       ~TransactionSerializerBaseTestCase.assertSetEqual
       ~TransactionSerializerBaseTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.assertWarnsRegex
       ~TransactionSerializerBaseTestCase.assertXMLEqual
       ~TransactionSerializerBaseTestCase.assertXMLNotEqual
-      ~TransactionSerializerBaseTestCase.assert_
       ~TransactionSerializerBaseTestCase.captureOnCommitCallbacks
       ~TransactionSerializerBaseTestCase.countTestCases
       ~TransactionSerializerBaseTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.enterClassContext
       ~TransactionSerializerBaseTestCase.enterContext
       ~TransactionSerializerBaseTestCase.fail
-      ~TransactionSerializerBaseTestCase.failIf
-      ~TransactionSerializerBaseTestCase.failIfAlmostEqual
-      ~TransactionSerializerBaseTestCase.failIfEqual
-      ~TransactionSerializerBaseTestCase.failUnless
-      ~TransactionSerializerBaseTestCase.failUnlessAlmostEqual
-      ~TransactionSerializerBaseTestCase.failUnlessEqual
-      ~TransactionSerializerBaseTestCase.failUnlessRaises
       ~TransactionSerializerBaseTestCase.id
       ~TransactionSerializerBaseTestCase.modify_settings
       ~TransactionSerializerBaseTestCase.run

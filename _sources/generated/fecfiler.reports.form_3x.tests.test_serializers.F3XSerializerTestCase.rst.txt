@@ -24,13 +24,10 @@ fecfiler.reports.form\_3x.tests.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.addCleanup
       ~F3XSerializerTestCase.addTypeEqualityFunc
       ~F3XSerializerTestCase.assertAlmostEqual
-      ~F3XSerializerTestCase.assertAlmostEquals
       ~F3XSerializerTestCase.assertContains
       ~F3XSerializerTestCase.assertCountEqual
-      ~F3XSerializerTestCase.assertDictContainsSubset
       ~F3XSerializerTestCase.assertDictEqual
       ~F3XSerializerTestCase.assertEqual
-      ~F3XSerializerTestCase.assertEquals
       ~F3XSerializerTestCase.assertFalse
       ~F3XSerializerTestCase.assertFieldOutput
       ~F3XSerializerTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.reports.form\_3x.tests.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.assertMultiLineEqual
       ~F3XSerializerTestCase.assertNoLogs
       ~F3XSerializerTestCase.assertNotAlmostEqual
-      ~F3XSerializerTestCase.assertNotAlmostEquals
       ~F3XSerializerTestCase.assertNotContains
       ~F3XSerializerTestCase.assertNotEqual
-      ~F3XSerializerTestCase.assertNotEquals
       ~F3XSerializerTestCase.assertNotIn
       ~F3XSerializerTestCase.assertNotInHTML
       ~F3XSerializerTestCase.assertNotIsInstance
       ~F3XSerializerTestCase.assertNotRegex
-      ~F3XSerializerTestCase.assertNotRegexpMatches
       ~F3XSerializerTestCase.assertNumQueries
       ~F3XSerializerTestCase.assertQuerySetEqual
       ~F3XSerializerTestCase.assertRaises
       ~F3XSerializerTestCase.assertRaisesMessage
       ~F3XSerializerTestCase.assertRaisesRegex
-      ~F3XSerializerTestCase.assertRaisesRegexp
       ~F3XSerializerTestCase.assertRedirects
       ~F3XSerializerTestCase.assertRegex
-      ~F3XSerializerTestCase.assertRegexpMatches
       ~F3XSerializerTestCase.assertSequenceEqual
       ~F3XSerializerTestCase.assertSetEqual
       ~F3XSerializerTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.reports.form\_3x.tests.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.assertWarnsRegex
       ~F3XSerializerTestCase.assertXMLEqual
       ~F3XSerializerTestCase.assertXMLNotEqual
-      ~F3XSerializerTestCase.assert_
       ~F3XSerializerTestCase.captureOnCommitCallbacks
       ~F3XSerializerTestCase.countTestCases
       ~F3XSerializerTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.reports.form\_3x.tests.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.enterClassContext
       ~F3XSerializerTestCase.enterContext
       ~F3XSerializerTestCase.fail
-      ~F3XSerializerTestCase.failIf
-      ~F3XSerializerTestCase.failIfAlmostEqual
-      ~F3XSerializerTestCase.failIfEqual
-      ~F3XSerializerTestCase.failUnless
-      ~F3XSerializerTestCase.failUnlessAlmostEqual
-      ~F3XSerializerTestCase.failUnlessEqual
-      ~F3XSerializerTestCase.failUnlessRaises
       ~F3XSerializerTestCase.id
       ~F3XSerializerTestCase.modify_settings
       ~F3XSerializerTestCase.run

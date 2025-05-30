@@ -24,13 +24,10 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_memo\_text
       ~DotFECTextRecordsTestCase.addCleanup
       ~DotFECTextRecordsTestCase.addTypeEqualityFunc
       ~DotFECTextRecordsTestCase.assertAlmostEqual
-      ~DotFECTextRecordsTestCase.assertAlmostEquals
       ~DotFECTextRecordsTestCase.assertContains
       ~DotFECTextRecordsTestCase.assertCountEqual
-      ~DotFECTextRecordsTestCase.assertDictContainsSubset
       ~DotFECTextRecordsTestCase.assertDictEqual
       ~DotFECTextRecordsTestCase.assertEqual
-      ~DotFECTextRecordsTestCase.assertEquals
       ~DotFECTextRecordsTestCase.assertFalse
       ~DotFECTextRecordsTestCase.assertFieldOutput
       ~DotFECTextRecordsTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_memo\_text
       ~DotFECTextRecordsTestCase.assertMultiLineEqual
       ~DotFECTextRecordsTestCase.assertNoLogs
       ~DotFECTextRecordsTestCase.assertNotAlmostEqual
-      ~DotFECTextRecordsTestCase.assertNotAlmostEquals
       ~DotFECTextRecordsTestCase.assertNotContains
       ~DotFECTextRecordsTestCase.assertNotEqual
-      ~DotFECTextRecordsTestCase.assertNotEquals
       ~DotFECTextRecordsTestCase.assertNotIn
       ~DotFECTextRecordsTestCase.assertNotInHTML
       ~DotFECTextRecordsTestCase.assertNotIsInstance
       ~DotFECTextRecordsTestCase.assertNotRegex
-      ~DotFECTextRecordsTestCase.assertNotRegexpMatches
       ~DotFECTextRecordsTestCase.assertNumQueries
       ~DotFECTextRecordsTestCase.assertQuerySetEqual
       ~DotFECTextRecordsTestCase.assertRaises
       ~DotFECTextRecordsTestCase.assertRaisesMessage
       ~DotFECTextRecordsTestCase.assertRaisesRegex
-      ~DotFECTextRecordsTestCase.assertRaisesRegexp
       ~DotFECTextRecordsTestCase.assertRedirects
       ~DotFECTextRecordsTestCase.assertRegex
-      ~DotFECTextRecordsTestCase.assertRegexpMatches
       ~DotFECTextRecordsTestCase.assertSequenceEqual
       ~DotFECTextRecordsTestCase.assertSetEqual
       ~DotFECTextRecordsTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_memo\_text
       ~DotFECTextRecordsTestCase.assertWarnsRegex
       ~DotFECTextRecordsTestCase.assertXMLEqual
       ~DotFECTextRecordsTestCase.assertXMLNotEqual
-      ~DotFECTextRecordsTestCase.assert_
       ~DotFECTextRecordsTestCase.captureOnCommitCallbacks
       ~DotFECTextRecordsTestCase.countTestCases
       ~DotFECTextRecordsTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_memo\_text
       ~DotFECTextRecordsTestCase.enterClassContext
       ~DotFECTextRecordsTestCase.enterContext
       ~DotFECTextRecordsTestCase.fail
-      ~DotFECTextRecordsTestCase.failIf
-      ~DotFECTextRecordsTestCase.failIfAlmostEqual
-      ~DotFECTextRecordsTestCase.failIfEqual
-      ~DotFECTextRecordsTestCase.failUnless
-      ~DotFECTextRecordsTestCase.failUnlessAlmostEqual
-      ~DotFECTextRecordsTestCase.failUnlessEqual
-      ~DotFECTextRecordsTestCase.failUnlessRaises
       ~DotFECTextRecordsTestCase.id
       ~DotFECTextRecordsTestCase.modify_settings
       ~DotFECTextRecordsTestCase.run

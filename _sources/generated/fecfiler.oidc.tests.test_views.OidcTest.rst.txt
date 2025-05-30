@@ -24,13 +24,10 @@ fecfiler.oidc.tests.test\_views.OidcTest
       ~OidcTest.addCleanup
       ~OidcTest.addTypeEqualityFunc
       ~OidcTest.assertAlmostEqual
-      ~OidcTest.assertAlmostEquals
       ~OidcTest.assertContains
       ~OidcTest.assertCountEqual
-      ~OidcTest.assertDictContainsSubset
       ~OidcTest.assertDictEqual
       ~OidcTest.assertEqual
-      ~OidcTest.assertEquals
       ~OidcTest.assertFalse
       ~OidcTest.assertFieldOutput
       ~OidcTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.oidc.tests.test\_views.OidcTest
       ~OidcTest.assertMultiLineEqual
       ~OidcTest.assertNoLogs
       ~OidcTest.assertNotAlmostEqual
-      ~OidcTest.assertNotAlmostEquals
       ~OidcTest.assertNotContains
       ~OidcTest.assertNotEqual
-      ~OidcTest.assertNotEquals
       ~OidcTest.assertNotIn
       ~OidcTest.assertNotInHTML
       ~OidcTest.assertNotIsInstance
       ~OidcTest.assertNotRegex
-      ~OidcTest.assertNotRegexpMatches
       ~OidcTest.assertNumQueries
       ~OidcTest.assertQuerySetEqual
       ~OidcTest.assertRaises
       ~OidcTest.assertRaisesMessage
       ~OidcTest.assertRaisesRegex
-      ~OidcTest.assertRaisesRegexp
       ~OidcTest.assertRedirects
       ~OidcTest.assertRegex
-      ~OidcTest.assertRegexpMatches
       ~OidcTest.assertSequenceEqual
       ~OidcTest.assertSetEqual
       ~OidcTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.oidc.tests.test\_views.OidcTest
       ~OidcTest.assertWarnsRegex
       ~OidcTest.assertXMLEqual
       ~OidcTest.assertXMLNotEqual
-      ~OidcTest.assert_
       ~OidcTest.captureOnCommitCallbacks
       ~OidcTest.countTestCases
       ~OidcTest.debug
@@ -96,13 +87,6 @@ fecfiler.oidc.tests.test\_views.OidcTest
       ~OidcTest.enterClassContext
       ~OidcTest.enterContext
       ~OidcTest.fail
-      ~OidcTest.failIf
-      ~OidcTest.failIfAlmostEqual
-      ~OidcTest.failIfEqual
-      ~OidcTest.failUnless
-      ~OidcTest.failUnlessAlmostEqual
-      ~OidcTest.failUnlessEqual
-      ~OidcTest.failUnlessRaises
       ~OidcTest.get_request
       ~OidcTest.id
       ~OidcTest.modify_settings

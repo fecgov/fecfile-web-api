@@ -24,13 +24,10 @@ fecfiler.transactions.tests.test\_manager.TransactionViewTestCase
       ~TransactionViewTestCase.addCleanup
       ~TransactionViewTestCase.addTypeEqualityFunc
       ~TransactionViewTestCase.assertAlmostEqual
-      ~TransactionViewTestCase.assertAlmostEquals
       ~TransactionViewTestCase.assertContains
       ~TransactionViewTestCase.assertCountEqual
-      ~TransactionViewTestCase.assertDictContainsSubset
       ~TransactionViewTestCase.assertDictEqual
       ~TransactionViewTestCase.assertEqual
-      ~TransactionViewTestCase.assertEquals
       ~TransactionViewTestCase.assertFalse
       ~TransactionViewTestCase.assertFieldOutput
       ~TransactionViewTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.transactions.tests.test\_manager.TransactionViewTestCase
       ~TransactionViewTestCase.assertMultiLineEqual
       ~TransactionViewTestCase.assertNoLogs
       ~TransactionViewTestCase.assertNotAlmostEqual
-      ~TransactionViewTestCase.assertNotAlmostEquals
       ~TransactionViewTestCase.assertNotContains
       ~TransactionViewTestCase.assertNotEqual
-      ~TransactionViewTestCase.assertNotEquals
       ~TransactionViewTestCase.assertNotIn
       ~TransactionViewTestCase.assertNotInHTML
       ~TransactionViewTestCase.assertNotIsInstance
       ~TransactionViewTestCase.assertNotRegex
-      ~TransactionViewTestCase.assertNotRegexpMatches
       ~TransactionViewTestCase.assertNumQueries
       ~TransactionViewTestCase.assertQuerySetEqual
       ~TransactionViewTestCase.assertRaises
       ~TransactionViewTestCase.assertRaisesMessage
       ~TransactionViewTestCase.assertRaisesRegex
-      ~TransactionViewTestCase.assertRaisesRegexp
       ~TransactionViewTestCase.assertRedirects
       ~TransactionViewTestCase.assertRegex
-      ~TransactionViewTestCase.assertRegexpMatches
       ~TransactionViewTestCase.assertSequenceEqual
       ~TransactionViewTestCase.assertSetEqual
       ~TransactionViewTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.transactions.tests.test\_manager.TransactionViewTestCase
       ~TransactionViewTestCase.assertWarnsRegex
       ~TransactionViewTestCase.assertXMLEqual
       ~TransactionViewTestCase.assertXMLNotEqual
-      ~TransactionViewTestCase.assert_
       ~TransactionViewTestCase.captureOnCommitCallbacks
       ~TransactionViewTestCase.countTestCases
       ~TransactionViewTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.transactions.tests.test\_manager.TransactionViewTestCase
       ~TransactionViewTestCase.enterClassContext
       ~TransactionViewTestCase.enterContext
       ~TransactionViewTestCase.fail
-      ~TransactionViewTestCase.failIf
-      ~TransactionViewTestCase.failIfAlmostEqual
-      ~TransactionViewTestCase.failIfEqual
-      ~TransactionViewTestCase.failUnless
-      ~TransactionViewTestCase.failUnlessAlmostEqual
-      ~TransactionViewTestCase.failUnlessEqual
-      ~TransactionViewTestCase.failUnlessRaises
       ~TransactionViewTestCase.id
       ~TransactionViewTestCase.modify_settings
       ~TransactionViewTestCase.run

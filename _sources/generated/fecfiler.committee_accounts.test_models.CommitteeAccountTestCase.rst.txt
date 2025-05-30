@@ -24,13 +24,10 @@ fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
       ~CommitteeAccountTestCase.addCleanup
       ~CommitteeAccountTestCase.addTypeEqualityFunc
       ~CommitteeAccountTestCase.assertAlmostEqual
-      ~CommitteeAccountTestCase.assertAlmostEquals
       ~CommitteeAccountTestCase.assertContains
       ~CommitteeAccountTestCase.assertCountEqual
-      ~CommitteeAccountTestCase.assertDictContainsSubset
       ~CommitteeAccountTestCase.assertDictEqual
       ~CommitteeAccountTestCase.assertEqual
-      ~CommitteeAccountTestCase.assertEquals
       ~CommitteeAccountTestCase.assertFalse
       ~CommitteeAccountTestCase.assertFieldOutput
       ~CommitteeAccountTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
       ~CommitteeAccountTestCase.assertMultiLineEqual
       ~CommitteeAccountTestCase.assertNoLogs
       ~CommitteeAccountTestCase.assertNotAlmostEqual
-      ~CommitteeAccountTestCase.assertNotAlmostEquals
       ~CommitteeAccountTestCase.assertNotContains
       ~CommitteeAccountTestCase.assertNotEqual
-      ~CommitteeAccountTestCase.assertNotEquals
       ~CommitteeAccountTestCase.assertNotIn
       ~CommitteeAccountTestCase.assertNotInHTML
       ~CommitteeAccountTestCase.assertNotIsInstance
       ~CommitteeAccountTestCase.assertNotRegex
-      ~CommitteeAccountTestCase.assertNotRegexpMatches
       ~CommitteeAccountTestCase.assertNumQueries
       ~CommitteeAccountTestCase.assertQuerySetEqual
       ~CommitteeAccountTestCase.assertRaises
       ~CommitteeAccountTestCase.assertRaisesMessage
       ~CommitteeAccountTestCase.assertRaisesRegex
-      ~CommitteeAccountTestCase.assertRaisesRegexp
       ~CommitteeAccountTestCase.assertRedirects
       ~CommitteeAccountTestCase.assertRegex
-      ~CommitteeAccountTestCase.assertRegexpMatches
       ~CommitteeAccountTestCase.assertSequenceEqual
       ~CommitteeAccountTestCase.assertSetEqual
       ~CommitteeAccountTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
       ~CommitteeAccountTestCase.assertWarnsRegex
       ~CommitteeAccountTestCase.assertXMLEqual
       ~CommitteeAccountTestCase.assertXMLNotEqual
-      ~CommitteeAccountTestCase.assert_
       ~CommitteeAccountTestCase.captureOnCommitCallbacks
       ~CommitteeAccountTestCase.countTestCases
       ~CommitteeAccountTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.committee\_accounts.test\_models.CommitteeAccountTestCase
       ~CommitteeAccountTestCase.enterClassContext
       ~CommitteeAccountTestCase.enterContext
       ~CommitteeAccountTestCase.fail
-      ~CommitteeAccountTestCase.failIf
-      ~CommitteeAccountTestCase.failIfAlmostEqual
-      ~CommitteeAccountTestCase.failIfEqual
-      ~CommitteeAccountTestCase.failUnless
-      ~CommitteeAccountTestCase.failUnlessAlmostEqual
-      ~CommitteeAccountTestCase.failUnlessEqual
-      ~CommitteeAccountTestCase.failUnlessRaises
       ~CommitteeAccountTestCase.id
       ~CommitteeAccountTestCase.modify_settings
       ~CommitteeAccountTestCase.run

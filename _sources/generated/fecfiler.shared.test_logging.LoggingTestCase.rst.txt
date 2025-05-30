@@ -24,13 +24,10 @@ fecfiler.shared.test\_logging.LoggingTestCase
       ~LoggingTestCase.addCleanup
       ~LoggingTestCase.addTypeEqualityFunc
       ~LoggingTestCase.assertAlmostEqual
-      ~LoggingTestCase.assertAlmostEquals
       ~LoggingTestCase.assertContains
       ~LoggingTestCase.assertCountEqual
-      ~LoggingTestCase.assertDictContainsSubset
       ~LoggingTestCase.assertDictEqual
       ~LoggingTestCase.assertEqual
-      ~LoggingTestCase.assertEquals
       ~LoggingTestCase.assertFalse
       ~LoggingTestCase.assertFieldOutput
       ~LoggingTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.shared.test\_logging.LoggingTestCase
       ~LoggingTestCase.assertMultiLineEqual
       ~LoggingTestCase.assertNoLogs
       ~LoggingTestCase.assertNotAlmostEqual
-      ~LoggingTestCase.assertNotAlmostEquals
       ~LoggingTestCase.assertNotContains
       ~LoggingTestCase.assertNotEqual
-      ~LoggingTestCase.assertNotEquals
       ~LoggingTestCase.assertNotIn
       ~LoggingTestCase.assertNotInHTML
       ~LoggingTestCase.assertNotIsInstance
       ~LoggingTestCase.assertNotRegex
-      ~LoggingTestCase.assertNotRegexpMatches
       ~LoggingTestCase.assertNumQueries
       ~LoggingTestCase.assertQuerySetEqual
       ~LoggingTestCase.assertRaises
       ~LoggingTestCase.assertRaisesMessage
       ~LoggingTestCase.assertRaisesRegex
-      ~LoggingTestCase.assertRaisesRegexp
       ~LoggingTestCase.assertRedirects
       ~LoggingTestCase.assertRegex
-      ~LoggingTestCase.assertRegexpMatches
       ~LoggingTestCase.assertSequenceEqual
       ~LoggingTestCase.assertSetEqual
       ~LoggingTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.shared.test\_logging.LoggingTestCase
       ~LoggingTestCase.assertWarnsRegex
       ~LoggingTestCase.assertXMLEqual
       ~LoggingTestCase.assertXMLNotEqual
-      ~LoggingTestCase.assert_
       ~LoggingTestCase.captureOnCommitCallbacks
       ~LoggingTestCase.countTestCases
       ~LoggingTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.shared.test\_logging.LoggingTestCase
       ~LoggingTestCase.enterClassContext
       ~LoggingTestCase.enterContext
       ~LoggingTestCase.fail
-      ~LoggingTestCase.failIf
-      ~LoggingTestCase.failIfAlmostEqual
-      ~LoggingTestCase.failIfEqual
-      ~LoggingTestCase.failUnless
-      ~LoggingTestCase.failUnlessAlmostEqual
-      ~LoggingTestCase.failUnlessEqual
-      ~LoggingTestCase.failUnlessRaises
       ~LoggingTestCase.id
       ~LoggingTestCase.modify_settings
       ~LoggingTestCase.run

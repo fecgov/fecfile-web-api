@@ -24,13 +24,10 @@ fecfiler.devops.tests.test\_django\_key\_utils.DjangoKeyUtilsTestCase
       ~DjangoKeyUtilsTestCase.addCleanup
       ~DjangoKeyUtilsTestCase.addTypeEqualityFunc
       ~DjangoKeyUtilsTestCase.assertAlmostEqual
-      ~DjangoKeyUtilsTestCase.assertAlmostEquals
       ~DjangoKeyUtilsTestCase.assertContains
       ~DjangoKeyUtilsTestCase.assertCountEqual
-      ~DjangoKeyUtilsTestCase.assertDictContainsSubset
       ~DjangoKeyUtilsTestCase.assertDictEqual
       ~DjangoKeyUtilsTestCase.assertEqual
-      ~DjangoKeyUtilsTestCase.assertEquals
       ~DjangoKeyUtilsTestCase.assertFalse
       ~DjangoKeyUtilsTestCase.assertFieldOutput
       ~DjangoKeyUtilsTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.devops.tests.test\_django\_key\_utils.DjangoKeyUtilsTestCase
       ~DjangoKeyUtilsTestCase.assertMultiLineEqual
       ~DjangoKeyUtilsTestCase.assertNoLogs
       ~DjangoKeyUtilsTestCase.assertNotAlmostEqual
-      ~DjangoKeyUtilsTestCase.assertNotAlmostEquals
       ~DjangoKeyUtilsTestCase.assertNotContains
       ~DjangoKeyUtilsTestCase.assertNotEqual
-      ~DjangoKeyUtilsTestCase.assertNotEquals
       ~DjangoKeyUtilsTestCase.assertNotIn
       ~DjangoKeyUtilsTestCase.assertNotInHTML
       ~DjangoKeyUtilsTestCase.assertNotIsInstance
       ~DjangoKeyUtilsTestCase.assertNotRegex
-      ~DjangoKeyUtilsTestCase.assertNotRegexpMatches
       ~DjangoKeyUtilsTestCase.assertNumQueries
       ~DjangoKeyUtilsTestCase.assertQuerySetEqual
       ~DjangoKeyUtilsTestCase.assertRaises
       ~DjangoKeyUtilsTestCase.assertRaisesMessage
       ~DjangoKeyUtilsTestCase.assertRaisesRegex
-      ~DjangoKeyUtilsTestCase.assertRaisesRegexp
       ~DjangoKeyUtilsTestCase.assertRedirects
       ~DjangoKeyUtilsTestCase.assertRegex
-      ~DjangoKeyUtilsTestCase.assertRegexpMatches
       ~DjangoKeyUtilsTestCase.assertSequenceEqual
       ~DjangoKeyUtilsTestCase.assertSetEqual
       ~DjangoKeyUtilsTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.devops.tests.test\_django\_key\_utils.DjangoKeyUtilsTestCase
       ~DjangoKeyUtilsTestCase.assertWarnsRegex
       ~DjangoKeyUtilsTestCase.assertXMLEqual
       ~DjangoKeyUtilsTestCase.assertXMLNotEqual
-      ~DjangoKeyUtilsTestCase.assert_
       ~DjangoKeyUtilsTestCase.captureOnCommitCallbacks
       ~DjangoKeyUtilsTestCase.countTestCases
       ~DjangoKeyUtilsTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.devops.tests.test\_django\_key\_utils.DjangoKeyUtilsTestCase
       ~DjangoKeyUtilsTestCase.enterClassContext
       ~DjangoKeyUtilsTestCase.enterContext
       ~DjangoKeyUtilsTestCase.fail
-      ~DjangoKeyUtilsTestCase.failIf
-      ~DjangoKeyUtilsTestCase.failIfAlmostEqual
-      ~DjangoKeyUtilsTestCase.failIfEqual
-      ~DjangoKeyUtilsTestCase.failUnless
-      ~DjangoKeyUtilsTestCase.failUnlessAlmostEqual
-      ~DjangoKeyUtilsTestCase.failUnlessEqual
-      ~DjangoKeyUtilsTestCase.failUnlessRaises
       ~DjangoKeyUtilsTestCase.id
       ~DjangoKeyUtilsTestCase.modify_settings
       ~DjangoKeyUtilsTestCase.run

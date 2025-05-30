@@ -24,13 +24,10 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.addCleanup
       ~TasksTestCase.addTypeEqualityFunc
       ~TasksTestCase.assertAlmostEqual
-      ~TasksTestCase.assertAlmostEquals
       ~TasksTestCase.assertContains
       ~TasksTestCase.assertCountEqual
-      ~TasksTestCase.assertDictContainsSubset
       ~TasksTestCase.assertDictEqual
       ~TasksTestCase.assertEqual
-      ~TasksTestCase.assertEquals
       ~TasksTestCase.assertFalse
       ~TasksTestCase.assertFieldOutput
       ~TasksTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.assertMultiLineEqual
       ~TasksTestCase.assertNoLogs
       ~TasksTestCase.assertNotAlmostEqual
-      ~TasksTestCase.assertNotAlmostEquals
       ~TasksTestCase.assertNotContains
       ~TasksTestCase.assertNotEqual
-      ~TasksTestCase.assertNotEquals
       ~TasksTestCase.assertNotIn
       ~TasksTestCase.assertNotInHTML
       ~TasksTestCase.assertNotIsInstance
       ~TasksTestCase.assertNotRegex
-      ~TasksTestCase.assertNotRegexpMatches
       ~TasksTestCase.assertNumQueries
       ~TasksTestCase.assertQuerySetEqual
       ~TasksTestCase.assertRaises
       ~TasksTestCase.assertRaisesMessage
       ~TasksTestCase.assertRaisesRegex
-      ~TasksTestCase.assertRaisesRegexp
       ~TasksTestCase.assertRedirects
       ~TasksTestCase.assertRegex
-      ~TasksTestCase.assertRegexpMatches
       ~TasksTestCase.assertSequenceEqual
       ~TasksTestCase.assertSetEqual
       ~TasksTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.assertWarnsRegex
       ~TasksTestCase.assertXMLEqual
       ~TasksTestCase.assertXMLNotEqual
-      ~TasksTestCase.assert_
       ~TasksTestCase.captureOnCommitCallbacks
       ~TasksTestCase.countTestCases
       ~TasksTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.web\_services.test\_tasks.TasksTestCase
       ~TasksTestCase.enterClassContext
       ~TasksTestCase.enterContext
       ~TasksTestCase.fail
-      ~TasksTestCase.failIf
-      ~TasksTestCase.failIfAlmostEqual
-      ~TasksTestCase.failIfEqual
-      ~TasksTestCase.failUnless
-      ~TasksTestCase.failUnlessAlmostEqual
-      ~TasksTestCase.failUnlessEqual
-      ~TasksTestCase.failUnlessRaises
       ~TasksTestCase.id
       ~TasksTestCase.modify_settings
       ~TasksTestCase.run

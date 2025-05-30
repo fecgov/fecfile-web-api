@@ -24,13 +24,10 @@ fecfiler.cash\_on\_hand.tests.test\_views.CashOnHandYearlyViewSetTest
       ~CashOnHandYearlyViewSetTest.addCleanup
       ~CashOnHandYearlyViewSetTest.addTypeEqualityFunc
       ~CashOnHandYearlyViewSetTest.assertAlmostEqual
-      ~CashOnHandYearlyViewSetTest.assertAlmostEquals
       ~CashOnHandYearlyViewSetTest.assertContains
       ~CashOnHandYearlyViewSetTest.assertCountEqual
-      ~CashOnHandYearlyViewSetTest.assertDictContainsSubset
       ~CashOnHandYearlyViewSetTest.assertDictEqual
       ~CashOnHandYearlyViewSetTest.assertEqual
-      ~CashOnHandYearlyViewSetTest.assertEquals
       ~CashOnHandYearlyViewSetTest.assertFalse
       ~CashOnHandYearlyViewSetTest.assertFieldOutput
       ~CashOnHandYearlyViewSetTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.cash\_on\_hand.tests.test\_views.CashOnHandYearlyViewSetTest
       ~CashOnHandYearlyViewSetTest.assertMultiLineEqual
       ~CashOnHandYearlyViewSetTest.assertNoLogs
       ~CashOnHandYearlyViewSetTest.assertNotAlmostEqual
-      ~CashOnHandYearlyViewSetTest.assertNotAlmostEquals
       ~CashOnHandYearlyViewSetTest.assertNotContains
       ~CashOnHandYearlyViewSetTest.assertNotEqual
-      ~CashOnHandYearlyViewSetTest.assertNotEquals
       ~CashOnHandYearlyViewSetTest.assertNotIn
       ~CashOnHandYearlyViewSetTest.assertNotInHTML
       ~CashOnHandYearlyViewSetTest.assertNotIsInstance
       ~CashOnHandYearlyViewSetTest.assertNotRegex
-      ~CashOnHandYearlyViewSetTest.assertNotRegexpMatches
       ~CashOnHandYearlyViewSetTest.assertNumQueries
       ~CashOnHandYearlyViewSetTest.assertQuerySetEqual
       ~CashOnHandYearlyViewSetTest.assertRaises
       ~CashOnHandYearlyViewSetTest.assertRaisesMessage
       ~CashOnHandYearlyViewSetTest.assertRaisesRegex
-      ~CashOnHandYearlyViewSetTest.assertRaisesRegexp
       ~CashOnHandYearlyViewSetTest.assertRedirects
       ~CashOnHandYearlyViewSetTest.assertRegex
-      ~CashOnHandYearlyViewSetTest.assertRegexpMatches
       ~CashOnHandYearlyViewSetTest.assertSequenceEqual
       ~CashOnHandYearlyViewSetTest.assertSetEqual
       ~CashOnHandYearlyViewSetTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.cash\_on\_hand.tests.test\_views.CashOnHandYearlyViewSetTest
       ~CashOnHandYearlyViewSetTest.assertWarnsRegex
       ~CashOnHandYearlyViewSetTest.assertXMLEqual
       ~CashOnHandYearlyViewSetTest.assertXMLNotEqual
-      ~CashOnHandYearlyViewSetTest.assert_
       ~CashOnHandYearlyViewSetTest.captureOnCommitCallbacks
       ~CashOnHandYearlyViewSetTest.countTestCases
       ~CashOnHandYearlyViewSetTest.debug
@@ -96,13 +87,6 @@ fecfiler.cash\_on\_hand.tests.test\_views.CashOnHandYearlyViewSetTest
       ~CashOnHandYearlyViewSetTest.enterClassContext
       ~CashOnHandYearlyViewSetTest.enterContext
       ~CashOnHandYearlyViewSetTest.fail
-      ~CashOnHandYearlyViewSetTest.failIf
-      ~CashOnHandYearlyViewSetTest.failIfAlmostEqual
-      ~CashOnHandYearlyViewSetTest.failIfEqual
-      ~CashOnHandYearlyViewSetTest.failUnless
-      ~CashOnHandYearlyViewSetTest.failUnlessAlmostEqual
-      ~CashOnHandYearlyViewSetTest.failUnlessEqual
-      ~CashOnHandYearlyViewSetTest.failUnlessRaises
       ~CashOnHandYearlyViewSetTest.id
       ~CashOnHandYearlyViewSetTest.modify_settings
       ~CashOnHandYearlyViewSetTest.run

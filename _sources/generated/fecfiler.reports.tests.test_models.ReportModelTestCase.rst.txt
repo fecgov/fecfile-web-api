@@ -24,13 +24,10 @@ fecfiler.reports.tests.test\_models.ReportModelTestCase
       ~ReportModelTestCase.addCleanup
       ~ReportModelTestCase.addTypeEqualityFunc
       ~ReportModelTestCase.assertAlmostEqual
-      ~ReportModelTestCase.assertAlmostEquals
       ~ReportModelTestCase.assertContains
       ~ReportModelTestCase.assertCountEqual
-      ~ReportModelTestCase.assertDictContainsSubset
       ~ReportModelTestCase.assertDictEqual
       ~ReportModelTestCase.assertEqual
-      ~ReportModelTestCase.assertEquals
       ~ReportModelTestCase.assertFalse
       ~ReportModelTestCase.assertFieldOutput
       ~ReportModelTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.reports.tests.test\_models.ReportModelTestCase
       ~ReportModelTestCase.assertMultiLineEqual
       ~ReportModelTestCase.assertNoLogs
       ~ReportModelTestCase.assertNotAlmostEqual
-      ~ReportModelTestCase.assertNotAlmostEquals
       ~ReportModelTestCase.assertNotContains
       ~ReportModelTestCase.assertNotEqual
-      ~ReportModelTestCase.assertNotEquals
       ~ReportModelTestCase.assertNotIn
       ~ReportModelTestCase.assertNotInHTML
       ~ReportModelTestCase.assertNotIsInstance
       ~ReportModelTestCase.assertNotRegex
-      ~ReportModelTestCase.assertNotRegexpMatches
       ~ReportModelTestCase.assertNumQueries
       ~ReportModelTestCase.assertQuerySetEqual
       ~ReportModelTestCase.assertRaises
       ~ReportModelTestCase.assertRaisesMessage
       ~ReportModelTestCase.assertRaisesRegex
-      ~ReportModelTestCase.assertRaisesRegexp
       ~ReportModelTestCase.assertRedirects
       ~ReportModelTestCase.assertRegex
-      ~ReportModelTestCase.assertRegexpMatches
       ~ReportModelTestCase.assertSequenceEqual
       ~ReportModelTestCase.assertSetEqual
       ~ReportModelTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.reports.tests.test\_models.ReportModelTestCase
       ~ReportModelTestCase.assertWarnsRegex
       ~ReportModelTestCase.assertXMLEqual
       ~ReportModelTestCase.assertXMLNotEqual
-      ~ReportModelTestCase.assert_
       ~ReportModelTestCase.captureOnCommitCallbacks
       ~ReportModelTestCase.countTestCases
       ~ReportModelTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.reports.tests.test\_models.ReportModelTestCase
       ~ReportModelTestCase.enterClassContext
       ~ReportModelTestCase.enterContext
       ~ReportModelTestCase.fail
-      ~ReportModelTestCase.failIf
-      ~ReportModelTestCase.failIfAlmostEqual
-      ~ReportModelTestCase.failIfEqual
-      ~ReportModelTestCase.failUnless
-      ~ReportModelTestCase.failUnlessAlmostEqual
-      ~ReportModelTestCase.failUnlessEqual
-      ~ReportModelTestCase.failUnlessRaises
       ~ReportModelTestCase.id
       ~ReportModelTestCase.modify_settings
       ~ReportModelTestCase.run

@@ -24,13 +24,10 @@ fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.addCleanup
       ~FecSchemaValidatorSerializerMixin.addTypeEqualityFunc
       ~FecSchemaValidatorSerializerMixin.assertAlmostEqual
-      ~FecSchemaValidatorSerializerMixin.assertAlmostEquals
       ~FecSchemaValidatorSerializerMixin.assertContains
       ~FecSchemaValidatorSerializerMixin.assertCountEqual
-      ~FecSchemaValidatorSerializerMixin.assertDictContainsSubset
       ~FecSchemaValidatorSerializerMixin.assertDictEqual
       ~FecSchemaValidatorSerializerMixin.assertEqual
-      ~FecSchemaValidatorSerializerMixin.assertEquals
       ~FecSchemaValidatorSerializerMixin.assertFalse
       ~FecSchemaValidatorSerializerMixin.assertFieldOutput
       ~FecSchemaValidatorSerializerMixin.assertFormError
@@ -55,24 +52,19 @@ fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.assertMultiLineEqual
       ~FecSchemaValidatorSerializerMixin.assertNoLogs
       ~FecSchemaValidatorSerializerMixin.assertNotAlmostEqual
-      ~FecSchemaValidatorSerializerMixin.assertNotAlmostEquals
       ~FecSchemaValidatorSerializerMixin.assertNotContains
       ~FecSchemaValidatorSerializerMixin.assertNotEqual
-      ~FecSchemaValidatorSerializerMixin.assertNotEquals
       ~FecSchemaValidatorSerializerMixin.assertNotIn
       ~FecSchemaValidatorSerializerMixin.assertNotInHTML
       ~FecSchemaValidatorSerializerMixin.assertNotIsInstance
       ~FecSchemaValidatorSerializerMixin.assertNotRegex
-      ~FecSchemaValidatorSerializerMixin.assertNotRegexpMatches
       ~FecSchemaValidatorSerializerMixin.assertNumQueries
       ~FecSchemaValidatorSerializerMixin.assertQuerySetEqual
       ~FecSchemaValidatorSerializerMixin.assertRaises
       ~FecSchemaValidatorSerializerMixin.assertRaisesMessage
       ~FecSchemaValidatorSerializerMixin.assertRaisesRegex
-      ~FecSchemaValidatorSerializerMixin.assertRaisesRegexp
       ~FecSchemaValidatorSerializerMixin.assertRedirects
       ~FecSchemaValidatorSerializerMixin.assertRegex
-      ~FecSchemaValidatorSerializerMixin.assertRegexpMatches
       ~FecSchemaValidatorSerializerMixin.assertSequenceEqual
       ~FecSchemaValidatorSerializerMixin.assertSetEqual
       ~FecSchemaValidatorSerializerMixin.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.assertWarnsRegex
       ~FecSchemaValidatorSerializerMixin.assertXMLEqual
       ~FecSchemaValidatorSerializerMixin.assertXMLNotEqual
-      ~FecSchemaValidatorSerializerMixin.assert_
       ~FecSchemaValidatorSerializerMixin.captureOnCommitCallbacks
       ~FecSchemaValidatorSerializerMixin.countTestCases
       ~FecSchemaValidatorSerializerMixin.debug
@@ -96,13 +87,6 @@ fecfiler.validation.tests.FecSchemaValidatorSerializerMixin
       ~FecSchemaValidatorSerializerMixin.enterClassContext
       ~FecSchemaValidatorSerializerMixin.enterContext
       ~FecSchemaValidatorSerializerMixin.fail
-      ~FecSchemaValidatorSerializerMixin.failIf
-      ~FecSchemaValidatorSerializerMixin.failIfAlmostEqual
-      ~FecSchemaValidatorSerializerMixin.failIfEqual
-      ~FecSchemaValidatorSerializerMixin.failUnless
-      ~FecSchemaValidatorSerializerMixin.failUnlessAlmostEqual
-      ~FecSchemaValidatorSerializerMixin.failUnlessEqual
-      ~FecSchemaValidatorSerializerMixin.failUnlessRaises
       ~FecSchemaValidatorSerializerMixin.id
       ~FecSchemaValidatorSerializerMixin.modify_settings
       ~FecSchemaValidatorSerializerMixin.run

@@ -24,13 +24,10 @@ fecfiler.openapi.tests.test\_views.OpenApiTest
       ~OpenApiTest.addCleanup
       ~OpenApiTest.addTypeEqualityFunc
       ~OpenApiTest.assertAlmostEqual
-      ~OpenApiTest.assertAlmostEquals
       ~OpenApiTest.assertContains
       ~OpenApiTest.assertCountEqual
-      ~OpenApiTest.assertDictContainsSubset
       ~OpenApiTest.assertDictEqual
       ~OpenApiTest.assertEqual
-      ~OpenApiTest.assertEquals
       ~OpenApiTest.assertFalse
       ~OpenApiTest.assertFieldOutput
       ~OpenApiTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.openapi.tests.test\_views.OpenApiTest
       ~OpenApiTest.assertMultiLineEqual
       ~OpenApiTest.assertNoLogs
       ~OpenApiTest.assertNotAlmostEqual
-      ~OpenApiTest.assertNotAlmostEquals
       ~OpenApiTest.assertNotContains
       ~OpenApiTest.assertNotEqual
-      ~OpenApiTest.assertNotEquals
       ~OpenApiTest.assertNotIn
       ~OpenApiTest.assertNotInHTML
       ~OpenApiTest.assertNotIsInstance
       ~OpenApiTest.assertNotRegex
-      ~OpenApiTest.assertNotRegexpMatches
       ~OpenApiTest.assertNumQueries
       ~OpenApiTest.assertQuerySetEqual
       ~OpenApiTest.assertRaises
       ~OpenApiTest.assertRaisesMessage
       ~OpenApiTest.assertRaisesRegex
-      ~OpenApiTest.assertRaisesRegexp
       ~OpenApiTest.assertRedirects
       ~OpenApiTest.assertRegex
-      ~OpenApiTest.assertRegexpMatches
       ~OpenApiTest.assertSequenceEqual
       ~OpenApiTest.assertSetEqual
       ~OpenApiTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.openapi.tests.test\_views.OpenApiTest
       ~OpenApiTest.assertWarnsRegex
       ~OpenApiTest.assertXMLEqual
       ~OpenApiTest.assertXMLNotEqual
-      ~OpenApiTest.assert_
       ~OpenApiTest.captureOnCommitCallbacks
       ~OpenApiTest.countTestCases
       ~OpenApiTest.debug
@@ -96,13 +87,6 @@ fecfiler.openapi.tests.test\_views.OpenApiTest
       ~OpenApiTest.enterClassContext
       ~OpenApiTest.enterContext
       ~OpenApiTest.fail
-      ~OpenApiTest.failIf
-      ~OpenApiTest.failIfAlmostEqual
-      ~OpenApiTest.failIfEqual
-      ~OpenApiTest.failUnless
-      ~OpenApiTest.failUnlessAlmostEqual
-      ~OpenApiTest.failUnlessEqual
-      ~OpenApiTest.failUnlessRaises
       ~OpenApiTest.id
       ~OpenApiTest.modify_settings
       ~OpenApiTest.run

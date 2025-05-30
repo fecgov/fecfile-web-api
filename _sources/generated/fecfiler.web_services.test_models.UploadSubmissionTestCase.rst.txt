@@ -24,13 +24,10 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.addCleanup
       ~UploadSubmissionTestCase.addTypeEqualityFunc
       ~UploadSubmissionTestCase.assertAlmostEqual
-      ~UploadSubmissionTestCase.assertAlmostEquals
       ~UploadSubmissionTestCase.assertContains
       ~UploadSubmissionTestCase.assertCountEqual
-      ~UploadSubmissionTestCase.assertDictContainsSubset
       ~UploadSubmissionTestCase.assertDictEqual
       ~UploadSubmissionTestCase.assertEqual
-      ~UploadSubmissionTestCase.assertEquals
       ~UploadSubmissionTestCase.assertFalse
       ~UploadSubmissionTestCase.assertFieldOutput
       ~UploadSubmissionTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.assertMultiLineEqual
       ~UploadSubmissionTestCase.assertNoLogs
       ~UploadSubmissionTestCase.assertNotAlmostEqual
-      ~UploadSubmissionTestCase.assertNotAlmostEquals
       ~UploadSubmissionTestCase.assertNotContains
       ~UploadSubmissionTestCase.assertNotEqual
-      ~UploadSubmissionTestCase.assertNotEquals
       ~UploadSubmissionTestCase.assertNotIn
       ~UploadSubmissionTestCase.assertNotInHTML
       ~UploadSubmissionTestCase.assertNotIsInstance
       ~UploadSubmissionTestCase.assertNotRegex
-      ~UploadSubmissionTestCase.assertNotRegexpMatches
       ~UploadSubmissionTestCase.assertNumQueries
       ~UploadSubmissionTestCase.assertQuerySetEqual
       ~UploadSubmissionTestCase.assertRaises
       ~UploadSubmissionTestCase.assertRaisesMessage
       ~UploadSubmissionTestCase.assertRaisesRegex
-      ~UploadSubmissionTestCase.assertRaisesRegexp
       ~UploadSubmissionTestCase.assertRedirects
       ~UploadSubmissionTestCase.assertRegex
-      ~UploadSubmissionTestCase.assertRegexpMatches
       ~UploadSubmissionTestCase.assertSequenceEqual
       ~UploadSubmissionTestCase.assertSetEqual
       ~UploadSubmissionTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.assertWarnsRegex
       ~UploadSubmissionTestCase.assertXMLEqual
       ~UploadSubmissionTestCase.assertXMLNotEqual
-      ~UploadSubmissionTestCase.assert_
       ~UploadSubmissionTestCase.captureOnCommitCallbacks
       ~UploadSubmissionTestCase.countTestCases
       ~UploadSubmissionTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.web\_services.test\_models.UploadSubmissionTestCase
       ~UploadSubmissionTestCase.enterClassContext
       ~UploadSubmissionTestCase.enterContext
       ~UploadSubmissionTestCase.fail
-      ~UploadSubmissionTestCase.failIf
-      ~UploadSubmissionTestCase.failIfAlmostEqual
-      ~UploadSubmissionTestCase.failIfEqual
-      ~UploadSubmissionTestCase.failUnless
-      ~UploadSubmissionTestCase.failUnlessAlmostEqual
-      ~UploadSubmissionTestCase.failUnlessEqual
-      ~UploadSubmissionTestCase.failUnlessRaises
       ~UploadSubmissionTestCase.id
       ~UploadSubmissionTestCase.modify_settings
       ~UploadSubmissionTestCase.run

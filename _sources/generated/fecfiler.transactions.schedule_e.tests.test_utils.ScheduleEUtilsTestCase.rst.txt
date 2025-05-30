@@ -24,13 +24,10 @@ fecfiler.transactions.schedule\_e.tests.test\_utils.ScheduleEUtilsTestCase
       ~ScheduleEUtilsTestCase.addCleanup
       ~ScheduleEUtilsTestCase.addTypeEqualityFunc
       ~ScheduleEUtilsTestCase.assertAlmostEqual
-      ~ScheduleEUtilsTestCase.assertAlmostEquals
       ~ScheduleEUtilsTestCase.assertContains
       ~ScheduleEUtilsTestCase.assertCountEqual
-      ~ScheduleEUtilsTestCase.assertDictContainsSubset
       ~ScheduleEUtilsTestCase.assertDictEqual
       ~ScheduleEUtilsTestCase.assertEqual
-      ~ScheduleEUtilsTestCase.assertEquals
       ~ScheduleEUtilsTestCase.assertFalse
       ~ScheduleEUtilsTestCase.assertFieldOutput
       ~ScheduleEUtilsTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.transactions.schedule\_e.tests.test\_utils.ScheduleEUtilsTestCase
       ~ScheduleEUtilsTestCase.assertMultiLineEqual
       ~ScheduleEUtilsTestCase.assertNoLogs
       ~ScheduleEUtilsTestCase.assertNotAlmostEqual
-      ~ScheduleEUtilsTestCase.assertNotAlmostEquals
       ~ScheduleEUtilsTestCase.assertNotContains
       ~ScheduleEUtilsTestCase.assertNotEqual
-      ~ScheduleEUtilsTestCase.assertNotEquals
       ~ScheduleEUtilsTestCase.assertNotIn
       ~ScheduleEUtilsTestCase.assertNotInHTML
       ~ScheduleEUtilsTestCase.assertNotIsInstance
       ~ScheduleEUtilsTestCase.assertNotRegex
-      ~ScheduleEUtilsTestCase.assertNotRegexpMatches
       ~ScheduleEUtilsTestCase.assertNumQueries
       ~ScheduleEUtilsTestCase.assertQuerySetEqual
       ~ScheduleEUtilsTestCase.assertRaises
       ~ScheduleEUtilsTestCase.assertRaisesMessage
       ~ScheduleEUtilsTestCase.assertRaisesRegex
-      ~ScheduleEUtilsTestCase.assertRaisesRegexp
       ~ScheduleEUtilsTestCase.assertRedirects
       ~ScheduleEUtilsTestCase.assertRegex
-      ~ScheduleEUtilsTestCase.assertRegexpMatches
       ~ScheduleEUtilsTestCase.assertSequenceEqual
       ~ScheduleEUtilsTestCase.assertSetEqual
       ~ScheduleEUtilsTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.transactions.schedule\_e.tests.test\_utils.ScheduleEUtilsTestCase
       ~ScheduleEUtilsTestCase.assertWarnsRegex
       ~ScheduleEUtilsTestCase.assertXMLEqual
       ~ScheduleEUtilsTestCase.assertXMLNotEqual
-      ~ScheduleEUtilsTestCase.assert_
       ~ScheduleEUtilsTestCase.captureOnCommitCallbacks
       ~ScheduleEUtilsTestCase.countTestCases
       ~ScheduleEUtilsTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.transactions.schedule\_e.tests.test\_utils.ScheduleEUtilsTestCase
       ~ScheduleEUtilsTestCase.enterClassContext
       ~ScheduleEUtilsTestCase.enterContext
       ~ScheduleEUtilsTestCase.fail
-      ~ScheduleEUtilsTestCase.failIf
-      ~ScheduleEUtilsTestCase.failIfAlmostEqual
-      ~ScheduleEUtilsTestCase.failIfEqual
-      ~ScheduleEUtilsTestCase.failUnless
-      ~ScheduleEUtilsTestCase.failUnlessAlmostEqual
-      ~ScheduleEUtilsTestCase.failUnlessEqual
-      ~ScheduleEUtilsTestCase.failUnlessRaises
       ~ScheduleEUtilsTestCase.id
       ~ScheduleEUtilsTestCase.modify_settings
       ~ScheduleEUtilsTestCase.run

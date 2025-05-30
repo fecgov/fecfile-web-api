@@ -24,13 +24,10 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.addCleanup
       ~SharedUtilitiesTestCase.addTypeEqualityFunc
       ~SharedUtilitiesTestCase.assertAlmostEqual
-      ~SharedUtilitiesTestCase.assertAlmostEquals
       ~SharedUtilitiesTestCase.assertContains
       ~SharedUtilitiesTestCase.assertCountEqual
-      ~SharedUtilitiesTestCase.assertDictContainsSubset
       ~SharedUtilitiesTestCase.assertDictEqual
       ~SharedUtilitiesTestCase.assertEqual
-      ~SharedUtilitiesTestCase.assertEquals
       ~SharedUtilitiesTestCase.assertFalse
       ~SharedUtilitiesTestCase.assertFieldOutput
       ~SharedUtilitiesTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.assertMultiLineEqual
       ~SharedUtilitiesTestCase.assertNoLogs
       ~SharedUtilitiesTestCase.assertNotAlmostEqual
-      ~SharedUtilitiesTestCase.assertNotAlmostEquals
       ~SharedUtilitiesTestCase.assertNotContains
       ~SharedUtilitiesTestCase.assertNotEqual
-      ~SharedUtilitiesTestCase.assertNotEquals
       ~SharedUtilitiesTestCase.assertNotIn
       ~SharedUtilitiesTestCase.assertNotInHTML
       ~SharedUtilitiesTestCase.assertNotIsInstance
       ~SharedUtilitiesTestCase.assertNotRegex
-      ~SharedUtilitiesTestCase.assertNotRegexpMatches
       ~SharedUtilitiesTestCase.assertNumQueries
       ~SharedUtilitiesTestCase.assertQuerySetEqual
       ~SharedUtilitiesTestCase.assertRaises
       ~SharedUtilitiesTestCase.assertRaisesMessage
       ~SharedUtilitiesTestCase.assertRaisesRegex
-      ~SharedUtilitiesTestCase.assertRaisesRegexp
       ~SharedUtilitiesTestCase.assertRedirects
       ~SharedUtilitiesTestCase.assertRegex
-      ~SharedUtilitiesTestCase.assertRegexpMatches
       ~SharedUtilitiesTestCase.assertSequenceEqual
       ~SharedUtilitiesTestCase.assertSetEqual
       ~SharedUtilitiesTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.assertWarnsRegex
       ~SharedUtilitiesTestCase.assertXMLEqual
       ~SharedUtilitiesTestCase.assertXMLNotEqual
-      ~SharedUtilitiesTestCase.assert_
       ~SharedUtilitiesTestCase.captureOnCommitCallbacks
       ~SharedUtilitiesTestCase.countTestCases
       ~SharedUtilitiesTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.shared.test\_utilities.SharedUtilitiesTestCase
       ~SharedUtilitiesTestCase.enterClassContext
       ~SharedUtilitiesTestCase.enterContext
       ~SharedUtilitiesTestCase.fail
-      ~SharedUtilitiesTestCase.failIf
-      ~SharedUtilitiesTestCase.failIfAlmostEqual
-      ~SharedUtilitiesTestCase.failIfEqual
-      ~SharedUtilitiesTestCase.failUnless
-      ~SharedUtilitiesTestCase.failUnlessAlmostEqual
-      ~SharedUtilitiesTestCase.failUnlessEqual
-      ~SharedUtilitiesTestCase.failUnlessRaises
       ~SharedUtilitiesTestCase.id
       ~SharedUtilitiesTestCase.modify_settings
       ~SharedUtilitiesTestCase.run

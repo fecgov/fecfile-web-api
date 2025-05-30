@@ -24,13 +24,10 @@ fecfiler.reports.form\_3x.tests.test\_models.F3XTestCase
       ~F3XTestCase.addCleanup
       ~F3XTestCase.addTypeEqualityFunc
       ~F3XTestCase.assertAlmostEqual
-      ~F3XTestCase.assertAlmostEquals
       ~F3XTestCase.assertContains
       ~F3XTestCase.assertCountEqual
-      ~F3XTestCase.assertDictContainsSubset
       ~F3XTestCase.assertDictEqual
       ~F3XTestCase.assertEqual
-      ~F3XTestCase.assertEquals
       ~F3XTestCase.assertFalse
       ~F3XTestCase.assertFieldOutput
       ~F3XTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.reports.form\_3x.tests.test\_models.F3XTestCase
       ~F3XTestCase.assertMultiLineEqual
       ~F3XTestCase.assertNoLogs
       ~F3XTestCase.assertNotAlmostEqual
-      ~F3XTestCase.assertNotAlmostEquals
       ~F3XTestCase.assertNotContains
       ~F3XTestCase.assertNotEqual
-      ~F3XTestCase.assertNotEquals
       ~F3XTestCase.assertNotIn
       ~F3XTestCase.assertNotInHTML
       ~F3XTestCase.assertNotIsInstance
       ~F3XTestCase.assertNotRegex
-      ~F3XTestCase.assertNotRegexpMatches
       ~F3XTestCase.assertNumQueries
       ~F3XTestCase.assertQuerySetEqual
       ~F3XTestCase.assertRaises
       ~F3XTestCase.assertRaisesMessage
       ~F3XTestCase.assertRaisesRegex
-      ~F3XTestCase.assertRaisesRegexp
       ~F3XTestCase.assertRedirects
       ~F3XTestCase.assertRegex
-      ~F3XTestCase.assertRegexpMatches
       ~F3XTestCase.assertSequenceEqual
       ~F3XTestCase.assertSetEqual
       ~F3XTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.reports.form\_3x.tests.test\_models.F3XTestCase
       ~F3XTestCase.assertWarnsRegex
       ~F3XTestCase.assertXMLEqual
       ~F3XTestCase.assertXMLNotEqual
-      ~F3XTestCase.assert_
       ~F3XTestCase.captureOnCommitCallbacks
       ~F3XTestCase.countTestCases
       ~F3XTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.reports.form\_3x.tests.test\_models.F3XTestCase
       ~F3XTestCase.enterClassContext
       ~F3XTestCase.enterContext
       ~F3XTestCase.fail
-      ~F3XTestCase.failIf
-      ~F3XTestCase.failIfAlmostEqual
-      ~F3XTestCase.failIfEqual
-      ~F3XTestCase.failUnless
-      ~F3XTestCase.failUnlessAlmostEqual
-      ~F3XTestCase.failUnlessEqual
-      ~F3XTestCase.failUnlessRaises
       ~F3XTestCase.id
       ~F3XTestCase.modify_settings
       ~F3XTestCase.run

@@ -24,13 +24,10 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.addCleanup
       ~TransactionViewsTestCase.addTypeEqualityFunc
       ~TransactionViewsTestCase.assertAlmostEqual
-      ~TransactionViewsTestCase.assertAlmostEquals
       ~TransactionViewsTestCase.assertContains
       ~TransactionViewsTestCase.assertCountEqual
-      ~TransactionViewsTestCase.assertDictContainsSubset
       ~TransactionViewsTestCase.assertDictEqual
       ~TransactionViewsTestCase.assertEqual
-      ~TransactionViewsTestCase.assertEquals
       ~TransactionViewsTestCase.assertFalse
       ~TransactionViewsTestCase.assertFieldOutput
       ~TransactionViewsTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.assertMultiLineEqual
       ~TransactionViewsTestCase.assertNoLogs
       ~TransactionViewsTestCase.assertNotAlmostEqual
-      ~TransactionViewsTestCase.assertNotAlmostEquals
       ~TransactionViewsTestCase.assertNotContains
       ~TransactionViewsTestCase.assertNotEqual
-      ~TransactionViewsTestCase.assertNotEquals
       ~TransactionViewsTestCase.assertNotIn
       ~TransactionViewsTestCase.assertNotInHTML
       ~TransactionViewsTestCase.assertNotIsInstance
       ~TransactionViewsTestCase.assertNotRegex
-      ~TransactionViewsTestCase.assertNotRegexpMatches
       ~TransactionViewsTestCase.assertNumQueries
       ~TransactionViewsTestCase.assertQuerySetEqual
       ~TransactionViewsTestCase.assertRaises
       ~TransactionViewsTestCase.assertRaisesMessage
       ~TransactionViewsTestCase.assertRaisesRegex
-      ~TransactionViewsTestCase.assertRaisesRegexp
       ~TransactionViewsTestCase.assertRedirects
       ~TransactionViewsTestCase.assertRegex
-      ~TransactionViewsTestCase.assertRegexpMatches
       ~TransactionViewsTestCase.assertSequenceEqual
       ~TransactionViewsTestCase.assertSetEqual
       ~TransactionViewsTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.assertWarnsRegex
       ~TransactionViewsTestCase.assertXMLEqual
       ~TransactionViewsTestCase.assertXMLNotEqual
-      ~TransactionViewsTestCase.assert_
       ~TransactionViewsTestCase.captureOnCommitCallbacks
       ~TransactionViewsTestCase.countTestCases
       ~TransactionViewsTestCase.create_debt_repayment_payload
@@ -101,13 +92,6 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.enterClassContext
       ~TransactionViewsTestCase.enterContext
       ~TransactionViewsTestCase.fail
-      ~TransactionViewsTestCase.failIf
-      ~TransactionViewsTestCase.failIfAlmostEqual
-      ~TransactionViewsTestCase.failIfEqual
-      ~TransactionViewsTestCase.failUnless
-      ~TransactionViewsTestCase.failUnlessAlmostEqual
-      ~TransactionViewsTestCase.failUnlessEqual
-      ~TransactionViewsTestCase.failUnlessRaises
       ~TransactionViewsTestCase.get_request
       ~TransactionViewsTestCase.id
       ~TransactionViewsTestCase.modify_settings

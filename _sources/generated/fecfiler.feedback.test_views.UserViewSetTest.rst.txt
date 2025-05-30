@@ -24,13 +24,10 @@ fecfiler.feedback.test\_views.UserViewSetTest
       ~UserViewSetTest.addCleanup
       ~UserViewSetTest.addTypeEqualityFunc
       ~UserViewSetTest.assertAlmostEqual
-      ~UserViewSetTest.assertAlmostEquals
       ~UserViewSetTest.assertContains
       ~UserViewSetTest.assertCountEqual
-      ~UserViewSetTest.assertDictContainsSubset
       ~UserViewSetTest.assertDictEqual
       ~UserViewSetTest.assertEqual
-      ~UserViewSetTest.assertEquals
       ~UserViewSetTest.assertFalse
       ~UserViewSetTest.assertFieldOutput
       ~UserViewSetTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.feedback.test\_views.UserViewSetTest
       ~UserViewSetTest.assertMultiLineEqual
       ~UserViewSetTest.assertNoLogs
       ~UserViewSetTest.assertNotAlmostEqual
-      ~UserViewSetTest.assertNotAlmostEquals
       ~UserViewSetTest.assertNotContains
       ~UserViewSetTest.assertNotEqual
-      ~UserViewSetTest.assertNotEquals
       ~UserViewSetTest.assertNotIn
       ~UserViewSetTest.assertNotInHTML
       ~UserViewSetTest.assertNotIsInstance
       ~UserViewSetTest.assertNotRegex
-      ~UserViewSetTest.assertNotRegexpMatches
       ~UserViewSetTest.assertNumQueries
       ~UserViewSetTest.assertQuerySetEqual
       ~UserViewSetTest.assertRaises
       ~UserViewSetTest.assertRaisesMessage
       ~UserViewSetTest.assertRaisesRegex
-      ~UserViewSetTest.assertRaisesRegexp
       ~UserViewSetTest.assertRedirects
       ~UserViewSetTest.assertRegex
-      ~UserViewSetTest.assertRegexpMatches
       ~UserViewSetTest.assertSequenceEqual
       ~UserViewSetTest.assertSetEqual
       ~UserViewSetTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.feedback.test\_views.UserViewSetTest
       ~UserViewSetTest.assertWarnsRegex
       ~UserViewSetTest.assertXMLEqual
       ~UserViewSetTest.assertXMLNotEqual
-      ~UserViewSetTest.assert_
       ~UserViewSetTest.captureOnCommitCallbacks
       ~UserViewSetTest.countTestCases
       ~UserViewSetTest.debug
@@ -96,13 +87,6 @@ fecfiler.feedback.test\_views.UserViewSetTest
       ~UserViewSetTest.enterClassContext
       ~UserViewSetTest.enterContext
       ~UserViewSetTest.fail
-      ~UserViewSetTest.failIf
-      ~UserViewSetTest.failIfAlmostEqual
-      ~UserViewSetTest.failIfEqual
-      ~UserViewSetTest.failUnless
-      ~UserViewSetTest.failUnlessAlmostEqual
-      ~UserViewSetTest.failUnlessEqual
-      ~UserViewSetTest.failUnlessRaises
       ~UserViewSetTest.id
       ~UserViewSetTest.modify_settings
       ~UserViewSetTest.run

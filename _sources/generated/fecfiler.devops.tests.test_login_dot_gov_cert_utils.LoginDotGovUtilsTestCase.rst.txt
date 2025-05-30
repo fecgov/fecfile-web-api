@@ -24,13 +24,10 @@ fecfiler.devops.tests.test\_login\_dot\_gov\_cert\_utils.LoginDotGovUtilsTestCas
       ~LoginDotGovUtilsTestCase.addCleanup
       ~LoginDotGovUtilsTestCase.addTypeEqualityFunc
       ~LoginDotGovUtilsTestCase.assertAlmostEqual
-      ~LoginDotGovUtilsTestCase.assertAlmostEquals
       ~LoginDotGovUtilsTestCase.assertContains
       ~LoginDotGovUtilsTestCase.assertCountEqual
-      ~LoginDotGovUtilsTestCase.assertDictContainsSubset
       ~LoginDotGovUtilsTestCase.assertDictEqual
       ~LoginDotGovUtilsTestCase.assertEqual
-      ~LoginDotGovUtilsTestCase.assertEquals
       ~LoginDotGovUtilsTestCase.assertFalse
       ~LoginDotGovUtilsTestCase.assertFieldOutput
       ~LoginDotGovUtilsTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.devops.tests.test\_login\_dot\_gov\_cert\_utils.LoginDotGovUtilsTestCas
       ~LoginDotGovUtilsTestCase.assertMultiLineEqual
       ~LoginDotGovUtilsTestCase.assertNoLogs
       ~LoginDotGovUtilsTestCase.assertNotAlmostEqual
-      ~LoginDotGovUtilsTestCase.assertNotAlmostEquals
       ~LoginDotGovUtilsTestCase.assertNotContains
       ~LoginDotGovUtilsTestCase.assertNotEqual
-      ~LoginDotGovUtilsTestCase.assertNotEquals
       ~LoginDotGovUtilsTestCase.assertNotIn
       ~LoginDotGovUtilsTestCase.assertNotInHTML
       ~LoginDotGovUtilsTestCase.assertNotIsInstance
       ~LoginDotGovUtilsTestCase.assertNotRegex
-      ~LoginDotGovUtilsTestCase.assertNotRegexpMatches
       ~LoginDotGovUtilsTestCase.assertNumQueries
       ~LoginDotGovUtilsTestCase.assertQuerySetEqual
       ~LoginDotGovUtilsTestCase.assertRaises
       ~LoginDotGovUtilsTestCase.assertRaisesMessage
       ~LoginDotGovUtilsTestCase.assertRaisesRegex
-      ~LoginDotGovUtilsTestCase.assertRaisesRegexp
       ~LoginDotGovUtilsTestCase.assertRedirects
       ~LoginDotGovUtilsTestCase.assertRegex
-      ~LoginDotGovUtilsTestCase.assertRegexpMatches
       ~LoginDotGovUtilsTestCase.assertSequenceEqual
       ~LoginDotGovUtilsTestCase.assertSetEqual
       ~LoginDotGovUtilsTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.devops.tests.test\_login\_dot\_gov\_cert\_utils.LoginDotGovUtilsTestCas
       ~LoginDotGovUtilsTestCase.assertWarnsRegex
       ~LoginDotGovUtilsTestCase.assertXMLEqual
       ~LoginDotGovUtilsTestCase.assertXMLNotEqual
-      ~LoginDotGovUtilsTestCase.assert_
       ~LoginDotGovUtilsTestCase.captureOnCommitCallbacks
       ~LoginDotGovUtilsTestCase.countTestCases
       ~LoginDotGovUtilsTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.devops.tests.test\_login\_dot\_gov\_cert\_utils.LoginDotGovUtilsTestCas
       ~LoginDotGovUtilsTestCase.enterClassContext
       ~LoginDotGovUtilsTestCase.enterContext
       ~LoginDotGovUtilsTestCase.fail
-      ~LoginDotGovUtilsTestCase.failIf
-      ~LoginDotGovUtilsTestCase.failIfAlmostEqual
-      ~LoginDotGovUtilsTestCase.failIfEqual
-      ~LoginDotGovUtilsTestCase.failUnless
-      ~LoginDotGovUtilsTestCase.failUnlessAlmostEqual
-      ~LoginDotGovUtilsTestCase.failUnlessEqual
-      ~LoginDotGovUtilsTestCase.failUnlessRaises
       ~LoginDotGovUtilsTestCase.id
       ~LoginDotGovUtilsTestCase.modify_settings
       ~LoginDotGovUtilsTestCase.run

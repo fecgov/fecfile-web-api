@@ -24,13 +24,10 @@ fecfiler.devops.tests.test\_tasks.DevopsTasksTestCase
       ~DevopsTasksTestCase.addCleanup
       ~DevopsTasksTestCase.addTypeEqualityFunc
       ~DevopsTasksTestCase.assertAlmostEqual
-      ~DevopsTasksTestCase.assertAlmostEquals
       ~DevopsTasksTestCase.assertContains
       ~DevopsTasksTestCase.assertCountEqual
-      ~DevopsTasksTestCase.assertDictContainsSubset
       ~DevopsTasksTestCase.assertDictEqual
       ~DevopsTasksTestCase.assertEqual
-      ~DevopsTasksTestCase.assertEquals
       ~DevopsTasksTestCase.assertFalse
       ~DevopsTasksTestCase.assertFieldOutput
       ~DevopsTasksTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.devops.tests.test\_tasks.DevopsTasksTestCase
       ~DevopsTasksTestCase.assertMultiLineEqual
       ~DevopsTasksTestCase.assertNoLogs
       ~DevopsTasksTestCase.assertNotAlmostEqual
-      ~DevopsTasksTestCase.assertNotAlmostEquals
       ~DevopsTasksTestCase.assertNotContains
       ~DevopsTasksTestCase.assertNotEqual
-      ~DevopsTasksTestCase.assertNotEquals
       ~DevopsTasksTestCase.assertNotIn
       ~DevopsTasksTestCase.assertNotInHTML
       ~DevopsTasksTestCase.assertNotIsInstance
       ~DevopsTasksTestCase.assertNotRegex
-      ~DevopsTasksTestCase.assertNotRegexpMatches
       ~DevopsTasksTestCase.assertNumQueries
       ~DevopsTasksTestCase.assertQuerySetEqual
       ~DevopsTasksTestCase.assertRaises
       ~DevopsTasksTestCase.assertRaisesMessage
       ~DevopsTasksTestCase.assertRaisesRegex
-      ~DevopsTasksTestCase.assertRaisesRegexp
       ~DevopsTasksTestCase.assertRedirects
       ~DevopsTasksTestCase.assertRegex
-      ~DevopsTasksTestCase.assertRegexpMatches
       ~DevopsTasksTestCase.assertSequenceEqual
       ~DevopsTasksTestCase.assertSetEqual
       ~DevopsTasksTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.devops.tests.test\_tasks.DevopsTasksTestCase
       ~DevopsTasksTestCase.assertWarnsRegex
       ~DevopsTasksTestCase.assertXMLEqual
       ~DevopsTasksTestCase.assertXMLNotEqual
-      ~DevopsTasksTestCase.assert_
       ~DevopsTasksTestCase.captureOnCommitCallbacks
       ~DevopsTasksTestCase.countTestCases
       ~DevopsTasksTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.devops.tests.test\_tasks.DevopsTasksTestCase
       ~DevopsTasksTestCase.enterClassContext
       ~DevopsTasksTestCase.enterContext
       ~DevopsTasksTestCase.fail
-      ~DevopsTasksTestCase.failIf
-      ~DevopsTasksTestCase.failIfAlmostEqual
-      ~DevopsTasksTestCase.failIfEqual
-      ~DevopsTasksTestCase.failUnless
-      ~DevopsTasksTestCase.failUnlessAlmostEqual
-      ~DevopsTasksTestCase.failUnlessEqual
-      ~DevopsTasksTestCase.failUnlessRaises
       ~DevopsTasksTestCase.id
       ~DevopsTasksTestCase.modify_settings
       ~DevopsTasksTestCase.run

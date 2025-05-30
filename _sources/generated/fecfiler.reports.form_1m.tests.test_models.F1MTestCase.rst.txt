@@ -24,13 +24,10 @@ fecfiler.reports.form\_1m.tests.test\_models.F1MTestCase
       ~F1MTestCase.addCleanup
       ~F1MTestCase.addTypeEqualityFunc
       ~F1MTestCase.assertAlmostEqual
-      ~F1MTestCase.assertAlmostEquals
       ~F1MTestCase.assertContains
       ~F1MTestCase.assertCountEqual
-      ~F1MTestCase.assertDictContainsSubset
       ~F1MTestCase.assertDictEqual
       ~F1MTestCase.assertEqual
-      ~F1MTestCase.assertEquals
       ~F1MTestCase.assertFalse
       ~F1MTestCase.assertFieldOutput
       ~F1MTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.reports.form\_1m.tests.test\_models.F1MTestCase
       ~F1MTestCase.assertMultiLineEqual
       ~F1MTestCase.assertNoLogs
       ~F1MTestCase.assertNotAlmostEqual
-      ~F1MTestCase.assertNotAlmostEquals
       ~F1MTestCase.assertNotContains
       ~F1MTestCase.assertNotEqual
-      ~F1MTestCase.assertNotEquals
       ~F1MTestCase.assertNotIn
       ~F1MTestCase.assertNotInHTML
       ~F1MTestCase.assertNotIsInstance
       ~F1MTestCase.assertNotRegex
-      ~F1MTestCase.assertNotRegexpMatches
       ~F1MTestCase.assertNumQueries
       ~F1MTestCase.assertQuerySetEqual
       ~F1MTestCase.assertRaises
       ~F1MTestCase.assertRaisesMessage
       ~F1MTestCase.assertRaisesRegex
-      ~F1MTestCase.assertRaisesRegexp
       ~F1MTestCase.assertRedirects
       ~F1MTestCase.assertRegex
-      ~F1MTestCase.assertRegexpMatches
       ~F1MTestCase.assertSequenceEqual
       ~F1MTestCase.assertSetEqual
       ~F1MTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.reports.form\_1m.tests.test\_models.F1MTestCase
       ~F1MTestCase.assertWarnsRegex
       ~F1MTestCase.assertXMLEqual
       ~F1MTestCase.assertXMLNotEqual
-      ~F1MTestCase.assert_
       ~F1MTestCase.captureOnCommitCallbacks
       ~F1MTestCase.countTestCases
       ~F1MTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.reports.form\_1m.tests.test\_models.F1MTestCase
       ~F1MTestCase.enterClassContext
       ~F1MTestCase.enterContext
       ~F1MTestCase.fail
-      ~F1MTestCase.failIf
-      ~F1MTestCase.failIfAlmostEqual
-      ~F1MTestCase.failIfEqual
-      ~F1MTestCase.failUnless
-      ~F1MTestCase.failUnlessAlmostEqual
-      ~F1MTestCase.failUnlessEqual
-      ~F1MTestCase.failUnlessRaises
       ~F1MTestCase.id
       ~F1MTestCase.modify_settings
       ~F1MTestCase.run

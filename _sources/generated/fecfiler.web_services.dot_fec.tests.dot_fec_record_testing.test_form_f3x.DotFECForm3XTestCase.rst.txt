@@ -24,13 +24,10 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_f3x.
       ~DotFECForm3XTestCase.addCleanup
       ~DotFECForm3XTestCase.addTypeEqualityFunc
       ~DotFECForm3XTestCase.assertAlmostEqual
-      ~DotFECForm3XTestCase.assertAlmostEquals
       ~DotFECForm3XTestCase.assertContains
       ~DotFECForm3XTestCase.assertCountEqual
-      ~DotFECForm3XTestCase.assertDictContainsSubset
       ~DotFECForm3XTestCase.assertDictEqual
       ~DotFECForm3XTestCase.assertEqual
-      ~DotFECForm3XTestCase.assertEquals
       ~DotFECForm3XTestCase.assertFalse
       ~DotFECForm3XTestCase.assertFieldOutput
       ~DotFECForm3XTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_f3x.
       ~DotFECForm3XTestCase.assertMultiLineEqual
       ~DotFECForm3XTestCase.assertNoLogs
       ~DotFECForm3XTestCase.assertNotAlmostEqual
-      ~DotFECForm3XTestCase.assertNotAlmostEquals
       ~DotFECForm3XTestCase.assertNotContains
       ~DotFECForm3XTestCase.assertNotEqual
-      ~DotFECForm3XTestCase.assertNotEquals
       ~DotFECForm3XTestCase.assertNotIn
       ~DotFECForm3XTestCase.assertNotInHTML
       ~DotFECForm3XTestCase.assertNotIsInstance
       ~DotFECForm3XTestCase.assertNotRegex
-      ~DotFECForm3XTestCase.assertNotRegexpMatches
       ~DotFECForm3XTestCase.assertNumQueries
       ~DotFECForm3XTestCase.assertQuerySetEqual
       ~DotFECForm3XTestCase.assertRaises
       ~DotFECForm3XTestCase.assertRaisesMessage
       ~DotFECForm3XTestCase.assertRaisesRegex
-      ~DotFECForm3XTestCase.assertRaisesRegexp
       ~DotFECForm3XTestCase.assertRedirects
       ~DotFECForm3XTestCase.assertRegex
-      ~DotFECForm3XTestCase.assertRegexpMatches
       ~DotFECForm3XTestCase.assertSequenceEqual
       ~DotFECForm3XTestCase.assertSetEqual
       ~DotFECForm3XTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_f3x.
       ~DotFECForm3XTestCase.assertWarnsRegex
       ~DotFECForm3XTestCase.assertXMLEqual
       ~DotFECForm3XTestCase.assertXMLNotEqual
-      ~DotFECForm3XTestCase.assert_
       ~DotFECForm3XTestCase.captureOnCommitCallbacks
       ~DotFECForm3XTestCase.countTestCases
       ~DotFECForm3XTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_f3x.
       ~DotFECForm3XTestCase.enterClassContext
       ~DotFECForm3XTestCase.enterContext
       ~DotFECForm3XTestCase.fail
-      ~DotFECForm3XTestCase.failIf
-      ~DotFECForm3XTestCase.failIfAlmostEqual
-      ~DotFECForm3XTestCase.failIfEqual
-      ~DotFECForm3XTestCase.failUnless
-      ~DotFECForm3XTestCase.failUnlessAlmostEqual
-      ~DotFECForm3XTestCase.failUnlessEqual
-      ~DotFECForm3XTestCase.failUnlessRaises
       ~DotFECForm3XTestCase.id
       ~DotFECForm3XTestCase.modify_settings
       ~DotFECForm3XTestCase.run

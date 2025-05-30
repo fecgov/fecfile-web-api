@@ -24,13 +24,10 @@ fecfiler.devops.tests.test\_cf\_api\_utils.CfApiUtilsTestCase
       ~CfApiUtilsTestCase.addCleanup
       ~CfApiUtilsTestCase.addTypeEqualityFunc
       ~CfApiUtilsTestCase.assertAlmostEqual
-      ~CfApiUtilsTestCase.assertAlmostEquals
       ~CfApiUtilsTestCase.assertContains
       ~CfApiUtilsTestCase.assertCountEqual
-      ~CfApiUtilsTestCase.assertDictContainsSubset
       ~CfApiUtilsTestCase.assertDictEqual
       ~CfApiUtilsTestCase.assertEqual
-      ~CfApiUtilsTestCase.assertEquals
       ~CfApiUtilsTestCase.assertFalse
       ~CfApiUtilsTestCase.assertFieldOutput
       ~CfApiUtilsTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.devops.tests.test\_cf\_api\_utils.CfApiUtilsTestCase
       ~CfApiUtilsTestCase.assertMultiLineEqual
       ~CfApiUtilsTestCase.assertNoLogs
       ~CfApiUtilsTestCase.assertNotAlmostEqual
-      ~CfApiUtilsTestCase.assertNotAlmostEquals
       ~CfApiUtilsTestCase.assertNotContains
       ~CfApiUtilsTestCase.assertNotEqual
-      ~CfApiUtilsTestCase.assertNotEquals
       ~CfApiUtilsTestCase.assertNotIn
       ~CfApiUtilsTestCase.assertNotInHTML
       ~CfApiUtilsTestCase.assertNotIsInstance
       ~CfApiUtilsTestCase.assertNotRegex
-      ~CfApiUtilsTestCase.assertNotRegexpMatches
       ~CfApiUtilsTestCase.assertNumQueries
       ~CfApiUtilsTestCase.assertQuerySetEqual
       ~CfApiUtilsTestCase.assertRaises
       ~CfApiUtilsTestCase.assertRaisesMessage
       ~CfApiUtilsTestCase.assertRaisesRegex
-      ~CfApiUtilsTestCase.assertRaisesRegexp
       ~CfApiUtilsTestCase.assertRedirects
       ~CfApiUtilsTestCase.assertRegex
-      ~CfApiUtilsTestCase.assertRegexpMatches
       ~CfApiUtilsTestCase.assertSequenceEqual
       ~CfApiUtilsTestCase.assertSetEqual
       ~CfApiUtilsTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.devops.tests.test\_cf\_api\_utils.CfApiUtilsTestCase
       ~CfApiUtilsTestCase.assertWarnsRegex
       ~CfApiUtilsTestCase.assertXMLEqual
       ~CfApiUtilsTestCase.assertXMLNotEqual
-      ~CfApiUtilsTestCase.assert_
       ~CfApiUtilsTestCase.captureOnCommitCallbacks
       ~CfApiUtilsTestCase.countTestCases
       ~CfApiUtilsTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.devops.tests.test\_cf\_api\_utils.CfApiUtilsTestCase
       ~CfApiUtilsTestCase.enterClassContext
       ~CfApiUtilsTestCase.enterContext
       ~CfApiUtilsTestCase.fail
-      ~CfApiUtilsTestCase.failIf
-      ~CfApiUtilsTestCase.failIfAlmostEqual
-      ~CfApiUtilsTestCase.failIfEqual
-      ~CfApiUtilsTestCase.failUnless
-      ~CfApiUtilsTestCase.failUnlessAlmostEqual
-      ~CfApiUtilsTestCase.failUnlessEqual
-      ~CfApiUtilsTestCase.failUnlessRaises
       ~CfApiUtilsTestCase.id
       ~CfApiUtilsTestCase.modify_settings
       ~CfApiUtilsTestCase.run

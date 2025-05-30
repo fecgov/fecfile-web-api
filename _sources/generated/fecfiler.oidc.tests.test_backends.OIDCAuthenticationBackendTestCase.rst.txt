@@ -24,13 +24,10 @@ fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
       ~OIDCAuthenticationBackendTestCase.addCleanup
       ~OIDCAuthenticationBackendTestCase.addTypeEqualityFunc
       ~OIDCAuthenticationBackendTestCase.assertAlmostEqual
-      ~OIDCAuthenticationBackendTestCase.assertAlmostEquals
       ~OIDCAuthenticationBackendTestCase.assertContains
       ~OIDCAuthenticationBackendTestCase.assertCountEqual
-      ~OIDCAuthenticationBackendTestCase.assertDictContainsSubset
       ~OIDCAuthenticationBackendTestCase.assertDictEqual
       ~OIDCAuthenticationBackendTestCase.assertEqual
-      ~OIDCAuthenticationBackendTestCase.assertEquals
       ~OIDCAuthenticationBackendTestCase.assertFalse
       ~OIDCAuthenticationBackendTestCase.assertFieldOutput
       ~OIDCAuthenticationBackendTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
       ~OIDCAuthenticationBackendTestCase.assertMultiLineEqual
       ~OIDCAuthenticationBackendTestCase.assertNoLogs
       ~OIDCAuthenticationBackendTestCase.assertNotAlmostEqual
-      ~OIDCAuthenticationBackendTestCase.assertNotAlmostEquals
       ~OIDCAuthenticationBackendTestCase.assertNotContains
       ~OIDCAuthenticationBackendTestCase.assertNotEqual
-      ~OIDCAuthenticationBackendTestCase.assertNotEquals
       ~OIDCAuthenticationBackendTestCase.assertNotIn
       ~OIDCAuthenticationBackendTestCase.assertNotInHTML
       ~OIDCAuthenticationBackendTestCase.assertNotIsInstance
       ~OIDCAuthenticationBackendTestCase.assertNotRegex
-      ~OIDCAuthenticationBackendTestCase.assertNotRegexpMatches
       ~OIDCAuthenticationBackendTestCase.assertNumQueries
       ~OIDCAuthenticationBackendTestCase.assertQuerySetEqual
       ~OIDCAuthenticationBackendTestCase.assertRaises
       ~OIDCAuthenticationBackendTestCase.assertRaisesMessage
       ~OIDCAuthenticationBackendTestCase.assertRaisesRegex
-      ~OIDCAuthenticationBackendTestCase.assertRaisesRegexp
       ~OIDCAuthenticationBackendTestCase.assertRedirects
       ~OIDCAuthenticationBackendTestCase.assertRegex
-      ~OIDCAuthenticationBackendTestCase.assertRegexpMatches
       ~OIDCAuthenticationBackendTestCase.assertSequenceEqual
       ~OIDCAuthenticationBackendTestCase.assertSetEqual
       ~OIDCAuthenticationBackendTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
       ~OIDCAuthenticationBackendTestCase.assertWarnsRegex
       ~OIDCAuthenticationBackendTestCase.assertXMLEqual
       ~OIDCAuthenticationBackendTestCase.assertXMLNotEqual
-      ~OIDCAuthenticationBackendTestCase.assert_
       ~OIDCAuthenticationBackendTestCase.captureOnCommitCallbacks
       ~OIDCAuthenticationBackendTestCase.countTestCases
       ~OIDCAuthenticationBackendTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.oidc.tests.test\_backends.OIDCAuthenticationBackendTestCase
       ~OIDCAuthenticationBackendTestCase.enterClassContext
       ~OIDCAuthenticationBackendTestCase.enterContext
       ~OIDCAuthenticationBackendTestCase.fail
-      ~OIDCAuthenticationBackendTestCase.failIf
-      ~OIDCAuthenticationBackendTestCase.failIfAlmostEqual
-      ~OIDCAuthenticationBackendTestCase.failIfEqual
-      ~OIDCAuthenticationBackendTestCase.failUnless
-      ~OIDCAuthenticationBackendTestCase.failUnlessAlmostEqual
-      ~OIDCAuthenticationBackendTestCase.failUnlessEqual
-      ~OIDCAuthenticationBackendTestCase.failUnlessRaises
       ~OIDCAuthenticationBackendTestCase.id
       ~OIDCAuthenticationBackendTestCase.modify_settings
       ~OIDCAuthenticationBackendTestCase.run

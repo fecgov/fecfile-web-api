@@ -24,13 +24,10 @@ fecfiler.reports.form\_24.tests.test\_models.F24TestCase
       ~F24TestCase.addCleanup
       ~F24TestCase.addTypeEqualityFunc
       ~F24TestCase.assertAlmostEqual
-      ~F24TestCase.assertAlmostEquals
       ~F24TestCase.assertContains
       ~F24TestCase.assertCountEqual
-      ~F24TestCase.assertDictContainsSubset
       ~F24TestCase.assertDictEqual
       ~F24TestCase.assertEqual
-      ~F24TestCase.assertEquals
       ~F24TestCase.assertFalse
       ~F24TestCase.assertFieldOutput
       ~F24TestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.reports.form\_24.tests.test\_models.F24TestCase
       ~F24TestCase.assertMultiLineEqual
       ~F24TestCase.assertNoLogs
       ~F24TestCase.assertNotAlmostEqual
-      ~F24TestCase.assertNotAlmostEquals
       ~F24TestCase.assertNotContains
       ~F24TestCase.assertNotEqual
-      ~F24TestCase.assertNotEquals
       ~F24TestCase.assertNotIn
       ~F24TestCase.assertNotInHTML
       ~F24TestCase.assertNotIsInstance
       ~F24TestCase.assertNotRegex
-      ~F24TestCase.assertNotRegexpMatches
       ~F24TestCase.assertNumQueries
       ~F24TestCase.assertQuerySetEqual
       ~F24TestCase.assertRaises
       ~F24TestCase.assertRaisesMessage
       ~F24TestCase.assertRaisesRegex
-      ~F24TestCase.assertRaisesRegexp
       ~F24TestCase.assertRedirects
       ~F24TestCase.assertRegex
-      ~F24TestCase.assertRegexpMatches
       ~F24TestCase.assertSequenceEqual
       ~F24TestCase.assertSetEqual
       ~F24TestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.reports.form\_24.tests.test\_models.F24TestCase
       ~F24TestCase.assertWarnsRegex
       ~F24TestCase.assertXMLEqual
       ~F24TestCase.assertXMLNotEqual
-      ~F24TestCase.assert_
       ~F24TestCase.captureOnCommitCallbacks
       ~F24TestCase.countTestCases
       ~F24TestCase.debug
@@ -96,13 +87,6 @@ fecfiler.reports.form\_24.tests.test\_models.F24TestCase
       ~F24TestCase.enterClassContext
       ~F24TestCase.enterContext
       ~F24TestCase.fail
-      ~F24TestCase.failIf
-      ~F24TestCase.failIfAlmostEqual
-      ~F24TestCase.failIfEqual
-      ~F24TestCase.failUnless
-      ~F24TestCase.failUnlessAlmostEqual
-      ~F24TestCase.failUnlessEqual
-      ~F24TestCase.failUnlessRaises
       ~F24TestCase.id
       ~F24TestCase.modify_settings
       ~F24TestCase.run

@@ -24,13 +24,10 @@ fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
       ~MemoTextSerializerTestCase.addCleanup
       ~MemoTextSerializerTestCase.addTypeEqualityFunc
       ~MemoTextSerializerTestCase.assertAlmostEqual
-      ~MemoTextSerializerTestCase.assertAlmostEquals
       ~MemoTextSerializerTestCase.assertContains
       ~MemoTextSerializerTestCase.assertCountEqual
-      ~MemoTextSerializerTestCase.assertDictContainsSubset
       ~MemoTextSerializerTestCase.assertDictEqual
       ~MemoTextSerializerTestCase.assertEqual
-      ~MemoTextSerializerTestCase.assertEquals
       ~MemoTextSerializerTestCase.assertFalse
       ~MemoTextSerializerTestCase.assertFieldOutput
       ~MemoTextSerializerTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
       ~MemoTextSerializerTestCase.assertMultiLineEqual
       ~MemoTextSerializerTestCase.assertNoLogs
       ~MemoTextSerializerTestCase.assertNotAlmostEqual
-      ~MemoTextSerializerTestCase.assertNotAlmostEquals
       ~MemoTextSerializerTestCase.assertNotContains
       ~MemoTextSerializerTestCase.assertNotEqual
-      ~MemoTextSerializerTestCase.assertNotEquals
       ~MemoTextSerializerTestCase.assertNotIn
       ~MemoTextSerializerTestCase.assertNotInHTML
       ~MemoTextSerializerTestCase.assertNotIsInstance
       ~MemoTextSerializerTestCase.assertNotRegex
-      ~MemoTextSerializerTestCase.assertNotRegexpMatches
       ~MemoTextSerializerTestCase.assertNumQueries
       ~MemoTextSerializerTestCase.assertQuerySetEqual
       ~MemoTextSerializerTestCase.assertRaises
       ~MemoTextSerializerTestCase.assertRaisesMessage
       ~MemoTextSerializerTestCase.assertRaisesRegex
-      ~MemoTextSerializerTestCase.assertRaisesRegexp
       ~MemoTextSerializerTestCase.assertRedirects
       ~MemoTextSerializerTestCase.assertRegex
-      ~MemoTextSerializerTestCase.assertRegexpMatches
       ~MemoTextSerializerTestCase.assertSequenceEqual
       ~MemoTextSerializerTestCase.assertSetEqual
       ~MemoTextSerializerTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
       ~MemoTextSerializerTestCase.assertWarnsRegex
       ~MemoTextSerializerTestCase.assertXMLEqual
       ~MemoTextSerializerTestCase.assertXMLNotEqual
-      ~MemoTextSerializerTestCase.assert_
       ~MemoTextSerializerTestCase.captureOnCommitCallbacks
       ~MemoTextSerializerTestCase.countTestCases
       ~MemoTextSerializerTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.memo\_text.test\_serializers.MemoTextSerializerTestCase
       ~MemoTextSerializerTestCase.enterClassContext
       ~MemoTextSerializerTestCase.enterContext
       ~MemoTextSerializerTestCase.fail
-      ~MemoTextSerializerTestCase.failIf
-      ~MemoTextSerializerTestCase.failIfAlmostEqual
-      ~MemoTextSerializerTestCase.failIfEqual
-      ~MemoTextSerializerTestCase.failUnless
-      ~MemoTextSerializerTestCase.failUnlessAlmostEqual
-      ~MemoTextSerializerTestCase.failUnlessEqual
-      ~MemoTextSerializerTestCase.failUnlessRaises
       ~MemoTextSerializerTestCase.id
       ~MemoTextSerializerTestCase.modify_settings
       ~MemoTextSerializerTestCase.run

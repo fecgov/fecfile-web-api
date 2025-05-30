@@ -24,13 +24,10 @@ fecfiler.contacts.tests.test\_views.ContactViewSetTest
       ~ContactViewSetTest.addCleanup
       ~ContactViewSetTest.addTypeEqualityFunc
       ~ContactViewSetTest.assertAlmostEqual
-      ~ContactViewSetTest.assertAlmostEquals
       ~ContactViewSetTest.assertContains
       ~ContactViewSetTest.assertCountEqual
-      ~ContactViewSetTest.assertDictContainsSubset
       ~ContactViewSetTest.assertDictEqual
       ~ContactViewSetTest.assertEqual
-      ~ContactViewSetTest.assertEquals
       ~ContactViewSetTest.assertFalse
       ~ContactViewSetTest.assertFieldOutput
       ~ContactViewSetTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.contacts.tests.test\_views.ContactViewSetTest
       ~ContactViewSetTest.assertMultiLineEqual
       ~ContactViewSetTest.assertNoLogs
       ~ContactViewSetTest.assertNotAlmostEqual
-      ~ContactViewSetTest.assertNotAlmostEquals
       ~ContactViewSetTest.assertNotContains
       ~ContactViewSetTest.assertNotEqual
-      ~ContactViewSetTest.assertNotEquals
       ~ContactViewSetTest.assertNotIn
       ~ContactViewSetTest.assertNotInHTML
       ~ContactViewSetTest.assertNotIsInstance
       ~ContactViewSetTest.assertNotRegex
-      ~ContactViewSetTest.assertNotRegexpMatches
       ~ContactViewSetTest.assertNumQueries
       ~ContactViewSetTest.assertQuerySetEqual
       ~ContactViewSetTest.assertRaises
       ~ContactViewSetTest.assertRaisesMessage
       ~ContactViewSetTest.assertRaisesRegex
-      ~ContactViewSetTest.assertRaisesRegexp
       ~ContactViewSetTest.assertRedirects
       ~ContactViewSetTest.assertRegex
-      ~ContactViewSetTest.assertRegexpMatches
       ~ContactViewSetTest.assertSequenceEqual
       ~ContactViewSetTest.assertSetEqual
       ~ContactViewSetTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.contacts.tests.test\_views.ContactViewSetTest
       ~ContactViewSetTest.assertWarnsRegex
       ~ContactViewSetTest.assertXMLEqual
       ~ContactViewSetTest.assertXMLNotEqual
-      ~ContactViewSetTest.assert_
       ~ContactViewSetTest.captureOnCommitCallbacks
       ~ContactViewSetTest.countTestCases
       ~ContactViewSetTest.debug
@@ -96,13 +87,6 @@ fecfiler.contacts.tests.test\_views.ContactViewSetTest
       ~ContactViewSetTest.enterClassContext
       ~ContactViewSetTest.enterContext
       ~ContactViewSetTest.fail
-      ~ContactViewSetTest.failIf
-      ~ContactViewSetTest.failIfAlmostEqual
-      ~ContactViewSetTest.failIfEqual
-      ~ContactViewSetTest.failUnless
-      ~ContactViewSetTest.failUnlessAlmostEqual
-      ~ContactViewSetTest.failUnlessEqual
-      ~ContactViewSetTest.failUnlessRaises
       ~ContactViewSetTest.id
       ~ContactViewSetTest.modify_settings
       ~ContactViewSetTest.run

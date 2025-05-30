@@ -24,13 +24,10 @@ fecfiler.committee\_accounts.test\_models.MembershipTestCase
       ~MembershipTestCase.addCleanup
       ~MembershipTestCase.addTypeEqualityFunc
       ~MembershipTestCase.assertAlmostEqual
-      ~MembershipTestCase.assertAlmostEquals
       ~MembershipTestCase.assertContains
       ~MembershipTestCase.assertCountEqual
-      ~MembershipTestCase.assertDictContainsSubset
       ~MembershipTestCase.assertDictEqual
       ~MembershipTestCase.assertEqual
-      ~MembershipTestCase.assertEquals
       ~MembershipTestCase.assertFalse
       ~MembershipTestCase.assertFieldOutput
       ~MembershipTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.committee\_accounts.test\_models.MembershipTestCase
       ~MembershipTestCase.assertMultiLineEqual
       ~MembershipTestCase.assertNoLogs
       ~MembershipTestCase.assertNotAlmostEqual
-      ~MembershipTestCase.assertNotAlmostEquals
       ~MembershipTestCase.assertNotContains
       ~MembershipTestCase.assertNotEqual
-      ~MembershipTestCase.assertNotEquals
       ~MembershipTestCase.assertNotIn
       ~MembershipTestCase.assertNotInHTML
       ~MembershipTestCase.assertNotIsInstance
       ~MembershipTestCase.assertNotRegex
-      ~MembershipTestCase.assertNotRegexpMatches
       ~MembershipTestCase.assertNumQueries
       ~MembershipTestCase.assertQuerySetEqual
       ~MembershipTestCase.assertRaises
       ~MembershipTestCase.assertRaisesMessage
       ~MembershipTestCase.assertRaisesRegex
-      ~MembershipTestCase.assertRaisesRegexp
       ~MembershipTestCase.assertRedirects
       ~MembershipTestCase.assertRegex
-      ~MembershipTestCase.assertRegexpMatches
       ~MembershipTestCase.assertSequenceEqual
       ~MembershipTestCase.assertSetEqual
       ~MembershipTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.committee\_accounts.test\_models.MembershipTestCase
       ~MembershipTestCase.assertWarnsRegex
       ~MembershipTestCase.assertXMLEqual
       ~MembershipTestCase.assertXMLNotEqual
-      ~MembershipTestCase.assert_
       ~MembershipTestCase.captureOnCommitCallbacks
       ~MembershipTestCase.countTestCases
       ~MembershipTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.committee\_accounts.test\_models.MembershipTestCase
       ~MembershipTestCase.enterClassContext
       ~MembershipTestCase.enterContext
       ~MembershipTestCase.fail
-      ~MembershipTestCase.failIf
-      ~MembershipTestCase.failIfAlmostEqual
-      ~MembershipTestCase.failIfEqual
-      ~MembershipTestCase.failUnless
-      ~MembershipTestCase.failUnlessAlmostEqual
-      ~MembershipTestCase.failUnlessEqual
-      ~MembershipTestCase.failUnlessRaises
       ~MembershipTestCase.id
       ~MembershipTestCase.modify_settings
       ~MembershipTestCase.run

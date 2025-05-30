@@ -24,13 +24,10 @@ fecfiler.contacts.tests.test\_models.ContactTestCase
       ~ContactTestCase.addCleanup
       ~ContactTestCase.addTypeEqualityFunc
       ~ContactTestCase.assertAlmostEqual
-      ~ContactTestCase.assertAlmostEquals
       ~ContactTestCase.assertContains
       ~ContactTestCase.assertCountEqual
-      ~ContactTestCase.assertDictContainsSubset
       ~ContactTestCase.assertDictEqual
       ~ContactTestCase.assertEqual
-      ~ContactTestCase.assertEquals
       ~ContactTestCase.assertFalse
       ~ContactTestCase.assertFieldOutput
       ~ContactTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.contacts.tests.test\_models.ContactTestCase
       ~ContactTestCase.assertMultiLineEqual
       ~ContactTestCase.assertNoLogs
       ~ContactTestCase.assertNotAlmostEqual
-      ~ContactTestCase.assertNotAlmostEquals
       ~ContactTestCase.assertNotContains
       ~ContactTestCase.assertNotEqual
-      ~ContactTestCase.assertNotEquals
       ~ContactTestCase.assertNotIn
       ~ContactTestCase.assertNotInHTML
       ~ContactTestCase.assertNotIsInstance
       ~ContactTestCase.assertNotRegex
-      ~ContactTestCase.assertNotRegexpMatches
       ~ContactTestCase.assertNumQueries
       ~ContactTestCase.assertQuerySetEqual
       ~ContactTestCase.assertRaises
       ~ContactTestCase.assertRaisesMessage
       ~ContactTestCase.assertRaisesRegex
-      ~ContactTestCase.assertRaisesRegexp
       ~ContactTestCase.assertRedirects
       ~ContactTestCase.assertRegex
-      ~ContactTestCase.assertRegexpMatches
       ~ContactTestCase.assertSequenceEqual
       ~ContactTestCase.assertSetEqual
       ~ContactTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.contacts.tests.test\_models.ContactTestCase
       ~ContactTestCase.assertWarnsRegex
       ~ContactTestCase.assertXMLEqual
       ~ContactTestCase.assertXMLNotEqual
-      ~ContactTestCase.assert_
       ~ContactTestCase.captureOnCommitCallbacks
       ~ContactTestCase.countTestCases
       ~ContactTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.contacts.tests.test\_models.ContactTestCase
       ~ContactTestCase.enterClassContext
       ~ContactTestCase.enterContext
       ~ContactTestCase.fail
-      ~ContactTestCase.failIf
-      ~ContactTestCase.failIfAlmostEqual
-      ~ContactTestCase.failIfEqual
-      ~ContactTestCase.failUnless
-      ~ContactTestCase.failUnlessAlmostEqual
-      ~ContactTestCase.failUnlessEqual
-      ~ContactTestCase.failUnlessRaises
       ~ContactTestCase.id
       ~ContactTestCase.modify_settings
       ~ContactTestCase.run

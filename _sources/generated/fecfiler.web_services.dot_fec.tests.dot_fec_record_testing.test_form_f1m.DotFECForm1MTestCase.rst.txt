@@ -24,13 +24,10 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_f1m.
       ~DotFECForm1MTestCase.addCleanup
       ~DotFECForm1MTestCase.addTypeEqualityFunc
       ~DotFECForm1MTestCase.assertAlmostEqual
-      ~DotFECForm1MTestCase.assertAlmostEquals
       ~DotFECForm1MTestCase.assertContains
       ~DotFECForm1MTestCase.assertCountEqual
-      ~DotFECForm1MTestCase.assertDictContainsSubset
       ~DotFECForm1MTestCase.assertDictEqual
       ~DotFECForm1MTestCase.assertEqual
-      ~DotFECForm1MTestCase.assertEquals
       ~DotFECForm1MTestCase.assertFalse
       ~DotFECForm1MTestCase.assertFieldOutput
       ~DotFECForm1MTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_f1m.
       ~DotFECForm1MTestCase.assertMultiLineEqual
       ~DotFECForm1MTestCase.assertNoLogs
       ~DotFECForm1MTestCase.assertNotAlmostEqual
-      ~DotFECForm1MTestCase.assertNotAlmostEquals
       ~DotFECForm1MTestCase.assertNotContains
       ~DotFECForm1MTestCase.assertNotEqual
-      ~DotFECForm1MTestCase.assertNotEquals
       ~DotFECForm1MTestCase.assertNotIn
       ~DotFECForm1MTestCase.assertNotInHTML
       ~DotFECForm1MTestCase.assertNotIsInstance
       ~DotFECForm1MTestCase.assertNotRegex
-      ~DotFECForm1MTestCase.assertNotRegexpMatches
       ~DotFECForm1MTestCase.assertNumQueries
       ~DotFECForm1MTestCase.assertQuerySetEqual
       ~DotFECForm1MTestCase.assertRaises
       ~DotFECForm1MTestCase.assertRaisesMessage
       ~DotFECForm1MTestCase.assertRaisesRegex
-      ~DotFECForm1MTestCase.assertRaisesRegexp
       ~DotFECForm1MTestCase.assertRedirects
       ~DotFECForm1MTestCase.assertRegex
-      ~DotFECForm1MTestCase.assertRegexpMatches
       ~DotFECForm1MTestCase.assertSequenceEqual
       ~DotFECForm1MTestCase.assertSetEqual
       ~DotFECForm1MTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_f1m.
       ~DotFECForm1MTestCase.assertWarnsRegex
       ~DotFECForm1MTestCase.assertXMLEqual
       ~DotFECForm1MTestCase.assertXMLNotEqual
-      ~DotFECForm1MTestCase.assert_
       ~DotFECForm1MTestCase.captureOnCommitCallbacks
       ~DotFECForm1MTestCase.countTestCases
       ~DotFECForm1MTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_form\_f1m.
       ~DotFECForm1MTestCase.enterClassContext
       ~DotFECForm1MTestCase.enterContext
       ~DotFECForm1MTestCase.fail
-      ~DotFECForm1MTestCase.failIf
-      ~DotFECForm1MTestCase.failIfAlmostEqual
-      ~DotFECForm1MTestCase.failIfEqual
-      ~DotFECForm1MTestCase.failUnless
-      ~DotFECForm1MTestCase.failUnlessAlmostEqual
-      ~DotFECForm1MTestCase.failUnlessEqual
-      ~DotFECForm1MTestCase.failUnlessRaises
       ~DotFECForm1MTestCase.id
       ~DotFECForm1MTestCase.modify_settings
       ~DotFECForm1MTestCase.run

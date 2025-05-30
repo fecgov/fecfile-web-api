@@ -24,13 +24,10 @@ fecfiler.committee\_accounts.test\_delete\_committee\_command.CommitteeAccountsV
       ~CommitteeAccountsViewsTest.addCleanup
       ~CommitteeAccountsViewsTest.addTypeEqualityFunc
       ~CommitteeAccountsViewsTest.assertAlmostEqual
-      ~CommitteeAccountsViewsTest.assertAlmostEquals
       ~CommitteeAccountsViewsTest.assertContains
       ~CommitteeAccountsViewsTest.assertCountEqual
-      ~CommitteeAccountsViewsTest.assertDictContainsSubset
       ~CommitteeAccountsViewsTest.assertDictEqual
       ~CommitteeAccountsViewsTest.assertEqual
-      ~CommitteeAccountsViewsTest.assertEquals
       ~CommitteeAccountsViewsTest.assertFalse
       ~CommitteeAccountsViewsTest.assertFieldOutput
       ~CommitteeAccountsViewsTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.committee\_accounts.test\_delete\_committee\_command.CommitteeAccountsV
       ~CommitteeAccountsViewsTest.assertMultiLineEqual
       ~CommitteeAccountsViewsTest.assertNoLogs
       ~CommitteeAccountsViewsTest.assertNotAlmostEqual
-      ~CommitteeAccountsViewsTest.assertNotAlmostEquals
       ~CommitteeAccountsViewsTest.assertNotContains
       ~CommitteeAccountsViewsTest.assertNotEqual
-      ~CommitteeAccountsViewsTest.assertNotEquals
       ~CommitteeAccountsViewsTest.assertNotIn
       ~CommitteeAccountsViewsTest.assertNotInHTML
       ~CommitteeAccountsViewsTest.assertNotIsInstance
       ~CommitteeAccountsViewsTest.assertNotRegex
-      ~CommitteeAccountsViewsTest.assertNotRegexpMatches
       ~CommitteeAccountsViewsTest.assertNumQueries
       ~CommitteeAccountsViewsTest.assertQuerySetEqual
       ~CommitteeAccountsViewsTest.assertRaises
       ~CommitteeAccountsViewsTest.assertRaisesMessage
       ~CommitteeAccountsViewsTest.assertRaisesRegex
-      ~CommitteeAccountsViewsTest.assertRaisesRegexp
       ~CommitteeAccountsViewsTest.assertRedirects
       ~CommitteeAccountsViewsTest.assertRegex
-      ~CommitteeAccountsViewsTest.assertRegexpMatches
       ~CommitteeAccountsViewsTest.assertSequenceEqual
       ~CommitteeAccountsViewsTest.assertSetEqual
       ~CommitteeAccountsViewsTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.committee\_accounts.test\_delete\_committee\_command.CommitteeAccountsV
       ~CommitteeAccountsViewsTest.assertWarnsRegex
       ~CommitteeAccountsViewsTest.assertXMLEqual
       ~CommitteeAccountsViewsTest.assertXMLNotEqual
-      ~CommitteeAccountsViewsTest.assert_
       ~CommitteeAccountsViewsTest.captureOnCommitCallbacks
       ~CommitteeAccountsViewsTest.countTestCases
       ~CommitteeAccountsViewsTest.debug
@@ -96,13 +87,6 @@ fecfiler.committee\_accounts.test\_delete\_committee\_command.CommitteeAccountsV
       ~CommitteeAccountsViewsTest.enterClassContext
       ~CommitteeAccountsViewsTest.enterContext
       ~CommitteeAccountsViewsTest.fail
-      ~CommitteeAccountsViewsTest.failIf
-      ~CommitteeAccountsViewsTest.failIfAlmostEqual
-      ~CommitteeAccountsViewsTest.failIfEqual
-      ~CommitteeAccountsViewsTest.failUnless
-      ~CommitteeAccountsViewsTest.failUnlessAlmostEqual
-      ~CommitteeAccountsViewsTest.failUnlessEqual
-      ~CommitteeAccountsViewsTest.failUnlessRaises
       ~CommitteeAccountsViewsTest.id
       ~CommitteeAccountsViewsTest.modify_settings
       ~CommitteeAccountsViewsTest.run

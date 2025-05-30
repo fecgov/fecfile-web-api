@@ -24,13 +24,10 @@ fecfiler.devops.tests.test\_status\_views.SystemStatusViewTest
       ~SystemStatusViewTest.addCleanup
       ~SystemStatusViewTest.addTypeEqualityFunc
       ~SystemStatusViewTest.assertAlmostEqual
-      ~SystemStatusViewTest.assertAlmostEquals
       ~SystemStatusViewTest.assertContains
       ~SystemStatusViewTest.assertCountEqual
-      ~SystemStatusViewTest.assertDictContainsSubset
       ~SystemStatusViewTest.assertDictEqual
       ~SystemStatusViewTest.assertEqual
-      ~SystemStatusViewTest.assertEquals
       ~SystemStatusViewTest.assertFalse
       ~SystemStatusViewTest.assertFieldOutput
       ~SystemStatusViewTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.devops.tests.test\_status\_views.SystemStatusViewTest
       ~SystemStatusViewTest.assertMultiLineEqual
       ~SystemStatusViewTest.assertNoLogs
       ~SystemStatusViewTest.assertNotAlmostEqual
-      ~SystemStatusViewTest.assertNotAlmostEquals
       ~SystemStatusViewTest.assertNotContains
       ~SystemStatusViewTest.assertNotEqual
-      ~SystemStatusViewTest.assertNotEquals
       ~SystemStatusViewTest.assertNotIn
       ~SystemStatusViewTest.assertNotInHTML
       ~SystemStatusViewTest.assertNotIsInstance
       ~SystemStatusViewTest.assertNotRegex
-      ~SystemStatusViewTest.assertNotRegexpMatches
       ~SystemStatusViewTest.assertNumQueries
       ~SystemStatusViewTest.assertQuerySetEqual
       ~SystemStatusViewTest.assertRaises
       ~SystemStatusViewTest.assertRaisesMessage
       ~SystemStatusViewTest.assertRaisesRegex
-      ~SystemStatusViewTest.assertRaisesRegexp
       ~SystemStatusViewTest.assertRedirects
       ~SystemStatusViewTest.assertRegex
-      ~SystemStatusViewTest.assertRegexpMatches
       ~SystemStatusViewTest.assertSequenceEqual
       ~SystemStatusViewTest.assertSetEqual
       ~SystemStatusViewTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.devops.tests.test\_status\_views.SystemStatusViewTest
       ~SystemStatusViewTest.assertWarnsRegex
       ~SystemStatusViewTest.assertXMLEqual
       ~SystemStatusViewTest.assertXMLNotEqual
-      ~SystemStatusViewTest.assert_
       ~SystemStatusViewTest.captureOnCommitCallbacks
       ~SystemStatusViewTest.countTestCases
       ~SystemStatusViewTest.debug
@@ -96,13 +87,6 @@ fecfiler.devops.tests.test\_status\_views.SystemStatusViewTest
       ~SystemStatusViewTest.enterClassContext
       ~SystemStatusViewTest.enterContext
       ~SystemStatusViewTest.fail
-      ~SystemStatusViewTest.failIf
-      ~SystemStatusViewTest.failIfAlmostEqual
-      ~SystemStatusViewTest.failIfEqual
-      ~SystemStatusViewTest.failUnless
-      ~SystemStatusViewTest.failUnlessAlmostEqual
-      ~SystemStatusViewTest.failUnlessEqual
-      ~SystemStatusViewTest.failUnlessRaises
       ~SystemStatusViewTest.id
       ~SystemStatusViewTest.modify_settings
       ~SystemStatusViewTest.run

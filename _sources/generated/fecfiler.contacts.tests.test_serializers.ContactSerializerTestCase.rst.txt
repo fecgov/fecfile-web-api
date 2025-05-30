@@ -24,13 +24,10 @@ fecfiler.contacts.tests.test\_serializers.ContactSerializerTestCase
       ~ContactSerializerTestCase.addCleanup
       ~ContactSerializerTestCase.addTypeEqualityFunc
       ~ContactSerializerTestCase.assertAlmostEqual
-      ~ContactSerializerTestCase.assertAlmostEquals
       ~ContactSerializerTestCase.assertContains
       ~ContactSerializerTestCase.assertCountEqual
-      ~ContactSerializerTestCase.assertDictContainsSubset
       ~ContactSerializerTestCase.assertDictEqual
       ~ContactSerializerTestCase.assertEqual
-      ~ContactSerializerTestCase.assertEquals
       ~ContactSerializerTestCase.assertFalse
       ~ContactSerializerTestCase.assertFieldOutput
       ~ContactSerializerTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.contacts.tests.test\_serializers.ContactSerializerTestCase
       ~ContactSerializerTestCase.assertMultiLineEqual
       ~ContactSerializerTestCase.assertNoLogs
       ~ContactSerializerTestCase.assertNotAlmostEqual
-      ~ContactSerializerTestCase.assertNotAlmostEquals
       ~ContactSerializerTestCase.assertNotContains
       ~ContactSerializerTestCase.assertNotEqual
-      ~ContactSerializerTestCase.assertNotEquals
       ~ContactSerializerTestCase.assertNotIn
       ~ContactSerializerTestCase.assertNotInHTML
       ~ContactSerializerTestCase.assertNotIsInstance
       ~ContactSerializerTestCase.assertNotRegex
-      ~ContactSerializerTestCase.assertNotRegexpMatches
       ~ContactSerializerTestCase.assertNumQueries
       ~ContactSerializerTestCase.assertQuerySetEqual
       ~ContactSerializerTestCase.assertRaises
       ~ContactSerializerTestCase.assertRaisesMessage
       ~ContactSerializerTestCase.assertRaisesRegex
-      ~ContactSerializerTestCase.assertRaisesRegexp
       ~ContactSerializerTestCase.assertRedirects
       ~ContactSerializerTestCase.assertRegex
-      ~ContactSerializerTestCase.assertRegexpMatches
       ~ContactSerializerTestCase.assertSequenceEqual
       ~ContactSerializerTestCase.assertSetEqual
       ~ContactSerializerTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.contacts.tests.test\_serializers.ContactSerializerTestCase
       ~ContactSerializerTestCase.assertWarnsRegex
       ~ContactSerializerTestCase.assertXMLEqual
       ~ContactSerializerTestCase.assertXMLNotEqual
-      ~ContactSerializerTestCase.assert_
       ~ContactSerializerTestCase.captureOnCommitCallbacks
       ~ContactSerializerTestCase.countTestCases
       ~ContactSerializerTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.contacts.tests.test\_serializers.ContactSerializerTestCase
       ~ContactSerializerTestCase.enterClassContext
       ~ContactSerializerTestCase.enterContext
       ~ContactSerializerTestCase.fail
-      ~ContactSerializerTestCase.failIf
-      ~ContactSerializerTestCase.failIfAlmostEqual
-      ~ContactSerializerTestCase.failIfEqual
-      ~ContactSerializerTestCase.failUnless
-      ~ContactSerializerTestCase.failUnlessAlmostEqual
-      ~ContactSerializerTestCase.failUnlessEqual
-      ~ContactSerializerTestCase.failUnlessRaises
       ~ContactSerializerTestCase.id
       ~ContactSerializerTestCase.modify_settings
       ~ContactSerializerTestCase.run

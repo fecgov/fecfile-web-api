@@ -24,13 +24,10 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.addCleanup
       ~MemoTextViewSetTest.addTypeEqualityFunc
       ~MemoTextViewSetTest.assertAlmostEqual
-      ~MemoTextViewSetTest.assertAlmostEquals
       ~MemoTextViewSetTest.assertContains
       ~MemoTextViewSetTest.assertCountEqual
-      ~MemoTextViewSetTest.assertDictContainsSubset
       ~MemoTextViewSetTest.assertDictEqual
       ~MemoTextViewSetTest.assertEqual
-      ~MemoTextViewSetTest.assertEquals
       ~MemoTextViewSetTest.assertFalse
       ~MemoTextViewSetTest.assertFieldOutput
       ~MemoTextViewSetTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.assertMultiLineEqual
       ~MemoTextViewSetTest.assertNoLogs
       ~MemoTextViewSetTest.assertNotAlmostEqual
-      ~MemoTextViewSetTest.assertNotAlmostEquals
       ~MemoTextViewSetTest.assertNotContains
       ~MemoTextViewSetTest.assertNotEqual
-      ~MemoTextViewSetTest.assertNotEquals
       ~MemoTextViewSetTest.assertNotIn
       ~MemoTextViewSetTest.assertNotInHTML
       ~MemoTextViewSetTest.assertNotIsInstance
       ~MemoTextViewSetTest.assertNotRegex
-      ~MemoTextViewSetTest.assertNotRegexpMatches
       ~MemoTextViewSetTest.assertNumQueries
       ~MemoTextViewSetTest.assertQuerySetEqual
       ~MemoTextViewSetTest.assertRaises
       ~MemoTextViewSetTest.assertRaisesMessage
       ~MemoTextViewSetTest.assertRaisesRegex
-      ~MemoTextViewSetTest.assertRaisesRegexp
       ~MemoTextViewSetTest.assertRedirects
       ~MemoTextViewSetTest.assertRegex
-      ~MemoTextViewSetTest.assertRegexpMatches
       ~MemoTextViewSetTest.assertSequenceEqual
       ~MemoTextViewSetTest.assertSetEqual
       ~MemoTextViewSetTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.assertWarnsRegex
       ~MemoTextViewSetTest.assertXMLEqual
       ~MemoTextViewSetTest.assertXMLNotEqual
-      ~MemoTextViewSetTest.assert_
       ~MemoTextViewSetTest.captureOnCommitCallbacks
       ~MemoTextViewSetTest.countTestCases
       ~MemoTextViewSetTest.debug
@@ -96,13 +87,6 @@ fecfiler.memo\_text.test\_views.MemoTextViewSetTest
       ~MemoTextViewSetTest.enterClassContext
       ~MemoTextViewSetTest.enterContext
       ~MemoTextViewSetTest.fail
-      ~MemoTextViewSetTest.failIf
-      ~MemoTextViewSetTest.failIfAlmostEqual
-      ~MemoTextViewSetTest.failIfEqual
-      ~MemoTextViewSetTest.failUnless
-      ~MemoTextViewSetTest.failUnlessAlmostEqual
-      ~MemoTextViewSetTest.failUnlessEqual
-      ~MemoTextViewSetTest.failUnlessRaises
       ~MemoTextViewSetTest.id
       ~MemoTextViewSetTest.modify_settings
       ~MemoTextViewSetTest.run

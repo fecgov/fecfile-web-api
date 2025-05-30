@@ -24,13 +24,10 @@ fecfiler.memo\_text.test\_models.MemoTextTestCase
       ~MemoTextTestCase.addCleanup
       ~MemoTextTestCase.addTypeEqualityFunc
       ~MemoTextTestCase.assertAlmostEqual
-      ~MemoTextTestCase.assertAlmostEquals
       ~MemoTextTestCase.assertContains
       ~MemoTextTestCase.assertCountEqual
-      ~MemoTextTestCase.assertDictContainsSubset
       ~MemoTextTestCase.assertDictEqual
       ~MemoTextTestCase.assertEqual
-      ~MemoTextTestCase.assertEquals
       ~MemoTextTestCase.assertFalse
       ~MemoTextTestCase.assertFieldOutput
       ~MemoTextTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.memo\_text.test\_models.MemoTextTestCase
       ~MemoTextTestCase.assertMultiLineEqual
       ~MemoTextTestCase.assertNoLogs
       ~MemoTextTestCase.assertNotAlmostEqual
-      ~MemoTextTestCase.assertNotAlmostEquals
       ~MemoTextTestCase.assertNotContains
       ~MemoTextTestCase.assertNotEqual
-      ~MemoTextTestCase.assertNotEquals
       ~MemoTextTestCase.assertNotIn
       ~MemoTextTestCase.assertNotInHTML
       ~MemoTextTestCase.assertNotIsInstance
       ~MemoTextTestCase.assertNotRegex
-      ~MemoTextTestCase.assertNotRegexpMatches
       ~MemoTextTestCase.assertNumQueries
       ~MemoTextTestCase.assertQuerySetEqual
       ~MemoTextTestCase.assertRaises
       ~MemoTextTestCase.assertRaisesMessage
       ~MemoTextTestCase.assertRaisesRegex
-      ~MemoTextTestCase.assertRaisesRegexp
       ~MemoTextTestCase.assertRedirects
       ~MemoTextTestCase.assertRegex
-      ~MemoTextTestCase.assertRegexpMatches
       ~MemoTextTestCase.assertSequenceEqual
       ~MemoTextTestCase.assertSetEqual
       ~MemoTextTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.memo\_text.test\_models.MemoTextTestCase
       ~MemoTextTestCase.assertWarnsRegex
       ~MemoTextTestCase.assertXMLEqual
       ~MemoTextTestCase.assertXMLNotEqual
-      ~MemoTextTestCase.assert_
       ~MemoTextTestCase.captureOnCommitCallbacks
       ~MemoTextTestCase.countTestCases
       ~MemoTextTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.memo\_text.test\_models.MemoTextTestCase
       ~MemoTextTestCase.enterClassContext
       ~MemoTextTestCase.enterContext
       ~MemoTextTestCase.fail
-      ~MemoTextTestCase.failIf
-      ~MemoTextTestCase.failIfAlmostEqual
-      ~MemoTextTestCase.failIfEqual
-      ~MemoTextTestCase.failUnless
-      ~MemoTextTestCase.failUnlessAlmostEqual
-      ~MemoTextTestCase.failUnlessEqual
-      ~MemoTextTestCase.failUnlessRaises
       ~MemoTextTestCase.id
       ~MemoTextTestCase.modify_settings
       ~MemoTextTestCase.run

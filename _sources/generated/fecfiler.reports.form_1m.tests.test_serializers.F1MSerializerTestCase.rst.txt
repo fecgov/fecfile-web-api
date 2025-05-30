@@ -24,13 +24,10 @@ fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
       ~F1MSerializerTestCase.addCleanup
       ~F1MSerializerTestCase.addTypeEqualityFunc
       ~F1MSerializerTestCase.assertAlmostEqual
-      ~F1MSerializerTestCase.assertAlmostEquals
       ~F1MSerializerTestCase.assertContains
       ~F1MSerializerTestCase.assertCountEqual
-      ~F1MSerializerTestCase.assertDictContainsSubset
       ~F1MSerializerTestCase.assertDictEqual
       ~F1MSerializerTestCase.assertEqual
-      ~F1MSerializerTestCase.assertEquals
       ~F1MSerializerTestCase.assertFalse
       ~F1MSerializerTestCase.assertFieldOutput
       ~F1MSerializerTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
       ~F1MSerializerTestCase.assertMultiLineEqual
       ~F1MSerializerTestCase.assertNoLogs
       ~F1MSerializerTestCase.assertNotAlmostEqual
-      ~F1MSerializerTestCase.assertNotAlmostEquals
       ~F1MSerializerTestCase.assertNotContains
       ~F1MSerializerTestCase.assertNotEqual
-      ~F1MSerializerTestCase.assertNotEquals
       ~F1MSerializerTestCase.assertNotIn
       ~F1MSerializerTestCase.assertNotInHTML
       ~F1MSerializerTestCase.assertNotIsInstance
       ~F1MSerializerTestCase.assertNotRegex
-      ~F1MSerializerTestCase.assertNotRegexpMatches
       ~F1MSerializerTestCase.assertNumQueries
       ~F1MSerializerTestCase.assertQuerySetEqual
       ~F1MSerializerTestCase.assertRaises
       ~F1MSerializerTestCase.assertRaisesMessage
       ~F1MSerializerTestCase.assertRaisesRegex
-      ~F1MSerializerTestCase.assertRaisesRegexp
       ~F1MSerializerTestCase.assertRedirects
       ~F1MSerializerTestCase.assertRegex
-      ~F1MSerializerTestCase.assertRegexpMatches
       ~F1MSerializerTestCase.assertSequenceEqual
       ~F1MSerializerTestCase.assertSetEqual
       ~F1MSerializerTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
       ~F1MSerializerTestCase.assertWarnsRegex
       ~F1MSerializerTestCase.assertXMLEqual
       ~F1MSerializerTestCase.assertXMLNotEqual
-      ~F1MSerializerTestCase.assert_
       ~F1MSerializerTestCase.captureOnCommitCallbacks
       ~F1MSerializerTestCase.countTestCases
       ~F1MSerializerTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.reports.form\_1m.tests.test\_serializers.F1MSerializerTestCase
       ~F1MSerializerTestCase.enterClassContext
       ~F1MSerializerTestCase.enterContext
       ~F1MSerializerTestCase.fail
-      ~F1MSerializerTestCase.failIf
-      ~F1MSerializerTestCase.failIfAlmostEqual
-      ~F1MSerializerTestCase.failIfEqual
-      ~F1MSerializerTestCase.failUnless
-      ~F1MSerializerTestCase.failUnlessAlmostEqual
-      ~F1MSerializerTestCase.failUnlessEqual
-      ~F1MSerializerTestCase.failUnlessRaises
       ~F1MSerializerTestCase.id
       ~F1MSerializerTestCase.modify_settings
       ~F1MSerializerTestCase.run

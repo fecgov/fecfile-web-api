@@ -24,13 +24,10 @@ fecfiler.committee\_accounts.test\_views.CommitteeViewSetTest
       ~CommitteeViewSetTest.addCleanup
       ~CommitteeViewSetTest.addTypeEqualityFunc
       ~CommitteeViewSetTest.assertAlmostEqual
-      ~CommitteeViewSetTest.assertAlmostEquals
       ~CommitteeViewSetTest.assertContains
       ~CommitteeViewSetTest.assertCountEqual
-      ~CommitteeViewSetTest.assertDictContainsSubset
       ~CommitteeViewSetTest.assertDictEqual
       ~CommitteeViewSetTest.assertEqual
-      ~CommitteeViewSetTest.assertEquals
       ~CommitteeViewSetTest.assertFalse
       ~CommitteeViewSetTest.assertFieldOutput
       ~CommitteeViewSetTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.committee\_accounts.test\_views.CommitteeViewSetTest
       ~CommitteeViewSetTest.assertMultiLineEqual
       ~CommitteeViewSetTest.assertNoLogs
       ~CommitteeViewSetTest.assertNotAlmostEqual
-      ~CommitteeViewSetTest.assertNotAlmostEquals
       ~CommitteeViewSetTest.assertNotContains
       ~CommitteeViewSetTest.assertNotEqual
-      ~CommitteeViewSetTest.assertNotEquals
       ~CommitteeViewSetTest.assertNotIn
       ~CommitteeViewSetTest.assertNotInHTML
       ~CommitteeViewSetTest.assertNotIsInstance
       ~CommitteeViewSetTest.assertNotRegex
-      ~CommitteeViewSetTest.assertNotRegexpMatches
       ~CommitteeViewSetTest.assertNumQueries
       ~CommitteeViewSetTest.assertQuerySetEqual
       ~CommitteeViewSetTest.assertRaises
       ~CommitteeViewSetTest.assertRaisesMessage
       ~CommitteeViewSetTest.assertRaisesRegex
-      ~CommitteeViewSetTest.assertRaisesRegexp
       ~CommitteeViewSetTest.assertRedirects
       ~CommitteeViewSetTest.assertRegex
-      ~CommitteeViewSetTest.assertRegexpMatches
       ~CommitteeViewSetTest.assertSequenceEqual
       ~CommitteeViewSetTest.assertSetEqual
       ~CommitteeViewSetTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.committee\_accounts.test\_views.CommitteeViewSetTest
       ~CommitteeViewSetTest.assertWarnsRegex
       ~CommitteeViewSetTest.assertXMLEqual
       ~CommitteeViewSetTest.assertXMLNotEqual
-      ~CommitteeViewSetTest.assert_
       ~CommitteeViewSetTest.captureOnCommitCallbacks
       ~CommitteeViewSetTest.countTestCases
       ~CommitteeViewSetTest.debug
@@ -96,13 +87,6 @@ fecfiler.committee\_accounts.test\_views.CommitteeViewSetTest
       ~CommitteeViewSetTest.enterClassContext
       ~CommitteeViewSetTest.enterContext
       ~CommitteeViewSetTest.fail
-      ~CommitteeViewSetTest.failIf
-      ~CommitteeViewSetTest.failIfAlmostEqual
-      ~CommitteeViewSetTest.failIfEqual
-      ~CommitteeViewSetTest.failUnless
-      ~CommitteeViewSetTest.failUnlessAlmostEqual
-      ~CommitteeViewSetTest.failUnlessEqual
-      ~CommitteeViewSetTest.failUnlessRaises
       ~CommitteeViewSetTest.id
       ~CommitteeViewSetTest.modify_settings
       ~CommitteeViewSetTest.run

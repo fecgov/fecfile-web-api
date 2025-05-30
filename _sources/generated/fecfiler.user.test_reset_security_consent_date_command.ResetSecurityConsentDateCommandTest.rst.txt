@@ -24,13 +24,10 @@ fecfiler.user.test\_reset\_security\_consent\_date\_command.ResetSecurityConsent
       ~ResetSecurityConsentDateCommandTest.addCleanup
       ~ResetSecurityConsentDateCommandTest.addTypeEqualityFunc
       ~ResetSecurityConsentDateCommandTest.assertAlmostEqual
-      ~ResetSecurityConsentDateCommandTest.assertAlmostEquals
       ~ResetSecurityConsentDateCommandTest.assertContains
       ~ResetSecurityConsentDateCommandTest.assertCountEqual
-      ~ResetSecurityConsentDateCommandTest.assertDictContainsSubset
       ~ResetSecurityConsentDateCommandTest.assertDictEqual
       ~ResetSecurityConsentDateCommandTest.assertEqual
-      ~ResetSecurityConsentDateCommandTest.assertEquals
       ~ResetSecurityConsentDateCommandTest.assertFalse
       ~ResetSecurityConsentDateCommandTest.assertFieldOutput
       ~ResetSecurityConsentDateCommandTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.user.test\_reset\_security\_consent\_date\_command.ResetSecurityConsent
       ~ResetSecurityConsentDateCommandTest.assertMultiLineEqual
       ~ResetSecurityConsentDateCommandTest.assertNoLogs
       ~ResetSecurityConsentDateCommandTest.assertNotAlmostEqual
-      ~ResetSecurityConsentDateCommandTest.assertNotAlmostEquals
       ~ResetSecurityConsentDateCommandTest.assertNotContains
       ~ResetSecurityConsentDateCommandTest.assertNotEqual
-      ~ResetSecurityConsentDateCommandTest.assertNotEquals
       ~ResetSecurityConsentDateCommandTest.assertNotIn
       ~ResetSecurityConsentDateCommandTest.assertNotInHTML
       ~ResetSecurityConsentDateCommandTest.assertNotIsInstance
       ~ResetSecurityConsentDateCommandTest.assertNotRegex
-      ~ResetSecurityConsentDateCommandTest.assertNotRegexpMatches
       ~ResetSecurityConsentDateCommandTest.assertNumQueries
       ~ResetSecurityConsentDateCommandTest.assertQuerySetEqual
       ~ResetSecurityConsentDateCommandTest.assertRaises
       ~ResetSecurityConsentDateCommandTest.assertRaisesMessage
       ~ResetSecurityConsentDateCommandTest.assertRaisesRegex
-      ~ResetSecurityConsentDateCommandTest.assertRaisesRegexp
       ~ResetSecurityConsentDateCommandTest.assertRedirects
       ~ResetSecurityConsentDateCommandTest.assertRegex
-      ~ResetSecurityConsentDateCommandTest.assertRegexpMatches
       ~ResetSecurityConsentDateCommandTest.assertSequenceEqual
       ~ResetSecurityConsentDateCommandTest.assertSetEqual
       ~ResetSecurityConsentDateCommandTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.user.test\_reset\_security\_consent\_date\_command.ResetSecurityConsent
       ~ResetSecurityConsentDateCommandTest.assertWarnsRegex
       ~ResetSecurityConsentDateCommandTest.assertXMLEqual
       ~ResetSecurityConsentDateCommandTest.assertXMLNotEqual
-      ~ResetSecurityConsentDateCommandTest.assert_
       ~ResetSecurityConsentDateCommandTest.captureOnCommitCallbacks
       ~ResetSecurityConsentDateCommandTest.countTestCases
       ~ResetSecurityConsentDateCommandTest.debug
@@ -96,13 +87,6 @@ fecfiler.user.test\_reset\_security\_consent\_date\_command.ResetSecurityConsent
       ~ResetSecurityConsentDateCommandTest.enterClassContext
       ~ResetSecurityConsentDateCommandTest.enterContext
       ~ResetSecurityConsentDateCommandTest.fail
-      ~ResetSecurityConsentDateCommandTest.failIf
-      ~ResetSecurityConsentDateCommandTest.failIfAlmostEqual
-      ~ResetSecurityConsentDateCommandTest.failIfEqual
-      ~ResetSecurityConsentDateCommandTest.failUnless
-      ~ResetSecurityConsentDateCommandTest.failUnlessAlmostEqual
-      ~ResetSecurityConsentDateCommandTest.failUnlessEqual
-      ~ResetSecurityConsentDateCommandTest.failUnlessRaises
       ~ResetSecurityConsentDateCommandTest.id
       ~ResetSecurityConsentDateCommandTest.modify_settings
       ~ResetSecurityConsentDateCommandTest.run

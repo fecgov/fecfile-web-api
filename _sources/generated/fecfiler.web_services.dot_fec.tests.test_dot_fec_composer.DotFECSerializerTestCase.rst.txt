@@ -24,13 +24,10 @@ fecfiler.web\_services.dot\_fec.tests.test\_dot\_fec\_composer.DotFECSerializerT
       ~DotFECSerializerTestCase.addCleanup
       ~DotFECSerializerTestCase.addTypeEqualityFunc
       ~DotFECSerializerTestCase.assertAlmostEqual
-      ~DotFECSerializerTestCase.assertAlmostEquals
       ~DotFECSerializerTestCase.assertContains
       ~DotFECSerializerTestCase.assertCountEqual
-      ~DotFECSerializerTestCase.assertDictContainsSubset
       ~DotFECSerializerTestCase.assertDictEqual
       ~DotFECSerializerTestCase.assertEqual
-      ~DotFECSerializerTestCase.assertEquals
       ~DotFECSerializerTestCase.assertFalse
       ~DotFECSerializerTestCase.assertFieldOutput
       ~DotFECSerializerTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.web\_services.dot\_fec.tests.test\_dot\_fec\_composer.DotFECSerializerT
       ~DotFECSerializerTestCase.assertMultiLineEqual
       ~DotFECSerializerTestCase.assertNoLogs
       ~DotFECSerializerTestCase.assertNotAlmostEqual
-      ~DotFECSerializerTestCase.assertNotAlmostEquals
       ~DotFECSerializerTestCase.assertNotContains
       ~DotFECSerializerTestCase.assertNotEqual
-      ~DotFECSerializerTestCase.assertNotEquals
       ~DotFECSerializerTestCase.assertNotIn
       ~DotFECSerializerTestCase.assertNotInHTML
       ~DotFECSerializerTestCase.assertNotIsInstance
       ~DotFECSerializerTestCase.assertNotRegex
-      ~DotFECSerializerTestCase.assertNotRegexpMatches
       ~DotFECSerializerTestCase.assertNumQueries
       ~DotFECSerializerTestCase.assertQuerySetEqual
       ~DotFECSerializerTestCase.assertRaises
       ~DotFECSerializerTestCase.assertRaisesMessage
       ~DotFECSerializerTestCase.assertRaisesRegex
-      ~DotFECSerializerTestCase.assertRaisesRegexp
       ~DotFECSerializerTestCase.assertRedirects
       ~DotFECSerializerTestCase.assertRegex
-      ~DotFECSerializerTestCase.assertRegexpMatches
       ~DotFECSerializerTestCase.assertSequenceEqual
       ~DotFECSerializerTestCase.assertSetEqual
       ~DotFECSerializerTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.web\_services.dot\_fec.tests.test\_dot\_fec\_composer.DotFECSerializerT
       ~DotFECSerializerTestCase.assertWarnsRegex
       ~DotFECSerializerTestCase.assertXMLEqual
       ~DotFECSerializerTestCase.assertXMLNotEqual
-      ~DotFECSerializerTestCase.assert_
       ~DotFECSerializerTestCase.captureOnCommitCallbacks
       ~DotFECSerializerTestCase.countTestCases
       ~DotFECSerializerTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.web\_services.dot\_fec.tests.test\_dot\_fec\_composer.DotFECSerializerT
       ~DotFECSerializerTestCase.enterClassContext
       ~DotFECSerializerTestCase.enterContext
       ~DotFECSerializerTestCase.fail
-      ~DotFECSerializerTestCase.failIf
-      ~DotFECSerializerTestCase.failIfAlmostEqual
-      ~DotFECSerializerTestCase.failIfEqual
-      ~DotFECSerializerTestCase.failUnless
-      ~DotFECSerializerTestCase.failUnlessAlmostEqual
-      ~DotFECSerializerTestCase.failUnlessEqual
-      ~DotFECSerializerTestCase.failUnlessRaises
       ~DotFECSerializerTestCase.id
       ~DotFECSerializerTestCase.modify_settings
       ~DotFECSerializerTestCase.run

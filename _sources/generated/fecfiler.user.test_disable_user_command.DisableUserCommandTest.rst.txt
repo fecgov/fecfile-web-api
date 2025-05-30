@@ -24,13 +24,10 @@ fecfiler.user.test\_disable\_user\_command.DisableUserCommandTest
       ~DisableUserCommandTest.addCleanup
       ~DisableUserCommandTest.addTypeEqualityFunc
       ~DisableUserCommandTest.assertAlmostEqual
-      ~DisableUserCommandTest.assertAlmostEquals
       ~DisableUserCommandTest.assertContains
       ~DisableUserCommandTest.assertCountEqual
-      ~DisableUserCommandTest.assertDictContainsSubset
       ~DisableUserCommandTest.assertDictEqual
       ~DisableUserCommandTest.assertEqual
-      ~DisableUserCommandTest.assertEquals
       ~DisableUserCommandTest.assertFalse
       ~DisableUserCommandTest.assertFieldOutput
       ~DisableUserCommandTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.user.test\_disable\_user\_command.DisableUserCommandTest
       ~DisableUserCommandTest.assertMultiLineEqual
       ~DisableUserCommandTest.assertNoLogs
       ~DisableUserCommandTest.assertNotAlmostEqual
-      ~DisableUserCommandTest.assertNotAlmostEquals
       ~DisableUserCommandTest.assertNotContains
       ~DisableUserCommandTest.assertNotEqual
-      ~DisableUserCommandTest.assertNotEquals
       ~DisableUserCommandTest.assertNotIn
       ~DisableUserCommandTest.assertNotInHTML
       ~DisableUserCommandTest.assertNotIsInstance
       ~DisableUserCommandTest.assertNotRegex
-      ~DisableUserCommandTest.assertNotRegexpMatches
       ~DisableUserCommandTest.assertNumQueries
       ~DisableUserCommandTest.assertQuerySetEqual
       ~DisableUserCommandTest.assertRaises
       ~DisableUserCommandTest.assertRaisesMessage
       ~DisableUserCommandTest.assertRaisesRegex
-      ~DisableUserCommandTest.assertRaisesRegexp
       ~DisableUserCommandTest.assertRedirects
       ~DisableUserCommandTest.assertRegex
-      ~DisableUserCommandTest.assertRegexpMatches
       ~DisableUserCommandTest.assertSequenceEqual
       ~DisableUserCommandTest.assertSetEqual
       ~DisableUserCommandTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.user.test\_disable\_user\_command.DisableUserCommandTest
       ~DisableUserCommandTest.assertWarnsRegex
       ~DisableUserCommandTest.assertXMLEqual
       ~DisableUserCommandTest.assertXMLNotEqual
-      ~DisableUserCommandTest.assert_
       ~DisableUserCommandTest.captureOnCommitCallbacks
       ~DisableUserCommandTest.countTestCases
       ~DisableUserCommandTest.debug
@@ -96,13 +87,6 @@ fecfiler.user.test\_disable\_user\_command.DisableUserCommandTest
       ~DisableUserCommandTest.enterClassContext
       ~DisableUserCommandTest.enterContext
       ~DisableUserCommandTest.fail
-      ~DisableUserCommandTest.failIf
-      ~DisableUserCommandTest.failIfAlmostEqual
-      ~DisableUserCommandTest.failIfEqual
-      ~DisableUserCommandTest.failUnless
-      ~DisableUserCommandTest.failUnlessAlmostEqual
-      ~DisableUserCommandTest.failUnlessEqual
-      ~DisableUserCommandTest.failUnlessRaises
       ~DisableUserCommandTest.id
       ~DisableUserCommandTest.modify_settings
       ~DisableUserCommandTest.run

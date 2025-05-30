@@ -24,13 +24,10 @@ fecfiler.reports.form\_99.tests.test\_models.F99TestCase
       ~F99TestCase.addCleanup
       ~F99TestCase.addTypeEqualityFunc
       ~F99TestCase.assertAlmostEqual
-      ~F99TestCase.assertAlmostEquals
       ~F99TestCase.assertContains
       ~F99TestCase.assertCountEqual
-      ~F99TestCase.assertDictContainsSubset
       ~F99TestCase.assertDictEqual
       ~F99TestCase.assertEqual
-      ~F99TestCase.assertEquals
       ~F99TestCase.assertFalse
       ~F99TestCase.assertFieldOutput
       ~F99TestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.reports.form\_99.tests.test\_models.F99TestCase
       ~F99TestCase.assertMultiLineEqual
       ~F99TestCase.assertNoLogs
       ~F99TestCase.assertNotAlmostEqual
-      ~F99TestCase.assertNotAlmostEquals
       ~F99TestCase.assertNotContains
       ~F99TestCase.assertNotEqual
-      ~F99TestCase.assertNotEquals
       ~F99TestCase.assertNotIn
       ~F99TestCase.assertNotInHTML
       ~F99TestCase.assertNotIsInstance
       ~F99TestCase.assertNotRegex
-      ~F99TestCase.assertNotRegexpMatches
       ~F99TestCase.assertNumQueries
       ~F99TestCase.assertQuerySetEqual
       ~F99TestCase.assertRaises
       ~F99TestCase.assertRaisesMessage
       ~F99TestCase.assertRaisesRegex
-      ~F99TestCase.assertRaisesRegexp
       ~F99TestCase.assertRedirects
       ~F99TestCase.assertRegex
-      ~F99TestCase.assertRegexpMatches
       ~F99TestCase.assertSequenceEqual
       ~F99TestCase.assertSetEqual
       ~F99TestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.reports.form\_99.tests.test\_models.F99TestCase
       ~F99TestCase.assertWarnsRegex
       ~F99TestCase.assertXMLEqual
       ~F99TestCase.assertXMLNotEqual
-      ~F99TestCase.assert_
       ~F99TestCase.captureOnCommitCallbacks
       ~F99TestCase.countTestCases
       ~F99TestCase.debug
@@ -96,13 +87,6 @@ fecfiler.reports.form\_99.tests.test\_models.F99TestCase
       ~F99TestCase.enterClassContext
       ~F99TestCase.enterContext
       ~F99TestCase.fail
-      ~F99TestCase.failIf
-      ~F99TestCase.failIfAlmostEqual
-      ~F99TestCase.failIfEqual
-      ~F99TestCase.failUnless
-      ~F99TestCase.failUnlessAlmostEqual
-      ~F99TestCase.failUnlessEqual
-      ~F99TestCase.failUnlessRaises
       ~F99TestCase.id
       ~F99TestCase.modify_settings
       ~F99TestCase.run

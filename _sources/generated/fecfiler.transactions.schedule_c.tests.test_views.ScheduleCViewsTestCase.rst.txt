@@ -24,13 +24,10 @@ fecfiler.transactions.schedule\_c.tests.test\_views.ScheduleCViewsTestCase
       ~ScheduleCViewsTestCase.addCleanup
       ~ScheduleCViewsTestCase.addTypeEqualityFunc
       ~ScheduleCViewsTestCase.assertAlmostEqual
-      ~ScheduleCViewsTestCase.assertAlmostEquals
       ~ScheduleCViewsTestCase.assertContains
       ~ScheduleCViewsTestCase.assertCountEqual
-      ~ScheduleCViewsTestCase.assertDictContainsSubset
       ~ScheduleCViewsTestCase.assertDictEqual
       ~ScheduleCViewsTestCase.assertEqual
-      ~ScheduleCViewsTestCase.assertEquals
       ~ScheduleCViewsTestCase.assertFalse
       ~ScheduleCViewsTestCase.assertFieldOutput
       ~ScheduleCViewsTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.transactions.schedule\_c.tests.test\_views.ScheduleCViewsTestCase
       ~ScheduleCViewsTestCase.assertMultiLineEqual
       ~ScheduleCViewsTestCase.assertNoLogs
       ~ScheduleCViewsTestCase.assertNotAlmostEqual
-      ~ScheduleCViewsTestCase.assertNotAlmostEquals
       ~ScheduleCViewsTestCase.assertNotContains
       ~ScheduleCViewsTestCase.assertNotEqual
-      ~ScheduleCViewsTestCase.assertNotEquals
       ~ScheduleCViewsTestCase.assertNotIn
       ~ScheduleCViewsTestCase.assertNotInHTML
       ~ScheduleCViewsTestCase.assertNotIsInstance
       ~ScheduleCViewsTestCase.assertNotRegex
-      ~ScheduleCViewsTestCase.assertNotRegexpMatches
       ~ScheduleCViewsTestCase.assertNumQueries
       ~ScheduleCViewsTestCase.assertQuerySetEqual
       ~ScheduleCViewsTestCase.assertRaises
       ~ScheduleCViewsTestCase.assertRaisesMessage
       ~ScheduleCViewsTestCase.assertRaisesRegex
-      ~ScheduleCViewsTestCase.assertRaisesRegexp
       ~ScheduleCViewsTestCase.assertRedirects
       ~ScheduleCViewsTestCase.assertRegex
-      ~ScheduleCViewsTestCase.assertRegexpMatches
       ~ScheduleCViewsTestCase.assertSequenceEqual
       ~ScheduleCViewsTestCase.assertSetEqual
       ~ScheduleCViewsTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.transactions.schedule\_c.tests.test\_views.ScheduleCViewsTestCase
       ~ScheduleCViewsTestCase.assertWarnsRegex
       ~ScheduleCViewsTestCase.assertXMLEqual
       ~ScheduleCViewsTestCase.assertXMLNotEqual
-      ~ScheduleCViewsTestCase.assert_
       ~ScheduleCViewsTestCase.captureOnCommitCallbacks
       ~ScheduleCViewsTestCase.countTestCases
       ~ScheduleCViewsTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.transactions.schedule\_c.tests.test\_views.ScheduleCViewsTestCase
       ~ScheduleCViewsTestCase.enterClassContext
       ~ScheduleCViewsTestCase.enterContext
       ~ScheduleCViewsTestCase.fail
-      ~ScheduleCViewsTestCase.failIf
-      ~ScheduleCViewsTestCase.failIfAlmostEqual
-      ~ScheduleCViewsTestCase.failIfEqual
-      ~ScheduleCViewsTestCase.failUnless
-      ~ScheduleCViewsTestCase.failUnlessAlmostEqual
-      ~ScheduleCViewsTestCase.failUnlessEqual
-      ~ScheduleCViewsTestCase.failUnlessRaises
       ~ScheduleCViewsTestCase.id
       ~ScheduleCViewsTestCase.modify_settings
       ~ScheduleCViewsTestCase.run

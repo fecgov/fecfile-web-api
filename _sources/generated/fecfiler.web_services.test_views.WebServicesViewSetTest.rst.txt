@@ -24,13 +24,10 @@ fecfiler.web\_services.test\_views.WebServicesViewSetTest
       ~WebServicesViewSetTest.addCleanup
       ~WebServicesViewSetTest.addTypeEqualityFunc
       ~WebServicesViewSetTest.assertAlmostEqual
-      ~WebServicesViewSetTest.assertAlmostEquals
       ~WebServicesViewSetTest.assertContains
       ~WebServicesViewSetTest.assertCountEqual
-      ~WebServicesViewSetTest.assertDictContainsSubset
       ~WebServicesViewSetTest.assertDictEqual
       ~WebServicesViewSetTest.assertEqual
-      ~WebServicesViewSetTest.assertEquals
       ~WebServicesViewSetTest.assertFalse
       ~WebServicesViewSetTest.assertFieldOutput
       ~WebServicesViewSetTest.assertFormError
@@ -55,24 +52,19 @@ fecfiler.web\_services.test\_views.WebServicesViewSetTest
       ~WebServicesViewSetTest.assertMultiLineEqual
       ~WebServicesViewSetTest.assertNoLogs
       ~WebServicesViewSetTest.assertNotAlmostEqual
-      ~WebServicesViewSetTest.assertNotAlmostEquals
       ~WebServicesViewSetTest.assertNotContains
       ~WebServicesViewSetTest.assertNotEqual
-      ~WebServicesViewSetTest.assertNotEquals
       ~WebServicesViewSetTest.assertNotIn
       ~WebServicesViewSetTest.assertNotInHTML
       ~WebServicesViewSetTest.assertNotIsInstance
       ~WebServicesViewSetTest.assertNotRegex
-      ~WebServicesViewSetTest.assertNotRegexpMatches
       ~WebServicesViewSetTest.assertNumQueries
       ~WebServicesViewSetTest.assertQuerySetEqual
       ~WebServicesViewSetTest.assertRaises
       ~WebServicesViewSetTest.assertRaisesMessage
       ~WebServicesViewSetTest.assertRaisesRegex
-      ~WebServicesViewSetTest.assertRaisesRegexp
       ~WebServicesViewSetTest.assertRedirects
       ~WebServicesViewSetTest.assertRegex
-      ~WebServicesViewSetTest.assertRegexpMatches
       ~WebServicesViewSetTest.assertSequenceEqual
       ~WebServicesViewSetTest.assertSetEqual
       ~WebServicesViewSetTest.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.web\_services.test\_views.WebServicesViewSetTest
       ~WebServicesViewSetTest.assertWarnsRegex
       ~WebServicesViewSetTest.assertXMLEqual
       ~WebServicesViewSetTest.assertXMLNotEqual
-      ~WebServicesViewSetTest.assert_
       ~WebServicesViewSetTest.captureOnCommitCallbacks
       ~WebServicesViewSetTest.countTestCases
       ~WebServicesViewSetTest.debug
@@ -96,13 +87,6 @@ fecfiler.web\_services.test\_views.WebServicesViewSetTest
       ~WebServicesViewSetTest.enterClassContext
       ~WebServicesViewSetTest.enterContext
       ~WebServicesViewSetTest.fail
-      ~WebServicesViewSetTest.failIf
-      ~WebServicesViewSetTest.failIfAlmostEqual
-      ~WebServicesViewSetTest.failIfEqual
-      ~WebServicesViewSetTest.failUnless
-      ~WebServicesViewSetTest.failUnlessAlmostEqual
-      ~WebServicesViewSetTest.failUnlessEqual
-      ~WebServicesViewSetTest.failUnlessRaises
       ~WebServicesViewSetTest.id
       ~WebServicesViewSetTest.modify_settings
       ~WebServicesViewSetTest.run

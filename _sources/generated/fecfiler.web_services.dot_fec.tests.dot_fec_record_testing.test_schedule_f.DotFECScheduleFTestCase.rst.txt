@@ -24,13 +24,10 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_schedule\_
       ~DotFECScheduleFTestCase.addCleanup
       ~DotFECScheduleFTestCase.addTypeEqualityFunc
       ~DotFECScheduleFTestCase.assertAlmostEqual
-      ~DotFECScheduleFTestCase.assertAlmostEquals
       ~DotFECScheduleFTestCase.assertContains
       ~DotFECScheduleFTestCase.assertCountEqual
-      ~DotFECScheduleFTestCase.assertDictContainsSubset
       ~DotFECScheduleFTestCase.assertDictEqual
       ~DotFECScheduleFTestCase.assertEqual
-      ~DotFECScheduleFTestCase.assertEquals
       ~DotFECScheduleFTestCase.assertFalse
       ~DotFECScheduleFTestCase.assertFieldOutput
       ~DotFECScheduleFTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_schedule\_
       ~DotFECScheduleFTestCase.assertMultiLineEqual
       ~DotFECScheduleFTestCase.assertNoLogs
       ~DotFECScheduleFTestCase.assertNotAlmostEqual
-      ~DotFECScheduleFTestCase.assertNotAlmostEquals
       ~DotFECScheduleFTestCase.assertNotContains
       ~DotFECScheduleFTestCase.assertNotEqual
-      ~DotFECScheduleFTestCase.assertNotEquals
       ~DotFECScheduleFTestCase.assertNotIn
       ~DotFECScheduleFTestCase.assertNotInHTML
       ~DotFECScheduleFTestCase.assertNotIsInstance
       ~DotFECScheduleFTestCase.assertNotRegex
-      ~DotFECScheduleFTestCase.assertNotRegexpMatches
       ~DotFECScheduleFTestCase.assertNumQueries
       ~DotFECScheduleFTestCase.assertQuerySetEqual
       ~DotFECScheduleFTestCase.assertRaises
       ~DotFECScheduleFTestCase.assertRaisesMessage
       ~DotFECScheduleFTestCase.assertRaisesRegex
-      ~DotFECScheduleFTestCase.assertRaisesRegexp
       ~DotFECScheduleFTestCase.assertRedirects
       ~DotFECScheduleFTestCase.assertRegex
-      ~DotFECScheduleFTestCase.assertRegexpMatches
       ~DotFECScheduleFTestCase.assertSequenceEqual
       ~DotFECScheduleFTestCase.assertSetEqual
       ~DotFECScheduleFTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_schedule\_
       ~DotFECScheduleFTestCase.assertWarnsRegex
       ~DotFECScheduleFTestCase.assertXMLEqual
       ~DotFECScheduleFTestCase.assertXMLNotEqual
-      ~DotFECScheduleFTestCase.assert_
       ~DotFECScheduleFTestCase.captureOnCommitCallbacks
       ~DotFECScheduleFTestCase.countTestCases
       ~DotFECScheduleFTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_schedule\_
       ~DotFECScheduleFTestCase.enterClassContext
       ~DotFECScheduleFTestCase.enterContext
       ~DotFECScheduleFTestCase.fail
-      ~DotFECScheduleFTestCase.failIf
-      ~DotFECScheduleFTestCase.failIfAlmostEqual
-      ~DotFECScheduleFTestCase.failIfEqual
-      ~DotFECScheduleFTestCase.failUnless
-      ~DotFECScheduleFTestCase.failUnlessAlmostEqual
-      ~DotFECScheduleFTestCase.failUnlessEqual
-      ~DotFECScheduleFTestCase.failUnlessRaises
       ~DotFECScheduleFTestCase.id
       ~DotFECScheduleFTestCase.modify_settings
       ~DotFECScheduleFTestCase.run

@@ -24,13 +24,10 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_reattribut
       ~DotFECReattributionsTestCase.addCleanup
       ~DotFECReattributionsTestCase.addTypeEqualityFunc
       ~DotFECReattributionsTestCase.assertAlmostEqual
-      ~DotFECReattributionsTestCase.assertAlmostEquals
       ~DotFECReattributionsTestCase.assertContains
       ~DotFECReattributionsTestCase.assertCountEqual
-      ~DotFECReattributionsTestCase.assertDictContainsSubset
       ~DotFECReattributionsTestCase.assertDictEqual
       ~DotFECReattributionsTestCase.assertEqual
-      ~DotFECReattributionsTestCase.assertEquals
       ~DotFECReattributionsTestCase.assertFalse
       ~DotFECReattributionsTestCase.assertFieldOutput
       ~DotFECReattributionsTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_reattribut
       ~DotFECReattributionsTestCase.assertMultiLineEqual
       ~DotFECReattributionsTestCase.assertNoLogs
       ~DotFECReattributionsTestCase.assertNotAlmostEqual
-      ~DotFECReattributionsTestCase.assertNotAlmostEquals
       ~DotFECReattributionsTestCase.assertNotContains
       ~DotFECReattributionsTestCase.assertNotEqual
-      ~DotFECReattributionsTestCase.assertNotEquals
       ~DotFECReattributionsTestCase.assertNotIn
       ~DotFECReattributionsTestCase.assertNotInHTML
       ~DotFECReattributionsTestCase.assertNotIsInstance
       ~DotFECReattributionsTestCase.assertNotRegex
-      ~DotFECReattributionsTestCase.assertNotRegexpMatches
       ~DotFECReattributionsTestCase.assertNumQueries
       ~DotFECReattributionsTestCase.assertQuerySetEqual
       ~DotFECReattributionsTestCase.assertRaises
       ~DotFECReattributionsTestCase.assertRaisesMessage
       ~DotFECReattributionsTestCase.assertRaisesRegex
-      ~DotFECReattributionsTestCase.assertRaisesRegexp
       ~DotFECReattributionsTestCase.assertRedirects
       ~DotFECReattributionsTestCase.assertRegex
-      ~DotFECReattributionsTestCase.assertRegexpMatches
       ~DotFECReattributionsTestCase.assertSequenceEqual
       ~DotFECReattributionsTestCase.assertSetEqual
       ~DotFECReattributionsTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_reattribut
       ~DotFECReattributionsTestCase.assertWarnsRegex
       ~DotFECReattributionsTestCase.assertXMLEqual
       ~DotFECReattributionsTestCase.assertXMLNotEqual
-      ~DotFECReattributionsTestCase.assert_
       ~DotFECReattributionsTestCase.captureOnCommitCallbacks
       ~DotFECReattributionsTestCase.countTestCases
       ~DotFECReattributionsTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.web\_services.dot\_fec.tests.dot\_fec\_record\_testing.test\_reattribut
       ~DotFECReattributionsTestCase.enterClassContext
       ~DotFECReattributionsTestCase.enterContext
       ~DotFECReattributionsTestCase.fail
-      ~DotFECReattributionsTestCase.failIf
-      ~DotFECReattributionsTestCase.failIfAlmostEqual
-      ~DotFECReattributionsTestCase.failIfEqual
-      ~DotFECReattributionsTestCase.failUnless
-      ~DotFECReattributionsTestCase.failUnlessAlmostEqual
-      ~DotFECReattributionsTestCase.failUnlessEqual
-      ~DotFECReattributionsTestCase.failUnlessRaises
       ~DotFECReattributionsTestCase.id
       ~DotFECReattributionsTestCase.modify_settings
       ~DotFECReattributionsTestCase.run

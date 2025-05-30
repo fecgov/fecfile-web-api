@@ -24,13 +24,10 @@ fecfiler.transactions.tests.test\_transaction\_dependencies.TransactionDependenc
       ~TransactionDependenciesTestCase.addCleanup
       ~TransactionDependenciesTestCase.addTypeEqualityFunc
       ~TransactionDependenciesTestCase.assertAlmostEqual
-      ~TransactionDependenciesTestCase.assertAlmostEquals
       ~TransactionDependenciesTestCase.assertContains
       ~TransactionDependenciesTestCase.assertCountEqual
-      ~TransactionDependenciesTestCase.assertDictContainsSubset
       ~TransactionDependenciesTestCase.assertDictEqual
       ~TransactionDependenciesTestCase.assertEqual
-      ~TransactionDependenciesTestCase.assertEquals
       ~TransactionDependenciesTestCase.assertFalse
       ~TransactionDependenciesTestCase.assertFieldOutput
       ~TransactionDependenciesTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.transactions.tests.test\_transaction\_dependencies.TransactionDependenc
       ~TransactionDependenciesTestCase.assertMultiLineEqual
       ~TransactionDependenciesTestCase.assertNoLogs
       ~TransactionDependenciesTestCase.assertNotAlmostEqual
-      ~TransactionDependenciesTestCase.assertNotAlmostEquals
       ~TransactionDependenciesTestCase.assertNotContains
       ~TransactionDependenciesTestCase.assertNotEqual
-      ~TransactionDependenciesTestCase.assertNotEquals
       ~TransactionDependenciesTestCase.assertNotIn
       ~TransactionDependenciesTestCase.assertNotInHTML
       ~TransactionDependenciesTestCase.assertNotIsInstance
       ~TransactionDependenciesTestCase.assertNotRegex
-      ~TransactionDependenciesTestCase.assertNotRegexpMatches
       ~TransactionDependenciesTestCase.assertNumQueries
       ~TransactionDependenciesTestCase.assertQuerySetEqual
       ~TransactionDependenciesTestCase.assertRaises
       ~TransactionDependenciesTestCase.assertRaisesMessage
       ~TransactionDependenciesTestCase.assertRaisesRegex
-      ~TransactionDependenciesTestCase.assertRaisesRegexp
       ~TransactionDependenciesTestCase.assertRedirects
       ~TransactionDependenciesTestCase.assertRegex
-      ~TransactionDependenciesTestCase.assertRegexpMatches
       ~TransactionDependenciesTestCase.assertSequenceEqual
       ~TransactionDependenciesTestCase.assertSetEqual
       ~TransactionDependenciesTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.transactions.tests.test\_transaction\_dependencies.TransactionDependenc
       ~TransactionDependenciesTestCase.assertWarnsRegex
       ~TransactionDependenciesTestCase.assertXMLEqual
       ~TransactionDependenciesTestCase.assertXMLNotEqual
-      ~TransactionDependenciesTestCase.assert_
       ~TransactionDependenciesTestCase.captureOnCommitCallbacks
       ~TransactionDependenciesTestCase.countTestCases
       ~TransactionDependenciesTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.transactions.tests.test\_transaction\_dependencies.TransactionDependenc
       ~TransactionDependenciesTestCase.enterClassContext
       ~TransactionDependenciesTestCase.enterContext
       ~TransactionDependenciesTestCase.fail
-      ~TransactionDependenciesTestCase.failIf
-      ~TransactionDependenciesTestCase.failIfAlmostEqual
-      ~TransactionDependenciesTestCase.failIfEqual
-      ~TransactionDependenciesTestCase.failUnless
-      ~TransactionDependenciesTestCase.failUnlessAlmostEqual
-      ~TransactionDependenciesTestCase.failUnlessEqual
-      ~TransactionDependenciesTestCase.failUnlessRaises
       ~TransactionDependenciesTestCase.id
       ~TransactionDependenciesTestCase.modify_settings
       ~TransactionDependenciesTestCase.run

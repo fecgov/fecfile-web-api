@@ -24,13 +24,10 @@ fecfiler.reports.form\_24.tests.test\_serializers.F24SerializerTestCase
       ~F24SerializerTestCase.addCleanup
       ~F24SerializerTestCase.addTypeEqualityFunc
       ~F24SerializerTestCase.assertAlmostEqual
-      ~F24SerializerTestCase.assertAlmostEquals
       ~F24SerializerTestCase.assertContains
       ~F24SerializerTestCase.assertCountEqual
-      ~F24SerializerTestCase.assertDictContainsSubset
       ~F24SerializerTestCase.assertDictEqual
       ~F24SerializerTestCase.assertEqual
-      ~F24SerializerTestCase.assertEquals
       ~F24SerializerTestCase.assertFalse
       ~F24SerializerTestCase.assertFieldOutput
       ~F24SerializerTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.reports.form\_24.tests.test\_serializers.F24SerializerTestCase
       ~F24SerializerTestCase.assertMultiLineEqual
       ~F24SerializerTestCase.assertNoLogs
       ~F24SerializerTestCase.assertNotAlmostEqual
-      ~F24SerializerTestCase.assertNotAlmostEquals
       ~F24SerializerTestCase.assertNotContains
       ~F24SerializerTestCase.assertNotEqual
-      ~F24SerializerTestCase.assertNotEquals
       ~F24SerializerTestCase.assertNotIn
       ~F24SerializerTestCase.assertNotInHTML
       ~F24SerializerTestCase.assertNotIsInstance
       ~F24SerializerTestCase.assertNotRegex
-      ~F24SerializerTestCase.assertNotRegexpMatches
       ~F24SerializerTestCase.assertNumQueries
       ~F24SerializerTestCase.assertQuerySetEqual
       ~F24SerializerTestCase.assertRaises
       ~F24SerializerTestCase.assertRaisesMessage
       ~F24SerializerTestCase.assertRaisesRegex
-      ~F24SerializerTestCase.assertRaisesRegexp
       ~F24SerializerTestCase.assertRedirects
       ~F24SerializerTestCase.assertRegex
-      ~F24SerializerTestCase.assertRegexpMatches
       ~F24SerializerTestCase.assertSequenceEqual
       ~F24SerializerTestCase.assertSetEqual
       ~F24SerializerTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.reports.form\_24.tests.test\_serializers.F24SerializerTestCase
       ~F24SerializerTestCase.assertWarnsRegex
       ~F24SerializerTestCase.assertXMLEqual
       ~F24SerializerTestCase.assertXMLNotEqual
-      ~F24SerializerTestCase.assert_
       ~F24SerializerTestCase.captureOnCommitCallbacks
       ~F24SerializerTestCase.countTestCases
       ~F24SerializerTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.reports.form\_24.tests.test\_serializers.F24SerializerTestCase
       ~F24SerializerTestCase.enterClassContext
       ~F24SerializerTestCase.enterContext
       ~F24SerializerTestCase.fail
-      ~F24SerializerTestCase.failIf
-      ~F24SerializerTestCase.failIfAlmostEqual
-      ~F24SerializerTestCase.failIfEqual
-      ~F24SerializerTestCase.failUnless
-      ~F24SerializerTestCase.failUnlessAlmostEqual
-      ~F24SerializerTestCase.failUnlessEqual
-      ~F24SerializerTestCase.failUnlessRaises
       ~F24SerializerTestCase.id
       ~F24SerializerTestCase.modify_settings
       ~F24SerializerTestCase.run

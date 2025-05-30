@@ -24,13 +24,10 @@ fecfiler.user.test\_models.UserModelTestCase
       ~UserModelTestCase.addCleanup
       ~UserModelTestCase.addTypeEqualityFunc
       ~UserModelTestCase.assertAlmostEqual
-      ~UserModelTestCase.assertAlmostEquals
       ~UserModelTestCase.assertContains
       ~UserModelTestCase.assertCountEqual
-      ~UserModelTestCase.assertDictContainsSubset
       ~UserModelTestCase.assertDictEqual
       ~UserModelTestCase.assertEqual
-      ~UserModelTestCase.assertEquals
       ~UserModelTestCase.assertFalse
       ~UserModelTestCase.assertFieldOutput
       ~UserModelTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.user.test\_models.UserModelTestCase
       ~UserModelTestCase.assertMultiLineEqual
       ~UserModelTestCase.assertNoLogs
       ~UserModelTestCase.assertNotAlmostEqual
-      ~UserModelTestCase.assertNotAlmostEquals
       ~UserModelTestCase.assertNotContains
       ~UserModelTestCase.assertNotEqual
-      ~UserModelTestCase.assertNotEquals
       ~UserModelTestCase.assertNotIn
       ~UserModelTestCase.assertNotInHTML
       ~UserModelTestCase.assertNotIsInstance
       ~UserModelTestCase.assertNotRegex
-      ~UserModelTestCase.assertNotRegexpMatches
       ~UserModelTestCase.assertNumQueries
       ~UserModelTestCase.assertQuerySetEqual
       ~UserModelTestCase.assertRaises
       ~UserModelTestCase.assertRaisesMessage
       ~UserModelTestCase.assertRaisesRegex
-      ~UserModelTestCase.assertRaisesRegexp
       ~UserModelTestCase.assertRedirects
       ~UserModelTestCase.assertRegex
-      ~UserModelTestCase.assertRegexpMatches
       ~UserModelTestCase.assertSequenceEqual
       ~UserModelTestCase.assertSetEqual
       ~UserModelTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.user.test\_models.UserModelTestCase
       ~UserModelTestCase.assertWarnsRegex
       ~UserModelTestCase.assertXMLEqual
       ~UserModelTestCase.assertXMLNotEqual
-      ~UserModelTestCase.assert_
       ~UserModelTestCase.captureOnCommitCallbacks
       ~UserModelTestCase.countTestCases
       ~UserModelTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.user.test\_models.UserModelTestCase
       ~UserModelTestCase.enterClassContext
       ~UserModelTestCase.enterContext
       ~UserModelTestCase.fail
-      ~UserModelTestCase.failIf
-      ~UserModelTestCase.failIfAlmostEqual
-      ~UserModelTestCase.failIfEqual
-      ~UserModelTestCase.failUnless
-      ~UserModelTestCase.failUnlessAlmostEqual
-      ~UserModelTestCase.failUnlessEqual
-      ~UserModelTestCase.failUnlessRaises
       ~UserModelTestCase.id
       ~UserModelTestCase.modify_settings
       ~UserModelTestCase.run

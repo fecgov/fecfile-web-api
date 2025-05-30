@@ -24,13 +24,10 @@ fecfiler.web\_services.test\_tasks.PollingTasksTestCase
       ~PollingTasksTestCase.addCleanup
       ~PollingTasksTestCase.addTypeEqualityFunc
       ~PollingTasksTestCase.assertAlmostEqual
-      ~PollingTasksTestCase.assertAlmostEquals
       ~PollingTasksTestCase.assertContains
       ~PollingTasksTestCase.assertCountEqual
-      ~PollingTasksTestCase.assertDictContainsSubset
       ~PollingTasksTestCase.assertDictEqual
       ~PollingTasksTestCase.assertEqual
-      ~PollingTasksTestCase.assertEquals
       ~PollingTasksTestCase.assertFalse
       ~PollingTasksTestCase.assertFieldOutput
       ~PollingTasksTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.web\_services.test\_tasks.PollingTasksTestCase
       ~PollingTasksTestCase.assertMultiLineEqual
       ~PollingTasksTestCase.assertNoLogs
       ~PollingTasksTestCase.assertNotAlmostEqual
-      ~PollingTasksTestCase.assertNotAlmostEquals
       ~PollingTasksTestCase.assertNotContains
       ~PollingTasksTestCase.assertNotEqual
-      ~PollingTasksTestCase.assertNotEquals
       ~PollingTasksTestCase.assertNotIn
       ~PollingTasksTestCase.assertNotInHTML
       ~PollingTasksTestCase.assertNotIsInstance
       ~PollingTasksTestCase.assertNotRegex
-      ~PollingTasksTestCase.assertNotRegexpMatches
       ~PollingTasksTestCase.assertNumQueries
       ~PollingTasksTestCase.assertQuerySetEqual
       ~PollingTasksTestCase.assertRaises
       ~PollingTasksTestCase.assertRaisesMessage
       ~PollingTasksTestCase.assertRaisesRegex
-      ~PollingTasksTestCase.assertRaisesRegexp
       ~PollingTasksTestCase.assertRedirects
       ~PollingTasksTestCase.assertRegex
-      ~PollingTasksTestCase.assertRegexpMatches
       ~PollingTasksTestCase.assertSequenceEqual
       ~PollingTasksTestCase.assertSetEqual
       ~PollingTasksTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.web\_services.test\_tasks.PollingTasksTestCase
       ~PollingTasksTestCase.assertWarnsRegex
       ~PollingTasksTestCase.assertXMLEqual
       ~PollingTasksTestCase.assertXMLNotEqual
-      ~PollingTasksTestCase.assert_
       ~PollingTasksTestCase.captureOnCommitCallbacks
       ~PollingTasksTestCase.countTestCases
       ~PollingTasksTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.web\_services.test\_tasks.PollingTasksTestCase
       ~PollingTasksTestCase.enterClassContext
       ~PollingTasksTestCase.enterContext
       ~PollingTasksTestCase.fail
-      ~PollingTasksTestCase.failIf
-      ~PollingTasksTestCase.failIfAlmostEqual
-      ~PollingTasksTestCase.failIfEqual
-      ~PollingTasksTestCase.failUnless
-      ~PollingTasksTestCase.failUnlessAlmostEqual
-      ~PollingTasksTestCase.failUnlessEqual
-      ~PollingTasksTestCase.failUnlessRaises
       ~PollingTasksTestCase.id
       ~PollingTasksTestCase.modify_settings
       ~PollingTasksTestCase.run

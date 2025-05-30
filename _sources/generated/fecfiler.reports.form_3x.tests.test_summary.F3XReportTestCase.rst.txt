@@ -24,13 +24,10 @@ fecfiler.reports.form\_3x.tests.test\_summary.F3XReportTestCase
       ~F3XReportTestCase.addCleanup
       ~F3XReportTestCase.addTypeEqualityFunc
       ~F3XReportTestCase.assertAlmostEqual
-      ~F3XReportTestCase.assertAlmostEquals
       ~F3XReportTestCase.assertContains
       ~F3XReportTestCase.assertCountEqual
-      ~F3XReportTestCase.assertDictContainsSubset
       ~F3XReportTestCase.assertDictEqual
       ~F3XReportTestCase.assertEqual
-      ~F3XReportTestCase.assertEquals
       ~F3XReportTestCase.assertFalse
       ~F3XReportTestCase.assertFieldOutput
       ~F3XReportTestCase.assertFormError
@@ -55,24 +52,19 @@ fecfiler.reports.form\_3x.tests.test\_summary.F3XReportTestCase
       ~F3XReportTestCase.assertMultiLineEqual
       ~F3XReportTestCase.assertNoLogs
       ~F3XReportTestCase.assertNotAlmostEqual
-      ~F3XReportTestCase.assertNotAlmostEquals
       ~F3XReportTestCase.assertNotContains
       ~F3XReportTestCase.assertNotEqual
-      ~F3XReportTestCase.assertNotEquals
       ~F3XReportTestCase.assertNotIn
       ~F3XReportTestCase.assertNotInHTML
       ~F3XReportTestCase.assertNotIsInstance
       ~F3XReportTestCase.assertNotRegex
-      ~F3XReportTestCase.assertNotRegexpMatches
       ~F3XReportTestCase.assertNumQueries
       ~F3XReportTestCase.assertQuerySetEqual
       ~F3XReportTestCase.assertRaises
       ~F3XReportTestCase.assertRaisesMessage
       ~F3XReportTestCase.assertRaisesRegex
-      ~F3XReportTestCase.assertRaisesRegexp
       ~F3XReportTestCase.assertRedirects
       ~F3XReportTestCase.assertRegex
-      ~F3XReportTestCase.assertRegexpMatches
       ~F3XReportTestCase.assertSequenceEqual
       ~F3XReportTestCase.assertSetEqual
       ~F3XReportTestCase.assertTemplateNotUsed
@@ -85,7 +77,6 @@ fecfiler.reports.form\_3x.tests.test\_summary.F3XReportTestCase
       ~F3XReportTestCase.assertWarnsRegex
       ~F3XReportTestCase.assertXMLEqual
       ~F3XReportTestCase.assertXMLNotEqual
-      ~F3XReportTestCase.assert_
       ~F3XReportTestCase.captureOnCommitCallbacks
       ~F3XReportTestCase.countTestCases
       ~F3XReportTestCase.debug
@@ -96,13 +87,6 @@ fecfiler.reports.form\_3x.tests.test\_summary.F3XReportTestCase
       ~F3XReportTestCase.enterClassContext
       ~F3XReportTestCase.enterContext
       ~F3XReportTestCase.fail
-      ~F3XReportTestCase.failIf
-      ~F3XReportTestCase.failIfAlmostEqual
-      ~F3XReportTestCase.failIfEqual
-      ~F3XReportTestCase.failUnless
-      ~F3XReportTestCase.failUnlessAlmostEqual
-      ~F3XReportTestCase.failUnlessEqual
-      ~F3XReportTestCase.failUnlessRaises
       ~F3XReportTestCase.id
       ~F3XReportTestCase.modify_settings
       ~F3XReportTestCase.run
