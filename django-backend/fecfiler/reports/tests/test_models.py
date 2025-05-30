@@ -34,10 +34,10 @@ class ReportModelTestCase(TestCase):
 
         self.f24_report.amend()
 
-        self.assertEquals(
+        self.assertEqual(
             self.f24_report.form_24.original_amendment_date, new_upload_submission.created
         )
-        self.assertEquals(self.f24_report.form_type, "F24A")
+        self.assertEqual(self.f24_report.form_type, "F24A")
 
     def test_unamending(self):
         upload_submission = UploadSubmission(fec_report_id=self.f3x_report.report_id)
