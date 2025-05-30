@@ -17,6 +17,7 @@ class Form99(models.Model):
     )
 
     text_code = models.TextField(null=False, blank=False, default="", db_default="")
+    filing_frequency = models.TextField(null=True, blank=True, max_length=1)
     message_text = models.TextField(null=True, blank=True)
 
     class Meta:
