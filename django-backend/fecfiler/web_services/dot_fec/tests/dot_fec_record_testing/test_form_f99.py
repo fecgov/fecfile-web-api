@@ -33,6 +33,7 @@ class DotFECForm99TestCase(TestCase):
         self.f99.treasurer_middle_name = "Middlename"
         self.f99.treasurer_prefix = "Mr."
         self.f99.treasurer_suffix = "Junior"
+
         self.f99.save()
         UploadSubmission.objects.initiate_submission(self.f99.id)
         self.f99.refresh_from_db()
@@ -72,3 +73,18 @@ class DotFECForm99TestCase(TestCase):
 
     def test_text_code(self):
         self.assertEqual(self.split_row[14], "TEXT CODE")
+
+    def test_filing_frequency(self):
+        self.assertEqual(self.split_row[15], "")
+
+        self.f99.form_99.text_code = "MSM"
+        self.f99.form_99.filing_frequency = "M"
+        self.f99.form_99.save()
+        self.f99.save()
+
+        report = compose_report(self.f99.id)
+        report_row = serialize_instance(report.get_form_name(), report)
+        self.split_row = report_row.split(FS_STR)
+
+        self.assertEqual(self.split_row[14], "MSM")
+        self.assertEqual(self.split_row[15], "M")

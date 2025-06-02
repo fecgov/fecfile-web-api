@@ -104,8 +104,6 @@ class DotFECScheduleC1TestCase(TestCase):
         self.split_row = serialized_transaction.split(FS_STR)
 
     def test_form_type(self):
-        for i in self.split_row:
-            logger.info(i)
         self.assertEqual(self.split_row[0], "SC1/10")
 
     def test_committee(self):

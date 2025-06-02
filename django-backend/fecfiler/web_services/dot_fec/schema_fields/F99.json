@@ -1,21 +1,26 @@
 {
-    "form_type": {},
-    "filer_committee_id_number": {},
-    "committee_name": {},
-    "street_1": {},
-    "street_2": {},
-    "city": {},
-    "state": {},
-    "zip": {},
-    "treasurer_last_name": {},
-    "treasurer_first_name": {},
-    "treasurer_middle_name": {},
-    "treasurer_prefix": {},
-    "treasurer_suffix": {},
-    "date_signed": {
-        "serializer": "DATE"
-    },
-    "text_code": {
-        "path": "form_99.text_code"
-    }
+  "form_type": {},
+  "filer_committee_id_number": {},
+  "committee_name": {},
+  "street_1": {},
+  "street_2": {},
+  "city": {},
+  "state": {},
+  "zip": {},
+  "treasurer_last_name": {},
+  "treasurer_first_name": {},
+  "treasurer_middle_name": {},
+  "treasurer_prefix": {},
+  "treasurer_suffix": {},
+  "date_signed": {
+    "serializer": "DATE"
+  },
+  "text_code": {
+    "path": "form_99.text_code"
+  },
+  "filing_frequency": { "path": "form_99.filing_frequency" },
+  "pdf_attachment": {
+    "path": "form_99.pdf_attachment",
+    "serializer": "BOOLEAN_X"
+  }
 }

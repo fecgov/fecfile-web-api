@@ -19,5 +19,8 @@ class Form99(models.Model):
     text_code = models.TextField(null=False, blank=False, default="", db_default="")
     message_text = models.TextField(null=True, blank=True)
 
+    filing_frequency = models.TextField(blank=True)
+    pdf_attachment = models.BooleanField(default=False)
+
     class Meta:
         app_label = "reports"
