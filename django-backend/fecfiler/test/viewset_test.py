@@ -13,17 +13,35 @@ class FecfilerViewSetTest(TestCase):
         self.default_committee = CommitteeAccount.objects.get(committee_id="C01234567")
         self.factory = RequestFactory()
 
-    def construct_get_request(self, uri, authenticate=True, user=None, committee=None):
+    def send_viewset_get_request(
+        self,
+        uri,
+        viewset_class,
+        action_name,
+        **kwargs,
+    ):
         request = self.factory.get(uri)
-        self.init_request(request, authenticate, user, committee)
-        return request
+        self.init_request(request)
+        response = viewset_class.as_view({"get": action_name})(request, **kwargs)
+        return response
 
-    def construct_post_request(
-        self, uri, data, authenticate=True, user=None, committee=None
+    def send_viewset_post_request(
+        self,
+        uri,
+        data,
+        viewset_class,
+        action_name,
+        authenticate=True,
+        user=None,
+        committee=None,
+        **kwargs,
     ):
         request = self.factory.post(uri, data)
-        self.init_request(request, authenticate, user, committee)
-        return request
+        self.init_request(
+            request, authenticate=authenticate, user=user, committee=committee
+        )
+        response = viewset_class.as_view({"post": action_name})(request, **kwargs)
+        return response
 
     def init_request(self, request, authenticate=True, user=None, committee=None):
         if authenticate:
