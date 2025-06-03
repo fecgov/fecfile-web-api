@@ -1373,7 +1373,7 @@ class TransactionViewsTestCase(TestCase):
         self.view.process_general_election_year_aggregates(trans_a)
 
         trans_b.refresh_from_db()
-        self.assertEqual(trans_b.aggregate, 200.00)
+        self.assertEqual(trans_b.schedule_f.aggregate_general_elec_expended, 200.00)
 
     def test_schedule_f_aggregation_edge_cases(self):
         report = create_form3x(
@@ -1456,8 +1456,8 @@ class TransactionViewsTestCase(TestCase):
         transaction_1 = view_set.save_transaction(transaction_1_data, view_set.request)
         transaction_2 = view_set.save_transaction(transaction_2_data, view_set.request)
 
-        self.assertEqual(transaction_1.aggregate, 153.00)
-        self.assertEqual(transaction_2.aggregate, 200.00)
+        self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 153.00)
+        self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 200.00)
 
         # Test leapfrogging forward
         move_transaction_1_data = {
@@ -1472,8 +1472,8 @@ class TransactionViewsTestCase(TestCase):
         )
         transaction_2.refresh_from_db()
 
-        self.assertEqual(transaction_1.aggregate, 200.00)
-        self.assertEqual(transaction_2.aggregate, 47.00)
+        self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 200.00)
+        self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 47.00)
 
         # Test leapfrogging backward
         move_transaction_1_again_data = {
@@ -1487,8 +1487,8 @@ class TransactionViewsTestCase(TestCase):
         )
         transaction_2.refresh_from_db()
 
-        self.assertEqual(transaction_1.aggregate, 153.00)
-        self.assertEqual(transaction_2.aggregate, 200.00)
+        self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 153.00)
+        self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 200.00)
 
         # Test change GE year
         change_ge_transaction_1_data = {
@@ -1502,8 +1502,8 @@ class TransactionViewsTestCase(TestCase):
         )
         transaction_2.refresh_from_db()
 
-        self.assertEqual(transaction_1.aggregate, 153.00)
-        self.assertEqual(transaction_2.aggregate, 47.00)
+        self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 153.00)
+        self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 47.00)
 
         # Test change GE year back
         change_ge_transaction_1_back_data = {
@@ -1517,8 +1517,8 @@ class TransactionViewsTestCase(TestCase):
         )
         transaction_2.refresh_from_db()
 
-        self.assertEqual(transaction_1.aggregate, 153.00)
-        self.assertEqual(transaction_2.aggregate, 200.00)
+        self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 153.00)
+        self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 200.00)
 
     def test_previous_transaction_by_payee_candidate(self):
         report = create_form3x(

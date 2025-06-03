@@ -690,12 +690,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         for trans in to_update:
             previous_aggregate = 0
             if previous_transaction:
-                previous_aggregate = previous_transaction.aggregate
+                previous_aggregate = previous_transaction.schedule_f.aggregate_general_elec_expended 
 
-            trans.aggregate = trans.schedule_f.expenditure_amount + previous_aggregate
+            trans.schedule_f.aggregate_general_elec_expended = trans.schedule_f.expenditure_amount + previous_aggregate
+            trans.schedule_f.save()
             previous_transaction = trans
 
-        queryset.bulk_update(to_update, ["aggregate"])
+        # queryset.bulk_update(to_update, ["aggregate"])
 
 
 def noop(transaction, is_existing):
