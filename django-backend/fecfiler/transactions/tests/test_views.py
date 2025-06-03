@@ -1370,7 +1370,7 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(trans_a.schedule_f.general_election_year, "2024")
         self.assertEqual(trans_a.schedule_f.expenditure_amount, 125.00)
 
-        self.view.recalculate_schedule_f_aggregates(trans_a)
+        self.view.process_general_election_year_aggregates(trans_a)
 
         trans_b.refresh_from_db()
         self.assertEqual(trans_b.aggregate, 200.00)
