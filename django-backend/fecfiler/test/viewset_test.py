@@ -43,6 +43,37 @@ class FecfilerViewSetTest(TestCase):
         response = viewset_class.as_view({"post": action_name})(request, **kwargs)
         return response
 
+    def send_viewset_put_request(
+        self,
+        uri,
+        data,
+        content_type,
+        viewset_class,
+        action_name,
+        authenticate=True,
+        user=None,
+        committee=None,
+        **kwargs,
+    ):
+        request = self.factory.put(uri, data, content_type)
+        self.init_request(
+            request, authenticate=authenticate, user=user, committee=committee
+        )
+        response = viewset_class.as_view({"put": action_name})(request, **kwargs)
+        return response
+
+    def send_viewset_delete_request(
+        self,
+        uri,
+        viewset_class,
+        action_name,
+        **kwargs,
+    ):
+        request = self.factory.delete(uri)
+        self.init_request(request)
+        response = viewset_class.as_view({"delete": action_name})(request, **kwargs)
+        return response
+
     def init_request(self, request, authenticate=True, user=None, committee=None):
         if authenticate:
             request_user = user if user is not None else self.default_user
