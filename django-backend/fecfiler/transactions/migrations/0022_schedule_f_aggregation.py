@@ -8,7 +8,6 @@ from fecfiler.transactions.utils import filter_for_previous_transactions
 def calculate_schedule_f_aggregates(apps, schema_editor):
     CommitteeAccount = apps.get_model("committee_accounts", "CommitteeAccount")  # noqa
     Transaction = apps.get_model("transactions", "Transaction")  # noqa
-    SchF = apps.get_model("transactions", "ScheduleF")
 
     for committee in CommitteeAccount.objects.all():
         schedule_f_transactions = Transaction.objects.all().filter(
