@@ -525,13 +525,16 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def process_aggregation(self, transaction_instance, original_values):
         leapfrogged = False
         if original_values["instance"] is not None:
-            leapfrogged = self.handle_date_leapfrogging(transaction_instance, original_values)
+            leapfrogged = self.handle_date_leapfrogging(
+                transaction_instance,
+                original_values
+            )
             self.handle_broken_transaction_chain(transaction_instance, original_values)
 
         if not leapfrogged:
             schedule = transaction_instance.get_schedule_name()
             match schedule:
-                case Schedule.A | Schedule.B | Schedule.C | Schedule.C1 | Schedule.C2 | Schedule.D:
+                case Schedule.A | Schedule.B | Schedule.C | Schedule.C1 | Schedule.C2 | Schedule.D:  # noqa: E501
                     # process_entity_aggregation()
                     pass
                 case Schedule.E:
@@ -550,7 +553,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         # Set the earlier date in order to detect when a transaction has moved forward
         if original_date and original_date < schedule.get_date():
             match schedule_type:
-                case Schedule.A | Schedule.B | Schedule.C | Schedule.C1 | Schedule.C2 | Schedule.D:
+                case Schedule.A | Schedule.B | Schedule.C | Schedule.C1 | Schedule.C2 | Schedule.D:  # noqa: E501
                     # handle_leapfrogging_entity
                     pass
                 case Schedule.E:
@@ -560,7 +563,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     self.handle_leapfrogging_election_year(original_values)
             return True
         return False
-
 
     def handle_leapfrogging_election_year(self, original_values):
         original_contact_2 = original_values["contact_2"]
@@ -591,16 +593,23 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def handle_broken_transaction_chain(self, transaction_instance, original_values):
         schedule = transaction_instance.get_schedule_name()
         match schedule:
-            case Schedule.A | Schedule.B | Schedule.C | Schedule.C1 | Schedule.C2 | Schedule.D:
+            case Schedule.A | Schedule.B | Schedule.C | Schedule.C1 | Schedule.C2 | Schedule.D:  # noqa: E501
                 # handle_broken_transaction_chain_entity
                 pass
             case Schedule.E:
                 # handle_broken_transaction_chain_election_code
                 pass
             case Schedule.F:
-                self.handle_broken_transaction_chain_election_year(transaction_instance, original_values)
+                self.handle_broken_transaction_chain_election_year(
+                    transaction_instance,
+                    original_values
+                )
 
-    def handle_broken_transaction_chain_election_year(self, transaction_instance, original_values):
+    def handle_broken_transaction_chain_election_year(
+        self,
+        transaction_instance,
+        original_values
+    ):
         original_election_year = original_values["election_year"]
         original_instance = original_values["instance"]
         original_contact_2 = original_values["contact_2"]
@@ -694,9 +703,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         for trans in to_update:
             previous_aggregate = 0
             if previous_transaction:
-                previous_aggregate = previous_transaction.schedule_f.aggregate_general_elec_expended 
+                previous_aggregate = (
+                    previous_transaction.schedule_f.aggregate_general_elec_expended
+                )
 
-            trans.schedule_f.aggregate_general_elec_expended = trans.schedule_f.expenditure_amount + previous_aggregate
+            trans.schedule_f.aggregate_general_elec_expended = (
+                trans.schedule_f.expenditure_amount + previous_aggregate
+            )
             trans.schedule_f.save()
             previous_transaction = trans
 
