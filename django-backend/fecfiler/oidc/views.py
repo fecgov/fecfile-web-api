@@ -13,8 +13,12 @@ from django.http import HttpResponseRedirect, HttpResponseServerError
 from django.contrib.auth import logout
 from django.utils.crypto import get_random_string
 from django.urls import reverse
-from rest_framework import viewsets
-from rest_framework.decorators import action
+from django.views.decorators.http import require_http_methods
+from rest_framework.decorators import (
+    authentication_classes,
+    permission_classes,
+    api_view,
+)
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
     OIDC_RP_CLIENT_ID,
@@ -40,91 +44,91 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class OidcViewSet(viewsets.ViewSet):
-
-    @extend_schema(exclude=True)
-    @action(detail=False)
-    def login_redirect(self, request):
-        redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-        redirect.set_cookie(
-            FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
-            "true",
-            domain=FFAPI_COOKIE_DOMAIN,
-            secure=True,
-        )
-        return redirect
-
-    @extend_schema(exclude=True)
-    @action(
-        detail=False,
-        authentication_classes=[],
-        permission_classes=[],
+@extend_schema(exclude=True)
+@api_view(["GET"])
+@require_http_methods(["GET"])
+def login_redirect(request):
+    redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
+    redirect.set_cookie(
+        FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
+        "true",
+        domain=FFAPI_COOKIE_DOMAIN,
+        secure=True,
     )
-    def logout_redirect(self, request):
-        logout(request)
-        response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-        delete_user_logged_in_cookies(response)
-        return response
+    return redirect
 
-    @extend_schema(exclude=True)
-    @action(
-        detail=False,
-        authentication_classes=[],
-        permission_classes=[],
+
+@extend_schema(exclude=True)
+@api_view(["GET"])
+@require_http_methods(["GET"])
+@permission_classes([])
+def logout_redirect(request):
+    logout(request)
+    response = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
+    delete_user_logged_in_cookies(response)
+    return response
+
+
+@extend_schema(exclude=True)
+@api_view(["GET"])
+@authentication_classes([])
+@permission_classes([])
+@require_http_methods(["GET"])
+def oidc_authenticate(request):
+    state = get_random_string(32)
+    nonce = get_random_string(32)
+    params = {
+        "acr_values": OIDC_ACR_VALUES,
+        "client_id": OIDC_RP_CLIENT_ID,
+        "prompt": "select_account",
+        "response_type": "code",
+        "redirect_uri": request.build_absolute_uri(reverse("oidc_callback")),
+        "scope": "openid email",
+        "state": state,
+        "nonce": nonce,
+    }
+    add_oidc_nonce_to_session(request, state, nonce)
+    query = urlencode(params)
+    redirect_url = "{url}?{query}".format(
+        url=oidc_op_config.get_authorization_endpoint(), query=query
     )
-    def authenticate(self, request):
-        state = get_random_string(32)
-        nonce = get_random_string(32)
+    response = HttpResponseRedirect(redirect_url)
+    response.set_signed_cookie("oidc_state", state, secure=True, httponly=True)
+    return response
+
+
+@extend_schema(exclude=True)
+@api_view(["GET"])
+@authentication_classes([])
+@permission_classes([])
+@require_http_methods(["GET"])
+def oidc_callback(request):
+    try:
+        if (
+            "error" not in request.query_params
+            and "code" in request.query_params
+            and "state" in request.query_params
+        ):
+            handle_oidc_callback_request(request)
+            return HttpResponseRedirect(LOGIN_REDIRECT_URL)
+        handle_oidc_callback_error(request)
+        return HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
+    except Exception as error:
+        logger.error(f"Failed to process oidc_callback request {str(error)}")
+        return HttpResponseServerError()
+
+
+@extend_schema(exclude=True)
+@api_view(["GET"])
+@require_http_methods(["GET"])
+def oidc_logout(request):
+    if request.user.is_authenticated:
         params = {
-            "acr_values": OIDC_ACR_VALUES,
             "client_id": OIDC_RP_CLIENT_ID,
-            "prompt": "select_account",
-            "response_type": "code",
-            "redirect_uri": request.build_absolute_uri(reverse("oidc-callback")),
-            "scope": "openid email",
-            "state": state,
-            "nonce": nonce,
+            "post_logout_redirect_uri": LOGOUT_REDIRECT_URL,
+            "state": request.get_signed_cookie("oidc_state"),
         }
-        add_oidc_nonce_to_session(request, state, nonce)
         query = urlencode(params)
-        redirect_url = "{url}?{query}".format(
-            url=oidc_op_config.get_authorization_endpoint(), query=query
-        )
-        response = HttpResponseRedirect(redirect_url)
-        response.set_signed_cookie("oidc_state", state, secure=True, httponly=True)
-        return response
-
-    @extend_schema(exclude=True)
-    @action(
-        detail=False,
-        authentication_classes=[],
-        permission_classes=[],
-    )
-    def callback(self, request):
-        try:
-            if (
-                "error" not in request.query_params
-                and "code" in request.query_params
-                and "state" in request.query_params
-            ):
-                handle_oidc_callback_request(request)
-                return HttpResponseRedirect(LOGIN_REDIRECT_URL)
-            handle_oidc_callback_error(request)
-            return HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-        except Exception as error:
-            logger.error(f"Failed to process oidc_callback request {str(error)}")
-            return HttpResponseServerError()
-
-    @extend_schema(exclude=True)
-    @action(detail=False)
-    def logout(self, request):
-        if request.user.is_authenticated:
-            params = {
-                "client_id": OIDC_RP_CLIENT_ID,
-                "post_logout_redirect_uri": LOGOUT_REDIRECT_URL,
-                "state": request.get_signed_cookie("oidc_state"),
-            }
-            query = urlencode(params)
-            op_logout_url = oidc_op_config.get_logout_endpoint()
-            logout_url = f"{op_logout_url}?{query}"
-        return HttpResponseRedirect(logout_url or LOGOUT_REDIRECT_URL)
+        op_logout_url = oidc_op_config.get_logout_endpoint()
+        logout_url = f"{op_logout_url}?{query}"
+    return HttpResponseRedirect(logout_url or LOGOUT_REDIRECT_URL)

@@ -16,8 +16,8 @@ defaults: &defaults
     FFAPI_TIMEOUT_COOKIE_NAME: ffapi_timeout_dev
     FFAPI_COOKIE_DOMAIN: fecfile.fec.gov
     LOGIN_REDIRECT_CLIENT_URL: https://dev.fecfile.fec.gov
-    LOGIN_REDIRECT_SERVER_URL: https://dev-api.fecfile.fec.gov/api/v1/oidc/login_redirect
-    LOGOUT_REDIRECT_URL: https://dev-api.fecfile.fec.gov/api/v1/oidc/logout_redirect
+    LOGIN_REDIRECT_SERVER_URL: https://dev-api.fecfile.fec.gov/api/v1/oidc/login-redirect
+    LOGOUT_REDIRECT_URL: https://dev-api.fecfile.fec.gov/api/v1/oidc/logout-redirect
     PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
     STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
     FEC_AGENCY_ID: FEC

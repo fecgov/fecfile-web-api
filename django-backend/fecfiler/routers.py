@@ -4,8 +4,8 @@ from rest_framework.routers import DefaultRouter
 _all_routers = []
 
 
-def register_router(*args, **kwargs):
-    router = DefaultRouter(**kwargs)
+def register_router():
+    router = DefaultRouter()
     _all_routers.append(router)
     return router
 

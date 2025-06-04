@@ -9,12 +9,8 @@ class FecfilerViewSetTest(TestCase):
     fixtures = ["C01234567_user_and_committee"]
 
     def setUp(self):
-        self.default_user = User.objects.get(
-            id=self.test_user_pk or "12345678-aaaa-bbbb-cccc-111122223333"
-        )
-        self.default_committee = CommitteeAccount.objects.get(
-            committee_id=self.test_committee_id or "C01234567"
-        )
+        self.default_user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
+        self.default_committee = CommitteeAccount.objects.get(committee_id="C01234567")
         self.factory = RequestFactory()
 
     def send_viewset_get_request_for_default(
