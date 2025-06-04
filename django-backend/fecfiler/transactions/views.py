@@ -29,6 +29,7 @@ from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
+from fecfiler.transactions.schedule_f.models import ScheduleF
 import structlog
 
 import os
@@ -700,6 +701,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         ).order_by("date", "created")
 
         previous_transaction = previous_transactions.first()
+        updated_schedule_fs = []
         for trans in to_update:
             previous_aggregate = 0
             if previous_transaction:
@@ -710,10 +712,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             trans.schedule_f.aggregate_general_elec_expended = (
                 trans.schedule_f.expenditure_amount + previous_aggregate
             )
-            trans.schedule_f.save()
+            updated_schedule_fs.append(trans.schedule_f)
             previous_transaction = trans
 
-        # queryset.bulk_update(to_update, ["aggregate"])
+        ScheduleF.objects.bulk_update(
+            updated_schedule_fs,
+            ["aggregate_general_elec_expended"]
+        )
 
 
 def noop(transaction, is_existing):
