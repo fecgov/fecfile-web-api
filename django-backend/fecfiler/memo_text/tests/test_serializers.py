@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .serializers import MemoTextSerializer
+from ..serializers import MemoTextSerializer
 from fecfiler.user.models import User
 from rest_framework.request import Request, HttpRequest
 from fecfiler.committee_accounts.models import CommitteeAccount

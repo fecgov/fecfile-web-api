@@ -194,7 +194,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 400)
 
-    def xtest_individual_lookup_happy_path(self):
+    def test_individual_lookup_happy_path(self):
         response = self.send_viewset_get_request_for_default(
             "/api/v1/contacts/individual_lookup?q=Lastname&max_fecfile_results=5",
             ContactViewSet,

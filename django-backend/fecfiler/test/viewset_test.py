@@ -22,6 +22,18 @@ class FecfilerViewSetTest(TestCase):
     ):
         return self.send_viewset_get_request(uri, viewset_class, action_name, **kwargs)
 
+    def send_viewset_get_request_for_committee(
+        self,
+        uri,
+        viewset_class,
+        action_name,
+        committee,
+        **kwargs,
+    ):
+        return self.send_viewset_get_request(
+            uri, viewset_class, action_name, committee=committee, **kwargs
+        )
+
     def send_viewset_get_request(
         self,
         uri,
