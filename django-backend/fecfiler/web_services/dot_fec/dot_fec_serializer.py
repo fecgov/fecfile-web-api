@@ -4,7 +4,7 @@ from fecfiler.settings import BASE_DIR
 from curses import ascii
 import os
 import json
-
+from fecfiler.settings import FEC_FORMAT_VERSION
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -149,7 +149,7 @@ def get_field_mappings(schema_name):
 
 
 def extract_row_config(schema_name):
-    schema = validate.get_schema(schema_name)
+    schema = validate.get_schema(schema_name, FEC_FORMAT_VERSION)
     schema_properties = schema.get("properties", {}).items()
     column_sequences = {
         v.get("fec_spec", {}).get("COL_SEQ", None): k for k, v in schema_properties
