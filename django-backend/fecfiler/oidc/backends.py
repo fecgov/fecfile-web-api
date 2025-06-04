@@ -56,9 +56,7 @@ class OIDCAuthenticationBackend(ModelBackend):
         """Helper method to return email address from claim."""
         retval = claims.get("email")
         if not retval:
-            msg = (
-                "Failed to retrieve email from claims"
-            )
+            msg = "Failed to retrieve email from claims"
             raise SuspiciousOperation(msg)
         return retval
 
@@ -230,7 +228,7 @@ class OIDCAuthenticationBackend(ModelBackend):
             "client_secret": settings.OIDC_RP_CLIENT_SECRET,
             "grant_type": "authorization_code",
             "code": code,
-            "redirect_uri": self.request.build_absolute_uri(reverse("oidc_callback")),
+            "redirect_uri": self.request.build_absolute_uri(reverse("oidc-callback")),
         }
 
         # Get the token
