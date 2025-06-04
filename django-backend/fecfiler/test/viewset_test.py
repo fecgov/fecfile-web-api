@@ -70,16 +70,13 @@ class FecfilerViewSetTest(TestCase):
         data,
         viewset_class,
         action_name,
+        headers={},
         authenticate=True,
         user=None,
         committee=None,
         **kwargs,
     ):
-        request = self.factory.post(
-            uri,
-            data,
-            content_type="application/json",
-        )
+        request = self.factory.post(uri, data, content_type="application/json", **headers)
         self.init_request(
             request, authenticate=authenticate, user=user, committee=committee
         )
