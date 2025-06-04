@@ -3,13 +3,16 @@ ENV PYTHONUNBUFFERED=1
 
 RUN mkdir /opt/nxg_fec
 WORKDIR /opt/nxg_fec
-ADD requirements.txt /opt
-ADD requirements-test.txt /opt
-RUN pip3 install -r /opt/requirements.txt && pip3 install -r /opt/requirements-test.txt
+COPY requirements.txt /opt
+COPY requirements-test.txt /opt
+RUN pip3 install -r /opt/requirements.txt && 
+    pip3 install -r /opt/requirements-test.txt && 
+    mv /etc/localtime /etc/localtime.backup && 
+    ln -s /usr/share/zoneinfo/EST5EDT /etc/localtime && 
+    useradd nxgu --no-create-home --home /opt/nxg_fec && 
+    chown -R nxgu:nxgu /opt/nxg_fec
 
-RUN mv /etc/localtime /etc/localtime.backup && ln -s /usr/share/zoneinfo/EST5EDT /etc/localtime
 
-RUN useradd nxgu --no-create-home --home /opt/nxg_fec && chown -R nxgu:nxgu /opt/nxg_fec
 USER nxgu
 
 EXPOSE 8080
