@@ -17,7 +17,7 @@ class CashOnHandYearlyViewSetTest(FecfilerViewSetTest):
     def test_no_override(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
         create_cash_on_hand_yearly(other_committee, "2024", 1)
-        response = self.send_viewset_get_request(
+        response = self.send_viewset_get_request_for_default(
             "/api/v1/cash_on_hand/year/2024/",
             CashOnHandYearlyViewSet,
             "cash_on_hand_for_year",
@@ -27,7 +27,7 @@ class CashOnHandYearlyViewSetTest(FecfilerViewSetTest):
 
     def test_get_override(self):
         create_cash_on_hand_yearly(self.committee, "2024", 1)
-        response = self.send_viewset_get_request(
+        response = self.send_viewset_get_request_for_default(
             "/api/v1/cash_on_hand/year/2024/",
             CashOnHandYearlyViewSet,
             "cash_on_hand_for_year",
@@ -37,7 +37,7 @@ class CashOnHandYearlyViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.data["cash_on_hand"], "1.00")
 
     def test_set_override(self):
-        response = self.send_viewset_post_request(
+        response = self.send_viewset_post_request_for_default(
             "/api/v1/cash_on_hand/year/2024/",
             {"cash_on_hand": 2},
             CashOnHandYearlyViewSet,
@@ -55,7 +55,7 @@ class CashOnHandYearlyViewSetTest(FecfilerViewSetTest):
         new_committee = CommitteeAccount.objects.create(committee_id="C00000000")
 
         for committee in (self.committee, new_committee):
-            response = self.send_viewset_post_request(
+            response = self.send_viewset_post_request_for_committee(
                 "/api/v1/cash_on_hand/year/2024/",
                 {"cash_on_hand": 2},
                 CashOnHandYearlyViewSet,
