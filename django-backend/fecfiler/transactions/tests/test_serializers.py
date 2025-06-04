@@ -103,6 +103,7 @@ class TransactionSerializerBaseTestCase(TestCase):
             None,
             schedule_data={
                 "expenditure_amount": 40,
+                "aggregate_general_elec_expended": 62
             }
         )
         transaction.aggregate = 62
