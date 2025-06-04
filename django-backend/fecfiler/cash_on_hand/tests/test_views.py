@@ -4,8 +4,6 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from .utils import create_cash_on_hand_yearly
 from fecfiler.test.viewset_test import FecfilerViewSetTest
 
-from fecfiler.user.models import User
-
 
 class CashOnHandYearlyViewSetTest(FecfilerViewSetTest):
     fixtures = ["C01234567_user_and_committee"]
