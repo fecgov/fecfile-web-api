@@ -39,7 +39,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             role=Membership.CommitteeRole.MANAGER,
             committee_account=self.committee,
         )
-        response = self.send_viewset_delete_request_for_default(
+        response = self.send_viewset_delete_request(
             f"/api/v1/committee-members/{manager_membership.id}/remove-member",
             CommitteeMembershipViewSet,
             "remove_member",
@@ -47,11 +47,11 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 200)
         count = Membership.objects.filter(pk=manager_membership.id).count()
-        self.assertEquals(count, 0)
+        self.assertEqual(count, 0)
 
     def test_cannot_delete_self(self):
         membership_uuid = UUID("136a21f2-66fe-4d56-89e9-0d1d4612741c")
-        response = self.send_viewset_delete_request_for_default(
+        response = self.send_viewset_delete_request(
             f"/api/v1/committee-members/{membership_uuid}/remove-member",
             CommitteeMembershipViewSet,
             "remove_member",
@@ -67,7 +67,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
             "email": "this_email_doesnt_match_any_preexisting_user@test.com",
         }
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/committee-members/add-member",
             post_data,
             CommitteeMembershipViewSet,
@@ -88,7 +88,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
             "email": "test_user_0001@fec.gov",
         }
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/committee-members/add-member",
             post_data,
             CommitteeMembershipViewSet,
@@ -106,7 +106,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
             "email": "TEST_USER_0001@fec.gov",
         }
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/committee-members/add-member",
             post_data,
             CommitteeMembershipViewSet,
@@ -121,7 +121,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         post_data = {
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
         }
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/committee-members/add-member",
             post_data,
             CommitteeMembershipViewSet,
@@ -131,7 +131,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.data, "Missing fields: email")
 
         post_data = {"email": "an_email@fec.gov"}
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/committee-members/add-member",
             post_data,
             CommitteeMembershipViewSet,
@@ -141,7 +141,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.data, "Missing fields: role")
 
         post_data = {"email": "an_email@fec.gov", "role": "A Random String"}
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/committee-members/add-member",
             post_data,
             CommitteeMembershipViewSet,
@@ -154,7 +154,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             "email": "test@fec.gov",
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
         }
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/committee-members/add-member",
             post_data,
             CommitteeMembershipViewSet,
@@ -168,7 +168,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
 
     def test_update_membership_unauthorized(self):
         user = User.objects.get(id="fb20ffc3-285e-448e-9e56-9ca1fd43e7d3")
-        response = self.send_viewset_put_request_for_user(
+        response = self.send_viewset_put_request(
             "/api/v1/committee-members/5e4ae4ff-60da-4522-a588-ccd97e124b01/",
             {
                 "id": "5e4ae4ff-60da-4522-a588-ccd97e124b01",
@@ -194,7 +194,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         )
 
     def test_update_membership_happy_path(self):
-        response = self.send_viewset_put_request_for_default(
+        response = self.send_viewset_put_request(
             "/api/v1/committee-members/5e4ae4ff-60da-4522-a588-ccd97e124b01/",
             {
                 "id": "5e4ae4ff-60da-4522-a588-ccd97e124b01",
@@ -235,7 +235,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
                 mock_requests.get = Mock()
                 mock_requests.get.return_value = mock_response
-                response = self.send_viewset_get_request_for_default(
+                response = self.send_viewset_get_request(
                     "/api/v1/committees/get-available-committee/?committee_id=C12345678",
                     CommitteeViewSet,
                     "get_available_committee",
@@ -253,7 +253,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
                 mock_requests.get = Mock()
                 mock_requests.get.return_value = mock_response
-                response = self.send_viewset_get_request_for_default(
+                response = self.send_viewset_get_request(
                     "/api/v1/committees/get-available-committee/?committee_id=C12345678",
                     CommitteeViewSet,
                     "get_available_committee",
@@ -275,7 +275,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                     "name": "TEST",
                     "email": "test@fec.gov",
                 }
-                response = self.send_viewset_get_request_for_default(
+                response = self.send_viewset_get_request(
                     "/api/v1/committees/get-available-committee/?committee_id=C12345678",
                     CommitteeViewSet,
                     "get_available_committee",

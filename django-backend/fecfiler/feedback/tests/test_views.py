@@ -48,7 +48,7 @@ class FeedbackViewSetTest(FecfilerViewSetTest):
     @mock.patch("fecfiler.feedback.views.logger")
     def test_csp_report_happy_path(self, mock_logger):
         test_data = {"type": "csp-violation"}
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/feedback/csp-report",
             test_data,
             FeedbackViewSet,
@@ -59,7 +59,7 @@ class FeedbackViewSetTest(FecfilerViewSetTest):
 
     @mock.patch("fecfiler.feedback.views.logger")
     def test_csp_report_no_data(self, mock_logger):
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/feedback/csp-report",
             {},
             FeedbackViewSet,
@@ -70,7 +70,7 @@ class FeedbackViewSetTest(FecfilerViewSetTest):
 
     @mock.patch("fecfiler.feedback.views.logger")
     def test_csp_report_invalid_type(self, mock_logger):
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/feedback/csp-report",
             {"type": 2},
             FeedbackViewSet,

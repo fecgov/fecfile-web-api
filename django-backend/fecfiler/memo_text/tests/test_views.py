@@ -21,7 +21,7 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
         )
 
     def test_get_memo_texts_for_report_id(self):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             f"/api/v1/memo-text/?report_id={self.q1_report.id}",
             MemoTextViewSet,
             "list",
@@ -45,7 +45,7 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
                 "transaction_uuid",
             ],
         }
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/memo-text/",
             data,
             MemoTextViewSet,
@@ -63,7 +63,7 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
             "transaction_id_number": "id_number",
             "transaction_uuid": None,
         }
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/memo-text/",
             data,
             MemoTextViewSet,
@@ -72,7 +72,7 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["text4000"], "test_existing_text")
 
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             f"/api/v1/memo-text/?report_id={self.q1_report.id}",
             MemoTextViewSet,
             "list",
@@ -82,11 +82,11 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
 
     def test_cannot_get_other_committee_memos(self):
         committee2 = CommitteeAccount.objects.create(committee_id="C00000001")
-        response = self.send_viewset_get_request_for_committee(
+        response = self.send_viewset_get_request(
             f"/api/v1/memo-text/?report_id={self.q1_report.id}",
             MemoTextViewSet,
             "list",
-            committee2,
+            committee=committee2,
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)

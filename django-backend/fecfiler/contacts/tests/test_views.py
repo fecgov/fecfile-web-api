@@ -59,7 +59,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
 
     @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_no_candidate_id(self, mock_get):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/candidate",
             ContactViewSet,
             "candidate",
@@ -69,7 +69,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
 
     @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate(self, mock_get):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/candidate?candidate_id=P60012143",
             ContactViewSet,
             "candidate",
@@ -93,7 +93,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
 
     @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_lookup_no_q(self, mock_get):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/candidate_lookup",
             ContactViewSet,
             "candidate_lookup",
@@ -102,7 +102,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
 
     @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_lookup_happy_path(self, mock_get):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/candidate_lookup?"
             "q=test&max_fecfile_results=5&max_fec_results=5&exclude_fec_ids=P60012143",
             ContactViewSet,
@@ -132,7 +132,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
 
     @patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_no_q(self, mock_get):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/committee_lookup",
             ContactViewSet,
             "committee_lookup",
@@ -141,7 +141,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
 
     @patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_happy_path(self, mock_get):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/committee_lookup?"
             "q=test&max_fecfile_results=5&max_fec_results=5",
             ContactViewSet,
@@ -187,7 +187,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
     def test_individual_lookup_no_q(self):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/individual_lookup",
             ContactViewSet,
             "individual_lookup",
@@ -195,7 +195,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.status_code, 400)
 
     def test_individual_lookup_happy_path(self):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/individual_lookup?q=Lastname&max_fecfile_results=5",
             ContactViewSet,
             "individual_lookup",
@@ -205,7 +205,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertIn(expected_json_fragment, str(response.content, encoding="utf8"))
 
     def test_organization_lookup_no_q(self):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/organization_lookup",
             ContactViewSet,
             "organization_lookup",
@@ -213,7 +213,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.status_code, 400)
 
     def test_organization_lookup_happy_path(self):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/organization_lookup?q=test&max_fecfile_results=5",
             ContactViewSet,
             "organization_lookup",
@@ -223,7 +223,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertIn(expected_json_fragment, str(response.content, encoding="utf8"))
 
     def test_get_contact_id_no_fec_id(self):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/get_contact_id/",
             ContactViewSet,
             "get_contact_id",
@@ -231,7 +231,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.status_code, 400)
 
     def test_get_contact_id_finds_contact(self):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/get_contact_id/?fec_id=test_fec_id",
             ContactViewSet,
             "get_contact_id",
@@ -240,7 +240,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.data, uuid.UUID("a03a141a-d2df-402c-93c6-e705ec6007f3"))
 
     def test_get_contact_id_no_match(self):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/get_contact_id/?fec_id=id_that_doesnt_exist",
             ContactViewSet,
             "get_contact_id",
@@ -249,7 +249,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.data, "")
 
     def test_get_committee_invalid(self):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/committee/",
             ContactViewSet,
             "committee",
@@ -268,7 +268,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
                 mock_response.json = Mock()
                 mock_response.json.return_value = {"results": [{"name": "TEST"}]}
                 mock_requests.get.return_value = mock_response
-                response = self.send_viewset_get_request_for_default(
+                response = self.send_viewset_get_request(
                     "/api/v1/contacts/committee/?committee_id=C12345678",
                     ContactViewSet,
                     "committee",
@@ -283,7 +283,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
                 self.assertEqual(data["name"], "TEST")
 
     def test_restore_no_match(self):
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/contacts-deleted/restore",
             ["a5061946-0000-0000-82f6-f1782c333d70"],
             DeletedContactsViewSet,
@@ -304,7 +304,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             id="a5061946-0000-0000-82f6-f1782c333d70"
         )
         self.assertIsNotNone(deleted_contact.deleted)
-        response = self.send_viewset_post_request_for_default(
+        response = self.send_viewset_post_request(
             "/api/v1/contacts-deleted/restore",
             ["a5061946-0000-0000-82f6-f1782c333d70"],
             DeletedContactsViewSet,
@@ -320,7 +320,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             first_name="First",
             committee_account_id="11111111-2222-3333-4444-555555555555",
         )
-        response = self.send_viewset_put_request_for_default(
+        response = self.send_viewset_put_request(
             "/api/v1/contacts/{str(contact.id)}/",
             {
                 "first_name": "Other",
@@ -344,7 +344,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             create_test_individual_contact(
                 f"last{i}", f"first{i}", "11111111-2222-3333-4444-555555555555"
             )
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts?page=1",
             ContactViewSet,
             "list",
@@ -352,7 +352,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertEqual(len(response.data["results"]), 10)
 
     def test_list_no_pagination(self):
-        response = self.send_viewset_get_request_for_default(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts",
             ContactViewSet,
             "list",
