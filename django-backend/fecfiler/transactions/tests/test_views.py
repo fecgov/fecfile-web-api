@@ -1,5 +1,4 @@
 from decimal import Decimal
-from django.test.client import RequestFactory
 from rest_framework import status
 from rest_framework.request import HttpRequest, Request
 from fecfiler.user.models import User
@@ -39,7 +38,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         return super().setUpClass()
 
     def setUp(self):
-        self.factory = RequestFactory()
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.user = User.objects.create(email="test@fec.gov", username="gov")
         super().setUp(self.user, self.committee)
