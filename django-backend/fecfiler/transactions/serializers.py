@@ -100,6 +100,9 @@ class TransactionSerializer(
     calendar_ytd_per_election_office = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )
+    aggregate_general_elec_expended = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True
+    )
     balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_payment_to_date = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     loan_balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
@@ -152,6 +155,7 @@ class TransactionSerializer(
                 "debt_incurred_amount",
                 "aggregate",
                 "calendar_ytd_per_election_office",
+                "aggregate_general_elec_expended",
                 "loan_payment_to_date",
                 "balance",
                 "loan_balance",
@@ -326,9 +330,6 @@ class TransactionSerializer(
         schedule_f = representation.pop("schedule_f")
         if not schedule_f:
             return
-        representation[
-            "aggregate_general_elec_expended"
-        ] = representation.get("aggregate")
 
         add_schedule_f_contact_fields(instance, representation)
 
