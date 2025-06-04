@@ -27,10 +27,15 @@ class FecfilerViewSetTest(TestCase):
         uri,
         viewset_class,
         action_name,
+        authenticate=True,
+        user=None,
+        committee=None,
         **kwargs,
     ):
         request = self.factory.get(uri)
-        self.init_request(request)
+        self.init_request(
+            request, authenticate=authenticate, user=user, committee=committee
+        )
         response = viewset_class.as_view({"get": action_name})(request, **kwargs)
         return response
 
@@ -70,7 +75,11 @@ class FecfilerViewSetTest(TestCase):
         committee=None,
         **kwargs,
     ):
-        request = self.factory.post(uri, data)
+        request = self.factory.post(
+            uri,
+            data,
+            content_type="application/json",
+        )
         self.init_request(
             request, authenticate=authenticate, user=user, committee=committee
         )
@@ -81,34 +90,31 @@ class FecfilerViewSetTest(TestCase):
         self,
         uri,
         data,
-        content_type,
         viewset_class,
         action_name,
         **kwargs,
     ):
         return self.send_viewset_put_request(
-            uri, data, content_type, viewset_class, action_name, **kwargs
+            uri, data, viewset_class, action_name, **kwargs
         )
 
     def send_viewset_put_request_for_user(
         self,
         uri,
         data,
-        content_type,
         viewset_class,
         action_name,
         user,
         **kwargs,
     ):
         return self.send_viewset_put_request(
-            uri, data, content_type, viewset_class, action_name, user=user, **kwargs
+            uri, data, viewset_class, action_name, user=user, **kwargs
         )
 
     def send_viewset_put_request(
         self,
         uri,
         data,
-        content_type,
         viewset_class,
         action_name,
         authenticate=True,
@@ -116,7 +122,11 @@ class FecfilerViewSetTest(TestCase):
         committee=None,
         **kwargs,
     ):
-        request = self.factory.put(uri, data, content_type)
+        request = self.factory.put(
+            uri,
+            data,
+            content_type="application/json",
+        )
         self.init_request(
             request, authenticate=authenticate, user=user, committee=committee
         )
@@ -137,10 +147,15 @@ class FecfilerViewSetTest(TestCase):
         uri,
         viewset_class,
         action_name,
+        authenticate=True,
+        user=None,
+        committee=None,
         **kwargs,
     ):
         request = self.factory.delete(uri)
-        self.init_request(request)
+        self.init_request(
+            request, authenticate=authenticate, user=user, committee=committee
+        )
         response = viewset_class.as_view({"delete": action_name})(request, **kwargs)
         return response
 
