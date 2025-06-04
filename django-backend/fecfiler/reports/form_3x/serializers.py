@@ -1,5 +1,5 @@
 from django.db import transaction
-from fecfiler.reports.models import Report
+from fecfiler.reports.models import Report, ReportTransaction
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.serializers import (
     ReportSerializer,
@@ -13,14 +13,25 @@ from rest_framework.serializers import (
     DateField,
     BooleanField,
 )
+from rest_framework.serializers import ValidationError
 import structlog
 
 logger = structlog.get_logger(__name__)
+
+COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS = ValidationError(
+    {
+        "coverage_from_date_and_coverage_to_date": [
+            "Coverage date(s) exclude existing transaction(s) for report"
+        ]
+    }
+)
 
 
 class Form3XSerializer(ReportSerializer):
     schema_name = "F3X"
 
+    filing_frequency = CharField(required=False, allow_null=True)
+    report_type_category = CharField(required=False, allow_null=True)
     change_of_address = BooleanField(required=False, allow_null=True)
     election_code = CharField(required=False, allow_null=True)
     date_of_election = DateField(required=False, allow_null=True)
@@ -348,6 +359,16 @@ class Form3XSerializer(ReportSerializer):
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
+            # Check if there are any transactions that fall outside the coverage dates
+            transactions_outside_coverage_dates = ReportTransaction.objects.filter(
+                ~Q(transaction__memo_code=True),
+                self.get_transaction_date_outside_coverage_dates_clause(),
+                transaction__deleted=None,
+                report_id=instance.id,
+            ).count()
+            if transactions_outside_coverage_dates > 0:
+                raise COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS
+
             for attr, value in validated_data.items():
                 if attr != "id":
                     setattr(instance.form_3x, attr, value)
@@ -377,6 +398,60 @@ class Form3XSerializer(ReportSerializer):
             "fields_to_ignore", ["filer_committee_id_number"]
         )
         return super().validate(data)
+
+    def get_transaction_date_outside_coverage_dates_clause(self):
+        """Returns a clause that checks if the transaction date is outside
+        the coverage dates for the report.
+        """
+        from_date = self.validated_data["coverage_from_date"]
+        through_date = self.validated_data["coverage_through_date"]
+        return Q(
+            Q(
+                Q(transaction__schedule_a__isnull=False),
+                Q(
+                    Q(transaction__schedule_a__contribution_date__lt=from_date)
+                    | Q(transaction__schedule_a__contribution_date__gt=through_date)
+                ),
+            )
+            | Q(
+                Q(transaction__schedule_b__isnull=False),
+                Q(
+                    Q(transaction__schedule_b__expenditure_date__lt=from_date)
+                    | Q(transaction__schedule_b__expenditure_date__gt=through_date)
+                ),
+            )
+            | Q(
+                Q(
+                    transaction__schedule_c__isnull=False,
+                    transaction__loan_id__isnull=True,
+                ),
+                Q(
+                    Q(transaction__schedule_c__loan_incurred_date__lt=from_date)
+                    | Q(transaction__schedule_c__loan_incurred_date__gt=through_date)
+                ),
+            )
+            | Q(
+                Q(transaction__schedule_e__isnull=False),
+                Q(
+                    Q(transaction__schedule_e__disbursement_date__lt=from_date)
+                    | Q(transaction__schedule_e__disbursement_date__gt=through_date)
+                ),
+            )
+            | Q(
+                Q(transaction__schedule_e__isnull=False),
+                Q(
+                    Q(transaction__schedule_e__dissemination_date__lt=from_date)
+                    | Q(transaction__schedule_e__dissemination_date__gt=through_date)
+                ),
+            )
+            | Q(
+                Q(transaction__schedule_f__isnull=False),
+                Q(
+                    Q(transaction__schedule_f__expenditure_date__lt=from_date)
+                    | Q(transaction__schedule_f__expenditure_date__gt=through_date)
+                ),
+            )
+        )
 
     class Meta(ReportSerializer.Meta):
         fields = (

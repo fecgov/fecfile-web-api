@@ -7,7 +7,7 @@ django-cors-headers==4.7.0
 django-deprecate-fields==0.2.1
 django-migration-linter==5.2.0
 django-structlog==9.1.1
-Django==5.2.0
+Django==5.2.1
 djangorestframework==3.16.0
 drf-spectacular==0.28.0
 git+https://github.com/fecgov/fecfile-validate@41cb8476d9b3fc56ebf2b2b9baf439065c902f5e#egg=fecfile_validate&subdirectory=fecfile_validate_python

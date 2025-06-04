@@ -15,13 +15,13 @@ class CommitteeAccountTestCase(TestCase):
 
     def test_get_contact(self):
         committee_account = CommitteeAccount.objects.get(committee_id="C12345678")
-        self.assertEquals(committee_account.committee_id, "C12345678")
+        self.assertEqual(committee_account.committee_id, "C12345678")
 
     def test_save_and_delete(self):
         self.valid_committee_account.save()
         committee_account_from_db = CommitteeAccount.objects.get(committee_id="C87654321")
         self.assertIsInstance(committee_account_from_db, CommitteeAccount)
-        self.assertEquals(committee_account_from_db.committee_id, "C87654321")
+        self.assertEqual(committee_account_from_db.committee_id, "C87654321")
         committee_account_from_db.delete()
         self.assertRaises(
             CommitteeAccount.DoesNotExist,
@@ -32,7 +32,7 @@ class CommitteeAccountTestCase(TestCase):
         soft_deleted_committee_account = CommitteeAccount.all_objects.get(
             committee_id="C87654321"
         )
-        self.assertEquals(soft_deleted_committee_account.committee_id, "C87654321")
+        self.assertEqual(soft_deleted_committee_account.committee_id, "C87654321")
         self.assertIsNotNone(soft_deleted_committee_account.deleted)
         soft_deleted_committee_account.hard_delete()
         self.assertRaises(

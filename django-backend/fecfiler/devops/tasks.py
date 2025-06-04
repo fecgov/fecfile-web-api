@@ -2,9 +2,14 @@ from django.db import connection
 from celery import shared_task
 from datetime import datetime, timedelta
 from .utils.redis_utils import set_redis_value, get_redis_value
-from fecfiler.settings import SYSTEM_STATUS_CACHE_AGE, AWS_STORAGE_BUCKET_NAME
+from fecfiler.settings import (
+    SYSTEM_STATUS_CACHE_AGE,
+    AWS_STORAGE_BUCKET_NAME,
+    S3_OBJECTS_MAX_AGE_DAYS,
+)
 from fecfiler.s3 import S3_SESSION
 import structlog
+from django.utils import timezone
 
 logger = structlog.get_logger(__name__)
 
@@ -38,6 +43,28 @@ def get_devops_status_report():
 
     if S3_SESSION is not None:
         log_s3_bucket_size()
+
+
+@shared_task
+def delete_expired_s3_objects():
+    bucket = S3_SESSION.Bucket(AWS_STORAGE_BUCKET_NAME)
+    object_expiry_datetime = timezone.now() - timedelta(days=S3_OBJECTS_MAX_AGE_DAYS)
+    keys_to_delete = [
+        {"Key": object["key"]}
+        for object in bucket.objects.all()
+        if object["last_modified"] < object_expiry_datetime
+    ]
+    delete_count = len(keys_to_delete)
+    if delete_count > 0:
+        logger.info(
+            f"Deleting {delete_count} S3 objects older than "
+            f"{S3_OBJECTS_MAX_AGE_DAYS} days"
+        )
+        bucket.delete_objects(Delete={"Objects": keys_to_delete})
+    else:
+        logger.info(
+            f"No S3 objects older than {S3_OBJECTS_MAX_AGE_DAYS} days to clean up"
+        )
 
 
 def check_database_size():
