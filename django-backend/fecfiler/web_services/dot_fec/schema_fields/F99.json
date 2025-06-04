@@ -22,7 +22,6 @@
         "path": "form_99.filing_frequency"
     },
     "pdf_attachment": {
-        "serializer": "FIXED_VALUE",
-        "value": ""
+        "path": "form_99.pdf_attachment"
     }
 }
