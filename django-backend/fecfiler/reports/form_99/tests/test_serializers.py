@@ -19,6 +19,7 @@ class F99SerializerTestCase(TestCase):
             "treasurer_first_name": "George",
             "date_signed": "2023-11-1",
             "text_code": "MSM",
+            "filing_frequency": "Q",
             "message_text": "A message to FEC",
             "fields_to_validate": [f.name for f in Form99._meta.get_fields()],
         }

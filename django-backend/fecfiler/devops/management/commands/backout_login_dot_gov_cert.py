@@ -1,29 +1,22 @@
-from django.core.management.base import BaseCommand
 from fecfiler.devops.utils.login_dot_gov_cert_utils import backout_login_dot_gov_cert
+from .fecfile_base import FECCommand
 
 
-class Command(BaseCommand):
+class Command(FECCommand):
     help = "Backout certificate"
+    command_name = "backout_login_dot_gov_cert"
 
     def add_arguments(self, parser):
         parser.add_argument("cf_token", type=str)
+        parser.add_argument("cf_organization_name", type=str)
         parser.add_argument("cf_space_name", type=str)
         parser.add_argument("cf_service_instance_name", type=str)
 
-    def handle(self, *args, **options):
-        try:
-            cf_token = options["cf_token"]
-            cf_space_name = options["cf_space_name"]
-            cf_service_instance_name = options["cf_service_instance_name"]
-
-            self.stdout.write(
-                self.style.NOTICE("STARTING backout_login_dot_gov_cert command")
-            )
-            backout_login_dot_gov_cert(cf_token, cf_space_name, cf_service_instance_name)
-            self.stdout.write(
-                self.style.NOTICE("FINISHED backout_login_dot_gov_cert command")
-            )
-        except Exception:
-            self.stdout.write(
-                self.style.ERROR("FAILED to execute backout_login_dot_gov_cert command")
-            )
+    def command(self, *args, **options):
+        cf_token = options["cf_token"]
+        cf_organization_name = options["cf_organization_name"]
+        cf_space_name = options["cf_space_name"]
+        cf_service_instance_name = options["cf_service_instance_name"]
+        backout_login_dot_gov_cert(
+            cf_token, cf_organization_name, cf_space_name, cf_service_instance_name
+        )

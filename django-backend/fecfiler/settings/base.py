@@ -175,7 +175,10 @@ OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
 
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 FFAPI_LOGIN_DOT_GOV_COOKIE_NAME = "ffapi_login_dot_gov"
-FFAPI_TIMEOUT_COOKIE_NAME = "ffapi_timeout"
+FFAPI_TIMEOUT_COOKIE_NAME = env.get_credential("FFAPI_TIMEOUT_COOKIE_NAME", "False")
+if not FFAPI_TIMEOUT_COOKIE_NAME:
+    raise Exception("FFAPI_TIMEOUT_COOKIE_NAME is not set!")
+
 
 LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
 LOGIN_REDIRECT_CLIENT_URL = env.get_credential("LOGIN_REDIRECT_CLIENT_URL")
@@ -230,6 +233,7 @@ def get_logging_config(log_format=LINE):
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.dict_tracebacks,
                     structlog.processors.JSONRenderer(),
                 ],
             },
@@ -237,6 +241,7 @@ def get_logging_config(log_format=LINE):
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.dict_tracebacks,
                     structlog.dev.ConsoleRenderer(
                         colors=True, exception_formatter=structlog.dev.rich_traceback
                     ),
@@ -249,6 +254,7 @@ def get_logging_config(log_format=LINE):
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.dict_tracebacks,
                     structlog.processors.ExceptionRenderer(),
                     structlog.processors.KeyValueRenderer(
                         key_order=["level", "event", "logger"]
@@ -357,6 +363,14 @@ CELERY_BEAT_SCHEDULE = {
             "priority": 1,  # 0-9; 0 is the highest priority; 5 is the default
         },
     },
+    "delete_expired_s3_objects": {
+        "task": "fecfiler.devops.tasks.delete_expired_s3_objects",
+        "schedule": 86400.0,  # Once per day
+        "args": (),
+        "options": {
+            "expires": 15.0,
+        },
+    },
 }
 
 """FEC Webload settings
@@ -405,7 +419,9 @@ AWS_ACCESS_KEY_ID = env.get_credential("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
 AWS_REGION = env.get_credential("AWS_REGION")
-
+S3_OBJECTS_MAX_AGE_DAYS = get_float_from_string(
+    env.get_credential("S3_OBJECTS_MAX_AGE_DAYS", 365)
+)
 
 """FEATURE FLAGS
 """
