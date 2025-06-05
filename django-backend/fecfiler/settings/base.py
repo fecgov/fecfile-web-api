@@ -89,7 +89,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
-    # "fecfiler.oidc.middleware.TimeoutMiddleware.TimeoutMiddleware",
+    "fecfiler.oidc.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

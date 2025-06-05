@@ -39,14 +39,17 @@ def custom_exception_handler(exc, context):
 
 @silk_profile(name="save_copy")
 def save_copy(instance, data={}, links={}):
+    print(f"saving copy {instance.id}")
     if instance:
         for field, value in data.items():
+            print(f"setting field {field} to {value}")
             setattr(instance, field, value)
         instance.pk = None
         instance.id = None
         instance._state.adding = True
         instance.save()
         for link_name, link in links.items():
+            print(f"setting link {link_name} to {link}")
             getattr(instance, link_name).set(link)
         return instance
     return None
