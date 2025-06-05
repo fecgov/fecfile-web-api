@@ -49,9 +49,11 @@ fecfiler.reports.form\_99.models.Form99
 
    .. autosummary::
    
+      ~Form99.filing_frequency
       ~Form99.id
       ~Form99.message_text
       ~Form99.objects
+      ~Form99.pdf_attachment
       ~Form99.pk
       ~Form99.report_set
       ~Form99.text_code

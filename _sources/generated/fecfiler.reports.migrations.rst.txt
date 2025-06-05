@@ -47,4 +47,5 @@ fecfiler.reports.migrations
    fecfiler.reports.migrations.0014_form99_swap_text_code
    fecfiler.reports.migrations.0015_form3x_filing_frequency_form3x_report_type_category
    fecfiler.reports.migrations.0016_determine_frequency_and_category
+   fecfiler.reports.migrations.0017_form99_filing_frequency_form99_pdf_attachment
 
