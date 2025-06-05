@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reports', '0014_form99_swap_text_code'),
+        ("reports", "0016_determine_frequency_and_category"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='form99',
-            name='filing_frequency',
+            model_name="form99",
+            name="filing_frequency",
             field=models.TextField(blank=True, max_length=1, null=True),
         ),
         migrations.AddField(
-            model_name='form99',
-            name='pdf_attachment',
+            model_name="form99",
+            name="pdf_attachment",
             field=models.BooleanField(blank=True, null=True),
         ),
     ]
