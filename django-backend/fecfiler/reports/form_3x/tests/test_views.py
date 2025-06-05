@@ -1,19 +1,18 @@
-from django.test import TestCase, RequestFactory
-
 from fecfiler.reports.models import Report
 from ..views import Form3XViewSet
 from ..models import Form3X
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
-from rest_framework.test import force_authenticate
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
 
-class Form3XViewSetTest(TestCase):
+class Form3XViewSetTest(FecfilerViewSetTest):
 
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        self.user = User.objects.create(email="test@fec.gov", username="gov")
+        user = User.objects.create(email="test@fec.gov", username="gov")
+        super().setUp(default_user=user, default_committee=self.committee)
         self.q1_report = create_form3x(
             self.committee,
             "2004-01-01",
@@ -46,18 +45,14 @@ class Form3XViewSetTest(TestCase):
             {},
             "12C",
         )
-        self.factory = RequestFactory()
 
     def test_coverage_dates_happy_path(self):
         self.assertEqual(True, True)
-        request = self.factory.get("/api/v1/reports/form-f3x/coverage_dates")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
-
-        response = Form3XViewSet.as_view({"get": "coverage_dates"})(request)
+        response = self.send_viewset_get_request(
+            "/api/v1/reports/form-f3x/coverage_dates",
+            Form3XViewSet,
+            "coverage_dates",
+        )
 
         expected_json = [
             {
@@ -86,15 +81,13 @@ class Form3XViewSetTest(TestCase):
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
     def test_amend(self):
-        request = self.factory.post(f"/api/v1/reports/{self.q1_report.id}/amend/")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
-        force_authenticate(request, self.user)
-        view = Form3XViewSet.as_view({"post": "amend"})
-        response = view(request, pk=self.q1_report.id)
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{self.q1_report.id}/amend/",
+            {},
+            Form3XViewSet,
+            "amend",
+            pk=self.q1_report.id,
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             Report.objects.filter(id=self.q1_report.id).first().form_type,
@@ -102,14 +95,8 @@ class Form3XViewSetTest(TestCase):
         )
 
     def test_final(self):
-        request = self.factory.get("/api/v1/reports/form-f3x/final")
-        request.user = self.user
+        request = self.build_viewset_get_request("/api/v1/reports/form-f3x/final")
         request.query_params = {"year": "2004"}
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
-        force_authenticate(request, self.user)
         view = Form3XViewSet.as_view({"get": "get_final_report"})
         view.request = request
         view.request.GET = {"year": "2004"}
