@@ -12,7 +12,10 @@ class Form3XViewSetTest(FecfilerViewSetTest):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         user = User.objects.create(email="test@fec.gov", username="gov")
-        super().setUp(default_user=user, default_committee=self.committee)
+        super().set_default_user(user)
+        super().set_default_committee(self.committee)
+        super().setUp()
+
         self.q1_report = create_form3x(
             self.committee,
             "2004-01-01",

@@ -15,7 +15,9 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         user = User.objects.create(email="test@fec.gov", username="gov")
-        super().setUp(default_user=user, default_committee=self.committee)
+        super().set_default_user(user)
+        super().set_default_committee(self.committee)
+        super().setUp()
 
     def test_list_paginated(self):
         for _ in range(10):

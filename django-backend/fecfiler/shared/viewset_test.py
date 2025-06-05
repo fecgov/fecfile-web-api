@@ -7,12 +7,20 @@ from fecfiler.user.models import User
 
 class FecfilerViewSetTest(TestCase):
     fixtures = ["C01234567_user_and_committee"]
+    default_user = None
+    default_committee = None
 
-    def setUp(self, default_user=None, default_committee=None):
-        self.default_user = default_user or User.objects.get(
+    def set_default_user(self, default_user):
+        self.default_user = default_user
+
+    def set_default_committee(self, default_committee):
+        self.default_committee = default_committee
+
+    def setUp(self):
+        self.default_user = self.default_user or User.objects.get(
             id="12345678-aaaa-bbbb-cccc-111122223333"
         )
-        self.default_committee = default_committee or CommitteeAccount.objects.get(
+        self.default_committee = self.default_committee or CommitteeAccount.objects.get(
             committee_id="C01234567"
         )
         self.factory = RequestFactory()

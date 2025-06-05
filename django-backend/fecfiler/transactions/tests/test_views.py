@@ -40,7 +40,9 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.user = User.objects.create(email="test@fec.gov", username="gov")
-        super().setUp(self.user, self.committee)
+        super().set_default_user(self.user)
+        super().set_default_committee(self.committee)
+        super().setUp()
 
         self.q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.q2_report = create_form3x(self.committee, "2024-02-02", "2024-03-01", {})
