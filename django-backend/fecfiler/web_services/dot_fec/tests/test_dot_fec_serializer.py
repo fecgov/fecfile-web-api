@@ -84,11 +84,11 @@ class DotFECSerializerTestCase(TestCase):
         serialized_text = serialize_field(
             self.f3x, "treasurer_last_name", f3x_field_mappings
         )
-        self.assertEquals(serialized_text, "Lastname")
+        self.assertEqual(serialized_text, "Lastname")
         serialized_text_undefined = serialize_field(
             Report(), "treasurer_last_name", f3x_field_mappings
         )
-        self.assertEquals(serialized_text_undefined, "")
+        self.assertEqual(serialized_text_undefined, "")
 
         # NUMERIC
         serialized_numeric = serialize_field(

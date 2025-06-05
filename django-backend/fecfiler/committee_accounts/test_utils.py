@@ -43,13 +43,13 @@ class CommitteeAccountsUtilsTest(TestCase):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
-            self.assertEquals(account.committee_id, "C12345678")
+            self.assertEqual(account.committee_id, "C12345678")
 
     def test_create_committee_account_existing(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
-            self.assertEquals(account.committee_id, "C12345678")
+            self.assertEqual(account.committee_id, "C12345678")
             self.assertRaisesMessage(
                 Exception,
                 self.create_error_message,
@@ -74,7 +74,7 @@ class CommitteeAccountsUtilsTest(TestCase):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             self.test_user.email = self.test_user.email.upper()
             account = create_committee_account("C12345678", self.test_user)
-            self.assertEquals(account.committee_id, "C12345678")
+            self.assertEqual(account.committee_id, "C12345678")
             self.assertRaisesMessage(
                 Exception,
                 self.create_error_message,
@@ -92,9 +92,7 @@ class CommitteeAccountsUtilsTest(TestCase):
     def test_no_match(self):
         f1_emails = "email1@example.com;email2@example.com"
         result = check_email_match("email3@example.com", f1_emails)
-        self.assertEqual(
-            result, "email does not match committee email"
-        )
+        self.assertEqual(result, "email does not match committee email")
 
     def test_match_semicolon(self):
         f1_emails = "email1@example.com;email2@example.com"

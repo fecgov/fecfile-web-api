@@ -123,11 +123,11 @@ class F1MSerializerTestCase(TestCase):
 
         add_form_1m_contact_fields(form_1m, representation)
 
-        self.assertEquals(
+        self.assertEqual(
             representation["affiliated_committee_name"], "Affiliated Committee"
         )
-        self.assertEquals(representation["I_candidate_last_name"], "last name I")
-        self.assertEquals(representation["II_candidate_last_name"], "last name II")
-        self.assertEquals(representation["III_candidate_last_name"], "last name III")
-        self.assertEquals(representation["IV_candidate_last_name"], "last name IV")
-        self.assertEquals(representation["V_candidate_last_name"], "last name V")
+        self.assertEqual(representation["I_candidate_last_name"], "last name I")
+        self.assertEqual(representation["II_candidate_last_name"], "last name II")
+        self.assertEqual(representation["III_candidate_last_name"], "last name III")
+        self.assertEqual(representation["IV_candidate_last_name"], "last name IV")
+        self.assertEqual(representation["V_candidate_last_name"], "last name V")

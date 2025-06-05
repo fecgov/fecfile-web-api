@@ -22,7 +22,7 @@ class MemoTextTestCase(TestCase):
     def test_get_memo_text(self):
         self.valid_memo_text.save()
         memo_text = MemoText.objects.get(id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b")
-        self.assertEquals(memo_text.text4000, "tessst4")
+        self.assertEqual(memo_text.text4000, "tessst4")
 
     def test_save_and_delete(self):
         self.valid_memo_text.save()
@@ -30,8 +30,8 @@ class MemoTextTestCase(TestCase):
             id="94777fb3-6d3a-4e2c-87dc-5e6ed326e65b"
         )
         self.assertIsInstance(memo_text_from_db, MemoText)
-        self.assertEquals(
+        self.assertEqual(
             memo_text_from_db.id, uuid.UUID("94777fb3-6d3a-4e2c-87dc-5e6ed326e65b")
         )
-        self.assertEquals(memo_text_from_db.transaction_id_number, "REPORT_MEMO_TEXT1")
-        self.assertEquals(memo_text_from_db.text4000, "tessst4")
+        self.assertEqual(memo_text_from_db.transaction_id_number, "REPORT_MEMO_TEXT1")
+        self.assertEqual(memo_text_from_db.text4000, "tessst4")
