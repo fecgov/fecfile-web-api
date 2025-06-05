@@ -1,7 +1,5 @@
 from uuid import UUID
 from rest_framework.status import HTTP_400_BAD_REQUEST
-from rest_framework.test import APIClient
-from django.test import RequestFactory, TestCase
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.committee_accounts.views import (
     CommitteeMembershipViewSet,
@@ -11,24 +9,21 @@ from fecfiler.committee_accounts.views import (
 from fecfiler.user.models import User
 from unittest.mock import Mock, patch
 from fecfiler.routers import get_all_routers
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
+
 import structlog
-from rest_framework.test import force_authenticate
 
 logger = structlog.get_logger(__name__)
 
 
-class CommitteeMemberViewSetTest(TestCase):
+class CommitteeMemberViewSetTest(FecfilerViewSetTest):
     fixtures = ["C01234567_user_and_committee", "unaffiliated_users"]
 
     def setUp(self):
-        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
-        self.factory = RequestFactory()
+        super().setUp()
         self.committee = CommitteeAccount.objects.filter(
             id="11111111-2222-3333-4444-555555555555"
         ).first()
-
-        client = APIClient()
-        client.force_authenticate(user=self.user)
 
     def tearDown(self):
         Membership.objects.all().delete()
@@ -44,58 +39,40 @@ class CommitteeMemberViewSetTest(TestCase):
             role=Membership.CommitteeRole.MANAGER,
             committee_account=self.committee,
         )
-        view = CommitteeMembershipViewSet()
-        request = self.factory.get(
-            f"/api/v1/committee-members/{manager_membership.id}/remove-member"
+        response = self.send_viewset_delete_request(
+            f"/api/v1/committee-members/{manager_membership.id}/remove-member",
+            CommitteeMembershipViewSet,
+            "remove_member",
+            pk=manager_membership.id,
         )
-        request.user = self.user
-        request.session = {
-            "committee_uuid": self.committee.id,
-            "committee_id": self.committee.committee_id,
-        }
-        request.method = "DELETE"
-        request.query_params = dict()
-        view.kwargs = {"pk": manager_membership.id}
-        view.request = request
-        response = view.remove_member(request, manager_membership.id)
         self.assertEqual(response.status_code, 200)
+        count = Membership.objects.filter(pk=manager_membership.id).count()
+        self.assertEqual(count, 0)
 
     def test_cannot_delete_self(self):
         membership_uuid = UUID("136a21f2-66fe-4d56-89e9-0d1d4612741c")
-        view = CommitteeMembershipViewSet()
-        request = self.factory.get(
-            f"/api/v1/committee-members/{membership_uuid}/remove-member"
+        response = self.send_viewset_delete_request(
+            f"/api/v1/committee-members/{membership_uuid}/remove-member",
+            CommitteeMembershipViewSet,
+            "remove_member",
+            pk=membership_uuid,
         )
-        request.user = self.user
-        request.session = {
-            "committee_uuid": self.committee.id,
-            "committee_id": self.committee.committee_id,
-        }
-        request.method = "DELETE"
-        request.query_params = dict()
-        view.kwargs = {"pk": membership_uuid}
-        view.request = request
-        response = view.remove_member(request, membership_uuid)
         self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
         self.assertEqual(
             response.data["error"], "You cannot remove yourself from the committee."
         )
 
     def test_add_pending_membership(self):
-        view = CommitteeMembershipViewSet()
-        request = self.factory.get("/api/v1/committee-members/add-member")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": self.committee.id,
-            "committee_id": self.committee.committee_id,
-        }
-        request.method = "POST"
-        request.data = {
+        post_data = {
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
             "email": "this_email_doesnt_match_any_preexisting_user@test.com",
         }
-        view.request = request
-        response = view.add_member(request)
+        response = self.send_viewset_post_request(
+            "/api/v1/committee-members/add-member",
+            post_data,
+            CommitteeMembershipViewSet,
+            "add_member",
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -107,21 +84,16 @@ class CommitteeMemberViewSetTest(TestCase):
     def test_add_membership_for_preexisting_user(self):
         # This test covers a bug found by QA where adding a membership
         # for a pre-existing user was triggering a 500 server error
-
-        view = CommitteeMembershipViewSet()
-        request = self.factory.get("/api/v1/committee-members/add-member")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": self.committee.id,
-            "committee_id": self.committee.committee_id,
-        }
-        request.method = "POST"
-        request.data = {
+        post_data = {
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
             "email": "test_user_0001@fec.gov",
         }
-        view.request = request
-        response = view.add_member(request)
+        response = self.send_viewset_post_request(
+            "/api/v1/committee-members/add-member",
+            post_data,
+            CommitteeMembershipViewSet,
+            "add_member",
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["email"], "test_user_0001@fec.gov")
@@ -130,62 +102,64 @@ class CommitteeMemberViewSetTest(TestCase):
     def test_add_membership_for_preexisting_user_email_case_test(self):
         # This test covers a bug found where the email entered is treated
         # as case when determining membership when it should not be.
-
-        view = CommitteeMembershipViewSet()
-        request = self.factory.get("/api/v1/committee-members/add-member")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": self.committee.id,
-            "committee_id": self.committee.committee_id,
-        }
-        request.method = "POST"
-        request.data = {
+        post_data = {
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
             "email": "TEST_USER_0001@fec.gov",
         }
-        view.request = request
-        response = view.add_member(request)
+        response = self.send_viewset_post_request(
+            "/api/v1/committee-members/add-member",
+            post_data,
+            CommitteeMembershipViewSet,
+            "add_member",
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["email"], "test_user_0001@fec.gov")
         self.assertEqual(response.data["is_active"], True)
 
     def test_add_membership_requires_correct_parameters(self):
-        view = CommitteeMembershipViewSet()
-        request = self.factory.get("/api/v1/committee-members/add-member")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": self.committee.id,
-            "committee_id": self.committee.committee_id,
-        }
-        request.method = "POST"
-
-        request.data = {
+        post_data = {
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
         }
-        view.request = request
-        response = view.add_member(request)
+        response = self.send_viewset_post_request(
+            "/api/v1/committee-members/add-member",
+            post_data,
+            CommitteeMembershipViewSet,
+            "add_member",
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, "Missing fields: email")
 
-        request.data = {"email": "an_email@fec.gov"}
-        view.request = request
-        response = view.add_member(request)
+        post_data = {"email": "an_email@fec.gov"}
+        response = self.send_viewset_post_request(
+            "/api/v1/committee-members/add-member",
+            post_data,
+            CommitteeMembershipViewSet,
+            "add_member",
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, "Missing fields: role")
 
-        request.data = {"email": "an_email@fec.gov", "role": "A Random String"}
-        view.request = request
-        response = view.add_member(request)
+        post_data = {"email": "an_email@fec.gov", "role": "A Random String"}
+        response = self.send_viewset_post_request(
+            "/api/v1/committee-members/add-member",
+            post_data,
+            CommitteeMembershipViewSet,
+            "add_member",
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, "Invalid role")
 
-        request.data = {
+        post_data = {
             "email": "test@fec.gov",
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
         }
-        view.request = request
-        response = view.add_member(request)
+        response = self.send_viewset_post_request(
+            "/api/v1/committee-members/add-member",
+            post_data,
+            CommitteeMembershipViewSet,
+            "add_member",
+        )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             response.data,
@@ -193,7 +167,8 @@ class CommitteeMemberViewSetTest(TestCase):
         )
 
     def test_update_membership_unauthorized(self):
-        request = self.factory.put(
+        user = User.objects.get(id="fb20ffc3-285e-448e-9e56-9ca1fd43e7d3")
+        response = self.send_viewset_put_request(
             "/api/v1/committee-members/5e4ae4ff-60da-4522-a588-ccd97e124b01/",
             {
                 "id": "5e4ae4ff-60da-4522-a588-ccd97e124b01",
@@ -208,16 +183,10 @@ class CommitteeMemberViewSetTest(TestCase):
                 "updated": "2025-03-06T15:27:17.313259-05:00",
                 "name": "",
             },
-            "application/json",
-        )
-        request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
-        }
-        unauthorized_user = User.objects.get(id="fb20ffc3-285e-448e-9e56-9ca1fd43e7d3")
-        force_authenticate(request, unauthorized_user)
-        response = CommitteeMembershipViewSet.as_view({"put": "update"})(
-            request, pk="5e4ae4ff-60da-4522-a588-ccd97e124b01"
+            CommitteeMembershipViewSet,
+            "update",
+            user=user,
+            pk="5e4ae4ff-60da-4522-a588-ccd97e124b01",
         )
         self.assertEqual(response.status_code, 401)
         self.assertEqual(
@@ -225,7 +194,7 @@ class CommitteeMemberViewSetTest(TestCase):
         )
 
     def test_update_membership_happy_path(self):
-        request = self.factory.put(
+        response = self.send_viewset_put_request(
             "/api/v1/committee-members/5e4ae4ff-60da-4522-a588-ccd97e124b01/",
             {
                 "id": "5e4ae4ff-60da-4522-a588-ccd97e124b01",
@@ -240,47 +209,36 @@ class CommitteeMemberViewSetTest(TestCase):
                 "updated": "2025-03-06T15:27:17.313259-05:00",
                 "name": "",
             },
-            "application/json",
+            CommitteeMembershipViewSet,
+            "update",
+            pk="5e4ae4ff-60da-4522-a588-ccd97e124b01",
         )
-        request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
-        }
-        force_authenticate(request, self.user)
-        response = CommitteeMembershipViewSet.as_view({"put": "update"})(
-            request, pk="5e4ae4ff-60da-4522-a588-ccd97e124b01"
-        )
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["email"], "test2@fec.gov")
         self.assertEqual(response.data["is_active"], True)
         self.assertEqual(response.data["role"], Membership.CommitteeRole.MANAGER)
 
 
-class CommitteeViewSetTest(TestCase):
+class CommitteeViewSetTest(FecfilerViewSetTest):
     fixtures = ["C01234567_user_and_committee"]
 
     def setUp(self):
-        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
-        self.factory = RequestFactory()
+        super().setUp()
 
     def test_get_committee_account_data_from_production(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
-            request = self.factory.get(
-                "/api/v1/committees/get-available-committee/?committee_id=C12345678"
-            )
-            request.user = self.user
-            request.query_params = {"committee_id": "C12345678"}
-
             with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
                 mock_response = Mock()
                 mock_response.status_code = 200
                 mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
                 mock_requests.get = Mock()
                 mock_requests.get.return_value = mock_response
-
-                response = CommitteeViewSet.as_view({"get": "get_available_committee"})(
-                    request
+                response = self.send_viewset_get_request(
+                    "/api/v1/committees/get-available-committee/?committee_id=C12345678",
+                    CommitteeViewSet,
+                    "get_available_committee",
                 )
                 self.assertEqual(response.status_code, 200)
 
@@ -289,20 +247,16 @@ class CommitteeViewSetTest(TestCase):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
             settings.STAGE_OPEN_FEC_API = "https://stage.not-real.api/"
             settings.STAGE_OPEN_FEC_API_KEY = "MOCK_KEY"
-            request = self.factory.get(
-                "/api/v1/committees/get-available-committee/?committee_id=C12345678"
-            )
-            request.user = self.user
-            request.query_params = {"committee_id": "C12345678"}
             with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
                 mock_response = Mock()
                 mock_response.status_code = 200
                 mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
                 mock_requests.get = Mock()
                 mock_requests.get.return_value = mock_response
-
-                response = CommitteeViewSet.as_view({"get": "get_available_committee"})(
-                    request
+                response = self.send_viewset_get_request(
+                    "/api/v1/committees/get-available-committee/?committee_id=C12345678",
+                    CommitteeViewSet,
+                    "get_available_committee",
                 )
                 was_called_with = mock_requests.get.call_args.args
                 self.assertEqual(response.status_code, 200)
@@ -314,11 +268,6 @@ class CommitteeViewSetTest(TestCase):
     def test_get_committee_account_data_from_redis(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
-            request = self.factory.get(
-                "/api/v1/committees/get-available-committee/?committee_id=C12345678"
-            )
-            request.user = self.user
-            request.query_params = {"committee_id": "C12345678"}
             with patch(
                 "fecfiler.committee_accounts.utils.get_mocked_committee_data"
             ) as mock_committee:
@@ -326,8 +275,10 @@ class CommitteeViewSetTest(TestCase):
                     "name": "TEST",
                     "email": "test@fec.gov",
                 }
-                response = CommitteeViewSet.as_view({"get": "get_available_committee"})(
-                    request
+                response = self.send_viewset_get_request(
+                    "/api/v1/committees/get-available-committee/?committee_id=C12345678",
+                    CommitteeViewSet,
+                    "get_available_committee",
                 )
                 was_called_with = mock_committee.call_args.args or []
                 self.assertNotEqual(len(was_called_with), 0)
