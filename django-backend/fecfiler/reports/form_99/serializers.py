@@ -3,7 +3,7 @@ from fecfiler.reports.models import Report
 from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.shared.utilities import get_model_data
-from rest_framework.serializers import CharField
+from rest_framework.serializers import CharField, BooleanField
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -13,6 +13,8 @@ class Form99Serializer(ReportSerializer):
     schema_name = "F99"
 
     text_code = CharField(required=False, allow_null=True)
+    filing_frequency = CharField(required=False, allow_null=True)
+    pdf_attachment = BooleanField(required=False, allow_null=True)
     message_text = CharField(required=False, allow_null=True)
 
     def to_internal_value(self, data):
