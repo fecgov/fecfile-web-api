@@ -119,8 +119,8 @@ def log_polling_notice(attempts):
 
     logger.info(
         f"""Submission queued for processing.  Polling every {
-        interval} seconds for {
-        MAX_ATTEMPTS} attempts over {duration_string}"""
+            interval} seconds for {
+            MAX_ATTEMPTS} attempts over {duration_string}"""
     )
 
 

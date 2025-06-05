@@ -1,10 +1,11 @@
-from django.core.management.base import BaseCommand
+from .fecfile_base import FECCommand
 from fecfiler.devops.utils.cf_api_utils import update_credentials
 import json
 
 
-class Command(BaseCommand):
+class Command(FECCommand):
     help = "Update cf credential service with cred(s)"
+    command_name = "update_creds_service"
 
     def add_arguments(self, parser):
         parser.add_argument("cf_token", type=str)
@@ -13,24 +14,16 @@ class Command(BaseCommand):
         parser.add_argument("cf_service_instance_name", type=str)
         parser.add_argument("credentials_dict", type=json.loads)
 
-    def handle(self, *args, **options):
-        try:
-            cf_token = options["cf_token"]
-            cf_organization_name = options["cf_organization_name"]
-            cf_space_name = options["cf_space_name"]
-            cf_service_instance_name = options["cf_service_instance_name"]
-            credentials_dict = options["credentials_dict"]
-
-            self.stdout.write(self.style.NOTICE("STARTING update_creds_service command"))
-            update_credentials(
-                cf_token,
-                cf_organization_name,
-                cf_space_name,
-                cf_service_instance_name,
-                credentials_dict,
-            )
-            self.stdout.write(self.style.NOTICE("FINISHED update_creds_service command"))
-        except Exception:
-            self.stdout.write(
-                self.style.ERROR("FAILED to execute update_creds_service command")
-            )
+    def command(self, *args, **options):
+        cf_token = options["cf_token"]
+        cf_organization_name = options["cf_organization_name"]
+        cf_space_name = options["cf_space_name"]
+        cf_service_instance_name = options["cf_service_instance_name"]
+        credentials_dict = options["credentials_dict"]
+        update_credentials(
+            cf_token,
+            cf_organization_name,
+            cf_space_name,
+            cf_service_instance_name,
+            credentials_dict,
+        )

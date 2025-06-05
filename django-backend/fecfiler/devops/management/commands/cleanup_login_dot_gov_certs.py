@@ -1,20 +1,10 @@
-from django.core.management.base import BaseCommand
+from .fecfile_base import FECCommand
 from fecfiler.devops.utils.login_dot_gov_cert_utils import cleanup_login_dot_gov_certs
 
 
-class Command(BaseCommand):
+class Command(FECCommand):
     help = "Cleanup certificates"
+    command_name = "cleanup_login_dot_gov_certs"
 
-    def handle(self, *args, **options):
-        try:
-            self.stdout.write(
-                self.style.NOTICE("STARTING cleanup_login_dot_gov_certs command")
-            )
-            cleanup_login_dot_gov_certs()
-            self.stdout.write(
-                self.style.NOTICE("FINISHED cleanup_login_dot_gov_certs command")
-            )
-        except Exception:
-            self.stdout.write(
-                self.style.ERROR("FAILED to execute cleanup_login_dot_gov_certs command")
-            )
+    def command(self, *args, **options):
+        cleanup_login_dot_gov_certs()

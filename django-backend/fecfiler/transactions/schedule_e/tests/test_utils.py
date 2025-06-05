@@ -14,12 +14,12 @@ class ScheduleEUtilsTestCase(TestCase):
 
         add_schedule_e_contact_fields(instance, representation)
 
-        self.assertEquals(
+        self.assertEqual(
             representation["transaction_type_identifier"], "INDEPENDENT_EXPENDITURE"
         )
-        self.assertEquals(representation["payee_last_name"], "1 last name")
-        self.assertEquals(representation["so_candidate_last_name"], "2 last name")
-        self.assertEquals(representation["so_candidate_state"], "2 candidate state")
+        self.assertEqual(representation["payee_last_name"], "1 last name")
+        self.assertEqual(representation["so_candidate_last_name"], "2 last name")
+        self.assertEqual(representation["so_candidate_state"], "2 candidate state")
 
     def test_contacts_to_representation_primary_presidential(self):
 
@@ -31,9 +31,9 @@ class ScheduleEUtilsTestCase(TestCase):
 
         add_schedule_e_contact_fields(instance, representation)
 
-        self.assertEquals(
+        self.assertEqual(
             representation["transaction_type_identifier"], "INDEPENDENT_EXPENDITURE"
         )
-        self.assertEquals(representation["payee_last_name"], "1 last name")
-        self.assertEquals(representation["so_candidate_last_name"], "2 last name")
-        self.assertEquals(representation["so_candidate_state"], "CA")
+        self.assertEqual(representation["payee_last_name"], "1 last name")
+        self.assertEqual(representation["so_candidate_last_name"], "2 last name")
+        self.assertEqual(representation["so_candidate_state"], "CA")

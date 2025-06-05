@@ -15,20 +15,20 @@ class ScheduleFUtilsTestCase(TestCase):
 
         add_schedule_f_contact_fields(instance, representation)
 
-        self.assertEquals(
+        self.assertEqual(
             representation["transaction_type_identifier"],
             self.schedule_f_transaction_type,
         )
-        self.assertEquals(representation["payee_last_name"], "1 last name")
-        self.assertEquals(representation["payee_candidate_last_name"], "2 last name")
-        self.assertEquals(representation["payee_candidate_state"], "2 candidate state")
-        self.assertEquals(representation["payee_candidate_id_number"], "2 candidate id")
-        self.assertEquals(representation["payee_committee_id_number"], "3 committee id")
-        self.assertEquals(
+        self.assertEqual(representation["payee_last_name"], "1 last name")
+        self.assertEqual(representation["payee_candidate_last_name"], "2 last name")
+        self.assertEqual(representation["payee_candidate_state"], "2 candidate state")
+        self.assertEqual(representation["payee_candidate_id_number"], "2 candidate id")
+        self.assertEqual(representation["payee_committee_id_number"], "3 committee id")
+        self.assertEqual(
             representation["designating_committee_id_number"], "4 committee id"
         )
-        self.assertEquals(representation["designating_committee_name"], "4 name")
-        self.assertEquals(
+        self.assertEqual(representation["designating_committee_name"], "4 name")
+        self.assertEqual(
             representation["subordinate_committee_id_number"], "5 committee id"
         )
-        self.assertEquals(representation["subordinate_committee_name"], "5 name")
+        self.assertEqual(representation["subordinate_committee_name"], "5 name")

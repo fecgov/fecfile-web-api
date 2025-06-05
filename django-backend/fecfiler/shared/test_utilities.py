@@ -5,12 +5,12 @@ from .utilities import generate_fec_uid, get_float_from_string, get_boolean_from
 class SharedUtilitiesTestCase(TestCase):
     def test_uid_has_length_20(self):
         uid = generate_fec_uid()
-        self.assertEquals(len(uid), 20)
+        self.assertEqual(len(uid), 20)
 
     def test_uid_all_uppercase(self):
         uid = generate_fec_uid()
         upper = uid.upper()
-        self.assertEquals(uid, upper)
+        self.assertEqual(uid, upper)
 
     def test_get_fallback_from_invalid_string(self):
         value = get_float_from_string("Invalid Error", 20.2)

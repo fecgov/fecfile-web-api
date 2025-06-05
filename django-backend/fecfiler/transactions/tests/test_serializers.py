@@ -31,7 +31,7 @@ class TransactionSerializerBaseTestCase(TestCase):
             context={"request": self.mock_request},
         )
 
-        self.assertEquals(
+        self.assertEqual(
             serializer.get_schema_name({"schema_name": "INDIVIDUAL_RECEIPT"}),
             "INDIVIDUAL_RECEIPT",
         )
