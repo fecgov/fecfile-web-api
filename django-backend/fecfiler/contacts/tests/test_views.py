@@ -5,7 +5,7 @@ import uuid
 from ..models import Contact
 from ..views import ContactViewSet, DeletedContactsViewSet
 from .utils import create_test_individual_contact
-from fecfiler.test.viewset_test import FecfilerViewSetTest
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
 mock_results = {
     "results": [

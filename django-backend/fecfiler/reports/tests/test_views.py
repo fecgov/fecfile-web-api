@@ -1,35 +1,28 @@
-from uuid import UUID
 from django.http import QueryDict
-from django.test import RequestFactory, TestCase
 from fecfiler.reports.views import ReportViewSet, delete_all_reports
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
-class CommitteeMemberViewSetTest(TestCase):
+class CommitteeMemberViewSetTest(FecfilerViewSetTest):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        self.user = User.objects.create(email="test@fec.gov", username="gov")
-        self.factory = RequestFactory()
+        user = User.objects.create(email="test@fec.gov", username="gov")
+        super().setUp(default_user=user, default_committee=self.committee)
 
     def test_list_paginated(self):
         for _ in range(10):
             create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         view = ReportViewSet()
         view.format_kwarg = "format"
-        request = self.factory.get("/api/v1/reports")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
-        request.method = "GET"
+        request = self.build_viewset_get_request("/api/v1/reports")
         request.query_params = {"page": 1}
         view.request = request
         response = view.list(request)
@@ -38,13 +31,7 @@ class CommitteeMemberViewSetTest(TestCase):
     def test_list_no_pagination(self):
         view = ReportViewSet()
         view.format_kwarg = "format"
-        request = self.factory.get("/api/v1/reports")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
-        request.method = "GET"
+        request = self.build_viewset_get_request("/api/v1/reports")
         request.query_params = {}
         view.request = request
         response = view.list(request)
@@ -57,13 +44,7 @@ class CommitteeMemberViewSetTest(TestCase):
     def test_ordering(self):
         view = ReportViewSet()
         view.format_kwarg = "format"
-        request = self.factory.get("/api/v1/reports")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
-        }
-        request.method = "GET"
+        request = self.build_viewset_get_request("/api/v1/reports")
         q = QueryDict(mutable=True)
         q["ordering"] = "form_type"
         q["page"] = 1
@@ -113,14 +94,10 @@ class CommitteeMemberViewSetTest(TestCase):
         self.assertGreater(transaction_count, 0)
 
         view.format_kwarg = "format"
-        request = self.factory.post("/api/v1/reports/e2e-delete-all-reports")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
-        }
+        request = self.build_viewset_post_request(
+            "/api/v1/reports/e2e-delete-all-reports", {}
+        )
         request.query_params = QueryDict({})
-        request.method = "POST"
         view.request = request
         view.e2e_delete_all_reports(request)
 

@@ -2,7 +2,7 @@ from fecfiler.memo_text.models import MemoText
 from ..views import MemoTextViewSet
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
-from fecfiler.test.viewset_test import FecfilerViewSetTest
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
 
 class MemoTextViewSetTest(FecfilerViewSetTest):

@@ -23,7 +23,7 @@ from fecfiler.transactions.tests.utils import (
     create_ie,
 )
 from fecfiler.transactions.serializers import TransactionSerializer
-from fecfiler.test.viewset_test import FecfilerViewSetTest
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 import structlog
 
 logger = structlog.get_logger(__name__)

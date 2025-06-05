@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from fecfiler.test.viewset_test import FecfilerViewSetTest
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 from fecfiler.user.views import UserViewSet
 
 

@@ -2,7 +2,7 @@ from ..views import CashOnHandYearlyViewSet
 from ..models import CashOnHandYearly
 from fecfiler.committee_accounts.models import CommitteeAccount
 from .utils import create_cash_on_hand_yearly
-from fecfiler.test.viewset_test import FecfilerViewSetTest
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
 
 class CashOnHandYearlyViewSetTest(FecfilerViewSetTest):

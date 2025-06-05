@@ -9,7 +9,7 @@ from fecfiler.committee_accounts.views import (
 from fecfiler.user.models import User
 from unittest.mock import Mock, patch
 from fecfiler.routers import get_all_routers
-from fecfiler.test.viewset_test import FecfilerViewSetTest
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
 import structlog
 

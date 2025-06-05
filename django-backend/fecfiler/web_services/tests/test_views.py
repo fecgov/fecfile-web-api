@@ -1,6 +1,5 @@
 from datetime import datetime
-from django.test import RequestFactory, TestCase, override_settings
-from rest_framework.test import force_authenticate
+from django.test import override_settings
 
 from fecfiler.web_services.views import WebServicesViewSet
 from fecfiler.user.models import User
@@ -13,18 +12,19 @@ from fecfiler.reports.tests.utils import (
     create_form1m,
 )
 from fecfiler.web_services.summary.tasks import CalculationState
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
 from unittest.mock import patch
 
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
-class WebServicesViewSetTest(TestCase):
+class WebServicesViewSetTest(FecfilerViewSetTest):
 
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
-        self.user = User.objects.create(email="test@fec.gov", username="gov")
-        self.committee.members.add(self.user)
-        self.factory = RequestFactory()
+        user = User.objects.create(email="test@fec.gov", username="gov")
+        self.committee.members.add(user)
+        super().setUp(default_user=user, default_committee=self.committee)
         self.view = WebServicesViewSet()
         self.task_id = "testTaskId"
 
@@ -36,13 +36,12 @@ class WebServicesViewSetTest(TestCase):
         )
         report = create_form3x(self.committee, "2024-01-01", "2024-02-01")
 
-        request = self.factory.post(
-            "/api/v1/web-services/dot-fec/", {"report_id": report.id}
+        response = self.send_viewset_post_request(
+            "/api/v1/web-services/dot-fec/",
+            {"report_id": report.id},
+            WebServicesViewSet,
+            "create_dot_fec",
         )
-        force_authenticate(request, self.user)
-        request.session = {"committee_uuid": self.committee.id}
-
-        response = WebServicesViewSet.as_view({"post": "create_dot_fec"})(request)
         self.assertEqual(response.status_code, 200)
         report.refresh_from_db()
         # assert that summary was caclulated
@@ -52,7 +51,13 @@ class WebServicesViewSetTest(TestCase):
         report.form_3x.L6a_cash_on_hand_jan_1_ytd = 2
         report.calculation_status = CalculationState.SUCCEEDED
         report.save()
-        response = WebServicesViewSet.as_view({"post": "create_dot_fec"})(request)
+
+        response = self.send_viewset_post_request(
+            "/api/v1/web-services/dot-fec/",
+            {"report_id": report.id},
+            WebServicesViewSet,
+            "create_dot_fec",
+        )
         self.assertEqual(response.status_code, 200)
         report.refresh_from_db()
         # assert that summary was caclulated
@@ -60,37 +65,37 @@ class WebServicesViewSetTest(TestCase):
 
     def test_create_dot_fec_form_24(self):
         report = create_form24(self.committee)
-        request = self.factory.post(
-            "/api/v1/web-services/dot-fec/", {"report_id": report.id}
-        )
-        force_authenticate(request, self.user)
-        request.session = {"committee_uuid": self.committee.id}
 
-        response = WebServicesViewSet.as_view({"post": "create_dot_fec"})(request)
+        response = self.send_viewset_post_request(
+            "/api/v1/web-services/dot-fec/",
+            {"report_id": report.id},
+            WebServicesViewSet,
+            "create_dot_fec",
+        )
         self.assertEqual(response.status_code, 200)
         report.refresh_from_db()
 
     def test_create_dot_fec_form_99(self):
         report = create_form99(self.committee)
-        request = self.factory.post(
-            "/api/v1/web-services/dot-fec/", {"report_id": report.id}
-        )
-        force_authenticate(request, self.user)
-        request.session = {"committee_uuid": self.committee.id}
 
-        response = WebServicesViewSet.as_view({"post": "create_dot_fec"})(request)
+        response = self.send_viewset_post_request(
+            "/api/v1/web-services/dot-fec/",
+            {"report_id": report.id},
+            WebServicesViewSet,
+            "create_dot_fec",
+        )
         self.assertEqual(response.status_code, 200)
         report.refresh_from_db()
 
     def test_create_dot_fec_form_1m(self):
         report = create_form1m(self.committee)
-        request = self.factory.post(
-            "/api/v1/web-services/dot-fec/", {"report_id": report.id}
-        )
-        force_authenticate(request, self.user)
-        request.session = {"committee_uuid": self.committee.id}
 
-        response = WebServicesViewSet.as_view({"post": "create_dot_fec"})(request)
+        response = self.send_viewset_post_request(
+            "/api/v1/web-services/dot-fec/",
+            {"report_id": report.id},
+            WebServicesViewSet,
+            "create_dot_fec",
+        )
         self.assertEqual(response.status_code, 200)
         report.refresh_from_db()
 
@@ -102,12 +107,12 @@ class WebServicesViewSetTest(TestCase):
         )
         report = create_form3x(self.committee, "2024-01-01", "2024-02-01")
 
-        request = self.factory.post(
-            "/api/v1/web-services/dot-fec/", {"report_id": report.id}
+        response = self.send_viewset_post_request(
+            "/api/v1/web-services/dot-fec/",
+            {"report_id": report.id},
+            WebServicesViewSet,
+            "submit_to_webprint",
         )
-        force_authenticate(request, self.user)
-        request.session = {"committee_uuid": self.committee.id}
-        response = WebServicesViewSet.as_view({"post": "submit_to_webprint"})(request)
         self.assertEqual(response.status_code, 200)
         report.refresh_from_db()
         # assert that summary was caclulated
@@ -117,7 +122,13 @@ class WebServicesViewSetTest(TestCase):
         report.form_3x.L6a_cash_on_hand_jan_1_ytd = 2
         report.calculation_status = CalculationState.SUCCEEDED
         report.save()
-        response = WebServicesViewSet.as_view({"post": "submit_to_webprint"})(request)
+
+        response = self.send_viewset_post_request(
+            "/api/v1/web-services/dot-fec/",
+            {"report_id": report.id},
+            WebServicesViewSet,
+            "submit_to_webprint",
+        )
         self.assertEqual(response.status_code, 200)
         report.refresh_from_db()
         # assert that summary was caclulated
@@ -131,12 +142,12 @@ class WebServicesViewSetTest(TestCase):
         )
         report = create_form3x(self.committee, "2024-01-01", "2024-02-01")
 
-        request = self.factory.post(
-            "/api/v1/web-services/dot-fec/", {"report_id": report.id, "password": "123"}
+        response = self.send_viewset_post_request(
+            "/api/v1/web-services/dot-fec/",
+            {"report_id": report.id, "password": "123"},
+            WebServicesViewSet,
+            "submit_to_fec",
         )
-        force_authenticate(request, self.user)
-        request.session = {"committee_uuid": self.committee.id}
-        response = WebServicesViewSet.as_view({"post": "submit_to_fec"})(request)
         self.assertEqual(response.status_code, 200)
         report.refresh_from_db()
         # assert that summary was caclulated
@@ -151,7 +162,13 @@ class WebServicesViewSetTest(TestCase):
         report.form_3x.L6a_cash_on_hand_jan_1_ytd = 2
         report.calculation_status = CalculationState.SUCCEEDED
         report.save()
-        response = WebServicesViewSet.as_view({"post": "submit_to_fec"})(request)
+
+        response = self.send_viewset_post_request(
+            "/api/v1/web-services/dot-fec/",
+            {"report_id": report.id, "password": "123"},
+            WebServicesViewSet,
+            "submit_to_fec",
+        )
         self.assertEqual(response.status_code, 200)
         report.refresh_from_db()
         # assert that summary was caclulated
@@ -159,11 +176,15 @@ class WebServicesViewSetTest(TestCase):
 
     @patch("fecfiler.web_services.views.AsyncResult")
     def test_check_dot_fec_ready(self, mock_async_result):
-        request = self.factory.get(f"api/v1/web-services/dot-fec/check/{self.task_id}")
+        request = self.build_viewset_get_request(
+            f"api/v1/web-services/dot-fec/check/{self.task_id}"
+        )
         mock_instance = mock_async_result.return_value
         mock_instance.ready.return_value = True
         mock_instance.get.return_value = "testId"
-        self.view.request = request
+        self.view.request = self.build_viewset_get_request(
+            f"api/v1/web-services/dot-fec/check/{self.task_id}"
+        )
         response = self.view.check_dot_fec(request, self.task_id)
 
         self.assertEqual(response.status_code, 200)
@@ -171,7 +192,9 @@ class WebServicesViewSetTest(TestCase):
 
     @patch("fecfiler.web_services.views.AsyncResult")
     def test_check_dot_fec_not_ready(self, mock_async_result):
-        request = self.factory.get(f"api/v1/web-services/dot-fec/check/{self.task_id}")
+        request = self.build_viewset_get_request(
+            f"api/v1/web-services/dot-fec/check/{self.task_id}"
+        )
         mock_instance = mock_async_result.return_value
         mock_instance.ready.return_value = False
         mock_instance.get.return_value = "testId"
@@ -189,12 +212,7 @@ class WebServicesViewSetTest(TestCase):
         )
         report = create_form3x(self.committee, "2024-01-01", "2024-02-01")
         test_id = report.id
-        request = self.factory.get(f"api/v1/web-services/dot-fec/{test_id}")
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
-        force_authenticate(request, user=self.user)
+        request = self.build_viewset_get_request(f"api/v1/web-services/dot-fec/{test_id}")
         response = self.view.get_dot_fec(request, test_id)
 
         self.assertEqual(response.status_code, 400)

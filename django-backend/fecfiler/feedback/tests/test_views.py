@@ -4,7 +4,7 @@ import github3
 from github3 import GitHub
 from github3.repos import Repository
 from fecfiler.feedback.views import FeedbackViewSet
-from fecfiler.test.viewset_test import FecfilerViewSetTest
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
 
 class FeedbackViewSetTest(FecfilerViewSetTest):
