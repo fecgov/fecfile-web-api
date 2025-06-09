@@ -4,14 +4,13 @@ from fecfile_validate import validate
 from rest_framework import exceptions
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import CharField, ListField
+from fecfiler.settings import FEC_FORMAT_VERSION
 from functools import reduce
 import structlog
 
 logger = structlog.get_logger(__name__)
 
-MISSING_SCHEMA_NAME_ERROR = ValidationError(
-    {"schema_name": ["No schema_name provided"]}
-)
+MISSING_SCHEMA_NAME_ERROR = ValidationError({"schema_name": ["No schema_name provided"]})
 
 
 class FecSchemaValidatorSerializerMixin(serializers.Serializer):
@@ -127,6 +126,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
             self.get_schema_name(data),
             self.get_validation_candidate(data),
             fields_to_validate,
+            FEC_FORMAT_VERSION == "8.4",
         )
         errors = self.ignore_fields(validation_result.errors)
         if errors:
