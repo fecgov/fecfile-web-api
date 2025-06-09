@@ -296,9 +296,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                         original_transaction.amount
                     )
                 if previous_transaction.schedule_f is not None:
-                    previous_transaction.schedule_f.aggregate_general_elec_expended -= (
-                        original_transaction.amount
-                    )
+                    if (
+                        original_transaction.schedule_f.general_election_year
+                        == previous_transaction.schedule_f.general_election_year
+                    ):
+                        previous_transaction.schedule_f.aggregate_general_elec_expended -= (  # noqa
+                            original_transaction.amount
+                        )
             serializer = self.get_serializer(previous_transaction)
             return Response(data=serializer.data)
 

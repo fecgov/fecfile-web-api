@@ -1592,6 +1592,15 @@ class TransactionViewsTestCase(TestCase):
             contact_can,
             contact_com
         )
+        transaction_3_data = gen_schedule_f_request_data(
+            str(report.id),
+            "25.00",
+            "2024-01-10",
+            "2021",
+            contact_org,
+            contact_can,
+            contact_com
+        )
 
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
@@ -1600,6 +1609,7 @@ class TransactionViewsTestCase(TestCase):
         # Test standard aggregation
         transaction_1 = view_set.save_transaction(transaction_1_data, view_set.request)
         transaction_2 = view_set.save_transaction(transaction_2_data, view_set.request)
+        transaction_3 = view_set.save_transaction(transaction_3_data, view_set.request)
 
         response = view_set.previous_transaction_by_payee_candidate(
             self.post_request(
@@ -1678,3 +1688,18 @@ class TransactionViewsTestCase(TestCase):
             )
         )
         self.assertEqual(response.status_code, 404)
+
+        response = view_set.previous_transaction_by_payee_candidate(
+            self.post_request(
+                {},
+                {
+                    "transaction_id": str(transaction_3.id),
+                    "contact_2_id": str(contact_can.id),
+                    "date": "2024-01-15",
+                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
+                    "general_election_year": "2022"
+                },
+            )
+        )
+        self.assertEqual(response.data["id"], str(transaction_2.id))
+        self.assertEqual(response.data["aggregate_general_elec_expended"], "200.00")
