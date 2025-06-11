@@ -1,9 +1,10 @@
-from django.core.management.base import BaseCommand
+from .fecfile_base import FECCommand
 from fecfiler.devops.utils.login_dot_gov_cert_utils import install_login_dot_gov_cert
 
 
-class Command(BaseCommand):
+class Command(FECCommand):
     help = "Install certificate"
+    command_name = "install_login_dot_gov_cert"
 
     def add_arguments(self, parser):
         parser.add_argument("cf_token", type=str)
@@ -11,23 +12,11 @@ class Command(BaseCommand):
         parser.add_argument("cf_space_name", type=str)
         parser.add_argument("cf_service_instance_name", type=str)
 
-    def handle(self, *args, **options):
-        try:
-            cf_token = options["cf_token"]
-            cf_organization_name = options["cf_organization_name"]
-            cf_space_name = options["cf_space_name"]
-            cf_service_instance_name = options["cf_service_instance_name"]
-
-            self.stdout.write(
-                self.style.NOTICE("STARTING install_login_dot_gov_cert command")
-            )
-            install_login_dot_gov_cert(
-                cf_token, cf_organization_name, cf_space_name, cf_service_instance_name
-            )
-            self.stdout.write(
-                self.style.NOTICE("FINISHED install_login_dot_gov_cert command")
-            )
-        except Exception:
-            self.stdout.write(
-                self.style.ERROR("FAILED to execute install_login_dot_gov_cert command")
-            )
+    def command(self, *args, **options):
+        cf_token = options["cf_token"]
+        cf_organization_name = options["cf_organization_name"]
+        cf_space_name = options["cf_space_name"]
+        cf_service_instance_name = options["cf_service_instance_name"]
+        install_login_dot_gov_cert(
+            cf_token, cf_organization_name, cf_space_name, cf_service_instance_name
+        )

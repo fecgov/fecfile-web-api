@@ -17,5 +17,11 @@
     },
     "text_code": {
         "path": "form_99.text_code"
+    },
+    "filing_frequency": {
+        "path": "form_99.filing_frequency"
+    },
+    "pdf_attachment": {
+        "path": "form_99.pdf_attachment"
     }
 }

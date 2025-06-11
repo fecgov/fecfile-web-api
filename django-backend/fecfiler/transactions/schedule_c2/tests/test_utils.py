@@ -7,16 +7,14 @@ class ScheduleC2UtilsTestCase(TestCase):
 
     def test_contacts_to_representation(self):
 
-        instance = get_test_transaction('C2_LOAN_GUARANTOR')
+        instance = get_test_transaction("C2_LOAN_GUARANTOR")
 
-        representation = dict(
-            transaction_type_identifier='C2_LOAN_GUARANTOR'
-        )
+        representation = dict(transaction_type_identifier="C2_LOAN_GUARANTOR")
 
         add_schedule_c2_contact_fields(instance, representation)
 
-        self.assertEquals(
-            representation['transaction_type_identifier'], 'C2_LOAN_GUARANTOR'
+        self.assertEqual(
+            representation["transaction_type_identifier"], "C2_LOAN_GUARANTOR"
         )
-        self.assertEquals(representation['guarantor_last_name'], '1 last name')
-        self.assertEquals(representation['guarantor_zip'], '1 zip')
+        self.assertEqual(representation["guarantor_last_name"], "1 last name")
+        self.assertEqual(representation["guarantor_zip"], "1 zip")
