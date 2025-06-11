@@ -5,6 +5,7 @@ Django settings for the FECFile project.
 import os
 import dj_database_url
 import structlog
+import logging
 import sys
 
 from .env import env
@@ -223,6 +224,9 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
+class NotErrorFilter(logging.Filter):
+    def filter(self, record):
+        return record.levelno < logging.ERROR
 
 def get_logging_config(log_format=LINE):
     logging_config = {
@@ -265,16 +269,35 @@ def get_logging_config(log_format=LINE):
                 ],
             },
         },
+        "filters": {
+            "not_error": {
+                "()": NotErrorFilter,
+            },
+        },
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
                 "formatter": "plain_console",
                 "stream": sys.stdout,
+                "filters": ["not_error"],
+            },
+            "console_error": {
+                "level": "ERROR",
+                "class": "logging.StreamHandler",
+                "formatter": "plain_console",
+                "stream": sys.stderr,
             },
             "cloud": {
                 "class": "logging.StreamHandler",
                 "formatter": "key_value",
                 "stream": sys.stdout,
+                "filters": ["not_error"],
+            },
+            "cloud_error": {
+                "level": "ERROR",
+                "class": "logging.StreamHandler",
+                "formatter": "key_value",
+                "stream": sys.stderr,
             },
         },
     }
@@ -282,11 +305,11 @@ def get_logging_config(log_format=LINE):
     if log_format == LINE:
         logging_config["loggers"] = {
             "django_structlog": {
-                "handlers": ["console"],
+                "handlers": ["console", "console_error"],
                 "level": "DEBUG",
             },
             "fecfiler": {
-                "handlers": ["console"],
+                "handlers": ["console", "console_error"],
                 "level": "DEBUG",
             },
         }
@@ -298,11 +321,11 @@ def get_logging_config(log_format=LINE):
     else:
         logging_config["loggers"] = {
             "django_structlog": {
-                "handlers": ["cloud"],
+                "handlers": ["cloud", "cloud_error"],
                 "level": "INFO",
             },
             "fecfiler": {
-                "handlers": ["cloud"],
+                "handlers": ["cloud", "cloud_error"],
                 "level": "INFO",
             },
         }
