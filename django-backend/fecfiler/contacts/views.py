@@ -107,8 +107,11 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
                 "sort": "-two_year_period",
             }
             url = FEC_API_CANDIDATE_ENDPOINT.format(sanitized_candidate_id)
-            response = requests.get(url, headers=headers, params=params).json()
-            results = response["results"]
+            response = requests.get(url, headers=headers, params=params)
+            response.raise_for_status()
+
+            response_json = response.json()
+            results = response_json["results"]
             return JsonResponse(results[0] if len(results) > 0 else {})
         except AssertionError:
             return HttpResponseBadRequest()
@@ -121,13 +124,18 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         try:
             sanitized_committee_id = validate_and_sanitize_committee(committee_id)
             headers = {"Content-Type": "application/json"}
+            endpoint = f"{settings.PRODUCTION_OPEN_FEC_API}committee/{sanitized_committee_id}/"  # noqa
             response = requests.get(
-                f"{settings.PRODUCTION_OPEN_FEC_API}committee/{sanitized_committee_id}/",
+                endpoint,
                 params={"api_key": settings.PRODUCTION_OPEN_FEC_API_KEY},
                 headers=headers,
-            ).json()
-            if response.get("results"):
-                return JsonResponse(response["results"][0])
+            )
+            response.raise_for_status()
+
+            response_json = response.json()
+            results = response_json.get("results")
+            if results:
+                return JsonResponse(results[0])
             else:
                 return JsonResponse({})
         except AssertionError:
@@ -155,9 +163,13 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         if office:
             params["office"] = office
         params = urlencode(params)
-        json_results = requests.get(
+        response = requests.get(
             FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
-        ).json()
+        )
+        if response.status_code not in [200, 404]:
+            response.raise_for_status()
+
+        json_results = response.json()
 
         tokens = list(filter(None, re.split("[^\\w+]", q)))
         term = (".*" + ".* .*".join(tokens) + ".*").lower()
@@ -216,9 +228,13 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             else []
         )
         params = urlencode({"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY})
-        json_results = requests.get(
+        response = requests.get(
             FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
-        ).json()
+        )
+        if response.status_code not in [200, 404]:
+            response.raise_for_status()
+
+        json_results = response.json()
 
         fecfile_committees = list(
             self.get_queryset()
