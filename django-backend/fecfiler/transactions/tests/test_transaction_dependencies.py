@@ -72,7 +72,7 @@ class TransactionDependenciesTestCase(TestCase):
         self.assertIsNone(jf_memo.schedule_a.contribution_purpose_descrip)
         update_dependent_children(jf_transfer)
         jf_memo.refresh_from_db()
-        self.assertEquals(
+        self.assertEqual(
             jf_memo.schedule_a.contribution_purpose_descrip,
             "JF Memo: Parent Contact",
         )
@@ -98,7 +98,7 @@ class TransactionDependenciesTestCase(TestCase):
         self.assertIsNone(partnership_memo.schedule_a.contribution_purpose_descrip)
         update_dependent_children(jf_transfer)
         partnership_memo.refresh_from_db()
-        self.assertEquals(
+        self.assertEqual(
             partnership_memo.schedule_a.contribution_purpose_descrip,
             "JF Memo: Parent Contact"
             + " (Partnership attributions do not meet itemization threshold)",
@@ -137,11 +137,11 @@ class TransactionDependenciesTestCase(TestCase):
         update_dependent_children(jf_transfer)
         partnership_memo.refresh_from_db()
         attribution_memo.refresh_from_db()
-        self.assertEquals(
+        self.assertEqual(
             partnership_memo.schedule_a.contribution_purpose_descrip,
             "JF Memo: Parent Contact (See Partnership Attribution(s) below)",
         )
-        self.assertEquals(
+        self.assertEqual(
             attribution_memo.schedule_a.contribution_purpose_descrip,
             "JF Memo: Parent Contact (Partnership Attribution)",
         )
@@ -176,14 +176,14 @@ class TransactionDependenciesTestCase(TestCase):
         self.assertIsNone(attribution_memo.schedule_a.contribution_purpose_descrip)
         update_dependent_parent(attribution_memo)
         partnership_memo.refresh_from_db()
-        self.assertEquals(
+        self.assertEqual(
             partnership_memo.schedule_a.contribution_purpose_descrip,
             "JF Memo: Parent Contact (See Partnership Attribution(s) below)",
         )
         attribution_memo.delete()
         update_dependent_parent(attribution_memo)
         partnership_memo.refresh_from_db()
-        self.assertEquals(
+        self.assertEqual(
             partnership_memo.schedule_a.contribution_purpose_descrip,
             "JF Memo: Parent Contact"
             + " (Partnership attributions do not meet itemization threshold)",

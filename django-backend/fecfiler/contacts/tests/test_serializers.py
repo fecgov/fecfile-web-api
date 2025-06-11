@@ -61,5 +61,5 @@ class ContactSerializerTestCase(TestCase):
             data=update, context={"request": self.mock_request}
         )
         self.assertTrue(contact_serializer.is_valid(raise_exception=True))
-        self.assertEquals(contact_serializer.validated_data["last_name"], "Newlastname")
+        self.assertEqual(contact_serializer.validated_data["last_name"], "Newlastname")
         self.assertIsNone(contact_serializer.validated_data.get("deleted"))
