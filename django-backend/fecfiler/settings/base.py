@@ -224,9 +224,11 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
 }
 
+
 class NotErrorFilter(logging.Filter):
     def filter(self, record):
         return record.levelno < logging.ERROR
+
 
 def get_logging_config(log_format=LINE):
     logging_config = {
