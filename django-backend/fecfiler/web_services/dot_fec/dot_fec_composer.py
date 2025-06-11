@@ -19,6 +19,9 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
+OVERRIDE_LIST = ["C2_LOAN_GUARANTOR.json", "F99.json"]
+
+
 def compose_report(report_id):
     report_result = Report.objects.filter(id=report_id)
     if report_result.exists():
@@ -180,7 +183,10 @@ def compose_dot_fec(report_id):
         file_content = add_row_to_content(None, header_row)
 
         report = compose_report(report_id)
-        report_row = serialize_instance(report.get_form_name(), report)
+        report_schema_name = report.get_form_name()
+        if FEC_FORMAT_VERSION == "8.4" and report_schema_name in OVERRIDE_LIST:
+            report_schema_name = f"_OVERRIDE_{report_schema_name}"
+        report_row = serialize_instance(report_schema_name, report)
         logger.debug("Serialized Report:")
         logger.debug(report_row)
         file_content = add_row_to_content(file_content, report_row)
