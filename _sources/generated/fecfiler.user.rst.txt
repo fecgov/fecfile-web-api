@@ -36,10 +36,7 @@ fecfiler.user
    fecfiler.user.migrations
    fecfiler.user.models
    fecfiler.user.serializers
-   fecfiler.user.test_disable_user_command
-   fecfiler.user.test_models
-   fecfiler.user.test_reset_security_consent_date_command
-   fecfiler.user.test_views
+   fecfiler.user.tests
    fecfiler.user.urls
    fecfiler.user.views
 

@@ -1,0 +1,135 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.user.tests.test\_views.UserViewSetTest
+===============================================
+
+.. currentmodule:: fecfiler.user.tests.test_views
+
+.. autoclass:: UserViewSetTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~UserViewSetTest.__init__
+      ~UserViewSetTest.addClassCleanup
+      ~UserViewSetTest.addCleanup
+      ~UserViewSetTest.addTypeEqualityFunc
+      ~UserViewSetTest.assertAlmostEqual
+      ~UserViewSetTest.assertContains
+      ~UserViewSetTest.assertCountEqual
+      ~UserViewSetTest.assertDictEqual
+      ~UserViewSetTest.assertEqual
+      ~UserViewSetTest.assertFalse
+      ~UserViewSetTest.assertFieldOutput
+      ~UserViewSetTest.assertFormError
+      ~UserViewSetTest.assertFormSetError
+      ~UserViewSetTest.assertGreater
+      ~UserViewSetTest.assertGreaterEqual
+      ~UserViewSetTest.assertHTMLEqual
+      ~UserViewSetTest.assertHTMLNotEqual
+      ~UserViewSetTest.assertIn
+      ~UserViewSetTest.assertInHTML
+      ~UserViewSetTest.assertIs
+      ~UserViewSetTest.assertIsInstance
+      ~UserViewSetTest.assertIsNone
+      ~UserViewSetTest.assertIsNot
+      ~UserViewSetTest.assertIsNotNone
+      ~UserViewSetTest.assertJSONEqual
+      ~UserViewSetTest.assertJSONNotEqual
+      ~UserViewSetTest.assertLess
+      ~UserViewSetTest.assertLessEqual
+      ~UserViewSetTest.assertListEqual
+      ~UserViewSetTest.assertLogs
+      ~UserViewSetTest.assertMultiLineEqual
+      ~UserViewSetTest.assertNoLogs
+      ~UserViewSetTest.assertNotAlmostEqual
+      ~UserViewSetTest.assertNotContains
+      ~UserViewSetTest.assertNotEqual
+      ~UserViewSetTest.assertNotIn
+      ~UserViewSetTest.assertNotInHTML
+      ~UserViewSetTest.assertNotIsInstance
+      ~UserViewSetTest.assertNotRegex
+      ~UserViewSetTest.assertNumQueries
+      ~UserViewSetTest.assertQuerySetEqual
+      ~UserViewSetTest.assertRaises
+      ~UserViewSetTest.assertRaisesMessage
+      ~UserViewSetTest.assertRaisesRegex
+      ~UserViewSetTest.assertRedirects
+      ~UserViewSetTest.assertRegex
+      ~UserViewSetTest.assertSequenceEqual
+      ~UserViewSetTest.assertSetEqual
+      ~UserViewSetTest.assertTemplateNotUsed
+      ~UserViewSetTest.assertTemplateUsed
+      ~UserViewSetTest.assertTrue
+      ~UserViewSetTest.assertTupleEqual
+      ~UserViewSetTest.assertURLEqual
+      ~UserViewSetTest.assertWarns
+      ~UserViewSetTest.assertWarnsMessage
+      ~UserViewSetTest.assertWarnsRegex
+      ~UserViewSetTest.assertXMLEqual
+      ~UserViewSetTest.assertXMLNotEqual
+      ~UserViewSetTest.build_viewset_delete_request
+      ~UserViewSetTest.build_viewset_get_request
+      ~UserViewSetTest.build_viewset_post_request
+      ~UserViewSetTest.build_viewset_put_request
+      ~UserViewSetTest.captureOnCommitCallbacks
+      ~UserViewSetTest.countTestCases
+      ~UserViewSetTest.debug
+      ~UserViewSetTest.defaultTestResult
+      ~UserViewSetTest.doClassCleanups
+      ~UserViewSetTest.doCleanups
+      ~UserViewSetTest.ensure_connection_patch_method
+      ~UserViewSetTest.enterClassContext
+      ~UserViewSetTest.enterContext
+      ~UserViewSetTest.fail
+      ~UserViewSetTest.id
+      ~UserViewSetTest.init_request
+      ~UserViewSetTest.modify_settings
+      ~UserViewSetTest.run
+      ~UserViewSetTest.send_viewset_delete_request
+      ~UserViewSetTest.send_viewset_get_request
+      ~UserViewSetTest.send_viewset_post_request
+      ~UserViewSetTest.send_viewset_put_request
+      ~UserViewSetTest.setUp
+      ~UserViewSetTest.setUpClass
+      ~UserViewSetTest.setUpTestData
+      ~UserViewSetTest.set_default_committee
+      ~UserViewSetTest.set_default_user
+      ~UserViewSetTest.settings
+      ~UserViewSetTest.shortDescription
+      ~UserViewSetTest.skipTest
+      ~UserViewSetTest.subTest
+      ~UserViewSetTest.tearDown
+      ~UserViewSetTest.tearDownClass
+      ~UserViewSetTest.test_get_current_user_signed_annual_security_consent
+      ~UserViewSetTest.test_get_current_user_signed_ephemeral_security_consent
+      ~UserViewSetTest.test_get_current_user_unsigned_security_consent
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~UserViewSetTest.available_apps
+      ~UserViewSetTest.databases
+      ~UserViewSetTest.default_committee
+      ~UserViewSetTest.default_user
+      ~UserViewSetTest.fixtures
+      ~UserViewSetTest.longMessage
+      ~UserViewSetTest.maxDiff
+      ~UserViewSetTest.reset_sequences
+      ~UserViewSetTest.serialized_rollback
+   
+   

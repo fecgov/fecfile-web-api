@@ -43,7 +43,6 @@ fecfiler.reports
    fecfiler.reports.report_code_label
    fecfiler.reports.serializers
    fecfiler.reports.signals
-   fecfiler.reports.test_views
    fecfiler.reports.tests
    fecfiler.reports.urls
    fecfiler.reports.views

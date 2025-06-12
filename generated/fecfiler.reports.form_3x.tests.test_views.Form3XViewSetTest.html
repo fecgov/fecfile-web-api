@@ -37,7 +37,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.reports.form_3x.tests.test_views.</span></span><span class="sig-name descname"><span class="pre">Form3XViewSetTest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.shared.viewset_test.FecfilerViewSetTest.html#fecfiler.shared.viewset_test.FecfilerViewSetTest" title="fecfiler.shared.viewset_test.FecfilerViewSetTest"><code class="xref py py-class docutils literal notranslate"><span class="pre">FecfilerViewSetTest</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.__init__" title="Link to this definition">¶</a></dt>
@@ -223,6 +223,18 @@ not have a method with the specified name.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.assertXMLNotEqual" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.assertXMLNotEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertXMLNotEqual</span></code></a>(xml1, xml2[, msg])</p></td>
 <td><p>Assert that two XML snippets are not semantically equivalent.</p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_viewset_delete_request</span></code>(uri[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_viewset_get_request</span></code>(uri[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_viewset_post_request</span></code>(uri, data[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_viewset_put_request</span></code>(uri, data[, ...])</p></td>
+<td><p></p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.captureOnCommitCallbacks" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.captureOnCommitCallbacks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">captureOnCommitCallbacks</span></code></a>(*[, using, execute])</p></td>
 <td><p>Context manager to capture transaction.on_commit() callbacks.</p></td>
 </tr>
@@ -256,46 +268,67 @@ not have a method with the specified name.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.modify_settings" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.modify_settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_settings</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_request</span></code>(request[, authenticate, user, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.modify_settings" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.modify_settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_settings</span></code></a>(**kwargs)</p></td>
 <td><p>A context manager that temporarily applies changes to a list setting and reverts back to the original value when exiting the context.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>([result])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>([result])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUp" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUp</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_viewset_delete_request</span></code>(uri, ...[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_viewset_get_request</span></code>(uri, viewset_class, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_viewset_post_request</span></code>(uri, data, ...[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_viewset_put_request</span></code>(uri, data, ...[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUp" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUp</span></code></a>()</p></td>
 <td><p>Hook method for setting up the test fixture before exercising it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUpClass" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUpClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpClass</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUpClass" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUpClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpClass</span></code></a>()</p></td>
 <td><p>Hook method for setting up class fixture before running tests in the class.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUpTestData" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUpTestData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpTestData</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUpTestData" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.setUpTestData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpTestData</span></code></a>()</p></td>
 <td><p>Load initial data for the TestCase.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.settings" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">settings</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_default_committee</span></code>(default_committee)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_default_user</span></code>(default_user)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.settings" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">settings</span></code></a>(**kwargs)</p></td>
 <td><p>A context manager that temporarily sets a setting and reverts to the original value when exiting the context.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.shortDescription" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.shortDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortDescription</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.shortDescription" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.shortDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortDescription</span></code></a>()</p></td>
 <td><p>Returns a one-line description of the test, or None if no description has been provided.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.skipTest" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.skipTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skipTest</span></code></a>(reason)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.skipTest" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.skipTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skipTest</span></code></a>(reason)</p></td>
 <td><p>Skip this test.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.subTest" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.subTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subTest</span></code></a>([msg])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.subTest" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.subTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subTest</span></code></a>([msg])</p></td>
 <td><p>Return a context manager that will return the enclosed block of code in a subtest identified by the optional message and keyword parameters.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.tearDown" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.tearDown"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDown</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.tearDown" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.tearDown"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDown</span></code></a>()</p></td>
 <td><p>Hook method for deconstructing the test fixture after testing it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.tearDownClass" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.tearDownClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDownClass</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.tearDownClass" title="fecfiler.reports.form_3x.tests.test_views.Form3XViewSetTest.tearDownClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDownClass</span></code></a>()</p></td>
 <td><p>Hook method for deconstructing the class fixture after running all tests in the class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_amend</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_amend</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_coverage_dates_happy_path</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_coverage_dates_happy_path</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_final</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_final</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -307,6 +340,12 @@ not have a method with the specified name.</p>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">databases</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_committee</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_user</span></code></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fixtures</span></code></p></td>
@@ -1163,7 +1202,6 @@ block, allowing further test code to be executed.</p>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.report_code_label.html">fecfiler.reports.report_code_label</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.serializers.html">fecfiler.reports.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.signals.html">fecfiler.reports.signals</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.test_views.html">fecfiler.reports.test_views</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.tests.html">fecfiler.reports.tests</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.urls.html">fecfiler.reports.urls</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.views.html">fecfiler.reports.views</a></li>

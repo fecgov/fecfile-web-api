@@ -32,7 +32,7 @@ fecfiler.feedback
    :recursive:
 
    fecfiler.feedback.serializers
-   fecfiler.feedback.test_views
+   fecfiler.feedback.tests
    fecfiler.feedback.urls
    fecfiler.feedback.views
 

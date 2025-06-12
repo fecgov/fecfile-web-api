@@ -1,0 +1,38 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.user.tests
+===================
+
+.. automodule:: fecfiler.user.tests
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+
+.. rubric:: Modules
+
+.. autosummary::
+   :toctree:
+   :template: custom-module-template.rst                 
+   :recursive:
+
+   fecfiler.user.tests.test_disable_user_command
+   fecfiler.user.tests.test_models
+   fecfiler.user.tests.test_reset_security_consent_date_command
+   fecfiler.user.tests.test_views
+

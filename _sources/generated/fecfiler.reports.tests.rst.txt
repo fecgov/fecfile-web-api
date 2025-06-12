@@ -32,5 +32,6 @@ fecfiler.reports.tests
    :recursive:
 
    fecfiler.reports.tests.test_models
+   fecfiler.reports.tests.test_views
    fecfiler.reports.tests.utils
 

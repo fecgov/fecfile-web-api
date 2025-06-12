@@ -77,6 +77,10 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.assertWarnsRegex
       ~TransactionViewsTestCase.assertXMLEqual
       ~TransactionViewsTestCase.assertXMLNotEqual
+      ~TransactionViewsTestCase.build_viewset_delete_request
+      ~TransactionViewsTestCase.build_viewset_get_request
+      ~TransactionViewsTestCase.build_viewset_post_request
+      ~TransactionViewsTestCase.build_viewset_put_request
       ~TransactionViewsTestCase.captureOnCommitCallbacks
       ~TransactionViewsTestCase.countTestCases
       ~TransactionViewsTestCase.create_debt_repayment_payload
@@ -94,12 +98,19 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.fail
       ~TransactionViewsTestCase.get_request
       ~TransactionViewsTestCase.id
+      ~TransactionViewsTestCase.init_request
       ~TransactionViewsTestCase.modify_settings
       ~TransactionViewsTestCase.post_request
       ~TransactionViewsTestCase.run
+      ~TransactionViewsTestCase.send_viewset_delete_request
+      ~TransactionViewsTestCase.send_viewset_get_request
+      ~TransactionViewsTestCase.send_viewset_post_request
+      ~TransactionViewsTestCase.send_viewset_put_request
       ~TransactionViewsTestCase.setUp
       ~TransactionViewsTestCase.setUpClass
       ~TransactionViewsTestCase.setUpTestData
+      ~TransactionViewsTestCase.set_default_committee
+      ~TransactionViewsTestCase.set_default_user
       ~TransactionViewsTestCase.settings
       ~TransactionViewsTestCase.shortDescription
       ~TransactionViewsTestCase.skipTest
@@ -145,6 +156,8 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
    
       ~TransactionViewsTestCase.available_apps
       ~TransactionViewsTestCase.databases
+      ~TransactionViewsTestCase.default_committee
+      ~TransactionViewsTestCase.default_user
       ~TransactionViewsTestCase.fixtures
       ~TransactionViewsTestCase.json_content_type
       ~TransactionViewsTestCase.longMessage

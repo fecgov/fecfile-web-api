@@ -34,4 +34,5 @@ fecfiler.shared
    fecfiler.shared.test_logging
    fecfiler.shared.test_utilities
    fecfiler.shared.utilities
+   fecfiler.shared.viewset_test
 

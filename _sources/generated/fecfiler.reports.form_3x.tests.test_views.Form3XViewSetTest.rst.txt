@@ -77,6 +77,10 @@ fecfiler.reports.form\_3x.tests.test\_views.Form3XViewSetTest
       ~Form3XViewSetTest.assertWarnsRegex
       ~Form3XViewSetTest.assertXMLEqual
       ~Form3XViewSetTest.assertXMLNotEqual
+      ~Form3XViewSetTest.build_viewset_delete_request
+      ~Form3XViewSetTest.build_viewset_get_request
+      ~Form3XViewSetTest.build_viewset_post_request
+      ~Form3XViewSetTest.build_viewset_put_request
       ~Form3XViewSetTest.captureOnCommitCallbacks
       ~Form3XViewSetTest.countTestCases
       ~Form3XViewSetTest.debug
@@ -88,11 +92,18 @@ fecfiler.reports.form\_3x.tests.test\_views.Form3XViewSetTest
       ~Form3XViewSetTest.enterContext
       ~Form3XViewSetTest.fail
       ~Form3XViewSetTest.id
+      ~Form3XViewSetTest.init_request
       ~Form3XViewSetTest.modify_settings
       ~Form3XViewSetTest.run
+      ~Form3XViewSetTest.send_viewset_delete_request
+      ~Form3XViewSetTest.send_viewset_get_request
+      ~Form3XViewSetTest.send_viewset_post_request
+      ~Form3XViewSetTest.send_viewset_put_request
       ~Form3XViewSetTest.setUp
       ~Form3XViewSetTest.setUpClass
       ~Form3XViewSetTest.setUpTestData
+      ~Form3XViewSetTest.set_default_committee
+      ~Form3XViewSetTest.set_default_user
       ~Form3XViewSetTest.settings
       ~Form3XViewSetTest.shortDescription
       ~Form3XViewSetTest.skipTest
@@ -113,6 +124,8 @@ fecfiler.reports.form\_3x.tests.test\_views.Form3XViewSetTest
    
       ~Form3XViewSetTest.available_apps
       ~Form3XViewSetTest.databases
+      ~Form3XViewSetTest.default_committee
+      ~Form3XViewSetTest.default_user
       ~Form3XViewSetTest.fixtures
       ~Form3XViewSetTest.longMessage
       ~Form3XViewSetTest.maxDiff

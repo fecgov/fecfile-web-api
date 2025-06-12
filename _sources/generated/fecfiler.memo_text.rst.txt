@@ -36,9 +36,7 @@ fecfiler.memo\_text
    fecfiler.memo_text.models
    fecfiler.memo_text.serializers
    fecfiler.memo_text.signals
-   fecfiler.memo_text.test_models
-   fecfiler.memo_text.test_serializers
-   fecfiler.memo_text.test_views
+   fecfiler.memo_text.tests
    fecfiler.memo_text.urls
    fecfiler.memo_text.views
 

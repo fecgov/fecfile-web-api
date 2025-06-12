@@ -1,0 +1,136 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.feedback.tests.test\_views.FeedbackViewSetTest
+=======================================================
+
+.. currentmodule:: fecfiler.feedback.tests.test_views
+
+.. autoclass:: FeedbackViewSetTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FeedbackViewSetTest.__init__
+      ~FeedbackViewSetTest.addClassCleanup
+      ~FeedbackViewSetTest.addCleanup
+      ~FeedbackViewSetTest.addTypeEqualityFunc
+      ~FeedbackViewSetTest.assertAlmostEqual
+      ~FeedbackViewSetTest.assertContains
+      ~FeedbackViewSetTest.assertCountEqual
+      ~FeedbackViewSetTest.assertDictEqual
+      ~FeedbackViewSetTest.assertEqual
+      ~FeedbackViewSetTest.assertFalse
+      ~FeedbackViewSetTest.assertFieldOutput
+      ~FeedbackViewSetTest.assertFormError
+      ~FeedbackViewSetTest.assertFormSetError
+      ~FeedbackViewSetTest.assertGreater
+      ~FeedbackViewSetTest.assertGreaterEqual
+      ~FeedbackViewSetTest.assertHTMLEqual
+      ~FeedbackViewSetTest.assertHTMLNotEqual
+      ~FeedbackViewSetTest.assertIn
+      ~FeedbackViewSetTest.assertInHTML
+      ~FeedbackViewSetTest.assertIs
+      ~FeedbackViewSetTest.assertIsInstance
+      ~FeedbackViewSetTest.assertIsNone
+      ~FeedbackViewSetTest.assertIsNot
+      ~FeedbackViewSetTest.assertIsNotNone
+      ~FeedbackViewSetTest.assertJSONEqual
+      ~FeedbackViewSetTest.assertJSONNotEqual
+      ~FeedbackViewSetTest.assertLess
+      ~FeedbackViewSetTest.assertLessEqual
+      ~FeedbackViewSetTest.assertListEqual
+      ~FeedbackViewSetTest.assertLogs
+      ~FeedbackViewSetTest.assertMultiLineEqual
+      ~FeedbackViewSetTest.assertNoLogs
+      ~FeedbackViewSetTest.assertNotAlmostEqual
+      ~FeedbackViewSetTest.assertNotContains
+      ~FeedbackViewSetTest.assertNotEqual
+      ~FeedbackViewSetTest.assertNotIn
+      ~FeedbackViewSetTest.assertNotInHTML
+      ~FeedbackViewSetTest.assertNotIsInstance
+      ~FeedbackViewSetTest.assertNotRegex
+      ~FeedbackViewSetTest.assertNumQueries
+      ~FeedbackViewSetTest.assertQuerySetEqual
+      ~FeedbackViewSetTest.assertRaises
+      ~FeedbackViewSetTest.assertRaisesMessage
+      ~FeedbackViewSetTest.assertRaisesRegex
+      ~FeedbackViewSetTest.assertRedirects
+      ~FeedbackViewSetTest.assertRegex
+      ~FeedbackViewSetTest.assertSequenceEqual
+      ~FeedbackViewSetTest.assertSetEqual
+      ~FeedbackViewSetTest.assertTemplateNotUsed
+      ~FeedbackViewSetTest.assertTemplateUsed
+      ~FeedbackViewSetTest.assertTrue
+      ~FeedbackViewSetTest.assertTupleEqual
+      ~FeedbackViewSetTest.assertURLEqual
+      ~FeedbackViewSetTest.assertWarns
+      ~FeedbackViewSetTest.assertWarnsMessage
+      ~FeedbackViewSetTest.assertWarnsRegex
+      ~FeedbackViewSetTest.assertXMLEqual
+      ~FeedbackViewSetTest.assertXMLNotEqual
+      ~FeedbackViewSetTest.build_viewset_delete_request
+      ~FeedbackViewSetTest.build_viewset_get_request
+      ~FeedbackViewSetTest.build_viewset_post_request
+      ~FeedbackViewSetTest.build_viewset_put_request
+      ~FeedbackViewSetTest.captureOnCommitCallbacks
+      ~FeedbackViewSetTest.countTestCases
+      ~FeedbackViewSetTest.debug
+      ~FeedbackViewSetTest.defaultTestResult
+      ~FeedbackViewSetTest.doClassCleanups
+      ~FeedbackViewSetTest.doCleanups
+      ~FeedbackViewSetTest.ensure_connection_patch_method
+      ~FeedbackViewSetTest.enterClassContext
+      ~FeedbackViewSetTest.enterContext
+      ~FeedbackViewSetTest.fail
+      ~FeedbackViewSetTest.id
+      ~FeedbackViewSetTest.init_request
+      ~FeedbackViewSetTest.modify_settings
+      ~FeedbackViewSetTest.run
+      ~FeedbackViewSetTest.send_viewset_delete_request
+      ~FeedbackViewSetTest.send_viewset_get_request
+      ~FeedbackViewSetTest.send_viewset_post_request
+      ~FeedbackViewSetTest.send_viewset_put_request
+      ~FeedbackViewSetTest.setUp
+      ~FeedbackViewSetTest.setUpClass
+      ~FeedbackViewSetTest.setUpTestData
+      ~FeedbackViewSetTest.set_default_committee
+      ~FeedbackViewSetTest.set_default_user
+      ~FeedbackViewSetTest.settings
+      ~FeedbackViewSetTest.shortDescription
+      ~FeedbackViewSetTest.skipTest
+      ~FeedbackViewSetTest.subTest
+      ~FeedbackViewSetTest.tearDown
+      ~FeedbackViewSetTest.tearDownClass
+      ~FeedbackViewSetTest.test_csp_report_happy_path
+      ~FeedbackViewSetTest.test_csp_report_invalid_type
+      ~FeedbackViewSetTest.test_csp_report_no_data
+      ~FeedbackViewSetTest.test_submit_feedback_happy_path
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FeedbackViewSetTest.available_apps
+      ~FeedbackViewSetTest.databases
+      ~FeedbackViewSetTest.default_committee
+      ~FeedbackViewSetTest.default_user
+      ~FeedbackViewSetTest.fixtures
+      ~FeedbackViewSetTest.longMessage
+      ~FeedbackViewSetTest.maxDiff
+      ~FeedbackViewSetTest.reset_sequences
+      ~FeedbackViewSetTest.serialized_rollback
+   
+   

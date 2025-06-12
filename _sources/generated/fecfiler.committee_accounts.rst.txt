@@ -37,11 +37,7 @@ fecfiler.committee\_accounts
    fecfiler.committee_accounts.models
    fecfiler.committee_accounts.serializers
    fecfiler.committee_accounts.signals
-   fecfiler.committee_accounts.test_delete_committee_command
-   fecfiler.committee_accounts.test_load_committee_data
-   fecfiler.committee_accounts.test_models
-   fecfiler.committee_accounts.test_utils
-   fecfiler.committee_accounts.test_views
+   fecfiler.committee_accounts.tests
    fecfiler.committee_accounts.urls
    fecfiler.committee_accounts.utils
    fecfiler.committee_accounts.views

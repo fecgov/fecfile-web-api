@@ -1,0 +1,138 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.tests.test\_utils.CommitteeAccountsUtilsTest
+=========================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.tests.test_utils
+
+.. autoclass:: CommitteeAccountsUtilsTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CommitteeAccountsUtilsTest.__init__
+      ~CommitteeAccountsUtilsTest.addClassCleanup
+      ~CommitteeAccountsUtilsTest.addCleanup
+      ~CommitteeAccountsUtilsTest.addTypeEqualityFunc
+      ~CommitteeAccountsUtilsTest.assertAlmostEqual
+      ~CommitteeAccountsUtilsTest.assertContains
+      ~CommitteeAccountsUtilsTest.assertCountEqual
+      ~CommitteeAccountsUtilsTest.assertDictEqual
+      ~CommitteeAccountsUtilsTest.assertEqual
+      ~CommitteeAccountsUtilsTest.assertFalse
+      ~CommitteeAccountsUtilsTest.assertFieldOutput
+      ~CommitteeAccountsUtilsTest.assertFormError
+      ~CommitteeAccountsUtilsTest.assertFormSetError
+      ~CommitteeAccountsUtilsTest.assertGreater
+      ~CommitteeAccountsUtilsTest.assertGreaterEqual
+      ~CommitteeAccountsUtilsTest.assertHTMLEqual
+      ~CommitteeAccountsUtilsTest.assertHTMLNotEqual
+      ~CommitteeAccountsUtilsTest.assertIn
+      ~CommitteeAccountsUtilsTest.assertInHTML
+      ~CommitteeAccountsUtilsTest.assertIs
+      ~CommitteeAccountsUtilsTest.assertIsInstance
+      ~CommitteeAccountsUtilsTest.assertIsNone
+      ~CommitteeAccountsUtilsTest.assertIsNot
+      ~CommitteeAccountsUtilsTest.assertIsNotNone
+      ~CommitteeAccountsUtilsTest.assertJSONEqual
+      ~CommitteeAccountsUtilsTest.assertJSONNotEqual
+      ~CommitteeAccountsUtilsTest.assertLess
+      ~CommitteeAccountsUtilsTest.assertLessEqual
+      ~CommitteeAccountsUtilsTest.assertListEqual
+      ~CommitteeAccountsUtilsTest.assertLogs
+      ~CommitteeAccountsUtilsTest.assertMultiLineEqual
+      ~CommitteeAccountsUtilsTest.assertNoLogs
+      ~CommitteeAccountsUtilsTest.assertNotAlmostEqual
+      ~CommitteeAccountsUtilsTest.assertNotContains
+      ~CommitteeAccountsUtilsTest.assertNotEqual
+      ~CommitteeAccountsUtilsTest.assertNotIn
+      ~CommitteeAccountsUtilsTest.assertNotInHTML
+      ~CommitteeAccountsUtilsTest.assertNotIsInstance
+      ~CommitteeAccountsUtilsTest.assertNotRegex
+      ~CommitteeAccountsUtilsTest.assertNumQueries
+      ~CommitteeAccountsUtilsTest.assertQuerySetEqual
+      ~CommitteeAccountsUtilsTest.assertRaises
+      ~CommitteeAccountsUtilsTest.assertRaisesMessage
+      ~CommitteeAccountsUtilsTest.assertRaisesRegex
+      ~CommitteeAccountsUtilsTest.assertRedirects
+      ~CommitteeAccountsUtilsTest.assertRegex
+      ~CommitteeAccountsUtilsTest.assertSequenceEqual
+      ~CommitteeAccountsUtilsTest.assertSetEqual
+      ~CommitteeAccountsUtilsTest.assertTemplateNotUsed
+      ~CommitteeAccountsUtilsTest.assertTemplateUsed
+      ~CommitteeAccountsUtilsTest.assertTrue
+      ~CommitteeAccountsUtilsTest.assertTupleEqual
+      ~CommitteeAccountsUtilsTest.assertURLEqual
+      ~CommitteeAccountsUtilsTest.assertWarns
+      ~CommitteeAccountsUtilsTest.assertWarnsMessage
+      ~CommitteeAccountsUtilsTest.assertWarnsRegex
+      ~CommitteeAccountsUtilsTest.assertXMLEqual
+      ~CommitteeAccountsUtilsTest.assertXMLNotEqual
+      ~CommitteeAccountsUtilsTest.captureOnCommitCallbacks
+      ~CommitteeAccountsUtilsTest.countTestCases
+      ~CommitteeAccountsUtilsTest.debug
+      ~CommitteeAccountsUtilsTest.defaultTestResult
+      ~CommitteeAccountsUtilsTest.doClassCleanups
+      ~CommitteeAccountsUtilsTest.doCleanups
+      ~CommitteeAccountsUtilsTest.ensure_connection_patch_method
+      ~CommitteeAccountsUtilsTest.enterClassContext
+      ~CommitteeAccountsUtilsTest.enterContext
+      ~CommitteeAccountsUtilsTest.fail
+      ~CommitteeAccountsUtilsTest.id
+      ~CommitteeAccountsUtilsTest.mock_requests_get
+      ~CommitteeAccountsUtilsTest.mock_response
+      ~CommitteeAccountsUtilsTest.modify_settings
+      ~CommitteeAccountsUtilsTest.run
+      ~CommitteeAccountsUtilsTest.setUp
+      ~CommitteeAccountsUtilsTest.setUpClass
+      ~CommitteeAccountsUtilsTest.setUpTestData
+      ~CommitteeAccountsUtilsTest.settings
+      ~CommitteeAccountsUtilsTest.shortDescription
+      ~CommitteeAccountsUtilsTest.skipTest
+      ~CommitteeAccountsUtilsTest.subTest
+      ~CommitteeAccountsUtilsTest.tearDown
+      ~CommitteeAccountsUtilsTest.tearDownClass
+      ~CommitteeAccountsUtilsTest.test_create_committee_account
+      ~CommitteeAccountsUtilsTest.test_create_committee_account_case_insensitive
+      ~CommitteeAccountsUtilsTest.test_create_committee_account_existing
+      ~CommitteeAccountsUtilsTest.test_create_committee_account_mismatch_email
+      ~CommitteeAccountsUtilsTest.test_email_matching_case_insensitive
+      ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_production_processed
+      ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_production_processed_pac_pty
+      ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_production_raw
+      ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_test_PAC
+      ~CommitteeAccountsUtilsTest.test_get_committee_account_data_from_test_PTY
+      ~CommitteeAccountsUtilsTest.test_get_emails_environments
+      ~CommitteeAccountsUtilsTest.test_get_production_committee_emails
+      ~CommitteeAccountsUtilsTest.test_get_test_committee_emails
+      ~CommitteeAccountsUtilsTest.test_match_comma
+      ~CommitteeAccountsUtilsTest.test_match_semicolon
+      ~CommitteeAccountsUtilsTest.test_no_f1_email
+      ~CommitteeAccountsUtilsTest.test_no_match
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CommitteeAccountsUtilsTest.available_apps
+      ~CommitteeAccountsUtilsTest.databases
+      ~CommitteeAccountsUtilsTest.fixtures
+      ~CommitteeAccountsUtilsTest.longMessage
+      ~CommitteeAccountsUtilsTest.maxDiff
+      ~CommitteeAccountsUtilsTest.reset_sequences
+      ~CommitteeAccountsUtilsTest.serialized_rollback
+   
+   

@@ -1,0 +1,120 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.user.tests.test\_models.UserModelTestCase
+==================================================
+
+.. currentmodule:: fecfiler.user.tests.test_models
+
+.. autoclass:: UserModelTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~UserModelTestCase.__init__
+      ~UserModelTestCase.addClassCleanup
+      ~UserModelTestCase.addCleanup
+      ~UserModelTestCase.addTypeEqualityFunc
+      ~UserModelTestCase.assertAlmostEqual
+      ~UserModelTestCase.assertContains
+      ~UserModelTestCase.assertCountEqual
+      ~UserModelTestCase.assertDictEqual
+      ~UserModelTestCase.assertEqual
+      ~UserModelTestCase.assertFalse
+      ~UserModelTestCase.assertFieldOutput
+      ~UserModelTestCase.assertFormError
+      ~UserModelTestCase.assertFormSetError
+      ~UserModelTestCase.assertGreater
+      ~UserModelTestCase.assertGreaterEqual
+      ~UserModelTestCase.assertHTMLEqual
+      ~UserModelTestCase.assertHTMLNotEqual
+      ~UserModelTestCase.assertIn
+      ~UserModelTestCase.assertInHTML
+      ~UserModelTestCase.assertIs
+      ~UserModelTestCase.assertIsInstance
+      ~UserModelTestCase.assertIsNone
+      ~UserModelTestCase.assertIsNot
+      ~UserModelTestCase.assertIsNotNone
+      ~UserModelTestCase.assertJSONEqual
+      ~UserModelTestCase.assertJSONNotEqual
+      ~UserModelTestCase.assertLess
+      ~UserModelTestCase.assertLessEqual
+      ~UserModelTestCase.assertListEqual
+      ~UserModelTestCase.assertLogs
+      ~UserModelTestCase.assertMultiLineEqual
+      ~UserModelTestCase.assertNoLogs
+      ~UserModelTestCase.assertNotAlmostEqual
+      ~UserModelTestCase.assertNotContains
+      ~UserModelTestCase.assertNotEqual
+      ~UserModelTestCase.assertNotIn
+      ~UserModelTestCase.assertNotInHTML
+      ~UserModelTestCase.assertNotIsInstance
+      ~UserModelTestCase.assertNotRegex
+      ~UserModelTestCase.assertNumQueries
+      ~UserModelTestCase.assertQuerySetEqual
+      ~UserModelTestCase.assertRaises
+      ~UserModelTestCase.assertRaisesMessage
+      ~UserModelTestCase.assertRaisesRegex
+      ~UserModelTestCase.assertRedirects
+      ~UserModelTestCase.assertRegex
+      ~UserModelTestCase.assertSequenceEqual
+      ~UserModelTestCase.assertSetEqual
+      ~UserModelTestCase.assertTemplateNotUsed
+      ~UserModelTestCase.assertTemplateUsed
+      ~UserModelTestCase.assertTrue
+      ~UserModelTestCase.assertTupleEqual
+      ~UserModelTestCase.assertURLEqual
+      ~UserModelTestCase.assertWarns
+      ~UserModelTestCase.assertWarnsMessage
+      ~UserModelTestCase.assertWarnsRegex
+      ~UserModelTestCase.assertXMLEqual
+      ~UserModelTestCase.assertXMLNotEqual
+      ~UserModelTestCase.captureOnCommitCallbacks
+      ~UserModelTestCase.countTestCases
+      ~UserModelTestCase.debug
+      ~UserModelTestCase.defaultTestResult
+      ~UserModelTestCase.doClassCleanups
+      ~UserModelTestCase.doCleanups
+      ~UserModelTestCase.ensure_connection_patch_method
+      ~UserModelTestCase.enterClassContext
+      ~UserModelTestCase.enterContext
+      ~UserModelTestCase.fail
+      ~UserModelTestCase.id
+      ~UserModelTestCase.modify_settings
+      ~UserModelTestCase.run
+      ~UserModelTestCase.setUp
+      ~UserModelTestCase.setUpClass
+      ~UserModelTestCase.setUpTestData
+      ~UserModelTestCase.settings
+      ~UserModelTestCase.shortDescription
+      ~UserModelTestCase.skipTest
+      ~UserModelTestCase.subTest
+      ~UserModelTestCase.tearDown
+      ~UserModelTestCase.tearDownClass
+      ~UserModelTestCase.test_redeem_pending_membership
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~UserModelTestCase.available_apps
+      ~UserModelTestCase.databases
+      ~UserModelTestCase.fixtures
+      ~UserModelTestCase.longMessage
+      ~UserModelTestCase.maxDiff
+      ~UserModelTestCase.reset_sequences
+      ~UserModelTestCase.serialized_rollback
+   
+   

@@ -77,6 +77,10 @@ fecfiler.cash\_on\_hand.tests.test\_views.CashOnHandYearlyViewSetTest
       ~CashOnHandYearlyViewSetTest.assertWarnsRegex
       ~CashOnHandYearlyViewSetTest.assertXMLEqual
       ~CashOnHandYearlyViewSetTest.assertXMLNotEqual
+      ~CashOnHandYearlyViewSetTest.build_viewset_delete_request
+      ~CashOnHandYearlyViewSetTest.build_viewset_get_request
+      ~CashOnHandYearlyViewSetTest.build_viewset_post_request
+      ~CashOnHandYearlyViewSetTest.build_viewset_put_request
       ~CashOnHandYearlyViewSetTest.captureOnCommitCallbacks
       ~CashOnHandYearlyViewSetTest.countTestCases
       ~CashOnHandYearlyViewSetTest.debug
@@ -88,11 +92,18 @@ fecfiler.cash\_on\_hand.tests.test\_views.CashOnHandYearlyViewSetTest
       ~CashOnHandYearlyViewSetTest.enterContext
       ~CashOnHandYearlyViewSetTest.fail
       ~CashOnHandYearlyViewSetTest.id
+      ~CashOnHandYearlyViewSetTest.init_request
       ~CashOnHandYearlyViewSetTest.modify_settings
       ~CashOnHandYearlyViewSetTest.run
+      ~CashOnHandYearlyViewSetTest.send_viewset_delete_request
+      ~CashOnHandYearlyViewSetTest.send_viewset_get_request
+      ~CashOnHandYearlyViewSetTest.send_viewset_post_request
+      ~CashOnHandYearlyViewSetTest.send_viewset_put_request
       ~CashOnHandYearlyViewSetTest.setUp
       ~CashOnHandYearlyViewSetTest.setUpClass
       ~CashOnHandYearlyViewSetTest.setUpTestData
+      ~CashOnHandYearlyViewSetTest.set_default_committee
+      ~CashOnHandYearlyViewSetTest.set_default_user
       ~CashOnHandYearlyViewSetTest.settings
       ~CashOnHandYearlyViewSetTest.shortDescription
       ~CashOnHandYearlyViewSetTest.skipTest
@@ -114,6 +125,8 @@ fecfiler.cash\_on\_hand.tests.test\_views.CashOnHandYearlyViewSetTest
    
       ~CashOnHandYearlyViewSetTest.available_apps
       ~CashOnHandYearlyViewSetTest.databases
+      ~CashOnHandYearlyViewSetTest.default_committee
+      ~CashOnHandYearlyViewSetTest.default_user
       ~CashOnHandYearlyViewSetTest.fixtures
       ~CashOnHandYearlyViewSetTest.longMessage
       ~CashOnHandYearlyViewSetTest.maxDiff

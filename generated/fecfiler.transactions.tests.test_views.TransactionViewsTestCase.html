@@ -37,7 +37,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="fecfiler.transactions.tests.test_views.TransactionViewsTestCase">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.transactions.tests.test_views.</span></span><span class="sig-name descname"><span class="pre">TransactionViewsTestCase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="fecfiler.shared.viewset_test.FecfilerViewSetTest.html#fecfiler.shared.viewset_test.FecfilerViewSetTest" title="fecfiler.shared.viewset_test.FecfilerViewSetTest"><code class="xref py py-class docutils literal notranslate"><span class="pre">FecfilerViewSetTest</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.__init__" title="Link to this definition">¶</a></dt>
@@ -223,6 +223,18 @@ not have a method with the specified name.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.assertXMLNotEqual" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.assertXMLNotEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertXMLNotEqual</span></code></a>(xml1, xml2[, msg])</p></td>
 <td><p>Assert that two XML snippets are not semantically equivalent.</p></td>
 </tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_viewset_delete_request</span></code>(uri[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_viewset_get_request</span></code>(uri[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_viewset_post_request</span></code>(uri, data[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_viewset_put_request</span></code>(uri, data[, ...])</p></td>
+<td><p></p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.captureOnCommitCallbacks" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.captureOnCommitCallbacks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">captureOnCommitCallbacks</span></code></a>(*[, using, execute])</p></td>
 <td><p>Context manager to capture transaction.on_commit() callbacks.</p></td>
 </tr>
@@ -274,124 +286,145 @@ not have a method with the specified name.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.modify_settings" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.modify_settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_settings</span></code></a>(**kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_request</span></code>(request[, authenticate, user, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.modify_settings" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.modify_settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">modify_settings</span></code></a>(**kwargs)</p></td>
 <td><p>A context manager that temporarily applies changes to a list setting and reverts back to the original value when exiting the context.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">post_request</span></code>(payload[, params])</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">post_request</span></code>(payload[, params])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>([result])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>([result])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUp" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUp</span></code></a>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_viewset_delete_request</span></code>(uri, ...[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_viewset_get_request</span></code>(uri, viewset_class, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_viewset_post_request</span></code>(uri, data, ...[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">send_viewset_put_request</span></code>(uri, data, ...[, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUp" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUp</span></code></a>()</p></td>
 <td><p>Hook method for setting up the test fixture before exercising it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUpClass" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUpClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpClass</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUpClass" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUpClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpClass</span></code></a>()</p></td>
 <td><p>Hook method for setting up class fixture before running tests in the class.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUpTestData" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUpTestData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpTestData</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUpTestData" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.setUpTestData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpTestData</span></code></a>()</p></td>
 <td><p>Load initial data for the TestCase.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.settings" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">settings</span></code></a>(**kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_default_committee</span></code>(default_committee)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_default_user</span></code>(default_user)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.settings" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.settings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">settings</span></code></a>(**kwargs)</p></td>
 <td><p>A context manager that temporarily sets a setting and reverts to the original value when exiting the context.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.shortDescription" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.shortDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortDescription</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.shortDescription" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.shortDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortDescription</span></code></a>()</p></td>
 <td><p>Returns a one-line description of the test, or None if no description has been provided.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.skipTest" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.skipTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skipTest</span></code></a>(reason)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.skipTest" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.skipTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skipTest</span></code></a>(reason)</p></td>
 <td><p>Skip this test.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.subTest" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.subTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subTest</span></code></a>([msg])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.subTest" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.subTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subTest</span></code></a>([msg])</p></td>
 <td><p>Return a context manager that will return the enclosed block of code in a subtest identified by the optional message and keyword parameters.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.tearDown" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.tearDown"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDown</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.tearDown" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.tearDown"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDown</span></code></a>()</p></td>
 <td><p>Hook method for deconstructing the test fixture after testing it.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.tearDownClass" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.tearDownClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDownClass</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.tearDownClass" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.tearDownClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDownClass</span></code></a>()</p></td>
 <td><p>Hook method for deconstructing the class fixture after running all tests in the class.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_add_transaction_family_to_report_from_child</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_add_transaction_family_to_report_from_child</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_add_transaction_family_to_report_from_parent</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_add_transaction_family_to_report_from_parent</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_add_transaction_to_report</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_add_transaction_to_report</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_create_schedule_f_debt_repayment" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_create_schedule_f_debt_repayment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_schedule_f_debt_repayment</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_create_schedule_f_debt_repayment" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_create_schedule_f_debt_repayment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_create_schedule_f_debt_repayment</span></code></a>()</p></td>
 <td><p>Making a schedule f debt repayment should reduce the balance accordingly</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_carried_forward_debt" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_carried_forward_debt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_carried_forward_debt_on_repayment_to_carried_forward_debt</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_carried_forward_debt" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_carried_forward_debt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_carried_forward_debt_on_repayment_to_carried_forward_debt</span></code></a>()</p></td>
 <td><p>Paying off a debt in one report should delete any carried forward copies in future reports</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_orignal_debt" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_orignal_debt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_carried_forward_debt_on_repayment_to_orignal_debt</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_orignal_debt" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_orignal_debt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_carried_forward_debt_on_repayment_to_orignal_debt</span></code></a>()</p></td>
 <td><p>Paying off a debt in the original report should delete any carried forward copies in future reports</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_carried_forward_loan" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_carried_forward_loan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_carried_forward_loan_on_repayment_to_carried_forward_loan</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_carried_forward_loan" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_carried_forward_loan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_carried_forward_loan_on_repayment_to_carried_forward_loan</span></code></a>()</p></td>
 <td><p>Paying off a loan in one report should delete any carried forward copies in future reports</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_orignal_loan" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_orignal_loan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_carried_forward_loan_on_repayment_to_orignal_loan</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_orignal_loan" title="fecfiler.transactions.tests.test_views.TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_orignal_loan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_carried_forward_loan_on_repayment_to_orignal_loan</span></code></a>()</p></td>
 <td><p>Paying off a loan in the original report should delete any carried forward copies in future reports</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_destroy</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_destroy</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_destroy_with_dependent_parent</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_destroy_with_dependent_parent</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_entity_date_leapfrogging</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_entity_date_leapfrogging</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_entity_date_leapfrogging_and_contact_change</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_entity_date_leapfrogging_and_contact_change</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_entity_move_date_backwards</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_entity_move_date_backwards</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_previous_election</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_previous_election</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_previous_election_leapfrogging</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_previous_election_leapfrogging</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_previous_entity</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_previous_entity</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_previous_entity_same_day</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_previous_entity_same_day</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_queryset</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_queryset</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_inherited_election_aggregate</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_inherited_election_aggregate</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_multi_sorting</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_multi_sorting</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_reatt_redes_multisave_transactions</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_reatt_redes_multisave_transactions</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_remove_transaction_from_report</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_remove_transaction_from_report</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_save_debt</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_save_debt</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_save_transaction_pair</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_save_transaction_pair</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_sorting_memo_code</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_sorting_memo_code</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_sorting_memo_code_inverted</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_sorting_memo_code_inverted</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_sorting_memos_only_true</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_sorting_memos_only_true</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_update</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_update</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -403,6 +436,12 @@ not have a method with the specified name.</p>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">databases</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_committee</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">default_user</span></code></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">fixtures</span></code></p></td>

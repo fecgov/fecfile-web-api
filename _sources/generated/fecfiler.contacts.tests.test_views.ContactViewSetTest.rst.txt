@@ -77,6 +77,10 @@ fecfiler.contacts.tests.test\_views.ContactViewSetTest
       ~ContactViewSetTest.assertWarnsRegex
       ~ContactViewSetTest.assertXMLEqual
       ~ContactViewSetTest.assertXMLNotEqual
+      ~ContactViewSetTest.build_viewset_delete_request
+      ~ContactViewSetTest.build_viewset_get_request
+      ~ContactViewSetTest.build_viewset_post_request
+      ~ContactViewSetTest.build_viewset_put_request
       ~ContactViewSetTest.captureOnCommitCallbacks
       ~ContactViewSetTest.countTestCases
       ~ContactViewSetTest.debug
@@ -88,11 +92,18 @@ fecfiler.contacts.tests.test\_views.ContactViewSetTest
       ~ContactViewSetTest.enterContext
       ~ContactViewSetTest.fail
       ~ContactViewSetTest.id
+      ~ContactViewSetTest.init_request
       ~ContactViewSetTest.modify_settings
       ~ContactViewSetTest.run
+      ~ContactViewSetTest.send_viewset_delete_request
+      ~ContactViewSetTest.send_viewset_get_request
+      ~ContactViewSetTest.send_viewset_post_request
+      ~ContactViewSetTest.send_viewset_put_request
       ~ContactViewSetTest.setUp
       ~ContactViewSetTest.setUpClass
       ~ContactViewSetTest.setUpTestData
+      ~ContactViewSetTest.set_default_committee
+      ~ContactViewSetTest.set_default_user
       ~ContactViewSetTest.settings
       ~ContactViewSetTest.shortDescription
       ~ContactViewSetTest.skipTest
@@ -132,6 +143,8 @@ fecfiler.contacts.tests.test\_views.ContactViewSetTest
    
       ~ContactViewSetTest.available_apps
       ~ContactViewSetTest.databases
+      ~ContactViewSetTest.default_committee
+      ~ContactViewSetTest.default_user
       ~ContactViewSetTest.fixtures
       ~ContactViewSetTest.longMessage
       ~ContactViewSetTest.maxDiff

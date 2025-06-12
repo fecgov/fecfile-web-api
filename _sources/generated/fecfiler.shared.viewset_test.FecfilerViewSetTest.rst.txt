@@ -1,0 +1,132 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.shared.viewset\_test.FecfilerViewSetTest
+=================================================
+
+.. currentmodule:: fecfiler.shared.viewset_test
+
+.. autoclass:: FecfilerViewSetTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~FecfilerViewSetTest.__init__
+      ~FecfilerViewSetTest.addClassCleanup
+      ~FecfilerViewSetTest.addCleanup
+      ~FecfilerViewSetTest.addTypeEqualityFunc
+      ~FecfilerViewSetTest.assertAlmostEqual
+      ~FecfilerViewSetTest.assertContains
+      ~FecfilerViewSetTest.assertCountEqual
+      ~FecfilerViewSetTest.assertDictEqual
+      ~FecfilerViewSetTest.assertEqual
+      ~FecfilerViewSetTest.assertFalse
+      ~FecfilerViewSetTest.assertFieldOutput
+      ~FecfilerViewSetTest.assertFormError
+      ~FecfilerViewSetTest.assertFormSetError
+      ~FecfilerViewSetTest.assertGreater
+      ~FecfilerViewSetTest.assertGreaterEqual
+      ~FecfilerViewSetTest.assertHTMLEqual
+      ~FecfilerViewSetTest.assertHTMLNotEqual
+      ~FecfilerViewSetTest.assertIn
+      ~FecfilerViewSetTest.assertInHTML
+      ~FecfilerViewSetTest.assertIs
+      ~FecfilerViewSetTest.assertIsInstance
+      ~FecfilerViewSetTest.assertIsNone
+      ~FecfilerViewSetTest.assertIsNot
+      ~FecfilerViewSetTest.assertIsNotNone
+      ~FecfilerViewSetTest.assertJSONEqual
+      ~FecfilerViewSetTest.assertJSONNotEqual
+      ~FecfilerViewSetTest.assertLess
+      ~FecfilerViewSetTest.assertLessEqual
+      ~FecfilerViewSetTest.assertListEqual
+      ~FecfilerViewSetTest.assertLogs
+      ~FecfilerViewSetTest.assertMultiLineEqual
+      ~FecfilerViewSetTest.assertNoLogs
+      ~FecfilerViewSetTest.assertNotAlmostEqual
+      ~FecfilerViewSetTest.assertNotContains
+      ~FecfilerViewSetTest.assertNotEqual
+      ~FecfilerViewSetTest.assertNotIn
+      ~FecfilerViewSetTest.assertNotInHTML
+      ~FecfilerViewSetTest.assertNotIsInstance
+      ~FecfilerViewSetTest.assertNotRegex
+      ~FecfilerViewSetTest.assertNumQueries
+      ~FecfilerViewSetTest.assertQuerySetEqual
+      ~FecfilerViewSetTest.assertRaises
+      ~FecfilerViewSetTest.assertRaisesMessage
+      ~FecfilerViewSetTest.assertRaisesRegex
+      ~FecfilerViewSetTest.assertRedirects
+      ~FecfilerViewSetTest.assertRegex
+      ~FecfilerViewSetTest.assertSequenceEqual
+      ~FecfilerViewSetTest.assertSetEqual
+      ~FecfilerViewSetTest.assertTemplateNotUsed
+      ~FecfilerViewSetTest.assertTemplateUsed
+      ~FecfilerViewSetTest.assertTrue
+      ~FecfilerViewSetTest.assertTupleEqual
+      ~FecfilerViewSetTest.assertURLEqual
+      ~FecfilerViewSetTest.assertWarns
+      ~FecfilerViewSetTest.assertWarnsMessage
+      ~FecfilerViewSetTest.assertWarnsRegex
+      ~FecfilerViewSetTest.assertXMLEqual
+      ~FecfilerViewSetTest.assertXMLNotEqual
+      ~FecfilerViewSetTest.build_viewset_delete_request
+      ~FecfilerViewSetTest.build_viewset_get_request
+      ~FecfilerViewSetTest.build_viewset_post_request
+      ~FecfilerViewSetTest.build_viewset_put_request
+      ~FecfilerViewSetTest.captureOnCommitCallbacks
+      ~FecfilerViewSetTest.countTestCases
+      ~FecfilerViewSetTest.debug
+      ~FecfilerViewSetTest.defaultTestResult
+      ~FecfilerViewSetTest.doClassCleanups
+      ~FecfilerViewSetTest.doCleanups
+      ~FecfilerViewSetTest.ensure_connection_patch_method
+      ~FecfilerViewSetTest.enterClassContext
+      ~FecfilerViewSetTest.enterContext
+      ~FecfilerViewSetTest.fail
+      ~FecfilerViewSetTest.id
+      ~FecfilerViewSetTest.init_request
+      ~FecfilerViewSetTest.modify_settings
+      ~FecfilerViewSetTest.run
+      ~FecfilerViewSetTest.send_viewset_delete_request
+      ~FecfilerViewSetTest.send_viewset_get_request
+      ~FecfilerViewSetTest.send_viewset_post_request
+      ~FecfilerViewSetTest.send_viewset_put_request
+      ~FecfilerViewSetTest.setUp
+      ~FecfilerViewSetTest.setUpClass
+      ~FecfilerViewSetTest.setUpTestData
+      ~FecfilerViewSetTest.set_default_committee
+      ~FecfilerViewSetTest.set_default_user
+      ~FecfilerViewSetTest.settings
+      ~FecfilerViewSetTest.shortDescription
+      ~FecfilerViewSetTest.skipTest
+      ~FecfilerViewSetTest.subTest
+      ~FecfilerViewSetTest.tearDown
+      ~FecfilerViewSetTest.tearDownClass
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~FecfilerViewSetTest.available_apps
+      ~FecfilerViewSetTest.databases
+      ~FecfilerViewSetTest.default_committee
+      ~FecfilerViewSetTest.default_user
+      ~FecfilerViewSetTest.fixtures
+      ~FecfilerViewSetTest.longMessage
+      ~FecfilerViewSetTest.maxDiff
+      ~FecfilerViewSetTest.reset_sequences
+      ~FecfilerViewSetTest.serialized_rollback
+   
+   
