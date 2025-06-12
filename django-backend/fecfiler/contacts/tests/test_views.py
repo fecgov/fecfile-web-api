@@ -45,6 +45,9 @@ def mocked_requests_get_committees(*args, **kwargs):
         def json(self):
             return self.json_data
 
+        def raise_for_status(self):
+            return
+
     return MockResponse(
         {
             "results": [
