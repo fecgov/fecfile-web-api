@@ -22,6 +22,7 @@
         "path": "form_99.filing_frequency"
     },
     "pdf_attachment": {
+        "serializer": "BOOLEAN_X",
         "path": "form_99.pdf_attachment"
     }
 }
