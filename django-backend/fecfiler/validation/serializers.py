@@ -4,15 +4,12 @@ from fecfile_validate import validate
 from rest_framework import exceptions
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import CharField, ListField
-from fecfiler.settings import FEC_FORMAT_VERSION
 from functools import reduce
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 MISSING_SCHEMA_NAME_ERROR = ValidationError({"schema_name": ["No schema_name provided"]})
-
-OVERRIDE_LIST = ["C2_LOAN_GUARANTOR.json", "F99.json"]
 
 
 class FecSchemaValidatorSerializerMixin(serializers.Serializer):
@@ -59,8 +56,6 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
             "`schema_name` attribute, or override the `get_schema_name()` method."
         )
 
-        if FEC_FORMAT_VERSION == "8.4" and self.schema_name in OVERRIDE_LIST:
-            self.schema_name = f"_OVERRIDE_{self.schema_name}"
         return self.schema_name
 
     def get_validation_candidate(self, data):

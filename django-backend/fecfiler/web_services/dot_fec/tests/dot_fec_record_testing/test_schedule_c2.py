@@ -45,7 +45,7 @@ class DotFECScheduleC2TestCase(TestCase):
             type=Contact.ContactType.INDIVIDUAL,
             last_name="last name",
             first_name="First name",
-            committee_id=self.committee.committee_id,
+            committee_id="C87654321",
             middle_name="Middle Name",
             prefix="Mr.",
             suffix="Junior",
@@ -89,7 +89,7 @@ class DotFECScheduleC2TestCase(TestCase):
     def test_guarantor(self):
         self.assertEqual(self.split_row[4], self.individual.type)
         self.assertEqual(self.split_row[5], "")
-        self.assertEqual(self.split_row[6], self.committee.committee_id)
+        self.assertEqual(self.split_row[6], self.individual.committee_id)
         self.assertEqual(self.split_row[7], self.individual.last_name)
         self.assertEqual(self.split_row[8], self.individual.first_name)
         self.assertEqual(self.split_row[9], self.individual.middle_name)

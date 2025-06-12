@@ -2,6 +2,7 @@ from unittest.mock import patch
 from django.test import TestCase
 from fecfiler.web_services.dot_fec.dot_fec_composer import (
     compose_dot_fec,
+    compose_transaction,
     add_row_to_content,
     compose_header,
 )
@@ -12,10 +13,11 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import (
 )
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x, create_form99, create_report_memo
-from fecfiler.transactions.tests.utils import create_schedule_a
+from fecfiler.transactions.tests.utils import create_schedule_a, create_loan_from_bank
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from django.core.exceptions import ImproperlyConfigured
 from datetime import datetime
+from decimal import Decimal
 
 
 class DotFECSerializerTestCase(TestCase):
@@ -35,11 +37,26 @@ class DotFECSerializerTestCase(TestCase):
             {
                 "filing_frequency": "Q",
                 "text_code": "ABC",
+                "pdf_attachment": True,
                 "message_text": "\nBEHOLD! A large text string\nwith new lines",
             },
         )
         self.contact_1 = create_test_individual_contact(
-            "last name", "First name", self.committee.id
+            "last name",
+            "First name",
+            self.committee.id,
+            {
+                "middle_name": "Middle Name",
+                "prefix": "Mr.",
+                "suffix": "Junior",
+                "street_1": "1234 Street Rd",
+                "street_2": "Apt 1",
+                "city": "Phoenix",
+                "state": "MD",
+                "zip": "12345",
+                "employer": "employer",
+                "occupation": "occupation",
+            },
         )
 
         self.transaction = create_schedule_a(
@@ -112,14 +129,15 @@ class DotFECSerializerTestCase(TestCase):
         row_str = add_row_to_content("", transaction_row)
         self.assertIn("75.00", row_str)
 
+    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.5")
     def test_f99(self):
         content = compose_dot_fec(self.f99.id)
         split_content = content.split("\n")
         split_report_row = split_content[1].split(FS_STR)
         self.assertEqual(split_report_row[14], "ABC")
         self.assertEqual(split_report_row[15], "Q")
-        self.assertEqual(split_report_row[16], "\r")
-        free_text = content[content.find("[BEGINTEXT]"):]
+        self.assertEqual(split_report_row[16], "X\r")
+        free_text = content[content.find("[BEGINTEXT]") :]
         self.assertEqual(
             free_text,
             "[BEGINTEXT]\r\n\nBEHOLD! A large text string"
@@ -131,3 +149,42 @@ class DotFECSerializerTestCase(TestCase):
         with self.assertRaises(ImproperlyConfigured) as cm:
             compose_header(self.f3x.id)
         self.assertIn("FEC_FORMAT_VERSION is not set", str(cm.exception))
+
+    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.4")
+    def test_schema_override_8_dot_4_f99(self):
+        content = compose_dot_fec(self.f99.id)
+        split_content = content.split("\n")
+        split_report_row = split_content[1].split(FS_STR)
+        self.assertEqual(split_report_row[14], "ABC\r")
+
+    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.4")
+    def test_schema_override_8_dot_4_C2(self):
+        _, _, _, c2 = create_loan_from_bank(
+            self.committee,
+            self.contact_1,
+            1000.00,
+            datetime.strptime("2024-01-10", "%Y-%m-%d"),
+            "5%",
+            loan_incurred_date=datetime.strptime("2024-01-02", "%Y-%m-%d"),
+            report=self.f3x,
+        )
+        c2.schedule_c2.guaranteed_amount = Decimal(10.00)
+        c2.schedule_c2.save()
+        c2.refresh_from_db()
+        compose_transaction(c2)
+        content = serialize_instance("SchC2", c2)
+        split_content = content.split(FS_STR)
+        self.assertEqual(split_content[0], "SC2/10")
+        self.assertEqual(split_content[4], self.contact_1.last_name)
+        self.assertEqual(split_content[5], self.contact_1.first_name)
+        self.assertEqual(split_content[6], self.contact_1.middle_name)
+        self.assertEqual(split_content[7], self.contact_1.prefix)
+        self.assertEqual(split_content[8], self.contact_1.suffix)
+        self.assertEqual(split_content[9], self.contact_1.street_1)
+        self.assertEqual(split_content[10], self.contact_1.street_2)
+        self.assertEqual(split_content[11], self.contact_1.city)
+        self.assertEqual(split_content[12], self.contact_1.state)
+        self.assertEqual(split_content[13], self.contact_1.zip)
+        self.assertEqual(split_content[14], self.contact_1.employer)
+        self.assertEqual(split_content[15], self.contact_1.occupation)
+        self.assertEqual(split_content[16], "10.00")
