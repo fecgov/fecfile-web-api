@@ -104,6 +104,8 @@ fecfiler.web\_services.dot\_fec.tests.test\_dot\_fec\_composer.DotFECSerializerT
       ~DotFECSerializerTestCase.test_f99
       ~DotFECSerializerTestCase.test_missing_fec_format_version_raises_error
       ~DotFECSerializerTestCase.test_row_contains_aggregate
+      ~DotFECSerializerTestCase.test_schema_override_8_dot_4_C2
+      ~DotFECSerializerTestCase.test_schema_override_8_dot_4_f99
    
    
 

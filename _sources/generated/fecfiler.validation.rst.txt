@@ -33,4 +33,5 @@ fecfiler.validation
 
    fecfiler.validation.serializers
    fecfiler.validation.tests
+   fecfiler.validation.utilities
 

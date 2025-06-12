@@ -1,0 +1,6 @@
+fecfiler.validation.utilities.get\_schema\_name\_for\_version
+=============================================================
+
+.. currentmodule:: fecfiler.validation.utilities
+
+.. autofunction:: get_schema_name_for_version
