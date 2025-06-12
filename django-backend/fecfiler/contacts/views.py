@@ -6,7 +6,7 @@ import requests
 from django.db.models import CharField, Q, Value
 from django.db.models.functions import Concat, Lower, Coalesce
 from django.http import HttpResponseBadRequest, JsonResponse
-from rest_framework import viewsets, pagination
+from rest_framework import viewsets, pagination, status
 from fecfiler.committee_accounts.views import (
     CommitteeOwnedViewMixin,
 )
@@ -166,7 +166,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         response = requests.get(
             FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
         )
-        if response.status_code not in [200, 404]:
+        if response.status_code != status.HTTP_404_NOT_FOUND:
             response.raise_for_status()
 
         json_results = response.json()
@@ -231,7 +231,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         response = requests.get(
             FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
         )
-        if response.status_code not in [200, 404]:
+        if response.status_code != status.HTTP_404_NOT_FOUND:
             response.raise_for_status()
 
         json_results = response.json()
