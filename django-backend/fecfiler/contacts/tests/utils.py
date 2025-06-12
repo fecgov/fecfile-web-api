@@ -41,8 +41,8 @@ def create_test_candidate_contact(
     committee_account_id: UUID,
     candidate_id: str,
     candidate_office: str,
-    candidate_state: str,
-    candidate_district: str,
+    candidate_state: str | None,
+    candidate_district: str | None,
     kwargs={},
 ):
     return Contact.objects.create(
