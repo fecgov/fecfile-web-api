@@ -132,17 +132,17 @@ class DotFECSerializerTestCase(TestCase):
     @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.5")
     def test_f99(self):
         content = compose_dot_fec(self.f99.id)
-        split_content = content.split("\n")
+        split_content = content.split(CRLF_STR)
         split_report_row = split_content[1].split(FS_STR)
         self.assertEqual(split_report_row[14], "ABC")
         self.assertEqual(split_report_row[15], "Q")
-        self.assertEqual(split_report_row[16], "X\r")
-        free_text = content[content.find("[BEGINTEXT]") :]
+        self.assertEqual(split_report_row[16], "X")
+        self.assertEqual(split_content[2], "[BEGINTEXT]")
         self.assertEqual(
-            free_text,
-            "[BEGINTEXT]\r\n\nBEHOLD! A large text string"
-            + "\nwith new lines\r\n[ENDTEXT]\r\n",
+            split_content[3],
+            "\nBEHOLD! A large text string\nwith new lines",
         )
+        self.assertEqual(split_content[4], "[ENDTEXT]")
 
     @patch("fecfiler.web_services.dot_fec.dot_fec_composer.FEC_FORMAT_VERSION", None)
     def test_missing_fec_format_version_raises_error(self):
@@ -153,9 +153,10 @@ class DotFECSerializerTestCase(TestCase):
     @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.4")
     def test_schema_override_8_dot_4_f99(self):
         content = compose_dot_fec(self.f99.id)
-        split_content = content.split("\n")
+        split_content = content.split(CRLF_STR)
         split_report_row = split_content[1].split(FS_STR)
-        self.assertEqual(split_report_row[14], "ABC\r")
+        self.assertEqual(split_report_row[14], "ABC")
+        self.assertEqual(len(split_report_row), 15)
 
     @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.4")
     def test_schema_override_8_dot_4_C2(self):
