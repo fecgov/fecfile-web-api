@@ -180,8 +180,7 @@ def compose_dot_fec(report_id):
         file_content = add_row_to_content(None, header_row)
 
         report = compose_report(report_id)
-        report_schema_name = report.get_form_name()
-        report_row = serialize_instance(report_schema_name, report)
+        report_row = serialize_instance(report.get_form_name(), report)
         logger.debug("Serialized Report:")
         logger.debug(report_row)
         file_content = add_row_to_content(file_content, report_row)
