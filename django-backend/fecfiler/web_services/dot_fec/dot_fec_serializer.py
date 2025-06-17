@@ -1,6 +1,7 @@
 from datetime import datetime
 from fecfile_validate import validate
 from fecfiler.settings import BASE_DIR
+from fecfiler.validation.utilities import get_schema_name_for_version
 from curses import ascii
 import os
 import json
@@ -149,7 +150,11 @@ def get_field_mappings(schema_name):
 
 
 def extract_row_config(schema_name):
-    schema = validate.get_schema(schema_name)
+    """Extracts the column sequences and row length from the schema."""
+    # get possible override for schema name based on FEC format version
+    # override only used for schema, not row_config
+    override_schema_name = get_schema_name_for_version(schema_name)
+    schema = validate.get_schema(override_schema_name)
     schema_properties = schema.get("properties", {}).items()
     column_sequences = {
         v.get("fec_spec", {}).get("COL_SEQ", None): k for k, v in schema_properties

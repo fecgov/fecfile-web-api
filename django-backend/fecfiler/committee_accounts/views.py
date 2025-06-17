@@ -252,7 +252,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 )
             return Response({"success": "Membership removed."})
         except ValidationError as e:
-            logger.info(f"{str(e)}")
+            logger.error(f"{str(e)}")
             return Response({"error": str(e)}, status=400)
 
     def update(self, request, *args, **kwargs):

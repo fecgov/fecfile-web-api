@@ -1,9 +1,6 @@
 from decimal import Decimal
-from django.test import TestCase
-from django.test.client import RequestFactory
 from rest_framework import status
 from rest_framework.request import HttpRequest, Request
-from rest_framework.test import force_authenticate
 from fecfiler.user.models import User
 from fecfiler.reports.models import Report
 import json
@@ -28,12 +25,13 @@ from fecfiler.transactions.tests.utils import (
     gen_schedule_f_request_data,
 )
 from fecfiler.transactions.serializers import TransactionSerializer
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
-class TransactionViewsTestCase(TestCase):
+class TransactionViewsTestCase(FecfilerViewSetTest):
 
     json_content_type = "application/json"
 
@@ -42,9 +40,12 @@ class TransactionViewsTestCase(TestCase):
         return super().setUpClass()
 
     def setUp(self):
-        self.factory = RequestFactory()
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.user = User.objects.create(email="test@fec.gov", username="gov")
+        super().set_default_user(self.user)
+        super().set_default_committee(self.committee)
+        super().setUp()
+
         self.q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.q2_report = create_form3x(self.committee, "2024-02-02", "2024-03-01", {})
         self.contact_1 = create_test_individual_contact(
@@ -104,20 +105,12 @@ class TransactionViewsTestCase(TestCase):
 
         self.ordering_filter = TransactionOrderingFilter()
         self.view = TransactionViewSet()
-
-        request = self.factory.get(
-            "/api/v1/transactions/",
-            content_type=self.json_content_type,
+        self.view.request = self.get_request(
+            params={
+                "ordering": "memo_code",
+                "report_id": self.q1_report.id,
+            }
         )
-        request.query_params = {
-            "ordering": "memo_code",
-            "report_id": self.q1_report.id,
-        }
-        request.session = {
-            "committee_uuid": self.committee.id,
-            "committee_id": self.committee.committee_id,
-        }
-        self.view.request = request
 
         self.test_com_contact = create_test_committee_contact(
             "test-com-name1",
@@ -176,40 +169,23 @@ class TransactionViewsTestCase(TestCase):
         )
 
     def post_request(self, payload, params={}):
-        request = self.factory.post(
-            "/api/v1/transactions",
-            json.dumps(payload, default=str),
-            content_type=self.json_content_type,
+        request = self.build_viewset_post_request(
+            "/api/v1/transactions", json.dumps(payload, default=str)
         )
-        request.user = self.user
         request.data = deepcopy(payload)
         request.query_params = params
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
         return request
 
     def delete_request(self, path="api/v1/transactions", params={}):
-        request = self.factory.delete(path)
-        request.user = self.user
+        request = self.build_viewset_delete_request(path)
         request.query_params = params
         request.data = {}
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
         return request
 
     def get_request(self, path="api/v1/transactions", params={}):
-        request = self.factory.get(path)
-        request.user = self.user
+        request = self.build_viewset_get_request(path)
         request.query_params = params
         request.data = {}
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
         return request
 
     def test_save_transaction_pair(self):
@@ -589,19 +565,12 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(transaction.get("calendar_ytd_per_election_office"), "147.00")
 
     def test_inherited_election_aggregate(self):
-        request = self.factory.get(f"/api/v1/transactions/{self.transaction.id}/")
-        request.user = self.user
-        request.query_params = {}
-        request.data = {}
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
-
-        view = TransactionViewSet
-        view.request = request
-
-        response = view.as_view({"get": "retrieve"})(request, pk=str(self.transaction.id))
+        response = self.send_viewset_get_request(
+            f"/api/v1/transactions/{self.transaction.id}/",
+            TransactionViewSet,
+            "retrieve",
+            pk=str(self.transaction.id),
+        )
         transaction = response.data
         logger.debug(transaction)
         self.assertEqual(transaction.get("_calendar_ytd_per_election_office"), "153.00")
@@ -858,10 +827,11 @@ class TransactionViewsTestCase(TestCase):
             self.assertEqual(ordered_queryset[i].id, memos_sorted[i].id)
 
     def test_destroy(self):
-        request = self.delete_request(f"api/v1/transactions/{self.transaction.id}/")
-        force_authenticate(request, self.user)
-        response = TransactionViewSet.as_view({"delete": "destroy"})(
-            request, pk=self.transaction.id
+        response = self.send_viewset_delete_request(
+            f"api/v1/transactions/{self.transaction.id}/",
+            TransactionViewSet,
+            "destroy",
+            pk=self.transaction.id,
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Transaction.objects.filter(pk=self.transaction.pk).exists())
@@ -894,10 +864,11 @@ class TransactionViewsTestCase(TestCase):
             "100",
             parent_id=partnership_memo.id,
         )
-        get_request = self.get_request(f"api/v1/transactions/{partnership_memo.id}/")
-        force_authenticate(get_request, self.user)
-        response = TransactionViewSet.as_view({"get": "retrieve"})(
-            get_request, pk=partnership_memo.id
+        response = self.send_viewset_get_request(
+            f"api/v1/transactions/{partnership_memo.id}/",
+            TransactionViewSet,
+            "retrieve",
+            pk=partnership_memo.id,
         )
         self.assertEqual(
             response.data["contribution_purpose_descrip"],
@@ -905,17 +876,19 @@ class TransactionViewsTestCase(TestCase):
         )
 
         # If we delete the attribution memo, the parent memo should be updated
-        delete_request = self.delete_request(
-            f"api/v1/transactions/{partnership_attribution_memo.id}/"
-        )
-        force_authenticate(delete_request, self.user)
-        response = TransactionViewSet.as_view({"delete": "destroy"})(
-            delete_request, pk=partnership_attribution_memo.id
+        response = self.send_viewset_delete_request(
+            f"api/v1/transactions/{partnership_attribution_memo.id}/",
+            TransactionViewSet,
+            "destroy",
+            pk=partnership_attribution_memo.id,
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        response = TransactionViewSet.as_view({"get": "retrieve"})(
-            get_request, pk=partnership_memo.id
+        response = self.send_viewset_get_request(
+            f"api/v1/transactions/{partnership_memo.id}/",
+            TransactionViewSet,
+            "retrieve",
+            pk=partnership_memo.id,
         )
         self.assertEqual(
             response.data["contribution_purpose_descrip"],
