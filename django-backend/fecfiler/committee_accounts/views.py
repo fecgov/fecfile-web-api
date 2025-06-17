@@ -6,9 +6,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.committee_accounts.utils import (
-    check_can_create_committee_account,
     create_committee_account,
     get_committee_account_data,
+    raise_if_cannot_create_committee_account,
 )
 from django.core.exceptions import ValidationError
 from drf_spectacular.utils import extend_schema, OpenApiParameter
@@ -74,12 +74,18 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 
     @action(detail=False, methods=["get"], url_path="get-available-committee")
     def get_available_committee(self, request):
-        committee_id = request.query_params.get("committee_id")
-        committee = get_committee_account_data(committee_id)
-        if check_can_create_committee_account(committee_id, request.user):
+        try:
+            committee_id = request.query_params.get("committee_id")
+            committee = get_committee_account_data(committee_id)
+            raise_if_cannot_create_committee_account(committee_id, request.user)
             return Response(committee)
-        response = {"message": "No available committee found."}
-        return Response(response, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(
+                f"User {request.user.email} failed to create committee account "
+                f"{committee_id}: {str(e)}"
+            )
+            response = {"message": "No available committee found."}
+            return Response(response, status=status.HTTP_404_NOT_FOUND)
 
     def list(self, request, *args, **kwargs):
         response = super(CommitteeViewSet, self).list(request, *args, **kwargs)
@@ -212,9 +218,9 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         new_member = Membership(**membership_args)
         new_member.save()
 
-        action = f'existing user {user.id} to' if user else "pending membership for"
+        action = f"existing user {user.id} to" if user else "pending membership for"
         logger.info(
-            f'User {request.user.id} added {action} committee {committee} as {role}'
+            f"User {request.user.id} added {action} committee {committee} as {role}"
         )
 
         return Response(CommitteeMembershipSerializer(new_member).data, status=200)
@@ -280,13 +286,13 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         member_string = ""
         if existing_member.user is not None:
             user_id = existing_member.user.id
-            member_string = f'user {user_id}'
+            member_string = f"user {user_id}"
         else:
             membership_id = existing_member.id
-            member_string = f'pending membership {membership_id}'
+            member_string = f"pending membership {membership_id}"
 
         logger.info(
-            f'Updating role for {member_string} in committee {committee} to {new_role}'
+            f"Updating role for {member_string} in committee {committee} to {new_role}"
         )
 
         return super().update(request, *args, **kwargs)
