@@ -55,7 +55,6 @@ def get_query_for_earlier_in_same_day(queryset, transaction_id, date):
     return Q()
 
 
-# Filter out transactions
 def get_query_for_entity_aggregation(contact_id):
     return Q(contact_1_id=contact_id)
 
