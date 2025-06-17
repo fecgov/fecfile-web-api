@@ -272,9 +272,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         date = datetime.fromisoformat(date)
         previous_transactions = filter_queryset_for_previous_transactions_in_aggregation(
             queryset,
-            transaction_id,
             date,
             aggregation_group,
+            transaction_id,
             contact_1_id,
             contact_2_id,
             election_code,
@@ -698,9 +698,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         previous_transactions = filter_queryset_for_previous_transactions_in_aggregation(
             shared_entity_transactions,
-            transaction.id,
             transaction.date,
             transaction.aggregation_group,
+            transaction.id,
             None,
             transaction.contact_2.id,
             None,

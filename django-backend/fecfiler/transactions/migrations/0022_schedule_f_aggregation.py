@@ -21,9 +21,9 @@ def calculate_schedule_f_aggregates(apps, schema_editor):
         for trans in schedule_f_transactions:
             previous_transactions = filter_queryset_for_previous_transactions_in_aggregation(
                 schedule_f_transactions,
-                trans.id,
                 trans.date,
                 trans.aggregation_group,
+                trans.id,
                 None,
                 trans.contact_2.id,
                 None,

@@ -102,9 +102,9 @@ def get_query_for_aggregation_relationship(
 # Returns the set of transactions whose amounts would factor into an aggregate for a date
 def filter_queryset_for_previous_transactions_in_aggregation(
     queryset,
-    transaction_id,
     date,
     aggregation_group,
+    transaction_id=None,
     contact_1_id=None,
     contact_2_id=None,
     election_code=None,
