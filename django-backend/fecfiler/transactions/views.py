@@ -22,7 +22,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.transactions.utils import filter_queryset_for_previous_transactions_in_aggregation
+from fecfiler.transactions.utils import filter_queryset_for_previous_transactions_in_aggregation  # noqa: E501
 from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact

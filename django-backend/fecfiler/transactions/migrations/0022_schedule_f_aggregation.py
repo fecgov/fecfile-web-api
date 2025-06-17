@@ -2,7 +2,7 @@
 
 from django.db import migrations
 from django.db.models import F
-from fecfiler.transactions.utils import filter_queryset_for_previous_transactions_in_aggregation
+from fecfiler.transactions.utils import filter_queryset_for_previous_transactions_in_aggregation  # noqa: E501
 
 
 def calculate_schedule_f_aggregates(apps, schema_editor):
@@ -19,7 +19,7 @@ def calculate_schedule_f_aggregates(apps, schema_editor):
         ).order_by("date")
 
         for trans in schedule_f_transactions:
-            previous_transactions = filter_queryset_for_previous_transactions_in_aggregation(
+            previous_transactions = filter_queryset_for_previous_transactions_in_aggregation(  # noqa: E501
                 schedule_f_transactions,
                 trans.date,
                 trans.aggregation_group,

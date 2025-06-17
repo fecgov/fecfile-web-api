@@ -68,11 +68,13 @@ def get_query_for_election_aggregation(election_code, state, office, district):
         Q(contact_2__candidate_district=district),
     )
 
+
 def get_query_for_payee_candidate_aggregation(election_year, contact_id):
     return Q(
         Q(contact_2_id=contact_id),
         Q(schedule_f__general_election_year=election_year)
     )
+
 
 def get_query_for_aggregation_relationship(
     contact_1_id,
