@@ -22,7 +22,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.transactions.utils import filter_for_previous_transactions
+from fecfiler.transactions.utils import filter_queryset_for_previous_transactions_in_aggregation
 from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
@@ -262,7 +262,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     ):
         date = datetime.fromisoformat(date)
         queryset = self.get_queryset()
-        previous_transactions = filter_for_previous_transactions(
+        previous_transactions = filter_queryset_for_previous_transactions_in_aggregation(
             queryset,
             transaction_id,
             date,
@@ -688,7 +688,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             schedule_f__general_election_year=transaction.schedule_f.general_election_year,  # noqa: E501
         )
 
-        previous_transactions = filter_for_previous_transactions(
+        previous_transactions = filter_queryset_for_previous_transactions_in_aggregation(
             shared_entity_transactions,
             transaction.id,
             transaction.date,
