@@ -21,6 +21,13 @@ fecfiler.transactions.utils
       add_committee_contact
       add_location
       add_org_ind_contact
+      filter_queryset_for_previous_transactions_in_aggregation
+      get_query_for_aggregation_relationship
+      get_query_for_earlier_in_same_day
+      get_query_for_earlier_in_same_year
+      get_query_for_election_aggregation
+      get_query_for_entity_aggregation
+      get_query_for_payee_candidate_aggregation
    
    
 

@@ -1,0 +1,6 @@
+fecfiler.transactions.utils.get\_query\_for\_entity\_aggregation
+================================================================
+
+.. currentmodule:: fecfiler.transactions.utils
+
+.. autofunction:: get_query_for_entity_aggregation

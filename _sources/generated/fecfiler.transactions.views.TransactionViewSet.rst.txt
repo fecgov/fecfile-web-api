@@ -57,7 +57,11 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.get_throttles
       ~TransactionViewSet.get_view_description
       ~TransactionViewSet.get_view_name
+      ~TransactionViewSet.handle_broken_transaction_chain
+      ~TransactionViewSet.handle_broken_transaction_chain_election_year
+      ~TransactionViewSet.handle_date_leapfrogging
       ~TransactionViewSet.handle_exception
+      ~TransactionViewSet.handle_leapfrogging_election_year
       ~TransactionViewSet.http_method_not_allowed
       ~TransactionViewSet.initial
       ~TransactionViewSet.initialize_request
@@ -73,6 +77,9 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.permission_denied
       ~TransactionViewSet.previous_transaction_by_election
       ~TransactionViewSet.previous_transaction_by_entity
+      ~TransactionViewSet.previous_transaction_by_payee_candidate
+      ~TransactionViewSet.process_aggregation
+      ~TransactionViewSet.process_aggregation_by_payee_candidate
       ~TransactionViewSet.raise_uncaught_exception
       ~TransactionViewSet.remove_transaction_from_report
       ~TransactionViewSet.retrieve

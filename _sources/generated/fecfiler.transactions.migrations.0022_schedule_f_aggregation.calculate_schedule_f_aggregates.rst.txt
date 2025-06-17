@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0022\_schedule\_f\_aggregation.calculate\_schedule\_f\_aggregates
+==================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0022_schedule_f_aggregation
+
+.. autofunction:: calculate_schedule_f_aggregates

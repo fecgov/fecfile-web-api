@@ -1,0 +1,6 @@
+fecfiler.transactions.utils.filter\_queryset\_for\_previous\_transactions\_in\_aggregation
+==========================================================================================
+
+.. currentmodule:: fecfiler.transactions.utils
+
+.. autofunction:: filter_queryset_for_previous_transactions_in_aggregation

@@ -52,4 +52,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0019_aggregate_committee_controls
    fecfiler.transactions.migrations.0020_trigger_save_on_transactions
    fecfiler.transactions.migrations.0021_alter_transaction_reports
+   fecfiler.transactions.migrations.0022_schedule_f_aggregation
 

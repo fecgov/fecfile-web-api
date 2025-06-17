@@ -137,10 +137,13 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.test_get_queryset
       ~TransactionViewsTestCase.test_inherited_election_aggregate
       ~TransactionViewsTestCase.test_multi_sorting
+      ~TransactionViewsTestCase.test_previous_transaction_by_payee_candidate
       ~TransactionViewsTestCase.test_reatt_redes_multisave_transactions
       ~TransactionViewsTestCase.test_remove_transaction_from_report
       ~TransactionViewsTestCase.test_save_debt
       ~TransactionViewsTestCase.test_save_transaction_pair
+      ~TransactionViewsTestCase.test_schedule_f_aggregation
+      ~TransactionViewsTestCase.test_schedule_f_aggregation_edge_cases
       ~TransactionViewsTestCase.test_sorting_memo_code
       ~TransactionViewsTestCase.test_sorting_memo_code_inverted
       ~TransactionViewsTestCase.test_sorting_memos_only_true

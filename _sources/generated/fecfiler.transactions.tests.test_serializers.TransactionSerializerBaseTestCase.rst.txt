@@ -103,6 +103,7 @@ fecfiler.transactions.tests.test\_serializers.TransactionSerializerBaseTestCase
       ~TransactionSerializerBaseTestCase.test_has_redesignation
       ~TransactionSerializerBaseTestCase.test_no_reattribution
       ~TransactionSerializerBaseTestCase.test_no_transaction_type_identifier
+      ~TransactionSerializerBaseTestCase.test_schedule_f_serialization
    
    
 

@@ -1,0 +1,41 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.transactions.migrations.0022\_schedule\_f\_aggregation
+===============================================================
+
+.. automodule:: fecfiler.transactions.migrations.0022_schedule_f_aggregation
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      calculate_schedule_f_aggregates
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

@@ -52,6 +52,7 @@ fecfiler.transactions.serializers.TransactionSerializer
       ~TransactionSerializer.handle_schedule_a
       ~TransactionSerializer.handle_schedule_b
       ~TransactionSerializer.handle_schedule_c
+      ~TransactionSerializer.handle_schedule_f
       ~TransactionSerializer.ignore_fields
       ~TransactionSerializer.include_extra_kwargs
       ~TransactionSerializer.is_valid

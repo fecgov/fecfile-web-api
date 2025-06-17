@@ -1,0 +1,6 @@
+fecfiler.transactions.utils.get\_query\_for\_aggregation\_relationship
+======================================================================
+
+.. currentmodule:: fecfiler.transactions.utils
+
+.. autofunction:: get_query_for_aggregation_relationship
