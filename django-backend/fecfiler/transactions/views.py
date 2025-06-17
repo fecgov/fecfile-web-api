@@ -184,7 +184,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             message = "contact_1_id, date, and aggregate_group are required params"
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-        return self.get_previous(transaction_id, date, aggregation_group, contact_1_id)
+        return self.get_previous(
+            self.get_queryset(),
+            date,
+            aggregation_group,
+            transaction_id,
+            contact_1_id
+        )
 
     @action(detail=False, methods=["get"], url_path=r"previous/election")
     def previous_transaction_by_election(self, request):
@@ -210,9 +216,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
         return self.get_previous(
-            id,
+            self.get_queryset(),
             date,
             aggregation_group,
+            id,
             None, None,
             election_code,
             None,
@@ -238,9 +245,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
         return self.get_previous(
-            transaction_id,
+            self.get_queryset(),
             date,
             aggregation_group,
+            transaction_id,
             None,
             contact_2_id,
             None,
@@ -249,9 +257,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def get_previous(
         self,
-        transaction_id,
+        queryset,
         date,
         aggregation_group,
+        transaction_id=None,
         contact_1_id=None,
         contact_2_id=None,
         election_code=None,
@@ -261,7 +270,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         district=None,
     ):
         date = datetime.fromisoformat(date)
-        queryset = self.get_queryset()
         previous_transactions = filter_queryset_for_previous_transactions_in_aggregation(
             queryset,
             transaction_id,
@@ -541,13 +549,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             schedule = transaction_instance.get_schedule_name()
             match schedule:
                 case Schedule.A | Schedule.B | Schedule.C | Schedule.C1 | Schedule.C2 | Schedule.D:  # noqa: E501
-                    # process_entity_aggregation()
+                    # process_aggregation_by_entity()
                     pass
                 case Schedule.E:
-                    # process_election_aggregation()
+                    # process_aggregation_by_election()
                     pass
                 case Schedule.F:
-                    self.process_general_election_year_aggregates(transaction_instance)
+                    self.process_aggregation_by_payee_candidate(transaction_instance)
 
     # If a transaction has been moved forward, update the aggregate values
     # for any transactions that were "leaped over"
@@ -591,7 +599,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
             to_recalculate = leapfrogged_sch_f_transactions.first()
             if to_recalculate is not None:
-                self.process_general_election_year_aggregates(to_recalculate)
+                self.process_aggregation_by_payee_candidate(to_recalculate)
 
     # If a transaction has been updated in such a way that would change which transactions
     # it would aggregate with, such as switching to a different contact or election code,
@@ -638,7 +646,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
             to_recalculate = leapfrogged_sch_f_transactions.first()
             if to_recalculate is not None:
-                self.process_general_election_year_aggregates(to_recalculate)
+                self.process_aggregation_by_payee_candidate(to_recalculate)
 
     @action(detail=False, methods=["post"], url_path=r"add-to-report")
     def add_transaction_to_report(self, request):
@@ -672,7 +680,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction.reports.remove(report)
         return Response("Transaction removed from report")
 
-    def process_general_election_year_aggregates(self, transaction_instance):
+    def process_aggregation_by_payee_candidate(self, transaction_instance):
         # Get the transaction out of the queryset in order to populate annotated fields
         transaction = self.get_queryset().filter(id=transaction_instance.id).first()
         if transaction is None:
@@ -722,7 +730,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         ScheduleF.objects.bulk_update(
             updated_schedule_fs,
-            ["aggregate_general_elec_expended"]
+            ["aggregate_general_elec_expended"],
+            batch_size=64
         )
 
 
