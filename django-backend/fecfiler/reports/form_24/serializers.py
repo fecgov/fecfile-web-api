@@ -3,10 +3,7 @@ from fecfiler.reports.models import Report
 from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.shared.utilities import get_model_data
-from rest_framework.serializers import (
-    CharField,
-    DateField,
-)
+from rest_framework.serializers import CharField, DateField
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -17,6 +14,7 @@ class Form24Serializer(ReportSerializer):
 
     report_type_24_48 = CharField(required=False, allow_null=True)
     original_amendment_date = DateField(required=False, allow_null=True)
+    name = CharField(required=False, allow_null=True)
 
     def to_internal_value(self, data):
         internal = super().to_internal_value(data)
