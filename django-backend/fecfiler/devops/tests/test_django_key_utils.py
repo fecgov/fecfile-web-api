@@ -1,4 +1,4 @@
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from unittest.mock import patch
 from fecfiler.devops.utils.django_key_utils import (
     gen_and_install_django_key,
@@ -8,9 +8,6 @@ from django.core import management
 
 
 class DjangoKeyUtilsTestCase(TestCase):
-
-    def setUp(self):
-        self.factory = RequestFactory()
 
     # gen_and_install_django_key
 

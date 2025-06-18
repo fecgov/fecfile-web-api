@@ -1,6 +1,6 @@
 import uuid
 from django.test import TestCase
-from .models import MemoText
+from ..models import MemoText
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 

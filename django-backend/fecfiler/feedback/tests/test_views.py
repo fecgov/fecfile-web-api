@@ -1,20 +1,17 @@
 from unittest import mock
 
 import github3
-from django.test import RequestFactory, TestCase
-from fecfiler.user.models import User
 from github3 import GitHub
 from github3.repos import Repository
-from rest_framework.test import APIClient
 from fecfiler.feedback.views import FeedbackViewSet
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
 
-class UserViewSetTest(TestCase):
+class FeedbackViewSetTest(FecfilerViewSetTest):
     fixtures = ["C01234567_user_and_committee"]
 
     def setUp(self):
-        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
-        self.factory = RequestFactory()
+        super().setUp()
 
     @mock.patch.object(github3, "login", return_value=GitHub)
     @mock.patch.object(GitHub, "repository", return_value=Repository)
@@ -22,18 +19,17 @@ class UserViewSetTest(TestCase):
     def test_submit_feedback_happy_path(
         self, mock_repo_create_issue, mock_github3_repo, mock_github3_login
     ):
-        client = APIClient()
-        client.force_authenticate(user=self.user)
-        test_headers = {"HTTP_USER_AGENT": "test_user_agent"}
-        test_post_data = {
-            "action": "test_action",
-            "feedback": "test_feedback",
-            "about": "test_about",
-            "location": "<b>test_location</b>",
-        }
-
-        response = client.post(
-            "/api/v1/feedback/submit/", data=test_post_data, secure=True, **test_headers
+        response = self.send_viewset_post_request(
+            "/api/v1/feedback/submit/",
+            {
+                "action": "test_action",
+                "feedback": "test_feedback",
+                "about": "test_about",
+                "location": "<b>test_location</b>",
+            },
+            FeedbackViewSet,
+            "submit_feedback",
+            headers={"HTTP_USER_AGENT": "test_user_agent"},
         )
 
         mock_github3_login.assert_called_once()
@@ -51,38 +47,34 @@ class UserViewSetTest(TestCase):
 
     @mock.patch("fecfiler.feedback.views.logger")
     def test_csp_report_happy_path(self, mock_logger):
-        factory = RequestFactory()
-        view = FeedbackViewSet()
-
-        request = factory.post(
+        test_data = {"type": "csp-violation"}
+        response = self.send_viewset_post_request(
             "/api/v1/feedback/csp-report",
+            test_data,
+            FeedbackViewSet,
+            "log_csp_report",
         )
-        request.data = {"type": "csp-violation"}
-        response = view.log_csp_report(request)
         self.assertEqual(response.status_code, 200)
-        mock_logger.warning.assert_called_with({"CSP Failure": request.data})
+        mock_logger.warning.assert_called_with({"CSP Failure": test_data})
 
     @mock.patch("fecfiler.feedback.views.logger")
     def test_csp_report_no_data(self, mock_logger):
-        factory = RequestFactory()
-        view = FeedbackViewSet()
-
-        request = factory.post(
+        response = self.send_viewset_post_request(
             "/api/v1/feedback/csp-report",
+            {},
+            FeedbackViewSet,
+            "log_csp_report",
         )
-        response = view.log_csp_report(request)
         self.assertEqual(response.status_code, 400)
         mock_logger.warning.assert_not_called()
 
     @mock.patch("fecfiler.feedback.views.logger")
     def test_csp_report_invalid_type(self, mock_logger):
-        factory = RequestFactory()
-        view = FeedbackViewSet()
-
-        request = factory.post(
+        response = self.send_viewset_post_request(
             "/api/v1/feedback/csp-report",
+            {"type": 2},
+            FeedbackViewSet,
+            "log_csp_report",
         )
-        request.data = {"type": 2}
-        response = view.log_csp_report(request)
         self.assertEqual(response.status_code, 400)
         mock_logger.warning.assert_not_called()

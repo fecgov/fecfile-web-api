@@ -114,6 +114,7 @@ def query_fec_api(endpoint, params):
     """Shared method to query an EFO API"""
     headers = {"Content-Type": "application/json"}
     response = requests.get(endpoint, headers=headers, params=params)
+    response.raise_for_status()
     response_data = response.json()
     committee_results = response_data.get("results", [])
     return committee_results[0] if committee_results else None

@@ -1,4 +1,4 @@
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from unittest.mock import patch
 from fecfiler.devops.utils.crypt_utils import (
     gen_rsa_pk,
@@ -9,9 +9,6 @@ from fecfiler.devops.utils.crypt_utils import (
 
 
 class CfApiUtilsTestCase(TestCase):
-
-    def setUp(self):
-        self.factory = RequestFactory()
 
     # gen_rsa_pk
 
