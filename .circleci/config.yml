@@ -258,7 +258,7 @@ workflows:
             - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|feature/2154-intentional_migration_fail|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
           requires:
             - test
