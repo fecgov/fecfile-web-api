@@ -7,7 +7,7 @@ def raise_error_during_migration():
     """
     Raises an intentional error during the migration process.
     """
-    raise ValueError("This is an intentional error during migration!")
+    raise Exception("This is an intentional error during migration!")
 
 class Migration(migrations.Migration):
 
