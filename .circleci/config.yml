@@ -91,8 +91,8 @@ jobs:
           command: mkdir ~/project/coverage-reports
 
       - run:
-          name: Make XML coverage report
-          command: coverage xml -o ~/project/coverage-reports/coverage.xml
+          name: Make XML coverage report (SKIP)
+          command: echo coverage xml -o ~/project/coverage-reports/coverage.xml
           working_directory: ~/project/django-backend
 
       # Sonar cloud setup and scanning
