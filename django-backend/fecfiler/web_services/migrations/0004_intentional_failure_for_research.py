@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(raise_error_during_migration("Raising an error before sleeping just to see if it shows in the logs.")),
+        #migrations.RunPython(raise_error_during_migration("Raising an error before sleeping just to see if it shows in the logs.")),
         migrations.RunPython(time.sleep(660)),  # sleep for 11 minutes
         migrations.RunPython(raise_error_during_migration("This is an intentional error during migration!")),
     ]
