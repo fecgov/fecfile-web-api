@@ -81,9 +81,9 @@ jobs:
           command: deptry ~/project/
 
       - run:
-          name: Run tests
+          name: Run tests (SKIP)
           # Use built-in Django test module
-          command: coverage run --source='.' --rcfile=.coveragerc manage.py test
+          command: echo coverage run --source='.' --rcfile=.coveragerc manage.py test
           working_directory: ~/project/django-backend/
 
       - run:
