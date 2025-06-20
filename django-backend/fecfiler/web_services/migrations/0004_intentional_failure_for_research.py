@@ -4,6 +4,7 @@
 from django.db import migrations
 import time
 
+
 def raise_error_during_migration(error_msg):
     """
     Raises an intentional error during the migration process.
