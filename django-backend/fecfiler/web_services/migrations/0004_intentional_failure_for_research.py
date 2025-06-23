@@ -19,7 +19,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(raise_error_during_migration("Error at outset.")),
+        # migrations.RunPython(raise_error_during_migration("Error at outset.")),
+        # migrations.RunPython(print("about to exec: migrations.RunPython(time.sleep(660))")),
         migrations.RunPython(time.sleep(660)),  # sleep for 11 minutes
+        # migrations.RunPython(print("""about to exec: raise_error_during_migration("Intentional error!")""")),
         migrations.RunPython(raise_error_during_migration("Intentional error!")),
     ]
