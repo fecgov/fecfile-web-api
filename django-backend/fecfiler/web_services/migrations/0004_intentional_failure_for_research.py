@@ -3,6 +3,9 @@
 
 from django.db import migrations
 import time
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 def raise_error_during_migration(error_msg):
@@ -10,6 +13,17 @@ def raise_error_during_migration(error_msg):
     Raises an intentional error during the migration process.
     """
     raise Exception(error_msg)
+
+
+def sleep_during_migration(minutes):
+    """
+    Sleeps for given number of minutes
+    """
+    logger.info(f"Sleeping for {minutes} minutes...")
+    for minute in range(minutes):
+        logger.info(f"Minute: {minute}")
+        time.sleep(60)
+    logger.info(f"Slept for {minutes} minutes")
 
 
 class Migration(migrations.Migration):
@@ -20,8 +34,6 @@ class Migration(migrations.Migration):
 
     operations = [
         # migrations.RunPython(raise_error_during_migration("Error at outset.")),
-        # migrations.RunPython(print("about to exec: migrations.RunPython(time.sleep(660))")),
-        migrations.RunPython(time.sleep(660)),  # sleep for 11 minutes
-        # migrations.RunPython(print("""about to exec: raise_error_during_migration("Intentional error!")""")),
+        migrations.RunPython(sleep_during_migration(15)),  # sleep for 15 minutes
         migrations.RunPython(raise_error_during_migration("Intentional error!")),
     ]
