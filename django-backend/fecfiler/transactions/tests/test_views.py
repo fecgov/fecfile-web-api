@@ -1295,6 +1295,29 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "zip": "59624"
             }
         )
+        contact_can_2 = create_test_candidate_contact(
+            "Testerson",
+            "George",
+            self.committee.id,
+            "S6MT00163",
+            "S",
+            "MT",
+            None,
+            {
+                "city": "HELENA",
+                "country": "USA",
+                "employer": None,
+                "middle_name": None,
+                "occupation": None,
+                "prefix": None,
+                "state": "MT",
+                "street_1": "PO BOX 1135",
+                "street_2": None,
+                "suffix": None,
+                "telephone": None,
+                "zip": "59624"
+            }
+        )
         contact_com = create_test_committee_contact(
             "Testersons United",
             "C12344321",
@@ -1336,17 +1359,52 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "general_election_year": "2024"
             }
         )
+        c = create_schedule_f(
+            type="COORDINATED_PARTY_EXPENDITURE",
+            committee=self.committee,
+            contact_1=contact_org,
+            contact_2=contact_can_2,
+            contact_3=contact_com,
+            report=report,
+            schedule_data={
+                "expenditure_amount": 100.00,
+                "expenditure_date": "2023-02-20",
+                "general_election_year": "2024"
+            }
+        )
+        d = create_schedule_f(
+            type="COORDINATED_PARTY_EXPENDITURE",
+            committee=self.committee,
+            contact_1=contact_org,
+            contact_2=contact_can,
+            contact_3=contact_com,
+            report=report,
+            schedule_data={
+                "expenditure_amount": 50.00,
+                "expenditure_date": "2023-02-25",
+                "general_election_year": "2024"
+            }
+        )
 
         trans_a = Transaction.objects.get(id=a.id)
         trans_b = Transaction.objects.get(id=b.id)
+        trans_c = Transaction.objects.get(id=c.id)
+        trans_d = Transaction.objects.get(id=d.id)
 
         self.assertEqual(trans_a.schedule_f.general_election_year, "2024")
         self.assertEqual(trans_a.schedule_f.expenditure_amount, 125.00)
 
+        self.view.process_aggregation_by_payee_candidate(trans_c)
         self.view.process_aggregation_by_payee_candidate(trans_a)
 
         trans_b.refresh_from_db()
         self.assertEqual(trans_b.schedule_f.aggregate_general_elec_expended, 200.00)
+
+        trans_c.refresh_from_db()
+        self.assertEqual(trans_c.schedule_f.aggregate_general_elec_expended, 100.00)
+
+        trans_d.refresh_from_db()
+        self.assertEqual(trans_d.schedule_f.aggregate_general_elec_expended, 250.00)
 
     def test_schedule_f_aggregation_edge_cases(self):
         report = create_form3x(
