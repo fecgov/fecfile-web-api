@@ -20,6 +20,7 @@ class DotFECForm24TestCase(TestCase):
             {
                 "report_type_24_48": "24",
                 "original_amendment_date": datetime.strptime("2024-01-01", "%Y-%m-%d"),
+                "name": "test 24",
             },
         )
         self.f24.committee_name = "TEST_COMMITTEE"

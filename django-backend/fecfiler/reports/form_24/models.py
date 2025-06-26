@@ -1,14 +1,14 @@
 import uuid
-from django.db import models
+from django.db.models import Model, UUIDField, TextField, DateField
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
-class Form24(models.Model):
+class Form24(Model):
     """Generated model from json schema"""
 
-    id = models.UUIDField(
+    id = UUIDField(
         default=uuid.uuid4,
         editable=False,
         primary_key=True,
@@ -16,8 +16,9 @@ class Form24(models.Model):
         unique=True,
     )
 
-    report_type_24_48 = models.TextField(null=True, blank=True)
-    original_amendment_date = models.DateField(null=True, blank=True)
+    report_type_24_48 = TextField(null=True, blank=True)
+    original_amendment_date = DateField(null=True, blank=True)
+    name = TextField(null=False, blank=False)
 
     class Meta:
         app_label = "reports"
