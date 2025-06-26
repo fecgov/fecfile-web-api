@@ -18,7 +18,7 @@ class Form24(Model):
 
     report_type_24_48 = TextField(null=True, blank=True)
     original_amendment_date = DateField(null=True, blank=True)
-    name = TextField(null=False, blank=False, unique=True)
+    name = TextField(null=False, blank=False)
 
     class Meta:
         app_label = "reports"
