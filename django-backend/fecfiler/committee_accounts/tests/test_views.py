@@ -285,6 +285,23 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 self.assertIn("C12345678", was_called_with)
                 self.assertEqual(response.data["name"], "TEST")
 
+    def test_get_committee_account_data_from_redis_no_data(self):
+        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
+            with patch(
+                "fecfiler.committee_accounts.utils.get_mocked_committee_data"
+            ) as mock_committee:
+                mock_committee.return_value = None
+                response = self.send_viewset_get_request(
+                    "/api/v1/committees/get-available-committee/?committee_id=C12345678",
+                    CommitteeViewSet,
+                    "get_available_committee",
+                )
+                self.assertEqual(response.status_code, 404)
+                self.assertEqual(
+                    response.data["message"], "No available committee found."
+                )
+
     def test_viewsets_have_committee_owned_mixin(self):
         exclude_list = [
             "CommitteeViewSet",
