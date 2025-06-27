@@ -18,7 +18,7 @@ def create_in_future_reports(transaction):
     current_report = transaction.reports.filter(
         Q(form_3x__isnull=False) | Q(form_3__isnull=False)
     ).first()
-    future_reports = current_report.get_future_in_progress_reports()
+    future_reports = current_report.get_future_reports()
     for report in future_reports:
         loan_query = Transaction.objects.filter(
             reports__id=report.id, loan_id=transaction.parent_transaction.id
@@ -33,7 +33,7 @@ def update_in_future_reports(transaction):
     current_report = transaction.reports.filter(
         Q(form_3x__isnull=False) | Q(form_3__isnull=False)
     ).first()
-    future_reports = current_report.get_future_in_progress_reports()
+    future_reports = current_report.get_future_reports()
 
     transaction_copy = copy.deepcopy(model_to_dict(transaction))
     # model_to_dict doesn't copy id
