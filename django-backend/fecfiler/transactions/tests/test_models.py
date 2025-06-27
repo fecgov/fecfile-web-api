@@ -79,6 +79,15 @@ class TransactionModelTestCase(TestCase):
             report=self.m1_report,
         )
 
+        # Submit the M2 report to test with a submitted report as well
+        self.m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
+            self.m2_report.id
+        )
+        self.m2_report.refresh_from_db()
+        self.m2_report.upload_submission.fec_status = FECStatus.ACCEPTED
+        self.m2_report.upload_submission.save()
+        self.m2_report.refresh_from_db()
+
         carry_forward_loans(self.m2_report)
         self.carried_forward_loan = (
             Transaction.objects.transaction_view()
