@@ -296,9 +296,7 @@ class Tasks(TaskSet):
             try:
                 retval.append(self.confirm_information_for_report_json(report_json))
             except Exception as e:
-                print(
-                    f"Failed to confirm report information for report_json {report_json}: {e}"
-                )
+                print(f"Failed to confirm report information for {report_json}: {e}")
         return retval
 
     def confirm_information_for_report_json(self, report_json):
