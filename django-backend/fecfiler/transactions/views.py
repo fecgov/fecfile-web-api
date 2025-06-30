@@ -800,7 +800,7 @@ def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_i
             current_report = transaction.reports.filter(
                 Q(form_3x__isnull=False) | Q(form_3__isnull=False)
             ).first()
-            future_reports = current_report.get_future_in_progress_reports()
+            future_reports = current_report.get_future_reports()
             transactions_to_delete = list(
                 Transaction.objects.filter(
                     loan_id=original_loan_id,
@@ -820,7 +820,7 @@ def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_i
             current_report = transaction.reports.filter(
                 Q(form_3x__isnull=False) | Q(form_3__isnull=False)
             ).first()
-            future_reports = current_report.get_future_in_progress_reports()
+            future_reports = current_report.get_future_reports()
             transactions_to_delete = list(
                 Transaction.objects.filter(
                     debt_id=original_debt_id,
