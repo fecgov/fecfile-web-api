@@ -182,12 +182,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             aggregation_group = request.query_params["aggregation_group"]
             assert (
                 date
-                and contact_1_id
                 and aggregation_group
             )  # Raises error if any value is not truthy (i.e, "" or None)
         except Exception:
-            message = "contact_1_id, date, and aggregate_group are required params"
+            message = "date and aggregate_group are required params"
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+        if not contact_1_id:
+            message = "no contact id provided"
+            return Response(message, status=status.HTTP_404_NOT_FOUND)
 
         return self.get_previous(
             self.get_queryset(),
@@ -216,6 +219,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
             assert (
                 date
+                and office
                 and aggregation_group
                 and election_code
             )  # Raises error if any value is not truthy (i.e, "" or None)
@@ -249,18 +253,21 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             general_election_year = request.query_params["general_election_year"]
 
             assert (
-                contact_2_id
-                and date
+                date
                 and aggregation_group
                 and general_election_year
             )  # Raises error if any value is not truthy (i.e, "" or None)
         except Exception:
             message = (
-                "contact_2_id, date, aggregation_group, and "
+                "date, aggregation_group, and "
                 "general_election_year are required params"
             )
 
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+        if not contact_2_id:
+            message = "no contact id provided"
+            return Response(message, status=status.HTTP_404_NOT_FOUND)
 
         return self.get_previous(
             self.get_queryset(),
