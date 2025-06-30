@@ -26,11 +26,11 @@ Software necessary to run the application locally
 
 ### Docker basic usage.
 
-When running docker-compose you will need to be in the root directory of the project. The reason for this is that docker-compose looks for docker-compose.yml to be in the same directory where it's run. You will also need at least 3GB of memory allocated for docker during the build.
+When running docker compose you will need to be in the root directory of the project. The reason for this is that docker compose looks for docker-compose.yml to be in the same directory where it's run. You will also need at least 3GB of memory allocated for docker during the build.
 
 ### Run the fecfile web API application
 
-`docker-compose up -d`
+`docker compose up -d`
 
 By default EFO services (print/upload) will be mocked.
 To integrate with EFO, set the following environment variables:
@@ -46,7 +46,7 @@ for a better key, reach out to a team member or get one at https://api.open.fec.
 
 ### Shut down the containers
 
-`docker-compose down`
+`docker compose down`
 
 ### see all running containers
 
@@ -54,7 +54,7 @@ for a better key, reach out to a team member or get one at https://api.open.fec.
 
 ### running commands in a running container
 
-`docker-compose exec <container name> <command>`
+`docker compose exec <container name> <command>`
 
 # Deployment (FEC team only)
 
