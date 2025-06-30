@@ -4,6 +4,10 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.contacts.models import Contact
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
+from fecfiler.web_services.models import (
+    FECStatus,
+    UploadSubmission,
+)
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.transactions.tests.utils import (
     create_test_transaction,
@@ -54,7 +58,6 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(transactions[3].aggregate, Decimal("100"))
 
     def test_force_unaggregated(self):
-
         create_test_transaction(  # noqa: F841
             "INDIVIDUAL_RECEIPT",
             ScheduleA,
@@ -403,8 +406,16 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(transactions[1].amount, Decimal("1000.00"))
         self.assertEqual(transactions[2].amount, Decimal("500.00"))
 
-        # Pull loan forward and make sure payments are still correct
+        # submit m1 loan
+        m1_report.upload_submission = UploadSubmission.objects.initiate_submission(
+            m1_report.id
+        )
+        m1_report.refresh_from_db()
+        m1_report.upload_submission.fec_status = FECStatus.ACCEPTED
+        m1_report.upload_submission.save()
+        m1_report.refresh_from_db()
 
+        # pull m1 loan forward and make sure payments are still correct in m2 report
         m2_report = create_form3x(self.committee, "2024-02-01", "2024-02-28", {})
         carry_forward_loans(m2_report)
         carried_forward_loan = (
