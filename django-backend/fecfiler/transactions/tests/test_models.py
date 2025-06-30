@@ -79,15 +79,6 @@ class TransactionModelTestCase(TestCase):
             report=self.m1_report,
         )
 
-        # Submit the M2 report to test with a submitted report as well
-        self.m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
-            self.m2_report.id
-        )
-        self.m2_report.refresh_from_db()
-        self.m2_report.upload_submission.fec_status = FECStatus.ACCEPTED
-        self.m2_report.upload_submission.save()
-        self.m2_report.refresh_from_db()
-
         carry_forward_loans(self.m2_report)
         self.carried_forward_loan = (
             Transaction.objects.transaction_view()
@@ -839,7 +830,6 @@ class TransactionModelTestCase(TestCase):
         self.assertFalse(reattribution_from.can_delete)
 
     def test_can_delete_debt(self):
-
         m1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         m2_report = create_form3x(self.committee, "2024-02-01", "2024-03-01", {})
         original_debt = create_debt(
@@ -1198,7 +1188,7 @@ class TransactionModelTestCase(TestCase):
         self.assertFalse(tier1.itemized)
         self.assertFalse(tier2.itemized)
 
-    def test_election_aggregates_accross_committees(self):
+    def test_election_aggregates_across_committees(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C99999999")
         individual = create_test_individual_contact("ind", "ividual", other_committee.id)
         candidate = create_test_candidate_contact(
