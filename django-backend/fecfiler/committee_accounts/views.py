@@ -17,6 +17,7 @@ from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
 import structlog
+import traceback
 
 logger = structlog.get_logger(__name__)
 
@@ -81,8 +82,8 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             return Response(committee)
         except Exception as e:
             logger.error(
-                f"User {request.user.email} failed to create committee account "
-                f"{committee_id}: {str(e)}"
+                f"User {request.user.email} failed2 to create committee account "
+                f"{committee_id}: {traceback.format_exc()}"
             )
             response = {"message": "No available committee found."}
             return Response(response, status=status.HTTP_404_NOT_FOUND)
