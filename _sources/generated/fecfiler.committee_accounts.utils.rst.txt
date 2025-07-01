@@ -17,8 +17,7 @@ fecfiler.committee\_accounts.utils
    .. autosummary::
       :toctree:                                          
    
-      check_can_create_committee_account
-      check_email_match
+      check_user_email_matches_committee_email
       convert_raw_to_processed
       create_committee_account
       get_committee_account_data
@@ -36,6 +35,7 @@ fecfiler.committee\_accounts.utils
       is_production_efo_pty
       is_test_efo_pty
       query_fec_api
+      raise_if_cannot_create_committee_account
    
    
 

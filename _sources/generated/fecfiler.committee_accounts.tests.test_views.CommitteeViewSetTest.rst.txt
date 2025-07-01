@@ -112,6 +112,7 @@ fecfiler.committee\_accounts.tests.test\_views.CommitteeViewSetTest
       ~CommitteeViewSetTest.tearDownClass
       ~CommitteeViewSetTest.test_get_committee_account_data_from_production
       ~CommitteeViewSetTest.test_get_committee_account_data_from_redis
+      ~CommitteeViewSetTest.test_get_committee_account_data_from_redis_no_data
       ~CommitteeViewSetTest.test_get_committee_account_data_from_test
       ~CommitteeViewSetTest.test_viewsets_have_committee_owned_mixin
    

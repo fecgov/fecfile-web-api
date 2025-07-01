@@ -1,6 +1,0 @@
-fecfiler.committee\_accounts.utils.check\_can\_create\_committee\_account
-=========================================================================
-
-.. currentmodule:: fecfiler.committee_accounts.utils
-
-.. autofunction:: check_can_create_committee_account
