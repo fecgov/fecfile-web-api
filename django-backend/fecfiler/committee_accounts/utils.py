@@ -44,7 +44,10 @@ def check_user_email_matches_committee_email(user_email, committee_emails):
 
 def raise_if_cannot_create_committee_account(committee_id, user):
     user_email = user.email
-    committee_emails = get_committee_emails(committee_id)
+    try:
+        committee_emails = get_committee_emails(committee_id)
+    except Exception as e:
+        raise ValidationError("Call to retrieve form 1 committee emails failed") from e
     if not committee_emails:
         raise ValidationError("No form 1 found for committee")
 
