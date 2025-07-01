@@ -55,6 +55,8 @@ Run the script with the `-h` flag for additional information.
 
 2. Go to http://localhost:8089/ in your browser of choice to run tests.
 
+3. If testing locally, set Host to http://fecfile-api-proxy:8080
+
 ### Recommended tests:
 - 5 users / 1 ramp-up rate
 - 100 users / 1 ramp-up rate

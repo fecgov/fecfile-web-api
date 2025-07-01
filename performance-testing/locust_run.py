@@ -258,7 +258,7 @@ class Tasks(TaskSet):
             "page": page,
         }
         return self.client_get(
-            f"/api/v1/{endpoint}", params=params, name=f"preload_{endpoint}_ids"
+            f"/api/v1/{endpoint}/", params=params, name=f"preload_{endpoint}_ids"
         )
 
     def prepare_reports_for_submit(self):
