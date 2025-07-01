@@ -383,7 +383,7 @@ class Tasks(TaskSet):
                 ):
                     return report_json
             response.failure(
-                f"Failed to receive successful fec submission status for report_id {report_id}"
+                f"Failed to get successful fec submit status for report_id {report_id}"
             )
 
     def retrieve_report(self, report_id):
@@ -398,7 +398,7 @@ class Tasks(TaskSet):
 
     def retrieve_report_id_and_coverage_from_date_list(self):
         response = self.client_get(
-            f"/api/v1/reports/",
+            "/api/v1/reports/",
             name="retrieve_report_ids_and_coverage_from_dates",
             timeout=TIMEOUT,
         )
