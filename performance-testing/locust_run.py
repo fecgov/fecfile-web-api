@@ -80,7 +80,11 @@ class Tasks(TaskSet):
             logging.info("Not enough contacts, creating some")
             self.create_contacts(WANTED_CONTACTS - contact_count)
 
-        self.report_ids = self.fetch_values("reports", "id")
+        report_id_and_coverage_from_date_list = (
+            self.retrieve_report_id_and_coverage_from_date_list()
+        )
+        self.report_ids = list(report_id_and_coverage_from_date_list.keys())
+
         logging.info(f"Report ids {self.report_ids}")
         self.contacts = self.scrape_endpoint("contacts")
         if transaction_count < WANTED_TRANSACTIONS:
@@ -88,8 +92,13 @@ class Tasks(TaskSet):
             difference = WANTED_TRANSACTIONS - transaction_count
             singles_needed = math.ceil(difference * SINGLE_TO_TRIPLE_RATIO)
             triples_needed = math.ceil(difference * (1 - SINGLE_TO_TRIPLE_RATIO))
-            self.create_single_transactions(singles_needed)
-            self.create_triple_transactions(triples_needed)
+            self.create_single_transactions(
+                report_id_and_coverage_from_date_list,
+                singles_needed,
+            )
+            self.create_triple_transactions(
+                report_id_and_coverage_from_date_list, triples_needed
+            )
 
         logging.info("Preparing reports for submit")
         self.prepared_reports_for_submit = self.prepare_reports_for_submit()
@@ -132,7 +141,6 @@ class Tasks(TaskSet):
             self.client.post(
                 "/api/v1/reports/form-3x/",
                 name="create_report",
-                # TODO: does it make sense to pass both the params and json here?
                 params=params,
                 json=report,
             )
@@ -146,31 +154,33 @@ class Tasks(TaskSet):
             self.client.post(
                 "/api/v1/contacts/",
                 name="create_contacts",
-                # TODO: does it make sense to pass both the params and json here?
-                # Same with create_reports
                 json=contact,
                 timeout=TIMEOUT,
             )
 
-    def create_single_transactions(self, count=1):
+    def create_single_transactions(self, report_id_and_coverage_from_date_list, count=1):
         transactions = get_json_data("single-transactions")
         self.patch_prebuilt_transactions(transactions)
         if len(transactions) < count:
             difference = count - len(transactions)
             transactions += locust_data_generator.generate_single_transactions(
-                difference, self.contacts, self.report_ids
+                difference,
+                self.contacts,
+                report_id_and_coverage_from_date_list,
             )
 
         for transaction in transactions[:count]:
             self.create_transaction(transaction)
 
-    def create_triple_transactions(self, count=1):
+    def create_triple_transactions(self, report_id_and_coverage_from_date_list, count=1):
         transactions = get_json_data("triple-transactions")
         self.patch_prebuilt_transactions(transactions)
         if len(transactions) < count:
             difference = count - len(transactions)
             transactions += locust_data_generator.generate_triple_transactions(
-                difference, self.contacts, self.report_ids
+                difference,
+                self.contacts,
+                report_id_and_coverage_from_date_list,
             )
 
         for transaction in transactions[:count]:
@@ -279,6 +289,7 @@ class Tasks(TaskSet):
     def calculate_summary_for_report_id(self, report_id, poll_seconds=2):
         response = self.client.post(
             "/api/v1/web-services/summary/calculate-summary/",
+            name="calculate_report_summary",
             json={"report_id": report_id},
         )
         if response.status_code != 200:
@@ -318,6 +329,7 @@ class Tasks(TaskSet):
         report_json["hasChangeOfAddress"] = False
         response = self.client.put(
             f"/api/v1/reports/form-3x/{report_id}/",
+            name="confirm_report_info_for_submit",
             params=params,
             json=report_json,
         )
@@ -345,6 +357,7 @@ class Tasks(TaskSet):
         report_json["treasurer_first_name"] = "test_treasurer_first_name"
         response = self.client.put(
             f"/api/v1/reports/form-3x/{report_id}/",
+            name="update_report_treasurer_for_submit",
             params=params,
             json=report_json,
         )
@@ -352,31 +365,50 @@ class Tasks(TaskSet):
             raise Exception("Failed to update report information for submit")
 
     def submit_to_fec_and_poll_for_success(self, report_id, poll_seconds=2):
-        response = self.client.post(
+        with self.client.post(
             "/api/v1/web-services/submit-to-fec/",
+            name="submit_report_to_fec",
             json={"report_id": report_id, "password": "fake_pd"},
-        )
-        if response.status_code != 200:
-            raise Exception("Failed to post submit to fec task")
-        for i in range(3):
-            time.sleep(poll_seconds)
-            report_json = self.retrieve_report(report_id)
-            upload_submission = report_json.get("upload_submission", None)
-            if (
-                upload_submission
-                and upload_submission.get("fec_status", None) == "ACCEPTED"
-            ):
-                return report_json
-        raise Exception("Failed to receive successful fec submission status")
+            catch_response=True,
+        ) as response:
+            if response.status_code != 200:
+                response.failure("Failed to post submit to fec task")
+            for i in range(3):
+                time.sleep(poll_seconds)
+                report_json = self.retrieve_report(report_id)
+                upload_submission = report_json.get("upload_submission", None)
+                if (
+                    upload_submission
+                    and upload_submission.get("fec_status", None) == "ACCEPTED"
+                ):
+                    return report_json
+            response.failure(
+                f"Failed to receive successful fec submission status for report_id {report_id}"
+            )
 
     def retrieve_report(self, report_id):
         response = self.client_get(
-            f"/api/v1/reports/${report_id}/",
+            f"/api/v1/reports/{report_id}/",
+            name="retrieve_report",
             timeout=TIMEOUT,
         )
         if response and response.status_code == 200:
             return response.json()
         raise Exception("Failed to retrieve report")
+
+    def retrieve_report_id_and_coverage_from_date_list(self):
+        response = self.client_get(
+            f"/api/v1/reports/",
+            name="retrieve_report_ids_and_coverage_from_dates",
+            timeout=TIMEOUT,
+        )
+        if response and response.status_code == 200:
+            retval = {}
+            reports = response.json()
+            for report in reports:
+                retval[report["id"]] = report.get("coverage_from_date", None)
+            return retval
+        raise Exception("Failed to retrieve report ids/coverage from dates")
 
     @task
     def celery_test(self):
@@ -424,8 +456,12 @@ class Tasks(TaskSet):
     @task
     def submit_reports(self):
         with self.report_ids_to_submit_lock:
+            if len(self.report_ids_to_submit) == 0:
+                logging.info("No more reports to submit")
+                return
             report_id = self.report_ids_to_submit.pop()
-        self.submit_report(report_id, poll_seconds=2)
+        # poll_seconds Determined by INITIAL_POLLING_INTERVAL setting
+        self.submit_report(report_id, poll_seconds=40)
 
     def client_get(self, *args, **kwargs):
         kwargs["catch_response"] = True
