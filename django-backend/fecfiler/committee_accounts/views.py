@@ -80,7 +80,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             committee = get_committee_account_data(committee_id)
             raise_if_cannot_create_committee_account(committee_id, request.user)
             return Response(committee)
-        except Exception as e:
+        except Exception:
             logger.error(
                 f"User {request.user.email} failed2 to create committee account "
                 f"{committee_id}: {traceback.format_exc()}"
