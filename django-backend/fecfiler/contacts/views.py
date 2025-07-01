@@ -162,13 +162,16 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         if office:
             params["office"] = office
         params = urlencode(params)
-        response = requests.get(
-            FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
-        )
-        if response.status_code != status.HTTP_404_NOT_FOUND:
-            response.raise_for_status()
+        if len(q) >= 3:
+            response = requests.get(
+                FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
+            )
+            if response.status_code != status.HTTP_404_NOT_FOUND:
+                response.raise_for_status()
 
-        json_results = response.json()
+            json_results = response.json()
+        else:
+            json_results = {}
 
         tokens = list(filter(None, re.split("[^\\w+]", q)))
         term = (".*" + ".* .*".join(tokens) + ".*").lower()
@@ -227,13 +230,16 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             else []
         )
         params = urlencode({"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY})
-        response = requests.get(
-            FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
-        )
-        if response.status_code != status.HTTP_404_NOT_FOUND:
-            response.raise_for_status()
+        if len(q) >= 3:
+            response = requests.get(
+                FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
+            )
+            if response.status_code != status.HTTP_404_NOT_FOUND:
+                response.raise_for_status()
 
-        json_results = response.json()
+            json_results = response.json()
+        else:
+            json_results = {}
 
         fecfile_committees = list(
             self.get_queryset()

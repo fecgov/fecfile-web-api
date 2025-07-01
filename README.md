@@ -44,6 +44,8 @@ export EFO_FILING_API_KEY="EFO_get_this_from_team_member"
 *Note* - the default PRODUCTION_OPEN_FEC_API_KEY and STAGE_OPEN_FEC_API_KEY key has a very low rate limit -
 for a better key, reach out to a team member or get one at https://api.open.fec.gov/developers/
 
+Go to http://localhost:8080/ to see the API documentation
+
 ### Shut down the containers
 
 `docker compose down`
