@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import User
+from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 
 

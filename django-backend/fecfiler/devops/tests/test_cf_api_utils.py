@@ -1,4 +1,4 @@
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from unittest.mock import Mock, patch
 from fecfiler.devops.utils.cf_api_utils import (
     get_organization_guid,
@@ -14,9 +14,6 @@ from fecfiler.devops.utils.cf_api_utils import (
 
 
 class CfApiUtilsTestCase(TestCase):
-
-    def setUp(self):
-        self.factory = RequestFactory()
 
     # retrieve_credentials
 

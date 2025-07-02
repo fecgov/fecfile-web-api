@@ -51,7 +51,7 @@ services:
             AWS_SECRET_ACCESS_KEY:
             AWS_STORAGE_BUCKET_NAME:
             AWS_REGION:
-            CELERY_WORKER_STORAGE:
+            CELERY_WORKER_STORAGE: local
             MOCK_EFO_FILING: True
             EFO_FILING_API: https://efoservices.stage.efo.fec.gov
             EFO_FILING_API_KEY:
@@ -94,7 +94,7 @@ services:
             AWS_SECRET_ACCESS_KEY:
             AWS_STORAGE_BUCKET_NAME:
             AWS_REGION:
-            CELERY_WORKER_STORAGE:
+            CELERY_WORKER_STORAGE: local
             MOCK_EFO_FILING: True
             EFO_FILING_API: https://efoservices.stage.efo.fec.gov
             EFO_FILING_API_KEY:
@@ -144,7 +144,7 @@ services:
             AWS_SECRET_ACCESS_KEY:
             AWS_STORAGE_BUCKET_NAME:
             AWS_REGION:
-            CELERY_WORKER_STORAGE:
+            CELERY_WORKER_STORAGE: local
             MOCK_EFO_FILING: True
             EFO_FILING_API: https://efoservices.stage.efo.fec.gov
             EFO_FILING_API_KEY:
