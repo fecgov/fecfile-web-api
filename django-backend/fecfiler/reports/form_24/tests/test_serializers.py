@@ -1,3 +1,4 @@
+from uuid import UUID
 from django.test import TestCase
 
 from fecfiler.reports.form_24.models import Form24
@@ -5,7 +6,9 @@ from ..serializers import (
     Form24Serializer,
 )
 from fecfiler.user.models import User
-from rest_framework.request import Request, HttpRequest
+from rest_framework.test import APIRequestFactory
+from rest_framework.request import Request
+from rest_framework.parsers import JSONParser
 
 
 class F24SerializerTestCase(TestCase):
@@ -27,10 +30,19 @@ class F24SerializerTestCase(TestCase):
             "committee_type": "WAY TOO MANY CHARS",
         }
 
-        self.mock_request = Request(HttpRequest())
+        self.factory = APIRequestFactory()
+        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
+
+        wsgi_request = self.factory.post(
+            "/",
+            data={"committee_account": UUID("11111111-2222-3333-4444-555555555555")},
+            format="json",
+        )
+        self.mock_request = Request(wsgi_request, parsers=[JSONParser()])
         self.mock_request.user = User.objects.get(
             id="12345678-aaaa-bbbb-cccc-111122223333"
         )
+
         self.mock_request.session = {
             "committee_uuid": "11111111-2222-3333-4444-555555555555",
             "committee_id": "C01234567",
