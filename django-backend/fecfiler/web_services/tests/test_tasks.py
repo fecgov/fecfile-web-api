@@ -3,7 +3,7 @@ import timeit
 from uuid import uuid4
 from django.test import TestCase, tag, override_settings
 from unittest.mock import patch
-from .tasks import (
+from fecfiler.web_services.tasks import (
     calculate_polling_interval,
     create_dot_fec,
     submit_to_fec,
@@ -11,7 +11,7 @@ from .tasks import (
     poll_for_fec_response,
     log_polling_notice,
 )
-from .models import (
+from fecfiler.web_services.models import (
     DotFEC,
     FECStatus,
     FECSubmissionState,

@@ -1,6 +1,6 @@
 from django.apps import apps
 from django.test import TestCase
-from .models import CommitteeAccount, CommitteeOwnedModel, Membership
+from ..models import CommitteeAccount, CommitteeOwnedModel, Membership
 from fecfiler.user.models import User
 from django.core.exceptions import ValidationError
 

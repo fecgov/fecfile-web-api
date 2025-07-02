@@ -9,12 +9,14 @@ from fecfiler.transactions.tests.utils import create_loan_from_bank
 from fecfiler.contacts.models import Contact
 from datetime import datetime
 from fecfiler.web_services.models import UploadSubmission
+from unittest.mock import patch
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
 class DotFECScheduleC2TestCase(TestCase):
+    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.5")
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         coverage_from = datetime.strptime("2024-01-01", "%Y-%m-%d")
@@ -45,7 +47,7 @@ class DotFECScheduleC2TestCase(TestCase):
             type=Contact.ContactType.INDIVIDUAL,
             last_name="last name",
             first_name="First name",
-            committee_id=self.committee.committee_id,
+            committee_id="C87654321",
             middle_name="Middle Name",
             prefix="Mr.",
             suffix="Junior",
@@ -89,7 +91,7 @@ class DotFECScheduleC2TestCase(TestCase):
     def test_guarantor(self):
         self.assertEqual(self.split_row[4], self.individual.type)
         self.assertEqual(self.split_row[5], "")
-        self.assertEqual(self.split_row[6], self.committee.committee_id)
+        self.assertEqual(self.split_row[6], self.individual.committee_id)
         self.assertEqual(self.split_row[7], self.individual.last_name)
         self.assertEqual(self.split_row[8], self.individual.first_name)
         self.assertEqual(self.split_row[9], self.individual.middle_name)
