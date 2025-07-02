@@ -172,7 +172,17 @@ def _delete_migrator_app(ctx, space):
 
 def _check_running_migrations(ctx, space):
     print("Checking for migrations in progress...")
-    return True
+    task_status = ctx.run(
+        'cf curl "/v3/tasks?states=RUNNING"',
+        hide=True,
+        warn=True,
+    )
+    active_tasks = json.loads(task_status.stdout).get("pagination").get("total_results")
+
+    if active_tasks > 0:
+        return True
+
+    return False
 
 
 def _run_migrations(ctx, space):
