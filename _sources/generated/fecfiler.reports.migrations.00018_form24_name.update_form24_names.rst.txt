@@ -1,0 +1,6 @@
+fecfiler.reports.migrations.00018\_form24\_name.update\_form24\_names
+=====================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.00018_form24_name
+
+.. autofunction:: update_form24_names

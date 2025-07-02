@@ -50,6 +50,7 @@ fecfiler.reports.form\_24.models.Form24
    .. autosummary::
    
       ~Form24.id
+      ~Form24.name
       ~Form24.objects
       ~Form24.original_amendment_date
       ~Form24.pk
