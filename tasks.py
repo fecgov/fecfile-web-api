@@ -170,6 +170,11 @@ def _delete_migrator_app(ctx, space):
     return True
 
 
+def _check_running_migrations(ctx, space):
+    print("Checking for migrations in progress...")
+    return True
+
+
 def _run_migrations(ctx, space):
     print("Running migrations...")
 
@@ -235,6 +240,14 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     # Set deploy variables
     with open(".cfmeta", "w") as fp:
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
+
+    # Check for running migations
+    migrations_in_progress = _check_running_migrations(ctx, space)
+
+    if migrations_in_progress:
+        print("Migrations are in progress.")
+        print("See the logs for more information.\nCanceling deploy...")
+        sys.exit(1)
 
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
