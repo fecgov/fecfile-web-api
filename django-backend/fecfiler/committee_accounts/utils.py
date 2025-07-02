@@ -47,7 +47,9 @@ def raise_if_cannot_create_committee_account(committee_id, user):
     try:
         committee_emails = get_committee_emails(committee_id)
     except Exception as e:
-        raise ValidationError("Call to retrieve form 1 committee emails failed") from e
+        raise ValidationError(
+            "Call to retrieve form 1 committee emails failed: " + str(e)
+        )
     if not committee_emails:
         raise ValidationError("No form 1 found for committee")
 
@@ -204,15 +206,15 @@ def get_raw_committee_data(committee_id):
 def is_production_efo_pty(committee_data):
     designation = committee_data.get("designation", None)
     committee_type = committee_data.get("committee_type", None)
-    return designation is not None and (
-        committee_type == "Y" or committee_type == "X")
+    return designation is not None and (committee_type == "Y" or committee_type == "X")
 
 
 def is_production_efo_pac(committee_data):
     designation = committee_data.get("designation", None)
     committee_type = committee_data.get("committee_type", None)
     return committee_type in PRODUCTION_PAC_COMMITTEE_TYPES or (
-        committee_type == "X" and designation == "U")
+        committee_type == "X" and designation == "U"
+    )
 
 
 """
@@ -276,6 +278,7 @@ Mock
 
 
 def get_mocked_committee_emails(committee_id):
+    raise Exception("200 some long exception from fec")
     committee = get_mocked_committee_data(committee_id)
     return committee.get("email", "") if committee else ""
 
