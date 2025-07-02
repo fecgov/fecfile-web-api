@@ -256,7 +256,8 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     if migrations_in_progress:
         print("Migrations are in progress.")
-        print("See the logs for more information.\nCanceling deploy...")
+        print("Check logs for more information.")
+        print("Canceling deploy, please retry after migrations finish.")
         sys.exit(1)
 
     # Runs migrations
@@ -266,7 +267,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     if not (migrations_successful and migrator_app_deleted):
         print("Migrations failed and/or the migrator app was not deleted successfully.")
-        print("See the logs for more information.\nCanceling deploy...")
+        print("Check logs for more information.\nCanceling deploy...")
         sys.exit(1)
 
     for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
