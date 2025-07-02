@@ -8,7 +8,7 @@ def generate_form_3x(count=1, collision_maximum=1000):
         ["Q1", "01-01", "03-31"],
         ["Q2", "04-01", "06-30"],
         ["Q3", "07-01", "09-30"],
-        ["YE", "10-01", "12-31"]
+        ["YE", "10-01", "12-31"],
     ]
     form_3x_list = []
     dates_taken = set()
@@ -18,7 +18,7 @@ def generate_form_3x(count=1, collision_maximum=1000):
         quarter, from_date, through_date = choice(reports_and_dates)
         year = randrange(1000, 9999)
         hashable_date = f"{year}, {quarter}"
-        if (hashable_date in dates_taken):
+        if hashable_date in dates_taken:
             collision_count += 1
             continue
 
@@ -55,30 +55,38 @@ def generate_contacts(count=1):
     contacts = []
     for _ in range(count):
         street_1 = f"{randrange(1, 999)} {choice(street_names)} {choice(street_types)}"
-        contacts.append({
-            "type": "IND",
-            "street_1": street_1,
-            "city": "Testville",
-            "state": "AK",
-            "zip": "12345",
-            "country": "USA",
-            "last_name": choice(last_names),
-            "first_name": choice(first_names),
-            "middle_name": choice(first_names),
-            "prefix": choice(prefixes),
-            "suffix": choice(suffixes),
-            "street_2": None,
-            "telephone": None,
-            "employer": "Business Inc.",
-            "occupation": "Job"
-        })
+        contacts.append(
+            {
+                "type": "IND",
+                "street_1": street_1,
+                "city": "Testville",
+                "state": "AK",
+                "zip": "12345",
+                "country": "USA",
+                "last_name": choice(last_names),
+                "first_name": choice(first_names),
+                "middle_name": choice(first_names),
+                "prefix": choice(prefixes),
+                "suffix": choice(suffixes),
+                "street_2": None,
+                "telephone": None,
+                "employer": "Business Inc.",
+                "occupation": "Job",
+            }
+        )
 
     return contacts
 
 
-def generate_single_transactions(count=1, contacts=None, report_ids=None):
+def generate_single_transactions(
+    count=1, contacts=None, report_id_and_coverage_from_date_list=None
+):
     transactions = []
     for _ in range(count):
+        if report_id_and_coverage_from_date_list:
+            report_id, coverage_from_date = choice(
+                list(report_id_and_coverage_from_date_list.items())
+            )
         contact = choice(contacts) if contacts else generate_contacts()[0]
         new_transaction = {
             "children": [],
@@ -86,7 +94,7 @@ def generate_single_transactions(count=1, contacts=None, report_ids=None):
             "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             "aggregation_group": "GENERAL",
             "schema_name": "INDIVIDUAL_RECEIPT",
-            "report_ids": [choice(report_ids)] if report_ids else None,
+            "report_ids": [report_id] if report_id else None,
             "entity_type": "IND",
             "contributor_last_name": contact["last_name"],
             "contributor_first_name": contact["first_name"],
@@ -98,7 +106,7 @@ def generate_single_transactions(count=1, contacts=None, report_ids=None):
             "contributor_city": contact["city"],
             "contributor_state": contact["state"],
             "contributor_zip": contact["zip"],
-            "contribution_date": "2024-02-01",
+            "contribution_date": coverage_from_date or "2024-02-01",
             "contribution_amount": randrange(25, 10000),
             "contribution_purpose_descrip": None,
             "contributor_employer": contact["employer"],
@@ -106,7 +114,7 @@ def generate_single_transactions(count=1, contacts=None, report_ids=None):
             "memo_code": None,
             "contact_1": contact,
             "contact_1_id": contact.get("id", None),
-            "schedule_id": "A"
+            "schedule_id": "A",
         }
 
         transactions.append(new_transaction)
@@ -114,10 +122,14 @@ def generate_single_transactions(count=1, contacts=None, report_ids=None):
     return transactions
 
 
-def generate_triple_transactions(count=1, contacts=None, report_ids=None):
+def generate_triple_transactions(
+    count=1, contacts=None, report_id_and_coverage_from_date_list=None
+):
     triple_transactions = []
     for _ in range(count):
-        a, b, c = generate_single_transactions(3, contacts, report_ids)
+        a, b, c = generate_single_transactions(
+            3, contacts, report_id_and_coverage_from_date_list
+        )
         b["children"].append(c)
         a["children"].append(b)
         triple_transactions.append(a)
@@ -153,12 +165,17 @@ class LocustDataGenerator:
         except ValueError:
             print("Non-integer value passed as argument")
 
-        if sum([
-            self.form3x_count,
-            self.contact_count,
-            self.single_transaction_count,
-            self.triple_transaction_count
-        ]) == 0:
+        if (
+            sum(
+                [
+                    self.form3x_count,
+                    self.contact_count,
+                    self.single_transaction_count,
+                    self.triple_transaction_count,
+                ]
+            )
+            == 0
+        ):
             print("No arguments provided.  Run with --help or -h for instructions")
 
     def build(self):
@@ -168,13 +185,11 @@ class LocustDataGenerator:
             self.contact_list = generate_contacts(self.contact_count)
         if self.single_transaction_count > 0:
             self.single_transaction_list = generate_single_transactions(
-                self.single_transaction_count,
-                self.contact_list
+                self.single_transaction_count, self.contact_list
             )
         if self.triple_transaction_count > 0:
             self.triple_transaction_list = generate_triple_transactions(
-                self.triple_transaction_count,
-                self.contact_list
+                self.triple_transaction_count, self.contact_list
             )
 
     def dump(self):
