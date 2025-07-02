@@ -278,7 +278,6 @@ Mock
 
 
 def get_mocked_committee_emails(committee_id):
-    raise Exception("200 some long exception from fec")
     committee = get_mocked_committee_data(committee_id)
     return committee.get("email", "") if committee else ""
 
