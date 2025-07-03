@@ -181,6 +181,7 @@ def _check_for_migrations(ctx, space):
     app_guid_formatted = app_guid.stdout.strip()
 
     print("Checking if migrator app is running migrations...")
+    ctx.run(f"cf tasks {MIGRATOR_APP_NAME}", hide=True, warn=True)
     task_status = ctx.run(
         'cf curl "/v3/tasks?app_guids={app_guid_formatted}&states=RUNNING"',
         hide=True,
@@ -189,8 +190,9 @@ def _check_for_migrations(ctx, space):
     active_tasks = json.loads(task_status.stdout).get("pagination").get("total_results")
 
     if active_tasks > 0:
-        print("Migrator app is running migrations. Check logs.")
+        print("Migrator app is running migrations.")
 
+    print("Migrator app is up, but not running migrations")
     return True
 
 
