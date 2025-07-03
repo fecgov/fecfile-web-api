@@ -171,15 +171,31 @@ def _delete_migrator_app(ctx, space):
 
 
 def _check_running_migrations(ctx, space):
-    print("Checking for migrations in progress...")
+    print("Checking if migrator app is up...")
+    app_guid = ctx.run(f"cf app {MIGRATOR_APP_NAME} --guid", hide=True, warn=True)
+    app_guid_formatted = app_guid.stdout.strip()
+    app_status = ctx.run(
+        f'cf curl "/v3/deployments?app_guids={app_guid_formatted}&status_values=ACTIVE"',
+        hide=True,
+        warn=True,
+    )
+
+    active_migrators = json.loads(app_status.stdout).get("pagination").get("total_results")
+    # Check if migrator app is up
+    if active_migrators > 0:
+        print("Migrator app is up.  Check logs.")
+        return True
+
+    print("Checking if migrator is running migrations...")
     task_status = ctx.run(
-        'cf curl "/v3/tasks?states=RUNNING"',
+        'cf curl "/v3/tasks?app_guids={app_guid_formatted}&states=RUNNING"',
         hide=True,
         warn=True,
     )
     active_tasks = json.loads(task_status.stdout).get("pagination").get("total_results")
 
     if active_tasks > 0:
+        print("Migrator app is running migrations. Check logs.")
         return True
 
     return False
