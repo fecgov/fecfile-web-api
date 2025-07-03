@@ -268,7 +268,8 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     if migrations_in_progress:
         print("Not clear to safely run migrations, cancelling deploy.\n")
-        print("Check logs for more information.")
+        print("Check logs for more information.\n")
+        print("Retry when migrations have finished.")
         sys.exit(1)
 
     # Runs migrations
