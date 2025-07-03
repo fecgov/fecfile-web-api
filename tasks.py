@@ -170,6 +170,33 @@ def _delete_migrator_app(ctx, space):
     return True
 
 
+def _check_for_migrations(ctx, space):
+    print("Checking if migrator app is up...")
+    app_guid = ctx.run(f"cf app {MIGRATOR_APP_NAME} --guid", hide=True, warn=True)
+    if not app_guid.ok:
+        print("Migrator not found, ok to continue.")
+        return False
+
+    print("Migrator app found!")
+    app_guid_formatted = app_guid.stdout.strip()
+
+    print("Checking if migrator app is running migrations...\n")
+    ctx.run(f"cf tasks {MIGRATOR_APP_NAME}", hide=False, warn=True)
+    task_status = ctx.run(
+        f'cf curl "/v3/apps/{app_guid_formatted}/tasks?states=RUNNING"',
+        hide=True,
+        warn=True,
+    )
+    active_tasks = json.loads(task_status.stdout).get("pagination").get("total_results")
+
+    if active_tasks > 0:
+        print("\nMigrator app is running migrations.\n")
+        return True
+
+    print("Migrator app is up, but not running migrations\n")
+    return True
+
+
 def _run_migrations(ctx, space):
     print("Running migrations...")
 
@@ -236,6 +263,15 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     with open(".cfmeta", "w") as fp:
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
 
+    # Check for running migations
+    migrations_in_progress = _check_for_migrations(ctx, space)
+
+    if migrations_in_progress:
+        print("Not clear to safely run migrations, cancelling deploy.\n")
+        print("Check logs for more information.\n")
+        print("Retry when migrations have finished.")
+        sys.exit(1)
+
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
     migrations_successful = _run_migrations(ctx, space)
@@ -243,7 +279,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     if not (migrations_successful and migrator_app_deleted):
         print("Migrations failed and/or the migrator app was not deleted successfully.")
-        print("See the logs for more information.\nCanceling deploy...")
+        print("Check logs for more information.\nCanceling deploy...")
         sys.exit(1)
 
     for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
