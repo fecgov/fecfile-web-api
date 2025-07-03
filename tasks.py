@@ -170,23 +170,17 @@ def _delete_migrator_app(ctx, space):
     return True
 
 
-def _check_running_migrations(ctx, space):
+def _check_for_migrations(ctx, space):
     print("Checking if migrator app is up...")
     app_guid = ctx.run(f"cf app {MIGRATOR_APP_NAME} --guid", hide=True, warn=True)
+    if not app_guid.ok:
+        print("Migrator not found, ok to continue.")
+        return False
+
+    print("Migrator app found!")
     app_guid_formatted = app_guid.stdout.strip()
-    app_status = ctx.run(
-        f'cf curl "/v3/deployments?app_guids={app_guid_formatted}&status_values=ACTIVE"',
-        hide=True,
-        warn=True,
-    )
 
-    active_migrators = json.loads(app_status.stdout).get("pagination").get("total_results")
-    # Check if migrator app is up
-    if active_migrators > 0:
-        print("Migrator app is up.  Check logs.")
-        return True
-
-    print("Checking if migrator is running migrations...")
+    print("Checking if migrator app is running migrations...")
     task_status = ctx.run(
         'cf curl "/v3/tasks?app_guids={app_guid_formatted}&states=RUNNING"',
         hide=True,
@@ -196,9 +190,8 @@ def _check_running_migrations(ctx, space):
 
     if active_tasks > 0:
         print("Migrator app is running migrations. Check logs.")
-        return True
 
-    return False
+    return True
 
 
 def _run_migrations(ctx, space):
@@ -268,10 +261,10 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
 
     # Check for running migations
-    migrations_in_progress = _check_running_migrations(ctx, space)
+    migrations_in_progress = _check_for_migrations(ctx, space)
 
     if migrations_in_progress:
-        print("Migrations are in progress.")
+        print("Migrator app found and/or is running migrations.")
         print("Check logs for more information.")
         print("Canceling deploy, please retry after migrations finish.")
         sys.exit(1)
