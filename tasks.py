@@ -180,8 +180,8 @@ def _check_for_migrations(ctx, space):
     print("Migrator app found!")
     app_guid_formatted = app_guid.stdout.strip()
 
-    print("Checking if migrator app is running migrations...")
-    ctx.run(f"cf tasks {MIGRATOR_APP_NAME}", hide=True, warn=True)
+    print("Checking if migrator app is running migrations...\n")
+    ctx.run(f"cf tasks {MIGRATOR_APP_NAME}", hide=False, warn=True)
     task_status = ctx.run(
         'cf curl "/v3/tasks?app_guids={app_guid_formatted}&states=RUNNING"',
         hide=True,
@@ -190,9 +190,9 @@ def _check_for_migrations(ctx, space):
     active_tasks = json.loads(task_status.stdout).get("pagination").get("total_results")
 
     if active_tasks > 0:
-        print("Migrator app is running migrations.")
+        print("Migrator app is running migrations.\n")
 
-    print("Migrator app is up, but not running migrations")
+    print("Migrator app is up, but not running migrations\n")
     return True
 
 
@@ -266,9 +266,8 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     migrations_in_progress = _check_for_migrations(ctx, space)
 
     if migrations_in_progress:
-        print("Migrator app found and/or is running migrations.")
+        print("Not clear to safely run migrations, cancelling deploy.\n")
         print("Check logs for more information.")
-        print("Canceling deploy, please retry after migrations finish.")
         sys.exit(1)
 
     # Runs migrations
