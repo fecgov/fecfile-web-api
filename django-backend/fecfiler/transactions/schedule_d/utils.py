@@ -19,17 +19,19 @@ def add_schedule_d_contact_fields(instance, representation=None):
 
 
 def carry_forward_debts(report):
-    if report.previous_report:
-        debts_to_carry_forward = Transaction.objects.transaction_view().filter(
-            ~Q(balance_at_close=Decimal(0)) | Q(balance_at_close__isnull=True),
+    previous_report = report.previous_report
+    if previous_report:
+
+        all_debts_for_committee = Transaction.objects.transaction_view().filter(
             ~Q(memo_code=True),
-            reports=report.previous_report,
             schedule_d_id__isnull=False,
             committee_account__id=report.committee_account.id,
+            reports=previous_report,
         )
 
-        for debt in debts_to_carry_forward:
-            carry_forward_debt(debt, report)
+        for debt in all_debts_for_committee:
+            if debt.balance_at_close != Decimal(0) and debt.balance_at_close is not None:
+                carry_forward_debt(debt, report)
 
 
 def carry_forward_debt(debt, report):
