@@ -196,7 +196,7 @@ def _run_migrations(ctx, space):
             print(f"Migration in progress... ({minutes_elapsed} minutes elapsed)")
             time.sleep(60)
             # Check every second for the stop event, but only print every 60 seconds
-            #for _ in range(60):
+            # for _ in range(60):
             #    if heartbeat_stop_event.is_set():
             #        break
             #    time.sleep(1)
