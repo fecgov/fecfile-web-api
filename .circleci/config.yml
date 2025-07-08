@@ -100,7 +100,7 @@ jobs:
 
       - run:
           name: Deploy API
-          no_output_timeout: 1m
+          no_output_timeout: 3m
           command: |
             export PATH=$HOME/bin:$PATH
             invoke deploy --branch $CIRCLE_BRANCH --login
