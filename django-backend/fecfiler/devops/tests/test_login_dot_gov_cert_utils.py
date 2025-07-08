@@ -1,4 +1,4 @@
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from unittest.mock import patch
 from fecfiler.devops.utils.login_dot_gov_cert_utils import (
     stage_login_dot_gov_cert,
@@ -12,9 +12,6 @@ from django.core import management
 
 
 class LoginDotGovUtilsTestCase(TestCase):
-
-    def setUp(self):
-        self.factory = RequestFactory()
 
     # backout_login_dot_gov_cert
 

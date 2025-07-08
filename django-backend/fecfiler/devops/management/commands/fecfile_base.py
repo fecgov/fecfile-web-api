@@ -48,7 +48,7 @@ class FECCommand(BaseCommand):
     def log(self, msg, level: Levels):
         match level:
             case Levels.ERROR:
-                self.stdout.write(self.style.ERROR(msg))
+                self.stderr.write(self.style.ERROR(msg))
             case Levels.SUCCESS:
                 if self.verbosity > 0:
                     self.stdout.write(self.style.SUCCESS(msg))
@@ -99,4 +99,4 @@ class FECCommand(BaseCommand):
                     self.stdout.write(self.style.MIGRATE_LABEL(msg))
             case Levels.ERROR_OUTPUT:
                 if self.verbosity > 0:
-                    self.stdout.write(self.style.ERROR_OUTPUT(msg))
+                    self.stderr.write(self.style.ERROR_OUTPUT(msg))

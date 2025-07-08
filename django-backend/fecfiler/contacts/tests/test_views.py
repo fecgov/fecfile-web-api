@@ -1,13 +1,11 @@
 import json
 from unittest.mock import patch, Mock
-from django.test import RequestFactory, TestCase
-from rest_framework.test import force_authenticate
 import uuid
 
-from fecfiler.user.models import User
 from ..models import Contact
 from ..views import ContactViewSet, DeletedContactsViewSet
 from .utils import create_test_individual_contact
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
 mock_results = {
     "results": [
@@ -30,6 +28,9 @@ def mocked_requests_get_candidates(*args, **kwargs):
         def json(self):
             return self.json_data
 
+        def raise_for_status(self):
+            return
+
     return MockResponse(mock_results, 200)
 
 
@@ -42,6 +43,9 @@ def mocked_requests_get_committees(*args, **kwargs):
         def json(self):
             return self.json_data
 
+        def raise_for_status(self):
+            return
+
     return MockResponse(
         {
             "results": [
@@ -53,27 +57,29 @@ def mocked_requests_get_committees(*args, **kwargs):
     )
 
 
-class ContactViewSetTest(TestCase):
+class ContactViewSetTest(FecfilerViewSetTest):
     fixtures = ["test_contacts", "C01234567_user_and_committee"]
 
     def setUp(self):
-        self.user = User.objects.get(id="12345678-aaaa-bbbb-cccc-111122223333")
-        self.factory = RequestFactory()
+        super().setUp()
 
     @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_no_candidate_id(self, mock_get):
-        request = self.factory.get("/api/v1/contacts/candidate")
-        request.user = self.user
-        response = ContactViewSet.as_view({"get": "candidate"})(request)
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/candidate",
+            ContactViewSet,
+            "candidate",
+        )
 
         self.assertEqual(response.status_code, 400)
 
     @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate(self, mock_get):
-        request = self.factory.get("/api/v1/contacts/candidate?candidate_id=P60012143")
-        request.user = self.user
-        response = ContactViewSet.as_view({"get": "candidate"})(request)
-
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/candidate?candidate_id=P60012143",
+            ContactViewSet,
+            "candidate",
+        )
         expected_json = {
             "name": "LNAME, FNAME I",
             "candidate_id": "P60012143",
@@ -83,35 +89,31 @@ class ContactViewSetTest(TestCase):
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
     def test_candidate_lookup_no_auth(self):
-        request = self.factory.get("/api/v1/contacts/candidate_lookup")
-
-        response = ContactViewSet.as_view({"get": "candidate_lookup"})(request)
-
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/candidate_lookup?q=test",
+            ContactViewSet,
+            "candidate_lookup",
+            authenticate=False,
+        )
         self.assertEqual(response.status_code, 403)
 
     @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_lookup_no_q(self, mock_get):
-        request = self.factory.get("/api/v1/contacts/candidate_lookup")
-        request.user = self.user
-
-        response = ContactViewSet.as_view({"get": "candidate_lookup"})(request)
-
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/candidate_lookup",
+            ContactViewSet,
+            "candidate_lookup",
+        )
         self.assertEqual(response.status_code, 400)
 
     @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_lookup_happy_path(self, mock_get):
-        request = self.factory.get(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/candidate_lookup?"
-            "q=test&max_fecfile_results=5&max_fec_results=5&exclude_fec_ids=P60012143"
+            "q=test&max_fecfile_results=5&max_fec_results=5&exclude_fec_ids=P60012143",
+            ContactViewSet,
+            "candidate_lookup",
         )
-        request.user = self.user
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-
-        response = ContactViewSet.as_view({"get": "candidate_lookup"})(request)
-
         expected_json = {
             "fec_api_candidates": [
                 {
@@ -122,48 +124,35 @@ class ContactViewSetTest(TestCase):
             ],
             "fecfile_candidates": [],
         }
-
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
     def test_committee_lookup_no_auth(self):
-        request = self.factory.get("/api/v1/contacts/committee_lookup")
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-
-        response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
-
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/committee_lookup?q=test",
+            ContactViewSet,
+            "committee_lookup",
+            authenticate=False,
+        )
         self.assertEqual(response.status_code, 403)
 
     @patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_no_q(self, mock_get):
-        request = self.factory.get("/api/v1/contacts/committee_lookup")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-
-        response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
-
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/committee_lookup",
+            ContactViewSet,
+            "committee_lookup",
+        )
         self.assertEqual(response.status_code, 400)
 
     @patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_happy_path(self, mock_get):
-        request = self.factory.get(
+        response = self.send_viewset_get_request(
             "/api/v1/contacts/committee_lookup?"
-            "q=test&max_fecfile_results=5&max_fec_results=5"
+            "q=test&max_fecfile_results=5&max_fec_results=5",
+            ContactViewSet,
+            "committee_lookup",
         )
-        request.user = self.user
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-
-        response = ContactViewSet.as_view({"get": "committee_lookup"})(request)
-
         expected_json = {
             "fec_api_committees": [
                 {"name": "BIDEN FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
@@ -200,113 +189,77 @@ class ContactViewSetTest(TestCase):
                 }
             ],
         }
-
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
     def test_individual_lookup_no_q(self):
-        request = self.factory.get("/api/v1/contacts/individual_lookup")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-
-        response = ContactViewSet.as_view({"get": "individual_lookup"})(request)
-
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/individual_lookup",
+            ContactViewSet,
+            "individual_lookup",
+        )
         self.assertEqual(response.status_code, 400)
 
     def test_individual_lookup_happy_path(self):
-        request = self.factory.get(
-            "/api/v1/contacts/individual_lookup?q=Lastname&max_fecfile_results=5"
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/individual_lookup?q=Lastname&max_fecfile_results=5",
+            ContactViewSet,
+            "individual_lookup",
         )
-        request.user = self.user
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-
-        response = ContactViewSet.as_view({"get": "individual_lookup"})(request)
-
         expected_json_fragment = '"last_name": "Lastname", "first_name": "Firstname"'
-
         self.assertEqual(response.status_code, 200)
         self.assertIn(expected_json_fragment, str(response.content, encoding="utf8"))
 
     def test_organization_lookup_no_q(self):
-        request = self.factory.get("/api/v1/contacts/organization_lookup")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-
-        response = ContactViewSet.as_view({"get": "organization_lookup"})(request)
-
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/organization_lookup",
+            ContactViewSet,
+            "organization_lookup",
+        )
         self.assertEqual(response.status_code, 400)
 
     def test_organization_lookup_happy_path(self):
-        request = self.factory.get(
-            "/api/v1/contacts/organization_lookup?q=test&max_fecfile_results=5"
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/organization_lookup?q=test&max_fecfile_results=5",
+            ContactViewSet,
+            "organization_lookup",
         )
-        request.user = self.user
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-
-        response = ContactViewSet.as_view({"get": "organization_lookup"})(request)
-
         expected_json_fragment = '"name": "test name contains TestOrgName1"'
-
         self.assertEqual(response.status_code, 200)
         self.assertIn(expected_json_fragment, str(response.content, encoding="utf8"))
 
     def test_get_contact_id_no_fec_id(self):
-        request = self.factory.get("/api/v1/contacts/get_contact_id/")
-        request.user = self.user
-
-        response = ContactViewSet.as_view({"get": "get_contact_id"})(request)
-
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/get_contact_id/",
+            ContactViewSet,
+            "get_contact_id",
+        )
         self.assertEqual(response.status_code, 400)
 
     def test_get_contact_id_finds_contact(self):
-        request = self.factory.get("/api/v1/contacts/get_contact_id/?fec_id=test_fec_id")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-
-        response = ContactViewSet.as_view({"get": "get_contact_id"})(request)
-
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/get_contact_id/?fec_id=test_fec_id",
+            ContactViewSet,
+            "get_contact_id",
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, uuid.UUID("a03a141a-d2df-402c-93c6-e705ec6007f3"))
 
     def test_get_contact_id_no_match(self):
-        request = self.factory.get(
-            "/api/v1/contacts/get_contact_id/?fec_id=id_that_doesnt_exist"
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/get_contact_id/?fec_id=id_that_doesnt_exist",
+            ContactViewSet,
+            "get_contact_id",
         )
-        request.user = self.user
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-
-        response = ContactViewSet.as_view({"get": "get_contact_id"})(request)
-
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, "")
 
     def test_get_committee_invalid(self):
-        request = self.factory.get("/api/v1/contacts/committee/")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-
-        response = ContactViewSet.as_view({"get": "committee"})(request)
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/committee/",
+            ContactViewSet,
+            "committee",
+        )
         self.assertEqual(response.status_code, 400)
 
     def test_get_committee(self):
@@ -321,17 +274,12 @@ class ContactViewSetTest(TestCase):
                 mock_response.json = Mock()
                 mock_response.json.return_value = {"results": [{"name": "TEST"}]}
                 mock_requests.get.return_value = mock_response
-
-                request = self.factory.get(
-                    "/api/v1/contacts/committee/?committee_id=C12345678"
+                response = self.send_viewset_get_request(
+                    "/api/v1/contacts/committee/?committee_id=C12345678",
+                    ContactViewSet,
+                    "committee",
                 )
-                request.user = self.user
-                request.session = {
-                    "committee_uuid": "11111111-2222-3333-4444-555555555555",
-                    "committee_id": "C01234567",
-                }
 
-                response = ContactViewSet.as_view({"get": "committee"})(request)
                 self.assertEqual(response.status_code, 200)
                 self.assertIn(expected_call, mock_requests.get.call_args[0])
                 self.assertEqual(
@@ -341,13 +289,12 @@ class ContactViewSetTest(TestCase):
                 self.assertEqual(data["name"], "TEST")
 
     def test_restore_no_match(self):
-        request = self.factory.post(
+        response = self.send_viewset_post_request(
             "/api/v1/contacts-deleted/restore",
             ["a5061946-0000-0000-82f6-f1782c333d70"],
-            "application/json",
+            DeletedContactsViewSet,
+            "restore",
         )
-        force_authenticate(request, self.user)
-        response = DeletedContactsViewSet.as_view({"post": "restore"})(request)
         self.assertEqual(response.status_code, 400)
 
     def test_restore(self):
@@ -363,13 +310,12 @@ class ContactViewSetTest(TestCase):
             id="a5061946-0000-0000-82f6-f1782c333d70"
         )
         self.assertIsNotNone(deleted_contact.deleted)
-        request = self.factory.post(
+        response = self.send_viewset_post_request(
             "/api/v1/contacts-deleted/restore",
             ["a5061946-0000-0000-82f6-f1782c333d70"],
-            "application/json",
+            DeletedContactsViewSet,
+            "restore",
         )
-        force_authenticate(request, self.user)
-        response = DeletedContactsViewSet.as_view({"post": "restore"})(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, ["a5061946-0000-0000-82f6-f1782c333d70"])
 
@@ -380,8 +326,8 @@ class ContactViewSetTest(TestCase):
             first_name="First",
             committee_account_id="11111111-2222-3333-4444-555555555555",
         )
-        request = self.factory.put(
-            f"/api/v1/contacts/{str(contact.id)}/",
+        response = self.send_viewset_put_request(
+            "/api/v1/contacts/{str(contact.id)}/",
             {
                 "first_name": "Other",
                 "last_name": "other",
@@ -392,50 +338,31 @@ class ContactViewSetTest(TestCase):
                 "country": "USA",
                 "type": "IND",
             },
-            "application/json",
+            ContactViewSet,
+            "update",
+            pk=contact.id,
         )
-        request.session = {
-            "committee_uuid": "11111111-2222-3333-4444-555555555555",
-            "committee_id": "C01234567",
-        }
-        force_authenticate(request, self.user)
-        response = ContactViewSet.as_view({"put": "update"})(request, pk=contact.id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["first_name"], "Other")
 
     def test_list_paginated(self):
-        view = ContactViewSet()
-        view.format_kwarg = "format"
-        request = self.factory.get("/api/v1/contacts")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": uuid.UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
-        }
-
         for i in range(10):
             create_test_individual_contact(
                 f"last{i}", f"first{i}", "11111111-2222-3333-4444-555555555555"
             )
-        request.method = "GET"
-        request.query_params = {"page": 1}
-        view.request = request
-        response = view.list(request)
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts?page=1",
+            ContactViewSet,
+            "list",
+        )
         self.assertEqual(len(response.data["results"]), 10)
 
     def test_list_no_pagination(self):
-        view = ContactViewSet()
-        view.format_kwarg = "format"
-        request = self.factory.get("/api/v1/contacts")
-        request.user = self.user
-        request.session = {
-            "committee_uuid": uuid.UUID("11111111-2222-3333-4444-555555555555"),
-            "committee_id": "C01234567",
-        }
-        request.method = "GET"
-        request.query_params = {}
-        view.request = request
-        response = view.list(request)
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts",
+            ContactViewSet,
+            "list",
+        )
         try:
             response.data["results"]  # A non-paginated response will throw an error here
             self.assertTrue(response is None)
