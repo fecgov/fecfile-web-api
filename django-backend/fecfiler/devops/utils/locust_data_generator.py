@@ -1,11 +1,16 @@
 from random import choice, randrange
 import json
 from os import path
+from fecfiler.reports.models import Report
+from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.contacts.models import Contact
+from fecfiler.transactions.tests.utils import create_schedule_a
+from fecfiler.transactions.schedule_a.models import ScheduleA
 
 
 class LocustDataGenerator:
-    def __init__(self, committee_id):
-        self.committee_id = committee_id
+    def __init__(self, committee):
+        self.committee = committee
 
     def generate_form_3x(self, count, collision_maximum=1000):
         reports_and_dates = [
@@ -25,25 +30,14 @@ class LocustDataGenerator:
             if hashable_date in dates_taken:
                 collision_count += 1
                 continue
-
             dates_taken.add(hashable_date)
-            alert_text = "Are you sure you want to submit this form \
-                    electronically? Please note that you cannot undo this action. \
-                    Any changes needed will need to be filed as an amended report."
 
+            coverage_from_date = f"{year}-{from_date}"
+            coverage_through_date = f"{year}-{through_date}"
             form_3x_list.append(
-                {
-                    "committee_account_id": self.committee_id,
-                    "hasChangeOfAddress": "true",
-                    "submitAlertText": alert_text,
-                    "report_type": "F3X",
-                    "form_type": "F3XN",
-                    "report_code": quarter,
-                    "date_of_election": None,
-                    "state_of_election": None,
-                    "coverage_from_date": f"{year}-{from_date}",
-                    "coverage_through_date": f"{year}-{through_date}",
-                }
+                create_form3x(
+                    self.committee, coverage_from_date, coverage_through_date, {}, quarter
+                )
             )
 
         return form_3x_list
@@ -62,24 +56,26 @@ class LocustDataGenerator:
                 f"{randrange(1, 999)} {choice(street_names)} {choice(street_types)}"
             )
             contacts.append(
-                {
-                    "committee_account_id": self.committee_id,
-                    "type": "IND",
-                    "street_1": street_1,
-                    "city": "Testville",
-                    "state": "AK",
-                    "zip": "12345",
-                    "country": "USA",
-                    "last_name": choice(last_names),
-                    "first_name": choice(first_names),
-                    "middle_name": choice(first_names),
-                    "prefix": choice(prefixes),
-                    "suffix": choice(suffixes),
-                    "street_2": None,
-                    "telephone": None,
-                    "employer": "Business Inc.",
-                    "occupation": "Job",
-                }
+                Contact(
+                    **{
+                        "committee_account_id": self.committee.id,
+                        "type": "IND",
+                        "street_1": street_1,
+                        "city": "Testville",
+                        "state": "AK",
+                        "zip": "12345",
+                        "country": "USA",
+                        "last_name": choice(last_names),
+                        "first_name": choice(first_names),
+                        "middle_name": choice(first_names),
+                        "prefix": choice(prefixes),
+                        "suffix": choice(suffixes),
+                        "street_2": None,
+                        "telephone": None,
+                        "employer": "Business Inc.",
+                        "occupation": "Job",
+                    }
+                )
             )
 
         return contacts
@@ -87,40 +83,25 @@ class LocustDataGenerator:
     def generate_single_transactions(self, count, reports, contacts):
         transactions = []
         for _ in range(count):
-            report = choice(reports)
+            transaction_type_identifier = "INDIVIDUAL_RECEIPT"
             contact = choice(contacts)
-            new_transaction = {
-                "committee_account_id": self.committee_id,
-                "children": [],
-                "form_type": "SA11AI",
-                "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
-                "aggregation_group": "GENERAL",
-                "schema_name": "INDIVIDUAL_RECEIPT",
-                "report_ids": [report["id"]],
-                "entity_type": "IND",
-                "contributor_last_name": contact["last_name"],
-                "contributor_first_name": contact["first_name"],
-                "contributor_middle_name": contact["middle_name"],
-                "contributor_prefix": contact["prefix"],
-                "contributor_suffix": contact["suffix"],
-                "contributor_street_1": contact["street_1"],
-                "contributor_street_2": None,
-                "contributor_city": contact["city"],
-                "contributor_state": contact["state"],
-                "contributor_zip": contact["zip"],
-                "contribution_date": report["coverage_from_date"],
-                "contribution_amount": randrange(25, 10000),
-                "contribution_purpose_descrip": None,
-                "contributor_employer": contact["employer"],
-                "contributor_occupation": contact["occupation"],
-                "memo_code": None,
-                "contact_1": contact,
-                "contact_1_id": contact.get("id", None),
-                "schedule_id": "A",
-            }
+            report = choice(reports)
+            contribution_date = report.coverage_from_date
+            contribution_amount = randrange(25, 10000)
+            aggregation_group = "GENERAL"
+            form_type = "SA11AI"
 
+            new_transaction = create_schedule_a(
+                transaction_type_identifier,
+                self.committee,
+                contact,
+                contribution_date,
+                contribution_amount,
+                aggregation_group,
+                form_type,
+                report=report,
+            )
             transactions.append(new_transaction)
-
         return transactions
 
     def generate_triple_transactions(
@@ -131,9 +112,46 @@ class LocustDataGenerator:
     ):
         triple_transactions = []
         for _ in range(count):
-            a, b, c = self.generate_single_transactions(3, reports, contacts)
-            b["children"].append(c)
-            a["children"].append(b)
+            transaction_type_identifier = "INDIVIDUAL_RECEIPT"
+            contact = choice(contacts)
+            report = choice(reports)
+            contribution_date = report.coverage_from_date
+            contribution_amount = randrange(25, 10000)
+            aggregation_group = "GENERAL"
+            form_type = "SA11AI"
+
+            a = create_schedule_a(
+                transaction_type_identifier,
+                self.committee,
+                contact,
+                contribution_date,
+                contribution_amount,
+                aggregation_group,
+                form_type,
+                report=report,
+            )
+            b = create_schedule_a(
+                transaction_type_identifier,
+                self.committee,
+                contact,
+                contribution_date,
+                contribution_amount,
+                aggregation_group,
+                form_type,
+                report=report,
+                parent_id=a.id,
+            )
+            create_schedule_a(
+                transaction_type_identifier,
+                self.committee,
+                contact,
+                contribution_date,
+                contribution_amount,
+                aggregation_group,
+                form_type,
+                report=report,
+                parent_id=b.id,
+            )
             triple_transactions.append(a)
         return triple_transactions
 

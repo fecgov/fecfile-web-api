@@ -2,11 +2,10 @@ import requests
 import structlog
 import math
 
-from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.reports.models import Report
-from fecfiler.contacts.models import Contacts
-from fecfiler.transactions.models import Transactions
-from locust_data_generator import LocustDataGenerator
+from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.contacts.models import Contact
+from fecfiler.user.models import User
+from .locust_data_generator import LocustDataGenerator
 
 logger = structlog.get_logger(__name__)
 
@@ -23,15 +22,18 @@ class LoadTestUtils:
 
     def create_load_test_committee_and_data(
         self,
-        new_committee_id="C33333333",
-        number_of_reports=10,
-        number_of_contacts=100,
-        number_of_transactions=500,
-        single_to_triple_transaction_ratio=9 / 10,
+        new_committee_id,
+        number_of_reports,
+        number_of_contacts,
+        number_of_transactions,
+        single_to_triple_transaction_ratio,
     ):
+        logger.info(f"Getting user_id for session")
+        user_id = self.get_current_user_id()
+
         logger.info(f"Creating and activating new committee: {new_committee_id}")
-        committee_uuid = self.create_and_activate_committee(new_committee_id)
-        self.locust_data_generator = LocustDataGenerator(committee_uuid)
+        committee = self.create_and_activate_committee(new_committee_id, user_id)
+        self.locust_data_generator = LocustDataGenerator(committee)
 
         logger.info(f"Creating {number_of_reports} reports")
         reports = self.create_reports(number_of_reports)
@@ -51,35 +53,42 @@ class LoadTestUtils:
         logger.info(f"Creating {triple_transactions_needed} triple transactions")
         self.create_triple_transactions(triple_transactions_needed, reports, contacts)
 
-    def create_and_activate_committee(self, new_committee_id):
+    def get_current_user_id(self):
+        get_current_url = f"{self.base_uri}/users/get_current/"
+        response = requests.get(get_current_url, headers=self.headers)
+        response.raise_for_status()
+        current_user = response.json()
+        return User.objects.get(email=current_user["email"]).id
+
+    def create_and_activate_committee(self, new_committee_id, user_id):
         committee = CommitteeAccount.objects.create(committee_id=new_committee_id)
+        Membership.objects.create(
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            committee_account_id=committee.id,
+            user_id=user_id,
+        )
         activate_url = f"{self.base_uri}/committees/{committee.id}/activate/"
         response = requests.post(activate_url, headers=self.headers)
         response.raise_for_status()
-        return committee.id
+        return committee
 
     def create_reports(self, number_of_reports):
-        report_json_list = self.locust_data_generator.generate_form_3x(number_of_reports)
-        return list(Report.objects.bulk_create(report_json_list))
+        return self.locust_data_generator.generate_form_3x(number_of_reports)
 
     def create_contacts(self, number_of_contacts):
         contact_json_list = self.locust_data_generator.generate_contacts(
             number_of_contacts
         )
-        return list(Contacts.objects.bulk_create(contact_json_list))
+        return list(Contact.objects.bulk_create(contact_json_list))
 
     def create_single_transactions(self, number_of_transactions, reports, contacts):
-        single_transaction_json_list = (
-            self.locust_data_generator.generate_single_transactions(
-                number_of_transactions, contacts, reports
-            )
+        self.locust_data_generator.generate_single_transactions(
+            number_of_transactions,
+            reports,
+            contacts,
         )
-        Transactions.objects.bulk_create(single_transaction_json_list)
 
     def create_triple_transactions(self, number_of_transactions, reports, contacts):
-        triple_transaction_json_list = (
-            self.locust_data_generator.generate_triple_transactions(
-                number_of_transactions, reports, contacts
-            )
+        self.locust_data_generator.generate_triple_transactions(
+            number_of_transactions, reports, contacts
         )
-        Transactions.objects.bulk_create(triple_transaction_json_list)

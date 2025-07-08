@@ -7,15 +7,15 @@ class Command(FECCommand):
     command_name = "gen_locust_load_test_data"
 
     def add_arguments(self, parser):
-        parser.add_argument("base_uri", type=str, default="http://localhost:8080/api/v1/")
         parser.add_argument("session_id", type=str)
         parser.add_argument("csrftoken", type=str)
-        parser.add_argument("new_committee_id", type=str, default="C33333333")
-        parser.add_argument("number_of_reports", type=int, default=10)
-        parser.add_argument("number_of_contacts", type=int, default=100)
-        parser.add_argument("number_of_transactions", type=int, default=500)
+        parser.add_argument("--base_uri", default="http://localhost:8080/api/v1")
+        parser.add_argument("--new_committee_id", type=str, default="C33333333")
+        parser.add_argument("--number_of_reports", type=int, default=10)
+        parser.add_argument("--number_of_contacts", type=int, default=100)
+        parser.add_argument("--number_of_transactions", type=int, default=500)
         parser.add_argument(
-            "single_to_triple_transaction_ratio", type=float, default=9 / 10
+            "single_to_triple_transaction_ratio", type=float, nargs="?", default=9 / 10
         )
 
     def command(self, *args, **options):
