@@ -44,10 +44,8 @@ def get_json_data(name):
     return []
 
 
-report_ids_to_submit_lock = threading.Lock()
-
-
 class Tasks(TaskSet):
+    report_ids_to_submit_lock = threading.Lock()
     report_ids = []
     contacts = []
 
@@ -60,6 +58,7 @@ class Tasks(TaskSet):
         }
 
         logging.info("Preparing reports for submit")
+        self.report_ids = self.retrieve_report_id_list()
         self.prepared_reports_for_submit = self.prepare_reports_for_submit()
         self.report_ids_to_submit = self.report_ids.copy()
 
@@ -188,19 +187,18 @@ class Tasks(TaskSet):
             return response.json()
         raise Exception("Failed to retrieve report")
 
-    def retrieve_report_id_and_coverage_from_date_list(self):
+    def retrieve_report_id_list(self):
         response = self.client_get(
             "/api/v1/reports/",
-            name="retrieve_report_ids_and_coverage_from_dates",
             timeout=TIMEOUT,
         )
         if response and response.status_code == 200:
-            retval = {}
+            retval = []
             reports = response.json()
             for report in reports:
-                retval[report["id"]] = report.get("coverage_from_date", None)
+                retval.append(report["id"])
             return retval
-        raise Exception("Failed to retrieve report ids/coverage from dates")
+        raise Exception("Failed to retrieve report ids for load test setup")
 
     @task
     def celery_test(self):
