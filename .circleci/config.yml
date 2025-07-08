@@ -53,22 +53,22 @@ jobs:
           working_directory: ~/project/db
 
       - run:
-          name: SKIP Check for missing migrations
+          name: Check for missing migrations
           command: |
-            echo "[SKIP] python manage.py makemigrations --check"
+            python manage.py makemigrations --check
           working_directory: ~/project/django-backend/
 
       - run:
-          name: SKIP Check for breaking change migrations
+          name: Check for breaking change migrations
           # After December 2024
           command: |
-            echo "[SKIP] python manage.py lintmigrations --git-commit-id d73068e23fc5b035af2b224b16d4726b7b20d67c --project-root-path '.'"
+            python manage.py lintmigrations --git-commit-id d73068e23fc5b035af2b224b16d4726b7b20d67c --project-root-path '.'
           working_directory: ~/project/django-backend/
 
       - run:
-          name: SKIP Run migrations
+          name: Run migrations
           command: |
-            echo "[SKIP] python manage.py migrate --no-input --traceback --verbosity 3"
+            python manage.py migrate --no-input --traceback --verbosity 3
           working_directory: ~/project/django-backend/
 
       - run:
@@ -79,6 +79,63 @@ jobs:
       - run:
           name: Run deptry
           command: deptry ~/project/
+
+      - run:
+          name: Run tests
+          # Use built-in Django test module
+          command: coverage run --source='.' --rcfile=.coveragerc manage.py test
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: setup coverage dir
+          command: mkdir ~/project/coverage-reports
+
+      - run:
+          name: Make XML coverage report
+          command: coverage xml -o ~/project/coverage-reports/coverage.xml
+          working_directory: ~/project/django-backend
+
+      # Sonar cloud setup and scanning
+      - run:
+          name: Create sonar-scanner cache directory if it doesn't exist
+          command: mkdir -p /tmp/cache/scanner
+      - restore_cache:
+          keys:
+            - v1-sonarcloud-scanner-7.1.0.4889
+      - run:
+          name: SonarCloud
+          command: |
+            set -e
+            VERSION=7.1.0.4889
+            if [ -z "$SONAR_TOKEN" ]; then
+                 echo "You must set SONAR_TOKEN environemnt variable"
+                 exit 1
+            fi
+            SCANNER_DIRECTORY=/tmp/cache/scanner
+            export SONAR_USER_HOME=$SCANNER_DIRECTORY/.sonar
+            OS="linux"
+            SUFFIX="$VERSION-$OS-x64"
+            SS_DIR="sonar-scanner-$SUFFIX"
+            SS_FILENAME="sonar-scanner-cli-$SUFFIX.zip"
+            echo $SONAR_USER_HOME
+            if [[ ! -x "$SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner" ]]; then
+              curl -Ol https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/$SS_FILENAME
+              unzip -qq -o $SS_FILENAME -d $SCANNER_DIRECTORY
+            fi
+
+            chmod +x $SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner
+            chmod +x $SCANNER_DIRECTORY/$SS_DIR/jre/bin/java
+            $SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner
+            mkdir -p /tmp/sonar_report
+            cp /home/circleci/project/coverage-reports/coverage.xml /tmp/sonar_report
+          environment:
+            SONARQUBE_SCANNER_PARAMS: '{"sonar.host.url":"https://sonarcloud.io"}'
+      - save_cache:
+          key: v1-sonarcloud-scanner-7.1.0.4889
+          paths: /tmp/cache/scanner
+      - store_artifacts:
+          path: /tmp/sonar_report
+          destination: sonar_report
 
   deploy-job:
     docker:
@@ -100,7 +157,6 @@ jobs:
 
       - run:
           name: Deploy API
-          no_output_timeout: 3m
           command: |
             export PATH=$HOME/bin:$PATH
             invoke deploy --branch $CIRCLE_BRANCH --login
@@ -202,7 +258,7 @@ workflows:
             - test
           filters:
             branches:
-              only: /develop|feature\/2185-migration_heartbeat|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
           requires:
             - test
