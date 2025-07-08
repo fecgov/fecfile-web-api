@@ -9,7 +9,11 @@ from fecfiler.transactions.serializers import (
     REDESIGNATED,
 )
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.transactions.tests.utils import create_schedule_a, create_schedule_b
+from fecfiler.transactions.tests.utils import (
+    create_schedule_a,
+    create_schedule_b,
+    create_schedule_f
+)
 
 
 class TransactionSerializerBaseTestCase(TestCase):
@@ -87,3 +91,26 @@ class TransactionSerializerBaseTestCase(TestCase):
         )
         representation = serializer.to_representation(transaction)
         self.assertEqual(representation.get("reatt_redes_total"), "1.00")
+
+    def test_schedule_f_serialization(self):
+        transaction = create_schedule_f(
+            "COORDINATED_PARTY_EXPENDITURE",
+            self.committee,
+            None,
+            None,
+            None,
+            None,
+            None,
+            schedule_data={
+                "expenditure_amount": 40,
+                "aggregate_general_elec_expended": 62
+            }
+        )
+        transaction.aggregate = 62
+
+        serializer = TransactionSerializer(
+            context={"request": self.mock_request},
+        )
+        representation = serializer.to_representation(transaction)
+        self.assertEqual(representation["aggregate"], '62.00')
+        self.assertEqual(representation["aggregate_general_elec_expended"], '62.00')
