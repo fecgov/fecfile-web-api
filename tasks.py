@@ -194,12 +194,12 @@ def _run_migrations(ctx, space):
         while not heartbeat_stop_event.is_set():
             minutes_elapsed += 1
             print(f"Migration in progress... ({minutes_elapsed} minutes elapsed)")
-            time.sleep(60)
-            # Check every second for the stop event, but only print every 60 seconds
-            # for _ in range(60):
-            #    if heartbeat_stop_event.is_set():
-            #        break
-            #    time.sleep(1)
+
+            # Check every second for the stop event
+            for _ in range(60):
+                if heartbeat_stop_event.is_set():
+                    break
+                time.sleep(1)
 
     heartbeat_thread = threading.Thread(target=heartbeat)
     heartbeat_thread.daemon = True  # Daemonize thread to allow program exit
