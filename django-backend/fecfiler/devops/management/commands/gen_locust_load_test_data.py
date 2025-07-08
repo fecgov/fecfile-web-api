@@ -15,7 +15,7 @@ class Command(FECCommand):
         parser.add_argument("--number_of_contacts", type=int, default=100)
         parser.add_argument("--number_of_transactions", type=int, default=500)
         parser.add_argument(
-            "single_to_triple_transaction_ratio", type=float, nargs="?", default=9 / 10
+            "--single_to_triple_transaction_ratio", type=float, default=9 / 10
         )
 
     def command(self, *args, **options):

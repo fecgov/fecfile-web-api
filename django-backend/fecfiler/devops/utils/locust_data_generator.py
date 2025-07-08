@@ -1,11 +1,9 @@
 from random import choice, randrange
 import json
 from os import path
-from fecfiler.reports.models import Report
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.models import Contact
 from fecfiler.transactions.tests.utils import create_schedule_a
-from fecfiler.transactions.schedule_a.models import ScheduleA
 
 
 class LocustDataGenerator:

@@ -28,7 +28,7 @@ class LoadTestUtils:
         number_of_transactions,
         single_to_triple_transaction_ratio,
     ):
-        logger.info(f"Getting user_id for session")
+        logger.info("Getting user_id for session")
         user_id = self.get_current_user_id()
 
         logger.info(f"Creating and activating new committee: {new_committee_id}")
