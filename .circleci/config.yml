@@ -258,7 +258,7 @@ workflows:
             - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|feature\/2185-migration_heartbeat|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
           requires:
             - test
