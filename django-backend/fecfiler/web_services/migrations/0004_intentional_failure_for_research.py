@@ -11,11 +11,13 @@ def raise_error_during_migration(error_msg):
     """
     raise Exception(error_msg)
 
+
 def sleep_for_duration(duration):
     """
     Sleeps for the specified duration in seconds.
     """
     time.sleep(duration)
+
 
 class Migration(migrations.Migration):
 
