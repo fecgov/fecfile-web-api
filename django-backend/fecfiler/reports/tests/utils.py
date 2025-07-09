@@ -19,7 +19,7 @@ def create_form3x(
     )
 
 
-def create_form24(committee, data={}):
+def create_form24(committee, data={"name": "TEST"}):
     return create_test_report(Form24, "F24N", committee, data=data)
 
 

@@ -180,6 +180,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             contact_1_id = request.query_params["contact_1_id"]
             date = request.query_params["date"]
             aggregation_group = request.query_params["aggregation_group"]
+            assert (
+                date
+                and contact_1_id
+                and aggregation_group
+            )  # Raises error if any value is not truthy (i.e, "" or None)
         except Exception:
             message = "contact_1_id, date, and aggregate_group are required params"
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
@@ -208,6 +213,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             district = request.query_params.get("candidate_district", None)
             if office == Contact.CandidateOffice.HOUSE and not district:
                 raise Exception()
+
+            assert (
+                date
+                and aggregation_group
+                and election_code
+            )  # Raises error if any value is not truthy (i.e, "" or None)
         except Exception:
             message = """date, aggregate_group, election_code, and candidate_office \
             are required params.
@@ -236,6 +247,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             date = request.query_params["date"]
             aggregation_group = request.query_params["aggregation_group"]
             general_election_year = request.query_params["general_election_year"]
+
+            assert (
+                contact_2_id
+                and date
+                and aggregation_group
+                and general_election_year
+            )  # Raises error if any value is not truthy (i.e, "" or None)
         except Exception:
             message = (
                 "contact_2_id, date, aggregation_group, and "
@@ -775,7 +793,7 @@ def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_i
             current_report = transaction.reports.filter(
                 Q(form_3x__isnull=False) | Q(form_3__isnull=False)
             ).first()
-            future_reports = current_report.get_future_in_progress_reports()
+            future_reports = current_report.get_future_reports()
             transactions_to_delete = list(
                 Transaction.objects.filter(
                     loan_id=original_loan_id,
@@ -795,7 +813,7 @@ def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_i
             current_report = transaction.reports.filter(
                 Q(form_3x__isnull=False) | Q(form_3__isnull=False)
             ).first()
-            future_reports = current_report.get_future_in_progress_reports()
+            future_reports = current_report.get_future_reports()
             transactions_to_delete = list(
                 Transaction.objects.filter(
                     debt_id=original_debt_id,
