@@ -19,6 +19,14 @@ def sleep_for_duration(duration):
     time.sleep(duration)
 
 
+def sleep_for_3minutes(apps, schema_editor):
+    """
+    Sleeps for 3 minutes during the migration process.
+    This is useful for testing purposes to simulate a long-running migration.
+    """
+    sleep_for_duration(180)  # Sleep for 3 minutes
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -27,6 +35,6 @@ class Migration(migrations.Migration):
 
     operations = [
         # migrations.RunPython(raise_error_during_migration("Error at outset.")),
-        migrations.RunPython(sleep_for_duration(180)),  # sleep for 3 minutes
+        migrations.RunPython(code=sleep_for_3minutes),  # sleep for 3 minutes
         # migrations.RunPython(raise_error_during_migration("Intentional error!")),
     ]
