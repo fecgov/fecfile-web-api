@@ -60,7 +60,10 @@ class EFODotFECSubmitter(DotFECSubmitter):
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
-        logger.debug(f"FEC upload response: {response}")
+        if response.status != FECStatus.ACCEPTED.value:
+            logger.error(f"FEC upload failed: {response}")
+        else:
+            logger.info(f"FEC upload successful: {response}")
         return response
 
     def poll_status(self, submission: BaseSubmission):

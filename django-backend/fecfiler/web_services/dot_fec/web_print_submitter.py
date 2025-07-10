@@ -32,7 +32,10 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
         response = self.fec_soap_client.service.print(
             EFO_FILING_API_KEY, email, dot_fec_bytes
         )
-        logger.debug(f"FEC upload response: {response}")
+        if response.status != FECStatus.ACCEPTED.value:
+            logger.error(f"FEC upload failed: {response}")
+        else:
+            logger.info(f"FEC upload successful: {response}")
         return response
 
     def poll_status(self, submission: BaseSubmission):
