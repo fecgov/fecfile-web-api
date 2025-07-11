@@ -214,6 +214,7 @@ def _run_migrations(ctx, space):
         return False
 
     # Heartbeat thread
+    # Prints an in-progress message every minute to keep circleci step from timing out
     heartbeat_stop_event = threading.Event()
 
     def heartbeat():
