@@ -35,7 +35,9 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
             self.mock = True
             self.mock_submitter = MockWebPrintSubmitter()
         else:
-            self.fec_soap_client = Client(f"{EFO_FILING_API}/webprint/services/print?wsdl")
+            self.fec_soap_client = Client(
+                f"{EFO_FILING_API}/webprint/services/print?wsdl"
+            )
 
     def submit(self, email, dot_fec_bytes):
         if self.mock:
