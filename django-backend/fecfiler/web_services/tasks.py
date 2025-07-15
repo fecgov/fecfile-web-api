@@ -36,18 +36,15 @@ logger = structlog.get_logger(__name__)
 WEB_PRINT_KEY = "WebPrint"
 MOCK_WEB_PRINT_KEY = "MockWebPrint"
 EFO_SUBMITTER_KEY = "DotFEC"
-MOCK_SUBMITTER_KEY = "MockDotFEC"
 SUBMISSION_MANAGERS = {
     WEB_PRINT_KEY: EFOWebPrintSubmitter,
     MOCK_WEB_PRINT_KEY: MockWebPrintSubmitter,
     EFO_SUBMITTER_KEY: EFODotFECSubmitter,
-    MOCK_SUBMITTER_KEY: MockDotFECSubmitter,
 }
 SUBMISSION_CLASSES = {
     WEB_PRINT_KEY: WebPrintSubmission,
     MOCK_WEB_PRINT_KEY: WebPrintSubmission,
     EFO_SUBMITTER_KEY: UploadSubmission,
-    MOCK_SUBMITTER_KEY: UploadSubmission,
 }
 
 MAX_ATTEMPTS = INITIAL_POLLING_MAX_ATTEMPTS + SECONDARY_POLLING_MAX_ATTEMPTS
@@ -154,7 +151,7 @@ def submit_to_fec(
 
     """Submit to FEC"""
     try:
-        submission_type_key = EFO_SUBMITTER_KEY  # if not mock else MOCK_SUBMITTER_KEY
+        submission_type_key = EFO_SUBMITTER_KEY
         submitter = SUBMISSION_MANAGERS[submission_type_key]()
         logger.info(f"Uploading {file_name} to FEC")
         submission_json = submitter.get_submission_json(
