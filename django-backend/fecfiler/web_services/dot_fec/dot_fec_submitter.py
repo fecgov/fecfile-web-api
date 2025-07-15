@@ -62,15 +62,21 @@ class EFODotFECSubmitter(DotFECSubmitter):
             self.mock = True
             self.mock_submitter = MockDotFECSubmitter()
         else:
-            self.fec_soap_client = Client(f"{EFO_FILING_API}/webload/services/upload?wsdl")
+            self.fec_soap_client = Client(
+                f"{EFO_FILING_API}/webload/services/upload?wsdl"
+            )
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         if self.mock:
-            response = self.mock_submitter.submit(dot_fec_bytes, json_payload, fec_report_id)
-            response_obj = json.loads(response, object_hook=lambda d: SimpleNamespace(**d))
+            response = self.mock_submitter.submit(
+                dot_fec_bytes, json_payload, fec_report_id
+            )
         else:
-            response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
+            response = self.fec_soap_client.service.upload(
+                json_payload, dot_fec_bytes
+            )
 
+        response_obj = json.loads(response, object_hook=lambda d: SimpleNamespace(**d))
         if response_obj.status != FECStatus.ACCEPTED.value:
             logger.error(f"FEC upload failed: {response}")
         else:
