@@ -3,11 +3,13 @@ import json
 from uuid import uuid4 as uuid
 from zeep import Client
 from abc import ABC, abstractmethod
+from types import SimpleNamespace
 from fecfiler.web_services.models import FECStatus, BaseSubmission
 from fecfiler.settings import (
     EFO_FILING_API,
     EFO_FILING_API_KEY,
     FEC_AGENCY_ID,
+    MOCK_EFO_FILING,
 )
 import structlog
 
@@ -56,18 +58,31 @@ class EFODotFECSubmitter(DotFECSubmitter):
     """Submitter class for submitting .FEC files to EFO's webload service"""
 
     def __init__(self) -> None:
-        self.fec_soap_client = Client(f"{EFO_FILING_API}/webload/services/upload?wsdl")
+        if MOCK_EFO_FILING:
+            self.mock = True
+            self.mock_submitter = MockDotFECSubmitter()
+        else:
+            self.fec_soap_client = Client(f"{EFO_FILING_API}/webload/services/upload?wsdl")
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
-        response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
-        if response.status != FECStatus.ACCEPTED.value:
+        if self.mock:
+            response = self.mock_submitter.submit(dot_fec_bytes, json_payload, fec_report_id)
+            response_obj = json.loads(response, object_hook=lambda d: SimpleNamespace(**d))
+        else:
+            response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
+
+        if response_obj.status != FECStatus.ACCEPTED.value:
             logger.error(f"FEC upload failed: {response}")
         else:
             logger.info(f"FEC upload successful: {response}")
         return response
 
     def poll_status(self, submission: BaseSubmission):
-        response = self.fec_soap_client.service.status(submission.fec_submission_id)
+        if self.mock:
+            response = self.mock_submitter.poll_status(submission)
+        else:
+            response = self.fec_soap_client.service.status(submission.fec_submission_id)
+
         logger.debug(f"FEC polling response: {response}")
         return response
 

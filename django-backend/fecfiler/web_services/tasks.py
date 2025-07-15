@@ -154,7 +154,7 @@ def submit_to_fec(
 
     """Submit to FEC"""
     try:
-        submission_type_key = EFO_SUBMITTER_KEY if not mock else MOCK_SUBMITTER_KEY
+        submission_type_key = EFO_SUBMITTER_KEY #if not mock else MOCK_SUBMITTER_KEY
         submitter = SUBMISSION_MANAGERS[submission_type_key]()
         logger.info(f"Uploading {file_name} to FEC")
         submission_json = submitter.get_submission_json(
