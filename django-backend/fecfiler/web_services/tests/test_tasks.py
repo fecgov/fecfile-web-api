@@ -28,7 +28,7 @@ from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.web_services.dot_fec.web_print_submitter import (
     WebPrintSubmitter,
-    MockWebPrintSubmitter,
+    EFOWebPrintSubmitter,
 )
 from fecfiler.web_services.dot_fec.dot_fec_submitter import EFODotFECSubmitter
 from fecfiler.settings import (
@@ -263,11 +263,11 @@ class PollingTasksTestCase(TestCase):
         self.mock_web_print_key = "MockWebPrint"
         self.test_print_key = "UnitTestWebPrint"
         self.submission_managers = {
-            self.mock_web_print_key: MockWebPrintSubmitter,
+            self.mock_web_print_key: EFOWebPrintSubmitter,
             self.test_print_key: UnitTestWebPrintSubmitter,
         }
         self.submission_classes = {
-            self.mock_web_print_key: WebPrintSubmission,
+            self.mock_web_print_key: EFOWebPrintSubmitter,
             self.test_print_key: WebPrintSubmission,
         }
 

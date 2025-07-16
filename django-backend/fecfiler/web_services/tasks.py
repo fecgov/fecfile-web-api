@@ -15,7 +15,6 @@ from fecfiler.web_services.dot_fec.dot_fec_submitter import (
 )
 from fecfiler.web_services.dot_fec.web_print_submitter import (
     EFOWebPrintSubmitter,
-    MockWebPrintSubmitter,
 )
 from .web_service_storage import get_file_bytes, store_file
 from fecfiler.settings import (
@@ -37,7 +36,6 @@ MOCK_WEB_PRINT_KEY = "MockWebPrint"
 EFO_SUBMITTER_KEY = "DotFEC"
 SUBMISSION_MANAGERS = {
     WEB_PRINT_KEY: EFOWebPrintSubmitter,
-    MOCK_WEB_PRINT_KEY: MockWebPrintSubmitter,
     EFO_SUBMITTER_KEY: EFODotFECSubmitter,
 }
 SUBMISSION_CLASSES = {
