@@ -26,10 +26,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.transactions.tests.utils import create_schedule_a
-from fecfiler.web_services.dot_fec.web_print_submitter import (
-    WebPrintSubmitter,
-    EFOWebPrintSubmitter,
-)
+from fecfiler.web_services.dot_fec.web_print_submitter import EFOWebPrintSubmitter
 from fecfiler.web_services.dot_fec.dot_fec_submitter import EFODotFECSubmitter
 from fecfiler.settings import (
     INITIAL_POLLING_MAX_ATTEMPTS,
