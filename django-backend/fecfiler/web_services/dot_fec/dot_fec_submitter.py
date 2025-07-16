@@ -16,16 +16,21 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class DotFECSubmitter(ABC):
-    """Abstract submitter class for submitting .FEC files to a webload service"""
+class EFODotFECSubmitter():
+    """Submitter class for submitting .FEC files to EFO's webload service"""
 
-    @abstractmethod
-    def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
-        pass
+    def __init__(self) -> None:
+        if MOCK_EFO_FILING:
+            self.force_mock()
+            self.mock_responder = MockDotFECResponse()
+        else:
+            self.fec_soap_client = Client(
+                f"{EFO_FILING_API}/webload/services/upload?wsdl"
+            )
 
-    @abstractmethod
-    def poll_status(self, submission: BaseSubmission):
-        pass
+    def force_mock(self):
+        """Force the submitter to use mock responses"""
+        self.mock = True
 
     def get_submission_json(self, dot_fec_record, e_filing_password, backdoor_code=None):
         """Generate json payload for submission and log it"""
@@ -53,39 +58,26 @@ class DotFECSubmitter(ABC):
             copy_json_obj["amendment_id"] = dot_fec_record.report.report_id + "xxxxx"
         logger.info(f"submission json: {json.dumps(copy_json_obj)}")
 
-
-class EFODotFECSubmitter(DotFECSubmitter):
-    """Submitter class for submitting .FEC files to EFO's webload service"""
-
-    def __init__(self) -> None:
-        if MOCK_EFO_FILING:
-            self.mock = True
-            self.mock_submitter = MockDotFECSubmitter()
-        else:
-            self.fec_soap_client = Client(
-                f"{EFO_FILING_API}/webload/services/upload?wsdl"
-            )
-
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         if self.mock:
-            response = self.mock_submitter.submit(
-                dot_fec_bytes, json_payload, fec_report_id
-            )
+            response = self.mock_responder.processing()
         else:
             response = self.fec_soap_client.service.upload(
                 json_payload, dot_fec_bytes
             )
 
         response_obj = json.loads(response, object_hook=lambda d: SimpleNamespace(**d))
-        if response_obj.status != FECStatus.ACCEPTED.value:
-            logger.error(f"FEC upload failed: {response}")
-        else:
+        if response_obj.status == FECStatus.ACCEPTED.value:
             logger.info(f"FEC upload successful: {response}")
+        elif response_obj.status == FECStatus.PROCESSING.value:
+            logger.info(f"FEC upload processing: {response}")
+        else:
+            logger.error(f"FEC upload failed: {response}")
         return response
 
     def poll_status(self, submission: BaseSubmission):
         if self.mock:
-            response = self.mock_submitter.poll_status(submission)
+            response = self.mock_responder.accepted()
         else:
             response = self.fec_soap_client.service.status(submission.fec_submission_id)
 
@@ -93,24 +85,24 @@ class EFODotFECSubmitter(DotFECSubmitter):
         return response
 
 
-class MockDotFECSubmitter(DotFECSubmitter):
-    """Submitter class for mocking a response from a webload service"""
+class MockDotFECResponse():
+    """Mock responses from FEC webload service"""
 
-    def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
+    def accepted(self):
         return json.dumps(
             {
                 "submission_id": "fake_submission_id",
                 "status": FECStatus.ACCEPTED.value,
                 "message": "We didn't really send anything to FEC",
-                "report_id": fec_report_id or str(uuid()),
+                "report_id": str(uuid()),
             }
         )
 
-    def poll_status(self, submission: BaseSubmission):
+    def processing(self):
         return json.dumps(
             {
                 "submission_id": "fake_submission_id",
-                "status": FECStatus.ACCEPTED.value,
+                "status": FECStatus.PROCESSING.value,
                 "message": "We didn't really send anything to FEC",
                 "report_id": str(uuid()),
             }
