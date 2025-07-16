@@ -2,7 +2,6 @@ import copy
 import json
 from uuid import uuid4 as uuid
 from zeep import Client
-from abc import ABC, abstractmethod
 from types import SimpleNamespace
 from fecfiler.web_services.models import FECStatus, BaseSubmission
 from fecfiler.settings import (
