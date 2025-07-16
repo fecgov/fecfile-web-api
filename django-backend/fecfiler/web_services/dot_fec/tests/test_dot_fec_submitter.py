@@ -2,7 +2,7 @@ import json
 from uuid import uuid4 as uuid
 from django.test import TestCase
 from fecfiler.web_services.dot_fec.dot_fec_submitter import EFODotFECSubmitter
-from fecfiler.web_services.dot_fec.web_print_submitter import MockWebPrintSubmitter
+from fecfiler.web_services.dot_fec.web_print_submitter import EFOWebPrintSubmitter
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from fecfiler.web_services.tasks import create_dot_fec
 from fecfiler.committee_accounts.models import CommitteeAccount
@@ -51,7 +51,8 @@ class DotFECSubmitterTestCase(TestCase):
         response_obj = json.loads(response)
         self.assertEqual(response_obj["status"], "ACCEPTED")
 
-        submitter = MockWebPrintSubmitter()
+        submitter = EFOWebPrintSubmitter()
+        submitter.force_mock()  # Force mock for testing
         response = submitter.poll_status(WebPrintSubmission())
         response_obj = json.loads(response)
         self.assertEqual(response_obj["status"], "COMPLETED")
