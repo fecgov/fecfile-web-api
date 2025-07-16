@@ -48,7 +48,7 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
             )
 
         response_obj = json.loads(response, object_hook=lambda d: SimpleNamespace(**d))
-        if response_obj.status != FECStatus.ACCEPTED.value:
+        if response_obj.status != FECStatus.COMPLETED.value:
             logger.error(f"FEC upload failed: {response}")
         else:
             logger.info(f"FEC upload successful: {response}")
