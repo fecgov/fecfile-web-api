@@ -203,7 +203,7 @@ class TasksTestCase(TestCase):
         )
 
 
-class UnitTestWebPrintSubmitter(WebPrintSubmitter):
+class UnitTestWebPrintSubmitter():
     # A stand-in WebPrintSubmitter that returns PROCESSING on submission
     # and always returns PROCESSING except on exactly the 4th polling attempt.
 
