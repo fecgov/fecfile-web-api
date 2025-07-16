@@ -12,7 +12,6 @@ from fecfiler.web_services.models import (
 from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
 from fecfiler.web_services.dot_fec.dot_fec_submitter import (
     EFODotFECSubmitter,
-    MockDotFECSubmitter,
 )
 from fecfiler.web_services.dot_fec.web_print_submitter import (
     EFOWebPrintSubmitter,
