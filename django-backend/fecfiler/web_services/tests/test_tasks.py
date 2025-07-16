@@ -115,7 +115,8 @@ class TasksTestCase(TestCase):
     SUBMIT TO FEC TESTS
     """
 
-    def test_submit_to_fec(self):
+    @patch("fecfiler.web_services.tasks.poll_for_fec_response")
+    def test_submit_to_fec(self, mock_poll_for_fec_response):
         upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
         dot_fec_id = create_dot_fec(
             str(self.f3x.id),
@@ -133,7 +134,7 @@ class TasksTestCase(TestCase):
         upload_submission.refresh_from_db()
         self.assertEqual(upload_submission.dot_fec_id, dot_fec_id)
         self.assertEqual(
-            upload_submission.fecfile_task_state, FECSubmissionState.SUCCEEDED.value
+            upload_submission.fecfile_task_state, FECSubmissionState.SUBMITTING.value
         )
         self.assertIsNone(upload_submission.fecfile_error)
         self.assertEqual(upload_submission.fec_submission_id, "fake_submission_id")
