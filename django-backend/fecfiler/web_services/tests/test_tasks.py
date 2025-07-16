@@ -30,7 +30,7 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
     WebPrintSubmitter,
     MockWebPrintSubmitter,
 )
-from fecfiler.web_services.dot_fec.dot_fec_submitter import MockDotFECSubmitter
+from fecfiler.web_services.dot_fec.dot_fec_submitter import EFODotFECSubmitter
 from uuid import uuid4 as uuid
 from fecfiler.settings import (
     INITIAL_POLLING_MAX_ATTEMPTS,
@@ -239,19 +239,6 @@ class UnitTestWebPrintSubmitter(WebPrintSubmitter):
         )
 
 
-class UnitTestDotFecSubmitter(MockDotFECSubmitter):
-    # A stand-in DotFECSubmitter that returns PROCESSING on submission
-    def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
-        return json.dumps(
-            {
-                "submission_id": "fake_submission_id",
-                "status": FECStatus.PROCESSING.value,
-                "message": "We didn't really send anything to FEC",
-                "report_id": fec_report_id or str(uuid()),
-            }
-        )
-
-
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True, CELERY_TASK_EAGER_PROPOGATES=True)
 class PollingTasksTestCase(TestCase):
 
@@ -286,14 +273,11 @@ class PollingTasksTestCase(TestCase):
         }
 
         self.mock_submitter_key = "MockDotFEC"
-        self.test_dot_fec_key = "UnitTestDotFec"
         self.test_dot_fec_submission_managers = {
-            self.mock_submitter_key: MockDotFECSubmitter,
-            self.test_dot_fec_key: UnitTestDotFecSubmitter,
+            self.mock_submitter_key: EFODotFECSubmitter,
         }
         self.test_dot_fec_submission_classes = {
             self.mock_submitter_key: UploadSubmission,
-            self.test_dot_fec_key: UploadSubmission,
         }
 
     def test_dotfec_submission_polling_completes(self):
