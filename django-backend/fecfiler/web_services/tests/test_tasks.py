@@ -31,7 +31,6 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
     MockWebPrintSubmitter,
 )
 from fecfiler.web_services.dot_fec.dot_fec_submitter import EFODotFECSubmitter
-from uuid import uuid4 as uuid
 from fecfiler.settings import (
     INITIAL_POLLING_MAX_ATTEMPTS,
     SECONDARY_POLLING_MAX_ATTEMPTS,
