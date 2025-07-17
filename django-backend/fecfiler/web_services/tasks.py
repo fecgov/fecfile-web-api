@@ -10,13 +10,8 @@ from fecfiler.web_services.models import (
     FECStatus,
 )
 from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
-from fecfiler.web_services.dot_fec.dot_fec_submitter import (
-    EFODotFECSubmitter,
-)
-from fecfiler.web_services.dot_fec.web_print_submitter import (
-    EFOWebPrintSubmitter,
-    MockWebPrintSubmitter,
-)
+from fecfiler.web_services.dot_fec.dot_fec_submitter import EFODotFECSubmitter
+from fecfiler.web_services.dot_fec.web_print_submitter import EFOWebPrintSubmitter
 from .web_service_storage import get_file_bytes, store_file
 from fecfiler.settings import (
     INITIAL_POLLING_INTERVAL,
@@ -32,18 +27,11 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-WEB_PRINT_KEY = "WebPrint"
-MOCK_WEB_PRINT_KEY = "MockWebPrint"
-EFO_SUBMITTER_KEY = "DotFEC"
-SUBMISSION_MANAGERS = {
-    WEB_PRINT_KEY: EFOWebPrintSubmitter,
-    MOCK_WEB_PRINT_KEY: MockWebPrintSubmitter,
-    EFO_SUBMITTER_KEY: EFODotFECSubmitter,
-}
+WEB_PRINT_KEY = "WebPrint"  # This is the key used for the WebPrint submitter
+UPLOAD_KEY = "WebUpload"  # This is the key used for the EFO submitter to WebUpload
 SUBMISSION_CLASSES = {
     WEB_PRINT_KEY: WebPrintSubmission,
-    MOCK_WEB_PRINT_KEY: WebPrintSubmission,
-    EFO_SUBMITTER_KEY: UploadSubmission,
+    UPLOAD_KEY: UploadSubmission,
 }
 
 MAX_ATTEMPTS = INITIAL_POLLING_MAX_ATTEMPTS + SECONDARY_POLLING_MAX_ATTEMPTS
@@ -150,8 +138,7 @@ def submit_to_fec(
 
     """Submit to FEC"""
     try:
-        submission_type_key = EFO_SUBMITTER_KEY
-        submitter = SUBMISSION_MANAGERS[submission_type_key]()
+        submitter = EFODotFECSubmitter(mock=mock)
         logger.info(f"Uploading {file_name} to FEC")
         submission_json = submitter.get_submission_json(
             dot_fec_record, e_filing_password, backdoor_code
@@ -173,7 +160,7 @@ def submit_to_fec(
             need them."""
             countdown = calculate_polling_interval(submission.fecfile_polling_attempts)
             return poll_for_fec_response.apply_async(
-                [submission.id, submission_type_key, "Dot FEC"],
+                [submission.id, submitter, UPLOAD_KEY, "Dot FEC"],
                 countdown=countdown,
             )
         else:
@@ -202,8 +189,7 @@ def submit_to_webprint(
 
     """Submit to WebPrint"""
     try:
-        submission_type_key = WEB_PRINT_KEY if not mock else MOCK_WEB_PRINT_KEY
-        submitter = SUBMISSION_MANAGERS[submission_type_key]()
+        submitter = EFOWebPrintSubmitter(mock=mock)
         logger.info(f"Uploading {file_name} to FEC WebPrint")
         submission_response_string = submitter.submit(None, dot_fec_bytes)
         submission.save_fec_response(submission_response_string)
@@ -218,7 +204,7 @@ def submit_to_webprint(
             need them."""
             countdown = calculate_polling_interval(submission.fecfile_polling_attempts)
             return poll_for_fec_response.apply_async(
-                [submission.id, submission_type_key, "WebPrint"],
+                [submission.id, submitter, WEB_PRINT_KEY, "WebPrint"],
                 countdown=countdown,
             )
         else:
@@ -230,10 +216,12 @@ def submit_to_webprint(
 
 
 @shared_task
-def poll_for_fec_response(submission_id, submission_type_key, submission_name):
+def poll_for_fec_response(
+    submission_id, submitter, submission_type_key, submission_name
+):  # really if we're making the submitter the state holder, all this info should just be in it
+    # OR this should be a method on the submitter
     try:
         submission = SUBMISSION_CLASSES[submission_type_key].objects.get(id=submission_id)
-        submitter = SUBMISSION_MANAGERS[submission_type_key]()
 
         submission.fecfile_polling_attempts += 1
         logger.info(f"Polling status for {submission.fec_submission_id}.")
@@ -256,7 +244,7 @@ def poll_for_fec_response(submission_id, submission_type_key, submission_name):
         else:
             countdown = calculate_polling_interval(submission.fecfile_polling_attempts)
             return poll_for_fec_response.apply_async(
-                [submission_id, submission_type_key, submission_name],
+                [submission_id, submitter, submission_type_key, submission_name],
                 countdown=countdown,
             )
     except Exception as e:

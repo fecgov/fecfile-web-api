@@ -2,7 +2,7 @@ import json
 from uuid import uuid4 as uuid
 from django.test import TestCase
 from fecfiler.web_services.dot_fec.dot_fec_submitter import EFODotFECSubmitter
-from fecfiler.web_services.dot_fec.web_print_submitter import MockWebPrintSubmitter
+from fecfiler.web_services.dot_fec.web_print_submitter import WebPrintSubmitter
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 from fecfiler.web_services.tasks import create_dot_fec
 from fecfiler.committee_accounts.models import CommitteeAccount
@@ -21,8 +21,7 @@ class DotFECSubmitterTestCase(TestCase):
         self.dot_fec_record = DotFEC.objects.get(id=self.dot_fec_id)
 
     def test_get_submission_json(self):
-        submitter = EFODotFECSubmitter()
-        submitter.force_mock()  # Force mock for testing
+        submitter = EFODotFECSubmitter(mock=True)
         json_str = submitter.get_submission_json(
             self.dot_fec_record, "test_json_password"
         )
@@ -32,8 +31,7 @@ class DotFECSubmitterTestCase(TestCase):
         self.assertFalse(json_obj["wait"])
 
     def test_get_submission_json_for_amendment(self):
-        submitter = EFODotFECSubmitter()
-        submitter.force_mock()  # Force mock for testing
+        submitter = EFODotFECSubmitter(mock=True)
         self.dot_fec_record.report.report_id = str(uuid())
         json_str = submitter.get_submission_json(
             self.dot_fec_record, "test_json_password", "test_backdoor_code"
@@ -45,13 +43,12 @@ class DotFECSubmitterTestCase(TestCase):
         )
 
     def test_poll(self):
-        submitter = EFODotFECSubmitter()
-        submitter.force_mock()  # Force mock for testing
+        submitter = EFODotFECSubmitter(mock=True)
         response = submitter.poll_status(UploadSubmission())
         response_obj = json.loads(response)
         self.assertEqual(response_obj["status"], "ACCEPTED")
 
-        submitter = MockWebPrintSubmitter()
+        submitter = WebPrintSubmitter(mock=True)
         response = submitter.poll_status(WebPrintSubmission())
         response_obj = json.loads(response)
         self.assertEqual(response_obj["status"], "COMPLETED")

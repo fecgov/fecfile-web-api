@@ -8,28 +8,23 @@ from fecfiler.settings import (
     EFO_FILING_API,
     EFO_FILING_API_KEY,
     FEC_AGENCY_ID,
-    MOCK_EFO_FILING,
 )
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
-class EFODotFECSubmitter():
+class EFODotFECSubmitter:
     """Submitter class for submitting .FEC files to EFO's webload service"""
 
-    def __init__(self) -> None:
-        if MOCK_EFO_FILING:
-            self.force_mock()
+    def __init__(self, mock=False) -> None:
+        if mock:
+            self.mock = True
             self.mock_responder = MockDotFECResponse()
         else:
             self.fec_soap_client = Client(
                 f"{EFO_FILING_API}/webload/services/upload?wsdl"
             )
-
-    def force_mock(self):
-        """Force the submitter to use mock responses"""
-        self.mock = True
 
     def get_submission_json(self, dot_fec_record, e_filing_password, backdoor_code=None):
         """Generate json payload for submission and log it"""
@@ -61,9 +56,7 @@ class EFODotFECSubmitter():
         if self.mock:
             response = self.mock_responder.processing()
         else:
-            response = self.fec_soap_client.service.upload(
-                json_payload, dot_fec_bytes
-            )
+            response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
 
         response_obj = json.loads(response, object_hook=lambda d: SimpleNamespace(**d))
         if response_obj.status == FECStatus.ACCEPTED.value:
@@ -84,7 +77,7 @@ class EFODotFECSubmitter():
         return response
 
 
-class MockDotFECResponse():
+class MockDotFECResponse:
     """Mock responses from FEC webload service"""
 
     def accepted(self):

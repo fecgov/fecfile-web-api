@@ -7,7 +7,6 @@ from fecfiler.web_services.models import FECStatus, BaseSubmission
 from fecfiler.settings import (
     EFO_FILING_API,
     EFO_FILING_API_KEY,
-    MOCK_EFO_FILING,
 )
 
 import structlog
@@ -30,10 +29,10 @@ class WebPrintSubmitter(ABC):
 class EFOWebPrintSubmitter(WebPrintSubmitter):
     """Submitter class for submitting .FEC files to EFO's web print service"""
 
-    def __init__(self):
-        if MOCK_EFO_FILING:
+    def __init__(self, mock=False):
+        if mock:
             self.mock = True
-            self.mock_submitter = MockWebPrintSubmitter()
+            self.mock_submitter = MockWebPrintResponse()
         else:
             self.fec_soap_client = Client(
                 f"{EFO_FILING_API}/webprint/services/print?wsdl"
@@ -41,7 +40,7 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
 
     def submit(self, email, dot_fec_bytes):
         if self.mock:
-            response = self.mock_submitter.submit(email, dot_fec_bytes)
+            response = self.mock_submitter.processing()
         else:
             response = self.fec_soap_client.service.print(
                 EFO_FILING_API_KEY, email, dot_fec_bytes
@@ -56,7 +55,7 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
 
     def poll_status(self, submission: BaseSubmission):
         if self.mock:
-            response = self.mock_submitter.poll_status(submission)
+            response = self.mock_submitter.completed()
         else:
             response = self.fec_soap_client.service.status(
                 getattr(submission, "fec_batch_id", None), submission.fec_submission_id
@@ -66,10 +65,10 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
         return response
 
 
-class MockWebPrintSubmitter(WebPrintSubmitter):
-    """Submitter class for mocking a response from a web print service"""
+class MockWebPrintResponse:
+    """Mock response for web print service"""
 
-    def submit(self, email, dot_fec_bytes):
+    def completed(self):
         """return an accepted message without reaching out to api"""
         return json.dumps(
             {
@@ -81,10 +80,10 @@ class MockWebPrintSubmitter(WebPrintSubmitter):
             }
         )
 
-    def poll_status(self, submission: BaseSubmission):
+    def processing(self):
         return json.dumps(
             {
-                "status": FECStatus.COMPLETED.value,
+                "status": FECStatus.PROCESSING.value,
                 "image_url": "https://www.fec.gov/static/img/seal.svg",
                 "message": "This did not really come from FEC",
                 "submission_id": str(uuid()),
