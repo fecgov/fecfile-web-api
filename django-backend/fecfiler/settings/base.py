@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "rest_framework",
+    "django.contrib.staticfiles",
     "drf_spectacular",
     "corsheaders",
     "django_structlog",
@@ -81,9 +82,11 @@ INSTALLED_APPS = [
     "fecfiler.mock_oidc_provider",
     "fecfiler.cash_on_hand",
     "fecfiler.openapi",
+    "silk",
 ]
 
 MIDDLEWARE = [
+    "silk.middleware.SilkyMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
@@ -123,6 +126,20 @@ CORS_ALLOW_HEADERS = (
 )
 
 CORS_ALLOW_CREDENTIALS = True
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
+
+STATIC_URL = "/static/"
+
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
+
+STATIC_ROOT = "static"
+SILKY_PYTHON_PROFILER = True
+SILKY_PYTHON_PROFILER_BINARY = True
+
+# the sub-directories of media and static files
+STATICFILES_LOCATION = "static"
 
 # Database
 DATABASES = {

@@ -4,3 +4,6 @@ flake8==7.2.0
 liccheck==0.6.2
 rich==13.9.4
 sphinx==7.2.6
+django-silk==5.1.0
+static3==0.7.0
+dj-static==0.0.6
