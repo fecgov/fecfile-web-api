@@ -32,7 +32,7 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
             f"{EFO_FILING_API}/webload/services/print?wsdl",
             plugins=[self.history]
         )
- 
+
     def submit(self, email, dot_fec_bytes):
         response = self.fec_soap_client.service.print(
             EFO_FILING_API_KEY, email, dot_fec_bytes
