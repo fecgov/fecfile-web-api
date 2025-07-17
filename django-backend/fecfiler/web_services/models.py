@@ -194,7 +194,7 @@ class UploadSubmission(BaseSubmission):
         try:
             fec_response_json = json.loads(response_string)
         except Exception as error:
-            logger.error("Failed to parse JSON response from upload submission")
+            logger.error("Failed to parse JSON response from upload submission: {response_string}")
             raise error
 
         if fec_response_json.get("status") == FECStatus.PROCESSING.value:
@@ -231,7 +231,7 @@ class WebPrintSubmission(BaseSubmission):
         try:
             fec_response_json = json.loads(response_string)
         except Exception as error:
-            logger.error("Failed to parse JSON response from web print submission")
+            logger.error("Failed to parse JSON response from web print submission: {response_string}")
             raise error
 
         if fec_response_json.get("status") == FECStatus.PROCESSING.value:
