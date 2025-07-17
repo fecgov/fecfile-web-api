@@ -197,6 +197,11 @@ class UploadSubmission(BaseSubmission):
             logger.error("Failed to parse JSON response from upload submission")
             raise error
 
+        if fec_response_json.get("status") != FECStatus.ACCEPTED.value:
+            logger.error(f"FEC upload failed: {response_string}")
+        else:
+            logger.info(f"FEC upload successful: {response_string}")
+
         self.fec_report_id = fec_response_json.get("report_id")
         report = self.report_set.first()
         if not report.report_id:
@@ -223,6 +228,11 @@ class WebPrintSubmission(BaseSubmission):
         except Exception as error:
             logger.error("Failed to parse JSON response from web print submission")
             raise error
+
+        if fec_response_json.get("status") != FECStatus.ACCEPTED.value:
+            logger.error(f"FEC upload failed: {response_string}")
+        else:
+            logger.info(f"FEC upload successful: {response_string}")
 
         self.fec_image_url = fec_response_json.get("image_url")
         self.fec_batch_id = fec_response_json.get("batch_id")

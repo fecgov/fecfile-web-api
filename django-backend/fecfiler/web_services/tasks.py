@@ -166,7 +166,6 @@ def submit_to_fec(
         submission.save_fec_response(submission_response_string)
 
         """Poll FEC for status of submission"""
-
         if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
             log_polling_notice(submission.fecfile_polling_attempts)
             """ apply_async()
