@@ -234,7 +234,8 @@ class WebPrintSubmission(BaseSubmission):
             fec_response_json = json.loads(response_string)
         except Exception as error:
             logger.error(
-                "Failed to parse JSON response from web print submission: {response_string}"
+                "Failed to parse JSON response from web print submission: "
+                f"{response_string}"
             )
             raise error
 
