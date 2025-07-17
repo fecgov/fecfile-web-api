@@ -200,7 +200,7 @@ class UploadSubmission(BaseSubmission):
         if fec_response_json.get("status") == FECStatus.PROCESSING.value:
             logger.info(f"FEC upload is processing: {response_string}")
         elif fec_response_json.get("status") in (
-            FECStatus.ACCEPTED.value, 
+            FECStatus.ACCEPTED.value,
             FECStatus.COMPLETED.value
         ):
             logger.info(f"FEC upload successful: {response_string}")
@@ -237,7 +237,7 @@ class WebPrintSubmission(BaseSubmission):
         if fec_response_json.get("status") == FECStatus.PROCESSING.value:
             logger.info(f"FEC upload is processing: {response_string}")
         elif fec_response_json.get("status") in (
-            FECStatus.ACCEPTED.value, 
+            FECStatus.ACCEPTED.value,
             FECStatus.COMPLETED.value
         ):
             logger.info(f"FEC upload successful: {response_string}")
