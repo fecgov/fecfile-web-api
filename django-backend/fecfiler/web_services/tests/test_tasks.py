@@ -285,14 +285,14 @@ class PollingTasksTestCase(TestCase):
             self.test_print_key: WebPrintSubmission,
         }
 
-        self.mock_dot_fec_key = "MockDotFEC"
+        self.mock_submitter_key = "MockDotFEC"
         self.test_dot_fec_key = "UnitTestDotFec"
         self.test_dot_fec_submission_managers = {
-            self.mock_dot_fec_key: MockDotFECSubmitter,
+            self.mock_submitter_key: MockDotFECSubmitter,
             self.test_dot_fec_key: UnitTestDotFecSubmitter,
         }
         self.test_dot_fec_submission_classes = {
-            self.mock_dot_fec_key: UploadSubmission,
+            self.mock_submitter_key: UploadSubmission,
             self.test_dot_fec_key: UploadSubmission,
         }
 
@@ -308,7 +308,7 @@ class PollingTasksTestCase(TestCase):
             self.assertNotEqual(upload_submission.fec_status, FECStatus.COMPLETED)
             poll_for_fec_response(
                 upload_submission.id,
-                self.mock_dot_fec_key,
+                self.mock_submitter_key,
                 "Unit Testing Upload Submission",
             )
             resolved_submission = UploadSubmission.objects.get(id=upload_submission.id)
