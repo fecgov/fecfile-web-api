@@ -7,22 +7,11 @@ import threading
 
 from locust import between, task, TaskSet, user
 
-
-TEST_USER = os.environ.get("LOCAL_TEST_USER")
-TEST_PWD = os.environ.get("LOCAL_TEST_PWD")
 SESSION_ID = os.environ.get("OIDC_SESSION_ID")
 CSRF_TOKEN = os.environ.get("CSRF_TOKEN")
 
 # seconds
 TIMEOUT = 30  # seconds
-
-# item counts
-WANTED_REPORTS = int(os.environ.get("LOCUST_WANTED_REPORTS", 10))
-WANTED_CONTACTS = int(os.environ.get("LOCUST_WANTED_CONTACTS", 20))
-WANTED_TRANSACTIONS = int(os.environ.get("LOCUST_WANTED_TRANSACTIONS", 50))
-SINGLE_TO_TRIPLE_RATIO = float(
-    os.environ.get("LOCUST_TRANSACTIONS_SINGLE_TO_TRIPLE_RATIO", 9 / 10)
-)
 
 SCHEDULES = ["A"]  # Further schedules to be implemented in the future
 
@@ -44,6 +33,21 @@ def get_json_data(name):
     return []
 
 
+class AtomicInteger:
+    def __init__(self, initial_value=0):
+        self._value = initial_value
+        self._lock = threading.Lock()
+
+    def get_and_increment(self):
+        with self._lock:
+            retval = self._value
+            self._value += 1
+            return retval
+
+
+user_index_counter = AtomicInteger(0)
+
+
 class Tasks(TaskSet):
     report_ids_to_submit_lock = threading.Lock()
     report_ids = []
@@ -59,12 +63,31 @@ class Tasks(TaskSet):
 
         logging.info("Preparing reports for submit")
         self.report_ids = self.retrieve_report_id_list()
-        self.prepared_reports_for_submit = self.prepare_reports_for_submit()
-        self.report_ids_to_submit = self.report_ids.copy()
+        self.report_ids_to_submit = self.get_report_ids_to_submit(
+            self.user.user_index, self.report_ids
+        )
+        self.prepare_reports_for_submit(self.report_ids_to_submit)
 
-    def prepare_reports_for_submit(self):
+    def get_report_ids_to_submit(self, user_index, all_report_ids):
+        user_count = self.user.environment.parsed_options.users
+        total_report_count = len(all_report_ids)
+        reports_per_user = (
+            total_report_count // user_count if total_report_count > user_count else 1
+        )
+        start_index = user_index * reports_per_user
+        end_index = start_index + reports_per_user
+        logging.info(f"================ user index {user_index} ================")
+        logging.info(f"start index {start_index} end index {end_index}")
+        if start_index >= total_report_count:
+            logging.warning(
+                f"User index {user_index} exceeds available reports. No reports to submit."
+            )
+            return []
+        return all_report_ids[start_index:end_index]
+
+    def prepare_reports_for_submit(self, report_ids):
         logging.info("Calculating summaries for reports")
-        report_json_list = self.calculate_summary_for_report_id_list(self.report_ids)
+        report_json_list = self.calculate_summary_for_report_id_list(report_ids)
         logging.info("Confirming information for reports")
         return self.confirm_information_for_report_json_list(report_json_list)
 
@@ -262,5 +285,8 @@ class Tasks(TaskSet):
 
 
 class Swarm(user.HttpUser):
+    def on_start(self):
+        self.user_index = user_index_counter.get_and_increment()
+
     tasks = [Tasks]
     wait_time = between(1.5, 4)
