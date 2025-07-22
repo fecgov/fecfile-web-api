@@ -80,7 +80,7 @@ class Tasks(TaskSet):
         logging.info(f"start index {start_index} end index {end_index}")
         if start_index >= total_report_count:
             logging.warning(
-                f"User index {user_index} exceeds available reports. No reports to submit."
+                f"User index {user_index} exceeds report count. No reports to submit."
             )
             return []
         return all_report_ids[start_index:end_index]
