@@ -79,7 +79,7 @@ class LoadTestUtils:
         contact_json_list = self.locust_data_generator.generate_contacts(
             number_of_contacts
         )
-        return list(Contact.objects.bulk_create(contact_json_list))
+        return Contact.objects.bulk_create(contact_json_list)
 
     def create_single_transactions(self, number_of_transactions, reports, contacts):
         self.locust_data_generator.generate_single_transactions(
