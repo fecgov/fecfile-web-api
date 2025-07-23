@@ -163,6 +163,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         report_count = reports.count()
 
         delete_all_reports()
+        delete_all_reports("C99999998")
         return Response(f"Deleted {report_count} Reports")
 
     def create(self, request):
