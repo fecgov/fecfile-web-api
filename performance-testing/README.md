@@ -1,4 +1,24 @@
-# Locust Testing
+# Quick Start
+
+1. Login to FECFile in the environment to test against.
+2. Open the network tab and copy the `sessionid` and `csrftoken` cookie header values
+   from any post-authenticate API call to use later.
+3. Run the following data load management command in the environment to test against 
+   using the cookie values copied in step 2 (optional additional command arguments as 
+   desired):
+   `./manage.py gen_locust_load_test_data <session_id> <csrf_token>`
+4. After the committee has been created and test data loaded, update the `locust-leader`
+   and `locust-follower` sections in `docker-compose.yml`.  Replace the `OIDC_SESSION_ID`
+   and `CSRF_TOKEN` environment variable values with the `sessionid` and `csrftoken` 
+   cookie values (respectively) copied in step 2.
+5. Run Locust locally using the following command (you may not need `sudo`):
+   `sudo docker compose --profile locust up --force-recreate`
+6. Open a browser to http://localhost:8089 and begin testing.
+7. Once you are done testing, you may wish to cleanup the load test data created in step
+   3 using the following management command (committee `C33333333` is the default used):
+   `./manage.py delete_committee_account <committee_account_id>`
+
+# Locust Testing detailed instructions
 
 Locust testing is used to simulate swarms of users making requests to an API service, allowing
 the testing of API performance under load.  Locust tests are first set up by spinning up a
