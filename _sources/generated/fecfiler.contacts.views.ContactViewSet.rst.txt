@@ -32,6 +32,7 @@ fecfiler.contacts.views.ContactViewSet
       ~ContactViewSet.destroy
       ~ContactViewSet.determine_version
       ~ContactViewSet.dispatch
+      ~ContactViewSet.e2e_delete_all_contacts
       ~ContactViewSet.filter_queryset
       ~ContactViewSet.finalize_response
       ~ContactViewSet.get_authenticate_header

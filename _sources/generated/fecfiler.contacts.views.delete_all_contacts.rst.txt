@@ -1,0 +1,6 @@
+fecfiler.contacts.views.delete\_all\_contacts
+=============================================
+
+.. currentmodule:: fecfiler.contacts.views
+
+.. autofunction:: delete_all_contacts

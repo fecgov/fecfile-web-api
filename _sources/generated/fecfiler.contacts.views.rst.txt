@@ -17,6 +17,7 @@ fecfiler.contacts.views
    .. autosummary::
       :toctree:                                          
    
+      delete_all_contacts
       validate_and_sanitize_candidate
       validate_and_sanitize_committee
    
