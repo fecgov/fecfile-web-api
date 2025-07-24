@@ -12,10 +12,12 @@
    and `locust-follower` sections in `docker-compose.yml`.  Replace the `OIDC_SESSION_ID`
    and `CSRF_TOKEN` environment variable values with the `sessionid` and `csrftoken` 
    cookie values (respectively) copied in step 2.
-5. Run Locust locally using the following command (you may not need `sudo`):
+5. Select the committee you want to test against in the 'select committee' FECFile 
+   screen to associate the session id with the test committee.
+6. Run Locust locally using the following command (you may not need `sudo`):
    `sudo docker compose --profile locust up`
-6. Open a browser to http://localhost:8089 and begin testing.
-7. Once you are done testing, you may wish to cleanup the load test data created in step
+7. Open a browser to http://localhost:8089 and begin testing.
+8. Once you are done testing, you may wish to cleanup the load test data created in step
    3 using the following management command (committee `C33333333` is the default used):
    `./manage.py delete_committee_account <committee_account_id>`
 
