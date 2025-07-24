@@ -35,19 +35,19 @@ logger = structlog.get_logger(__name__)
 
 WEB_PRINT_KEY = "WebPrint"
 MOCK_WEB_PRINT_KEY = "MockWebPrint"
-DOT_FEC_KEY = "DotFEC"
-MOCK_DOT_FEC_KEY = "MockDotFEC"
+EFO_SUBMITTER_KEY = "DotFEC"
+MOCK_SUBMITTER_KEY = "MockDotFEC"
 SUBMISSION_MANAGERS = {
     WEB_PRINT_KEY: EFOWebPrintSubmitter,
     MOCK_WEB_PRINT_KEY: MockWebPrintSubmitter,
-    DOT_FEC_KEY: EFODotFECSubmitter,
-    MOCK_DOT_FEC_KEY: MockDotFECSubmitter,
+    EFO_SUBMITTER_KEY: EFODotFECSubmitter,
+    MOCK_SUBMITTER_KEY: MockDotFECSubmitter,
 }
 SUBMISSION_CLASSES = {
     WEB_PRINT_KEY: WebPrintSubmission,
     MOCK_WEB_PRINT_KEY: WebPrintSubmission,
-    DOT_FEC_KEY: UploadSubmission,
-    MOCK_DOT_FEC_KEY: UploadSubmission,
+    EFO_SUBMITTER_KEY: UploadSubmission,
+    MOCK_SUBMITTER_KEY: UploadSubmission,
 }
 
 MAX_ATTEMPTS = INITIAL_POLLING_MAX_ATTEMPTS + SECONDARY_POLLING_MAX_ATTEMPTS
@@ -154,7 +154,7 @@ def submit_to_fec(
 
     """Submit to FEC"""
     try:
-        submission_type_key = DOT_FEC_KEY if not mock else MOCK_DOT_FEC_KEY
+        submission_type_key = EFO_SUBMITTER_KEY if not mock else MOCK_SUBMITTER_KEY
         submitter = SUBMISSION_MANAGERS[submission_type_key]()
         logger.info(f"Uploading {file_name} to FEC")
         submission_json = submitter.get_submission_json(
@@ -166,7 +166,6 @@ def submit_to_fec(
         submission.save_fec_response(submission_response_string)
 
         """Poll FEC for status of submission"""
-
         if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
             log_polling_notice(submission.fecfile_polling_attempts)
             """ apply_async()

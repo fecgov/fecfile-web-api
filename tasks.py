@@ -3,6 +3,8 @@ import json
 import git
 import sys
 import cfenv
+import threading
+import time
 
 from invoke import task
 
@@ -170,6 +172,33 @@ def _delete_migrator_app(ctx, space):
     return True
 
 
+def _check_for_migrations(ctx, space):
+    print("Checking if migrator app is up...")
+    app_guid = ctx.run(f"cf app {MIGRATOR_APP_NAME} --guid", hide=True, warn=True)
+    if not app_guid.ok:
+        print("Migrator not found, ok to continue.")
+        return False
+
+    print("Migrator app found!")
+    app_guid_formatted = app_guid.stdout.strip()
+
+    print("Checking if migrator app is running migrations...\n")
+    ctx.run(f"cf tasks {MIGRATOR_APP_NAME}", hide=False, warn=True)
+    task_status = ctx.run(
+        f'cf curl "/v3/apps/{app_guid_formatted}/tasks?states=RUNNING"',
+        hide=True,
+        warn=True,
+    )
+    active_tasks = json.loads(task_status.stdout).get("pagination").get("total_results")
+
+    if active_tasks > 0:
+        print("\nMigrator app is running migrations.\n")
+        return True
+
+    print("Migrator app is up, but not running migrations\n")
+    return True
+
+
 def _run_migrations(ctx, space):
     print("Running migrations...")
 
@@ -184,6 +213,26 @@ def _run_migrations(ctx, space):
         print("Failed to spin up migrator app.  Check logs.")
         return False
 
+    # Heartbeat thread
+    # Prints an in-progress message every minute to keep circleci step from timing out
+    heartbeat_stop_event = threading.Event()
+
+    def heartbeat():
+        minutes_elapsed = 0
+        while not heartbeat_stop_event.is_set():
+            minutes_elapsed += 1
+            print(f"Migration in progress... ({minutes_elapsed} minutes elapsed)")
+
+            # Check every second for the stop event
+            for _ in range(60):
+                if heartbeat_stop_event.is_set():
+                    break
+                time.sleep(1)
+
+    heartbeat_thread = threading.Thread(target=heartbeat)
+    heartbeat_thread.daemon = True  # Daemonize thread to allow program exit
+    heartbeat_thread.start()
+
     # Run migrations
     task = "django-backend/manage.py migrate --no-input --traceback --verbosity 3"
     migrations = ctx.run(
@@ -191,6 +240,11 @@ def _run_migrations(ctx, space):
         echo=True,
         warn=True,
     )
+
+    # Stop heartbeat
+    heartbeat_stop_event.set()
+    heartbeat_thread.join()
+
     if not migrations.ok:
         print("Failed to run migrations.  Check logs.")
         return False
@@ -236,6 +290,15 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     with open(".cfmeta", "w") as fp:
         json.dump({"user": os.getenv("USER"), "branch": branch}, fp)
 
+    # Check for running migations
+    migrations_in_progress = _check_for_migrations(ctx, space)
+
+    if migrations_in_progress:
+        print("Not clear to safely run migrations, cancelling deploy.\n")
+        print("Check logs for more information.\n")
+        print("Retry when migrations have finished.")
+        sys.exit(1)
+
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
     migrations_successful = _run_migrations(ctx, space)
@@ -243,7 +306,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
 
     if not (migrations_successful and migrator_app_deleted):
         print("Migrations failed and/or the migrator app was not deleted successfully.")
-        print("See the logs for more information.\nCanceling deploy...")
+        print("Check logs for more information.\nCanceling deploy...")
         sys.exit(1)
 
     for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
