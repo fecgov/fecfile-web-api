@@ -2,6 +2,7 @@ import copy
 import json
 from uuid import uuid4 as uuid
 from zeep import Client
+from zeep.plugins import HistoryPlugin
 from abc import ABC, abstractmethod
 from fecfiler.web_services.models import FECStatus, BaseSubmission
 from fecfiler.settings import (
@@ -56,16 +57,34 @@ class EFODotFECSubmitter(DotFECSubmitter):
     """Submitter class for submitting .FEC files to EFO's webload service"""
 
     def __init__(self) -> None:
-        self.fec_soap_client = Client(f"{EFO_FILING_API}/webload/services/upload?wsdl")
+        self.history = HistoryPlugin()
+        self.fec_soap_client = Client(
+            f"{EFO_FILING_API}/webload/services/upload?wsdl",
+            plugins=[self.history]
+        )
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
         logger.debug(f"FEC upload response: {response}")
+
+        # Get the last HTTP response
+        http_response = self.history.last_received
+        status_code = http_response.status_code if http_response else None
+        if status_code != 200:
+            raise Exception(f"FEC upload failed with HTTP status code: {status_code}")
+
         return response
 
     def poll_status(self, submission: BaseSubmission):
         response = self.fec_soap_client.service.status(submission.fec_submission_id)
         logger.debug(f"FEC polling response: {response}")
+
+        # Get the last HTTP response
+        http_response = self.history.last_received
+        status_code = http_response.status_code if http_response else None
+        if status_code != 200:
+            raise Exception(f"FEC polling failed with HTTP status code: {status_code}")
+
         return response
 
 
