@@ -22,7 +22,9 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.transactions.utils import filter_queryset_for_previous_transactions_in_aggregation  # noqa: E501
+from fecfiler.transactions.utils import (
+    filter_queryset_for_previous_transactions_in_aggregation,
+)  # noqa: E501
 from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
@@ -181,20 +183,14 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             date = request.query_params["date"]
             aggregation_group = request.query_params["aggregation_group"]
             assert (
-                date
-                and contact_1_id
-                and aggregation_group
+                date and contact_1_id and aggregation_group
             )  # Raises error if any value is not truthy (i.e, "" or None)
         except Exception:
             message = "contact_1_id, date, and aggregate_group are required params"
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
         return self.get_previous(
-            self.get_queryset(),
-            date,
-            aggregation_group,
-            transaction_id,
-            contact_1_id
+            self.get_queryset(), date, aggregation_group, transaction_id, contact_1_id
         )
 
     @action(detail=False, methods=["get"], url_path=r"previous/election")
@@ -215,9 +211,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 raise Exception()
 
             assert (
-                date
-                and aggregation_group
-                and election_code
+                date and aggregation_group and election_code
             )  # Raises error if any value is not truthy (i.e, "" or None)
         except Exception:
             message = """date, aggregate_group, election_code, and candidate_office \
@@ -231,10 +225,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             date,
             aggregation_group,
             id,
-            None, None,
+            None,
+            None,
             election_code,
             None,
-            office, state, district
+            office,
+            state,
+            district,
         )
 
     @action(detail=False, methods=["get"], url_path=r"previous/payee-candidate")
@@ -249,10 +246,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             general_election_year = request.query_params["general_election_year"]
 
             assert (
-                contact_2_id
-                and date
-                and aggregation_group
-                and general_election_year
+                contact_2_id and date and aggregation_group and general_election_year
             )  # Raises error if any value is not truthy (i.e, "" or None)
         except Exception:
             message = (
@@ -270,7 +264,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             None,
             contact_2_id,
             None,
-            general_election_year
+            general_election_year,
         )
 
     def get_previous(
@@ -445,14 +439,17 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         # Manually trigger aggregate recalculation
         # ---- Currently Schedule F only
-        self.process_aggregation(transaction_instance, {
-            "instance": original_instance,
-            "date": original_date,
-            "contact_1": original_contact_1,
-            "contact_2": original_contact_2,
-            "election_code": original_election_code,
-            "election_year": original_election_year
-        })
+        self.process_aggregation(
+            transaction_instance,
+            {
+                "instance": original_instance,
+                "date": original_date,
+                "contact_1": original_contact_1,
+                "contact_2": original_contact_2,
+                "election_code": original_election_code,
+                "election_year": original_election_year,
+            },
+        )
 
         for child_transaction_data in children:
             if type(child_transaction_data) is str:
@@ -558,15 +555,21 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         leapfrogged = False
         if original_values["instance"] is not None:
             leapfrogged = self.handle_date_leapfrogging(
-                transaction_instance,
-                original_values
+                transaction_instance, original_values
             )
             self.handle_broken_transaction_chain(transaction_instance, original_values)
 
         if not leapfrogged:
             schedule = transaction_instance.get_schedule_name()
             match schedule:
-                case Schedule.A | Schedule.B | Schedule.C | Schedule.C1 | Schedule.C2 | Schedule.D:  # noqa: E501
+                case (
+                    Schedule.A
+                    | Schedule.B
+                    | Schedule.C
+                    | Schedule.C1
+                    | Schedule.C2
+                    | Schedule.D
+                ):  # noqa: E501
                     # process_aggregation_by_entity()
                     pass
                 case Schedule.E:
@@ -585,7 +588,14 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         # Set the earlier date in order to detect when a transaction has moved forward
         if original_date and original_date < schedule.get_date():
             match schedule_type:
-                case Schedule.A | Schedule.B | Schedule.C | Schedule.C1 | Schedule.C2 | Schedule.D:  # noqa: E501
+                case (
+                    Schedule.A
+                    | Schedule.B
+                    | Schedule.C
+                    | Schedule.C1
+                    | Schedule.C2
+                    | Schedule.D
+                ):  # noqa: E501
                     # handle_leapfrogging_entity
                     pass
                 case Schedule.E:
@@ -604,16 +614,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         # Handle date leap-frogging just for Schedule F transactions
         if original_contact_2 is not None and original_election_year:
-            leapfrogged_sch_f_transactions = self.get_queryset().filter(
-                ~Q(id=original_instance.id),
-                Q(
-                    contact_2_id=original_contact_2.id,
-                    schedule_f__isnull=False,
-                    schedule_f__general_election_year=original_election_year,
-                ),
-                Q(date__gt=original_date)
-                | Q(date=original_date, created__gt=original_instance.created),
-            ).order_by("date")
+            leapfrogged_sch_f_transactions = (
+                self.get_queryset()
+                .filter(
+                    ~Q(id=original_instance.id),
+                    Q(
+                        contact_2_id=original_contact_2.id,
+                        schedule_f__isnull=False,
+                        schedule_f__general_election_year=original_election_year,
+                    ),
+                    Q(date__gt=original_date)
+                    | Q(date=original_date, created__gt=original_instance.created),
+                )
+                .order_by("date")
+            )
 
             to_recalculate = leapfrogged_sch_f_transactions.first()
             if to_recalculate is not None:
@@ -625,7 +639,14 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def handle_broken_transaction_chain(self, transaction_instance, original_values):
         schedule = transaction_instance.get_schedule_name()
         match schedule:
-            case Schedule.A | Schedule.B | Schedule.C | Schedule.C1 | Schedule.C2 | Schedule.D:  # noqa: E501
+            case (
+                Schedule.A
+                | Schedule.B
+                | Schedule.C
+                | Schedule.C1
+                | Schedule.C2
+                | Schedule.D
+            ):  # noqa: E501
                 # handle_broken_transaction_chain_entity
                 pass
             case Schedule.E:
@@ -633,14 +654,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 pass
             case Schedule.F:
                 self.handle_broken_transaction_chain_election_year(
-                    transaction_instance,
-                    original_values
+                    transaction_instance, original_values
                 )
 
     def handle_broken_transaction_chain_election_year(
-        self,
-        transaction_instance,
-        original_values
+        self, transaction_instance, original_values
     ):
         original_election_year = original_values["election_year"]
         original_instance = original_values["instance"]
@@ -649,18 +667,23 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         if (
             original_election_year is not None
-            and original_election_year != transaction_instance.schedule_f.general_election_year  # noqa: E501
+            and original_election_year
+            != transaction_instance.schedule_f.general_election_year  # noqa: E501
         ):
-            leapfrogged_sch_f_transactions = self.get_queryset().filter(
-                ~Q(id=original_instance.id),
-                Q(
-                    contact_2_id=original_contact_2.id,
-                    schedule_f__isnull=False,
-                    schedule_f__general_election_year=original_election_year,
-                ),
-                Q(date__gt=original_date)
-                | Q(date=original_date, created__gt=original_instance.created),
-            ).order_by("date")
+            leapfrogged_sch_f_transactions = (
+                self.get_queryset()
+                .filter(
+                    ~Q(id=original_instance.id),
+                    Q(
+                        contact_2_id=original_contact_2.id,
+                        schedule_f__isnull=False,
+                        schedule_f__general_election_year=original_election_year,
+                    ),
+                    Q(date__gt=original_date)
+                    | Q(date=original_date, created__gt=original_instance.created),
+                )
+                .order_by("date")
+            )
 
             to_recalculate = leapfrogged_sch_f_transactions.first()
             if to_recalculate is not None:
@@ -722,7 +745,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             None,
             transaction.contact_2.id,
             None,
-            transaction.schedule_f.general_election_year
+            transaction.schedule_f.general_election_year,
         )
 
         to_update = shared_entity_transactions.filter(
@@ -747,9 +770,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             previous_transaction = trans
 
         ScheduleF.objects.bulk_update(
-            updated_schedule_fs,
-            ["aggregate_general_elec_expended"],
-            batch_size=64
+            updated_schedule_fs, ["aggregate_general_elec_expended"], batch_size=64
         )
 
 
