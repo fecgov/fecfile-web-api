@@ -1,23 +1,21 @@
 # Quick Start
 
-1. Login to FECFile in the environment to test against.
-2. Open the network tab and copy the `sessionid` and `csrftoken` cookie header values
-   from any post-authenticate API call to use later.  NOTE: Please do not logout at 
-   any point or these values will be invalidated for use.
-3. Run the following data load management command in the environment to test against 
+1. Run the following data load management command in the environment to test against 
    using the user email address you wish to be assigned to the new committee (optional 
    additional command arguments as desired):
    `./manage.py gen_locust_load_test_data <user_email>`
-4. After the committee has been created and test data loaded, update the `locust-leader`
-   and `locust-follower` sections in `docker-compose.yml`.  Replace the `OIDC_SESSION_ID`
-   and `CSRF_TOKEN` environment variable values with the `sessionid` and `csrftoken` 
-   cookie values (respectively) copied in step 2.
-5. Select the committee you want to test against in the 'select committee' FECFile 
-   screen to associate the session id with the test committee.
-6. Run Locust locally using the following command (you may not need `sudo`):
+2. Login to FECFile in the environment to test against and select the test committee
+   from step 1.
+3. Open the network tab and copy the `sessionid` and `csrftoken` cookie header values
+   from any post-authenticate API call to use later.  NOTE: Please do not logout at 
+   any point or these values will be invalidated for use.
+4. Update the `locust-leader` and `locust-follower` sections in `docker-compose.yml`.  
+   Replace the `OIDC_SESSION_ID` and `CSRF_TOKEN` environment variable values with the
+   `sessionid` and `csrftoken` cookie values (respectively) copied in step 3.
+5. Run Locust locally using the following command (you may not need `sudo`):
    `sudo docker compose --profile locust up`
-7. Open a browser to http://localhost:8089 and begin testing.
-8. Once you are done testing, you may wish to cleanup the load test data created in step
+6. Open a browser to http://localhost:8089 and begin testing.
+7. Once you are done testing, you may wish to cleanup the load test data created in step
    3 using the following management command (committee `C33333333` is the default used):
    `./manage.py delete_committee_account <committee_account_id>`
 
