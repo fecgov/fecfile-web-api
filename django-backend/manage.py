@@ -21,6 +21,7 @@ allowed_commands = [
     "install_login_dot_gov_cert",
     "update_creds_service",
     "disable_user",
+    "gen_locust_load_test_data",
 ]
 restricted_commands = [
     "loaddata",
