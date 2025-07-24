@@ -5,9 +5,9 @@
    from any post-authenticate API call to use later.  NOTE: Please do not logout at 
    any point or these values will be invalidated for use.
 3. Run the following data load management command in the environment to test against 
-   using the cookie values copied in step 2 (optional additional command arguments as 
-   desired):
-   `./manage.py gen_locust_load_test_data <session_id> <csrf_token>`
+   using the user email address you wish to be assigned to the new committee (optional 
+   additional command arguments as desired):
+   `./manage.py gen_locust_load_test_data <user_email>`
 4. After the committee has been created and test data loaded, update the `locust-leader`
    and `locust-follower` sections in `docker-compose.yml`.  Replace the `OIDC_SESSION_ID`
    and `CSRF_TOKEN` environment variable values with the `sessionid` and `csrftoken` 
@@ -30,9 +30,10 @@ The instructions for running tests with Locust follow:
 ## (Optional) Prepare testing data with gen_locust_load_test_data command
 
 A new devops command has been added to insert test data directly into the database.  This
-command can be executed as follows:
+command can be executed as follows using the user_email you wish to be assigned to the 
+new commmittee:
 
-`python manage.py gen_locust_load_test_data <session_id> <csrf_token>`
+`python manage.py gen_locust_load_test_data <user_email>`
 
 Optional additional flags can be used to override various defaults:
 
