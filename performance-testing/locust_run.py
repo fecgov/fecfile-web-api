@@ -4,6 +4,7 @@ import random
 import json
 import time
 import threading
+from copy import deepcopy
 
 from locust import between, task, TaskSet, user
 
@@ -49,7 +50,6 @@ user_index_counter = AtomicInteger(0)
 
 
 class Tasks(TaskSet):
-    report_ids_to_submit_lock = threading.Lock()
     report_ids = []
     contacts = []
 
@@ -83,7 +83,7 @@ class Tasks(TaskSet):
                 f"User index {user_index} exceeds report count. No reports to submit."
             )
             return []
-        return all_report_ids[start_index:end_index]
+        return deepcopy(all_report_ids[start_index:end_index])
 
     def prepare_reports_for_submit(self, report_ids):
         logging.info("Calculating summaries for reports")
@@ -153,6 +153,7 @@ class Tasks(TaskSet):
 
     def submit_report(self, report_id, poll_seconds):
         self.update_report_for_submit(report_id)
+        logging.info(f"================ SUBMITTING FOR: {report_id} ================")
         self.submit_to_fec_and_poll_for_success(report_id, poll_seconds)
 
     def update_report_for_submit(self, report_id):
@@ -220,6 +221,7 @@ class Tasks(TaskSet):
             reports = response.json()
             for report in reports:
                 retval.append(report["id"])
+            retval.sort()
             return retval
         raise Exception("Failed to retrieve report ids for load test setup")
 
@@ -268,11 +270,10 @@ class Tasks(TaskSet):
 
     @task
     def submit_reports(self):
-        with self.report_ids_to_submit_lock:
-            if len(self.report_ids_to_submit) == 0:
-                logging.info("No more reports to submit")
-                return
-            report_id = self.report_ids_to_submit.pop()
+        if len(self.report_ids_to_submit) == 0:
+            logging.info("No more reports to submit")
+            return
+        report_id = self.report_ids_to_submit.pop()
         # poll_seconds Determined by INITIAL_POLLING_INTERVAL setting
         self.submit_report(report_id, poll_seconds=40)
 
