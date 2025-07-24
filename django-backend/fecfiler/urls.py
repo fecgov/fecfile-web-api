@@ -16,6 +16,7 @@ urlpatterns = [
     re_path(BASE_V1_URL, include("fecfiler.web_services.urls")),
     re_path(BASE_V1_URL, include("fecfiler.user.urls")),
     re_path(BASE_V1_URL, include("fecfiler.feedback.urls")),
+    re_path(BASE_V1_URL, include("fecfiler.sse.urls")),
     re_path(BASE_V1_URL, include("fecfiler.oidc.urls")),
     re_path(BASE_V1_URL, include("fecfiler.cash_on_hand.urls")),
     path("", RedirectView.as_view(url="/api/docs/")),
