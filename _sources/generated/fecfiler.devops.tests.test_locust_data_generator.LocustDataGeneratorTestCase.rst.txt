@@ -1,0 +1,124 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.devops.tests.test\_locust\_data\_generator.LocustDataGeneratorTestCase
+===============================================================================
+
+.. currentmodule:: fecfiler.devops.tests.test_locust_data_generator
+
+.. autoclass:: LocustDataGeneratorTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LocustDataGeneratorTestCase.__init__
+      ~LocustDataGeneratorTestCase.addClassCleanup
+      ~LocustDataGeneratorTestCase.addCleanup
+      ~LocustDataGeneratorTestCase.addTypeEqualityFunc
+      ~LocustDataGeneratorTestCase.assertAlmostEqual
+      ~LocustDataGeneratorTestCase.assertContains
+      ~LocustDataGeneratorTestCase.assertCountEqual
+      ~LocustDataGeneratorTestCase.assertDictEqual
+      ~LocustDataGeneratorTestCase.assertEqual
+      ~LocustDataGeneratorTestCase.assertFalse
+      ~LocustDataGeneratorTestCase.assertFieldOutput
+      ~LocustDataGeneratorTestCase.assertFormError
+      ~LocustDataGeneratorTestCase.assertFormSetError
+      ~LocustDataGeneratorTestCase.assertGreater
+      ~LocustDataGeneratorTestCase.assertGreaterEqual
+      ~LocustDataGeneratorTestCase.assertHTMLEqual
+      ~LocustDataGeneratorTestCase.assertHTMLNotEqual
+      ~LocustDataGeneratorTestCase.assertIn
+      ~LocustDataGeneratorTestCase.assertInHTML
+      ~LocustDataGeneratorTestCase.assertIs
+      ~LocustDataGeneratorTestCase.assertIsInstance
+      ~LocustDataGeneratorTestCase.assertIsNone
+      ~LocustDataGeneratorTestCase.assertIsNot
+      ~LocustDataGeneratorTestCase.assertIsNotNone
+      ~LocustDataGeneratorTestCase.assertJSONEqual
+      ~LocustDataGeneratorTestCase.assertJSONNotEqual
+      ~LocustDataGeneratorTestCase.assertLess
+      ~LocustDataGeneratorTestCase.assertLessEqual
+      ~LocustDataGeneratorTestCase.assertListEqual
+      ~LocustDataGeneratorTestCase.assertLogs
+      ~LocustDataGeneratorTestCase.assertMultiLineEqual
+      ~LocustDataGeneratorTestCase.assertNoLogs
+      ~LocustDataGeneratorTestCase.assertNotAlmostEqual
+      ~LocustDataGeneratorTestCase.assertNotContains
+      ~LocustDataGeneratorTestCase.assertNotEqual
+      ~LocustDataGeneratorTestCase.assertNotIn
+      ~LocustDataGeneratorTestCase.assertNotInHTML
+      ~LocustDataGeneratorTestCase.assertNotIsInstance
+      ~LocustDataGeneratorTestCase.assertNotRegex
+      ~LocustDataGeneratorTestCase.assertNumQueries
+      ~LocustDataGeneratorTestCase.assertQuerySetEqual
+      ~LocustDataGeneratorTestCase.assertRaises
+      ~LocustDataGeneratorTestCase.assertRaisesMessage
+      ~LocustDataGeneratorTestCase.assertRaisesRegex
+      ~LocustDataGeneratorTestCase.assertRedirects
+      ~LocustDataGeneratorTestCase.assertRegex
+      ~LocustDataGeneratorTestCase.assertSequenceEqual
+      ~LocustDataGeneratorTestCase.assertSetEqual
+      ~LocustDataGeneratorTestCase.assertTemplateNotUsed
+      ~LocustDataGeneratorTestCase.assertTemplateUsed
+      ~LocustDataGeneratorTestCase.assertTrue
+      ~LocustDataGeneratorTestCase.assertTupleEqual
+      ~LocustDataGeneratorTestCase.assertURLEqual
+      ~LocustDataGeneratorTestCase.assertWarns
+      ~LocustDataGeneratorTestCase.assertWarnsMessage
+      ~LocustDataGeneratorTestCase.assertWarnsRegex
+      ~LocustDataGeneratorTestCase.assertXMLEqual
+      ~LocustDataGeneratorTestCase.assertXMLNotEqual
+      ~LocustDataGeneratorTestCase.captureOnCommitCallbacks
+      ~LocustDataGeneratorTestCase.countTestCases
+      ~LocustDataGeneratorTestCase.debug
+      ~LocustDataGeneratorTestCase.defaultTestResult
+      ~LocustDataGeneratorTestCase.doClassCleanups
+      ~LocustDataGeneratorTestCase.doCleanups
+      ~LocustDataGeneratorTestCase.ensure_connection_patch_method
+      ~LocustDataGeneratorTestCase.enterClassContext
+      ~LocustDataGeneratorTestCase.enterContext
+      ~LocustDataGeneratorTestCase.fail
+      ~LocustDataGeneratorTestCase.id
+      ~LocustDataGeneratorTestCase.modify_settings
+      ~LocustDataGeneratorTestCase.run
+      ~LocustDataGeneratorTestCase.setUp
+      ~LocustDataGeneratorTestCase.setUpClass
+      ~LocustDataGeneratorTestCase.setUpTestData
+      ~LocustDataGeneratorTestCase.settings
+      ~LocustDataGeneratorTestCase.shortDescription
+      ~LocustDataGeneratorTestCase.skipTest
+      ~LocustDataGeneratorTestCase.subTest
+      ~LocustDataGeneratorTestCase.tearDown
+      ~LocustDataGeneratorTestCase.tearDownClass
+      ~LocustDataGeneratorTestCase.test_generate_contacts
+      ~LocustDataGeneratorTestCase.test_generate_form_3x
+      ~LocustDataGeneratorTestCase.test_generate_single_transactions
+      ~LocustDataGeneratorTestCase.test_generate_triple_transactions
+      ~LocustDataGeneratorTestCase.test_save_json
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LocustDataGeneratorTestCase.available_apps
+      ~LocustDataGeneratorTestCase.databases
+      ~LocustDataGeneratorTestCase.fixtures
+      ~LocustDataGeneratorTestCase.longMessage
+      ~LocustDataGeneratorTestCase.maxDiff
+      ~LocustDataGeneratorTestCase.reset_sequences
+      ~LocustDataGeneratorTestCase.serialized_rollback
+   
+   

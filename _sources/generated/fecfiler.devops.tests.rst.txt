@@ -34,6 +34,8 @@ fecfiler.devops.tests
    fecfiler.devops.tests.test_cf_api_utils
    fecfiler.devops.tests.test_crypt_utils
    fecfiler.devops.tests.test_django_key_utils
+   fecfiler.devops.tests.test_load_test_utils
+   fecfiler.devops.tests.test_locust_data_generator
    fecfiler.devops.tests.test_login_dot_gov_cert_utils
    fecfiler.devops.tests.test_status_views
    fecfiler.devops.tests.test_tasks
