@@ -54,6 +54,37 @@ class Tasks(TaskSet):
     contacts = []
 
     def on_start(self):
+        response = self.client.get(
+            "/api/v1/oidc/authenticate",
+            allow_redirects=False
+        )
+        if 300 <= response.status_code < 400 and 'Location' in response.headers:
+            logging.info(f"response.headers['Location']: {response.headers['Location']}")
+            redirect_url = response.headers['Location']
+            print(f"Redirect status code: {response.status_code}")
+            print(f"New URL (before following redirect): {redirect_url}")
+        else:
+            print(f"No redirect detected for url. Status code: {response.status_code}")
+
+        parts = redirect_url.split("?", 1)
+        if len(parts) > 1:
+            args = parts[1]
+        else:
+            args = ""
+        print(args)
+
+        response = self.client.get(
+            f"/api/v1/mock_oidc_provider/authorize?{args}",
+            allow_redirects=False
+        )
+        if 300 <= response.status_code < 400 and 'Location' in response.headers:
+            logging.info(f"response.headers['Location']: {response.headers['Location']}")
+            redirect_url = response.headers['Location']
+            print(f"Redirect status code: {response.status_code}")
+            print(f"New URL (before following redirect): {redirect_url}")
+        else:
+            print(f"No redirect detected for url. Status code: {response.status_code}")
+
         self.client.headers = {
             "cookie": f"sessionid={SESSION_ID}; csrftoken={CSRF_TOKEN};",
             "user-agent": "Locust testing",

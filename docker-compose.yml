@@ -136,7 +136,7 @@ services:
             FFAPI_TIMEOUT_COOKIE_NAME: ffapi_timeout_local
             OIDC_RP_CLIENT_ID:
             OIDC_RP_CLIENT_SECRET:
-            OIDC_MAX_STATES:
+            OIDC_MAX_STATES: 50
             LOGIN_REDIRECT_SERVER_URL: http://localhost:8080/api/v1/oidc/login-redirect
             LOGIN_REDIRECT_CLIENT_URL: http://localhost:4200
             LOGOUT_REDIRECT_URL: http://localhost:8080/api/v1/oidc/logout-redirect
@@ -193,8 +193,8 @@ services:
             - '8089:8089'
         volumes:
             - ./:/mnt/locust
-        command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
-        #command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080
+        #command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
+        command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080
         profiles: [locust]
         environment:
             LOCAL_TEST_USER:
