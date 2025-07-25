@@ -148,7 +148,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # Maximum number of concurrent sessions
-OIDC_MAX_STATES = env.get_credential("OIDC_MAX_STATES", 3)
+OIDC_MAX_STATES = int(env.get_credential("OIDC_MAX_STATES", "3"))
 
 OIDC_RP_SIGN_ALGO = "RS256"
 OIDC_RP_CLIENT_ID = env.get_credential("OIDC_RP_CLIENT_ID")
