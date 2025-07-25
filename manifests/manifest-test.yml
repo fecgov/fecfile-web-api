@@ -35,6 +35,7 @@ defaults: &defaults
     FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, and MOCKED
     ENABLE_RESTRICTED_COMMANDS: True
     FEC_FORMAT_VERSION: 8.4
+    OIDC_MAX_STATES: 3
 
 applications:
   - name: fecfile-web-api
