@@ -3,11 +3,17 @@ from celery import shared_task
 from fecfiler.reports.models import Report, FORMS_TO_CALCULATE, Q
 from fecfiler.reports.form_3x.summary import calculate_summary as calculate_summary_3x
 from fecfiler.reports.form_3.summary import calculate_summary as calculate_summary_3
-
+from fecfiler.settings import SYSTEM_STATUS_CACHE_BACKEND, SYSTEM_STATUS_CACHE_AGE
 import uuid
 import structlog
+import redis
 
 logger = structlog.get_logger(__name__)
+
+if SYSTEM_STATUS_CACHE_BACKEND:
+    redis_instance = redis.Redis.from_url(SYSTEM_STATUS_CACHE_BACKEND)
+else:
+    raise SystemError("SYSTEM_STATUS_CACHE_BACKEND is not set")
 
 
 class CalculationState(Enum):
@@ -71,5 +77,14 @@ def calculate_summary(report_id):
             break
         else:
             logger.info(f"Report: {report.id} recalculated")
+            if redis_instance:
+                try:
+                    channel_name = f"calculation_status:{report.id}"
+                    redis_instance.publish(channel_name, str(CalculationState.SUCCEEDED))
+                    logger.info(f"Published SUCCEEDED to {channel_name}")
+                except Exception as e:
+                    logger.error(
+                        f"Failed to publish to Redis for report {report.id}: {e}"
+                    )
 
     return primary_report.id
