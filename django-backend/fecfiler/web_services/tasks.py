@@ -27,10 +27,16 @@ from fecfiler.settings import (
     SECONDARY_POLLING_DURATION,
     SECONDARY_POLLING_MAX_ATTEMPTS,
 )
-
+import redis
 import structlog
+from fecfiler.settings import SYSTEM_STATUS_CACHE_BACKEND
 
 logger = structlog.get_logger(__name__)
+
+if SYSTEM_STATUS_CACHE_BACKEND:
+    redis_instance = redis.Redis.from_url(SYSTEM_STATUS_CACHE_BACKEND)
+else:
+    raise SystemError("SYSTEM_STATUS_CACHE_BACKEND is not set")
 
 
 WEB_PRINT_KEY = "WebPrint"
@@ -291,5 +297,14 @@ def resolve_final_submission_state(submission: BaseSubmission):
 
     if new_state == FECSubmissionState.FAILED:
         submission.log_submission_failure_state()
+
+    if redis_instance:
+        try:
+            channel_name = f"webprint_status:{submission.id}"
+            redis_instance.publish(channel_name, new_state)
+        except Exception as e:
+            logger.error(
+                f"Failed to publish to Redis for webprint submission {submission.id}: {e}"
+            )
 
     return submission.id

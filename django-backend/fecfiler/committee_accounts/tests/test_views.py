@@ -310,6 +310,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
             "SummaryViewSet",
             "FeedbackViewSet",
             "WebServicesViewSet",
+            "SSEViewSet",
         ]
         routers = get_all_routers()
         missing_mixin = []

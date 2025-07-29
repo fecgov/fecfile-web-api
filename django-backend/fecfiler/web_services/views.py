@@ -193,7 +193,9 @@ class WebServicesViewSet(viewsets.ViewSet):
         )
 
         logger.debug(f"submit_to_webprint report {report_id}: {task.status}")
-        return Response({"status": "Submit .FEC task created"})
+        return Response(
+            {"status": "Submit .FEC task created", "submission_id": submission_id}
+        )
 
     def get_calculation_task(self, request, report_id):
         committee_uuid = request.session["committee_uuid"]

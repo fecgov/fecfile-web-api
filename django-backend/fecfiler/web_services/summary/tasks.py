@@ -3,7 +3,7 @@ from celery import shared_task
 from fecfiler.reports.models import Report, FORMS_TO_CALCULATE, Q
 from fecfiler.reports.form_3x.summary import calculate_summary as calculate_summary_3x
 from fecfiler.reports.form_3.summary import calculate_summary as calculate_summary_3
-from fecfiler.settings import SYSTEM_STATUS_CACHE_BACKEND, SYSTEM_STATUS_CACHE_AGE
+from fecfiler.settings import SYSTEM_STATUS_CACHE_BACKEND
 import uuid
 import structlog
 import redis
