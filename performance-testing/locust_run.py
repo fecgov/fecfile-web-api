@@ -1,6 +1,5 @@
 import os
 import logging
-import random
 import json
 import time
 import threading
@@ -54,11 +53,43 @@ class Tasks(TaskSet):
     contacts = []
 
     def on_start(self):
-        response1 = self.client.get("/api/v1/oidc/authenticate", allow_redirects=False)
-        redirect_uri = response1.headers["Location"].removeprefix("http://localhost:8080")
-        response2 = self.client.get(redirect_uri, allow_redirects=False)
-        redirect_uri = response2.headers["Location"].removeprefix("http://localhost:8080")
-        self.client.get(redirect_uri, allow_redirects=False)
+        self.login()
+        self.get_and_activate_commmittee()
+
+    def login(self):
+        authenticate_response = self.client.get(
+            "/api/v1/oidc/authenticate", name="oidc_authenticate", allow_redirects=False
+        )
+        authenticate_redirect_uri = self.get_redirect_uri(authenticate_response)
+        authorize_response = self.client.get(
+            authenticate_redirect_uri,
+            name="oidc_provider_authorize",
+            allow_redirects=False,
+        )
+        authorize_redirect_uri = self.get_redirect_uri(authorize_response)
+        self.client.get(
+            authorize_redirect_uri, name="oidc_callback", allow_redirects=False
+        )
+        self.client.headers["x-csrftoken"] = self.client.cookies["csrftoken"]
+        self.client.headers["user-agent"] = "Locust testing"
+        self.client.headers["Origin"] = self.client.base_url
+
+    def get_and_activate_commmittee(self):
+        committee_id_list = self.retrieve_committee_id_list()
+        committee_id = committee_id_list[self.user.user_index]
+        response = self.client.post(
+            f"/api/v1/committees/{committee_id}/activate/",
+            name=f"activate_committee_{committee_id}",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed to activate committee for user_index {self.user.user_index}"
+            )
+
+    def get_redirect_uri(self, response):
+        if response.status_code == 302:
+            return response.headers["Location"].removeprefix("http://localhost:8080")
+        return None
 
     def get_report_ids_to_submit(self, user_index, all_report_ids):
         user_count = self.user.environment.parsed_options.users
@@ -216,6 +247,20 @@ class Tasks(TaskSet):
             retval.sort()
             return retval
         raise Exception("Failed to retrieve report ids for load test setup")
+
+    def retrieve_committee_id_list(self):
+        response = self.client_get(
+            "/api/v1/committees/",
+            timeout=TIMEOUT,
+        )
+        if response and response.status_code == 200:
+            retval = []
+            committees = response.json()["results"]
+            committees.sort(key=lambda x: x["committee_id"])
+            for committee in committees:
+                retval.append(committee["id"])
+            return retval
+        raise Exception("Failed to retrieve committee ids for load test setup")
 
     @task
     def celery_test(self):
