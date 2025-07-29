@@ -54,19 +54,11 @@ class Tasks(TaskSet):
     contacts = []
 
     def on_start(self):
-        self.client.headers = {
-            "cookie": f"sessionid={SESSION_ID}; csrftoken={CSRF_TOKEN};",
-            "user-agent": "Locust testing",
-            "x-csrftoken": CSRF_TOKEN,
-            "Origin": self.client.base_url,
-        }
-
-        logging.info("Preparing reports for submit")
-        self.report_ids = self.retrieve_report_id_list()
-        self.report_ids_to_submit = self.get_report_ids_to_submit(
-            self.user.user_index, self.report_ids
-        )
-        self.prepare_reports_for_submit(self.report_ids_to_submit)
+        response1 = self.client.get("/api/v1/oidc/authenticate", allow_redirects=False)
+        redirect_uri = response1.headers["Location"].removeprefix("http://localhost:8080")
+        response2 = self.client.get(redirect_uri, allow_redirects=False)
+        redirect_uri = response2.headers["Location"].removeprefix("http://localhost:8080")
+        self.client.get(redirect_uri, allow_redirects=False)
 
     def get_report_ids_to_submit(self, user_index, all_report_ids):
         user_count = self.user.environment.parsed_options.users
@@ -227,55 +219,9 @@ class Tasks(TaskSet):
 
     @task
     def celery_test(self):
-        self.client_get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
-
-    @task
-    def load_contacts(self):
-        params = {
-            "page": 1,
-            "ordering": "form_type",
-        }
         self.client_get(
-            "/api/v1/contacts/", name="load_contacts", timeout=TIMEOUT, params=params
+            "/api/v1/users/get_current/", name="current_user", timeout=TIMEOUT
         )
-
-    @task
-    def load_reports(self):
-        params = {
-            "page": 1,
-            "ordering": "form_type",
-        }
-        self.client_get(
-            "/api/v1/reports/", name="load_reports", timeout=TIMEOUT, params=params
-        )
-
-    @task
-    def load_transactions(self):
-        if len(self.report_ids) > 0:
-            report_id = random.choice(self.report_ids)
-            schedules = random.choice(SCHEDULES)
-            print(f"\n\n\nREPORT ID: {report_id}\n{self.report_ids}\n\n\n")
-            params = {
-                "page": 1,
-                "ordering": "form_type",
-                "schedules": schedules,
-                "report_id": report_id,
-            }
-            self.client_get(
-                "/api/v1/transactions/",
-                name="load_transactions",
-                timeout=TIMEOUT,
-                params=params,
-            )
-
-    @task
-    def submit_reports(self):
-        if len(self.report_ids_to_submit) == 0:
-            logging.info("No more reports to submit")
-            return
-        report_id = self.report_ids_to_submit.pop()
-        # poll_seconds Determined by INITIAL_POLLING_INTERVAL setting
-        self.submit_report(report_id, poll_seconds=40)
 
     def client_get(self, *args, **kwargs):
         kwargs["catch_response"] = True
