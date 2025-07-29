@@ -10,6 +10,27 @@ logger = structlog.get_logger(__name__)
 
 
 class LoadTestUtils:
+    def create_load_test_committees_and_data(
+        self,
+        test_user_email,
+        number_of_committees,
+        number_of_reports,
+        number_of_contacts,
+        number_of_transactions,
+        single_to_triple_transaction_ratio,
+    ):
+        base_committee_number = 33333333
+        for i in range(number_of_committees):
+            new_committee_id = f"C{base_committee_number + i}"
+            self.create_load_test_committee_and_data(
+                test_user_email,
+                new_committee_id,
+                number_of_reports,
+                number_of_contacts,
+                number_of_transactions,
+                single_to_triple_transaction_ratio,
+            )
+
     def create_load_test_committee_and_data(
         self,
         test_user_email,

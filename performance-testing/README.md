@@ -31,14 +31,15 @@ The instructions for running tests with Locust follow:
 
 A new devops command has been added to insert test data directly into the database.  This
 command can be executed as follows using the user_email you wish to be assigned to the 
-new commmittee:
+new commmittee.  By default, the committees created will start with C33333333 and count 
+upwards:
 
 `python manage.py gen_locust_load_test_data <user_email>`
 
 Optional additional flags can be used to override various defaults:
 
 `--base_uri`
-`--new_committee_id`
+`--number_of_committees`
 `--number_of_reports`
 `--number_of_contacts`
 `--number_of_transactions`

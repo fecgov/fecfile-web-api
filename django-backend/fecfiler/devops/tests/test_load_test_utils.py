@@ -1,11 +1,49 @@
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
 from fecfiler.devops.utils.load_test_utils import LoadTestUtils
+from unittest.mock import call
 
 
 class LoadTestUtilsTestCase(TestCase):
     def setUp(self):
         self.utils = LoadTestUtils()
+
+    @patch("fecfiler.devops.utils.load_test_utils.LocustDataGenerator")
+    @patch.object(LoadTestUtils, "create_load_test_committee_and_data")
+    def test_create_load_test_committees_and_data(
+        self,
+        create_load_test_committee_and_data,
+        mock_locust_data_generator,
+    ):
+        test_user_email = "test_user_email@test.com"
+        test_number_of_committees = 10
+        test_number_of_reports = 10
+        test_number_of_contacts = 100
+        test_number_of_transactions = 500
+        test_single_to_triple_transaction_ratio = 9 / 10
+        self.utils.create_load_test_committees_and_data(
+            test_user_email,
+            test_number_of_committees,
+            test_number_of_reports,
+            test_number_of_contacts,
+            test_number_of_transactions,
+            test_single_to_triple_transaction_ratio,
+        )
+        expected_calls = []
+        base_committee_number = 33333333
+        for i in range(test_number_of_committees):
+            expected_calls.append(
+                call(
+                    test_user_email,
+                    f"C{base_committee_number + i}",
+                    test_number_of_reports,
+                    test_number_of_contacts,
+                    test_number_of_transactions,
+                    test_single_to_triple_transaction_ratio,
+                )
+            )
+        self.assertEqual(len(expected_calls), 10)
+        create_load_test_committee_and_data.assert_has_calls(expected_calls)
 
     @patch("fecfiler.devops.utils.load_test_utils.LocustDataGenerator")
     @patch.object(LoadTestUtils, "create_new_committee")
