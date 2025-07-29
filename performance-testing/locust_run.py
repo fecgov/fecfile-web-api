@@ -5,6 +5,7 @@ import json
 import time
 import threading
 from copy import deepcopy
+from urllib.parse import urlparse, parse_qs
 
 from locust import between, task, TaskSet, user
 
@@ -54,6 +55,7 @@ class Tasks(TaskSet):
     contacts = []
 
     def on_start(self):
+        # Authenticate
         response = self.client.get(
             "/api/v1/oidc/authenticate",
             allow_redirects=False
@@ -73,18 +75,43 @@ class Tasks(TaskSet):
             args = ""
         print(args)
 
-        response = self.client.get(
+        # Authorize
+        authorize_response = self.client.get(
             f"/api/v1/mock_oidc_provider/authorize?{args}",
             allow_redirects=False
         )
-        if 300 <= response.status_code < 400 and 'Location' in response.headers:
-            logging.info(f"response.headers['Location']: {response.headers['Location']}")
-            redirect_url = response.headers['Location']
-            print(f"Redirect status code: {response.status_code}")
+        if 300 <= authorize_response.status_code < 400 and 'Location' in authorize_response.headers:
+            logging.info(f"response.headers['Location']: {authorize_response.headers['Location']}")
+            redirect_url = authorize_response.headers['Location']
+            print(f"Redirect status code: {authorize_response.status_code}")
             print(f"New URL (before following redirect): {redirect_url}")
         else:
-            print(f"No redirect detected for url. Status code: {response.status_code}")
+            print(f"No redirect detected for url. Status code: {authorize_response.status_code}")
 
+        # Get code from redirect URL
+        parsed_url = urlparse(redirect_url)
+        query_params = parse_qs(parsed_url.query)
+
+        if 'code' in query_params:
+            code = query_params['code'][0]
+
+        # token
+        token_payload = {
+            "client_assertion": None,
+            "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",  # noqa
+            "code": code,
+            "grant_type": "authorization_code",
+        }
+        response = self.client.post(
+            "/api/v1/mock_oidc_provider/token",
+            data=token_payload,
+            allow_redirects=False
+        )
+        if response and response.status_code == 200:
+            logging.info(response.json())
+
+
+        # TODO: Set these
         self.client.headers = {
             "cookie": f"sessionid={SESSION_ID}; csrftoken={CSRF_TOKEN};",
             "user-agent": "Locust testing",
