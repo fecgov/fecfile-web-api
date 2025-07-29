@@ -65,8 +65,9 @@ def text_to_date_serializer(model_instance, field_name, mapping):
             return date_object.strftime("%Y%m%d") if date_object else ""
         except ValueError:
             continue  # If it fails, try the next format
-    logger.error(
-        f"failed to match manually entered date {date_string} with any known formats"
+    logger.debug(
+        f"unable to match manually entered date {date_string} with any known formats.  "
+        f"Returning value as is."
     )
     return date_string
 
