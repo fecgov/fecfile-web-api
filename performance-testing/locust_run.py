@@ -3,7 +3,6 @@ import logging
 import json
 import time
 import threading
-from copy import deepcopy
 
 from locust import between, task, TaskSet, user
 
@@ -56,6 +55,11 @@ class Tasks(TaskSet):
         self.login()
         self.get_and_activate_commmittee()
 
+        logging.info("Preparing reports for submit")
+        self.report_ids = self.retrieve_report_id_list()
+        self.prepare_reports_for_submit(self.report_ids)
+        self.report_ids_to_submit = self.report_ids.copy()
+
     def login(self):
         authenticate_response = self.client.get(
             "/api/v1/oidc/authenticate", name="oidc_authenticate", allow_redirects=False
@@ -90,23 +94,6 @@ class Tasks(TaskSet):
         if response.status_code == 302:
             return response.headers["Location"].removeprefix("http://localhost:8080")
         return None
-
-    def get_report_ids_to_submit(self, user_index, all_report_ids):
-        user_count = self.user.environment.parsed_options.users
-        total_report_count = len(all_report_ids)
-        reports_per_user = (
-            total_report_count // user_count if total_report_count > user_count else 1
-        )
-        start_index = user_index * reports_per_user
-        end_index = start_index + reports_per_user
-        logging.info(f"================ user index {user_index} ================")
-        logging.info(f"start index {start_index} end index {end_index}")
-        if start_index >= total_report_count:
-            logging.warning(
-                f"User index {user_index} exceeds report count. No reports to submit."
-            )
-            return []
-        return deepcopy(all_report_ids[start_index:end_index])
 
     def prepare_reports_for_submit(self, report_ids):
         logging.info("Calculating summaries for reports")
@@ -202,7 +189,7 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to update report information for submit")
 
-    def submit_to_fec_and_poll_for_success(self, report_id, poll_seconds=2):
+    def submit_to_fec_and_poll_for_success(self, report_id, poll_seconds):
         with self.client.post(
             "/api/v1/web-services/submit-to-fec/",
             name="submit_report_to_fec",
@@ -267,6 +254,15 @@ class Tasks(TaskSet):
         self.client_get(
             "/api/v1/users/get_current/", name="current_user", timeout=TIMEOUT
         )
+
+    @task
+    def submit_reports(self):
+        if len(self.report_ids_to_submit) == 0:
+            logging.info("No more reports to submit")
+            return
+        report_id = self.report_ids_to_submit.pop()
+        # poll_seconds Determined by INITIAL_POLLING_INTERVAL setting
+        self.submit_report(report_id, poll_seconds=40)
 
     def client_get(self, *args, **kwargs):
         kwargs["catch_response"] = True
