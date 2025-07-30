@@ -75,8 +75,11 @@ class SSEViewSet(viewsets.ViewSet):
                         continue
 
                     if message.get("type") == "message":
-                        yield f"data: {message['data']}\n\n"
-                        break  # Exit loop after sending the completion status
+                        data = message["data"]
+                        if isinstance(data, bytes):
+                            data = data.decode("utf-8")
+                        yield f"data: {data}\n\n"
+                        break
 
             except GeneratorExit:
                 pass
