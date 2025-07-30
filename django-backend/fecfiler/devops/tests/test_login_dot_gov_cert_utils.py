@@ -1,4 +1,4 @@
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from unittest.mock import patch
 from fecfiler.devops.utils.login_dot_gov_cert_utils import (
     stage_login_dot_gov_cert,
@@ -6,14 +6,12 @@ from fecfiler.devops.utils.login_dot_gov_cert_utils import (
     gen_and_stage_login_dot_gov_cert,
     install_login_dot_gov_cert,
     backout_login_dot_gov_cert,
+    cleanup_login_dot_gov_certs,
 )
 from django.core import management
 
 
 class LoginDotGovUtilsTestCase(TestCase):
-
-    def setUp(self):
-        self.factory = RequestFactory()
 
     # backout_login_dot_gov_cert
 
@@ -23,6 +21,7 @@ class LoginDotGovUtilsTestCase(TestCase):
         retrieve_credentials_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
@@ -33,7 +32,10 @@ class LoginDotGovUtilsTestCase(TestCase):
             "Failed backout login dot gov cert",
         ):
             backout_login_dot_gov_cert(
-                test_token, test_space_name, test_service_instance_name
+                test_token,
+                test_organization_name,
+                test_space_name,
+                test_service_instance_name,
             )
 
     @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.retrieve_credentials")
@@ -44,12 +46,14 @@ class LoginDotGovUtilsTestCase(TestCase):
         retrieve_credentials_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
         management.call_command(
             "backout_login_dot_gov_cert",
             test_token,
+            test_organization_name,
             test_space_name,
             test_service_instance_name,
         )
@@ -64,6 +68,7 @@ class LoginDotGovUtilsTestCase(TestCase):
         retrieve_credentials_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
@@ -74,7 +79,10 @@ class LoginDotGovUtilsTestCase(TestCase):
             "Failed install login dot gov cert",
         ):
             install_login_dot_gov_cert(
-                test_token, test_space_name, test_service_instance_name
+                test_token,
+                test_organization_name,
+                test_space_name,
+                test_service_instance_name,
             )
 
     @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.retrieve_credentials")
@@ -85,12 +93,14 @@ class LoginDotGovUtilsTestCase(TestCase):
         retrieve_credentials_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
         management.call_command(
             "install_login_dot_gov_cert",
             test_token,
+            test_organization_name,
             test_space_name,
             test_service_instance_name,
         )
@@ -105,6 +115,7 @@ class LoginDotGovUtilsTestCase(TestCase):
         gen_rsa_pk_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
@@ -115,7 +126,10 @@ class LoginDotGovUtilsTestCase(TestCase):
             "Failed to generate and stage cert",
         ):
             gen_and_stage_login_dot_gov_cert(
-                test_token, test_space_name, test_service_instance_name
+                test_token,
+                test_organization_name,
+                test_space_name,
+                test_service_instance_name,
             )
 
     @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.gen_rsa_pk")
@@ -130,12 +144,14 @@ class LoginDotGovUtilsTestCase(TestCase):
         gen_rsa_pk_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
         management.call_command(
             "gen_and_stage_login_dot_gov_cert",
             test_token,
+            test_organization_name,
             test_space_name,
             test_service_instance_name,
         )
@@ -154,6 +170,7 @@ class LoginDotGovUtilsTestCase(TestCase):
         rsa_pk_to_bytes_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
@@ -164,7 +181,11 @@ class LoginDotGovUtilsTestCase(TestCase):
             "Failed stage login dot gov pk",
         ):
             stage_login_dot_gov_pk(
-                test_token, test_space_name, test_service_instance_name, rsa_pk_mock
+                test_token,
+                test_organization_name,
+                test_space_name,
+                test_service_instance_name,
+                rsa_pk_mock,
             )
 
     @patch("fecfiler.devops.utils.crypt_utils.rsa_pk_to_bytes")
@@ -177,11 +198,16 @@ class LoginDotGovUtilsTestCase(TestCase):
         rsa_pk_to_bytes_mock,
     ):
         test_token = "test_token"
+        test_organization_name = "test_organization_name"
         test_space_name = "test_space_name"
         test_service_instance_name = "test_service_instance_name"
 
         stage_login_dot_gov_pk(
-            test_token, test_space_name, test_service_instance_name, rsa_pk_mock
+            test_token,
+            test_organization_name,
+            test_space_name,
+            test_service_instance_name,
+            rsa_pk_mock,
         )
 
         update_credentials_mock.assert_called_once()
@@ -215,4 +241,27 @@ class LoginDotGovUtilsTestCase(TestCase):
         test_bytes = b"test_bytes"
         x509_cert_to_bytes_mock.return_value = test_bytes
         stage_login_dot_gov_cert(x509_mock)
+        self.assertEqual(True, True)
+
+    # cleanup_login_dot_gov_certs
+
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.S3_SESSION")
+    def test_cleanup_login_dot_gov_certs_throws_exception(
+        self,
+        s3_session_mock,
+    ):
+        s3_session_mock.Bucket.side_effect = Exception("FAIL")
+
+        with self.assertRaisesMessage(
+            Exception,
+            "Failed cleanup login dot x509 certs",
+        ):
+            cleanup_login_dot_gov_certs()
+
+    @patch("fecfiler.devops.utils.login_dot_gov_cert_utils.S3_SESSION")
+    def test_cleanup_login_dot_gov_certs_happy_path(
+        self,
+        s3_session_mock,
+    ):
+        cleanup_login_dot_gov_certs()
         self.assertEqual(True, True)

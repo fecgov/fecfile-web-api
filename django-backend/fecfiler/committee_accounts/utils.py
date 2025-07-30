@@ -22,57 +22,57 @@ PRODUCTION_PAC_COMMITTEE_TYPES = ["O", "U", "D", "N", "Q", "V", "W"]
 PRODUCTION_QUALIFIED_COMMITTEES = ["Q", "W", "Y"]
 
 
-def check_email_match(email, f1_emails):
+def check_user_email_matches_committee_email(user_email, committee_emails):
     """
     Check if the provided email matches any of the committee emails.
 
     Args:
-        email (str): The email to be checked.
-        f1_emails (str): A string containing a list of committee emails separated
+        user_email (str): The email to be checked.
+        committee_emails (str): A string containing a list of committee emails separated
         by commas or semicolons.
 
     Returns:
-        str or None: If the provided email does not match any of the committee emails,
-        returns a string indicating the mismatch. Otherwise, returns None.
+        True if the user email matches a commmittee email and False otherwise.
     """
-    if not f1_emails:
-        return "No email provided in F1"
-    else:
-        f1_email_lowercase = f1_emails.lower()
-        f1_emails = re.split(r"[;,]", f1_email_lowercase)
-        if email.lower() not in f1_emails:
-            return "Email does not match committee email"
-    return None
+    if user_email and committee_emails:
+        committee_emails_lowercase = committee_emails.lower()
+        committee_emails_list = re.split(r"[;,]", committee_emails_lowercase)
+        if user_email.lower() in committee_emails_list:
+            return True
+    return False
 
 
-def check_can_create_committee_account(committee_id, user):
-    email = user.email
+def raise_if_cannot_create_committee_account(committee_id, user):
+    user_email = user.email
+    try:
+        committee_emails = get_committee_emails(committee_id)
+    except Exception as e:
+        raise ValidationError(
+            "Call to retrieve form 1 committee emails failed: " + str(e)
+        )
+    if not committee_emails:
+        raise ValidationError("No form 1 found for committee")
 
-    committee_emails = get_committee_emails(committee_id)
-    failure_reason = check_email_match(email, committee_emails)
+    if not check_user_email_matches_committee_email(user_email, committee_emails):
+        raise ValidationError("User email does not match committee email")
 
     existing_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if existing_account:
-        failure_reason = f"Committee account {committee_id} already created"
-
-    if failure_reason:
-        logger.error(
-            f"User {user.id} failed to create committee account: {failure_reason}"
-        )
-        return False
-
-    return True
+        raise ValidationError("Committee account already exists")
 
 
 def create_committee_account(committee_id, user):
-    if not check_can_create_committee_account(committee_id, user):
-        raise ValidationError("could not create committee account")
+    raise_if_cannot_create_committee_account(committee_id, user)
 
     account = CommitteeAccount.objects.create(committee_id=committee_id)
     Membership.objects.create(
         committee_account=account,
         user=user,
         role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+    )
+
+    logger.info(
+        f"User {user.email} successfully created committee account {committee_id}"
     )
 
     return account
@@ -109,6 +109,7 @@ def query_fec_api(endpoint, params):
     """Shared method to query an EFO API"""
     headers = {"Content-Type": "application/json"}
     response = requests.get(endpoint, headers=headers, params=params)
+    response.raise_for_status()
     response_data = response.json()
     committee_results = response_data.get("results", [])
     return committee_results[0] if committee_results else None
@@ -205,15 +206,15 @@ def get_raw_committee_data(committee_id):
 def is_production_efo_pty(committee_data):
     designation = committee_data.get("designation", None)
     committee_type = committee_data.get("committee_type", None)
-    return designation is not None and (
-        committee_type == "Y" or committee_type == "X")
+    return designation is not None and (committee_type == "Y" or committee_type == "X")
 
 
 def is_production_efo_pac(committee_data):
     designation = committee_data.get("designation", None)
     committee_type = committee_data.get("committee_type", None)
     return committee_type in PRODUCTION_PAC_COMMITTEE_TYPES or (
-        committee_type == "X" and designation == "U")
+        committee_type == "X" and designation == "U"
+    )
 
 
 """

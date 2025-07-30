@@ -1,7 +1,7 @@
 from django.test import TestCase
 from fecfiler.committee_accounts.utils import (
     create_committee_account,
-    check_email_match,
+    check_user_email_matches_committee_email,
     get_committee_account_data,
     get_committee_emails,
     get_production_committee_emails,
@@ -43,16 +43,16 @@ class CommitteeAccountsUtilsTest(TestCase):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
-            self.assertEquals(account.committee_id, "C12345678")
+            self.assertEqual(account.committee_id, "C12345678")
 
     def test_create_committee_account_existing(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
-            self.assertEquals(account.committee_id, "C12345678")
+            self.assertEqual(account.committee_id, "C12345678")
             self.assertRaisesMessage(
                 Exception,
-                self.create_error_message,
+                "Committee account already exists",
                 create_committee_account,
                 committee_id="C12345678",
                 user=self.test_user,
@@ -63,7 +63,7 @@ class CommitteeAccountsUtilsTest(TestCase):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             self.assertRaisesMessage(
                 Exception,
-                self.create_error_message,
+                "User email does not match committee email",
                 create_committee_account,
                 committee_id="C12345678",
                 user=self.other_user,
@@ -74,44 +74,42 @@ class CommitteeAccountsUtilsTest(TestCase):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             self.test_user.email = self.test_user.email.upper()
             account = create_committee_account("C12345678", self.test_user)
-            self.assertEquals(account.committee_id, "C12345678")
+            self.assertEqual(account.committee_id, "C12345678")
             self.assertRaisesMessage(
                 Exception,
-                self.create_error_message,
+                "Committee account already exists",
                 create_committee_account,
                 committee_id="C12345678",
                 user=self.test_user,
             )
 
-    # check_email_match
+    # check_user_email_matches_committee_email
 
     def test_no_f1_email(self):
-        result = check_email_match("email3@example.com", None)
-        self.assertEqual(result, "No email provided in F1")
+        result = check_user_email_matches_committee_email("email3@example.com", None)
+        self.assertEqual(result, False)
 
     def test_no_match(self):
         f1_emails = "email1@example.com;email2@example.com"
-        result = check_email_match("email3@example.com", f1_emails)
-        self.assertEqual(
-            result, "Email does not match committee email"
-        )
+        result = check_user_email_matches_committee_email("email3@example.com", f1_emails)
+        self.assertEqual(result, False)
 
     def test_match_semicolon(self):
         f1_emails = "email1@example.com;email2@example.com"
-        result = check_email_match("email1@example.com", f1_emails)
-        self.assertIsNone(result)
-        result = check_email_match("email2@example.com", f1_emails)
-        self.assertIsNone(result)
+        result = check_user_email_matches_committee_email("email1@example.com", f1_emails)
+        self.assertEqual(result, True)
+        result = check_user_email_matches_committee_email("email2@example.com", f1_emails)
+        self.assertEqual(result, True)
 
     def test_match_comma(self):
         f1_emails = "email1@example.com,email2@example.com"
-        result = check_email_match("email2@example.com", f1_emails)
-        self.assertIsNone(result)
+        result = check_user_email_matches_committee_email("email2@example.com", f1_emails)
+        self.assertEqual(result, True)
 
     def test_email_matching_case_insensitive(self):
         f1_emails = "email1@example.com;email2@example.com"
-        result = check_email_match("EMAIL1@example.com", f1_emails)
-        self.assertIsNone(result)
+        result = check_user_email_matches_committee_email("EMAIL1@example.com", f1_emails)
+        self.assertEqual(result, True)
 
     """
     GET COMMITTEE EMAILS

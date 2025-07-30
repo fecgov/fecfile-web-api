@@ -15,6 +15,8 @@ class Form3X(models.Model):
         serialize=False,
         unique=True,
     )
+    filing_frequency = models.TextField(null=True, blank=True)
+    report_type_category = models.TextField(null=True, blank=True)
     change_of_address = models.BooleanField(default=False, null=True, blank=True)
 
     election_code = models.TextField(null=True, blank=True)

@@ -51,13 +51,14 @@ services:
             AWS_SECRET_ACCESS_KEY:
             AWS_STORAGE_BUCKET_NAME:
             AWS_REGION:
-            CELERY_WORKER_STORAGE:
+            CELERY_WORKER_STORAGE: local
             MOCK_EFO_FILING: True
             EFO_FILING_API: https://efoservices.stage.efo.fec.gov
             EFO_FILING_API_KEY:
             FEC_AGENCY_ID:
             OUTPUT_TEST_INFO_IN_DOT_FEC:
             LOG_FORMAT:
+            ENABLE_PL_SQL_LOGGING: False # Django DEBUG base.py setting must also be set to True to see SQL output
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
             FEC_FORMAT_VERSION: 8.4
@@ -93,13 +94,14 @@ services:
             AWS_SECRET_ACCESS_KEY:
             AWS_STORAGE_BUCKET_NAME:
             AWS_REGION:
-            CELERY_WORKER_STORAGE:
+            CELERY_WORKER_STORAGE: local
             MOCK_EFO_FILING: True
             EFO_FILING_API: https://efoservices.stage.efo.fec.gov
             EFO_FILING_API_KEY:
             FEC_AGENCY_ID:
             OUTPUT_TEST_INFO_IN_DOT_FEC:
             LOG_FORMAT:
+            ENABLE_PL_SQL_LOGGING: False # Django DEBUG base.py setting must also be set to True to see SQL output
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
             FEC_FORMAT_VERSION: 8.4
@@ -131,6 +133,7 @@ services:
             DJANGO_SECRET_KEY:
             FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
             MOCK_OIDC_PROVIDER: True
+            FFAPI_TIMEOUT_COOKIE_NAME: ffapi_timeout_local
             OIDC_RP_CLIENT_ID:
             OIDC_RP_CLIENT_SECRET:
             LOGIN_REDIRECT_SERVER_URL: http://localhost:8080/api/v1/oidc/login-redirect
@@ -141,7 +144,7 @@ services:
             AWS_SECRET_ACCESS_KEY:
             AWS_STORAGE_BUCKET_NAME:
             AWS_REGION:
-            CELERY_WORKER_STORAGE:
+            CELERY_WORKER_STORAGE: local
             MOCK_EFO_FILING: True
             EFO_FILING_API: https://efoservices.stage.efo.fec.gov
             EFO_FILING_API_KEY:
@@ -152,6 +155,7 @@ services:
             STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
             STAGE_OPEN_FEC_API_KEY: DEMO_KEY
             LOG_FORMAT:
+            ENABLE_PL_SQL_LOGGING: False # Django DEBUG base.py setting must also be set to True to see SQL output
             FECFILE_GITHUB_TOKEN:
             OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
             INITIAL_POLLING_INTERVAL: 10
@@ -188,7 +192,8 @@ services:
             - '8089:8089'
         volumes:
             - ./:/mnt/locust
-        command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api:8080
+        command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
+        #command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080
         profiles: [locust]
         environment:
             LOCAL_TEST_USER:

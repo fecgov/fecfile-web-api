@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import User
+from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 
 
@@ -15,7 +15,7 @@ class UserModelTestCase(TestCase):
             pending_email="test_1234@test.com",
         )
 
-        self.assertEquals(
+        self.assertEqual(
             Membership.objects.get(pending_email="test_1234@test.com").user, None
         )
 
@@ -24,5 +24,5 @@ class UserModelTestCase(TestCase):
         )
 
         pending_membership.refresh_from_db()
-        self.assertEquals(pending_membership.user, new_user)
-        self.assertEquals(pending_membership.pending_email, None)
+        self.assertEqual(pending_membership.user, new_user)
+        self.assertEqual(pending_membership.pending_email, None)

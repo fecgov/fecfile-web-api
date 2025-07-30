@@ -1,11 +1,11 @@
 from decimal import Decimal
 from django.test import TestCase
 from fecfiler.committee_accounts.models import CommitteeAccount
-from .summary import SummaryService
 from fecfiler.reports.tests.utils import create_form3x
 from datetime import datetime
+from fecfiler.reports.form_3x.summary import calculate_summary_columns
 from fecfiler.contacts.tests.utils import create_test_individual_contact
-from .tests.utils import generate_data
+from fecfiler.web_services.summary.tests.utils import generate_data
 from fecfiler.cash_on_hand.tests.utils import create_cash_on_hand_yearly
 
 
@@ -32,8 +32,7 @@ class F3XReportTestCase(TestCase):
         self.debt = generate_data(
             self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e", "f"]
         )
-        summary_service = SummaryService(f3x)
-        summary_a, _ = summary_service.calculate_summary_columns()
+        summary_a, _ = calculate_summary_columns(f3x)
 
         self.assertEqual(summary_a["line_6c"], Decimal("18085.17"))
         self.assertEqual(
@@ -134,8 +133,7 @@ class F3XReportTestCase(TestCase):
         self.debt = generate_data(
             self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e", "f"]
         )
-        summary_service = SummaryService(f3x)
-        _, summary_b = summary_service.calculate_summary_columns()
+        _, summary_b = calculate_summary_columns(f3x)
 
         self.assertIsNotNone(self.debt)
         if self.debt is not None:
@@ -227,8 +225,7 @@ class F3XReportTestCase(TestCase):
             datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
             datetime.strptime("2024-02-01", "%Y-%m-%d").date(),
         )
-        summary_service = SummaryService(f3x)
-        summary_a, _ = summary_service.calculate_summary_columns()
+        summary_a, _ = calculate_summary_columns(f3x)
         self.assertEqual(summary_a["line_15"], Decimal("0"))
         self.assertEqual(summary_a["line_17"], Decimal("0"))
 
@@ -238,6 +235,5 @@ class F3XReportTestCase(TestCase):
             datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
             datetime.strptime("2024-02-01", "%Y-%m-%d").date(),
         )
-        summary_service = SummaryService(f3x)
-        summary_a, _ = summary_service.calculate_summary_columns()
+        summary_a, _ = calculate_summary_columns(f3x)
         self.assertTrue("line_8" in summary_a)

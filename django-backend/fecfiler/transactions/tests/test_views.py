@@ -1,9 +1,6 @@
 from decimal import Decimal
-from django.test import TestCase
-from django.test.client import RequestFactory
 from rest_framework import status
 from rest_framework.request import HttpRequest, Request
-from rest_framework.test import force_authenticate
 from fecfiler.user.models import User
 from fecfiler.reports.models import Report
 import json
@@ -24,14 +21,17 @@ from fecfiler.transactions.tests.utils import (
     create_loan,
     create_debt,
     create_ie,
+    create_schedule_f,
+    gen_schedule_f_request_data,
 )
 from fecfiler.transactions.serializers import TransactionSerializer
+from fecfiler.shared.viewset_test import FecfilerViewSetTest
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
-class TransactionViewsTestCase(TestCase):
+class TransactionViewsTestCase(FecfilerViewSetTest):
 
     json_content_type = "application/json"
 
@@ -40,13 +40,21 @@ class TransactionViewsTestCase(TestCase):
         return super().setUpClass()
 
     def setUp(self):
-        self.factory = RequestFactory()
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.user = User.objects.create(email="test@fec.gov", username="gov")
+        super().set_default_user(self.user)
+        super().set_default_committee(self.committee)
+        super().setUp()
+
         self.q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.q2_report = create_form3x(self.committee, "2024-02-02", "2024-03-01", {})
         self.contact_1 = create_test_individual_contact(
-            "last name", "First name", self.committee.id
+            "last name", "First name", self.committee.id, {
+                "street_1": "123 test street",
+                "city": "testville",
+                "state": "AK",
+                "zip": "12345",
+            }
         )
         self.contact_2 = create_test_candidate_contact(
             "last name", "First name", self.committee.id, "H8MA03131", "S", "AK", "01"
@@ -55,12 +63,13 @@ class TransactionViewsTestCase(TestCase):
             "last name",
             "First name",
             self.committee.id,
-            {
-                "street_1": "Test St",
-                "city": "Testville",
-                "state": "IL",
-                "zip": "12345"
-            }
+            {"street_1": "Test St", "city": "Testville", "state": "IL", "zip": "12345"},
+        )
+        self.contact_comm = create_test_committee_contact(
+            "TEST COMMITTEES UNITED",
+            "C12344321",
+            self.committee.id,
+            {"street_1": "Test St", "city": "Testville", "state": "IL", "zip": "12345"},
         )
         self.transaction = create_ie(
             self.committee,
@@ -96,20 +105,12 @@ class TransactionViewsTestCase(TestCase):
 
         self.ordering_filter = TransactionOrderingFilter()
         self.view = TransactionViewSet()
-
-        request = self.factory.get(
-            "/api/v1/transactions/",
-            content_type=self.json_content_type,
+        self.view.request = self.get_request(
+            params={
+                "ordering": "memo_code",
+                "report_id": self.q1_report.id,
+            }
         )
-        request.query_params = {
-            "ordering": "memo_code",
-            "report_id": self.q1_report.id,
-        }
-        request.session = {
-            "committee_uuid": self.committee.id,
-            "committee_id": self.committee.committee_id,
-        }
-        self.view.request = request
 
         self.test_com_contact = create_test_committee_contact(
             "test-com-name1",
@@ -168,40 +169,23 @@ class TransactionViewsTestCase(TestCase):
         )
 
     def post_request(self, payload, params={}):
-        request = self.factory.post(
-            "/api/v1/transactions",
-            json.dumps(payload, default=str),
-            content_type=self.json_content_type,
+        request = self.build_viewset_post_request(
+            "/api/v1/transactions", json.dumps(payload, default=str)
         )
-        request.user = self.user
         request.data = deepcopy(payload)
         request.query_params = params
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
         return request
 
     def delete_request(self, path="api/v1/transactions", params={}):
-        request = self.factory.delete(path)
-        request.user = self.user
+        request = self.build_viewset_delete_request(path)
         request.query_params = params
         request.data = {}
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
         return request
 
     def get_request(self, path="api/v1/transactions", params={}):
-        request = self.factory.get(path)
-        request.user = self.user
+        request = self.build_viewset_get_request(path)
         request.query_params = params
         request.data = {}
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
         return request
 
     def test_save_transaction_pair(self):
@@ -363,8 +347,8 @@ class TransactionViewsTestCase(TestCase):
                 },
             )
         )
-        self.assertEqual(response.data['id'], str(second_transaction.id))
-        self.assertEqual(response.data['aggregate'], '47.00')
+        self.assertEqual(response.data["id"], str(second_transaction.id))
+        self.assertEqual(response.data["aggregate"], "47.00")
 
         transaction_data = {
             **self.transaction_serializer.to_representation(first_transaction),
@@ -372,17 +356,14 @@ class TransactionViewsTestCase(TestCase):
                 "contribution_date": "2023-01-15",
                 "schedule_id": "A",
                 "schema_name": "INDIVIDUAL_RECEIPT",
-                "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
+                "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             },
         }
 
-        view_set.save_transaction(
-            transaction_data,
-            view_set.request
-        )
+        view_set.save_transaction(transaction_data, view_set.request)
 
         saved_transaction = view_set.get_queryset().get(id=first_transaction.id)
-        self.assertEqual(str(saved_transaction.aggregate), '200.00')
+        self.assertEqual(str(saved_transaction.aggregate), "200.00")
 
     def test_get_entity_date_leapfrogging_and_contact_change(self):
         view_set = TransactionViewSet()
@@ -425,22 +406,19 @@ class TransactionViewsTestCase(TestCase):
                 "contributor_street_1": "Test",
                 "contributor_city": "Testville",
                 "contributor_state": "IL",
-                "contributor_zip": "12345"
+                "contributor_zip": "12345",
             },
         }
 
-        view_set.save_transaction(
-            transaction_data,
-            view_set.request
-        )
+        view_set.save_transaction(transaction_data, view_set.request)
 
         first_transaction.refresh_from_db()
         second_transaction.refresh_from_db()
         third_transaction.refresh_from_db()
 
-        self.assertEqual(str(first_transaction.aggregate), '153.00')
-        self.assertEqual(str(second_transaction.aggregate), '47.00')
-        self.assertEqual(str(third_transaction.aggregate), '178.00')
+        self.assertEqual(str(first_transaction.aggregate), "153.00")
+        self.assertEqual(str(second_transaction.aggregate), "47.00")
+        self.assertEqual(str(third_transaction.aggregate), "178.00")
 
     def test_get_entity_move_date_backwards(self):
         view_set = TransactionViewSet()
@@ -490,17 +468,14 @@ class TransactionViewsTestCase(TestCase):
                 "contribution_date": "2023-01-10",
                 "schedule_id": "A",
                 "schema_name": "INDIVIDUAL_RECEIPT",
-                "transaction_type_identifier": "INDIVIDUAL_RECEIPT"
+                "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
             },
         }
 
-        view_set.save_transaction(
-            transaction_data,
-            view_set.request
-        )
+        view_set.save_transaction(transaction_data, view_set.request)
 
         saved_transaction = view_set.get_queryset().get(id=first_transaction.id)
-        self.assertEqual(str(saved_transaction.aggregate), '178.00')
+        self.assertEqual(str(saved_transaction.aggregate), "178.00")
         response = view_set.previous_transaction_by_entity(
             self.post_request(
                 {},
@@ -512,15 +487,15 @@ class TransactionViewsTestCase(TestCase):
                 },
             )
         )
-        self.assertEqual(response.data['id'], str(third_transaction.id))
+        self.assertEqual(response.data["id"], str(third_transaction.id))
 
         first_transaction.refresh_from_db()
         second_transaction.refresh_from_db()
         third_transaction.refresh_from_db()
 
-        self.assertEqual(str(first_transaction.aggregate), '178.00')
-        self.assertEqual(str(second_transaction.aggregate), '225.00')
-        self.assertEqual(str(third_transaction.aggregate), '25.00')
+        self.assertEqual(str(first_transaction.aggregate), "178.00")
+        self.assertEqual(str(second_transaction.aggregate), "225.00")
+        self.assertEqual(str(third_transaction.aggregate), "25.00")
 
     def test_get_previous_election(self):
         view_set = TransactionViewSet()
@@ -590,19 +565,12 @@ class TransactionViewsTestCase(TestCase):
         self.assertEqual(transaction.get("calendar_ytd_per_election_office"), "147.00")
 
     def test_inherited_election_aggregate(self):
-        request = self.factory.get(f"/api/v1/transactions/{self.transaction.id}/")
-        request.user = self.user
-        request.query_params = {}
-        request.data = {}
-        request.session = {
-            "committee_uuid": str(self.committee.id),
-            "committee_id": str(self.committee.committee_id),
-        }
-
-        view = TransactionViewSet
-        view.request = request
-
-        response = view.as_view({"get": "retrieve"})(request, pk=str(self.transaction.id))
+        response = self.send_viewset_get_request(
+            f"/api/v1/transactions/{self.transaction.id}/",
+            TransactionViewSet,
+            "retrieve",
+            pk=str(self.transaction.id),
+        )
         transaction = response.data
         logger.debug(transaction)
         self.assertEqual(transaction.get("_calendar_ytd_per_election_office"), "153.00")
@@ -859,10 +827,11 @@ class TransactionViewsTestCase(TestCase):
             self.assertEqual(ordered_queryset[i].id, memos_sorted[i].id)
 
     def test_destroy(self):
-        request = self.delete_request(f"api/v1/transactions/{self.transaction.id}/")
-        force_authenticate(request, self.user)
-        response = TransactionViewSet.as_view({"delete": "destroy"})(
-            request, pk=self.transaction.id
+        response = self.send_viewset_delete_request(
+            f"api/v1/transactions/{self.transaction.id}/",
+            TransactionViewSet,
+            "destroy",
+            pk=self.transaction.id,
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Transaction.objects.filter(pk=self.transaction.pk).exists())
@@ -895,10 +864,11 @@ class TransactionViewsTestCase(TestCase):
             "100",
             parent_id=partnership_memo.id,
         )
-        get_request = self.get_request(f"api/v1/transactions/{partnership_memo.id}/")
-        force_authenticate(get_request, self.user)
-        response = TransactionViewSet.as_view({"get": "retrieve"})(
-            get_request, pk=partnership_memo.id
+        response = self.send_viewset_get_request(
+            f"api/v1/transactions/{partnership_memo.id}/",
+            TransactionViewSet,
+            "retrieve",
+            pk=partnership_memo.id,
         )
         self.assertEqual(
             response.data["contribution_purpose_descrip"],
@@ -906,17 +876,19 @@ class TransactionViewsTestCase(TestCase):
         )
 
         # If we delete the attribution memo, the parent memo should be updated
-        delete_request = self.delete_request(
-            f"api/v1/transactions/{partnership_attribution_memo.id}/"
-        )
-        force_authenticate(delete_request, self.user)
-        response = TransactionViewSet.as_view({"delete": "destroy"})(
-            delete_request, pk=partnership_attribution_memo.id
+        response = self.send_viewset_delete_request(
+            f"api/v1/transactions/{partnership_attribution_memo.id}/",
+            TransactionViewSet,
+            "destroy",
+            pk=partnership_attribution_memo.id,
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-        response = TransactionViewSet.as_view({"get": "retrieve"})(
-            get_request, pk=partnership_memo.id
+        response = self.send_viewset_get_request(
+            f"api/v1/transactions/{partnership_memo.id}/",
+            TransactionViewSet,
+            "retrieve",
+            pk=partnership_memo.id,
         )
         self.assertEqual(
             response.data["contribution_purpose_descrip"],
@@ -1197,6 +1169,34 @@ class TransactionViewsTestCase(TestCase):
             Transaction.all_objects.get(pk=test_q2_carried_over_debt.id).deleted
         )
 
+    def test_create_schedule_f_debt_repayment(self):
+        """Making a schedule f debt repayment should reduce the balance accordingly"""
+        # create q1 and associated debt
+        test_q1_report_2025 = create_form3x(
+            self.committee, "2025-01-01", "2025-03-31", {}
+        )
+        test_debt = create_debt(
+            self.committee,
+            self.test_org_contact,
+            "1000.00",
+            report=test_q1_report_2025,
+        )
+        # pay off debt on q2 and confirm q3 carry foward debt deleted
+        test_schedule_f_debt_repayment = self.create_schedule_f_debt_repayment_payload(
+            test_debt,
+            test_q1_report_2025,
+            "2025-04-03",
+            150.00,
+        )
+        response = self.view.create(
+            self.post_request(test_schedule_f_debt_repayment)
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            Transaction.objects.transaction_view().get(pk=test_debt.id).balance_at_close,
+            850.00,
+        )
+
     def create_loan_repayment_payload(
         self,
         loan: Transaction,
@@ -1232,3 +1232,505 @@ class TransactionViewsTestCase(TestCase):
         debt_repayment_payload["expenditure_date"] = repayment_date
         debt_repayment_payload["expenditure_amount"] = repayment_amount
         return debt_repayment_payload
+
+    def create_schedule_f_debt_repayment_payload(
+        self,
+        debt: Transaction,
+        report: Report,
+        repayment_date: str,
+        repayment_amount: int,
+    ):
+        debt_representation = self.transaction_serializer.to_representation(debt)
+        schedule_f_debt_repayment_payload = deepcopy(
+            self.payloads["COORDINATED_PARTY_EXPENDITURE"]
+        )
+        schedule_f_debt_repayment_payload["contact_1"] = debt_representation["contact_1"]
+        schedule_f_debt_repayment_payload["contact_1_id"] = debt_representation[
+            "contact_1_id"
+        ]
+        schedule_f_debt_repayment_payload["debt"] = debt_representation
+        schedule_f_debt_repayment_payload["debt_id"] = debt_representation["id"]
+        schedule_f_debt_repayment_payload["report_ids"] = [str(report.id)]
+        schedule_f_debt_repayment_payload["expenditure_date"] = repayment_date
+        schedule_f_debt_repayment_payload["expenditure_amount"] = repayment_amount
+        return schedule_f_debt_repayment_payload
+
+    def test_schedule_f_aggregation(self):
+        report = create_form3x(
+            self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
+        )
+        contact_org = create_test_organization_contact(
+            "Testerson Inc.",
+            self.committee.id,
+            {
+                "city": "Testville",
+                "country": "USA",
+                "state": "AK",
+                "street_1": "1234 Test Ln",
+                "street_2": None,
+                "telephone": None,
+                "zip": "12345"
+            }
+        )
+        contact_can = create_test_candidate_contact(
+            "Testerson",
+            "Philip",
+            self.committee.id,
+            "S6MT00162",
+            "S",
+            "MT",
+            None,
+            {
+                "city": "HELENA",
+                "country": "USA",
+                "employer": None,
+                "middle_name": None,
+                "occupation": None,
+                "prefix": None,
+                "state": "MT",
+                "street_1": "PO BOX 1135",
+                "street_2": None,
+                "suffix": None,
+                "telephone": None,
+                "zip": "59624"
+            }
+        )
+        contact_can_2 = create_test_candidate_contact(
+            "Testerson",
+            "George",
+            self.committee.id,
+            "S6MT00163",
+            "S",
+            "MT",
+            None,
+            {
+                "city": "HELENA",
+                "country": "USA",
+                "employer": None,
+                "middle_name": None,
+                "occupation": None,
+                "prefix": None,
+                "state": "MT",
+                "street_1": "PO BOX 1135",
+                "street_2": None,
+                "suffix": None,
+                "telephone": None,
+                "zip": "59624"
+            }
+        )
+        contact_com = create_test_committee_contact(
+            "Testersons United",
+            "C12344321",
+            self.committee.id,
+            {
+                "city": "BILLINGS",
+                "country": "USA",
+                "state": "MT",
+                "street_1": "PO BOX 558",
+                "telephone": "+1 3144010501",
+                "zip": "59103"
+            }
+        )
+        self.view.request.query_params["report_id"] = report.id
+
+        a = create_schedule_f(
+            type="COORDINATED_PARTY_EXPENDITURE",
+            committee=self.committee,
+            contact_1=contact_org,
+            contact_2=contact_can,
+            contact_3=contact_com,
+            report=report,
+            schedule_data={
+                "expenditure_amount": 125.00,
+                "expenditure_date": "2023-02-11",
+                "general_election_year": "2024"
+            }
+        )
+        b = create_schedule_f(
+            type="COORDINATED_PARTY_EXPENDITURE",
+            committee=self.committee,
+            contact_1=contact_org,
+            contact_2=contact_can,
+            contact_3=contact_com,
+            report=report,
+            schedule_data={
+                "expenditure_amount": 75.00,
+                "expenditure_date": "2023-02-15",
+                "general_election_year": "2024"
+            }
+        )
+        c = create_schedule_f(
+            type="COORDINATED_PARTY_EXPENDITURE",
+            committee=self.committee,
+            contact_1=contact_org,
+            contact_2=contact_can_2,
+            contact_3=contact_com,
+            report=report,
+            schedule_data={
+                "expenditure_amount": 100.00,
+                "expenditure_date": "2023-02-20",
+                "general_election_year": "2024"
+            }
+        )
+        d = create_schedule_f(
+            type="COORDINATED_PARTY_EXPENDITURE",
+            committee=self.committee,
+            contact_1=contact_org,
+            contact_2=contact_can,
+            contact_3=contact_com,
+            report=report,
+            schedule_data={
+                "expenditure_amount": 50.00,
+                "expenditure_date": "2023-02-25",
+                "general_election_year": "2024"
+            }
+        )
+
+        trans_a = Transaction.objects.get(id=a.id)
+        trans_b = Transaction.objects.get(id=b.id)
+        trans_c = Transaction.objects.get(id=c.id)
+        trans_d = Transaction.objects.get(id=d.id)
+
+        self.assertEqual(trans_a.schedule_f.general_election_year, "2024")
+        self.assertEqual(trans_a.schedule_f.expenditure_amount, 125.00)
+
+        self.view.process_aggregation_by_payee_candidate(trans_c)
+        self.view.process_aggregation_by_payee_candidate(trans_a)
+
+        trans_b.refresh_from_db()
+        self.assertEqual(trans_b.schedule_f.aggregate_general_elec_expended, 200.00)
+
+        trans_c.refresh_from_db()
+        self.assertEqual(trans_c.schedule_f.aggregate_general_elec_expended, 100.00)
+
+        trans_d.refresh_from_db()
+        self.assertEqual(trans_d.schedule_f.aggregate_general_elec_expended, 250.00)
+
+    def test_schedule_f_aggregation_edge_cases(self):
+        report = create_form3x(
+            self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
+        )
+        contact_org = create_test_organization_contact(
+            "Testerson Inc.",
+            self.committee.id,
+            {
+                "city": "Testville",
+                "country": "USA",
+                "state": "AK",
+                "street_1": "1234 Test Ln",
+                "street_2": None,
+                "telephone": None,
+                "zip": "12345"
+            }
+        )
+        contact_can = create_test_candidate_contact(
+            "Testerson",
+            "Philip",
+            self.committee.id,
+            "S6MT00162",
+            "S",
+            "MT",
+            None,
+            {
+                "city": "HELENA",
+                "country": "USA",
+                "employer": None,
+                "middle_name": None,
+                "occupation": None,
+                "prefix": None,
+                "state": "MT",
+                "street_1": "PO BOX 1135",
+                "street_2": None,
+                "suffix": None,
+                "telephone": None,
+                "zip": "59624"
+            }
+        )
+        contact_com = create_test_committee_contact(
+            "Testersons United",
+            "C12344321",
+            self.committee.id,
+            {
+                "city": "BILLINGS",
+                "country": "USA",
+                "state": "MT",
+                "street_1": "PO BOX 558",
+                "telephone": "+1 3144010501",
+                "zip": "59103"
+            }
+        )
+
+        transaction_1_data = gen_schedule_f_request_data(
+            str(report.id),
+            "153.00",
+            "2024-01-12",
+            "2022",
+            contact_org,
+            contact_can,
+            contact_com
+        )
+        transaction_2_data = gen_schedule_f_request_data(
+            str(report.id),
+            "47.00",
+            "2024-01-13",
+            "2022",
+            contact_org,
+            contact_can,
+            contact_com
+        )
+
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+        view_set.request = self.post_request(transaction_1_data)
+
+        # Test standard aggregation
+        transaction_1 = view_set.save_transaction(transaction_1_data, view_set.request)
+        transaction_2 = view_set.save_transaction(transaction_2_data, view_set.request)
+
+        self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 153.00)
+        self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 200.00)
+
+        # Test leapfrogging forward
+        move_transaction_1_data = {
+            **transaction_1_data,
+            "expenditure_date": "2024-01-15",
+            "id": transaction_1.id
+        }
+
+        transaction_1 = view_set.save_transaction(
+            move_transaction_1_data,
+            view_set.request
+        )
+        transaction_2.refresh_from_db()
+
+        self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 200.00)
+        self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 47.00)
+
+        # Test leapfrogging backward
+        move_transaction_1_again_data = {
+            **move_transaction_1_data,
+            "expenditure_date": "2024-01-10",
+        }
+
+        transaction_1 = view_set.save_transaction(
+            move_transaction_1_again_data,
+            view_set.request
+        )
+        transaction_2.refresh_from_db()
+
+        self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 153.00)
+        self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 200.00)
+
+        # Test change GE year
+        change_ge_transaction_1_data = {
+            **move_transaction_1_again_data,
+            "general_election_year": "1999",
+        }
+
+        transaction_1 = view_set.save_transaction(
+            change_ge_transaction_1_data,
+            view_set.request
+        )
+        transaction_2.refresh_from_db()
+
+        self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 153.00)
+        self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 47.00)
+
+        # Test change GE year back
+        change_ge_transaction_1_back_data = {
+            **move_transaction_1_again_data,
+            "general_election_year": "2022",
+        }
+
+        transaction_1 = view_set.save_transaction(
+            change_ge_transaction_1_back_data,
+            view_set.request
+        )
+        transaction_2.refresh_from_db()
+
+        self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 153.00)
+        self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 200.00)
+
+    def test_previous_transaction_by_payee_candidate(self):
+        report = create_form3x(
+            self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
+        )
+        contact_org = create_test_organization_contact(
+            "Testerson Inc.",
+            self.committee.id,
+            {
+                "city": "Testville",
+                "country": "USA",
+                "state": "AK",
+                "street_1": "1234 Test Ln",
+                "street_2": None,
+                "telephone": None,
+                "zip": "12345"
+            }
+        )
+        contact_can = create_test_candidate_contact(
+            "Testerson",
+            "Philip",
+            self.committee.id,
+            "S6MT00162",
+            "S",
+            "MT",
+            None,
+            {
+                "city": "HELENA",
+                "country": "USA",
+                "employer": None,
+                "middle_name": None,
+                "occupation": None,
+                "prefix": None,
+                "state": "MT",
+                "street_1": "PO BOX 1135",
+                "street_2": None,
+                "suffix": None,
+                "telephone": None,
+                "zip": "59624"
+            }
+        )
+        contact_com = create_test_committee_contact(
+            "Testersons United",
+            "C12344321",
+            self.committee.id,
+            {
+                "city": "BILLINGS",
+                "country": "USA",
+                "state": "MT",
+                "street_1": "PO BOX 558",
+                "telephone": "+1 3144010501",
+                "zip": "59103"
+            }
+        )
+
+        transaction_1_data = gen_schedule_f_request_data(
+            str(report.id),
+            "153.00",
+            "2024-01-12",
+            "2022",
+            contact_org,
+            contact_can,
+            contact_com
+        )
+        transaction_2_data = gen_schedule_f_request_data(
+            str(report.id),
+            "47.00",
+            "2024-01-13",
+            "2022",
+            contact_org,
+            contact_can,
+            contact_com
+        )
+        transaction_3_data = gen_schedule_f_request_data(
+            str(report.id),
+            "25.00",
+            "2024-01-10",
+            "2021",
+            contact_org,
+            contact_can,
+            contact_com
+        )
+
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+        view_set.request = self.post_request(transaction_1_data)
+
+        # Test standard aggregation
+        transaction_1 = view_set.save_transaction(transaction_1_data, view_set.request)
+        transaction_2 = view_set.save_transaction(transaction_2_data, view_set.request)
+        transaction_3 = view_set.save_transaction(transaction_3_data, view_set.request)
+
+        response = view_set.previous_transaction_by_payee_candidate(
+            self.post_request(
+                {},
+                {
+                    "contact_2_id": str(contact_can.id),
+                    "date": "2024-01-10",
+                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
+                    "general_election_year": "2022"
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+        response = view_set.previous_transaction_by_payee_candidate(
+            self.post_request(
+                {},
+                {
+                    "contact_2_id": str(contact_can.id),
+                    "date": "2024-01-12",
+                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
+                    "general_election_year": "2022"
+                },
+            )
+        )
+        self.assertEqual(response.data["id"], str(transaction_1.id))
+
+        response = view_set.previous_transaction_by_payee_candidate(
+            self.post_request(
+                {},
+                {
+                    "contact_2_id": str(contact_can.id),
+                    "date": "2024-01-13",
+                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
+                    "general_election_year": "2022"
+                },
+            )
+        )
+        self.assertEqual(response.data["id"], str(transaction_2.id))
+
+        response = view_set.previous_transaction_by_payee_candidate(
+            self.post_request(
+                {},
+                {
+                    "contact_2_id": str(contact_can.id),
+                    "date": "2024-01-15",
+                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
+                    "general_election_year": "2020"
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+        response = view_set.previous_transaction_by_payee_candidate(
+            self.post_request(
+                {},
+                {
+                    "contact_2_id": str(contact_com.id),
+                    "date": "2024-01-15",
+                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
+                    "general_election_year": "2022"
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+        response = view_set.previous_transaction_by_payee_candidate(
+            self.post_request(
+                {},
+                {
+                    "contact_2_id": str(contact_can.id),
+                    "date": "2024-01-15",
+                    "aggregation_group": "THIS_DOESNT_MATCH_ANYTHING",
+                    "general_election_year": "2022"
+                },
+            )
+        )
+        self.assertEqual(response.status_code, 404)
+
+        response = view_set.previous_transaction_by_payee_candidate(
+            self.post_request(
+                {},
+                {
+                    "transaction_id": str(transaction_3.id),
+                    "contact_2_id": str(contact_can.id),
+                    "date": "2024-01-15",
+                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
+                    "general_election_year": "2022"
+                },
+            )
+        )
+        self.assertEqual(response.data["id"], str(transaction_2.id))
+        self.assertEqual(response.data["aggregate_general_elec_expended"], "200.00")

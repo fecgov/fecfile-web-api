@@ -191,7 +191,24 @@ class UploadSubmission(BaseSubmission):
     objects = UploadSubmissionManager()
 
     def save_fec_response(self, response_string):
-        fec_response_json = json.loads(response_string)
+        try:
+            fec_response_json = json.loads(response_string)
+        except Exception as error:
+            logger.error(
+                "Failed to parse JSON response from upload submission: {response_string}"
+            )
+            raise error
+
+        if fec_response_json.get("status") == FECStatus.PROCESSING.value:
+            logger.info(f"FEC upload is processing: {response_string}")
+        elif fec_response_json.get("status") in (
+            FECStatus.ACCEPTED.value,
+            FECStatus.COMPLETED.value
+        ):
+            logger.info(f"FEC upload successful: {response_string}")
+        else:
+            logger.error(f"FEC upload failed: {response_string}")
+
         self.fec_report_id = fec_response_json.get("report_id")
         report = self.report_set.first()
         if not report.report_id:
@@ -213,7 +230,25 @@ class WebPrintSubmission(BaseSubmission):
     objects = WebPrintSubmissionManager()
 
     def save_fec_response(self, response_string):
-        fec_response_json = json.loads(response_string)
+        try:
+            fec_response_json = json.loads(response_string)
+        except Exception as error:
+            logger.error(
+                "Failed to parse JSON response from web print submission: "
+                f"{response_string}"
+            )
+            raise error
+
+        if fec_response_json.get("status") == FECStatus.PROCESSING.value:
+            logger.info(f"FEC upload is processing: {response_string}")
+        elif fec_response_json.get("status") in (
+            FECStatus.ACCEPTED.value,
+            FECStatus.COMPLETED.value
+        ):
+            logger.info(f"FEC upload successful: {response_string}")
+        else:
+            logger.error(f"FEC upload failed: {response_string}")
+
         self.fec_image_url = fec_response_json.get("image_url")
         self.fec_batch_id = fec_response_json.get("batch_id")
         self.fec_email = fec_response_json.get("email")

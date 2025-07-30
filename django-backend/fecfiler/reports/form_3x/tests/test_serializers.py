@@ -86,7 +86,7 @@ class F3XSerializerTestCase(TestCase):
         f3x_report = Report.objects.get(id=f3x_report.id)
         valid_serializer.is_valid()
         representation = valid_serializer.to_representation(f3x_report)
-        self.assertEquals(representation["report_status"], "In progress")
+        self.assertEqual(representation["report_status"], "In progress")
 
         # .fec has been submitted but a result is pending
         f3x_report.upload_submission = UploadSubmission.objects.initiate_submission(
@@ -95,7 +95,7 @@ class F3XSerializerTestCase(TestCase):
         # retrieve from manager to populate annotations
         f3x_report = Report.objects.get(id=f3x_report.id)
         representation = valid_serializer.to_representation(f3x_report)
-        self.assertEquals(representation["report_status"], "Submission pending")
+        self.assertEqual(representation["report_status"], "Submission pending")
 
         # .fec was submitted and efo came back with an 'Accepted'
         f3x_report.upload_submission.fec_status = FECStatus.ACCEPTED
@@ -103,7 +103,7 @@ class F3XSerializerTestCase(TestCase):
         # retrieve from manager to populate annotations
         f3x_report = Report.objects.get(id=f3x_report.id)
         representation = valid_serializer.to_representation(f3x_report)
-        self.assertEquals(representation["report_status"], "Submission success")
+        self.assertEqual(representation["report_status"], "Submission success")
 
         # an error occured at some point on our side after the user submitted
         f3x_report.upload_submission.fecfile_task_state = FECSubmissionState.FAILED
@@ -112,7 +112,7 @@ class F3XSerializerTestCase(TestCase):
         # retrieve from manager to populate annotations
         f3x_report = Report.objects.get(id=f3x_report.id)
         representation = valid_serializer.to_representation(f3x_report)
-        self.assertEquals(representation["report_status"], "Submission failure")
+        self.assertEqual(representation["report_status"], "Submission failure")
 
         # .fec was submitted and efo came back with a 'rejected'
         f3x_report.upload_submission.fecfile_task_state = FECSubmissionState.SUBMITTING
@@ -121,4 +121,4 @@ class F3XSerializerTestCase(TestCase):
         # retrieve from manager to populate annotations
         f3x_report = Report.objects.get(id=f3x_report.id)
         representation = valid_serializer.to_representation(f3x_report)
-        self.assertEquals(representation["report_status"], "Submission failure")
+        self.assertEqual(representation["report_status"], "Submission failure")

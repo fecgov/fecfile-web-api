@@ -7,6 +7,7 @@ logger = structlog.get_logger(__name__)
 
 def gen_and_install_django_key(
     cf_token: str,
+    cf_organization_name: str,
     cf_space_name: str,
     cf_service_instance_name: str,
 ):
@@ -16,7 +17,7 @@ def gen_and_install_django_key(
 
         logger.info("Retrieving current creds")
         current_creds = retrieve_credentials(
-            cf_token, cf_space_name, cf_service_instance_name
+            cf_token, cf_organization_name, cf_space_name, cf_service_instance_name
         )
 
         logger.info("Installing key")
@@ -28,7 +29,11 @@ def gen_and_install_django_key(
             "DJANGO_SECRET_KEY": key,
         }
         update_credentials(
-            cf_token, cf_space_name, cf_service_instance_name, updated_keys
+            cf_token,
+            cf_organization_name,
+            cf_space_name,
+            cf_service_instance_name,
+            updated_keys,
         )
     except Exception as e:
         raise Exception("Failed to generate and install django key") from e
@@ -36,13 +41,18 @@ def gen_and_install_django_key(
 
 def clear_fallback_django_keys(
     cf_token: str,
+    cf_organization_name: str,
     cf_space_name: str,
     cf_service_instance_name: str,
 ):
     try:
         creds_to_update = {"DJANGO_SECRET_KEY_FALLBACKS": []}
         update_credentials(
-            cf_token, cf_space_name, cf_service_instance_name, creds_to_update
+            cf_token,
+            cf_organization_name,
+            cf_space_name,
+            cf_service_instance_name,
+            creds_to_update,
         )
     except Exception as e:
         raise Exception("Failed to clear fallback django keys") from e

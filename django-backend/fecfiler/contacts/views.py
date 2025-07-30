@@ -6,14 +6,13 @@ import requests
 from django.db.models import CharField, Q, Value
 from django.db.models.functions import Concat, Lower, Coalesce
 from django.http import HttpResponseBadRequest, JsonResponse
-from rest_framework import viewsets, pagination
 from fecfiler.committee_accounts.views import (
     CommitteeOwnedViewMixin,
 )
-from rest_framework.decorators import action
-from rest_framework import filters, status
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework.viewsets import mixins, GenericViewSet
+from rest_framework import viewsets, pagination, filters, status
 from .models import Contact
 from .serializers import ContactSerializer
 import fecfiler.settings as settings
@@ -107,8 +106,11 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
                 "sort": "-two_year_period",
             }
             url = FEC_API_CANDIDATE_ENDPOINT.format(sanitized_candidate_id)
-            response = requests.get(url, headers=headers, params=params).json()
-            results = response["results"]
+            response = requests.get(url, headers=headers, params=params)
+            response.raise_for_status()
+
+            response_json = response.json()
+            results = response_json["results"]
             return JsonResponse(results[0] if len(results) > 0 else {})
         except AssertionError:
             return HttpResponseBadRequest()
@@ -121,13 +123,18 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         try:
             sanitized_committee_id = validate_and_sanitize_committee(committee_id)
             headers = {"Content-Type": "application/json"}
+            endpoint = f"{settings.PRODUCTION_OPEN_FEC_API}committee/{sanitized_committee_id}/"  # noqa
             response = requests.get(
-                f"{settings.PRODUCTION_OPEN_FEC_API}committee/{sanitized_committee_id}/",
+                endpoint,
                 params={"api_key": settings.PRODUCTION_OPEN_FEC_API_KEY},
                 headers=headers,
-            ).json()
-            if response.get("results"):
-                return JsonResponse(response["results"][0])
+            )
+            response.raise_for_status()
+
+            response_json = response.json()
+            results = response_json.get("results")
+            if results:
+                return JsonResponse(results[0])
             else:
                 return JsonResponse({})
         except AssertionError:
@@ -155,9 +162,14 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         if office:
             params["office"] = office
         params = urlencode(params)
-        json_results = requests.get(
-            FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
-        ).json()
+        if len(q) >= 3:
+            response = requests.get(FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params)
+            if response.status_code != status.HTTP_404_NOT_FOUND:
+                response.raise_for_status()
+
+            json_results = response.json()
+        else:
+            json_results = {}
 
         tokens = list(filter(None, re.split("[^\\w+]", q)))
         term = (".*" + ".* .*".join(tokens) + ".*").lower()
@@ -216,9 +228,14 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             else []
         )
         params = urlencode({"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY})
-        json_results = requests.get(
-            FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
-        ).json()
+        if len(q) >= 3:
+            response = requests.get(FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params)
+            if response.status_code != status.HTTP_404_NOT_FOUND:
+                response.raise_for_status()
+
+            json_results = response.json()
+        else:
+            json_results = {}
 
         fecfile_committees = list(
             self.get_queryset()
@@ -344,6 +361,19 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         )
         return max_fecfile_results, max_fec_results
 
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="e2e-delete-all-contacts",
+    )
+    def e2e_delete_all_contacts(self, request):
+        contacts = Contact.objects.filter(committee_account__committee_id="C99999999")
+        contact_count = contacts.count()
+
+        delete_all_contacts()
+        delete_all_contacts("C99999998")
+        return Response(f"Deleted {contact_count} Contacts")
+
 
 class DeletedContactsViewSet(
     CommitteeOwnedViewMixin,
@@ -385,3 +415,13 @@ class DeletedContactsViewSet(
             )
         contacts.update(deleted=None)
         return Response(ids_to_restore)
+
+
+def delete_all_contacts(committee_id="C99999999", log_method=logger.warn):
+    contacts = Contact.objects.filter(committee_account__committee_id=committee_id)
+    contact_count = contacts.count()
+
+    log_method(f"Deleting Contacts for {committee_id}")
+    log_method(f"Deleting Contacts: {contact_count}")
+
+    contacts.delete()

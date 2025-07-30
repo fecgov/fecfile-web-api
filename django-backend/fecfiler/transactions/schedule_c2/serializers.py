@@ -7,6 +7,8 @@ from fecfiler.shared.utilities import get_model_data
 
 
 CONTACT_FIELDS = [
+    'guarantor_organization_name',
+    'guarantor_committee_fec_id',
     'guarantor_last_name',
     'guarantor_first_name',
     'guarantor_middle_name',
@@ -23,6 +25,8 @@ CONTACT_FIELDS = [
 
 
 class ScheduleC2Serializer(ModelSerializer):
+    guarantor_organization_name = CharField(required=False, allow_null=True)
+    guarantor_committee_fec_id = CharField(required=False, allow_null=True)
     guarantor_last_name = CharField(required=False, allow_null=True)
     guarantor_first_name = CharField(required=False, allow_null=True)
     guarantor_middle_name = CharField(required=False, allow_null=True)

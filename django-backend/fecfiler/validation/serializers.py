@@ -9,9 +9,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-MISSING_SCHEMA_NAME_ERROR = ValidationError(
-    {"schema_name": ["No schema_name provided"]}
-)
+MISSING_SCHEMA_NAME_ERROR = ValidationError({"schema_name": ["No schema_name provided"]})
 
 
 class FecSchemaValidatorSerializerMixin(serializers.Serializer):
@@ -57,6 +55,7 @@ class FecSchemaValidatorSerializerMixin(serializers.Serializer):
             f"'{self.__class__.__name__}' should either include a "
             "`schema_name` attribute, or override the `get_schema_name()` method."
         )
+
         return self.schema_name
 
     def get_validation_candidate(self, data):

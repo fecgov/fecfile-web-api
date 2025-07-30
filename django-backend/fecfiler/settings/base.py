@@ -5,6 +5,7 @@ Django settings for the FECFile project.
 import os
 import dj_database_url
 import structlog
+import logging
 import sys
 
 from .env import env
@@ -25,7 +26,14 @@ TEMPLATE_DEBUG = DEBUG
 LINE = "LINE"
 KEY_VALUE = "KEY_VALUE"
 
+APPEND_SLASH = False
+
 LOG_FORMAT = env.get_credential("LOG_FORMAT", LINE)
+# SECURITY WARNING: for local logging only - do not enable in any cloud.gov environments!
+# Django DEBUG base.py setting must also be set to True to see SQL output
+ENABLE_PL_SQL_LOGGING = get_boolean_from_string(
+    env.get_credential("ENABLE_PL_SQL_LOGGING", "False")
+)
 
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
@@ -168,7 +176,10 @@ OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
 
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 FFAPI_LOGIN_DOT_GOV_COOKIE_NAME = "ffapi_login_dot_gov"
-FFAPI_TIMEOUT_COOKIE_NAME = "ffapi_timeout"
+FFAPI_TIMEOUT_COOKIE_NAME = env.get_credential("FFAPI_TIMEOUT_COOKIE_NAME", "False")
+if not FFAPI_TIMEOUT_COOKIE_NAME:
+    raise Exception("FFAPI_TIMEOUT_COOKIE_NAME is not set!")
+
 
 LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
 LOGIN_REDIRECT_CLIENT_URL = env.get_credential("LOGIN_REDIRECT_CLIENT_URL")
@@ -214,6 +225,11 @@ SPECTACULAR_SETTINGS = {
 }
 
 
+class NotErrorFilter(logging.Filter):
+    def filter(self, record):
+        return record.levelno < logging.ERROR
+
+
 def get_logging_config(log_format=LINE):
     logging_config = {
         "version": 1,
@@ -223,6 +239,7 @@ def get_logging_config(log_format=LINE):
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.dict_tracebacks,
                     structlog.processors.JSONRenderer(),
                 ],
             },
@@ -230,20 +247,33 @@ def get_logging_config(log_format=LINE):
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.dict_tracebacks,
                     structlog.dev.ConsoleRenderer(
                         colors=True, exception_formatter=structlog.dev.rich_traceback
                     ),
+                ],
+                "foreign_pre_chain": [
+                    structlog.contextvars.merge_contextvars,
                 ],
             },
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+                    structlog.processors.dict_tracebacks,
                     structlog.processors.ExceptionRenderer(),
                     structlog.processors.KeyValueRenderer(
                         key_order=["level", "event", "logger"]
                     ),
                 ],
+                "foreign_pre_chain": [
+                    structlog.contextvars.merge_contextvars,
+                ],
+            },
+        },
+        "filters": {
+            "not_error": {
+                "()": NotErrorFilter,
             },
         },
         "handlers": {
@@ -251,11 +281,25 @@ def get_logging_config(log_format=LINE):
                 "class": "logging.StreamHandler",
                 "formatter": "plain_console",
                 "stream": sys.stdout,
+                "filters": ["not_error"],
+            },
+            "console_error": {
+                "level": "ERROR",
+                "class": "logging.StreamHandler",
+                "formatter": "plain_console",
+                "stream": sys.stderr,
             },
             "cloud": {
                 "class": "logging.StreamHandler",
                 "formatter": "key_value",
                 "stream": sys.stdout,
+                "filters": ["not_error"],
+            },
+            "cloud_error": {
+                "level": "ERROR",
+                "class": "logging.StreamHandler",
+                "formatter": "key_value",
+                "stream": sys.stderr,
             },
         },
     }
@@ -263,22 +307,27 @@ def get_logging_config(log_format=LINE):
     if log_format == LINE:
         logging_config["loggers"] = {
             "django_structlog": {
-                "handlers": ["console"],
+                "handlers": ["console", "console_error"],
                 "level": "DEBUG",
             },
             "fecfiler": {
-                "handlers": ["console"],
+                "handlers": ["console", "console_error"],
                 "level": "DEBUG",
             },
         }
+        if ENABLE_PL_SQL_LOGGING is True:
+            logging_config["loggers"]["django.db.backends"] = {
+                "handlers": ["console"],
+                "level": "DEBUG",
+            }
     else:
         logging_config["loggers"] = {
             "django_structlog": {
-                "handlers": ["cloud"],
+                "handlers": ["cloud", "cloud_error"],
                 "level": "INFO",
             },
             "fecfiler": {
-                "handlers": ["cloud"],
+                "handlers": ["cloud", "cloud_error"],
                 "level": "INFO",
             },
         }
@@ -339,6 +388,14 @@ CELERY_BEAT_SCHEDULE = {
             "priority": 1,  # 0-9; 0 is the highest priority; 5 is the default
         },
     },
+    "delete_expired_s3_objects": {
+        "task": "fecfiler.devops.tasks.delete_expired_s3_objects",
+        "schedule": 86400.0,  # Once per day
+        "args": (),
+        "options": {
+            "expires": 15.0,
+        },
+    },
 }
 
 """FEC Webload settings
@@ -387,7 +444,9 @@ AWS_ACCESS_KEY_ID = env.get_credential("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
 AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
 AWS_REGION = env.get_credential("AWS_REGION")
-
+S3_OBJECTS_MAX_AGE_DAYS = get_float_from_string(
+    env.get_credential("S3_OBJECTS_MAX_AGE_DAYS", 365)
+)
 
 """FEATURE FLAGS
 """

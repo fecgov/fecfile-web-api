@@ -34,10 +34,10 @@ class ReportModelTestCase(TestCase):
 
         self.f24_report.amend()
 
-        self.assertEquals(
+        self.assertEqual(
             self.f24_report.form_24.original_amendment_date, new_upload_submission.created
         )
-        self.assertEquals(self.f24_report.form_type, "F24A")
+        self.assertEqual(self.f24_report.form_type, "F24A")
 
     def test_unamending(self):
         upload_submission = UploadSubmission(fec_report_id=self.f3x_report.report_id)
@@ -62,7 +62,7 @@ class ReportModelTestCase(TestCase):
         self.assertEqual(self.f3x_report.upload_submission, new_upload_submission)
 
     def test_delete(self):
-        f24_report = create_form24(self.committee)
+        f24_report = create_form24(self.committee, {"name": "test 24 delete"})
         f24_report_id = f24_report.id
         f24_id = f24_report.form_24.id
         f3x_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
