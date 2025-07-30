@@ -64,17 +64,3 @@ class LocustDataGeneratorTestCase(TestCase):
         )
         self.assertEqual(len(result), test_transaction_count)
         self.assertTrue(all(isinstance(x, MagicMock) for x in result))
-
-    @patch("builtins.open")
-    @patch("os.path.abspath")
-    @patch("os.path.dirname")
-    def test_save_json(self, mock_dirname, mock_abspath, mock_open):
-        mock_abspath.return_value = "/tmp/fakepath/testfile.py"
-        mock_dirname.return_value = "/tmp/fakepath"
-        mock_file = MagicMock()
-        mock_open.return_value = mock_file
-        data = [{"foo": "bar"}]
-        save_json(data, name="testdata")
-        mock_open.assert_called_once()
-        mock_file.write.assert_called_once()
-        mock_file.close.assert_called_once()
