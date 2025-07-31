@@ -5,24 +5,11 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.reports.models import ReportTransaction
 from fecfiler.contacts.models import Contact
-from fecfiler.transactions.tests.utils import create_schedule_a
-from fecfiler.committee_accounts.models import CommitteeAccount, Membership
-from fecfiler.user.models import User
 
 
 class LocustDataGenerator:
     def __init__(self, committee):
         self.committee = committee
-
-    def create_new_committee(self, new_committee_id, test_user_email):
-        user = User.objects.filter(email__iexact=test_user_email).first()
-        committee = CommitteeAccount.objects.create(committee_id=new_committee_id)
-        Membership.objects.create(
-            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
-            committee_account_id=committee.id,
-            user=user,
-        )
-        return committee
 
     def generate_form_3x(self, count, collision_maximum=1000):
         reports_and_dates = [
@@ -176,54 +163,3 @@ class LocustDataGenerator:
         )
 
         return tier1_transactions
-
-    def generate_triple_transactions(
-        self,
-        count,
-        reports,
-        contacts,
-    ):
-        triple_transactions = []
-        for _ in range(count):
-            transaction_type_identifier = "INDIVIDUAL_RECEIPT"
-            contact = choice(contacts)
-            report = choice(reports)
-            contribution_date = report.coverage_from_date
-            contribution_amount = randrange(25, 10000)
-            aggregation_group = "GENERAL"
-            form_type = "SA11AI"
-
-            a = create_schedule_a(
-                transaction_type_identifier,
-                self.committee,
-                contact,
-                contribution_date,
-                contribution_amount,
-                aggregation_group,
-                form_type,
-                report=report,
-            )
-            b = create_schedule_a(
-                transaction_type_identifier,
-                self.committee,
-                contact,
-                contribution_date,
-                contribution_amount,
-                aggregation_group,
-                form_type,
-                report=report,
-                parent_id=a.id,
-            )
-            create_schedule_a(
-                transaction_type_identifier,
-                self.committee,
-                contact,
-                contribution_date,
-                contribution_amount,
-                aggregation_group,
-                form_type,
-                report=report,
-                parent_id=b.id,
-            )
-            triple_transactions.append(a)
-        return triple_transactions

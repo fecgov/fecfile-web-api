@@ -3,6 +3,7 @@ import logging
 import json
 import time
 import threading
+from urlparse import urlparse
 
 from locust import between, task, TaskSet, user
 
@@ -92,7 +93,8 @@ class Tasks(TaskSet):
 
     def get_redirect_uri(self, response):
         if response.status_code == 302:
-            return response.headers["Location"].removeprefix("http://localhost:8080")
+            parsed_url = urlparse(response.headers["Location"])
+            return f"{parsed_url.path}?{parsed_url.query}"
         return None
 
     def prepare_reports_for_submit(self, report_ids):
