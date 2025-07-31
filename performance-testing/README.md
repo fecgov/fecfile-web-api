@@ -12,7 +12,9 @@
 4. Update the `locust-leader` and `locust-follower` sections in `docker-compose.yml`.  
    Replace the `OIDC_SESSION_ID` and `CSRF_TOKEN` environment variable values with the
    `sessionid` and `csrftoken` cookie values (respectively) copied in step 3.
-5. Run Locust locally using the following command (you may not need `sudo`):
+5. Run Locust locally using the following command (you may not need `sudo`).  You may 
+   need to add the `--force-recreate` flag if you are having trouble with your 
+   containers:
    `sudo docker compose --profile locust up`
 6. Open a browser to http://localhost:8089 and begin testing.
 7. Once you are done testing, you may wish to cleanup the load test data created in step
