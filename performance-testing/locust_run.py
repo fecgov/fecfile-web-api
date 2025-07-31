@@ -3,7 +3,7 @@ import logging
 import json
 import time
 import threading
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from locust import between, task, TaskSet, user
 
