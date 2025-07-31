@@ -3,6 +3,7 @@ import logging
 import json
 import time
 import threading
+import random
 from urllib.parse import urlparse
 
 from locust import between, task, TaskSet, user
@@ -253,9 +254,46 @@ class Tasks(TaskSet):
 
     @task
     def celery_test(self):
+        self.client_get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
+
+    @task
+    def load_contacts(self):
+        params = {
+            "page": 1,
+            "ordering": "form_type",
+        }
         self.client_get(
-            "/api/v1/users/get_current/", name="current_user", timeout=TIMEOUT
+            "/api/v1/contacts/", name="load_contacts", timeout=TIMEOUT, params=params
         )
+
+    @task
+    def load_reports(self):
+        params = {
+            "page": 1,
+            "ordering": "form_type",
+        }
+        self.client_get(
+            "/api/v1/reports/", name="load_reports", timeout=TIMEOUT, params=params
+        )
+
+    @task
+    def load_transactions(self):
+        if len(self.report_ids) > 0:
+            report_id = random.choice(self.report_ids)
+            schedules = random.choice(SCHEDULES)
+            print(f"\n\n\nREPORT ID: {report_id}\n{self.report_ids}\n\n\n")
+            params = {
+                "page": 1,
+                "ordering": "form_type",
+                "schedules": schedules,
+                "report_id": report_id,
+            }
+            self.client_get(
+                "/api/v1/transactions/",
+                name="load_transactions",
+                timeout=TIMEOUT,
+                params=params,
+            )
 
     @task
     def submit_reports(self):

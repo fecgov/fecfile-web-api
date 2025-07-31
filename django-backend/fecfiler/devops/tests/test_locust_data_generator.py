@@ -8,20 +8,21 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 import uuid
 
 
+def add_schedule_a_to_transaction(transaction_list):
+    for transaction in transaction_list:
+        transaction.schedule_a = ScheduleA(
+            **{
+                "contribution_purpose_descrip": uuid.uuid4(),
+            }
+        )
+    return transaction_list
+
+
 class LocustDataGeneratorTestCase(TestCase):
     def setUp(self):
         test_committee_account = CommitteeAccount()
         test_committee_account.id = uuid.uuid4()
         self.locust_data_generator = LocustDataGenerator(test_committee_account)
-
-    def add_schedule_a_to_transaction(transaction_list):
-        for transaction in transaction_list:
-            transaction.schedule_a = ScheduleA(
-                **{
-                    "contribution_purpose_descrip": uuid.uuid4(),
-                }
-            )
-        return transaction_list
 
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Form3X.objects.bulk_create",
