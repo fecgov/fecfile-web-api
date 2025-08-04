@@ -1,9 +1,8 @@
 from django.test import TestCase
 from ..models import Form3X
-from fecfiler.reports.models import Report, ReportTransaction
+from fecfiler.reports.models import ReportTransaction
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.reports.tests.utils import create_form3x
 
 
 class F3XTestCase(TestCase):
