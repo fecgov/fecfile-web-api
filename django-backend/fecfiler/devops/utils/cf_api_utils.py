@@ -3,7 +3,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-base_uri = "https://api.fr.cloud.gov/v3"
+base_uri = "https://api.fr.cloud.gov/v32"
 
 
 def check_api_status():
