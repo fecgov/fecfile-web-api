@@ -17,6 +17,7 @@ fecfiler.devops.utils.cf\_api\_utils
    .. autosummary::
       :toctree:                                          
    
+      check_api_status
       get_auth_header
       get_credentials_by_guid
       get_organization_guid

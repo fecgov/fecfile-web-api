@@ -99,6 +99,8 @@ fecfiler.devops.tests.test\_cf\_api\_utils.CfApiUtilsTestCase
       ~CfApiUtilsTestCase.subTest
       ~CfApiUtilsTestCase.tearDown
       ~CfApiUtilsTestCase.tearDownClass
+      ~CfApiUtilsTestCase.test_check_api_status_error_response
+      ~CfApiUtilsTestCase.test_check_api_status_happy_path
       ~CfApiUtilsTestCase.test_get_credentials_by_guid_happy_path
       ~CfApiUtilsTestCase.test_get_credentials_by_guid_throws_exception
       ~CfApiUtilsTestCase.test_get_organization_guid_empty_response

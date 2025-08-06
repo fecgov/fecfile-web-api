@@ -1,0 +1,6 @@
+fecfiler.devops.utils.cf\_api\_utils.check\_api\_status
+=======================================================
+
+.. currentmodule:: fecfiler.devops.utils.cf_api_utils
+
+.. autofunction:: check_api_status
