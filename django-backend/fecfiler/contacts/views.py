@@ -158,11 +158,12 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             if request.GET.get("exclude_ids")
             else []
         )
-        params = {"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY}
-        if office:
-            params["office"] = office
-        params = urlencode(params)
-        if len(q) >= 3:
+        if not settings.E2E_TEST and len(q) >= 3:
+            params = {"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY}
+            if office:
+                params["office"] = office
+            params = urlencode(params)
+
             response = requests.get(FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params)
             if response.status_code != status.HTTP_404_NOT_FOUND:
                 response.raise_for_status()
@@ -228,7 +229,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             else []
         )
         params = urlencode({"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY})
-        if len(q) >= 3:
+        if not settings.E2E_TEST and len(q) >= 3:
             response = requests.get(FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params)
             if response.status_code != status.HTTP_404_NOT_FOUND:
                 response.raise_for_status()
