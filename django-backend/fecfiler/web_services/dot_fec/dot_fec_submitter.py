@@ -59,8 +59,7 @@ class EFODotFECSubmitter(DotFECSubmitter):
     def __init__(self) -> None:
         self.history = HistoryPlugin()
         self.fec_soap_client = Client(
-            f"{EFO_FILING_API}/webload/services/upload?wsdl",
-            plugins=[self.history]
+            f"{EFO_FILING_API}/webload/services/upload?wsdl", plugins=[self.history]
         )
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
@@ -81,7 +80,7 @@ class EFODotFECSubmitter(DotFECSubmitter):
 
         # Get the last HTTP response
         http_response = self.history.last_received
-        status_code = http_response.status_code if http_response else None
+        status_code = http_response.get("status_code") if http_response else None
         if status_code != 200:
             raise Exception(f"FEC polling failed with HTTP status code: {status_code}")
 

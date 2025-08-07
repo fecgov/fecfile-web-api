@@ -40,7 +40,7 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
 
         # Get the last HTTP response
         http_response = self.history.last_received
-        status_code = http_response.status_code if http_response else None
+        status_code = http_response.get("status_code") if http_response else None
         if status_code != 200:
             raise Exception(f"FEC upload failed with HTTP status code: {status_code}")
 
