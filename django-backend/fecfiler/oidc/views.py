@@ -120,16 +120,13 @@ def oidc_callback(request):
 
 @extend_schema(exclude=True)
 @api_view(["GET"])
-@authentication_classes([])
-@permission_classes([])
 @require_http_methods(["GET"])
 def oidc_logout(request):
-    oidc_state = request.get_signed_cookie("oidc_state")
-    if oidc_state:
+    if request.user.is_authenticated:
         params = {
             "client_id": OIDC_RP_CLIENT_ID,
             "post_logout_redirect_uri": LOGOUT_REDIRECT_URL,
-            "state": oidc_state,
+            "state": request.get_signed_cookie("oidc_state"),
         }
         query = urlencode(params)
         op_logout_url = oidc_op_config.get_logout_endpoint()
