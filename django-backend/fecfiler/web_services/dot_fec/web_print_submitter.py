@@ -33,9 +33,7 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
             EFO_FILING_API_KEY, email, dot_fec_bytes
         )
         if not response:
-            raise Exception(
-                f"FEC web print submission failed and returned empty response"
-            )
+            raise Exception("FEC web print submission failed and returned empty response")
 
         logger.debug(f"FEC upload response: {response}")
         return response
@@ -45,9 +43,7 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
             getattr(submission, "fec_batch_id", None), submission.fec_submission_id
         )
         if not response:
-            raise Exception(
-                f"FEC web print submission failed and returned empty response"
-            )
+            raise Exception("FEC web print submission failed and returned empty response")
 
         logger.debug(f"FEC polling response: {response}")
         return response

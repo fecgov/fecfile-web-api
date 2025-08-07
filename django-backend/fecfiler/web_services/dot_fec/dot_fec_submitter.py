@@ -61,14 +61,14 @@ class EFODotFECSubmitter(DotFECSubmitter):
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
         if not response:
-            raise Exception(f"FEC webload submission failed and returned empty response")
+            raise Exception("FEC webload submission failed and returned empty response")
         logger.debug(f"FEC upload response: {response}")
         return response
 
     def poll_status(self, submission: BaseSubmission):
         response = self.fec_soap_client.service.status(submission.fec_submission_id)
         if not response:
-            raise Exception(f"FEC webload submission failed and returned empty response")
+            raise Exception("FEC webload submission failed and returned empty response")
         logger.debug(f"FEC polling response: {response}")
         return response
 
