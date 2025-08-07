@@ -29,8 +29,7 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
     def __init__(self):
         self.history = HistoryPlugin()
         self.fec_soap_client = Client(
-            f"{EFO_FILING_API}/webload/services/print?wsdl",
-            plugins=[self.history]
+            f"{EFO_FILING_API}/webprint/services/print?wsdl", plugins=[self.history]
         )
 
     def submit(self, email, dot_fec_bytes):
