@@ -2,7 +2,6 @@ import json
 from uuid import uuid4 as uuid
 from abc import ABC, abstractmethod
 from zeep import Client
-from zeep.plugins import HistoryPlugin
 from fecfiler.web_services.models import FECStatus, BaseSubmission
 from fecfiler.settings import EFO_FILING_API_KEY, EFO_FILING_API
 
@@ -27,37 +26,30 @@ class EFOWebPrintSubmitter(WebPrintSubmitter):
     """Submitter class for submitting .FEC files to EFO's web print service"""
 
     def __init__(self):
-        self.history = HistoryPlugin()
-        self.fec_soap_client = Client(
-            f"{EFO_FILING_API}/webprint/services/print?wsdl", plugins=[self.history]
-        )
+        self.fec_soap_client = Client(f"{EFO_FILING_API}/webprint/services/print?wsdl")
 
     def submit(self, email, dot_fec_bytes):
         response = self.fec_soap_client.service.print(
             EFO_FILING_API_KEY, email, dot_fec_bytes
         )
+        if not response:
+            raise Exception(
+                f"FEC web print submission failed and returned empty response"
+            )
+
         logger.debug(f"FEC upload response: {response}")
-
-        # Get the last HTTP response
-        http_response = self.history.last_received
-        status_code = http_response.get("status_code") if http_response else None
-        if status_code != 200:
-            raise Exception(f"FEC upload failed with HTTP status code: {status_code}")
-
         return response
 
     def poll_status(self, submission: BaseSubmission):
         response = self.fec_soap_client.service.status(
             getattr(submission, "fec_batch_id", None), submission.fec_submission_id
         )
+        if not response:
+            raise Exception(
+                f"FEC web print submission failed and returned empty response"
+            )
+
         logger.debug(f"FEC polling response: {response}")
-
-        # Get the last HTTP response
-        http_response = self.history.last_received
-        status_code = http_response.status_code if http_response else None
-        if status_code != 200:
-            raise Exception(f"FEC polling failed with HTTP status code: {status_code}")
-
         return response
 
 
