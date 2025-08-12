@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     "fecfiler.soft_delete",
     "fecfiler.validation",
     "fecfiler.web_services",
+    "fecfiler.imports",
     "fecfiler.user",
     "fecfiler.oidc",
     "fecfiler.devops",
