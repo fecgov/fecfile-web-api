@@ -174,10 +174,8 @@ def submit_to_fec(
             the submission id and a key that we can use to determine the type of the
             submission.  This lets us instantiate objects of the correct classes as we
             need them."""
-            countdown = calculate_polling_interval(submission.fecfile_polling_attempts)
             return poll_for_fec_response.apply_async(
-                [submission.id, submission_type_key, "Dot FEC"],
-                countdown=countdown,
+                [submission.id, submission_type_key, "Dot FEC"]
             )
         else:
             return resolve_final_submission_state(submission)

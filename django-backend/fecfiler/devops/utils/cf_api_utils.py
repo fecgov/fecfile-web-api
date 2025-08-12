@@ -6,6 +6,16 @@ logger = structlog.get_logger(__name__)
 base_uri = "https://api.fr.cloud.gov/v3"
 
 
+def check_api_status():
+    try:
+        url = base_uri
+        response = requests.get(url)
+        response.raise_for_status()
+        return response
+    except Exception as e:
+        raise Exception("Failed to retrieve api status") from e
+
+
 def retrieve_credentials(token, organization_name, space_name, service_instance_name):
     try:
         logger.info(f"Retrieving guid for service_instance_name {service_instance_name}")
