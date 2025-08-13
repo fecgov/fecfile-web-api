@@ -39,7 +39,9 @@ CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
+SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    raise Exception("DJANGO_SECRET_KEY is not set!")
 SECRET_KEY_FALLBACKS = env.get_credential("DJANGO_SECRET_KEY_FALLBACKS", [])
 
 
