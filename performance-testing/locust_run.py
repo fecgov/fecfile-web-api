@@ -1,6 +1,4 @@
-import os
 import logging
-import json
 import time
 import threading
 import random
@@ -8,30 +6,9 @@ from urllib.parse import urlparse
 
 from locust import between, task, TaskSet, user
 
-SESSION_ID = os.environ.get("OIDC_SESSION_ID")
-CSRF_TOKEN = os.environ.get("CSRF_TOKEN")
 
-# seconds
 TIMEOUT = 30  # seconds
-
-SCHEDULES = ["A"]  # Further schedules to be implemented in the future
-
-
-def get_json_data(name):
-    directory = os.path.dirname(os.path.abspath(__file__))
-    filename = f"{name}.locust.json"
-    full_filename = os.path.join(directory, "locust-data", filename)
-    if os.path.isfile(full_filename):
-        try:
-            file = open(full_filename, "r")
-            values = json.loads(file.read())
-            file.close()
-            logging.info(f"Retrieved {len(values)} items from {filename}")
-            return values
-        except (IOError, ValueError):
-            logging.error(f"Unable to retrieve locust data from file {filename}")
-
-    return []
+SCHEDULES = ["A", "B"]  # Further schedules to be implemented in the future
 
 
 class AtomicInteger:

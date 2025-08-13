@@ -195,9 +195,6 @@ services:
         # command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
         command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080
         profiles: [locust]
-        environment:
-            LOCAL_TEST_USER:
-            LOCAL_TEST_PWD:
 
     locust-follower:
         image: locustio/locust
@@ -205,9 +202,6 @@ services:
             - ./:/mnt/locust
         command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
         profiles: [locust]
-        environment:
-            LOCAL_TEST_USER:
-            LOCAL_TEST_PWD:
 
     locust-leader-app:
         image: locustio/locust

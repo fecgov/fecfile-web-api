@@ -4,8 +4,9 @@
    using the user email address you wish to be assigned to the new committees (optional
    additional command arguments as desired):
    `./manage.py gen_locust_load_test_data <user_email>`
-2. Run Locust locally using the following command (you may not need `sudo`).  You may 
-   need to add the `--force-recreate` flag if you are having trouble with your 
+   (on local, you can use `test@test.com`)
+2. Run Locust locally using the following command (you may not need `sudo`).  You may
+   need to add the `--force-recreate` flag if you are having trouble with your
    containers:
    `sudo docker compose --profile locust up`
 3. Open a browser to http://localhost:8089 and begin testing.
@@ -32,7 +33,6 @@ upwards:
 
 Optional additional flags can be used to override various defaults:
 
-`--base_uri`
 `--number_of_committees`
 `--number_of_reports`
 `--number_of_contacts`
@@ -103,27 +103,3 @@ To view the results, visit the API's `/silk` endpoint (for local development: `l
 
 If setting up from scratch or looking for usage instructions, you can find documentation [here](https://github.com/jazzband/django-silk?tab=readme-ov-file#installation).
 
-
-# Creating and loading bulk data with fixtures
-
-Fixtures are .json files that can be used to load data into the database.  Loading data with fixtures is far faster than
-creating records with individual requests, making it especially useful for preparing a database for ad-hoc performance testing.
-
-A script has been provided for generating fixtures with specific numbers of records.  You can run the script with
-```
-  python bulk-testing-data-fixture-generator.py
-```
-The script requires an environment variable to function:
-- `LOCAL_TEST_COMMITTEE_UUID`: Used to ensure that created records are viewable within the test committee.
-For most cases, the value in the `e2e-test-data.json` fixture is what you're looking for.  This can be overriden
-by using the `--committee-uuid` optional parameter when running the script.
-
-Running the script with the `-h` or `--help` flags will provide additional information.
-
-Once you have a fixture, you can load it into the database by following these steps:
-
-1. Enter a fecfile-api docker container
-- (For Local) Use `docker exec -it fecfile-api /bin/bash`
-- (For Cloud.gov or Circle CI) ssh into your docker instance of choice.
-2. (Cloud.gov only) use `/tmp/lifecycle/shell` to establish a shell session.
-3. Run `python manage.py loaddata FIXTURE-NAME` to load your fixture.
