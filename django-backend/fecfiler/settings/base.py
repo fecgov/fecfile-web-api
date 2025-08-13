@@ -49,6 +49,7 @@ AUTH_USER_MODEL = "user.User"
 
 ALLOWED_HOSTS = ["*"]
 
+
 # Application definition
 
 SESSION_COOKIE_AGE = int(
@@ -56,6 +57,8 @@ SESSION_COOKIE_AGE = int(
 )
 SESSION_SAVE_EVERY_REQUEST = True
 
+
+INCLUDE_SILK = get_boolean_from_string(env.get_credential("INCLUDE_SILK", "False"))
 INSTALLED_APPS = [
     # "django.contrib.admin",
     "django.contrib.auth",
@@ -63,6 +66,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "rest_framework",
+    "django.contrib.staticfiles",
     "drf_spectacular",
     "corsheaders",
     "django_structlog",
@@ -83,7 +87,56 @@ INSTALLED_APPS = [
     "fecfiler.openapi",
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE = []
+
+STATIC_URL = "/static/"
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
+STATIC_ROOT = "static"
+
+if INCLUDE_SILK:
+    INSTALLED_APPS += ["silk"]
+    MIDDLEWARE = ["silk.middleware.SilkyMiddleware"]
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/1.11/howto/static-files/
+
+    SILKY_PYTHON_PROFILER = True
+    SILKY_PYTHON_PROFILER_BINARY = True
+
+    # the sub-directories of media and static files
+    STATICFILES_LOCATION = "static"
+    SILKY_DYNAMIC_PROFILING = [
+        {
+            "module": "fecfiler.transactions.managers",
+            "function": "TransactionManager.get_queryset",
+        },
+        {
+            "module": "fecfiler.transactions.managers",
+            "function": "TransactionManager.SCHEDULE_CLAUSE",
+        },
+        {
+            "module": "fecfiler.transactions.managers",
+            "function": "TransactionManager.INCURRED_PRIOR_CLAUSE",
+        },
+        {
+            "module": "fecfiler.transactions.managers",
+            "function": "TransactionManager.PAYMENT_PRIOR_CLAUSE",
+        },
+        {
+            "module": "fecfiler.transactions.managers",
+            "function": "TransactionManager.PAYMENT_AMOUNT_CLAUSE",
+        },
+        {
+            "module": "fecfiler.transactions.managers",
+            "function": "TransactionManager.transaction_view",
+        },
+        {
+            "module": "fecfiler.transactions.managers",
+            "function": "TransactionManager.ORDER_KEY_CLAUSE",
+        },
+    ]
+
+
+MIDDLEWARE += [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
@@ -123,6 +176,7 @@ CORS_ALLOW_HEADERS = (
 )
 
 CORS_ALLOW_CREDENTIALS = True
+
 
 # Database
 DATABASES = {
