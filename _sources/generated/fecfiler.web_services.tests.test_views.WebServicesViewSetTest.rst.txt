@@ -118,7 +118,9 @@ fecfiler.web\_services.tests.test\_views.WebServicesViewSetTest
       ~WebServicesViewSetTest.test_create_dot_fec_form_99
       ~WebServicesViewSetTest.test_get_dot_fec_not_exists
       ~WebServicesViewSetTest.test_submit_to_fec
+      ~WebServicesViewSetTest.test_submit_to_fec_already_running
       ~WebServicesViewSetTest.test_submit_to_webprint
+      ~WebServicesViewSetTest.test_submit_to_webprint_already_running
    
    
 

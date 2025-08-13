@@ -346,8 +346,14 @@ not have a method with the specified name.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_submit_to_fec</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_submit_to_webprint</span></code>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.tests.test_views.WebServicesViewSetTest.test_submit_to_fec_already_running" title="fecfiler.web_services.tests.test_views.WebServicesViewSetTest.test_submit_to_fec_already_running"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_submit_to_fec_already_running</span></code></a>()</p></td>
+<td><p>Test that a new submission is blocked if one is already in progress.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_submit_to_webprint</span></code>()</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.web_services.tests.test_views.WebServicesViewSetTest.test_submit_to_webprint_already_running" title="fecfiler.web_services.tests.test_views.WebServicesViewSetTest.test_submit_to_webprint_already_running"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_submit_to_webprint_already_running</span></code></a>()</p></td>
+<td><p>Test that a new webprint is blocked if one is already in progress.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1077,6 +1083,18 @@ block, allowing further test code to be executed.</p>
 <dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.tests.test_views.WebServicesViewSetTest.test_submit_to_fec_already_running">
+<span class="sig-name descname"><span class="pre">test_submit_to_fec_already_running</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.tests.test_views.WebServicesViewSetTest.test_submit_to_fec_already_running" title="Link to this definition">¶</a></dt>
+<dd><p>Test that a new submission is blocked if one is already in progress.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.web_services.tests.test_views.WebServicesViewSetTest.test_submit_to_webprint_already_running">
+<span class="sig-name descname"><span class="pre">test_submit_to_webprint_already_running</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.web_services.tests.test_views.WebServicesViewSetTest.test_submit_to_webprint_already_running" title="Link to this definition">¶</a></dt>
+<dd><p>Test that a new webprint is blocked if one is already in progress.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1211,6 +1229,8 @@ block, allowing further test code to be executed.</p>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.web_services.tests.test_views.WebServicesViewSetTest.subTest"><code class="docutils literal notranslate"><span class="pre">WebServicesViewSetTest.subTest()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.web_services.tests.test_views.WebServicesViewSetTest.tearDown"><code class="docutils literal notranslate"><span class="pre">WebServicesViewSetTest.tearDown()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.web_services.tests.test_views.WebServicesViewSetTest.tearDownClass"><code class="docutils literal notranslate"><span class="pre">WebServicesViewSetTest.tearDownClass()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.web_services.tests.test_views.WebServicesViewSetTest.test_submit_to_fec_already_running"><code class="docutils literal notranslate"><span class="pre">WebServicesViewSetTest.test_submit_to_fec_already_running()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.web_services.tests.test_views.WebServicesViewSetTest.test_submit_to_webprint_already_running"><code class="docutils literal notranslate"><span class="pre">WebServicesViewSetTest.test_submit_to_webprint_already_running()</span></code></a></li>
 </ul>
 </li>
 </ul>
