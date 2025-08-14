@@ -10,7 +10,6 @@ import sys
 
 from .env import env
 from corsheaders.defaults import default_headers
-from django.utils.crypto import get_random_string
 from fecfiler.celery import CeleryStorageType
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
 from math import floor
