@@ -228,7 +228,7 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">first_name</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.models.User.groups" title="fecfiler.user.models.User.groups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">groups</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">groups</span></code></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code></p></td>
@@ -270,7 +270,7 @@
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">security_consent_exp_date</span></code></p></td>
 <td><p>A wrapper for a deferred-loading field.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.user.models.User.user_permissions" title="fecfiler.user.models.User.user_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">user_permissions</span></code></a></p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">user_permissions</span></code></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">username</span></code></p></td>
@@ -287,14 +287,14 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.user.models.User.DoesNotExist.add_note">
-<span class="sig-name descname"><span class="pre">add_note</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.DoesNotExist.add_note" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_note</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.DoesNotExist.add_note" title="Link to this definition">¶</a></dt>
 <dd><p>Exception.add_note(note) –
 add a note to the exception</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.user.models.User.DoesNotExist.with_traceback">
-<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.DoesNotExist.with_traceback" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.DoesNotExist.with_traceback" title="Link to this definition">¶</a></dt>
 <dd><p>Exception.with_traceback(tb) –
 set self.__traceback__ to tb and return self.</p>
 </dd></dl>
@@ -307,14 +307,14 @@ set self.__traceback__ to tb and return self.</p>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.user.models.User.MultipleObjectsReturned.add_note">
-<span class="sig-name descname"><span class="pre">add_note</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.MultipleObjectsReturned.add_note" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_note</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.MultipleObjectsReturned.add_note" title="Link to this definition">¶</a></dt>
 <dd><p>Exception.add_note(note) –
 add a note to the exception</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.user.models.User.MultipleObjectsReturned.with_traceback">
-<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.MultipleObjectsReturned.with_traceback" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">with_traceback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.MultipleObjectsReturned.with_traceback" title="Link to this definition">¶</a></dt>
 <dd><p>Exception.with_traceback(tb) –
 set self.__traceback__ to tb and return self.</p>
 </dd></dl>
@@ -440,11 +440,6 @@ return only permissions matching this object.</p>
 <dd><p>Return the username for this User.</p>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="fecfiler.user.models.User.groups">
-<span class="sig-name descname"><span class="pre">groups</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#fecfiler.user.models.User.groups" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.user.models.User.has_module_perms">
 <span class="sig-name descname"><span class="pre">has_module_perms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.has_module_perms" title="Link to this definition">¶</a></dt>
@@ -536,11 +531,6 @@ for example). Normally, you would just access the attribute directly
 and not use this method.</p>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="fecfiler.user.models.User.user_permissions">
-<span class="sig-name descname"><span class="pre">user_permissions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#fecfiler.user.models.User.user_permissions" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.user.models.User.validate_unique">
 <span class="sig-name descname"><span class="pre">validate_unique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.user.models.User.validate_unique" title="Link to this definition">¶</a></dt>
@@ -628,7 +618,6 @@ failed.</p>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.get_short_name"><code class="docutils literal notranslate"><span class="pre">User.get_short_name()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.get_user_permissions"><code class="docutils literal notranslate"><span class="pre">User.get_user_permissions()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.get_username"><code class="docutils literal notranslate"><span class="pre">User.get_username()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.groups"><code class="docutils literal notranslate"><span class="pre">User.groups</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.has_module_perms"><code class="docutils literal notranslate"><span class="pre">User.has_module_perms()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.has_perm"><code class="docutils literal notranslate"><span class="pre">User.has_perm()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.has_perms"><code class="docutils literal notranslate"><span class="pre">User.has_perms()</span></code></a></li>
@@ -639,7 +628,6 @@ failed.</p>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.save"><code class="docutils literal notranslate"><span class="pre">User.save()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.save_base"><code class="docutils literal notranslate"><span class="pre">User.save_base()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.serializable_value"><code class="docutils literal notranslate"><span class="pre">User.serializable_value()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.user_permissions"><code class="docutils literal notranslate"><span class="pre">User.user_permissions</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.user.models.User.validate_unique"><code class="docutils literal notranslate"><span class="pre">User.validate_unique()</span></code></a></li>
 </ul>
 </li>
