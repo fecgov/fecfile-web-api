@@ -2,11 +2,13 @@ from django.test import TestCase
 from ..serializers import (
     Form3XSerializer,
     COVERAGE_DATE_REPORT_CODE_COLLISION,
+    COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS
 )
 from fecfiler.user.models import User
 from fecfiler.reports.models import Report
 from rest_framework.request import Request, HttpRequest
 from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.web_services.models import (
     FECStatus,
@@ -122,3 +124,70 @@ class F3XSerializerTestCase(TestCase):
         f3x_report = Report.objects.get(id=f3x_report.id)
         representation = valid_serializer.to_representation(f3x_report)
         self.assertEqual(representation["report_status"], "Submission failure")
+
+    def test_update_coverage_to_overlapping_dates(self):
+        report_a = create_form3x(self.committee, "2024-01-01", "2024-03-31")
+        create_form3x(self.committee, "2024-04-01", "2024-06-30")
+
+        serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
+        )
+        serializer.is_valid()
+        self.assertRaises(
+            type(COVERAGE_DATE_REPORT_CODE_COLLISION),
+            serializer.update,
+            report_a,
+            {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-05-31"}
+        )
+
+    def test_update_coverage_to_exclude_transaction(self):
+        report_a = create_form3x(self.committee, "2024-01-01", "2024-03-31")
+        create_schedule_a("INDIVIDUAL_RECEIPT", self.committee, None, "2024-03-31", 250, report=report_a)
+
+        serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
+        )
+        serializer.is_valid()
+        self.assertRaises(
+            type(COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS),
+            serializer.update,
+            report_a,
+            {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-02-28"}
+        )
+
+    def test_update_coverage_to_exclude_memo_transaction(self):
+        report_a = create_form3x(self.committee, "2024-01-01", "2024-03-31")
+        create_schedule_a("INDIVIDUAL_RECEIPT", self.committee, None, "2024-03-31", 250, report=report_a, memo_code=True)
+
+        serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
+        )
+        serializer.is_valid()
+        self.assertEqual(
+            serializer.update(
+                report_a,
+                {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-02-28"}
+            ),
+            report_a
+        )
+
+    def test_update_coverage_to_exclude_deleted_transaction(self):
+        report_a = create_form3x(self.committee, "2024-01-01", "2024-03-31")
+        transaction = create_schedule_a("INDIVIDUAL_RECEIPT", self.committee, None, "2024-03-31", 250, report=report_a, memo_code=True)
+        transaction.delete()
+
+        serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
+        )
+        serializer.is_valid()
+        self.assertEqual(
+            serializer.update(
+                report_a,
+                {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-02-28"}
+            ),
+            report_a
+        )
