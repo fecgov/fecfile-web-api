@@ -54,7 +54,7 @@ class LoadTestUtils:
         )
         logger.info(f"Creating {single_transactions_needed} single transactions")
         self.locust_data_generator.generate_single_schedule_a_transactions(
-            number_of_transactions,
+            single_transactions_needed,
             reports,
             contacts,
         )
