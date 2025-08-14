@@ -97,13 +97,13 @@ BEGIN
                     (SELECT loan_id FROM transactions_transaction WHERE id = $1),
                     $1
                 )
-            )) 
-			OR data.original_loan_id IN (
-				SELECT t.transaction_id
-    			FROM transactions_transaction t
-    			WHERE t.schedule_c_id IS NOT NULL
-      			AND t.loan_id =  $2
-			)
+            ))
+            OR data.original_loan_id IN (
+                SELECT t.transaction_id
+                FROM transactions_transaction t
+                WHERE t.schedule_c_id IS NOT NULL
+                AND t.loan_id =  $2
+            )
         ) AS tc
         WHERE t.id = tc.id
         AND tc.is_loan = ''T'';
