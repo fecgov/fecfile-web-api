@@ -47,7 +47,16 @@ def get_devops_status_report():
 
 @shared_task
 def delete_expired_s3_objects():
-    bucket = S3_SESSION.Bucket(AWS_STORAGE_BUCKET_NAME)
+    try:
+        bucket = S3_SESSION.Bucket(AWS_STORAGE_BUCKET_NAME)
+    except Exception as e:
+        logger.error(
+            "Failed to access S3 bucket",
+            bucket_name=AWS_STORAGE_BUCKET_NAME,
+            error=str(e),
+        )
+        return
+
     object_expiry_datetime = timezone.now() - timedelta(days=S3_OBJECTS_MAX_AGE_DAYS)
     keys_to_delete = [
         {"Key": object["key"]}
