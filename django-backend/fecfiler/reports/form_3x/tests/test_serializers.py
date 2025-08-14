@@ -143,7 +143,13 @@ class F3XSerializerTestCase(TestCase):
 
     def test_update_coverage_to_exclude_transaction(self):
         report_a = create_form3x(self.committee, "2024-01-01", "2024-03-31")
-        create_schedule_a("INDIVIDUAL_RECEIPT", self.committee, None, "2024-03-31", 250, report=report_a)
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee, None,
+            "2024-03-31",
+            250,
+            report=report_a
+        )
 
         serializer = Form3XSerializer(
             data=self.valid_f3x_report,
@@ -159,7 +165,15 @@ class F3XSerializerTestCase(TestCase):
 
     def test_update_coverage_to_exclude_memo_transaction(self):
         report_a = create_form3x(self.committee, "2024-01-01", "2024-03-31")
-        create_schedule_a("INDIVIDUAL_RECEIPT", self.committee, None, "2024-03-31", 250, report=report_a, memo_code=True)
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            None,
+            "2024-03-31",
+            250,
+            report=report_a,
+            memo_code=True
+        )
 
         serializer = Form3XSerializer(
             data=self.valid_f3x_report,
@@ -169,14 +183,25 @@ class F3XSerializerTestCase(TestCase):
         self.assertEqual(
             serializer.update(
                 report_a,
-                {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-02-28"}
+                {
+                    "coverage_from_date": "2024-01-01",
+                    "coverage_through_date": "2024-02-28"
+                }
             ),
             report_a
         )
 
     def test_update_coverage_to_exclude_deleted_transaction(self):
         report_a = create_form3x(self.committee, "2024-01-01", "2024-03-31")
-        transaction = create_schedule_a("INDIVIDUAL_RECEIPT", self.committee, None, "2024-03-31", 250, report=report_a, memo_code=True)
+        transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            None,
+            "2024-03-31",
+            250,
+            report=report_a,
+            memo_code=True
+        )
         transaction.delete()
 
         serializer = Form3XSerializer(
@@ -187,7 +212,10 @@ class F3XSerializerTestCase(TestCase):
         self.assertEqual(
             serializer.update(
                 report_a,
-                {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-02-28"}
+                {
+                    "coverage_from_date": "2024-01-01",
+                    "coverage_through_date": "2024-02-28"
+                }
             ),
             report_a
         )
