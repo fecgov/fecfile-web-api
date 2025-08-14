@@ -388,15 +388,17 @@ CELERY_BEAT_SCHEDULE = {
             "priority": 1,  # 0-9; 0 is the highest priority; 5 is the default
         },
     },
-    "delete_expired_s3_objects": {
+}
+if CELERY_WORKER_STORAGE != "local":
+    CELERY_BEAT_SCHEDULE["delete_expired_s3_objects"] = {
         "task": "fecfiler.devops.tasks.delete_expired_s3_objects",
         "schedule": 86400.0,  # Once per day
         "args": (),
         "options": {
             "expires": 15.0,
         },
-    },
-}
+    }
+
 
 """FEC Webload settings
 """
