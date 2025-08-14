@@ -67,7 +67,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "rest_framework",
-    "django.contrib.staticfiles",
     "drf_spectacular",
     "corsheaders",
     "django_structlog",
@@ -90,12 +89,16 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = []
 
-STATIC_URL = "/static/"
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
-STATIC_ROOT = "static"
 
 if INCLUDE_SILK:
-    INSTALLED_APPS += ["silk"]
+    STATIC_URL = "/static/"
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
+    STATIC_ROOT = "static"
+
+    INSTALLED_APPS += [
+        "silk",
+        "django.contrib.staticfiles",
+    ]
     MIDDLEWARE = ["silk.middleware.SilkyMiddleware"]
     # Static files (CSS, JavaScript, Images)
     # https://docs.djangoproject.com/en/1.11/howto/static-files/
