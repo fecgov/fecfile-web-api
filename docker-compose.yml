@@ -192,14 +192,9 @@ services:
             - '8089:8089'
         volumes:
             - ./:/mnt/locust
-        command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
-        #command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080
+        # command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
+        command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080
         profiles: [locust]
-        environment:
-            LOCAL_TEST_USER:
-            LOCAL_TEST_PWD:
-            OIDC_SESSION_ID:
-            CSRF_TOKEN:
 
     locust-follower:
         image: locustio/locust
@@ -207,11 +202,6 @@ services:
             - ./:/mnt/locust
         command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
         profiles: [locust]
-        environment:
-            LOCAL_TEST_USER:
-            LOCAL_TEST_PWD:
-            OIDC_SESSION_ID:
-            CSRF_TOKEN:
 
     locust-leader-app:
         image: locustio/locust
