@@ -476,3 +476,5 @@ TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
 ENABLE_RESTRICTED_COMMANDS = get_boolean_from_string(
     env.get_credential("ENABLE_RESTRICTED_COMMANDS", "False")
 )
+
+E2E_TEST = get_boolean_from_string(env.get_credential("E2E_TEST", "False"))

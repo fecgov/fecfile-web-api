@@ -158,14 +158,13 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             if request.GET.get("exclude_ids")
             else []
         )
-        params = {"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY}
-        if office:
-            params["office"] = office
-        params = urlencode(params)
-        if len(q) >= 3:
-            response = requests.get(
-                FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params
-            )
+        if not settings.E2E_TEST and len(q) >= 3:
+            params = {"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY}
+            if office:
+                params["office"] = office
+            params = urlencode(params)
+
+            response = requests.get(FEC_API_CANDIDATE_LOOKUP_ENDPOINT, params=params)
             if response.status_code != status.HTTP_404_NOT_FOUND:
                 response.raise_for_status()
 
@@ -229,11 +228,9 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             if request.GET.get("exclude_ids")
             else []
         )
-        params = urlencode({"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY})
-        if len(q) >= 3:
-            response = requests.get(
-                FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params
-            )
+        if not settings.E2E_TEST and len(q) >= 3:
+            params = urlencode({"q": q, "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY})
+            response = requests.get(FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params=params)
             if response.status_code != status.HTTP_404_NOT_FOUND:
                 response.raise_for_status()
 
@@ -365,6 +362,19 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         )
         return max_fecfile_results, max_fec_results
 
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="e2e-delete-all-contacts",
+    )
+    def e2e_delete_all_contacts(self, request):
+        contacts = Contact.objects.filter(committee_account__committee_id="C99999999")
+        contact_count = contacts.count()
+
+        delete_all_contacts()
+        delete_all_contacts("C99999998")
+        return Response(f"Deleted {contact_count} Contacts")
+
 
 class DeletedContactsViewSet(
     CommitteeOwnedViewMixin,
@@ -406,3 +416,13 @@ class DeletedContactsViewSet(
             )
         contacts.update(deleted=None)
         return Response(ids_to_restore)
+
+
+def delete_all_contacts(committee_id="C99999999", log_method=logger.warn):
+    contacts = Contact.objects.filter(committee_account__committee_id=committee_id)
+    contact_count = contacts.count()
+
+    log_method(f"Deleting Contacts for {committee_id}")
+    log_method(f"Deleting Contacts: {contact_count}")
+
+    contacts.delete()

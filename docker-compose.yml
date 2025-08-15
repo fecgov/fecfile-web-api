@@ -193,6 +193,7 @@ services:
         volumes:
             - ./:/mnt/locust
         command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
+        #command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080
         profiles: [locust]
         environment:
             LOCAL_TEST_USER:
