@@ -25,6 +25,7 @@ import json
 import redis
 import structlog
 
+
 logger = structlog.get_logger(__name__)
 
 if MOCK_OIDC_PROVIDER_CACHE:
@@ -156,21 +157,21 @@ def token(request):
 @permission_classes([])
 @require_http_methods(["GET"])
 def userinfo(request):
-    auth_data = json.loads(redis_instance.get(MOCK_OIDC_PROVIDER_DATA))
-    if "Authorization" not in request.headers:
-        logger.error("Authorization header is required")
-        return HttpResponseBadRequest("Authorization header is required")
-    if not auth_data.get("access_token"):
-        logger.error("all to authorize endpoint is required first")
-        return HttpResponseBadRequest("call to authorize endpoint is required first")
-    auth_header = request.headers.get("Authorization")
-    match = re.search("Bearer (.+)", auth_header)
-    if not match:
-        logger.error("Bearer token not found")
-        return HttpResponseBadRequest("Bearer token not found")
-    if match.group(1) != auth_data.get("access_token"):
-        logger.error("Invalid Bearer token")
-        return HttpResponseBadRequest("Invalid Bearer token")
+    # auth_data = json.loads(redis_instance.get(MOCK_OIDC_PROVIDER_DATA))
+    # if "Authorization" not in request.headers:
+    #     logger.error("Authorization header is required")
+    #     return HttpResponseBadRequest("Authorization header is required")
+    # if not auth_data.get("access_token"):
+    #     logger.error("all to authorize endpoint is required first")
+    #     return HttpResponseBadRequest("call to authorize endpoint is required first")
+    # auth_header = request.headers.get("Authorization")
+    # match = re.search("Bearer (.+)", auth_header)
+    # if not match:
+    #     logger.error("Bearer token not found")
+    #     return HttpResponseBadRequest("Bearer token not found")
+    # if match.group(1) != auth_data.get("access_token"):
+    #     logger.error("Invalid Bearer token")
+    #     return HttpResponseBadRequest("Invalid Bearer token")
 
     retval = {
         "sub": test_username,
