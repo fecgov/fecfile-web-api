@@ -36,6 +36,7 @@ fecfiler.transactions
    fecfiler.transactions.managers
    fecfiler.transactions.migrations
    fecfiler.transactions.models
+   fecfiler.transactions.profilers
    fecfiler.transactions.schedule_a
    fecfiler.transactions.schedule_b
    fecfiler.transactions.schedule_c
