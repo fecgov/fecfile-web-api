@@ -14,7 +14,7 @@ class TimeoutMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
         session_cookie = response.cookies.get(settings.SESSION_COOKIE_NAME)
-        if session_cookie:
+        if session_cookie and request.user.is_authenticated:
             response.set_cookie(
                 FFAPI_TIMEOUT_COOKIE_NAME,
                 parse_http_date_safe(session_cookie.get("expires")),
@@ -22,7 +22,7 @@ class TimeoutMiddleware:
                 expires=session_cookie.get("expires"),
                 domain=FFAPI_COOKIE_DOMAIN,
                 secure=True,
-                samesite=settings.SESSION_COOKIE_SAMESITE
+                samesite=settings.SESSION_COOKIE_SAMESITE,
             )
 
         return response

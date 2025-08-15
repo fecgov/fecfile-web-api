@@ -1,6 +1,7 @@
 from django.test import TestCase
 from unittest.mock import Mock, patch
 from fecfiler.devops.utils.cf_api_utils import (
+    check_api_status,
     get_organization_guid,
     get_space_guid,
     get_service_instance_guid_from_names,
@@ -14,6 +15,25 @@ from fecfiler.devops.utils.cf_api_utils import (
 
 
 class CfApiUtilsTestCase(TestCase):
+
+    # check_api_status
+
+    def test_check_api_status_error_response(self):
+        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+            mock_requests.get.return_value = mock_response = Mock()
+            mock_response.raise_for_status.side_effect = Exception("FAIL")
+            with self.assertRaisesMessage(
+                Exception,
+                "Failed to retrieve api status",
+            ):
+                check_api_status()
+
+    def test_check_api_status_happy_path(self):
+        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+            mock_requests.get.return_value = mock_response = Mock()
+            mock_response.status_code = 200
+            response = check_api_status()
+            self.assertEqual(response.status_code, 200)
 
     # retrieve_credentials
 

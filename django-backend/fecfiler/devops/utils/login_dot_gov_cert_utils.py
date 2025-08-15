@@ -11,7 +11,11 @@ from fecfiler.settings import (
     LOGIN_DOT_GOV_RSA_PK_SIZE,
 )
 from fecfiler.s3 import S3_SESSION
-from fecfiler.devops.utils.cf_api_utils import retrieve_credentials, update_credentials
+from fecfiler.devops.utils.cf_api_utils import (
+    check_api_status,
+    retrieve_credentials,
+    update_credentials,
+)
 from fecfiler.devops.utils.crypt_utils import (
     gen_rsa_pk,
     rsa_pk_to_bytes,
@@ -33,6 +37,9 @@ def backout_login_dot_gov_cert(
     cf_service_instance_name: str,
 ):
     try:
+        logger.info("Checking cf api status")
+        check_api_status()
+
         logger.info("Retrieving current creds")
         current_creds = retrieve_credentials(
             cf_token, cf_organization_name, cf_space_name, cf_service_instance_name
@@ -61,6 +68,9 @@ def install_login_dot_gov_cert(
     cf_service_instance_name: str,
 ):
     try:
+        logger.info("Checking cf api status")
+        check_api_status()
+
         logger.info("Retrieving current creds")
         current_creds = retrieve_credentials(
             cf_token, cf_organization_name, cf_space_name, cf_service_instance_name
@@ -89,6 +99,9 @@ def gen_and_stage_login_dot_gov_cert(
     cf_service_instance_name: str,
 ):
     try:
+        logger.info("Checking cf api status")
+        check_api_status()
+
         logger.info("Generating rsa pk")
         rsa_pk = gen_rsa_pk(LOGIN_DOT_GOV_RSA_PK_SIZE)
 
