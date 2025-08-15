@@ -20,12 +20,9 @@ fecfiler.devops.utils.load\_test\_utils.LoadTestUtils
    .. autosummary::
    
       ~LoadTestUtils.__init__
-      ~LoadTestUtils.create_contacts
       ~LoadTestUtils.create_load_test_committee_and_data
+      ~LoadTestUtils.create_load_test_committees_and_data
       ~LoadTestUtils.create_new_committee
-      ~LoadTestUtils.create_reports
-      ~LoadTestUtils.create_single_transactions
-      ~LoadTestUtils.create_triple_transactions
    
    
 

@@ -99,12 +99,9 @@ fecfiler.devops.tests.test\_load\_test\_utils.LoadTestUtilsTestCase
       ~LoadTestUtilsTestCase.subTest
       ~LoadTestUtilsTestCase.tearDown
       ~LoadTestUtilsTestCase.tearDownClass
-      ~LoadTestUtilsTestCase.test_create_contacts
       ~LoadTestUtilsTestCase.test_create_load_test_committee_and_data
+      ~LoadTestUtilsTestCase.test_create_load_test_committees_and_data
       ~LoadTestUtilsTestCase.test_create_new_committee
-      ~LoadTestUtilsTestCase.test_create_reports
-      ~LoadTestUtilsTestCase.test_create_single_transactions
-      ~LoadTestUtilsTestCase.test_create_triple_transactions
    
    
 

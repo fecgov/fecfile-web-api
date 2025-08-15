@@ -1,6 +1,0 @@
-fecfiler.devops.utils.locust\_data\_generator.save\_json
-========================================================
-
-.. currentmodule:: fecfiler.devops.utils.locust_data_generator
-
-.. autofunction:: save_json
