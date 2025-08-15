@@ -12,6 +12,7 @@ from .env import env
 from corsheaders.defaults import default_headers
 from fecfiler.celery import CeleryStorageType
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
+from fecfiler.transactions.profilers import TRANSACTION_MANAGER_PROFILING
 from math import floor
 
 
@@ -50,6 +51,7 @@ AUTH_USER_MODEL = "user.User"
 
 ALLOWED_HOSTS = ["*"]
 
+
 # Application definition
 
 SESSION_COOKIE_AGE = int(
@@ -57,6 +59,8 @@ SESSION_COOKIE_AGE = int(
 )
 SESSION_SAVE_EVERY_REQUEST = True
 
+
+INCLUDE_SILK = get_boolean_from_string(env.get_credential("INCLUDE_SILK", "False"))
 INSTALLED_APPS = [
     # "django.contrib.admin",
     "django.contrib.auth",
@@ -84,7 +88,31 @@ INSTALLED_APPS = [
     "fecfiler.openapi",
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE = []
+
+
+if INCLUDE_SILK:
+    STATIC_URL = "/static/"
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
+    STATIC_ROOT = "static"
+
+    INSTALLED_APPS += [
+        "silk",
+        "django.contrib.staticfiles",
+    ]
+    MIDDLEWARE = ["silk.middleware.SilkyMiddleware"]
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/1.11/howto/static-files/
+
+    SILKY_PYTHON_PROFILER = True
+    SILKY_PYTHON_PROFILER_BINARY = True
+
+    # the sub-directories of media and static files
+    STATICFILES_LOCATION = "static"
+    SILKY_DYNAMIC_PROFILING = TRANSACTION_MANAGER_PROFILING
+
+
+MIDDLEWARE += [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
@@ -124,6 +152,7 @@ CORS_ALLOW_HEADERS = (
 )
 
 CORS_ALLOW_CREDENTIALS = True
+
 
 # Database
 DATABASES = {

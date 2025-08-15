@@ -7,6 +7,7 @@ from fecfiler import settings
 logger = structlog.get_logger(__name__)
 
 allowed_commands = [
+    "collectstatic",
     "help",
     "migrate",
     "lintmigrations",
