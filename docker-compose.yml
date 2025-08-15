@@ -189,22 +189,22 @@ services:
         limits:
           memory: 256M
 
-    locust-leader:
-      image: locustio/locust
-      ports:
-        - "8089:8089"
-      volumes:
-        - ./:/mnt/locust
-      # command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
-      command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080
-      profiles: [locust]
+  locust-leader:
+    image: locustio/locust
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./:/mnt/locust
+    # command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
+    command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080
+    profiles: [locust]
 
-    locust-follower:
-      image: locustio/locust
-      volumes:
-        - ./:/mnt/locust
-      command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
-      profiles: [locust]
+  locust-follower:
+    image: locustio/locust
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
+    profiles: [locust]
 
   locust-leader-app:
     image: locustio/locust
