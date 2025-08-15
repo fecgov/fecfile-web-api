@@ -14,7 +14,6 @@ fecfiler.settings.base
       :toctree:                                          
    
       SYSTEM_STATUS_CACHE_AGE
-      CELERY_BEAT_SCHEDULE
       FEC_FORMAT_VERSION
       SECONDARY_POLLING_MAX_ATTEMPTS
       S3_OBJECTS_MAX_AGE_DAYS

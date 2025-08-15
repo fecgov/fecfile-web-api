@@ -1,6 +1,0 @@
-fecfiler.settings.base.CELERY\_BEAT\_SCHEDULE
-=============================================
-
-.. currentmodule:: fecfiler.settings.base
-
-.. autodata:: CELERY_BEAT_SCHEDULE
