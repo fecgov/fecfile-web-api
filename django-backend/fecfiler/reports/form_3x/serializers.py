@@ -369,9 +369,25 @@ class Form3XSerializer(ReportSerializer):
             if transactions_outside_coverage_dates > 0:
                 raise COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS
 
+            # Check if there is any overlap in dates with other reports
+            number_of_overlapping_reports = Report.objects.filter(
+                ~Q(id=instance.id),
+                Q(
+                    coverage_from_date__gte=validated_data["coverage_from_date"],
+                    coverage_from_date__lte=validated_data["coverage_through_date"]
+                ) | Q(
+                    coverage_through_date__gte=validated_data["coverage_from_date"],
+                    coverage_through_date__lte=validated_data["coverage_through_date"]
+                )
+            ).count()
+            if number_of_overlapping_reports > 0:
+                raise COVERAGE_DATE_REPORT_CODE_COLLISION
+
+            # Apply changes to the form_3x instance
             for attr, value in validated_data.items():
                 if attr != "id":
                     setattr(instance.form_3x, attr, value)
+
             instance.form_3x.save()
             updated = super().update(instance, validated_data)
             return updated
