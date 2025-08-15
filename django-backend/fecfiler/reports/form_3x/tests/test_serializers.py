@@ -200,7 +200,7 @@ class F3XSerializerTestCase(TestCase):
             "2024-03-31",
             250,
             report=report_a,
-            memo_code=True
+            memo_code=False
         )
         transaction.delete()
 
