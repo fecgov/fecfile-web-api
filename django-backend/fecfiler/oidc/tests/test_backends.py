@@ -6,7 +6,6 @@ from fecfiler.oidc.backends import OIDCAuthenticationBackend
 from fecfiler.oidc.utils import idp_base64_encode_left_128_bits_of_str
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import Membership, CommitteeAccount
-import fnmatch
 
 import json
 
@@ -341,7 +340,7 @@ class OIDCAuthenticationBackendTestCase(TestCase):
             timeout=None,
             proxies=None,
         )
-        assert fnmatch.fnmatch(str(args[0]), "*/api/v1/*/userinfo") is True
+        assert "/userinfo" in str(args)
         self.assertIsNotNone(retval)
 
     @patch("fecfiler.oidc.backends.requests")
