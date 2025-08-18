@@ -110,11 +110,7 @@ fecfiler.mock\_oidc\_provider.tests.test\_views.OidcTest
       ~OidcTest.test_token_authorize_code_invalid
       ~OidcTest.test_token_happy_path
       ~OidcTest.test_token_no_auth_data_code
-      ~OidcTest.test_userinfo_bearer_token_invalid
-      ~OidcTest.test_userinfo_bearer_token_not_found
       ~OidcTest.test_userinfo_happy_path
-      ~OidcTest.test_userinfo_no_auth_data_access_token
-      ~OidcTest.test_userinfo_no_auth_header
    
    
 
