@@ -18,6 +18,11 @@ class LoadTestUtils:
         number_of_transactions,
         single_to_triple_transaction_ratio,
     ):
+        test_user = User.objects.filter(email__iexact=test_user_email).first()
+        if not test_user:
+            logger.info(f"Creating test user: {test_user_email}")
+            User.objects.create(email=test_user_email, username=test_user_email)
+        logger.info(f"Test user already exists: {test_user_email}")
         base_committee_number = 33333333
         for i in range(number_of_committees):
             new_committee_id = f"C{base_committee_number + i}"
