@@ -56,6 +56,7 @@ testem.log
 django-backend/.cache/
 django-backend/.local/
 
+
 ### Bower ###
 */bower_components
 *.bower-cache
@@ -83,3 +84,7 @@ django-backend/celerybeat-schedule
 
 # login.gov certs
 *.crt
+
+#profiling
+static/
+*.prof

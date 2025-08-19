@@ -1,4 +1,4 @@
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, ANY
 from requests.exceptions import HTTPError
 from django.core.exceptions import SuspiciousOperation
 from django.test import RequestFactory, TestCase
@@ -332,6 +332,15 @@ class OIDCAuthenticationBackendTestCase(TestCase):
         auth_request = RequestFactory().get("/foo", {"code": test_code, "state": "bar"})
 
         retval = self.backend.authenticate(request=auth_request, nonce=test_nonce_value)
+        args, _ = requests_mock.get.call_args
+        requests_mock.get.assert_called_with(
+            ANY,
+            headers={"Authorization": "Bearer test_access_token"},
+            verify=True,
+            timeout=None,
+            proxies=None,
+        )
+        assert "/userinfo" in str(args)
         self.assertIsNotNone(retval)
 
     @patch("fecfiler.oidc.backends.requests")
@@ -425,8 +434,9 @@ class OIDCAuthenticationBackendTestCase(TestCase):
             }
         ).encode()
 
-        existing_user = User.objects.create(email=existing_email,
-                                            username=existing_username)
+        existing_user = User.objects.create(
+            email=existing_email, username=existing_username
+        )
         committee = CommitteeAccount.objects.create(committee_id="C00000000")
         pending_membership = Membership.objects.create(
             pending_email=existing_email, committee_account=committee
