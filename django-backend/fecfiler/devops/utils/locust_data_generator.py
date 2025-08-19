@@ -3,6 +3,7 @@ from fecfiler.reports.models import Report
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
+from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.reports.models import ReportTransaction
 from fecfiler.contacts.models import Contact
 
@@ -152,6 +153,81 @@ class LocustDataGenerator:
             count, reports, contacts
         )
         tier3_transactions = self.generate_single_schedule_a_transactions(
+            count, reports, contacts
+        )
+
+        for index in range(count):
+            tier3_transactions[index].parent_transaction_id = tier2_transactions[index].id
+            tier2_transactions[index].parent_transaction_id = tier1_transactions[index].id
+        Transaction.objects.bulk_update(
+            tier3_transactions + tier2_transactions, ["parent_transaction_id"]
+        )
+
+        return tier1_transactions
+
+    def generate_single_schedule_b_transactions(self, count, reports, contacts):
+        schedule_b_list = []
+        transaction_list = []
+        report_transaction_list = []
+        for _ in range(count):
+            transaction_type_identifier = "OPERATING_EXPENDITURE"
+            contact = choice(contacts)
+            report = choice(reports)
+            contribution_date = report.coverage_from_date
+            contribution_amount = randrange(25, 10000)
+            aggregation_group = "GENERAL"
+            form_type = "SB21B"
+
+            schedule_b_list.append(
+                ScheduleB(
+                    **{
+                        "expenditure_date": contribution_date,
+                        "expenditure_amount": contribution_amount,
+                        # TODO: Are these swapped? This one and
+                        "expenditure_purpose_descrip": report.id,
+                    }
+                )
+            )
+
+        schedule_b_list = ScheduleB.objects.bulk_create(schedule_b_list)
+        for schedule_b in schedule_b_list:
+            transaction_list.append(
+                Transaction(
+                    **{
+                        "transaction_type_identifier": transaction_type_identifier,
+                        "committee_account_id": self.committee.id,
+                        "contact_1_id": contact.id,
+                        "aggregation_group": aggregation_group,
+                        "form_type": form_type,
+                        "schedule_b_id": schedule_b.id,
+                    }
+                )
+            )
+
+        transaction_list = Transaction.objects.bulk_create(transaction_list)
+
+        for transaction in transaction_list:
+            report_transaction_list.append(
+                ReportTransaction(
+                    **{
+                        # TODO: Are these swapped? This one and (also sch A)
+                        "report_id": transaction.schedule_b.expenditure_purpose_descrip,
+                        "transaction_id": transaction.id,
+                    }
+                )
+            )
+        ReportTransaction.objects.bulk_create(report_transaction_list)
+
+        return transaction_list
+
+    def generate_triple_schedule_b_transactions(self, count, reports, contacts):
+        tier1_transactions = self.generate_single_schedule_b_transactions(
+            count, reports, contacts
+        )
+        tier2_transactions = self.generate_single_schedule_b_transactions(
+            count, reports, contacts
+        )
+        tier3_transactions = self.generate_single_schedule_b_transactions(
             count, reports, contacts
         )
 

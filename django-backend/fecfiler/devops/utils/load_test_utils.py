@@ -57,8 +57,14 @@ class LoadTestUtils:
         single_transactions_needed = math.ceil(
             number_of_transactions * single_to_triple_transaction_ratio
         )
-        logger.info(f"Creating {single_transactions_needed} single transactions")
+        logger.info(f"Creating {single_transactions_needed} Sch A single transactions")
         self.locust_data_generator.generate_single_schedule_a_transactions(
+            single_transactions_needed,
+            reports,
+            contacts,
+        )
+        logger.info(f"Creating {single_transactions_needed} Sch B single transactions")
+        self.locust_data_generator.generate_single_schedule_b_transactions(
             single_transactions_needed,
             reports,
             contacts,
@@ -67,8 +73,14 @@ class LoadTestUtils:
         triple_transactions_needed = math.ceil(
             number_of_transactions * (1 - single_to_triple_transaction_ratio)
         )
-        logger.info(f"Creating {triple_transactions_needed} triple transactions")
+        logger.info(f"Creating {triple_transactions_needed} Sch A triple transactions")
         self.locust_data_generator.generate_triple_schedule_a_transactions(
+            triple_transactions_needed,
+            reports,
+            contacts,
+        )
+        logger.info(f"Creating {triple_transactions_needed} Sch B triple transactions")
+        self.locust_data_generator.generate_triple_schedule_b_transactions(
             triple_transactions_needed,
             reports,
             contacts,
