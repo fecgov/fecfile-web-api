@@ -1,5 +1,6 @@
 from uuid import UUID
 from fecfiler.user.models import User
+from committee_membership_utils import add_user_to_committee
 from rest_framework import filters, viewsets, mixins, pagination, status
 from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.decorators import action
@@ -10,6 +11,7 @@ from fecfiler.committee_accounts.utils import (
     get_committee_account_data,
     raise_if_cannot_create_committee_account,
 )
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
 from django.core.exceptions import ValidationError
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
@@ -168,8 +170,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
     @action(detail=False, methods=["post"], url_path="add-member", url_name="add_member")
     def add_member(self, request):
-        committee_uuid = self.request.session["committee_uuid"]
-        committee = CommitteeAccount.objects.filter(id=committee_uuid).first()
+        committee_id = self.request.session["committee_id"]
 
         email = request.data.get("email", None)
         role = request.data.get("role", None)
@@ -194,36 +195,23 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         if not choice_of:
             return Response("Invalid role", status=400)
 
-        # Check for pre-existing membership
-        matching_memberships = self.get_queryset().filter(
-            Q(pending_email__iexact=email) | Q(user__email__iexact=email)
-        )
-        if matching_memberships.count() > 0:
-            return Response(
-                "This email is taken by an existing membership to this committee",
-                status=400,
+        try:
+            add_user_to_committee(email, committee_id, role)
+        except Exception as e:
+            logger.error(
+                f"Failed to add email {email} to committtee {committee_id} as {role} {str(e)}"
+            )
+            return (
+                HttpResponseBadRequest()
+                if isinstance(e, ValidationError)
+                else HttpResponseServerError()
             )
 
-        # Create new membership
-        user = User.objects.filter(email__iexact=email).first()
-
-        membership_args = {
-            "committee_account": committee,
-            "role": role,
-            "user": user,
-        } | (
-            {"pending_email": email} if user is None else {}
-        )  # Add pending email to args only if there is no user
-
-        new_member = Membership(**membership_args)
-        new_member.save()
-
-        action = f"existing user {user.id} to" if user else "pending membership for"
         logger.info(
-            f"User {request.user.id} added {action} committee {committee} as {role}"
+            f"User {request.user.id} added {email} to committee {committee_id} as {role}"
         )
 
-        return Response(CommitteeMembershipSerializer(new_member).data, status=200)
+        return HttpResponse()
 
     @action(
         detail=True,
