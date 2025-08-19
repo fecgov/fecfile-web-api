@@ -31,6 +31,7 @@ restricted_commands = [
     # COMMITTEE ACCOUNT COMMANDS #
     "load_committee_data",
     "delete_committee_account",
+    "add_user_to_committee",
     # REPORT COMMANDS #
     "delete_committee_reports",
     # users
