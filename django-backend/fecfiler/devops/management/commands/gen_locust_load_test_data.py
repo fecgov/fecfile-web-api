@@ -8,6 +8,7 @@ class Command(FECCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("test_user_email", type=str)
+        parser.add_argument("--base_committee_number", type=int, default=33333333)
         parser.add_argument("--number_of_committees", type=int, default=10)
         parser.add_argument("--number_of_reports", type=int, default=10)
         parser.add_argument("--number_of_contacts", type=int, default=100)
@@ -20,6 +21,7 @@ class Command(FECCommand):
         load_test_utils = LoadTestUtils()
         load_test_utils.create_load_test_committees_and_data(
             options["test_user_email"],
+            options["base_committee_number"],
             options["number_of_committees"],
             options["number_of_reports"],
             options["number_of_contacts"],

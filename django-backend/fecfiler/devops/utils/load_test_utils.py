@@ -12,6 +12,7 @@ class LoadTestUtils:
     def create_load_test_committees_and_data(
         self,
         test_user_email,
+        base_committee_number,
         number_of_committees,
         number_of_reports,
         number_of_contacts,
@@ -23,7 +24,6 @@ class LoadTestUtils:
             logger.info(f"Creating test user: {test_user_email}")
             User.objects.create(email=test_user_email, username=test_user_email)
         logger.info(f"Test user already exists: {test_user_email}")
-        base_committee_number = 33333333
         for i in range(number_of_committees):
             new_committee_id = f"C{base_committee_number + i}"
             self.create_load_test_committee_and_data(

@@ -12,7 +12,7 @@ class LoadTestUtilsTestCase(TestCase):
         # Should call create_load_test_committee_and_data correct number of times
         # with correct args
         self.utils.create_load_test_committees_and_data(
-            "test@example.com", 3, 2, 4, 5, 0.5
+            "test@example.com", 33333333, 3, 2, 4, 5, 0.5
         )
         self.assertEqual(mock_create_committee_and_data.call_count, 3)
         mock_create_committee_and_data.assert_any_call(
