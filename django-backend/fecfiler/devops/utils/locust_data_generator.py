@@ -110,6 +110,7 @@ class LocustDataGenerator:
                     **{
                         "contribution_date": contribution_date,
                         "contribution_amount": contribution_amount,
+                        # Store report ID in purpose field
                         "contribution_purpose_descrip": report.id,
                     }
                 )
@@ -136,6 +137,7 @@ class LocustDataGenerator:
             report_transaction_list.append(
                 ReportTransaction(
                     **{
+                        # Retrieve report ID from purpose field
                         "report_id": transaction.schedule_a.contribution_purpose_descrip,
                         "transaction_id": transaction.id,
                     }
@@ -183,7 +185,7 @@ class LocustDataGenerator:
                     **{
                         "expenditure_date": contribution_date,
                         "expenditure_amount": contribution_amount,
-                        # TODO: Are these swapped? This one and
+                        # Store report ID in purpose field
                         "expenditure_purpose_descrip": report.id,
                     }
                 )
@@ -210,7 +212,7 @@ class LocustDataGenerator:
             report_transaction_list.append(
                 ReportTransaction(
                     **{
-                        # TODO: Are these swapped? This one and (also sch A)
+                        # Retrieve report ID from purpose field
                         "report_id": transaction.schedule_b.expenditure_purpose_descrip,
                         "transaction_id": transaction.id,
                     }
