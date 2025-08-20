@@ -31,7 +31,11 @@ from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.transactions.schedule_f.models import ScheduleF
-SCHEDULE_MODELS = [ScheduleA, ScheduleB, ScheduleC, ScheduleC1, ScheduleC2, ScheduleD, ScheduleE, ScheduleF]
+SCHEDULE_MODELS = [
+    ScheduleA, ScheduleB, ScheduleC,
+    ScheduleC1, ScheduleC2, ScheduleD,
+    ScheduleE, ScheduleF
+]
 
 # Memos
 from fecfiler.memo_text.models import MemoText
@@ -63,7 +67,7 @@ class Command(BaseCommand):
         parser.add_argument("--filename", required=False)
 
     def serialize(self, queryset):
-        return serializers.serialize("json", queryset)[1:-1] # Strip square brackets
+        return serializers.serialize("json", queryset)[1:-1]  # Strip square brackets
 
     def dump_model(self, Model, filter_args, order_by=None):
         queryset = Model.objects.filter(**filter_args)
@@ -83,10 +87,10 @@ class Command(BaseCommand):
         return dumped_models
 
     def dump_committee(self, committee):
-        return self.dump_model(CommitteeAccount, {"id":committee.id})
+        return self.dump_model(CommitteeAccount, {"id": committee.id})
 
     def dump_contacts(self, committee):
-        return self.dump_model(Contact, {"committee_account":committee})
+        return self.dump_model(Contact, {"committee_account": committee})
 
     def dump_reports(self, committee):
         dumped_data = self.dump_model_list(
@@ -104,8 +108,8 @@ class Command(BaseCommand):
         )
         dumped_data += self.dump_model(
             Transaction,
-            {"committee_account":committee},
-            "created" # Ensure that parents are loaded before children
+            {"committee_account": committee},
+            order_by="created"  # Ensure that parents are loaded before children
         )
         dumped_data += self.dump_model(
             ReportTransaction,
@@ -182,7 +186,7 @@ class Command(BaseCommand):
         committee_id = options.get("committee_id")
         if committee_id is None:
             raise CommandError("Committee ID is a required parameter")
- 
+
         committee = CommitteeAccount.objects.filter(committee_id=committee_id).first()
         if committee is None:
             raise CommandError("No Committee Account found matching that Committee ID")
