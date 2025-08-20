@@ -9,9 +9,11 @@ from .locust_data_generator import LocustDataGenerator
 logger = structlog.get_logger(__name__)
 
 TEST_USER_EMAIL = "test@test.com"
+BACKUP_TEST_USER_EMAIL = "test2@test.com"
 
 
 class LoadTestUtils:
+
     def create_load_test_committees_and_data(
         self,
         base_committee_number,
@@ -21,11 +23,7 @@ class LoadTestUtils:
         number_of_transactions,
         single_to_triple_transaction_ratio,
     ):
-        test_user = User.objects.filter(email__iexact=TEST_USER_EMAIL).first()
-        if not test_user:
-            logger.info(f"Creating test user: {TEST_USER_EMAIL}")
-            User.objects.create(email=TEST_USER_EMAIL, username=TEST_USER_EMAIL)
-        logger.info(f"Test user already exists: {TEST_USER_EMAIL}")
+        self.create_test_users()
         for i in range(number_of_committees):
             new_committee_id = f"C{base_committee_number + i}"
             self.create_load_test_committee_and_data(
@@ -87,13 +85,14 @@ class LoadTestUtils:
         )
 
     def create_new_committee(self, new_committee_id):
-        user = User.objects.filter(email__iexact=TEST_USER_EMAIL).first()
         committee = CommitteeAccount.objects.create(committee_id=new_committee_id)
-        Membership.objects.create(
-            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
-            committee_account_id=committee.id,
-            user=user,
-        )
+        for email in (TEST_USER_EMAIL, BACKUP_TEST_USER_EMAIL):
+            test_user = User.objects.filter(email__iexact=email).first()
+            Membership.objects.create(
+                role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+                committee_account_id=committee.id,
+                user=test_user,
+            )
         return committee
 
     def delete_load_test_committees_and_data(
@@ -101,15 +100,65 @@ class LoadTestUtils:
         base_committee_number,
         number_of_committees,
     ):
+        test_user = User.objects.filter(email__iexact=TEST_USER_EMAIL).first()
+        if not test_user:
+            logger.error(f"User with email does not exist: {TEST_USER_EMAIL}")
+            return
+        backup_test_user = User.objects.filter(email__iexact=BACKUP_TEST_USER_EMAIL).first()
         for i in range(number_of_committees):
             committee_id = f"C{base_committee_number + i}"
-            call_command("delete_committee_account", committee_id)
+            committee = CommitteeAccount.objects.filter(committee_id=committee_id).first()
+            user_count = Membership.objects.filter(
+                role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+                committee_account_id=committee.id
+            ).count()
+            test_user_membership = Membership.objects.filter(
+                role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+                committee_account_id=committee.id,
+                user=[test_user,backup_test_user]
+            ).count()
+            backup_test_user_membership = Membership.objects.filter(
+                role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+                committee_account_id=committee.id,
+                user=backup_test_user,
+            ).first()
+            # Make sure test users are the only users
+            if user_count <= 2 and test_user_membership and backup_test_user_membership:
+                logger.info(f"Deleting committee: {committee_id}")
+                call_command("delete_committee_account", committee_id)
+            logger.info(f"Skipped deleting committee: {committee_id}")
+        self.delete_test_users()
+
+    def create_test_users(self):
+        for email in (TEST_USER_EMAIL, BACKUP_TEST_USER_EMAIL):
+            test_user = User.objects.filter(email__iexact=email).first()
+            if not test_user:
+                logger.info(f"Creating test user: {email}")
+                User.objects.create(email=email, username=email)
+            else:
+                logger.info(f"Test user already exists: {email}")
+
+
+    def delete_test_users(self):
+        test_user = User.objects.filter(email__iexact=TEST_USER_EMAIL).first()
+        if not test_user:
+            logger.error(f"User with email does not exist: {TEST_USER_EMAIL}")
+            return
+        backup_test_user = User.objects.filter(email__iexact=BACKUP_TEST_USER_EMAIL).first()
+        test_user_membership = Membership.objects.filter(
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            user=test_user,
+        ).first()
+        backup_test_user_membership = Membership.objects.filter(
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            user=backup_test_user,
+        ).first()
         try:
             logger.info(f"Deleting test user: {TEST_USER_EMAIL}")
-            test_user = User.objects.filter(email__iexact=TEST_USER_EMAIL).first()
             test_user.delete()
             logger.info(f"Deleted test user successfully: {TEST_USER_EMAIL}")
-        except User.DoesNotExist:
-            print(f"User with email does not exist: {TEST_USER_EMAIL}")
+            logger.info(f"Deleting test user: {BACKUP_TEST_USER_EMAIL}")
+            backup_test_user.delete()
+            logger.info(f"Deleted test user successfully: {BACKUP_TEST_USER_EMAIL}")
         except Exception as e:
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
