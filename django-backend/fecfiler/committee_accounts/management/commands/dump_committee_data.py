@@ -48,7 +48,7 @@ logger = structlog.get_logger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Dump all data for a given committee into redis"
+    help = "Dump all data for a given committee into a valid JSON fixture"
 
     def add_arguments(self, parser):
         parser.add_argument("--s3", action="store_true")
