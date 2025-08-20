@@ -2,6 +2,7 @@ import structlog
 import math
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.user.models import User
+from django.core.management import call_command
 
 from .locust_data_generator import LocustDataGenerator
 
@@ -94,3 +95,21 @@ class LoadTestUtils:
             user=user,
         )
         return committee
+
+    def delete_load_test_committees_and_data(
+        self,
+        base_committee_number,
+        number_of_committees,
+    ):
+        for i in range(number_of_committees):
+            committee_id = f"C{base_committee_number + i}"
+            call_command("delete_committee_account", committee_id)
+        try:
+            logger.info(f"Deleting test user: {TEST_USER_EMAIL}")
+            test_user = User.objects.filter(email__iexact=TEST_USER_EMAIL).first()
+            test_user.delete()
+            logger.info(f"Deleted test user successfully: {TEST_USER_EMAIL}")
+        except User.DoesNotExist:
+            print(f"User with email does not exist: {TEST_USER_EMAIL}")
+        except Exception as e:
+            print(f"An error occurred: {e}")

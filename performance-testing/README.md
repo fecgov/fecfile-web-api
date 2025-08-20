@@ -11,7 +11,7 @@
 3. Open a browser to http://localhost:8089 and begin testing.
 4. Once you are done testing, you may wish to cleanup the load test data created in step
    3 using the following management command:
-   `./manage.py delete_committee_account <committee_account_id>`
+   `./manage.py delete_locust_load_test_data`
 
 # Locust Testing detailed instructions
 
