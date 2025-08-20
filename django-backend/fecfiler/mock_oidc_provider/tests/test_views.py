@@ -15,7 +15,7 @@ from fecfiler.mock_oidc_provider.views import (
 
 
 class OidcTest(TestCase):
-    fixtures = ["fixtures/e2e-test-data"]
+    fixtures = ["fixtures/user-data"]
 
     def setUp(self):
         self.factory = RequestFactory()
