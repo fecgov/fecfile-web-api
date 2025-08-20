@@ -7,11 +7,12 @@ from .locust_data_generator import LocustDataGenerator
 
 logger = structlog.get_logger(__name__)
 
+TEST_USER_EMAIL = "test@test.com"
+
 
 class LoadTestUtils:
     def create_load_test_committees_and_data(
         self,
-        test_user_email,
         base_committee_number,
         number_of_committees,
         number_of_reports,
@@ -19,15 +20,14 @@ class LoadTestUtils:
         number_of_transactions,
         single_to_triple_transaction_ratio,
     ):
-        test_user = User.objects.filter(email__iexact=test_user_email).first()
+        test_user = User.objects.filter(email__iexact=TEST_USER_EMAIL).first()
         if not test_user:
-            logger.info(f"Creating test user: {test_user_email}")
-            User.objects.create(email=test_user_email, username=test_user_email)
-        logger.info(f"Test user already exists: {test_user_email}")
+            logger.info(f"Creating test user: {TEST_USER_EMAIL}")
+            User.objects.create(email=TEST_USER_EMAIL, username=TEST_USER_EMAIL)
+        logger.info(f"Test user already exists: {TEST_USER_EMAIL}")
         for i in range(number_of_committees):
             new_committee_id = f"C{base_committee_number + i}"
             self.create_load_test_committee_and_data(
-                test_user_email,
                 new_committee_id,
                 number_of_reports,
                 number_of_contacts,
@@ -37,7 +37,6 @@ class LoadTestUtils:
 
     def create_load_test_committee_and_data(
         self,
-        test_user_email,
         new_committee_id,
         number_of_reports,
         number_of_contacts,
@@ -45,7 +44,7 @@ class LoadTestUtils:
         single_to_triple_transaction_ratio,
     ):
         logger.info(f"Creating and activating new committee: {new_committee_id}")
-        committee = self.create_new_committee(new_committee_id, test_user_email)
+        committee = self.create_new_committee(new_committee_id)
         self.locust_data_generator = LocustDataGenerator(committee)
 
         logger.info(f"Creating {number_of_reports} reports")
@@ -86,8 +85,8 @@ class LoadTestUtils:
             contacts,
         )
 
-    def create_new_committee(self, new_committee_id, test_user_email):
-        user = User.objects.filter(email__iexact=test_user_email).first()
+    def create_new_committee(self, new_committee_id):
+        user = User.objects.filter(email__iexact=TEST_USER_EMAIL).first()
         committee = CommitteeAccount.objects.create(committee_id=new_committee_id)
         Membership.objects.create(
             role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,

@@ -1,10 +1,9 @@
 # Quick Start
 
 1. Run the following data load management command in the environment to test against
-   using the user email address you wish to be assigned to the new committees (optional
+   using the email address test@test.com (optional
    additional command arguments as desired):
-   `./manage.py gen_locust_load_test_data <user_email>`
-   (on local, you can use `test@test.com`)
+   `./manage.py gen_locust_load_test_data`
 2. Run Locust locally using the following command (you may not need `sudo`).  You may
    need to add the `--force-recreate` flag if you are having trouble with your
    containers:
@@ -25,14 +24,14 @@ The instructions for running tests with Locust follow:
 ## (Optional) Prepare testing data with gen_locust_load_test_data command
 
 A new devops command has been added to insert test data directly into the database.  This
-command can be executed as follows using the user_email you wish to be assigned to the
-new committees.  By default, the committees created will start with C33333333 and count
+command can be executed as follows using the test@test.com email.  By default, the committees created will start with C33333333 and count
 upwards:
 
-`python manage.py gen_locust_load_test_data <user_email>`
+`python manage.py gen_locust_load_test_data`
 
 Optional additional flags can be used to override various defaults:
 
+`--base_committee_number` (Default 33333333)
 `--number_of_committees`
 `--number_of_reports`
 `--number_of_contacts`
