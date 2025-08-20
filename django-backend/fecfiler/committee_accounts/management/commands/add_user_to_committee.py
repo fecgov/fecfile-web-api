@@ -42,3 +42,4 @@ class Command(FECCommand):
                 to committee {committee_id} due to Exception {str(e)}
                 """
             )
+            raise e
