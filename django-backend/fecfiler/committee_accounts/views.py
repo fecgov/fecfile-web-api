@@ -11,7 +11,6 @@ from fecfiler.committee_accounts.utils import (
     raise_if_cannot_create_committee_account,
 )
 from django.http import (
-    HttpResponse,
     HttpResponseBadRequest,
     HttpResponseServerError,
 )
@@ -199,14 +198,16 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
             if not choice_of:
                 raise ValidationError("Invalid role")
 
-            add_user_to_committee(email, committee_id, role)
+            new_member = add_user_to_committee(email, committee_id, role)
             logger.info(
                 f"""
                 User {request.user.id} added {email} to committee
                 {committee_id} as {role}
                 """
             )
-            return HttpResponse()
+            print("==================333")
+            print(CommitteeMembershipSerializer(new_member).data)
+            return Response(CommitteeMembershipSerializer(new_member).data)
         except Exception as e:
             logger.error(
                 f"""

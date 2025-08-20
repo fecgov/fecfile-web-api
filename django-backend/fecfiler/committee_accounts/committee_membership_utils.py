@@ -33,7 +33,7 @@ def add_user_to_committee(user_email, committee_id, role):
         "role": role,
         "user": user,
     } | (
-        {"pending_email": user} if user is None else {}
+        {"pending_email": user_email} if user is None else {}
     )  # Add pending email to args only if there is no user
 
     new_member = Membership(**membership_args)

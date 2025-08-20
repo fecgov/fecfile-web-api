@@ -75,6 +75,11 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.data["email"],
+            "this_email_doesnt_match_any_preexisting_user@test.com",
+        )
+        self.assertEqual(response.data["is_active"], False)
 
     def test_add_membership_for_preexisting_user(self):
         # This test covers a bug found by QA where adding a membership
@@ -91,6 +96,8 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["email"], "test_user_0001@fec.gov")
+        self.assertEqual(response.data["is_active"], True)
 
     def test_add_membership_for_preexisting_user_email_case_test(self):
         # This test covers a bug found where the email entered is treated
@@ -107,6 +114,8 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["email"], "test_user_0001@fec.gov")
+        self.assertEqual(response.data["is_active"], True)
 
     def test_add_membership_requires_correct_parameters(self):
         post_data = {

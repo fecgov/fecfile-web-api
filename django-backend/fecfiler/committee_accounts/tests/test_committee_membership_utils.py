@@ -52,7 +52,6 @@ class AddUserToCommitteeTests(TestCase):
         self, mock_committee_account, mock_user, mock_membership
     ):
         mock_membership.objects.filter.return_value.count.return_value = 0
-        mock_user = MagicMock()
         mock_user.objects.filter.return_value.first.return_value = mock_user
         mock_committee = MagicMock()
         mock_committee_account.objects.filter.return_value.first.return_value = (
@@ -87,7 +86,7 @@ class AddUserToCommitteeTests(TestCase):
             "C12345678",
             Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
         )
-        args, kwargs = mock_membership.call_args
+        _args, kwargs = mock_membership.call_args
         self.assertIn("pending_email", kwargs)
-        self.assertEqual(kwargs["pending_email"], None)
+        self.assertEqual(kwargs["pending_email"], "test_pending@test.com")
         mock_new_member.save.assert_called_once()
