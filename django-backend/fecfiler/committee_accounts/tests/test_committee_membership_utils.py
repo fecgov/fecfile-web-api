@@ -1,6 +1,7 @@
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
 from django.core.exceptions import ValidationError
+from fecfiler.committee_accounts.models import Membership
 from fecfiler.committee_accounts.committee_membership_utils import add_user_to_committee
 
 
@@ -13,8 +14,15 @@ class AddUserToCommitteeTests(TestCase):
     ):
         mock_Membership.objects.filter.return_value.count.return_value = 1
         with self.assertRaises(ValidationError) as ctx:
-            add_user_to_committee("test@example.com", "C12345678", "ADMIN")
-        self.assertIn("already a member", str(ctx.exception))
+            add_user_to_committee(
+                "test@test.com",
+                "C12345678",
+                Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            )
+        self.assertIn(
+            "User with user_email is already a member of this committee",
+            str(ctx.exception),
+        )
         mock_Membership.objects.filter.assert_called_once()
 
     @patch("fecfiler.committee_accounts.committee_membership_utils.Membership")
@@ -27,8 +35,12 @@ class AddUserToCommitteeTests(TestCase):
         mock_User.objects.filter.return_value.first.return_value = MagicMock()
         mock_CommitteeAccount.objects.filter.return_value.first.return_value = None
         with self.assertRaises(ValidationError) as ctx:
-            add_user_to_committee("test@example.com", "C00000000", "ADMIN")
-        self.assertIn("does not exist", str(ctx.exception))
+            add_user_to_committee(
+                "test@test.com",
+                "C00000000",
+                Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            )
+        self.assertIn("Committee with committee id does not exist", str(ctx.exception))
         mock_CommitteeAccount.objects.filter.assert_called_once_with(
             committee_id="C00000000"
         )
@@ -49,7 +61,9 @@ class AddUserToCommitteeTests(TestCase):
         mock_new_member = MagicMock()
         mock_Membership.return_value = mock_new_member
 
-        add_user_to_committee("test@example.com", "C12345678", "ADMIN")
+        add_user_to_committee(
+            "test@test.com", "C12345678", Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR
+        )
         mock_Membership.assert_called_once()
         mock_new_member.save.assert_called_once()
 
@@ -68,7 +82,11 @@ class AddUserToCommitteeTests(TestCase):
         mock_new_member = MagicMock()
         mock_Membership.return_value = mock_new_member
 
-        add_user_to_committee("pending@example.com", "C12345678", "ADMIN")
+        add_user_to_committee(
+            "test_pending@test.com",
+            "C12345678",
+            Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+        )
         args, kwargs = mock_Membership.call_args
         self.assertIn("pending_email", kwargs)
         self.assertEqual(kwargs["pending_email"], None)
