@@ -6,8 +6,9 @@ from fecfiler.settings import (
 )
 import structlog
 
-# Committee Accounts
-from fecfiler.committee_accounts.models import CommitteeAccount
+# Committee Accounts and Users
+from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.user.models import User
 
 # Reports
 from fecfiler.reports.models import Report, ReportTransaction
@@ -88,8 +89,12 @@ class Command(BaseCommand):
             dumped_models += self.dump_model(Model, filter_args, order_by)
         return dumped_models
 
-    def dump_committee(self, committee):
-        return self.dump_model(CommitteeAccount, {"id": committee.id})
+    def dump_committee_and_users(self, committee):
+        dumped_data = self.dump_model(CommitteeAccount, {"id": committee.id})
+        dumped_data += self.dump_model(User, {"committeeaccount": committee})
+        dumped_data += self.dump_model(Membership, {"committee_account": committee})
+
+        return dumped_data
 
     def dump_contacts(self, committee):
         return self.dump_model(Contact, {"committee_account": committee})
@@ -136,7 +141,7 @@ class Command(BaseCommand):
 
     def dump_all_committee_data(self, committee):
         dumplist = [
-            *self.dump_committee(committee),
+            *self.dump_committee_and_users(committee),
             *self.dump_contacts(committee),
             *self.dump_reports(committee),
             *self.dump_transactions(committee),
