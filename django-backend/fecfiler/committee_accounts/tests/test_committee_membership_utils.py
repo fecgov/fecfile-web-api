@@ -1,6 +1,6 @@
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
-from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ValidationError
 from fecfiler.committee_accounts.committee_membership_utils import add_user_to_committee
 
 

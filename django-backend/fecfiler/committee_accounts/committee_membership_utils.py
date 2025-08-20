@@ -1,8 +1,7 @@
-from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ValidationError
 from .models import CommitteeAccount, Membership
 from fecfiler.user.models import User
 from django.db.models import Q
-
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -18,7 +17,7 @@ def add_user_to_committee(user_email, committee_id, role):
     )
     if matching_memberships.count() > 0:
         raise ValidationError(
-            f"User with user_email is already a member of this committee"
+            "User with user_email is already a member of this committee"
         )
 
     # Get user by email
@@ -27,7 +26,7 @@ def add_user_to_committee(user_email, committee_id, role):
     # Get committee account by ID
     committee_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if not committee_account:
-        raise ValidationError(f"Committee with committee id does not exist")
+        raise ValidationError("Committee with committee id does not exist")
 
     membership_args = {
         "committee_account": committee_account,
@@ -39,3 +38,5 @@ def add_user_to_committee(user_email, committee_id, role):
 
     new_member = Membership(**membership_args)
     new_member.save()
+
+    return new_member

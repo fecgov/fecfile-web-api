@@ -1,6 +1,5 @@
 from uuid import UUID
-from fecfiler.user.models import User
-from committee_membership_utils import add_user_to_committee
+from .committee_membership_utils import add_user_to_committee
 from rest_framework import filters, viewsets, mixins, pagination, status
 from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.decorators import action
@@ -11,7 +10,11 @@ from fecfiler.committee_accounts.utils import (
     get_committee_account_data,
     raise_if_cannot_create_committee_account,
 )
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseServerError
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseServerError,
+)
 from django.core.exceptions import ValidationError
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
@@ -170,48 +173,52 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
     @action(detail=False, methods=["post"], url_path="add-member", url_name="add_member")
     def add_member(self, request):
-        committee_id = self.request.session["committee_id"]
-
-        email = request.data.get("email", None)
-        role = request.data.get("role", None)
-
-        # Check for necessary fields
-        missing_fields = []
-        if email is None or len(email) == 0:
-            missing_fields.append("email")
-
-        if role is None:
-            missing_fields.append("role")
-
-        if len(missing_fields) > 0:
-            return Response(f"Missing fields: {', '.join(missing_fields)}", status=400)
-
-        # Check for valid role
-        choice_of = False
-        for choice in Membership.CommitteeRole.choices:
-            if role in choice:
-                choice_of = True
-                break
-        if not choice_of:
-            return Response("Invalid role", status=400)
-
         try:
+            committee_id = self.request.session["committee_id"]
+
+            email = request.data.get("email", None)
+            role = request.data.get("role", None)
+
+            # Check for necessary fields
+            missing_fields = []
+            if email is None or len(email) == 0:
+                missing_fields.append("email")
+
+            if role is None:
+                missing_fields.append("role")
+
+            if len(missing_fields) > 0:
+                raise ValidationError(f"Missing fields: {', '.join(missing_fields)}")
+
+            # Check for valid role
+            choice_of = False
+            for choice in Membership.CommitteeRole.choices:
+                if role in choice:
+                    choice_of = True
+                    break
+            if not choice_of:
+                raise ValidationError("Invalid role")
+
             add_user_to_committee(email, committee_id, role)
+            logger.info(
+                f"""
+                User {request.user.id} added {email} to committee
+                {committee_id} as {role}
+                """
+            )
+            return HttpResponse()
         except Exception as e:
             logger.error(
-                f"Failed to add email {email} to committtee {committee_id} as {role} {str(e)}"
+                f"""
+                Failed to add email {email} to committtee {type(e)}
+                {committee_id} as {role} {str(e)}
+                """
             )
             return (
                 HttpResponseBadRequest()
                 if isinstance(e, ValidationError)
                 else HttpResponseServerError()
             )
-
-        logger.info(
-            f"User {request.user.id} added {email} to committee {committee_id} as {role}"
-        )
-
-        return HttpResponse()
 
     @action(
         detail=True,
