@@ -13,7 +13,8 @@ def add_user_to_committee(user_email, committee_id, role):
     """
     # Check if the user is already a member of the committee
     matching_memberships = Membership.objects.filter(
-        Q(pending_email__iexact=user_email) | Q(user__email__iexact=user_email)
+        Q(committee_account__committee_id=committee_id)
+        & (Q(pending_email__iexact=user_email) | Q(user__email__iexact=user_email))
     )
     if matching_memberships.count() > 0:
         raise ValidationError(
