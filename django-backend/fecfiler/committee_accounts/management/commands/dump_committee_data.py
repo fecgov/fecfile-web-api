@@ -53,99 +53,72 @@ class Command(BaseCommand):
     def serialize(self, queryset):
         return serializers.serialize("json", queryset)[1:-1] # Strip square brackets
 
+    def dump_model(self, Model, filter_args, order_by=None):
+        queryset = Model.objects.filter(**filter_args)
+        if order_by is not None:
+            queryset.order_by(order_by)
+
+        dumped_model = self.serialize(queryset)
+        if len(dumped_model) > 0:
+            return [dumped_model]
+        else:
+            return []
+
+    def dump_model_list(self, model_list, filter_args, order_by=None):
+        dumped_models = []
+        for Model in model_list:
+            dumped_models += self.dump_model(Model, filter_args, order_by)
+        return dumped_models
+
     def dump_committee(self, committee):
-            return self.serialize(CommitteeAccount.objects.filter(id=committee.id))
+        return self.dump_model(CommitteeAccount, {"id":committee.id})
 
     def dump_contacts(self, committee):
-        dumped_contacts = self.serialize(
-            Contact.objects.filter(committee_account=committee)
-        )
-        if len(dumped_contacts) > 0:
-            return [dumped_contacts]
-        return []
+        return self.dump_model(Contact, {"committee_account":committee})
 
     def dump_reports(self, committee):
-        dumped_data = []
-        for FormModel in FORM_MODELS:
-            dumped_form = self.serialize(
-                FormModel.objects.filter(report__committee_account=committee)
-            )
-            if len(dumped_form) > 0:
-                dumped_data.append(dumped_form)
-
-        dumped_reports = self.serialize(Report.objects.filter(committee_account=committee))
-        if len(dumped_reports) > 0:
-            dumped_data.append(dumped_reports)
+        dumped_data = self.dump_model_list(
+            FORM_MODELS,
+            {"report__committee_account": committee}
+        )
+        dumped_data += self.dump_model(Report, {"committee_account": committee})
 
         return dumped_data
 
     def dump_transactions(self, committee):
-        dumped_data = []
-        for ScheduleModel in SCHEDULE_MODELS:
-            dumped_schedule = self.serialize(
-                ScheduleModel.objects.filter(transaction__committee_account=committee)
-            )
-            if len(dumped_schedule) > 0:
-                dumped_data.append(dumped_schedule)
-
-        dumped_transactions = self.serialize(
-            Transaction.objects.filter(
-                committee_account=committee
-            ).order_by("created")  # Ensure that parents are loaded before children
+        dumped_data = self.dump_model_list(
+            SCHEDULE_MODELS,
+            {"transaction__committee_account": committee}
         )
-        if len(dumped_transactions) > 0:
-            dumped_data.append(dumped_transactions)
-
-        dumped_report_transactions = self.serialize(
-            ReportTransaction.objects.filter(
-                transaction__committee_account=committee
-            )
+        dumped_data += self.dump_model(
+            Transaction,
+            {"committee_account":committee},
+            "created" # Ensure that parents are loaded before children
         )
-        if len(dumped_report_transactions) > 0:
-            dumped_data.append(dumped_report_transactions)
+        dumped_data += self.dump_model(
+            ReportTransaction,
+            {"transaction__committee_account": committee}
+        )
 
         return dumped_data
 
     def dump_memos(self, committee):
-        dumped_memos = self.serialize(
-            MemoText.objects.filter(committee_account=committee)
-        )
-        if len(dumped_memos) > 0:
-            return [dumped_memos]
-        return []
+        return self.dump_model(MemoText, {"committee_account": committee})
 
     def dump_cash_on_hand(self, committee):
-        dumped_cash_on_hand = self.serialize(
-            CashOnHandYearly.objects.filter(committee_account=committee)
-        )
-        if len(dumped_cash_on_hand) > 0:
-            return [dumped_cash_on_hand]
-        return []
+        return self.dump_model(CashOnHandYearly, {"committee_account": committee})
 
     def dump_submissions(self, committee):
-        dumped_data = []
-        dumped_dot_fec = self.serialize(
-            DotFEC.objects.filter(
-                report__committee_account=committee
-            )
+        dumped_data = self.dump_model(DotFEC, {"report__committee_account": committee})
+        dumped_data += self.dump_model_list(
+            SUBMISSION_MODELS,
+            {"dot_fec__report__committee_account": committee}
         )
-        if len(dumped_dot_fec) > 0:
-            dumped_data.append(dumped_dot_fec)
-
-        for SubmissionModel in SUBMISSION_MODELS:
-            dumped_submission = self.serialize(
-                SubmissionModel.objects.filter(
-                    dot_fec__report__committee_account=committee
-                )
-            )
-            if len(dumped_submission) > 0:
-                dumped_data.append(dumped_submission)
-
         return dumped_data
 
     def dump_all_committee_data(self, committee):
         dumplist = [
-            self.dump_committee(committee),
+            *self.dump_committee(committee),
             *self.dump_contacts(committee),
             *self.dump_reports(committee),
             *self.dump_transactions(committee),
@@ -153,6 +126,10 @@ class Command(BaseCommand):
             *self.dump_cash_on_hand(committee),
             *self.dump_submissions(committee)
         ]
+        """
+        Records will be loaded in the same order that they're dumped,
+        so the order in which they're dumped is load-bearing.
+        """
 
         return dumplist
 
