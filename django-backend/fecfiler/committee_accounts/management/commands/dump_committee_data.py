@@ -59,15 +59,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--s3",
-            action="store_true",
-            help="Save to S3 instead of a local file"
-        )
-        parser.add_argument(
             "committee_id",
             help="The ID (not UUID) for the target committee"
         )
-        parser.add_argument("--filename", required=False)
 
     def serialize(self, queryset):
         return serializers.serialize("json", queryset)[1:-1]  # Strip square brackets
@@ -157,15 +151,9 @@ class Command(BaseCommand):
         return dumplist
 
     def get_filename(self, options):
-        filename = options.get("filename")
-        if filename is None or len(filename) == 0:
-            filename = f"dumped_data_for_{options.get("committee_id")}.json"
-        return filename
+        return f"dumped_data_for_{options.get("committee_id")}.json"
 
     def save_to_s3(self, filename, formatted_json):
-        if S3_SESSION is None:
-            raise CommandError("Cannot save to s3: no valid session")
-
         try:
             logger.info(f"Uploading file to s3: {filename}")
             s3_object = S3_SESSION.Object(AWS_STORAGE_BUCKET_NAME, filename)
@@ -184,7 +172,7 @@ class Command(BaseCommand):
     def save_data(self, formatted_json, options):
         filename = self.get_filename(options)
 
-        if options.get("s3", False):
+        if S3_SESSION is not None:
             return self.save_to_s3(filename, formatted_json)
         else:
             return self.save_to_local(filename, formatted_json)
