@@ -4,8 +4,8 @@ from fecfiler.committee_accounts.models import Membership
 
 
 class Command(FECCommand):
-    help = "Generate Locust load test data"
-    command_name = "gen_locust_load_test_data"
+    help = "Adds a user to a committee account"
+    command_name = "add_user_to_committee"
 
     def add_arguments(self, parser):
         parser.add_argument("user_email", type=str)

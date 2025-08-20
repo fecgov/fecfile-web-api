@@ -205,9 +205,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 {committee_id} as {role}
                 """
             )
-            print("==================333")
-            print(CommitteeMembershipSerializer(new_member).data)
-            return Response(CommitteeMembershipSerializer(new_member).data)
+            return Response(CommitteeMembershipSerializer(new_member).data, status=200)
         except Exception as e:
             logger.error(
                 f"""
