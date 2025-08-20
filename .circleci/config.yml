@@ -159,7 +159,7 @@ jobs:
           name: Deploy API
           command: |
             export PATH=$HOME/bin:$PATH
-            invoke deploy --branch $CIRCLE_BRANCH --login
+            invoke deploy --branch feature/2224b-test-deploy --login
 
   docs-build:
     docker:
