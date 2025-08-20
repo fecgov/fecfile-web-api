@@ -1,11 +1,12 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.core import serializers
+from fecfiler.s3 import S3_SESSION
 from fecfiler.settings import (
-    BASE_DIR,
     AWS_STORAGE_BUCKET_NAME,
 )
-from fecfiler.s3 import S3_SESSION
-from django.core import serializers
+import structlog
 
+# Committee Accounts
 from fecfiler.committee_accounts.models import CommitteeAccount
 
 # Reports
@@ -43,12 +44,16 @@ from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmi
 SUBMISSION_MODELS = [UploadSubmission, WebPrintSubmission]
 
 
+logger = structlog.get_logger(__name__)
+
+
 class Command(BaseCommand):
     help = "Dump all data for a given committee into redis"
 
     def add_arguments(self, parser):
         parser.add_argument("--s3", action="store_true")
         parser.add_argument("committee_id")
+        parser.add_argument("--filename", required=False)
 
     def serialize(self, queryset):
         return serializers.serialize("json", queryset)[1:-1] # Strip square brackets
@@ -133,6 +138,39 @@ class Command(BaseCommand):
 
         return dumplist
 
+    def get_filename(self, options):
+        filename = options.get("filename")
+        if filename is None or len(filename) == 0:
+            filename = f"dumped_data_for_{options.get("committee_id")}.json"
+        return filename
+
+    def save_to_s3(self, filename, formatted_json):
+        if S3_SESSION is None:
+            raise CommandError("Cannot save to s3: no valid session")
+
+        try:
+            logger.info(f"Uploading file to s3: {filename}")
+            s3_object = S3_SESSION.Object(AWS_STORAGE_BUCKET_NAME, filename)
+            s3_object.put(Body=formatted_json.encode("utf-8"))
+            logger.info("Successfully uploaded file to s3")
+        except Exception as E:
+            raise CommandError(f"Failed to upload to s3: {str(E)}")
+
+    def save_to_local(self, filename, formatted_json):
+        logger.info(f"Saving committee data to local file: {filename}")
+
+        file = open(filename, "w")
+        file.write(formatted_json)
+        file.close()
+
+    def save_data(self, formatted_json, options):
+        filename = self.get_filename(options)
+
+        if options.get("s3", False):
+            return self.save_to_s3(filename, formatted_json)
+        else:
+            return self.save_to_local(filename, formatted_json)
+
     def handle(self, *args, **options):
         committee_id = options.get("committee_id")
         if committee_id is None:
@@ -142,10 +180,7 @@ class Command(BaseCommand):
         if committee is None:
             raise CommandError("No Committee Account found matching that Committee ID")
 
-        dumplist = self.dump_all_committee_data(committee)
+        dumped_committee_data = self.dump_all_committee_data(committee)
+        formatted_json = f"[{','.join(dumped_committee_data)}]"
 
-        final_json = f"[{','.join(dumplist)}]"
-
-        file = open("test_fixture.json", "w")
-        file.write(final_json)
-        file.close()
+        self.save_data(formatted_json, options)
