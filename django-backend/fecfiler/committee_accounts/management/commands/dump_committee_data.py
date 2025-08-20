@@ -16,7 +16,6 @@ from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_3.models import Form3
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.form_99.models import Form99
-FORM_MODELS = [Form1M, Form24, Form3, Form3X, Form99]
 
 # Contacts
 from fecfiler.contacts.models import Contact
@@ -31,11 +30,6 @@ from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.transactions.schedule_f.models import ScheduleF
-SCHEDULE_MODELS = [
-    ScheduleA, ScheduleB, ScheduleC,
-    ScheduleC1, ScheduleC2, ScheduleD,
-    ScheduleE, ScheduleF
-]
 
 # Memos
 from fecfiler.memo_text.models import MemoText
@@ -45,7 +39,15 @@ from fecfiler.cash_on_hand.models import CashOnHandYearly
 
 # Submissions
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
+
+
+FORM_MODELS = [Form1M, Form24, Form3, Form3X, Form99]
 SUBMISSION_MODELS = [UploadSubmission, WebPrintSubmission]
+SCHEDULE_MODELS = [
+    ScheduleA, ScheduleB, ScheduleC,
+    ScheduleC1, ScheduleC2, ScheduleD,
+    ScheduleE, ScheduleF
+]
 
 
 logger = structlog.get_logger(__name__)
