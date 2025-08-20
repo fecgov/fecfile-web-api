@@ -22,7 +22,6 @@ allowed_commands = [
     "install_login_dot_gov_cert",
     "update_creds_service",
     "disable_user",
-    "gen_locust_load_test_data",
 ]
 restricted_commands = [
     "loaddata",
@@ -30,6 +29,7 @@ restricted_commands = [
     "shell",
     # COMMITTEE ACCOUNT COMMANDS #
     "load_committee_data",
+    "gen_locust_load_test_data",
     "delete_committee_account",
     # REPORT COMMANDS #
     "delete_committee_reports",
