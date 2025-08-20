@@ -51,8 +51,15 @@ class Command(BaseCommand):
     help = "Dump all data for a given committee into a valid JSON fixture"
 
     def add_arguments(self, parser):
-        parser.add_argument("--s3", action="store_true")
-        parser.add_argument("committee_id")
+        parser.add_argument(
+            "--s3",
+            action="store_true",
+            help="Save to S3 instead of a local file"
+        )
+        parser.add_argument(
+            "committee_id",
+            help="The ID (not UUID) for the target committee"
+        )
         parser.add_argument("--filename", required=False)
 
     def serialize(self, queryset):
