@@ -20,7 +20,7 @@ class Command(FECCommand):
             committee_id = options["committee_id"]
             logger.info(
                 f"""
-                [Account lockout] Adding user_email {user_email}
+                [Account Override] Adding user_email {user_email}
                 to committee {committee_id}
                 """
             )
@@ -31,14 +31,14 @@ class Command(FECCommand):
             )
             logger.info(
                 f"""
-                [Account lockout] Successfully added user_email {user_email}
+                [Account Override] Successfully added user_email {user_email}
                 to committee {committee_id}"
                 """
             )
         except Exception as e:
             logger.error(
                 f"""
-                [Account lockout] Failed to add user_email {user_email}
+                [Account Override] Failed to add user_email {user_email}
                 to committee {committee_id} due to Exception {str(e)}
                 """
             )
