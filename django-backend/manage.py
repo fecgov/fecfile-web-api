@@ -31,6 +31,7 @@ restricted_commands = [
     # COMMITTEE ACCOUNT COMMANDS #
     "load_committee_data",
     "delete_committee_account",
+    "dump_committee_data",  # Can be unrestricted AFTER fuzzing is implemented
     # REPORT COMMANDS #
     "delete_committee_reports",
     # users
