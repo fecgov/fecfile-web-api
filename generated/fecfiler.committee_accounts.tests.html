@@ -13,7 +13,7 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.committee_accounts.tests.test_delete_committee_command" href="fecfiler.committee_accounts.tests.test_delete_committee_command.html" />
+    <link rel="next" title="fecfiler.committee_accounts.tests.test_committee_membership_utils" href="fecfiler.committee_accounts.tests.test_committee_membership_utils.html" />
     <link rel="prev" title="fecfiler.committee_accounts.signals.log_post_save" href="fecfiler.committee_accounts.signals.log_post_save.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -37,19 +37,22 @@
 <p class="rubric">Modules</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.tests.test_delete_committee_command.html#module-fecfiler.committee_accounts.tests.test_delete_committee_command" title="fecfiler.committee_accounts.tests.test_delete_committee_command"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.tests.test_delete_committee_command</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.tests.test_committee_membership_utils.html#module-fecfiler.committee_accounts.tests.test_committee_membership_utils" title="fecfiler.committee_accounts.tests.test_committee_membership_utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.tests.test_committee_membership_utils</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.tests.test_load_committee_data.html#module-fecfiler.committee_accounts.tests.test_load_committee_data" title="fecfiler.committee_accounts.tests.test_load_committee_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.tests.test_load_committee_data</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.tests.test_delete_committee_command.html#module-fecfiler.committee_accounts.tests.test_delete_committee_command" title="fecfiler.committee_accounts.tests.test_delete_committee_command"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.tests.test_delete_committee_command</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.tests.test_models.html#module-fecfiler.committee_accounts.tests.test_models" title="fecfiler.committee_accounts.tests.test_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.tests.test_models</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.tests.test_load_committee_data.html#module-fecfiler.committee_accounts.tests.test_load_committee_data" title="fecfiler.committee_accounts.tests.test_load_committee_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.tests.test_load_committee_data</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.tests.test_utils.html#module-fecfiler.committee_accounts.tests.test_utils" title="fecfiler.committee_accounts.tests.test_utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.tests.test_utils</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.tests.test_models.html#module-fecfiler.committee_accounts.tests.test_models" title="fecfiler.committee_accounts.tests.test_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.tests.test_models</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.tests.test_views.html#module-fecfiler.committee_accounts.tests.test_views" title="fecfiler.committee_accounts.tests.test_views"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.tests.test_views</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.tests.test_utils.html#module-fecfiler.committee_accounts.tests.test_utils" title="fecfiler.committee_accounts.tests.test_utils"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.tests.test_utils</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.tests.test_views.html#module-fecfiler.committee_accounts.tests.test_views" title="fecfiler.committee_accounts.tests.test_views"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.tests.test_views</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -80,12 +83,14 @@
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.apps.html">fecfiler.committee_accounts.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.committee_membership_utils.html">fecfiler.committee_accounts.committee_membership_utils</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.management.html">fecfiler.committee_accounts.management</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.migrations.html">fecfiler.committee_accounts.migrations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.models.html">fecfiler.committee_accounts.models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.serializers.html">fecfiler.committee_accounts.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.signals.html">fecfiler.committee_accounts.signals</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.committee_accounts.tests</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.tests.test_committee_membership_utils.html">fecfiler.committee_accounts.tests.test_committee_membership_utils</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.tests.test_delete_committee_command.html">fecfiler.committee_accounts.tests.test_delete_committee_command</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.tests.test_load_committee_data.html">fecfiler.committee_accounts.tests.test_load_committee_data</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.tests.test_models.html">fecfiler.committee_accounts.tests.test_models</a></li>
@@ -134,7 +139,7 @@
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a><ul>
       <li>Previous: <a href="fecfiler.committee_accounts.signals.log_post_save.html" title="previous chapter">fecfiler.committee_accounts.signals.log_post_save</a></li>
-      <li>Next: <a href="fecfiler.committee_accounts.tests.test_delete_committee_command.html" title="next chapter">fecfiler.committee_accounts.tests.test_delete_committee_command</a></li>
+      <li>Next: <a href="fecfiler.committee_accounts.tests.test_committee_membership_utils.html" title="next chapter">fecfiler.committee_accounts.tests.test_committee_membership_utils</a></li>
   </ul></li>
   </ul></li>
   </ul></li>

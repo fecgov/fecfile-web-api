@@ -1,0 +1,123 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.tests.test\_committee\_membership\_utils.AddUserToCommitteeTests
+=============================================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.tests.test_committee_membership_utils
+
+.. autoclass:: AddUserToCommitteeTests
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~AddUserToCommitteeTests.__init__
+      ~AddUserToCommitteeTests.addClassCleanup
+      ~AddUserToCommitteeTests.addCleanup
+      ~AddUserToCommitteeTests.addTypeEqualityFunc
+      ~AddUserToCommitteeTests.assertAlmostEqual
+      ~AddUserToCommitteeTests.assertContains
+      ~AddUserToCommitteeTests.assertCountEqual
+      ~AddUserToCommitteeTests.assertDictEqual
+      ~AddUserToCommitteeTests.assertEqual
+      ~AddUserToCommitteeTests.assertFalse
+      ~AddUserToCommitteeTests.assertFieldOutput
+      ~AddUserToCommitteeTests.assertFormError
+      ~AddUserToCommitteeTests.assertFormSetError
+      ~AddUserToCommitteeTests.assertGreater
+      ~AddUserToCommitteeTests.assertGreaterEqual
+      ~AddUserToCommitteeTests.assertHTMLEqual
+      ~AddUserToCommitteeTests.assertHTMLNotEqual
+      ~AddUserToCommitteeTests.assertIn
+      ~AddUserToCommitteeTests.assertInHTML
+      ~AddUserToCommitteeTests.assertIs
+      ~AddUserToCommitteeTests.assertIsInstance
+      ~AddUserToCommitteeTests.assertIsNone
+      ~AddUserToCommitteeTests.assertIsNot
+      ~AddUserToCommitteeTests.assertIsNotNone
+      ~AddUserToCommitteeTests.assertJSONEqual
+      ~AddUserToCommitteeTests.assertJSONNotEqual
+      ~AddUserToCommitteeTests.assertLess
+      ~AddUserToCommitteeTests.assertLessEqual
+      ~AddUserToCommitteeTests.assertListEqual
+      ~AddUserToCommitteeTests.assertLogs
+      ~AddUserToCommitteeTests.assertMultiLineEqual
+      ~AddUserToCommitteeTests.assertNoLogs
+      ~AddUserToCommitteeTests.assertNotAlmostEqual
+      ~AddUserToCommitteeTests.assertNotContains
+      ~AddUserToCommitteeTests.assertNotEqual
+      ~AddUserToCommitteeTests.assertNotIn
+      ~AddUserToCommitteeTests.assertNotInHTML
+      ~AddUserToCommitteeTests.assertNotIsInstance
+      ~AddUserToCommitteeTests.assertNotRegex
+      ~AddUserToCommitteeTests.assertNumQueries
+      ~AddUserToCommitteeTests.assertQuerySetEqual
+      ~AddUserToCommitteeTests.assertRaises
+      ~AddUserToCommitteeTests.assertRaisesMessage
+      ~AddUserToCommitteeTests.assertRaisesRegex
+      ~AddUserToCommitteeTests.assertRedirects
+      ~AddUserToCommitteeTests.assertRegex
+      ~AddUserToCommitteeTests.assertSequenceEqual
+      ~AddUserToCommitteeTests.assertSetEqual
+      ~AddUserToCommitteeTests.assertTemplateNotUsed
+      ~AddUserToCommitteeTests.assertTemplateUsed
+      ~AddUserToCommitteeTests.assertTrue
+      ~AddUserToCommitteeTests.assertTupleEqual
+      ~AddUserToCommitteeTests.assertURLEqual
+      ~AddUserToCommitteeTests.assertWarns
+      ~AddUserToCommitteeTests.assertWarnsMessage
+      ~AddUserToCommitteeTests.assertWarnsRegex
+      ~AddUserToCommitteeTests.assertXMLEqual
+      ~AddUserToCommitteeTests.assertXMLNotEqual
+      ~AddUserToCommitteeTests.captureOnCommitCallbacks
+      ~AddUserToCommitteeTests.countTestCases
+      ~AddUserToCommitteeTests.debug
+      ~AddUserToCommitteeTests.defaultTestResult
+      ~AddUserToCommitteeTests.doClassCleanups
+      ~AddUserToCommitteeTests.doCleanups
+      ~AddUserToCommitteeTests.ensure_connection_patch_method
+      ~AddUserToCommitteeTests.enterClassContext
+      ~AddUserToCommitteeTests.enterContext
+      ~AddUserToCommitteeTests.fail
+      ~AddUserToCommitteeTests.id
+      ~AddUserToCommitteeTests.modify_settings
+      ~AddUserToCommitteeTests.run
+      ~AddUserToCommitteeTests.setUp
+      ~AddUserToCommitteeTests.setUpClass
+      ~AddUserToCommitteeTests.setUpTestData
+      ~AddUserToCommitteeTests.settings
+      ~AddUserToCommitteeTests.shortDescription
+      ~AddUserToCommitteeTests.skipTest
+      ~AddUserToCommitteeTests.subTest
+      ~AddUserToCommitteeTests.tearDown
+      ~AddUserToCommitteeTests.tearDownClass
+      ~AddUserToCommitteeTests.test_add_pending_email_if_user_none
+      ~AddUserToCommitteeTests.test_add_user_to_committee_success
+      ~AddUserToCommitteeTests.test_committee_does_not_exist_raises
+      ~AddUserToCommitteeTests.test_user_already_member_raises
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~AddUserToCommitteeTests.available_apps
+      ~AddUserToCommitteeTests.databases
+      ~AddUserToCommitteeTests.fixtures
+      ~AddUserToCommitteeTests.longMessage
+      ~AddUserToCommitteeTests.maxDiff
+      ~AddUserToCommitteeTests.reset_sequences
+      ~AddUserToCommitteeTests.serialized_rollback
+   
+   
