@@ -290,7 +290,7 @@ class Tasks(TaskSet):
         self.submit_report(report_id, poll_seconds=40)
 
     @task
-    def create_schedule_a_report(self):
+    def create_schedule_a_transaction(self):
         data = deepcopy(self.payloads["INDIVIDUAL_RECEIPT"])
         report_id = random.choice(self.report_ids)
         contribution_date = self.report_ids_dict[report_id]
