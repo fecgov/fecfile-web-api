@@ -17,7 +17,7 @@ fi
 
 # Load application data
 echo "Loading initial data..."
-python manage.py loaddata fixtures/e2e-test-data.json
+python manage.py loaddata fixtures/user-data.json
 python manage.py load_committee_data
 
 # Start the Gunicorn server
