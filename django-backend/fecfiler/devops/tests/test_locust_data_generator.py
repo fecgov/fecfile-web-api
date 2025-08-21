@@ -132,7 +132,7 @@ class LocustDataGeneratorTestCase(TestCase):
         "fecfiler.devops.utils.locust_data_generator"
         ".LocustDataGenerator.generate_single_schedule_a_transactions"
     )
-    def test_generate_triple_schedule_a_transactions(
+    def test_generate_tiered_schedule_a_transactions(
         self,
         mock_generate_single_schedule_a_transactions,
         mock_transaction_bulk_update,
@@ -147,7 +147,7 @@ class LocustDataGeneratorTestCase(TestCase):
             [mock_tier3_transaction],
         ]
 
-        result = self.locust_data_generator.generate_triple_schedule_a_transactions(
+        result = self.locust_data_generator.generate_tiered_schedule_a_transactions(
             1, [], []
         )
         self.assertEqual(len(result), 1)
@@ -221,7 +221,7 @@ class LocustDataGeneratorTestCase(TestCase):
         "fecfiler.devops.utils.locust_data_generator"
         ".LocustDataGenerator.generate_single_schedule_b_transactions"
     )
-    def test_generate_triple_schedule_b_transactions(
+    def test_generate_tiered_schedule_b_transactions(
         self,
         mock_generate_single_schedule_b_transactions,
         mock_transaction_bulk_update,
@@ -236,12 +236,10 @@ class LocustDataGeneratorTestCase(TestCase):
             [mock_tier3_transaction],
         ]
 
-        result = self.locust_data_generator.generate_triple_schedule_b_transactions(
+        result = self.locust_data_generator.generate_tiered_schedule_b_transactions(
             1, [], []
         )
         self.assertEqual(len(result), 1)
-        self.assertEqual(mock_tier3_transaction.id, 3)
-        self.assertEqual(mock_tier3_transaction.parent_transaction_id, 2)
         self.assertEqual(mock_tier2_transaction.id, 2)
         self.assertEqual(mock_tier2_transaction.parent_transaction_id, 1)
         self.assertEqual(mock_tier1_transaction.id, 1)

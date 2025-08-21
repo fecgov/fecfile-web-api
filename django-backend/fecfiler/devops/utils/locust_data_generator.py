@@ -147,7 +147,7 @@ class LocustDataGenerator:
 
         return transaction_list
 
-    def generate_triple_schedule_a_transactions(self, count, reports, contacts):
+    def generate_tiered_schedule_a_transactions(self, count, reports, contacts):
         tier1_transactions = self.generate_single_schedule_a_transactions(
             count, reports, contacts
         )
@@ -222,22 +222,18 @@ class LocustDataGenerator:
 
         return transaction_list
 
-    def generate_triple_schedule_b_transactions(self, count, reports, contacts):
+    def generate_tiered_schedule_b_transactions(self, count, reports, contacts):
         tier1_transactions = self.generate_single_schedule_b_transactions(
             count, reports, contacts
         )
         tier2_transactions = self.generate_single_schedule_b_transactions(
             count, reports, contacts
         )
-        tier3_transactions = self.generate_single_schedule_b_transactions(
-            count, reports, contacts
-        )
 
         for index in range(count):
-            tier3_transactions[index].parent_transaction_id = tier2_transactions[index].id
             tier2_transactions[index].parent_transaction_id = tier1_transactions[index].id
         Transaction.objects.bulk_update(
-            tier3_transactions + tier2_transactions, ["parent_transaction_id"]
+            tier2_transactions, ["parent_transaction_id"]
         )
 
         return tier1_transactions
