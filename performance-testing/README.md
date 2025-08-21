@@ -36,7 +36,7 @@ Optional additional flags can be used to override various defaults:
 `--number_of_reports`
 `--number_of_contacts`
 `--number_of_transactions`
-`--single_to_triple_transaction_ratio`
+`--single_to_tiered_transaction_ratio`
 
 
 ## Setup - Additional steps for remote testing

@@ -42,7 +42,7 @@ class LoadTestUtilsTestCase(TestCase):
             mock_generator.generate_form_3x.assert_called_once_with(2)
             mock_generator.generate_contacts.assert_called_once_with(3)
             mock_generator.generate_single_schedule_a_transactions.assert_called_once()
-            mock_generator.generate_triple_schedule_a_transactions.assert_called_once()
+            mock_generator.generate_tiered_schedule_a_transactions.assert_called_once()
 
     @patch("fecfiler.devops.utils.load_test_utils.User")
     @patch("fecfiler.devops.utils.load_test_utils.CommitteeAccount")
