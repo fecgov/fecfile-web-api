@@ -5,6 +5,7 @@ import random
 from urllib.parse import urlparse
 import json
 import os
+from copy import deepcopy
 
 from locust import between, task, TaskSet, user
 
@@ -290,7 +291,7 @@ class Tasks(TaskSet):
 
     @task
     def create_schedule_a_report(self):
-        data = self.payloads["INDIVIDUAL_RECEIPT"]
+        data = deepcopy(self.payloads["INDIVIDUAL_RECEIPT"])
         report_id = random.choice(self.report_ids)
         contribution_date = self.report_ids_dict[report_id]
         data["report_ids"].append(report_id)
