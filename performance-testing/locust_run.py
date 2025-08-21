@@ -3,6 +3,8 @@ import time
 import threading
 import random
 from urllib.parse import urlparse
+import json
+import os
 
 from locust import between, task, TaskSet, user
 
@@ -34,8 +36,14 @@ class Tasks(TaskSet):
         self.login()
         self.get_and_activate_commmittee()
 
+        logging.info("Loading payloads")
+        directory = os.path.dirname(os.path.abspath(__file__))
+        full_filename = os.path.join(directory, "locust-data", "load_test_payloads.json")
+        self.payloads = json.load(open(full_filename))
+
         logging.info("Preparing reports for submit")
-        self.report_ids = self.retrieve_report_id_list()
+        self.report_ids_dict = self.retrieve_report_ids_dict()
+        self.report_ids = list(self.report_ids_dict.keys())
         self.prepare_reports_for_submit(self.report_ids)
         self.report_ids_to_submit = self.report_ids.copy()
 
@@ -201,17 +209,16 @@ class Tasks(TaskSet):
             return response.json()
         raise Exception("Failed to retrieve report")
 
-    def retrieve_report_id_list(self):
+    def retrieve_report_ids_dict(self):
         response = self.client_get(
             "/api/v1/reports/",
             timeout=TIMEOUT,
         )
         if response and response.status_code == 200:
-            retval = []
+            retval = {}
             reports = response.json()
             for report in reports:
-                retval.append(report["id"])
-            retval.sort()
+                retval[report["id"]] = report["coverage_from_date"]
             return retval
         raise Exception("Failed to retrieve report ids for load test setup")
 
@@ -280,6 +287,23 @@ class Tasks(TaskSet):
         report_id = self.report_ids_to_submit.pop()
         # poll_seconds Determined by INITIAL_POLLING_INTERVAL setting
         self.submit_report(report_id, poll_seconds=40)
+
+    @task
+    def create_schedule_a_report(self):
+        data = self.payloads["INDIVIDUAL_RECEIPT"]
+        report_id = random.choice(self.report_ids)
+        contribution_date = self.report_ids_dict[report_id]
+        data["report_ids"].append(report_id)
+        data["contribution_date"] = contribution_date
+        data["contribution_amount"] = random.randrange(25, 10000)
+
+        response = self.client.post(
+            "/api/v1/transactions/",
+            name="post_new_schedule_a_transaction",
+            json=data,
+        )
+        if response.status_code != 200:
+            raise Exception("Failed to POST new schedule a transaction")
 
     def client_get(self, *args, **kwargs):
         kwargs["catch_response"] = True
