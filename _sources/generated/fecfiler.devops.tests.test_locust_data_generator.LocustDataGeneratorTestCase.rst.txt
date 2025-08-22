@@ -102,7 +102,9 @@ fecfiler.devops.tests.test\_locust\_data\_generator.LocustDataGeneratorTestCase
       ~LocustDataGeneratorTestCase.test_generate_contacts
       ~LocustDataGeneratorTestCase.test_generate_form_3x
       ~LocustDataGeneratorTestCase.test_generate_single_schedule_a_transactions
-      ~LocustDataGeneratorTestCase.test_generate_triple_schedule_a_transactions
+      ~LocustDataGeneratorTestCase.test_generate_single_schedule_b_transactions
+      ~LocustDataGeneratorTestCase.test_generate_tiered_schedule_a_transactions
+      ~LocustDataGeneratorTestCase.test_generate_tiered_schedule_b_transactions
    
    
 

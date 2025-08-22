@@ -23,7 +23,9 @@ fecfiler.devops.utils.locust\_data\_generator.LocustDataGenerator
       ~LocustDataGenerator.generate_contacts
       ~LocustDataGenerator.generate_form_3x
       ~LocustDataGenerator.generate_single_schedule_a_transactions
-      ~LocustDataGenerator.generate_triple_schedule_a_transactions
+      ~LocustDataGenerator.generate_single_schedule_b_transactions
+      ~LocustDataGenerator.generate_tiered_schedule_a_transactions
+      ~LocustDataGenerator.generate_tiered_schedule_b_transactions
    
    
 

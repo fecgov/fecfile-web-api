@@ -18,6 +18,7 @@ fecfiler.devops.tests.test\_locust\_data\_generator
       :toctree:                                          
    
       add_schedule_a_to_transaction
+      add_schedule_b_to_transaction
    
    
 

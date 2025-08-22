@@ -1,0 +1,6 @@
+fecfiler.devops.tests.test\_locust\_data\_generator.add\_schedule\_b\_to\_transaction
+=====================================================================================
+
+.. currentmodule:: fecfiler.devops.tests.test_locust_data_generator
+
+.. autofunction:: add_schedule_b_to_transaction
