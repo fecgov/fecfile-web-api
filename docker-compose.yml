@@ -61,7 +61,7 @@ services:
             ENABLE_PL_SQL_LOGGING: False # Django DEBUG base.py setting must also be set to True to see SQL output
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
-            FEC_FORMAT_VERSION: 8.4
+            FEC_FORMAT_VERSION: 8.5
         deploy:
             resources:
                 limits:
@@ -104,7 +104,7 @@ services:
             ENABLE_PL_SQL_LOGGING: False # Django DEBUG base.py setting must also be set to True to see SQL output
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
             ENABLE_RESTRICTED_COMMANDS: True
-            FEC_FORMAT_VERSION: 8.4
+            FEC_FORMAT_VERSION: 8.5
         deploy:
             resources:
                 limits:
@@ -163,7 +163,7 @@ services:
             SECONDARY_POLLING_INTERVAL: 3600
             SECONDARY_POLLING_DURATION: 86400
             ENABLE_RESTRICTED_COMMANDS: True
-            FEC_FORMAT_VERSION: 8.4
+            FEC_FORMAT_VERSION: 8.5
 
             # ---- FEATURE FLAGS ----
             FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
