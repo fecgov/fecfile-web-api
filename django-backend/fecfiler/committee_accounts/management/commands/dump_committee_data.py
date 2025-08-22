@@ -190,9 +190,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         committee_id = options.get("committee_id")
-        if committee_id is None:
-            raise CommandError("Committee ID is a required parameter")
-
         committee = CommitteeAccount.objects.filter(committee_id=committee_id).first()
         if committee is None:
             raise CommandError("No Committee Account found matching that Committee ID")
