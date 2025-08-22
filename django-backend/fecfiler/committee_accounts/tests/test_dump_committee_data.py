@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core.management.base import CommandError
 from django.core.management import call_command
 from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
 import redis
@@ -112,3 +113,17 @@ class DumpTestDataCommandTest(TestCase):
         committee_data = self.get_committee_data(committee_id=COMMITTEE_TWO_ID)
 
         self.assertEqual(len(committee_data), 1)
+
+    def test_dump_invalid_committee(self):
+        self.assertRaises(
+            CommandError,
+            call_command,
+            "dump_committee_data", "C30000003", "--redis"
+        )
+
+    def test_dump_no_committee_id(self):
+        self.assertRaises(
+            CommandError,
+            call_command,
+            "dump_committee_data", "--redis"
+        )
