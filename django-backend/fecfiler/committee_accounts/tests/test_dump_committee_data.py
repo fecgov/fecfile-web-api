@@ -16,7 +16,7 @@ from fecfiler.transactions.tests.utils import (
     create_schedule_a, create_transaction_memo
 )
 from fecfiler.web_services.models import (
-	WebPrintSubmission, UploadSubmission, DotFEC
+    WebPrintSubmission, UploadSubmission, DotFEC
 )
 
 
@@ -112,5 +112,3 @@ class DumpTestDataCommandTest(TestCase):
         committee_data = self.get_committee_data(committee_id=COMMITTEE_TWO_ID)
 
         self.assertEqual(len(committee_data), 1)
-
-
