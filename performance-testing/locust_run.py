@@ -34,19 +34,20 @@ class Tasks(TaskSet):
     contacts = []
 
     def on_start(self):
+        logging.info("Logging in")
         self.login()
+
+        logging.info("Getting and activating committee")
         self.get_and_activate_commmittee()
 
         logging.info("Loading payloads")
-        directory = os.path.dirname(os.path.abspath(__file__))
-        full_filename = os.path.join(directory, "locust-data", "load_test_payloads.json")
-        self.payloads = json.load(open(full_filename))
+        self.load_payloads()
+
+        logging.info("Creating contact")
+        self.create_payload_contacts()
 
         logging.info("Preparing reports for submit")
-        self.report_ids_dict = self.retrieve_report_ids_dict()
-        self.report_ids = list(self.report_ids_dict.keys())
-        self.prepare_reports_for_submit(self.report_ids)
-        self.report_ids_to_submit = self.report_ids.copy()
+        self.prepare_reports_for_submit()
 
     def login(self):
         authenticate_response = self.client.get(
@@ -55,7 +56,7 @@ class Tasks(TaskSet):
         authenticate_redirect_uri = self.get_redirect_uri(authenticate_response)
         authorize_response = self.client.get(
             authenticate_redirect_uri,
-            name="oidc_provider_authorize",
+            name="oidc_authorize",
             allow_redirects=False,
         )
         authorize_redirect_uri = self.get_redirect_uri(authorize_response)
@@ -71,24 +72,55 @@ class Tasks(TaskSet):
         committee_id = committee_id_list[self.user.user_index]
         response = self.client.post(
             f"/api/v1/committees/{committee_id}/activate/",
-            name=f"activate_committee_{committee_id}",
+            name="activate_committee",
         )
         if response.status_code != 200:
             raise Exception(
                 f"Failed to activate committee for user_index {self.user.user_index}"
             )
 
+    def load_payloads(self):
+        directory = os.path.dirname(os.path.abspath(__file__))
+        self.contact_payloads = json.load(
+            open(
+                os.path.join(directory, "locust-data", "load_test_contact_payloads.json")
+            )
+        )
+        self.transaction_payloads = json.load(
+            open(
+                os.path.join(
+                    directory, "locust-data", "load_test_transaction_payloads.json"
+                )
+            )
+        )
+
+    def create_payload_contacts(self):
+        for key in self.contact_payloads:
+            data = deepcopy(self.contact_payloads[key])
+            response = self.client.post(
+                "/api/v1/contacts/",
+                name="POST_new_contact",
+                json=data,
+            )
+            if response.status_code != 201:
+                raise Exception("Failed to POST new contact")
+            self.contact_payloads[key]["id"] = response.json()["id"]
+
+    def prepare_reports_for_submit(self):
+        self.report_ids_dict = self.retrieve_report_ids_dict()
+        self.report_ids = list(self.report_ids_dict.keys())
+        self.report_ids_to_submit = self.report_ids.copy()
+
+        logging.info("Calculating summaries for reports")
+        report_json_list = self.calculate_summary_for_report_id_list(self.report_ids)
+        logging.info("Confirming information for reports")
+        return self.confirm_information_for_report_json_list(report_json_list)
+
     def get_redirect_uri(self, response):
         if response.status_code == 302:
             parsed_url = urlparse(response.headers["Location"])
             return f"{parsed_url.path}?{parsed_url.query}"
         return None
-
-    def prepare_reports_for_submit(self, report_ids):
-        logging.info("Calculating summaries for reports")
-        report_json_list = self.calculate_summary_for_report_id_list(report_ids)
-        logging.info("Confirming information for reports")
-        return self.confirm_information_for_report_json_list(report_json_list)
 
     def calculate_summary_for_report_id_list(self, report_id_list):
         retval = []
@@ -289,36 +321,44 @@ class Tasks(TaskSet):
         # poll_seconds Determined by INITIAL_POLLING_INTERVAL setting
         self.submit_report(report_id, poll_seconds=40)
 
-    @task(10)  # This task will be picked 10 times more often than the default
+    @task(100)  # This task will be picked 100 times more often than the default
     def create_schedule_a_transaction(self):
-        data = deepcopy(self.payloads["INDIVIDUAL_RECEIPT"])
+        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_1"])
+        transaction_data = deepcopy(self.transaction_payloads["INDIVIDUAL_RECEIPT"])
         report_id = random.choice(self.report_ids)
         contribution_date = self.report_ids_dict[report_id]
-        data["report_ids"].append(report_id)
-        data["contribution_date"] = contribution_date
-        data["contribution_amount"] = random.randrange(25, 10000)
+
+        transaction_data["contact_1"] = contact_data
+        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["report_ids"].append(report_id)
+        transaction_data["contribution_date"] = contribution_date
+        transaction_data["contribution_amount"] = random.randrange(25, 10000)
 
         response = self.client.post(
             "/api/v1/transactions/",
             name="create_new_schedule_a_transaction",
-            json=data,
+            json=transaction_data,
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule a transaction")
 
-    @task(10)  # This task will be picked 10 times more often than the default
+    @task(100)  # This task will be picked 100 times more often than the default
     def create_schedule_b_transaction(self):
-        data = deepcopy(self.payloads["OPERATING_EXPENDITURE"])
+        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_2"])
+        transaction_data = deepcopy(self.transaction_payloads["OPERATING_EXPENDITURE"])
         report_id = random.choice(self.report_ids)
         expenditure_date = self.report_ids_dict[report_id]
-        data["report_ids"].append(report_id)
-        data["expenditure_date"] = expenditure_date
-        data["expenditure_amount"] = random.randrange(25, 10000)
+
+        transaction_data["contact_1"] = contact_data
+        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["report_ids"].append(report_id)
+        transaction_data["expenditure_date"] = expenditure_date
+        transaction_data["expenditure_amount"] = random.randrange(25, 10000)
 
         response = self.client.post(
             "/api/v1/transactions/",
             name="create_new_schedule_b_transaction",
-            json=data,
+            json=transaction_data,
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule b transaction")

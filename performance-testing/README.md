@@ -1,13 +1,12 @@
 # Quick Start
 
-1. Run the following data load management command in the environment to test against
-   using the email address test@test.com (optional
-   additional command arguments as desired):
-   `./manage.py gen_locust_load_test_data`
-2. Run Locust locally using the following command (you may not need `sudo`).  You may
+1. Run Locust locally using the following command (you may not need `sudo`).  You may
    need to add the `--force-recreate` flag if you are having trouble with your
    containers:
    `sudo docker compose --profile locust up`
+2. Run the following data load management command in the environment to test against
+   (optional additional command arguments as desired):
+   `./manage.py gen_locust_load_test_data`
 3. Open a browser to http://localhost:8089 and begin testing.
 4. Once you are done testing, you may wish to cleanup the load test data created in step
    3 using the following management command:

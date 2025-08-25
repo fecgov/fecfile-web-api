@@ -99,9 +99,7 @@
         "memo_text_description",
         "reattribution_redesignation_tag"
     ],
-    "report_ids": [
-        "c9cff6c6-d73a-4adc-96a6-0b8a4d0bf125"
-    ],
+    "report_ids": [],
     "contact_1": {
       "type": "IND",
       "street_1": "test_street_1",

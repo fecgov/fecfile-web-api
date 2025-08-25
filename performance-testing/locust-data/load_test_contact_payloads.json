@@ -1,0 +1,36 @@
+{
+  "INDIVIDUAL_CONTACT_1": {
+    "type": "IND",
+    "street_1": "test_street_1",
+    "city": "test_city_1",
+    "state": "AL",
+    "zip": "12345",
+    "country": "USA",
+    "last_name": "test_last_name_1",
+    "first_name": "test_first_name_1",
+    "middle_name": null,
+    "prefix": null,
+    "suffix": null,
+    "street_2": null,
+    "telephone": null,
+    "employer": "test_employer_1",
+    "occupation": "test_occupation_1"
+  },
+  "INDIVIDUAL_CONTACT_2": {
+    "type": "IND",
+    "street_1": "test_street_2",
+    "city": "test_city_2",
+    "state": "AL",
+    "zip": "12345",
+    "country": "USA",
+    "last_name": "test_last_name_2",
+    "first_name": "test_first_name_2",
+    "middle_name": null,
+    "prefix": null,
+    "suffix": null,
+    "street_2": null,
+    "telephone": null,
+    "employer": "test_employer_2",
+    "occupation": "test_occupation_2"
+  }
+}
