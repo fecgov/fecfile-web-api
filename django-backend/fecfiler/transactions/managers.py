@@ -20,11 +20,25 @@ from django.db.models import (
     When,
     Value,
     TextField,
+    Window,
 )
 from decimal import Decimal
 from enum import Enum
 from ..reports.models import Report
 from fecfiler.reports.report_code_label import report_code_label_case
+from django.utils.functional import cached_property
+
+
+class Schedule(Enum):
+    A = Value("A")
+    B = Value("B")
+    C = Value("C")
+    C2 = Value("C1")
+    C1 = Value("C2")
+    D = Value("D")
+    E = Value("E")
+    F = Value("F")
+
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -33,19 +47,36 @@ but are called different names"""
 class TransactionManager(SoftDeleteManager):
 
     def get_queryset(self):
-        return super().get_queryset().annotate(date=self.DATE_CLAUSE)
-
-    def SCHEDULE_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(schedule_a__isnull=False, then=Schedule.A.value),
-            When(schedule_b__isnull=False, then=Schedule.B.value),
-            When(schedule_c__isnull=False, then=Schedule.C.value),
-            When(schedule_c1__isnull=False, then=Schedule.C1.value),
-            When(schedule_c2__isnull=False, then=Schedule.C2.value),
-            When(schedule_d__isnull=False, then=Schedule.D.value),
-            When(schedule_e__isnull=False, then=Schedule.E.value),
-            When(schedule_f__isnull=False, then=Schedule.F.value),
+        return (
+            super()
+            .get_queryset()
+            .select_related(
+                "schedule_a",
+                "schedule_b",
+                "schedule_c",
+                "schedule_c1",
+                "schedule_c2",
+                "schedule_d",
+                "schedule_e",
+                "schedule_f",
+                "parent_transaction",
+                "debt",
+                "loan",
+                "contact_1",
+            )
+            .annotate(date=self.DATE_CLAUSE)
         )
+
+    SCHEDULE_CLAUSE = Case(
+        When(schedule_a__isnull=False, then=Schedule.A.value),
+        When(schedule_b__isnull=False, then=Schedule.B.value),
+        When(schedule_c__isnull=False, then=Schedule.C.value),
+        When(schedule_c1__isnull=False, then=Schedule.C1.value),
+        When(schedule_c2__isnull=False, then=Schedule.C2.value),
+        When(schedule_d__isnull=False, then=Schedule.D.value),
+        When(schedule_e__isnull=False, then=Schedule.E.value),
+        When(schedule_f__isnull=False, then=Schedule.F.value),
+    )
 
     DATE_CLAUSE = Coalesce(
         "schedule_a__contribution_date",
@@ -110,51 +141,23 @@ class TransactionManager(SoftDeleteManager):
         output_field=TextField(),
     )
 
-    def INCURRED_PRIOR_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(
-                schedule_d__isnull=False,
-                then=Coalesce(
-                    Subquery(
-                        (
-                            super()
-                            .get_queryset()
-                            .filter(
-                                ~Q(debt_id=OuterRef("id")),
-                                transaction_id=OuterRef("transaction_id"),
-                                schedule_d__report_coverage_from_date__lt=OuterRef(
-                                    "schedule_d__report_coverage_from_date"
-                                ),
-                            )
-                            .values("committee_account_id")
-                            .annotate(
-                                incurred_prior=Sum("schedule_d__incurred_amount"),
-                            )
-                            .values("incurred_prior")
-                        )
-                    ),
-                    Value(Decimal(0)),
-                ),
-            ),
-            default=None,
+    @cached_property
+    def PAYMENT_PRIOR_CLAUSE(self):
+        payments = self.model.objects.annotate(
+            date=self.DATE_CLAUSE, amount=self.AMOUNT_CLAUSE
+        ).filter(
+            ~Q(debt_id=OuterRef("id")),
+            debt__transaction_id=OuterRef("transaction_id"),
+            schedule_d__isnull=True,
+            date__lt=OuterRef("schedule_d__report_coverage_from_date"),
         )
 
-    def PAYMENT_PRIOR_CLAUSE(self):  # noqa: N802
         return Case(
             When(
                 schedule_d__isnull=False,
                 then=Coalesce(
                     Subquery(
-                        super()
-                        .get_queryset()
-                        .annotate(date=self.DATE_CLAUSE, amount=self.AMOUNT_CLAUSE)
-                        .filter(
-                            ~Q(debt_id=OuterRef("id")),
-                            debt__transaction_id=OuterRef("transaction_id"),
-                            schedule_d__isnull=True,
-                            date__lt=OuterRef("schedule_d__report_coverage_from_date"),
-                        )
-                        .values("committee_account_id")
+                        payments.values("committee_account_id")
                         .annotate(debt_payments_prior=Sum("amount"))
                         .values("debt_payments_prior")
                     ),
@@ -164,6 +167,7 @@ class TransactionManager(SoftDeleteManager):
             default=None,
         )
 
+    @cached_property
     def PAYMENT_AMOUNT_CLAUSE(self):  # noqa: N802
         return Case(
             When(
@@ -195,12 +199,44 @@ class TransactionManager(SoftDeleteManager):
             super()
             .get_queryset()
             .annotate(
-                schedule=self.SCHEDULE_CLAUSE(),
+                schedule=self.SCHEDULE_CLAUSE,
                 date=self.DATE_CLAUSE,
                 amount=self.AMOUNT_CLAUSE,
-                incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
-                payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
-                payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
+                total_incurred_to_date=Window(
+                    expression=Sum("schedule_d__incurred_amount"),
+                    partition_by=[F("transaction_id")],
+                    order_by=[
+                        F("schedule_d__report_coverage_from_date").asc(),
+                        F("id").asc(),
+                    ],
+                ),
+                incurred_prior=Case(
+                    When(
+                        schedule_d__isnull=False,
+                        then=Coalesce(
+                            Subquery(
+                                super()
+                                .get_queryset()
+                                .filter(
+                                    ~Q(debt_id=OuterRef("id")),
+                                    transaction_id=OuterRef("transaction_id"),
+                                    schedule_d__report_coverage_from_date__lt=OuterRef(
+                                        "schedule_d__report_coverage_from_date"
+                                    ),
+                                )
+                                .values("committee_account_id")
+                                .annotate(
+                                    incurred_prior=Sum("schedule_d__incurred_amount")
+                                )
+                                .values("incurred_prior")
+                            ),
+                            Value(Decimal(0)),
+                        ),
+                    ),
+                    default=Value(Decimal(0)),
+                ),
+                payment_prior=self.PAYMENT_PRIOR_CLAUSE,
+                payment_amount=self.PAYMENT_AMOUNT_CLAUSE,
                 form_type=self.FORM_TYPE_CLAUSE,
                 name=self.DISPLAY_NAME_CLAUSE,
                 transaction_ptr_id=F("id"),
@@ -242,38 +278,21 @@ class TransactionManager(SoftDeleteManager):
                     "parent_transaction___calendar_ytd_per_election_office",
                     "_calendar_ytd_per_election_office",
                 ),
-                line_label=self.LINE_LABEL_CLAUSE(),
+                line_label=self.LINE_LABEL_CLAUSE,
                 report_code_label=REPORT_CODE_LABEL_CLAUSE,
             )
-            .alias(order_key=self.ORDER_KEY_CLAUSE())
-            .order_by("order_key")
-        )
-
-    def ORDER_KEY_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(
-                parent_transaction__isnull=False,
-                then=Concat(
-                    Case(
-                        When(
-                            parent_transaction__schedule_a__isnull=False,
-                            then=Schedule.A.value,
-                        ),
-                        When(
-                            parent_transaction__schedule_b__isnull=False,
-                            then=Schedule.B.value,
-                        ),
-                    ),
-                    "parent_transaction___form_type",
-                    "parent_transaction__created",
-                    "schedule",
-                    "_form_type",
-                    "created",
-                    output_field=TextField(),
-                ),
-            ),
-            default=Concat("schedule", "_form_type", "created", output_field=TextField()),
-            output_field=TextField(),
+            .alias(
+                group_date=Coalesce("parent_transaction__created", "created"),
+                group_form_type=Coalesce("parent_transaction___form_type", "_form_type"),
+            )
+            .order_by(
+                "group_date",
+                "group_form_type",
+                F("parent_transaction_id").asc(nulls_first=True),
+                "schedule",
+                "_form_type",
+                "created",
+            )
         )
 
     A_11 = ["SA11A", "SA11AI", "SA11AII", "SA11B", "SA11C"]
@@ -295,29 +314,15 @@ class TransactionManager(SoftDeleteManager):
     E = ["SE"]
     F = ["SF"]
 
-    def LINE_LABEL_CLAUSE(self):  # noqa: N802
-        label_map = {
-            **line_labels_a,
-            **line_labels_b,
-            **line_labels_c,
-            **line_labels_d,
-            **line_labels_e,
-            **line_labels_f,
-        }
-        return Case(
-            *[
-                When(form_type=line, then=Value(label))
-                for line, label in label_map.items()
-            ]
-        )
+    label_map = {
+        **line_labels_a,
+        **line_labels_b,
+        **line_labels_c,
+        **line_labels_d,
+        **line_labels_e,
+        **line_labels_f,
+    }
 
-
-class Schedule(Enum):
-    A = Value("A")
-    B = Value("B")
-    C = Value("C")
-    C2 = Value("C1")
-    C1 = Value("C2")
-    D = Value("D")
-    E = Value("E")
-    F = Value("F")
+    LINE_LABEL_CLAUSE = Case(
+        *[When(form_type=line, then=Value(label)) for line, label in label_map.items()]
+    )

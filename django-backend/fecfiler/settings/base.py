@@ -12,7 +12,7 @@ from .env import env
 from corsheaders.defaults import default_headers
 from fecfiler.celery import CeleryStorageType
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
-from fecfiler.transactions.profilers import TRANSACTION_MANAGER_PROFILING
+from fecfiler.transactions.profilers import TRANSACTION_VIEW_PROFILING
 from math import floor
 
 
@@ -109,7 +109,7 @@ if INCLUDE_SILK:
 
     # the sub-directories of media and static files
     STATICFILES_LOCATION = "static"
-    SILKY_DYNAMIC_PROFILING = TRANSACTION_MANAGER_PROFILING
+    SILKY_DYNAMIC_PROFILING = TRANSACTION_VIEW_PROFILING
 
 
 MIDDLEWARE += [
