@@ -242,27 +242,27 @@ class Tasks(TaskSet):
         self.client_get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
 
     @task
-    def load_contacts(self):
+    def get_contacts(self):
         params = {
             "page": 1,
             "ordering": "form_type",
         }
         self.client_get(
-            "/api/v1/contacts/", name="load_contacts", timeout=TIMEOUT, params=params
+            "/api/v1/contacts/", name="get_contacts", timeout=TIMEOUT, params=params
         )
 
     @task
-    def load_reports(self):
+    def get_reports(self):
         params = {
             "page": 1,
             "ordering": "form_type",
         }
         self.client_get(
-            "/api/v1/reports/", name="load_reports", timeout=TIMEOUT, params=params
+            "/api/v1/reports/", name="get_reports", timeout=TIMEOUT, params=params
         )
 
     @task
-    def load_transactions(self):
+    def get_transactions(self):
         if len(self.report_ids) > 0:
             report_id = random.choice(self.report_ids)
             schedules = random.choice(SCHEDULES)
@@ -275,7 +275,7 @@ class Tasks(TaskSet):
             }
             self.client_get(
                 "/api/v1/transactions/",
-                name="load_transactions",
+                name="get_transactions",
                 timeout=TIMEOUT,
                 params=params,
             )
@@ -289,7 +289,7 @@ class Tasks(TaskSet):
         # poll_seconds Determined by INITIAL_POLLING_INTERVAL setting
         self.submit_report(report_id, poll_seconds=40)
 
-    @task
+    @task(10)  # This task will be picked 10 times more often than the default
     def create_schedule_a_transaction(self):
         data = deepcopy(self.payloads["INDIVIDUAL_RECEIPT"])
         report_id = random.choice(self.report_ids)
@@ -300,11 +300,28 @@ class Tasks(TaskSet):
 
         response = self.client.post(
             "/api/v1/transactions/",
-            name="post_new_schedule_a_transaction",
+            name="create_new_schedule_a_transaction",
             json=data,
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule a transaction")
+
+    @task(10)  # This task will be picked 10 times more often than the default
+    def create_schedule_b_transaction(self):
+        data = deepcopy(self.payloads["OPERATING_EXPENDITURE"])
+        report_id = random.choice(self.report_ids)
+        expenditure_date = self.report_ids_dict[report_id]
+        data["report_ids"].append(report_id)
+        data["expenditure_date"] = expenditure_date
+        data["expenditure_amount"] = random.randrange(25, 10000)
+
+        response = self.client.post(
+            "/api/v1/transactions/",
+            name="create_new_schedule_b_transaction",
+            json=data,
+        )
+        if response.status_code != 200:
+            raise Exception("Failed to POST new schedule b transaction")
 
     def client_get(self, *args, **kwargs):
         kwargs["catch_response"] = True
