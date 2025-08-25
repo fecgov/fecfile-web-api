@@ -13,6 +13,7 @@ from rest_framework.serializers import (
     DateField,
     BooleanField,
 )
+from datetime import date
 from rest_framework.serializers import ValidationError
 import structlog
 
@@ -357,6 +358,27 @@ class Form3XSerializer(ReportSerializer):
             report = super().create(report_data)
             return report
 
+    def overlaps_other_f3x_report(self, instance_id, committee_uuid, validated_data):
+        coverage_from_date = validated_data.get("coverage_from_date")
+        coverage_year = coverage_from_date.year if (
+            type(coverage_from_date) == date
+        ) else coverage_from_date[:4]
+
+        return Report.objects.filter(
+            ~Q(id=instance_id),
+            Q(committee_account__id=committee_uuid),
+            Q(
+                coverage_from_date__gte=validated_data.get("coverage_from_date"),
+                coverage_from_date__lte=validated_data.get("coverage_through_date")
+            ) | Q(
+                coverage_through_date__gte=validated_data.get("coverage_from_date"),
+                coverage_through_date__lte=validated_data.get("coverage_through_date")
+            ) | Q(
+                coverage_from_date__year=coverage_year,
+                report_code=validated_data.get("report_code"),
+            ),
+        ).count() > 0
+
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
             # Check if there are any transactions that fall outside the coverage dates
@@ -368,19 +390,11 @@ class Form3XSerializer(ReportSerializer):
             ).count()
             if transactions_outside_coverage_dates > 0:
                 raise COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS
-
-            # Check if there is any overlap in dates with other reports
-            number_of_overlapping_reports = Report.objects.filter(
-                ~Q(id=instance.id),
-                Q(
-                    coverage_from_date__gte=validated_data["coverage_from_date"],
-                    coverage_from_date__lte=validated_data["coverage_through_date"]
-                ) | Q(
-                    coverage_through_date__gte=validated_data["coverage_from_date"],
-                    coverage_through_date__lte=validated_data["coverage_through_date"]
-                )
-            ).count()
-            if number_of_overlapping_reports > 0:
+            if self.overlaps_other_f3x_report(
+                instance.id,
+                instance.committee_account.id,
+                validated_data
+            ):
                 raise COVERAGE_DATE_REPORT_CODE_COLLISION
 
             # Apply changes to the form_3x instance
@@ -397,16 +411,15 @@ class Form3XSerializer(ReportSerializer):
         exists for the same year
         """
         committee_uuid = self.get_committee_uuid()
-        number_of_collisions = Report.objects.filter(
-            ~Q(id=(self.instance or Report()).id),
-            committee_account=committee_uuid,
-            coverage_from_date__year=self.validated_data["coverage_from_date"].year,
-            report_code=self.validated_data["report_code"],
-        ).count()
-        if number_of_collisions == 0:
-            return super(Form3XSerializer, self).save(**kwargs)
-        else:
+        instance_id = self.instance.id if self.instance else None
+        if self.overlaps_other_f3x_report(
+            instance_id,
+            committee_uuid,
+            self.validated_data
+        ):
             raise COVERAGE_DATE_REPORT_CODE_COLLISION
+
+        return super(Form3XSerializer, self).save(**kwargs)
 
     def validate(self, data):
         self._context = self.context.copy()
