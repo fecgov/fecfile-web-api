@@ -361,8 +361,10 @@ class Form3XSerializer(ReportSerializer):
     def overlaps_other_f3x_report(self, instance_id, committee_uuid, validated_data):
         coverage_from_date = validated_data.get("coverage_from_date")
         coverage_year = coverage_from_date.year if (
-            type(coverage_from_date) == date
-        ) else coverage_from_date[:4]
+            type(coverage_from_date) is date
+        ) else coverage_from_date[:4] if (
+            type(coverage_from_date) is str
+        ) else None
 
         return Report.objects.filter(
             ~Q(id=instance_id),
