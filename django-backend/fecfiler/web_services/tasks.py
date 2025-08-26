@@ -69,9 +69,9 @@ def create_dot_fec(
         submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
 
-    logger.info("Sleeping for 30 seconds.")
+    logger.info("DANTEST: Sleeping for 30 seconds.")
     time.sleep(30)
-    logger.info("Awake and proceeding.")
+    logger.info("DANTEST: Awake and proceeding.")
 
     try:
         file_content = compose_dot_fec(report_id)
