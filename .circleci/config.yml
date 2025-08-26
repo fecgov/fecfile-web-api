@@ -252,8 +252,6 @@ workflows:
             branches:
               only: /develop|feature\/2395-test-sleep_task|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
-          requires:
-            - test
           filters:
             branches:
               only: develop
