@@ -251,8 +251,6 @@ workflows:
             branches:
               only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - deploy-job:
-          requires:
-            - test
           filters:
             branches:
               only: /develop|feature\/2395-test-sleep_task|release\/sprint-[\.\d]+|release\/test|main/
