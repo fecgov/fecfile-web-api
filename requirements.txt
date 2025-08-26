@@ -21,4 +21,4 @@ PyJWT==2.10.1
 redis==4.5.5
 requests==2.32.4
 structlog==25.3.0
-zeep==4.2.1
+zeep==4.3.1

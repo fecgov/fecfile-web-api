@@ -30,6 +30,11 @@ When running docker compose you will need to be in the root directory of the pro
 
 ### Run the fecfile web API application
 
+You will need to define a DJANGO_SECRET_KEY.  Locally you can just add something like this your rc file:
+`export DJANGO_SECRET_KEY="thisismykey"`
+
+Spin up the containers
+
 `docker compose up -d`
 
 By default EFO services (print/upload) will be mocked.

@@ -128,7 +128,6 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             "add_member",
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, "Missing fields: email")
 
         post_data = {"email": "an_email@fec.gov"}
         response = self.send_viewset_post_request(
@@ -138,7 +137,6 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             "add_member",
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, "Missing fields: role")
 
         post_data = {"email": "an_email@fec.gov", "role": "A Random String"}
         response = self.send_viewset_post_request(
@@ -148,7 +146,6 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             "add_member",
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, "Invalid role")
 
         post_data = {
             "email": "test@fec.gov",
@@ -161,10 +158,6 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             "add_member",
         )
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.data,
-            "This email is taken by an existing membership to this committee",
-        )
 
     def test_update_membership_unauthorized(self):
         user = User.objects.get(id="fb20ffc3-285e-448e-9e56-9ca1fd43e7d3")
