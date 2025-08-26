@@ -43,4 +43,4 @@ class Command(BaseCommand):
             logger.info(f"Adding user {user.email} to new committee {committee_id}")
             call_command("add_user_to_committee", user.email, committee_id)
         except Exception as e:
-            logger.error(f"An error occurred while deleting the committee account: {e}")
+            logger.error(f"An error occurred while loading committee data: {e}")
