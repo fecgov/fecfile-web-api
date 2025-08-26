@@ -1,0 +1,127 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.tests.test\_dump\_committee\_data.DumpTestDataCommandTest
+======================================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.tests.test_dump_committee_data
+
+.. autoclass:: DumpTestDataCommandTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~DumpTestDataCommandTest.__init__
+      ~DumpTestDataCommandTest.addClassCleanup
+      ~DumpTestDataCommandTest.addCleanup
+      ~DumpTestDataCommandTest.addTypeEqualityFunc
+      ~DumpTestDataCommandTest.assertAlmostEqual
+      ~DumpTestDataCommandTest.assertContains
+      ~DumpTestDataCommandTest.assertCountEqual
+      ~DumpTestDataCommandTest.assertDictEqual
+      ~DumpTestDataCommandTest.assertEqual
+      ~DumpTestDataCommandTest.assertFalse
+      ~DumpTestDataCommandTest.assertFieldOutput
+      ~DumpTestDataCommandTest.assertFormError
+      ~DumpTestDataCommandTest.assertFormSetError
+      ~DumpTestDataCommandTest.assertGreater
+      ~DumpTestDataCommandTest.assertGreaterEqual
+      ~DumpTestDataCommandTest.assertHTMLEqual
+      ~DumpTestDataCommandTest.assertHTMLNotEqual
+      ~DumpTestDataCommandTest.assertIn
+      ~DumpTestDataCommandTest.assertInHTML
+      ~DumpTestDataCommandTest.assertIs
+      ~DumpTestDataCommandTest.assertIsInstance
+      ~DumpTestDataCommandTest.assertIsNone
+      ~DumpTestDataCommandTest.assertIsNot
+      ~DumpTestDataCommandTest.assertIsNotNone
+      ~DumpTestDataCommandTest.assertJSONEqual
+      ~DumpTestDataCommandTest.assertJSONNotEqual
+      ~DumpTestDataCommandTest.assertLess
+      ~DumpTestDataCommandTest.assertLessEqual
+      ~DumpTestDataCommandTest.assertListEqual
+      ~DumpTestDataCommandTest.assertLogs
+      ~DumpTestDataCommandTest.assertMultiLineEqual
+      ~DumpTestDataCommandTest.assertNoLogs
+      ~DumpTestDataCommandTest.assertNotAlmostEqual
+      ~DumpTestDataCommandTest.assertNotContains
+      ~DumpTestDataCommandTest.assertNotEqual
+      ~DumpTestDataCommandTest.assertNotIn
+      ~DumpTestDataCommandTest.assertNotInHTML
+      ~DumpTestDataCommandTest.assertNotIsInstance
+      ~DumpTestDataCommandTest.assertNotRegex
+      ~DumpTestDataCommandTest.assertNumQueries
+      ~DumpTestDataCommandTest.assertQuerySetEqual
+      ~DumpTestDataCommandTest.assertRaises
+      ~DumpTestDataCommandTest.assertRaisesMessage
+      ~DumpTestDataCommandTest.assertRaisesRegex
+      ~DumpTestDataCommandTest.assertRedirects
+      ~DumpTestDataCommandTest.assertRegex
+      ~DumpTestDataCommandTest.assertSequenceEqual
+      ~DumpTestDataCommandTest.assertSetEqual
+      ~DumpTestDataCommandTest.assertTemplateNotUsed
+      ~DumpTestDataCommandTest.assertTemplateUsed
+      ~DumpTestDataCommandTest.assertTrue
+      ~DumpTestDataCommandTest.assertTupleEqual
+      ~DumpTestDataCommandTest.assertURLEqual
+      ~DumpTestDataCommandTest.assertWarns
+      ~DumpTestDataCommandTest.assertWarnsMessage
+      ~DumpTestDataCommandTest.assertWarnsRegex
+      ~DumpTestDataCommandTest.assertXMLEqual
+      ~DumpTestDataCommandTest.assertXMLNotEqual
+      ~DumpTestDataCommandTest.captureOnCommitCallbacks
+      ~DumpTestDataCommandTest.countTestCases
+      ~DumpTestDataCommandTest.debug
+      ~DumpTestDataCommandTest.defaultTestResult
+      ~DumpTestDataCommandTest.doClassCleanups
+      ~DumpTestDataCommandTest.doCleanups
+      ~DumpTestDataCommandTest.ensure_connection_patch_method
+      ~DumpTestDataCommandTest.enterClassContext
+      ~DumpTestDataCommandTest.enterContext
+      ~DumpTestDataCommandTest.fail
+      ~DumpTestDataCommandTest.get_committee_data
+      ~DumpTestDataCommandTest.id
+      ~DumpTestDataCommandTest.modify_settings
+      ~DumpTestDataCommandTest.run
+      ~DumpTestDataCommandTest.setUp
+      ~DumpTestDataCommandTest.setUpClass
+      ~DumpTestDataCommandTest.setUpTestData
+      ~DumpTestDataCommandTest.settings
+      ~DumpTestDataCommandTest.shortDescription
+      ~DumpTestDataCommandTest.skipTest
+      ~DumpTestDataCommandTest.subTest
+      ~DumpTestDataCommandTest.tearDown
+      ~DumpTestDataCommandTest.tearDownClass
+      ~DumpTestDataCommandTest.test_dump_invalid_committee
+      ~DumpTestDataCommandTest.test_dump_no_committee_id
+      ~DumpTestDataCommandTest.test_dump_report_data
+      ~DumpTestDataCommandTest.test_dump_second_committee
+      ~DumpTestDataCommandTest.test_dump_submission_data
+      ~DumpTestDataCommandTest.test_dump_transaction_data
+      ~DumpTestDataCommandTest.test_dump_user_data
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~DumpTestDataCommandTest.available_apps
+      ~DumpTestDataCommandTest.databases
+      ~DumpTestDataCommandTest.fixtures
+      ~DumpTestDataCommandTest.longMessage
+      ~DumpTestDataCommandTest.maxDiff
+      ~DumpTestDataCommandTest.reset_sequences
+      ~DumpTestDataCommandTest.serialized_rollback
+   
+   
