@@ -69,8 +69,8 @@ def create_dot_fec(
         submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
 
-    logger.info("DANTEST: Sleeping for 300 seconds.")
-    time.sleep(300)
+    logger.info("DANTEST: Sleeping for 15m.")
+    time.sleep(900)
     logger.info("DANTEST: Awake and proceeding.")
 
     try:
