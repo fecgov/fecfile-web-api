@@ -371,7 +371,6 @@ class Tasks(TaskSet):
         )
         report_id = random.choice(self.report_ids)
         loan_incurred_date = self.report_ids_dict[report_id]
-        loan_incurred_date = self.report_ids_dict[report_id]
 
         transaction_data["contact_1"] = contact_data
         transaction_data["contact_1_id"] = contact_data["id"]
@@ -394,6 +393,26 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule c transaction")
+
+    @task(10)  # This task will be picked 10 times more often than the default
+    def create_schedule_d_transaction(self):
+        contact_data = deepcopy(self.contact_payloads["ORGANIZATION_CONTACT_1"])
+        transaction_data = deepcopy(self.transaction_payloads["DEBT_OWED_BY_COMMITTEE"])
+        report_id = random.choice(self.report_ids)
+
+        transaction_data["contact_1"] = contact_data
+        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["report_ids"].append(report_id)
+        transaction_data["incurred_amount"] = random.randrange(100, 10000)
+        transaction_data["balance_at_close"] = transaction_data["incurred_amount"]
+
+        response = self.client.post(
+            "/api/v1/transactions/",
+            name="create_new_schedule_d_transaction",
+            json=transaction_data,
+        )
+        if response.status_code != 200:
+            raise Exception("Failed to POST new schedule d transaction")
 
     def client_get(self, *args, **kwargs):
         kwargs["catch_response"] = True
