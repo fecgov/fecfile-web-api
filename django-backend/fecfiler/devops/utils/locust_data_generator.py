@@ -126,6 +126,7 @@ class LocustDataGenerator:
                         "contact_1_id": contact.id,
                         "aggregation_group": aggregation_group,
                         "form_type": form_type,
+                        "entity_type": contact.type,
                         "schedule_a_id": schedule_a.id,
                     }
                 )
@@ -201,6 +202,7 @@ class LocustDataGenerator:
                         "contact_1_id": contact.id,
                         "aggregation_group": aggregation_group,
                         "form_type": form_type,
+                        "entity_type": contact.type,
                         "schedule_b_id": schedule_b.id,
                     }
                 )
@@ -232,8 +234,6 @@ class LocustDataGenerator:
 
         for index in range(count):
             tier2_transactions[index].parent_transaction_id = tier1_transactions[index].id
-        Transaction.objects.bulk_update(
-            tier2_transactions, ["parent_transaction_id"]
-        )
+        Transaction.objects.bulk_update(tier2_transactions, ["parent_transaction_id"])
 
         return tier1_transactions

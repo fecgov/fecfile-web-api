@@ -49,5 +49,17 @@
     "telephone": null,
     "employer": "test_employer_3",
     "occupation": "test_occupation_3"
+  },
+  "ORGANIZATION_CONTACT_1": {
+    "type": "ORG",
+    "street_1": "test_street_1",
+    "city": "test_city_1",
+    "state": "AL",
+    "zip": "12345",
+    "country": "USA",
+    "has_transaction_or_report": false,
+    "name": "test_org_name1",
+    "street_2": null,
+    "telephone": null
   }
 }

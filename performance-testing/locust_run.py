@@ -343,6 +343,45 @@ class Tasks(TaskSet):
             raise Exception("Failed to POST new schedule a transaction")
 
     @task(100)  # This task will be picked 100 times more often than the default
+    def update_schedule_a_transaction(self):
+        if len(self.report_ids) > 0:
+            report_id = random.choice(self.report_ids)
+            transaction = self.get_first_individual_receipt_for_report(report_id)
+            if transaction:
+                response = self.client_get(
+                    f"/api/v1/transactions/{transaction["id"]}/",
+                    name="get_transaction_by_id",
+                    timeout=TIMEOUT,
+                )
+                if response and response.status_code == 200:
+                    data = response.json()
+                    data["contribution_amount"] = 1.23
+                    data["schedule_id"] = "A"
+                    data["schema_name"] = "INDIVIDUAL_RECEIPT"
+                    response = self.client.put(
+                        f"/api/v1/transactions/{data["id"]}/",
+                        name="update_schedule_a_transaction",
+                        json=data,
+                    )
+                if response.status_code == 200:
+                    return
+        raise Exception("Failed to PUT update schedule a transaction")
+
+    @task
+    def delete_schedule_a_transaction(self):
+        if len(self.report_ids) > 0:
+            report_id = random.choice(self.report_ids)
+            transaction = self.get_first_individual_receipt_for_report(report_id)
+            if transaction:
+                response = self.client.delete(
+                    f"/api/v1/transactions/{transaction['id']}/",
+                    name="delete_schedule_a_transaction",
+                )
+                if response.status_code == 204:
+                    return
+        raise Exception("Failed to DELETE schedule a transaction")
+
+    @task(100)  # This task will be picked 100 times more often than the default
     def create_schedule_b_transaction(self):
         contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_2"])
         transaction_data = deepcopy(self.transaction_payloads["OPERATING_EXPENDITURE"])
@@ -428,6 +467,26 @@ class Tasks(TaskSet):
             raise Exception(f"Invalid date string: {date_str}")
         year = int(parts[0]) + 1
         return f"{year}-{parts[1]}-{parts[2]}"
+    
+    def get_first_individual_receipt_for_report(self, report_id):
+        params = {
+            "page": 1,
+            "ordering": "-created",
+            "schedules": "A",
+            "report_id": report_id,
+        }
+        response = self.client_get(
+            "/api/v1/transactions/",
+            name="get_transactions",
+            timeout=TIMEOUT,
+            params=params,
+        )
+        if response and response.status_code == 200:
+            results = response.json().get("results", [])
+            for transaction in results:
+                if transaction.get("transaction_type_identifier", None) == "INDIVIDUAL_RECEIPT":
+                    return transaction
+        return None
 
 
 class Swarm(user.HttpUser):
