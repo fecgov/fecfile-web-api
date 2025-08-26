@@ -8,11 +8,13 @@ logger = structlog.get_logger(__name__)
 
 
 class Command(BaseCommand):
-    help = "Loads committee data from a json file and adds a given user to the newly created committee"
+    help = "Loads committee data from a json file and adds a given user as a member"
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "filename", type=str, help="The json file containing the committee data to be loaded"
+            "filename",
+            type=str,
+            help="The json file containing the committee data to be loaded"
         )
         parser.add_argument(
             "user_identifier",

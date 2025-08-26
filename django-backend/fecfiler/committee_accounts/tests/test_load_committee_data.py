@@ -10,15 +10,12 @@ from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.user.models import User
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.reports.tests.utils import create_form3x
-from fecfiler.transactions.tests.utils import (
-    create_schedule_a, create_transaction_memo
-)
+from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.reports.models import Report
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.contacts.models import Contact
-from fecfiler.memo_text.models import MemoText
 import structlog
 
 

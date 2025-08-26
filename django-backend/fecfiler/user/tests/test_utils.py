@@ -3,6 +3,7 @@ from fecfiler.user.models import User
 from fecfiler.user.utils import get_user_by_email_or_id
 from uuid import uuid4
 
+
 class UserUtilsTestCase(TestCase):
     def setUp(self):
         self.user_1 = User.objects.create_user(
