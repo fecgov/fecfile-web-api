@@ -467,7 +467,7 @@ class Tasks(TaskSet):
             raise Exception(f"Invalid date string: {date_str}")
         year = int(parts[0]) + 1
         return f"{year}-{parts[1]}-{parts[2]}"
-    
+
     def get_first_individual_receipt_for_report(self, report_id):
         params = {
             "page": 1,
@@ -484,7 +484,7 @@ class Tasks(TaskSet):
         if response and response.status_code == 200:
             results = response.json().get("results", [])
             for transaction in results:
-                if transaction.get("transaction_type_identifier", None) == "INDIVIDUAL_RECEIPT":
+                if transaction["transaction_type_identifier"] == "INDIVIDUAL_RECEIPT":
                     return transaction
         return None
 
