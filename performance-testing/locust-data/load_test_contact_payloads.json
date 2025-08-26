@@ -32,5 +32,22 @@
     "telephone": null,
     "employer": "test_employer_2",
     "occupation": "test_occupation_2"
+  },
+  "INDIVIDUAL_CONTACT_3": {
+    "type": "IND",
+    "street_1": "test_street_3",
+    "city": "test_city_3",
+    "state": "AL",
+    "zip": "12345",
+    "country": "USA",
+    "last_name": "test_last_name_3",
+    "first_name": "test_first_name_3",
+    "middle_name": null,
+    "prefix": null,
+    "suffix": null,
+    "street_2": null,
+    "telephone": null,
+    "employer": "test_employer_3",
+    "occupation": "test_occupation_3"
   }
 }

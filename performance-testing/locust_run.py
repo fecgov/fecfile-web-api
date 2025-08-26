@@ -363,12 +363,52 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule b transaction")
 
+    @task(10)  # This task will be picked 10 times more often than the default
+    def create_schedule_c_transaction(self):
+        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_3"])
+        transaction_data = deepcopy(
+            self.transaction_payloads["LOAN_RECEIVED_FROM_INDIVIDUAL"]
+        )
+        report_id = random.choice(self.report_ids)
+        loan_incurred_date = self.report_ids_dict[report_id]
+        loan_incurred_date = self.report_ids_dict[report_id]
+
+        transaction_data["contact_1"] = contact_data
+        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["report_ids"].append(report_id)
+        transaction_data["loan_incurred_date"] = loan_incurred_date
+        transaction_data["loan_due_date"] = self.add_year_to_date_str(loan_incurred_date)
+        transaction_data["loan_amount"] = random.randrange(100, 10000)
+
+        child_transaction_data = transaction_data["children"][0]
+        child_transaction_data["contact_1"] = contact_data
+        child_transaction_data["contact_1_id"] = contact_data["id"]
+        child_transaction_data["contribution_date"] = transaction_data["loan_due_date"]
+        child_transaction_data["contribution_amount"] = transaction_data["loan_amount"]
+        child_transaction_data["contribution_aggregate"] = transaction_data["loan_amount"]
+
+        response = self.client.post(
+            "/api/v1/transactions/",
+            name="create_new_schedule_c_transaction",
+            json=transaction_data,
+        )
+        if response.status_code != 200:
+            raise Exception("Failed to POST new schedule c transaction")
+
     def client_get(self, *args, **kwargs):
         kwargs["catch_response"] = True
         with self.client.get(*args, **kwargs) as response:
             if response.status_code != 200:
                 response.failure(f"Non-200 Response: {response.status_code}")
             return response
+
+    def add_year_to_date_str(self, date_str):
+        """Expects date_str in YYYY-MM-DD format"""
+        parts = date_str.split("-")
+        if len(parts) != 3:
+            raise Exception(f"Invalid date string: {date_str}")
+        year = int(parts[0]) + 1
+        return f"{year}-{parts[1]}-{parts[2]}"
 
 
 class Swarm(user.HttpUser):
