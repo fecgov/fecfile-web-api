@@ -3,7 +3,9 @@ from django.core import serializers
 from fecfiler.s3 import S3_SESSION
 from fecfiler.settings import (
     AWS_STORAGE_BUCKET_NAME,
+    MOCK_OPENFEC_REDIS_URL
 )
+import redis
 import structlog
 
 # Committee Accounts and Users
@@ -61,6 +63,9 @@ class Command(BaseCommand):
         parser.add_argument(
             "committee_id",
             help="The ID (not UUID) for the target committee"
+        )
+        parser.add_argument(
+            "--redis", action="store_true"
         )
 
     def serialize(self, queryset):
@@ -169,19 +174,22 @@ class Command(BaseCommand):
         file.write(formatted_json)
         file.close()
 
+    def save_to_redis(self, filename, formatted_json):
+        redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
+        redis_instance.set(filename, formatted_json)
+
     def save_data(self, formatted_json, options):
         filename = self.get_filename(options)
 
-        if S3_SESSION is not None:
+        if options.get("redis", False):
+            return self.save_to_redis(filename, formatted_json)
+        elif S3_SESSION is not None:
             return self.save_to_s3(filename, formatted_json)
         else:
             return self.save_to_local(filename, formatted_json)
 
     def handle(self, *args, **options):
         committee_id = options.get("committee_id")
-        if committee_id is None:
-            raise CommandError("Committee ID is a required parameter")
-
         committee = CommitteeAccount.objects.filter(committee_id=committee_id).first()
         if committee is None:
             raise CommandError("No Committee Account found matching that Committee ID")
