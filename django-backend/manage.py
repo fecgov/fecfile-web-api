@@ -7,6 +7,7 @@ from fecfiler import settings
 logger = structlog.get_logger(__name__)
 
 allowed_commands = [
+    "collectstatic",
     "help",
     "migrate",
     "lintmigrations",
@@ -30,6 +31,8 @@ restricted_commands = [
     # COMMITTEE ACCOUNT COMMANDS #
     "load_committee_data",
     "delete_committee_account",
+    "add_user_to_committee",
+    "dump_committee_data",  # Can be unrestricted AFTER fuzzing is implemented
     # REPORT COMMANDS #
     "delete_committee_reports",
     # users

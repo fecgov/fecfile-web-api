@@ -1,37 +1,14 @@
-import os
 import logging
-import random
-import json
 import time
 import threading
-from copy import deepcopy
+import random
+from urllib.parse import urlparse
 
 from locust import between, task, TaskSet, user
 
-SESSION_ID = os.environ.get("OIDC_SESSION_ID")
-CSRF_TOKEN = os.environ.get("CSRF_TOKEN")
 
-# seconds
 TIMEOUT = 30  # seconds
-
-SCHEDULES = ["A"]  # Further schedules to be implemented in the future
-
-
-def get_json_data(name):
-    directory = os.path.dirname(os.path.abspath(__file__))
-    filename = f"{name}.locust.json"
-    full_filename = os.path.join(directory, "locust-data", filename)
-    if os.path.isfile(full_filename):
-        try:
-            file = open(full_filename, "r")
-            values = json.loads(file.read())
-            file.close()
-            logging.info(f"Retrieved {len(values)} items from {filename}")
-            return values
-        except (IOError, ValueError):
-            logging.error(f"Unable to retrieve locust data from file {filename}")
-
-    return []
+SCHEDULES = ["A", "B"]  # Further schedules to be implemented in the future
 
 
 class AtomicInteger:
@@ -54,36 +31,49 @@ class Tasks(TaskSet):
     contacts = []
 
     def on_start(self):
-        self.client.headers = {
-            "cookie": f"sessionid={SESSION_ID}; csrftoken={CSRF_TOKEN};",
-            "user-agent": "Locust testing",
-            "x-csrftoken": CSRF_TOKEN,
-            "Origin": self.client.base_url,
-        }
+        self.login()
+        self.get_and_activate_commmittee()
 
         logging.info("Preparing reports for submit")
         self.report_ids = self.retrieve_report_id_list()
-        self.report_ids_to_submit = self.get_report_ids_to_submit(
-            self.user.user_index, self.report_ids
-        )
-        self.prepare_reports_for_submit(self.report_ids_to_submit)
+        self.prepare_reports_for_submit(self.report_ids)
+        self.report_ids_to_submit = self.report_ids.copy()
 
-    def get_report_ids_to_submit(self, user_index, all_report_ids):
-        user_count = self.user.environment.parsed_options.users
-        total_report_count = len(all_report_ids)
-        reports_per_user = (
-            total_report_count // user_count if total_report_count > user_count else 1
+    def login(self):
+        authenticate_response = self.client.get(
+            "/api/v1/oidc/authenticate", name="oidc_authenticate", allow_redirects=False
         )
-        start_index = user_index * reports_per_user
-        end_index = start_index + reports_per_user
-        logging.info(f"================ user index {user_index} ================")
-        logging.info(f"start index {start_index} end index {end_index}")
-        if start_index >= total_report_count:
-            logging.warning(
-                f"User index {user_index} exceeds report count. No reports to submit."
+        authenticate_redirect_uri = self.get_redirect_uri(authenticate_response)
+        authorize_response = self.client.get(
+            authenticate_redirect_uri,
+            name="oidc_provider_authorize",
+            allow_redirects=False,
+        )
+        authorize_redirect_uri = self.get_redirect_uri(authorize_response)
+        self.client.get(
+            authorize_redirect_uri, name="oidc_callback", allow_redirects=False
+        )
+        self.client.headers["x-csrftoken"] = self.client.cookies["csrftoken"]
+        self.client.headers["user-agent"] = "Locust testing"
+        self.client.headers["Origin"] = self.client.base_url
+
+    def get_and_activate_commmittee(self):
+        committee_id_list = self.retrieve_committee_id_list()
+        committee_id = committee_id_list[self.user.user_index]
+        response = self.client.post(
+            f"/api/v1/committees/{committee_id}/activate/",
+            name=f"activate_committee_{committee_id}",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed to activate committee for user_index {self.user.user_index}"
             )
-            return []
-        return deepcopy(all_report_ids[start_index:end_index])
+
+    def get_redirect_uri(self, response):
+        if response.status_code == 302:
+            parsed_url = urlparse(response.headers["Location"])
+            return f"{parsed_url.path}?{parsed_url.query}"
+        return None
 
     def prepare_reports_for_submit(self, report_ids):
         logging.info("Calculating summaries for reports")
@@ -179,7 +169,7 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to update report information for submit")
 
-    def submit_to_fec_and_poll_for_success(self, report_id, poll_seconds=2):
+    def submit_to_fec_and_poll_for_success(self, report_id, poll_seconds):
         with self.client.post(
             "/api/v1/web-services/submit-to-fec/",
             name="submit_report_to_fec",
@@ -224,6 +214,20 @@ class Tasks(TaskSet):
             retval.sort()
             return retval
         raise Exception("Failed to retrieve report ids for load test setup")
+
+    def retrieve_committee_id_list(self):
+        response = self.client_get(
+            "/api/v1/committees/",
+            timeout=TIMEOUT,
+        )
+        if response and response.status_code == 200:
+            retval = []
+            committees = response.json()["results"]
+            committees.sort(key=lambda x: x["committee_id"])
+            for committee in committees:
+                retval.append(committee["id"])
+            return retval
+        raise Exception("Failed to retrieve committee ids for load test setup")
 
     @task
     def celery_test(self):

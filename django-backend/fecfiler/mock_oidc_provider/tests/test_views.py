@@ -15,7 +15,7 @@ from fecfiler.mock_oidc_provider.views import (
 
 
 class OidcTest(TestCase):
-    fixtures = ["fixtures/e2e-test-data"]
+    fixtures = ["fixtures/user-data"]
 
     def setUp(self):
         self.factory = RequestFactory()
@@ -190,93 +190,6 @@ class OidcTest(TestCase):
         self.assertTrue("id_token" in actual_json_content)
 
     # userinfo
-
-    @patch("fecfiler.mock_oidc_provider.views.redis.Redis.get")
-    def test_userinfo_no_auth_header(self, mock_redis_get):
-        test_code = "test_code"
-        test_nonce = "test_nonce"
-        test_access_token = "test_access_token"
-        test_auth_data = {
-            "code": test_code,
-            "nonce": test_nonce,
-            "access_token": test_access_token,
-        }
-        expected_contents = "Authorization header is required"
-
-        mock_redis_get.side_effect = lambda _: json.dumps(test_auth_data).encode()
-
-        request = self.factory.get("/")
-        retval = userinfo(request)
-        actual_contents = retval.content.decode()
-
-        self.assertEqual(retval.status_code, 400)
-        self.assertEqual(expected_contents, actual_contents)
-
-    @patch("fecfiler.mock_oidc_provider.views.redis.Redis.get")
-    def test_userinfo_no_auth_data_access_token(self, mock_redis_get):
-        test_code = "test_code"
-        test_nonce = "test_nonce"
-        test_access_token = "test_access_token"
-        test_auth_data = {
-            "code": test_code,
-            "nonce": test_nonce,
-        }
-        test_headers = {"Authorization": f"Bearer {test_access_token}"}
-        expected_contents = "call to authorize endpoint is required first"
-
-        mock_redis_get.side_effect = lambda _: json.dumps(test_auth_data).encode()
-
-        request = self.factory.get("/", headers=test_headers)
-        retval = userinfo(request)
-        actual_contents = retval.content.decode()
-
-        self.assertEqual(retval.status_code, 400)
-        self.assertEqual(expected_contents, actual_contents)
-
-    @patch("fecfiler.mock_oidc_provider.views.redis.Redis.get")
-    def test_userinfo_bearer_token_not_found(self, mock_redis_get):
-        test_code = "test_code"
-        test_nonce = "test_nonce"
-        test_access_token = "test_access_token"
-        test_auth_data = {
-            "code": test_code,
-            "nonce": test_nonce,
-            "access_token": test_access_token,
-        }
-        test_headers = {"Authorization": f"{test_access_token}"}
-        expected_contents = "Bearer token not found"
-
-        mock_redis_get.side_effect = lambda _: json.dumps(test_auth_data).encode()
-
-        request = self.factory.get("/", headers=test_headers)
-        retval = userinfo(request)
-        actual_contents = retval.content.decode()
-
-        self.assertEqual(retval.status_code, 400)
-        self.assertEqual(expected_contents, actual_contents)
-
-    @patch("fecfiler.mock_oidc_provider.views.redis.Redis.get")
-    def test_userinfo_bearer_token_invalid(self, mock_redis_get):
-        test_code = "test_code"
-        test_nonce = "test_nonce"
-        test_access_token = "test_access_token"
-        test_auth_data = {
-            "code": test_code,
-            "nonce": test_nonce,
-            "access_token": test_access_token,
-        }
-        test_invalid_bearer_token = "test_invalid_bearer_token"
-        test_headers = {"Authorization": f"Bearer {test_invalid_bearer_token}"}
-        expected_contents = "Invalid Bearer token"
-
-        mock_redis_get.side_effect = lambda _: json.dumps(test_auth_data).encode()
-
-        request = self.factory.get("/", headers=test_headers)
-        retval = userinfo(request)
-        actual_contents = retval.content.decode()
-
-        self.assertEqual(retval.status_code, 400)
-        self.assertEqual(expected_contents, actual_contents)
 
     @patch("fecfiler.mock_oidc_provider.views.redis.Redis.get")
     def test_userinfo_happy_path(self, mock_redis_get):

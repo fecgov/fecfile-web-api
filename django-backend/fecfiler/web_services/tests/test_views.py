@@ -13,7 +13,11 @@ from fecfiler.reports.tests.utils import (
 )
 from fecfiler.web_services.summary.tasks import CalculationState
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
-
+from fecfiler.web_services.models import (
+    UploadSubmission,
+    WebPrintSubmission,
+    FECSubmissionState,
+)
 from unittest.mock import patch
 
 
@@ -220,3 +224,53 @@ class WebServicesViewSetTest(FecfilerViewSetTest):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, f"No .FEC was found for id: {test_id}")
+
+    def test_submit_to_fec_already_running(self):
+        """Test that a new submission is blocked if one is already in progress."""
+        report = create_form3x(self.committee, "2024-01-01", "2024-02-01")
+        # Create an existing submission in a "submitting" state
+        upload_submission = UploadSubmission.objects.create(
+            fecfile_task_state=FECSubmissionState.SUBMITTING
+        )
+        report.upload_submission = upload_submission
+        report.save()
+
+        response = self.send_viewset_post_request(
+            "/api/v1/web-services/submit-to-fec/",
+            {"report_id": report.id, "password": "123"},
+            WebServicesViewSet,
+            "submit_to_fec",
+        )
+
+        expected_message = {
+            "status": f"""There is already an active upload
+                     being generated for report {report.id}"""
+        }
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, expected_message)
+
+    def test_submit_to_webprint_already_running(self):
+        """Test that a new webprint is blocked if one is already in progress."""
+        report = create_form3x(self.committee, "2024-01-01", "2024-02-01")
+        # Create an existing submission in a "submitting" state
+        webprint_submission = WebPrintSubmission.objects.create(
+            fecfile_task_state=FECSubmissionState.SUBMITTING
+        )
+        report.webprint_submission = webprint_submission
+        report.save()
+
+        response = self.send_viewset_post_request(
+            "/api/v1/web-services/submit-to-webprint/",
+            {"report_id": report.id},
+            WebServicesViewSet,
+            "submit_to_webprint",
+        )
+
+        expected_message = {
+            "status": f"""There is already an active webprint being generated
+                    for report {report.id}"""
+        }
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, expected_message)
