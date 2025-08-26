@@ -28,7 +28,7 @@ restricted_commands = [
     "test",
     "shell",
     # COMMITTEE ACCOUNT COMMANDS #
-    "load_committee_data",
+    "load_mocked_committee_data",
     "gen_locust_load_test_data",
     "delete_committee_account",
     "add_user_to_committee",
