@@ -101,6 +101,10 @@ fecfiler.reports.form\_3x.tests.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.tearDownClass
       ~F3XSerializerTestCase.test_get_status_mapping
       ~F3XSerializerTestCase.test_serializer_validate
+      ~F3XSerializerTestCase.test_update_coverage_to_exclude_deleted_transaction
+      ~F3XSerializerTestCase.test_update_coverage_to_exclude_memo_transaction
+      ~F3XSerializerTestCase.test_update_coverage_to_exclude_transaction
+      ~F3XSerializerTestCase.test_update_coverage_to_overlapping_dates
       ~F3XSerializerTestCase.test_used_report_code
    
    

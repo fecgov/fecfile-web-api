@@ -52,6 +52,7 @@ fecfiler.reports.form\_3x.serializers.Form3XSerializer
       ~Form3XSerializer.include_extra_kwargs
       ~Form3XSerializer.is_valid
       ~Form3XSerializer.many_init
+      ~Form3XSerializer.overlaps_other_f3x_report
       ~Form3XSerializer.run_validation
       ~Form3XSerializer.run_validators
       ~Form3XSerializer.save
