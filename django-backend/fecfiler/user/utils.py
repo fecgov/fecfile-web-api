@@ -1,9 +1,10 @@
 from fecfiler.user.models import User
+from django.db.models import Q
 
 
 def get_user_by_email_or_id(email_or_id: str) -> User | None:
-    if "@" in email_or_id:
-        return User.objects.filter(email__iexact=email_or_id).first()
-    elif len(email_or_id) == 36 and email_or_id.count("-") == 4:
-        return User.objects.filter(id=email_or_id).first()
-    return None
+    return User.objects.filter(
+        # __iexact is used for case-insensitive exact matching
+		# which helpfully forces string comparison for UUID's
+        Q(email__iexact=email_or_id) | Q(id__iexact=email_or_id)
+	).first()
