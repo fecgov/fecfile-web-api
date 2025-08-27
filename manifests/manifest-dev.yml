@@ -34,6 +34,8 @@ defaults: &defaults
     FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, MOCKED
     ENABLE_RESTRICTED_COMMANDS: True
     FEC_FORMAT_VERSION: 8.5
+    MOCK_OIDC_PROVIDER: True
+    OIDC_OP_AUTODISCOVER_ENDPOINT: https://dev-api.fecfile.fec.gov/api/v1/mock_oidc_provider/.well-known/openid-configuration
 
 applications:
   - name: fecfile-web-api
