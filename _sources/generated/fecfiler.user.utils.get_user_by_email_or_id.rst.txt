@@ -1,0 +1,6 @@
+fecfiler.user.utils.get\_user\_by\_email\_or\_id
+================================================
+
+.. currentmodule:: fecfiler.user.utils
+
+.. autofunction:: get_user_by_email_or_id

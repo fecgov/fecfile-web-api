@@ -34,5 +34,6 @@ fecfiler.user.tests
    fecfiler.user.tests.test_disable_user_command
    fecfiler.user.tests.test_models
    fecfiler.user.tests.test_reset_security_consent_date_command
+   fecfiler.user.tests.test_utils
    fecfiler.user.tests.test_views
 

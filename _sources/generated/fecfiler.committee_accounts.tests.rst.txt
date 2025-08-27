@@ -35,6 +35,7 @@ fecfiler.committee\_accounts.tests
    fecfiler.committee_accounts.tests.test_delete_committee_command
    fecfiler.committee_accounts.tests.test_dump_committee_data
    fecfiler.committee_accounts.tests.test_load_committee_data
+   fecfiler.committee_accounts.tests.test_load_mocked_committee_data
    fecfiler.committee_accounts.tests.test_models
    fecfiler.committee_accounts.tests.test_utils
    fecfiler.committee_accounts.tests.test_views

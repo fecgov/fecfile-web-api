@@ -1,0 +1,120 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.tests.test\_load\_mocked\_committee\_data.LoadTestMockedDataCommandTest
+====================================================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.tests.test_load_mocked_committee_data
+
+.. autoclass:: LoadTestMockedDataCommandTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~LoadTestMockedDataCommandTest.__init__
+      ~LoadTestMockedDataCommandTest.addClassCleanup
+      ~LoadTestMockedDataCommandTest.addCleanup
+      ~LoadTestMockedDataCommandTest.addTypeEqualityFunc
+      ~LoadTestMockedDataCommandTest.assertAlmostEqual
+      ~LoadTestMockedDataCommandTest.assertContains
+      ~LoadTestMockedDataCommandTest.assertCountEqual
+      ~LoadTestMockedDataCommandTest.assertDictEqual
+      ~LoadTestMockedDataCommandTest.assertEqual
+      ~LoadTestMockedDataCommandTest.assertFalse
+      ~LoadTestMockedDataCommandTest.assertFieldOutput
+      ~LoadTestMockedDataCommandTest.assertFormError
+      ~LoadTestMockedDataCommandTest.assertFormSetError
+      ~LoadTestMockedDataCommandTest.assertGreater
+      ~LoadTestMockedDataCommandTest.assertGreaterEqual
+      ~LoadTestMockedDataCommandTest.assertHTMLEqual
+      ~LoadTestMockedDataCommandTest.assertHTMLNotEqual
+      ~LoadTestMockedDataCommandTest.assertIn
+      ~LoadTestMockedDataCommandTest.assertInHTML
+      ~LoadTestMockedDataCommandTest.assertIs
+      ~LoadTestMockedDataCommandTest.assertIsInstance
+      ~LoadTestMockedDataCommandTest.assertIsNone
+      ~LoadTestMockedDataCommandTest.assertIsNot
+      ~LoadTestMockedDataCommandTest.assertIsNotNone
+      ~LoadTestMockedDataCommandTest.assertJSONEqual
+      ~LoadTestMockedDataCommandTest.assertJSONNotEqual
+      ~LoadTestMockedDataCommandTest.assertLess
+      ~LoadTestMockedDataCommandTest.assertLessEqual
+      ~LoadTestMockedDataCommandTest.assertListEqual
+      ~LoadTestMockedDataCommandTest.assertLogs
+      ~LoadTestMockedDataCommandTest.assertMultiLineEqual
+      ~LoadTestMockedDataCommandTest.assertNoLogs
+      ~LoadTestMockedDataCommandTest.assertNotAlmostEqual
+      ~LoadTestMockedDataCommandTest.assertNotContains
+      ~LoadTestMockedDataCommandTest.assertNotEqual
+      ~LoadTestMockedDataCommandTest.assertNotIn
+      ~LoadTestMockedDataCommandTest.assertNotInHTML
+      ~LoadTestMockedDataCommandTest.assertNotIsInstance
+      ~LoadTestMockedDataCommandTest.assertNotRegex
+      ~LoadTestMockedDataCommandTest.assertNumQueries
+      ~LoadTestMockedDataCommandTest.assertQuerySetEqual
+      ~LoadTestMockedDataCommandTest.assertRaises
+      ~LoadTestMockedDataCommandTest.assertRaisesMessage
+      ~LoadTestMockedDataCommandTest.assertRaisesRegex
+      ~LoadTestMockedDataCommandTest.assertRedirects
+      ~LoadTestMockedDataCommandTest.assertRegex
+      ~LoadTestMockedDataCommandTest.assertSequenceEqual
+      ~LoadTestMockedDataCommandTest.assertSetEqual
+      ~LoadTestMockedDataCommandTest.assertTemplateNotUsed
+      ~LoadTestMockedDataCommandTest.assertTemplateUsed
+      ~LoadTestMockedDataCommandTest.assertTrue
+      ~LoadTestMockedDataCommandTest.assertTupleEqual
+      ~LoadTestMockedDataCommandTest.assertURLEqual
+      ~LoadTestMockedDataCommandTest.assertWarns
+      ~LoadTestMockedDataCommandTest.assertWarnsMessage
+      ~LoadTestMockedDataCommandTest.assertWarnsRegex
+      ~LoadTestMockedDataCommandTest.assertXMLEqual
+      ~LoadTestMockedDataCommandTest.assertXMLNotEqual
+      ~LoadTestMockedDataCommandTest.captureOnCommitCallbacks
+      ~LoadTestMockedDataCommandTest.countTestCases
+      ~LoadTestMockedDataCommandTest.debug
+      ~LoadTestMockedDataCommandTest.defaultTestResult
+      ~LoadTestMockedDataCommandTest.doClassCleanups
+      ~LoadTestMockedDataCommandTest.doCleanups
+      ~LoadTestMockedDataCommandTest.ensure_connection_patch_method
+      ~LoadTestMockedDataCommandTest.enterClassContext
+      ~LoadTestMockedDataCommandTest.enterContext
+      ~LoadTestMockedDataCommandTest.fail
+      ~LoadTestMockedDataCommandTest.id
+      ~LoadTestMockedDataCommandTest.modify_settings
+      ~LoadTestMockedDataCommandTest.run
+      ~LoadTestMockedDataCommandTest.setUp
+      ~LoadTestMockedDataCommandTest.setUpClass
+      ~LoadTestMockedDataCommandTest.setUpTestData
+      ~LoadTestMockedDataCommandTest.settings
+      ~LoadTestMockedDataCommandTest.shortDescription
+      ~LoadTestMockedDataCommandTest.skipTest
+      ~LoadTestMockedDataCommandTest.subTest
+      ~LoadTestMockedDataCommandTest.tearDown
+      ~LoadTestMockedDataCommandTest.tearDownClass
+      ~LoadTestMockedDataCommandTest.test_load_test_data
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~LoadTestMockedDataCommandTest.available_apps
+      ~LoadTestMockedDataCommandTest.databases
+      ~LoadTestMockedDataCommandTest.fixtures
+      ~LoadTestMockedDataCommandTest.longMessage
+      ~LoadTestMockedDataCommandTest.maxDiff
+      ~LoadTestMockedDataCommandTest.reset_sequences
+      ~LoadTestMockedDataCommandTest.serialized_rollback
+   
+   
