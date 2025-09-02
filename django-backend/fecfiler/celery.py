@@ -4,10 +4,10 @@ import ssl
 import cfenv
 import logging
 import structlog
-from django.conf import settings
 from celery import Celery
 from celery.signals import setup_logging
 from django_structlog.celery.steps import DjangoStructLogInitStep
+from fecfiler import settings
 
 logger = structlog.get_logger(__name__)
 
