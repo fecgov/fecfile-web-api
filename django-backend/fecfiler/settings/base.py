@@ -10,9 +10,9 @@ import sys
 
 from .env import env
 from corsheaders.defaults import default_headers
-from django.utils.crypto import get_random_string
 from fecfiler.celery import CeleryStorageType
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
+from fecfiler.transactions.profilers import TRANSACTION_MANAGER_PROFILING
 from math import floor
 
 
@@ -39,7 +39,9 @@ CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY", get_random_string(50))
+SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    raise Exception("DJANGO_SECRET_KEY is not set!")
 SECRET_KEY_FALLBACKS = env.get_credential("DJANGO_SECRET_KEY_FALLBACKS", [])
 
 
@@ -49,6 +51,7 @@ AUTH_USER_MODEL = "user.User"
 
 ALLOWED_HOSTS = ["*"]
 
+
 # Application definition
 
 SESSION_COOKIE_AGE = int(
@@ -56,6 +59,8 @@ SESSION_COOKIE_AGE = int(
 )
 SESSION_SAVE_EVERY_REQUEST = True
 
+
+INCLUDE_SILK = get_boolean_from_string(env.get_credential("INCLUDE_SILK", "False"))
 INSTALLED_APPS = [
     # "django.contrib.admin",
     "django.contrib.auth",
@@ -83,7 +88,31 @@ INSTALLED_APPS = [
     "fecfiler.openapi",
 ]
 
-MIDDLEWARE = [
+MIDDLEWARE = []
+
+
+if INCLUDE_SILK:
+    STATIC_URL = "/static/"
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
+    STATIC_ROOT = "static"
+
+    INSTALLED_APPS += [
+        "silk",
+        "django.contrib.staticfiles",
+    ]
+    MIDDLEWARE = ["silk.middleware.SilkyMiddleware"]
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/1.11/howto/static-files/
+
+    SILKY_PYTHON_PROFILER = True
+    SILKY_PYTHON_PROFILER_BINARY = True
+
+    # the sub-directories of media and static files
+    STATICFILES_LOCATION = "static"
+    SILKY_DYNAMIC_PROFILING = TRANSACTION_MANAGER_PROFILING
+
+
+MIDDLEWARE += [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
@@ -123,6 +152,7 @@ CORS_ALLOW_HEADERS = (
 )
 
 CORS_ALLOW_CREDENTIALS = True
+
 
 # Database
 DATABASES = {
@@ -388,15 +418,17 @@ CELERY_BEAT_SCHEDULE = {
             "priority": 1,  # 0-9; 0 is the highest priority; 5 is the default
         },
     },
-    "delete_expired_s3_objects": {
+}
+if CELERY_WORKER_STORAGE != "local":
+    CELERY_BEAT_SCHEDULE["delete_expired_s3_objects"] = {
         "task": "fecfiler.devops.tasks.delete_expired_s3_objects",
         "schedule": 86400.0,  # Once per day
         "args": (),
         "options": {
             "expires": 15.0,
         },
-    },
-}
+    }
+
 
 """FEC Webload settings
 """

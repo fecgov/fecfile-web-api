@@ -23,7 +23,7 @@
     },
     {
         "committee_id": "C99999999",
-        "name": "Test Committee",
+        "name": "Double Admin Test PAC Committee",
         "committee_type": "O",
         "committee_type_label": "PAC - Qualified - Unauthorized",
         "qualified": true,

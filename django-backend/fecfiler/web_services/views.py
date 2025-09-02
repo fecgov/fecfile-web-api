@@ -4,17 +4,17 @@ from wsgiref.util import FileWrapper
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from fecfiler.web_services.tasks import (
+from .tasks import (
     create_dot_fec,
     submit_to_fec,
     submit_to_webprint,
 )
-from fecfiler.web_services.summary.tasks import CalculationState, calculate_summary
+from .summary.tasks import CalculationState, calculate_summary
 from fecfiler.settings import MOCK_EFO_FILING
 from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
-from .models import DotFEC, UploadSubmission, WebPrintSubmission
+from .models import DotFEC, UploadSubmission, WebPrintSubmission, FECSubmissionState
 from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
 from drf_spectacular.utils import extend_schema
 from celery.result import AsyncResult
@@ -122,6 +122,26 @@ class WebServicesViewSet(viewsets.ViewSet):
             """If the server is set to mock, all submissions will be mocked"""
             mock = True
         report_id = serializer.validated_data["report_id"]
+
+        """Check if there's an already running submission"""
+        report = Report.objects.get(pk=report_id)
+        if (
+            report.upload_submission
+            and report.upload_submission.fecfile_task_state
+            not in [FECSubmissionState.SUCCEEDED, FECSubmissionState.FAILED]
+        ):
+            logger.debug(
+                f"""There is already an active upload being generated for report
+                {report_id}: {report.upload_submission.fecfile_task_state}"""
+            )
+            return Response(
+                {
+                    "status": f"""There is already an active upload
+                     being generated for report {report_id}"""
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         e_filing_password = serializer.validated_data["password"]
         backdoor_code = serializer.validated_data.get("backdoor_code", None)
 
@@ -171,6 +191,25 @@ class WebServicesViewSet(viewsets.ViewSet):
             """If the server is set to mock, all submissions will be mocked"""
             mock = True
         report_id = serializer.validated_data["report_id"]
+
+        """Check if there's an already running submission"""
+        report = Report.objects.get(pk=report_id)
+        if (
+            report.webprint_submission
+            and report.webprint_submission.fecfile_task_state
+            not in [FECSubmissionState.SUCCEEDED, FECSubmissionState.FAILED]
+        ):
+            logger.debug(
+                f"""There is already an active webprint being generated for report
+                {report_id}: {report.webprint_submission.fecfile_task_state}"""
+            )
+            return Response(
+                {
+                    "status": f"""There is already an active webprint being generated
+                    for report {report_id}"""
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         """Start tracking submission"""
         submission_id = WebPrintSubmission.objects.initiate_submission(report_id).id
