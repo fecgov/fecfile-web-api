@@ -100,7 +100,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             "create",
             "update",
             "destroy",
-            "save_transactions",
+            "save_transaction",
         ]:
             queryset = super().get_queryset()
         else:  # Otherwise, use the view for reading
@@ -197,7 +197,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def previous_transaction_by_election(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation and the same election"""
-        id = request.query_params.get("transaction_id", None)
+        transaction_id = request.query_params.get("transaction_id", None)
         try:
             date = request.query_params["date"]
             aggregation_group = request.query_params["aggregation_group"]
@@ -224,7 +224,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             self.get_queryset(),
             date,
             aggregation_group,
-            id,
+            transaction_id,
             None,
             None,
             election_code,
