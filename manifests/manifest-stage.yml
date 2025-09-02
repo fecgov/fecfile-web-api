@@ -18,6 +18,8 @@ defaults: &defaults
     LOGIN_REDIRECT_CLIENT_URL: https://stage.fecfile.fec.gov
     LOGIN_REDIRECT_SERVER_URL: https://stage-api.fecfile.fec.gov/api/v1/oidc/login-redirect
     LOGOUT_REDIRECT_URL: https://stage-api.fecfile.fec.gov/api/v1/oidc/logout-redirect
+    MOCK_OIDC_PROVIDER: False
+    OIDC_OP_AUTODISCOVER_ENDPOINT: https://idp.int.identitysandbox.gov/.well-known/openid-configuration
     PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
     STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
     EFO_FILING_API: https://efoservices.stage.efo.fec.gov

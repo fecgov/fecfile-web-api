@@ -1,4 +1,5 @@
 import requests
+from django.core.exceptions import ValidationError
 from fecfiler.settings import (
     OIDC_OP_AUTODISCOVER_ENDPOINT,
 )
@@ -13,7 +14,10 @@ OIDC_OP_CONFIG = None
 def get_oidc_op_config():
     global OIDC_OP_CONFIG
     if not OIDC_OP_CONFIG:
-        OIDC_OP_CONFIG = requests.get(OIDC_OP_AUTODISCOVER_ENDPOINT).json()
+        if OIDC_OP_AUTODISCOVER_ENDPOINT:
+            OIDC_OP_CONFIG = requests.get(OIDC_OP_AUTODISCOVER_ENDPOINT).json()
+        else:
+            raise ValidationError("OIDC_OP_AUTODISCOVER_ENDPOINT is not set")
     return OIDC_OP_CONFIG
 
 
