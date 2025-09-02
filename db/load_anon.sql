@@ -1,0 +1,1 @@
+ALTER DATABASE postgres SET session_preload_libraries = 'anon';

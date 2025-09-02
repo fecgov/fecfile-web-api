@@ -12,12 +12,11 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             sql="""
-                CREATE EXTENSION IF NOT EXISTS anon;
                 SECURITY LABEL FOR anon ON COLUMN user_user.first_name IS 'MASKED WITH FUNCTION anon.fake_first_name()';
                 SECURITY LABEL FOR anon ON COLUMN user_user.last_name IS 'MASKED WITH FUNCTION anon.fake_last_name()';
                 SECURITY LABEL FOR anon ON COLUMN user_user.email IS 'MASKED WITH FUNCTION anon.fake_email()';
             """,
-            reverse_SQL="""
+            reverse_sql="""
                 -- Define reverse operations to drop the security labels
                 SECURITY LABEL FOR anon ON COLUMN user_user.first_name IS NULL;
                 SECURITY LABEL FOR anon ON COLUMN user_user.last_name IS NULL;
