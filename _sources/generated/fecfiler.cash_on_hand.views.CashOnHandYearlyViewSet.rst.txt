@@ -32,7 +32,6 @@ fecfiler.cash\_on\_hand.views.CashOnHandYearlyViewSet
       ~CashOnHandYearlyViewSet.get_authenticate_header
       ~CashOnHandYearlyViewSet.get_authenticators
       ~CashOnHandYearlyViewSet.get_cash_on_hand_for_year
-      ~CashOnHandYearlyViewSet.get_committee_id
       ~CashOnHandYearlyViewSet.get_committee_uuid
       ~CashOnHandYearlyViewSet.get_content_negotiator
       ~CashOnHandYearlyViewSet.get_exception_handler

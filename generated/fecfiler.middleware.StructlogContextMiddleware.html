@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>fecfiler.celery.CeleryStorageType &#8212; FECFile Web API  documentation</title>
+    <title>fecfiler.middleware.StructlogContextMiddleware &#8212; FECFile Web API  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
@@ -13,8 +13,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.committee_accounts" href="fecfiler.committee_accounts.html" />
-    <link rel="prev" title="fecfiler.celery.receiver_setup_logging" href="fecfiler.celery.receiver_setup_logging.html" />
+    <link rel="next" title="fecfiler.mock_oidc_provider" href="fecfiler.mock_oidc_provider.html" />
+    <link rel="prev" title="fecfiler.middleware.HeaderMiddleware" href="fecfiler.middleware.HeaderMiddleware.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -32,24 +32,21 @@
 
           <div class="body" role="main">
             
-  <section id="fecfiler-celery-celerystoragetype">
-<h1>fecfiler.celery.CeleryStorageType<a class="headerlink" href="#fecfiler-celery-celerystoragetype" title="Link to this heading">¶</a></h1>
+  <section id="fecfiler-middleware-structlogcontextmiddleware">
+<h1>fecfiler.middleware.StructlogContextMiddleware<a class="headerlink" href="#fecfiler-middleware-structlogcontextmiddleware" title="Link to this heading">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="fecfiler.celery.CeleryStorageType">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.celery.</span></span><span class="sig-name descname"><span class="pre">CeleryStorageType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names=&lt;not</span> <span class="pre">given&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.celery.CeleryStorageType" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<dt class="sig sig-object py" id="fecfiler.middleware.StructlogContextMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.middleware.</span></span><span class="sig-name descname"><span class="pre">StructlogContextMiddleware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">get_response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.middleware.StructlogContextMiddleware" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.celery.CeleryStorageType.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.celery.CeleryStorageType.__init__" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="fecfiler.middleware.StructlogContextMiddleware.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">get_response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.middleware.StructlogContextMiddleware.__init__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<p class="rubric">Attributes</p>
+<p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">AWS</span></code></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">LOCAL</span></code></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.middleware.StructlogContextMiddleware.__init__" title="fecfiler.middleware.StructlogContextMiddleware.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(get_response)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -79,24 +76,24 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.cash_on_hand.html">fecfiler.cash_on_hand</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.celery.receiver_setup_logging.html">fecfiler.celery.receiver_setup_logging</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.celery.CeleryStorageType</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#fecfiler.celery.CeleryStorageType"><code class="docutils literal notranslate"><span class="pre">CeleryStorageType</span></code></a><ul>
-<li class="toctree-l6"><a class="reference internal" href="#fecfiler.celery.CeleryStorageType.__init__"><code class="docutils literal notranslate"><span class="pre">CeleryStorageType.__init__()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.dcf_importer.html">fecfiler.dcf_importer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.devops.html">fecfiler.devops</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.feedback.html">fecfiler.feedback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fecfiler.middleware.html">fecfiler.middleware</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.middleware.html">fecfiler.middleware</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.middleware.HeaderMiddleware.html">fecfiler.middleware.HeaderMiddleware</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.middleware.StructlogContextMiddleware</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#fecfiler.middleware.StructlogContextMiddleware"><code class="docutils literal notranslate"><span class="pre">StructlogContextMiddleware</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.middleware.StructlogContextMiddleware.__init__"><code class="docutils literal notranslate"><span class="pre">StructlogContextMiddleware.__init__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.mock_oidc_provider.html">fecfiler.mock_oidc_provider</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.oidc.html">fecfiler.oidc</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.openapi.html">fecfiler.openapi</a></li>
@@ -125,9 +122,9 @@
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="../api.html">API</a><ul>
   <li><a href="fecfiler.html">fecfiler</a><ul>
-  <li><a href="fecfiler.celery.html">fecfiler.celery</a><ul>
-      <li>Previous: <a href="fecfiler.celery.receiver_setup_logging.html" title="previous chapter">fecfiler.celery.receiver_setup_logging</a></li>
-      <li>Next: <a href="fecfiler.committee_accounts.html" title="next chapter">fecfiler.committee_accounts</a></li>
+  <li><a href="fecfiler.middleware.html">fecfiler.middleware</a><ul>
+      <li>Previous: <a href="fecfiler.middleware.HeaderMiddleware.html" title="previous chapter">fecfiler.middleware.HeaderMiddleware</a></li>
+      <li>Next: <a href="fecfiler.mock_oidc_provider.html" title="next chapter">fecfiler.mock_oidc_provider</a></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -164,7 +161,7 @@
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
-      <a href="../_sources/generated/fecfiler.celery.CeleryStorageType.rst.txt"
+      <a href="../_sources/generated/fecfiler.middleware.StructlogContextMiddleware.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

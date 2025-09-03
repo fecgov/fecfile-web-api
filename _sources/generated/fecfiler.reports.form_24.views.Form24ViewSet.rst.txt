@@ -34,7 +34,6 @@ fecfiler.reports.form\_24.views.Form24ViewSet
       ~Form24ViewSet.finalize_response
       ~Form24ViewSet.get_authenticate_header
       ~Form24ViewSet.get_authenticators
-      ~Form24ViewSet.get_committee_id
       ~Form24ViewSet.get_committee_uuid
       ~Form24ViewSet.get_content_negotiator
       ~Form24ViewSet.get_exception_handler

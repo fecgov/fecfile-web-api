@@ -30,7 +30,6 @@ fecfiler.contacts.views.DeletedContactsViewSet
       ~DeletedContactsViewSet.finalize_response
       ~DeletedContactsViewSet.get_authenticate_header
       ~DeletedContactsViewSet.get_authenticators
-      ~DeletedContactsViewSet.get_committee_id
       ~DeletedContactsViewSet.get_committee_uuid
       ~DeletedContactsViewSet.get_content_negotiator
       ~DeletedContactsViewSet.get_exception_handler

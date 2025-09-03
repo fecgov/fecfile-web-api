@@ -34,7 +34,6 @@ fecfiler.reports.form\_99.views.Form99ViewSet
       ~Form99ViewSet.finalize_response
       ~Form99ViewSet.get_authenticate_header
       ~Form99ViewSet.get_authenticators
-      ~Form99ViewSet.get_committee_id
       ~Form99ViewSet.get_committee_uuid
       ~Form99ViewSet.get_content_negotiator
       ~Form99ViewSet.get_exception_handler

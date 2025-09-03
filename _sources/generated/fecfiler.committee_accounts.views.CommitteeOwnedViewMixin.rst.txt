@@ -30,7 +30,6 @@ fecfiler.committee\_accounts.views.CommitteeOwnedViewMixin
       ~CommitteeOwnedViewMixin.finalize_response
       ~CommitteeOwnedViewMixin.get_authenticate_header
       ~CommitteeOwnedViewMixin.get_authenticators
-      ~CommitteeOwnedViewMixin.get_committee_id
       ~CommitteeOwnedViewMixin.get_committee_uuid
       ~CommitteeOwnedViewMixin.get_content_negotiator
       ~CommitteeOwnedViewMixin.get_exception_handler

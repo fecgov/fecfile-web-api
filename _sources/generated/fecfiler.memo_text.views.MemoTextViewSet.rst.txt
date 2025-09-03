@@ -32,7 +32,6 @@ fecfiler.memo\_text.views.MemoTextViewSet
       ~MemoTextViewSet.finalize_response
       ~MemoTextViewSet.get_authenticate_header
       ~MemoTextViewSet.get_authenticators
-      ~MemoTextViewSet.get_committee_id
       ~MemoTextViewSet.get_committee_uuid
       ~MemoTextViewSet.get_content_negotiator
       ~MemoTextViewSet.get_exception_handler

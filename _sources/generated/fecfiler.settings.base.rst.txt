@@ -41,6 +41,7 @@ fecfiler.settings.base
       :toctree:                                          
       :template: custom-class-template.rst               
    
+      CeleryStorageType
       NotErrorFilter
    
    

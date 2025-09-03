@@ -23,6 +23,7 @@ fecfiler.middleware
       :template: custom-class-template.rst               
    
       HeaderMiddleware
+      StructlogContextMiddleware
    
    
 
