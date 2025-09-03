@@ -97,6 +97,9 @@ class Command(BaseCommand):
     def dump_committee_and_users(self, committee):
         users = self.dump_model(User, {"committeeaccount": committee})
 
+        if not users:
+            return []
+
         # mask names and emails
         user_nodes = json.loads(f"[{users[0]}]")
         for user_obj in user_nodes:
@@ -116,6 +119,9 @@ class Command(BaseCommand):
 
     def dump_contacts(self, committee):
         contacts = self.dump_model(Contact, {"committee_account": committee})
+
+        if not contacts:
+            return []
 
         # mask telephone numbers
         contact_nodes = json.loads(f"[{contacts[0]}]")
