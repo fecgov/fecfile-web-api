@@ -128,7 +128,7 @@ class Command(BaseCommand):
         for contact_obj in contact_nodes:
             if "fields" in contact_obj and "telephone" in contact_obj["fields"]:
                 contact_obj["fields"]["telephone"] = fake.phone_number()
-        contacts = [json.dumps(contact_obj) for contact_obj in contact_nodes]
+        # contacts = [json.dumps(contact_obj) for contact_obj in contact_nodes]
 
         return contacts
 
