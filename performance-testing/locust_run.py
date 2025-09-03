@@ -402,7 +402,7 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule b transaction")
 
-    @task(10)  # This task will be picked 10 times more often than the default
+    @task()
     def create_schedule_c_transaction(self):
         contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_3"])
         transaction_data = deepcopy(
