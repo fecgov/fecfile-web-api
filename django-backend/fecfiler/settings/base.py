@@ -8,12 +8,17 @@ import structlog
 import logging
 import sys
 
+from enum import Enum
 from .env import env
 from corsheaders.defaults import default_headers
-from fecfiler.celery import CeleryStorageType
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
 from fecfiler.transactions.profilers import TRANSACTION_MANAGER_PROFILING
 from math import floor
+
+
+class CeleryStorageType(Enum):
+    AWS = "aws"
+    LOCAL = "local"
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -118,6 +123,7 @@ MIDDLEWARE += [
     "fecfiler.middleware.HeaderMiddleware",
     "fecfiler.oidc.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "fecfiler.middleware.StructlogContextMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
