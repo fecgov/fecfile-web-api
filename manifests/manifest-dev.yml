@@ -40,14 +40,14 @@ defaults: &defaults
 applications:
   - name: load-fecfile-web-api
     <<: *defaults
-    instances: 2
+    instances: 4
     routes:
       - route: load-fecfile-web-api-dev.apps.internal
     command: bin/run-api.sh
     memory: 2G
   - name: load-fecfile-web-services
     <<: *defaults
-    instances: 2
+    instances: 4
     no-route: true
     health-check-type: process
     command: bin/run-celery-worker.sh
