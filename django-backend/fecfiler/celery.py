@@ -45,7 +45,7 @@ def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
     )
 
 
-if env.get_service(name="fecfile-api-redis"):
+if env.get_service(name="load-fecfile-api-redis"):
     app.conf["broker_use_ssl"] = {"ssl_cert_reqs": ssl.CERT_NONE}
     app.conf["redis_backend_use_ssl"] = {"ssl_cert_reqs": ssl.CERT_NONE}
 
