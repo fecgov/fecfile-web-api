@@ -1,4 +1,3 @@
-from enum import Enum
 import os
 import ssl
 import cfenv
@@ -51,8 +50,3 @@ if env.get_service(name="fecfile-api-redis"):
 
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
-
-
-class CeleryStorageType(Enum):
-    AWS = "aws"
-    LOCAL = "local"
