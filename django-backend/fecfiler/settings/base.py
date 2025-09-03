@@ -200,8 +200,9 @@ OIDC_OP_UNIQUE_IDENTIFIER = "sub"
 
 OIDC_OP_AUTODISCOVER_ENDPOINT = env.get_credential(
     "OIDC_OP_AUTODISCOVER_ENDPOINT",
-    "https://idp.int.identitysandbox.gov/.well-known/openid-configuration",
 )
+if not OIDC_OP_AUTODISCOVER_ENDPOINT:
+    raise Exception("OIDC_OP_AUTODISCOVER_ENDPOINT is not set!")
 
 MOCK_OIDC_PROVIDER = get_boolean_from_string(
     env.get_credential("MOCK_OIDC_PROVIDER", "False")
