@@ -70,33 +70,19 @@ def get_query_for_election_aggregation(election_code, state, office, district):
 
 def get_query_for_payee_candidate_aggregation(election_year, contact_id):
     return Q(
-        Q(contact_2_id=contact_id),
-        Q(schedule_f__general_election_year=election_year)
+        Q(contact_2_id=contact_id), Q(schedule_f__general_election_year=election_year)
     )
 
 
 def get_query_for_aggregation_relationship(
-    contact_1_id,
-    contact_2_id,
-    election_year,
-    election_code,
-    state,
-    office,
-    district
+    contact_1_id, contact_2_id, election_year, election_code, state, office, district
 ):
     if contact_1_id:
-        return get_query_for_entity_aggregation(
-            contact_1_id
-        )
+        return get_query_for_entity_aggregation(contact_1_id)
     elif contact_2_id:
-        return get_query_for_payee_candidate_aggregation(
-            election_year,
-            contact_2_id
-        )
+        return get_query_for_payee_candidate_aggregation(election_year, contact_2_id)
     elif election_code is not None:
-        return get_query_for_election_aggregation(
-            election_code, state, office, district
-        )
+        return get_query_for_election_aggregation(election_code, state, office, district)
     return Q()
 
 
@@ -126,8 +112,8 @@ def filter_queryset_for_previous_transactions_in_aggregation(
             election_code,
             state,
             office,
-            district
-        )
+            district,
+        ),
     )
 
     return previous_transactions_in_aggregation.order_by("-date", "-created")
