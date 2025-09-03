@@ -109,7 +109,7 @@ class Command(BaseCommand):
                 user_obj["fields"]["last_name"] = fake.last_name()
             if "fields" in user_obj and "email" in user_obj["fields"]:
                 user_obj["fields"]["email"] = fake.email()
-        users = [json.dumps(user_obj) for user_obj in user_nodes]
+        # users = [json.dumps(user_obj) for user_obj in user_nodes]
 
         dumped_data = self.dump_model(CommitteeAccount, {"id": committee.id})
         dumped_data += users
