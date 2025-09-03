@@ -36,7 +36,7 @@ ENABLE_PL_SQL_LOGGING = get_boolean_from_string(
 )
 
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
-CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
+CSRF_TRUSTED_ORIGINS = ["https://*.app.cloud.gov"]
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY")

@@ -14,7 +14,7 @@ defaults: &defaults
     DISABLE_COLLECTSTATIC: 1
     DJANGO_SETTINGS_MODULE: fecfiler.settings.production
     FFAPI_TIMEOUT_COOKIE_NAME: ffapi_timeout_dev
-    FFAPI_COOKIE_DOMAIN: fecfile.fec.gov
+    FFAPI_COOKIE_DOMAIN: app.cloud.gov
     LOGIN_REDIRECT_CLIENT_URL: https://dev.fecfile.fec.gov
     LOGIN_REDIRECT_SERVER_URL: https://dev-api.fecfile.fec.gov/api/v1/oidc/login-redirect
     LOGOUT_REDIRECT_URL: https://dev-api.fecfile.fec.gov/api/v1/oidc/logout-redirect
@@ -35,7 +35,7 @@ defaults: &defaults
     ENABLE_RESTRICTED_COMMANDS: True
     FEC_FORMAT_VERSION: 8.5
     MOCK_OIDC_PROVIDER: True
-    OIDC_OP_AUTODISCOVER_ENDPOINT: https://load-dev-api.fecfile.fec.gov/api/v1/mock_oidc_provider/.well-known/openid-configuration
+    OIDC_OP_AUTODISCOVER_ENDPOINT: https://load-dev-api.app.cloud.gov/api/v1/mock_oidc_provider/.well-known/openid-configuration
 
 applications:
   - name: load-fecfile-web-api
