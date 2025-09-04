@@ -46,8 +46,8 @@ class Tasks(TaskSet):
         logging.info("Creating contact")
         self.create_payload_contacts()
 
-        logging.info("Preparing reports for submit")
-        self.prepare_reports_for_submit()
+        logging.info("Getting report IDs")
+        self.get_report_ids()
 
     def login(self):
         authenticate_response = self.client.get(
@@ -106,15 +106,10 @@ class Tasks(TaskSet):
                 raise Exception("Failed to POST new contact")
             self.contact_payloads[key]["id"] = response.json()["id"]
 
-    def prepare_reports_for_submit(self):
+    def get_report_ids(self):
         self.report_ids_dict = self.retrieve_report_ids_dict()
         self.report_ids = list(self.report_ids_dict.keys())
         self.report_ids_to_submit = self.report_ids.copy()
-
-        logging.info("Calculating summaries for reports")
-        report_json_list = self.calculate_summary_for_report_id_list(self.report_ids)
-        logging.info("Confirming information for reports")
-        return self.confirm_information_for_report_json_list(report_json_list)
 
     def get_redirect_uri(self, response):
         if response.status_code == 302:
