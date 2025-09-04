@@ -11,7 +11,7 @@ from locust import between, task, TaskSet, user
 
 
 TIMEOUT = 30  # seconds
-SCHEDULES = ["A", "B"]  # Further schedules to be implemented in the future
+SCHEDULES = ["A", "B,E,F", "C,D"]
 
 
 class AtomicInteger:
