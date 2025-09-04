@@ -10,6 +10,7 @@ from fecfiler.committee_accounts.utils import (
     get_committee_account_data,
     raise_if_cannot_create_committee_account,
 )
+from fecfiler.user.utils import delete_all_sessions_for_user
 from django.http import (
     HttpResponseBadRequest,
     HttpResponseServerError,
@@ -231,6 +232,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         try:
             member.delete()
             if member.user is not None:
+                delete_all_sessions_for_user(member.user)
                 logger.info(
                     f"{request.user.id} removed user {member.user.id} "
                     f"from committee {committee_id}"
