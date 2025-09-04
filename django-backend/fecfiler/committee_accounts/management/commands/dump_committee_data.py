@@ -97,19 +97,17 @@ class Command(BaseCommand):
     def dump_committee_and_users(self, committee):
         users = self.dump_model(User, {"committeeaccount": committee})
 
-        if not users:
-            return []
-
-        # mask names and emails
-        user_nodes = json.loads(f"[{users[0]}]")
-        for user_obj in user_nodes:
-            if "fields" in user_obj and "first_name" in user_obj["fields"]:
-                user_obj["fields"]["first_name"] = fake.first_name()
-            if "fields" in user_obj and "last_name" in user_obj["fields"]:
-                user_obj["fields"]["last_name"] = fake.last_name()
-            if "fields" in user_obj and "email" in user_obj["fields"]:
-                user_obj["fields"]["email"] = fake.email()
-        # users = [json.dumps(user_obj) for user_obj in user_nodes]
+        if users:
+            # mask names and emails
+            user_nodes = json.loads(f"[{users[0]}]")
+            for user_obj in user_nodes:
+                if "fields" in user_obj and "first_name" in user_obj["fields"]:
+                    user_obj["fields"]["first_name"] = fake.first_name()
+                if "fields" in user_obj and "last_name" in user_obj["fields"]:
+                    user_obj["fields"]["last_name"] = fake.last_name()
+                if "fields" in user_obj and "email" in user_obj["fields"]:
+                    user_obj["fields"]["email"] = fake.email()
+            users = [json.dumps(user_obj) for user_obj in user_nodes]
 
         dumped_data = self.dump_model(CommitteeAccount, {"id": committee.id})
         dumped_data += users
