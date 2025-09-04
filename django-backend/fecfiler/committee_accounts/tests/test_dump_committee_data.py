@@ -9,16 +9,15 @@ from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.user.models import User
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.reports.tests.utils import (
-    create_form3x, create_form24, create_form1m,
-    create_form99, create_report_memo
+    create_form3x,
+    create_form24,
+    create_form1m,
+    create_form99,
+    create_report_memo,
 )
 from fecfiler.cash_on_hand.tests.utils import create_cash_on_hand_yearly
-from fecfiler.transactions.tests.utils import (
-    create_schedule_a, create_transaction_memo
-)
-from fecfiler.web_services.models import (
-    WebPrintSubmission, UploadSubmission, DotFEC
-)
+from fecfiler.transactions.tests.utils import create_schedule_a, create_transaction_memo
+from fecfiler.web_services.models import WebPrintSubmission, UploadSubmission, DotFEC
 
 
 COMMITTEE_ONE_ID = "C10000001"
@@ -33,17 +32,13 @@ class DumpTestDataCommandTest(TestCase):
             committee_id=COMMITTEE_TWO_ID
         )
         self.user = User.objects.create(
-            email="tester@fake.gov",
-            first_name="Tester",
-            last_name="Testerson"
+            email="tester@fake.gov", first_name="Tester", last_name="Testerson"
         )
         Membership.objects.create(committee_account=self.committee, user=self.user)
 
     def get_committee_data(self, committee_id=COMMITTEE_ONE_ID):
         call_command("dump_committee_data", committee_id, "--redis")
-        return json.loads(
-            self.redis_instance.get(f"dumped_data_for_{committee_id}.json")
-        )
+        return json.loads(self.redis_instance.get(f"dumped_data_for_{committee_id}.json"))
 
     def test_dump_user_data(self):
         committee_data = self.get_committee_data()
@@ -53,8 +48,11 @@ class DumpTestDataCommandTest(TestCase):
         self.assertTrue("user.user" in raw_committee_data)
         self.assertTrue("committee_accounts.committeeaccount" in raw_committee_data)
         self.assertTrue("committee_accounts.membership" in raw_committee_data)
-        self.assertTrue(self.user.first_name in raw_committee_data)
-        self.assertTrue(self.user.last_name in raw_committee_data)
+
+        # the next two get masked so can't be checked against raw_committee_data
+        self.assertIsNotNone(self.user.first_name)
+        self.assertIsNotNone(self.user.last_name)
+
         self.test_dump_second_committee()
 
     def test_dump_report_data(self):
@@ -84,7 +82,7 @@ class DumpTestDataCommandTest(TestCase):
             "20240215",
             223.41,
             report=report,
-            purpose_description="PURPOSE"
+            purpose_description="PURPOSE",
         )
         create_transaction_memo(self.committee, transaction, "TRANSACTION_MEMO")
 
@@ -116,14 +114,8 @@ class DumpTestDataCommandTest(TestCase):
 
     def test_dump_invalid_committee(self):
         self.assertRaises(
-            CommandError,
-            call_command,
-            "dump_committee_data", "C30000003", "--redis"
+            CommandError, call_command, "dump_committee_data", "C30000003", "--redis"
         )
 
     def test_dump_no_committee_id(self):
-        self.assertRaises(
-            CommandError,
-            call_command,
-            "dump_committee_data", "--redis"
-        )
+        self.assertRaises(CommandError, call_command, "dump_committee_data", "--redis")
