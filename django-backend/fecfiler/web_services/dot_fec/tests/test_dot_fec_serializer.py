@@ -75,7 +75,7 @@ class DotFECSerializerTestCase(TestCase):
             self.committee, self.f3x, "dahtest2"
         )
 
-        self.header = Header("HDR", "FEC", "8.4", "FECFile Online", "0.0.1")
+        self.header = Header("HDR", "FEC", "8.5", "FECFile Online", "0.0.1")
 
     def test_serialize_field(self):
         f3x_field_mappings = get_field_mappings("F3X")
@@ -185,7 +185,7 @@ class DotFECSerializerTestCase(TestCase):
         split_row = report_level_memo_row.split(FS_STR)
         self.assertEqual(split_row[0], "HDR")
         self.assertEqual(split_row[1], "FEC")
-        self.assertEqual(split_row[2], "8.4")
+        self.assertEqual(split_row[2], "8.5")
         self.assertEqual(split_row[3], "FECFile Online")
         self.assertEqual(split_row[4], "0.0.1")
 
