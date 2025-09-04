@@ -18,7 +18,7 @@ class CommitteeAccountsUtilsTest(TestCase):
     def setUp(self):
         with patch("fecfiler.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
-            call_command("load_committee_data")
+            call_command("load_mocked_committee_data")
             self.test_user = User.objects.create(email="test@fec.gov", username="gov")
             self.other_user = User.objects.create(email="test@fec.com", username="com")
             self.create_error_message = "could not create committee account"

@@ -7,7 +7,7 @@ from fecfiler.committee_accounts.committee_membership_utils import add_user_to_c
 
 class AddUserToCommitteeTests(TestCase):
     @patch("fecfiler.committee_accounts.committee_membership_utils.Membership")
-    @patch("fecfiler.committee_accounts.committee_membership_utils.User")
+    @patch("fecfiler.user.utils.User")
     @patch("fecfiler.committee_accounts.committee_membership_utils.CommitteeAccount")
     def test_user_already_member_raises(
         self, mock_committee_account, mock_user, mock_membership
@@ -26,7 +26,7 @@ class AddUserToCommitteeTests(TestCase):
         mock_membership.objects.filter.assert_called_once()
 
     @patch("fecfiler.committee_accounts.committee_membership_utils.Membership")
-    @patch("fecfiler.committee_accounts.committee_membership_utils.User")
+    @patch("fecfiler.user.utils.User")
     @patch("fecfiler.committee_accounts.committee_membership_utils.CommitteeAccount")
     def test_committee_does_not_exist_raises(
         self, mock_committee_account, mock_user, mock_membership
@@ -46,7 +46,7 @@ class AddUserToCommitteeTests(TestCase):
         )
 
     @patch("fecfiler.committee_accounts.committee_membership_utils.Membership")
-    @patch("fecfiler.committee_accounts.committee_membership_utils.User")
+    @patch("fecfiler.user.utils.User")
     @patch("fecfiler.committee_accounts.committee_membership_utils.CommitteeAccount")
     def test_add_user_to_committee_success(
         self, mock_committee_account, mock_user, mock_membership
@@ -67,7 +67,7 @@ class AddUserToCommitteeTests(TestCase):
         mock_new_member.save.assert_called_once()
 
     @patch("fecfiler.committee_accounts.committee_membership_utils.Membership")
-    @patch("fecfiler.committee_accounts.committee_membership_utils.User")
+    @patch("fecfiler.user.utils.User")
     @patch("fecfiler.committee_accounts.committee_membership_utils.CommitteeAccount")
     def test_add_pending_email_if_user_none(
         self, mock_committee_account, mock_user, mock_membership

@@ -1,12 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.core import serializers
 from fecfiler.s3 import S3_SESSION
-from fecfiler.settings import (
-    AWS_STORAGE_BUCKET_NAME,
-    MOCK_OPENFEC_REDIS_URL
-)
+from fecfiler.settings import AWS_STORAGE_BUCKET_NAME, MOCK_OPENFEC_REDIS_URL
 import redis
 import structlog
+import json
 
 # Committee Accounts and Users
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
@@ -43,17 +41,28 @@ from fecfiler.cash_on_hand.models import CashOnHandYearly
 # Submissions
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
 
+# Faker bits
+from faker import Faker
+from faker.providers import person, phone_number
 
 FORM_MODELS = [Form1M, Form24, Form3, Form3X, Form99]
 SUBMISSION_MODELS = [UploadSubmission, WebPrintSubmission]
 SCHEDULE_MODELS = [
-    ScheduleA, ScheduleB, ScheduleC,
-    ScheduleC1, ScheduleC2, ScheduleD,
-    ScheduleE, ScheduleF
+    ScheduleA,
+    ScheduleB,
+    ScheduleC,
+    ScheduleC1,
+    ScheduleC2,
+    ScheduleD,
+    ScheduleE,
+    ScheduleF,
 ]
 
 
 logger = structlog.get_logger(__name__)
+fake = Faker()
+fake.add_provider(person)
+fake.add_provider(phone_number)
 
 
 class Command(BaseCommand):
@@ -61,12 +70,9 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "committee_id",
-            help="The ID (not UUID) for the target committee"
+            "committee_id", help="The ID (not UUID) for the target committee"
         )
-        parser.add_argument(
-            "--redis", action="store_true"
-        )
+        parser.add_argument("--redis", action="store_true")
 
     def serialize(self, queryset):
         return serializers.serialize("json", queryset)[1:-1]  # Strip square brackets
@@ -89,19 +95,45 @@ class Command(BaseCommand):
         return dumped_models
 
     def dump_committee_and_users(self, committee):
+        users = self.dump_model(User, {"committeeaccount": committee})
+
+        if users:
+            # mask names and emails
+            user_nodes = json.loads(f"[{users[0]}]")
+            for user_obj in user_nodes:
+                if "fields" in user_obj:
+                    if "first_name" in user_obj["fields"]:
+                        user_obj["fields"]["first_name"] = fake.first_name()
+                    if "last_name" in user_obj["fields"]:
+                        user_obj["fields"]["last_name"] = fake.last_name()
+                    if "email" in user_obj["fields"]:
+                        user_obj["fields"]["email"] = fake.email()
+            users = [json.dumps(user_obj) for user_obj in user_nodes]
+
         dumped_data = self.dump_model(CommitteeAccount, {"id": committee.id})
-        dumped_data += self.dump_model(User, {"committeeaccount": committee})
+        dumped_data += users
         dumped_data += self.dump_model(Membership, {"committee_account": committee})
 
         return dumped_data
 
     def dump_contacts(self, committee):
-        return self.dump_model(Contact, {"committee_account": committee})
+        contacts = self.dump_model(Contact, {"committee_account": committee})
+
+        if not contacts:
+            return []
+
+        # mask telephone numbers
+        contact_nodes = json.loads(f"[{contacts[0]}]")
+        for contact_obj in contact_nodes:
+            if "fields" in contact_obj and "telephone" in contact_obj["fields"]:
+                contact_obj["fields"]["telephone"] = fake.phone_number()
+        contacts = [json.dumps(contact_obj) for contact_obj in contact_nodes]
+
+        return contacts
 
     def dump_reports(self, committee):
         dumped_data = self.dump_model_list(
-            FORM_MODELS,
-            {"report__committee_account": committee}
+            FORM_MODELS, {"report__committee_account": committee}
         )
         dumped_data += self.dump_model(Report, {"committee_account": committee})
 
@@ -109,17 +141,15 @@ class Command(BaseCommand):
 
     def dump_transactions(self, committee):
         dumped_data = self.dump_model_list(
-            SCHEDULE_MODELS,
-            {"transaction__committee_account": committee}
+            SCHEDULE_MODELS, {"transaction__committee_account": committee}
         )
         dumped_data += self.dump_model(
             Transaction,
             {"committee_account": committee},
-            order_by="created"  # Ensure that parents are loaded before children
+            order_by="created",  # Ensure that parents are loaded before children
         )
         dumped_data += self.dump_model(
-            ReportTransaction,
-            {"transaction__committee_account": committee}
+            ReportTransaction, {"transaction__committee_account": committee}
         )
 
         return dumped_data
@@ -133,8 +163,7 @@ class Command(BaseCommand):
     def dump_submissions(self, committee):
         dumped_data = self.dump_model(DotFEC, {"report__committee_account": committee})
         dumped_data += self.dump_model_list(
-            SUBMISSION_MODELS,
-            {"dot_fec__report__committee_account": committee}
+            SUBMISSION_MODELS, {"dot_fec__report__committee_account": committee}
         )
         return dumped_data
 
@@ -146,7 +175,7 @@ class Command(BaseCommand):
             *self.dump_transactions(committee),
             *self.dump_memos(committee),
             *self.dump_cash_on_hand(committee),
-            *self.dump_submissions(committee)
+            *self.dump_submissions(committee),
         ]
         """
         Records will be loaded in the same order that they're dumped,
