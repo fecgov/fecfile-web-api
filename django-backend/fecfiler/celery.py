@@ -1,13 +1,12 @@
-from enum import Enum
 import os
 import ssl
 import cfenv
 import logging
 import structlog
-from django.conf import settings
 from celery import Celery
 from celery.signals import setup_logging
 from django_structlog.celery.steps import DjangoStructLogInitStep
+from fecfiler import settings
 
 logger = structlog.get_logger(__name__)
 
@@ -34,7 +33,7 @@ def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
     Celery and environment-specific logging
     See https://django-structlog.readthedocs.io/en/latest/celery.html
     """
-    log_format = env.get_credential("LOG_FORMAT")
+    log_format = settings.LOG_FORMAT
 
     logging.config.dictConfig(settings.get_logging_config(log_format))
 
@@ -51,8 +50,3 @@ if env.get_service(name="load-fecfile-api-redis"):
 
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
-
-
-class CeleryStorageType(Enum):
-    AWS = "aws"
-    LOCAL = "local"

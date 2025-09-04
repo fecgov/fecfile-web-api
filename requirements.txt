@@ -10,6 +10,7 @@ django-structlog==9.1.1
 Django==5.2.2
 djangorestframework==3.16.0
 drf-spectacular==0.28.0
+Faker==37.6.0
 git+https://github.com/fecgov/fecfile-validate@4eec31ae99999bd9febbb9783eca0e73cdcb1957#egg=fecfile_validate&subdirectory=fecfile_validate_python
 github3.py==4.0.1
 GitPython==3.1.43
