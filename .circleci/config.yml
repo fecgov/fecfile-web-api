@@ -250,7 +250,7 @@ workflows:
       - deploy-job:
           filters:
             branches:
-              only: /develop|feature\/2395-test-sleep_task|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
           filters:
             branches:
