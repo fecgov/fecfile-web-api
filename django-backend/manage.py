@@ -22,17 +22,18 @@ allowed_commands = [
     "install_login_dot_gov_cert",
     "update_creds_service",
     "disable_user",
-    "gen_locust_load_test_data",
 ]
 restricted_commands = [
     "loaddata",
     "test",
     "shell",
     # COMMITTEE ACCOUNT COMMANDS #
-    "load_committee_data",
+    "load_mocked_committee_data",
+    "gen_locust_load_test_data",
     "delete_committee_account",
     "add_user_to_committee",
     "dump_committee_data",  # Can be unrestricted AFTER fuzzing is implemented
+    "load_committee_data",
     # REPORT COMMANDS #
     "delete_committee_reports",
     # users

@@ -5,7 +5,7 @@ from fecfiler.settings import (
     CELERY_LOCAL_STORAGE_DIRECTORY,
 )
 from fecfiler.s3 import S3_SESSION
-from fecfiler.celery import CeleryStorageType
+from fecfiler.settings import CeleryStorageType
 import structlog
 
 logger = structlog.get_logger(__name__)
