@@ -49,6 +49,200 @@ class Tasks(TaskSet):
         logging.info("Getting report IDs")
         self.get_report_ids()
 
+    @task
+    def devops_celery_test(self):
+        self.client_get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
+
+    @task
+    def get_contacts(self):
+        params = {
+            "page": 1,
+            "ordering": "form_type",
+        }
+        self.client_get(
+            "/api/v1/contacts/", name="get_contacts", timeout=TIMEOUT, params=params
+        )
+
+    @task
+    def get_reports(self):
+        params = {
+            "page": 1,
+            "ordering": "form_type",
+        }
+        self.client_get(
+            "/api/v1/reports/", name="get_reports", timeout=TIMEOUT, params=params
+        )
+
+    @task
+    def get_schedule_transactions(self):
+        if len(self.report_ids) > 0:
+            report_id = random.choice(self.report_ids)
+            print(f"\n\n\nREPORT ID: {report_id}\n{self.report_ids}\n\n\n")
+            params = {
+                "page": 1,
+                "ordering": "form_type",
+                "report_id": report_id,
+            }
+            for schedule in SCHEDULES:
+                params["schedules"] = schedule
+                self.client_get(
+                    "/api/v1/transactions/",
+                    name=f"read_schedule_{schedule}_transactions",
+                    timeout=TIMEOUT,
+                    params=params,
+                )
+
+    @task(100)  # This task will be picked 100 times more often than the default
+    def create_schedule_a_transaction(self):
+        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_1"])
+        transaction_data = deepcopy(self.transaction_payloads["INDIVIDUAL_RECEIPT"])
+        report_id = random.choice(self.report_ids)
+        contribution_date = self.report_ids_dict[report_id]
+
+        transaction_data["contact_1"] = contact_data
+        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["report_ids"].append(report_id)
+        transaction_data["contribution_date"] = contribution_date
+        transaction_data["contribution_amount"] = random.randrange(25, 10000)
+
+        response = self.client.post(
+            "/api/v1/transactions/",
+            name="create_new_schedule_a_transaction",
+            json=transaction_data,
+        )
+        if response.status_code != 200:
+            raise Exception("Failed to POST new schedule a transaction")
+
+    @task(100)  # This task will be picked 100 times more often than the default
+    def create_schedule_b_transaction(self):
+        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_2"])
+        transaction_data = deepcopy(self.transaction_payloads["OPERATING_EXPENDITURE"])
+        report_id = random.choice(self.report_ids)
+        expenditure_date = self.report_ids_dict[report_id]
+
+        transaction_data["contact_1"] = contact_data
+        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["report_ids"].append(report_id)
+        transaction_data["expenditure_date"] = expenditure_date
+        transaction_data["expenditure_amount"] = random.randrange(25, 10000)
+
+        response = self.client.post(
+            "/api/v1/transactions/",
+            name="create_new_schedule_b_transaction",
+            json=transaction_data,
+        )
+        if response.status_code != 200:
+            raise Exception("Failed to POST new schedule b transaction")
+
+    @task
+    def create_schedule_c_transaction(self):
+        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_3"])
+        transaction_data = deepcopy(
+            self.transaction_payloads["LOAN_RECEIVED_FROM_INDIVIDUAL"]
+        )
+        report_id = random.choice(self.report_ids)
+        loan_incurred_date = self.report_ids_dict[report_id]
+
+        transaction_data["contact_1"] = contact_data
+        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["report_ids"].append(report_id)
+        transaction_data["loan_incurred_date"] = loan_incurred_date
+        transaction_data["loan_due_date"] = add_year_to_date_str(loan_incurred_date)
+        transaction_data["loan_amount"] = random.randrange(100, 10000)
+
+        child_transaction_data = transaction_data["children"][0]
+        child_transaction_data["contact_1"] = contact_data
+        child_transaction_data["contact_1_id"] = contact_data["id"]
+        child_transaction_data["contribution_date"] = transaction_data["loan_due_date"]
+        child_transaction_data["contribution_amount"] = transaction_data["loan_amount"]
+        child_transaction_data["contribution_aggregate"] = transaction_data["loan_amount"]
+
+        response = self.client.post(
+            "/api/v1/transactions/",
+            name="create_new_schedule_c_transaction",
+            json=transaction_data,
+        )
+        if response.status_code != 200:
+            raise Exception("Failed to POST new schedule c transaction")
+
+    @task(10)  # This task will be picked 10 times more often than the default
+    def create_schedule_d_transaction(self):
+        contact_data = deepcopy(self.contact_payloads["ORGANIZATION_CONTACT_1"])
+        transaction_data = deepcopy(self.transaction_payloads["DEBT_OWED_BY_COMMITTEE"])
+        report_id = random.choice(self.report_ids)
+
+        transaction_data["contact_1"] = contact_data
+        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["report_ids"].append(report_id)
+        transaction_data["incurred_amount"] = random.randrange(100, 10000)
+        transaction_data["balance_at_close"] = transaction_data["incurred_amount"]
+
+        response = self.client.post(
+            "/api/v1/transactions/",
+            name="create_new_schedule_d_transaction",
+            json=transaction_data,
+        )
+        if response.status_code != 200:
+            raise Exception("Failed to POST new schedule d transaction")
+
+    @task(100)  # This task will be picked 100 times more often than the default
+    def update_schedule_a_transaction(self):
+        if len(self.report_ids) > 0:
+            report_id = random.choice(self.report_ids)
+            transaction = self.get_first_individual_receipt_for_report(report_id)
+            if transaction:
+                response = self.client_get(
+                    f"/api/v1/transactions/{transaction["id"]}/",
+                    name="get_schedule_a_transaction_by_id",
+                    timeout=TIMEOUT,
+                )
+                if response and response.status_code == 200:
+                    data = response.json()
+                    data["contribution_amount"] = 1.23
+                    data["schedule_id"] = "A"
+                    data["schema_name"] = "INDIVIDUAL_RECEIPT"
+                    response = self.client.put(
+                        f"/api/v1/transactions/{data["id"]}/",
+                        name="update_schedule_a_transaction",
+                        json=data,
+                    )
+                if response.status_code == 200:
+                    return
+        raise Exception("Failed to PUT update schedule a transaction")
+
+    @task
+    def delete_schedule_a_transaction(self):
+        if len(self.report_ids) > 0:
+            report_id = random.choice(self.report_ids)
+            transaction = self.get_first_individual_receipt_for_report(report_id)
+            if transaction:
+                response = self.client.delete(
+                    f"/api/v1/transactions/{transaction['id']}/",
+                    name="delete_schedule_a_transaction",
+                )
+                if response.status_code == 204:
+                    return
+        raise Exception("Failed to DELETE schedule a transaction")
+
+    @task(100)
+    def filing_calculate_summary_only(self):
+        self.client.request_name = "recalculate_report_summary"
+        report_id = random.choice(self.report_ids)
+        self.calculate_summary_for_report_id(report_id, "filing_calculate_summary_for_report_id")
+
+    @task(500)
+    def filing_prepare_and_submit_report(self):
+        if len(self.report_ids_to_submit) == 0:
+            logging.info("No more reports to submit")
+            return
+        report_id = random.choice(self.report_ids_to_submit)
+        report_json = self.retrieve_report(report_id)
+
+        self.calculate_summary_for_report_id(report_id, "filing_1_calculate_report_summary")
+        self.confirm_information_for_report_json(report_json)
+        self.submit_report(report_id, poll_seconds=40)
+        self.report_ids_to_submit.pop()
+
     def login(self):
         self.client.request_name = "_log_in"
         authenticate_response = self.client.get(
@@ -111,25 +305,6 @@ class Tasks(TaskSet):
         self.report_ids_dict = self.retrieve_report_ids_dict()
         self.report_ids = list(self.report_ids_dict.keys())
         self.report_ids_to_submit = self.report_ids.copy()
-
-    @task(500)
-    def prepare_and_submit_report(self):
-        if len(self.report_ids_to_submit) == 0:
-            logging.info("No more reports to submit")
-            return
-        report_id = random.choice(self.report_ids_to_submit)
-        report_json = self.retrieve_report(report_id)
-
-        self.calculate_summary_for_report_id(report_id, "filing_1_calculate_report_summary")
-        self.confirm_information_for_report_json(report_json)
-        self.submit_report(report_id, poll_seconds=40)
-        self.report_ids_to_submit.pop()
-
-    @task(100)
-    def calculate_summary_only(self):
-        self.client.request_name = "recalculate_report_summary"
-        report_id = random.choice(self.report_ids)
-        self.calculate_summary_for_report_id(report_id, "calculate_summary_for_report_id")
 
     def calculate_summary_for_report_id(self, report_id, name, poll_seconds=2):
         response = self.client.post(
@@ -262,188 +437,6 @@ class Tasks(TaskSet):
             return retval
         raise Exception("Failed to retrieve committee ids for load test setup")
 
-    @task
-    def celery_test(self):
-        self.client_get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
-
-    @task
-    def get_contacts(self):
-        params = {
-            "page": 1,
-            "ordering": "form_type",
-        }
-        self.client_get(
-            "/api/v1/contacts/", name="get_contacts", timeout=TIMEOUT, params=params
-        )
-
-    @task
-    def get_reports(self):
-        params = {
-            "page": 1,
-            "ordering": "form_type",
-        }
-        self.client_get(
-            "/api/v1/reports/", name="get_reports", timeout=TIMEOUT, params=params
-        )
-
-    @task
-    def read_schedule_transactions(self):
-        if len(self.report_ids) > 0:
-            report_id = random.choice(self.report_ids)
-            print(f"\n\n\nREPORT ID: {report_id}\n{self.report_ids}\n\n\n")
-            params = {
-                "page": 1,
-                "ordering": "form_type",
-                "report_id": report_id,
-            }
-            for schedule in SCHEDULES:
-                params["schedules"] = schedule
-                self.client_get(
-                    "/api/v1/transactions/",
-                    name=f"read_schedule_{schedule}_transactions",
-                    timeout=TIMEOUT,
-                    params=params,
-                )
-
-    @task(100)  # This task will be picked 100 times more often than the default
-    def create_schedule_a_transaction(self):
-        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_1"])
-        transaction_data = deepcopy(self.transaction_payloads["INDIVIDUAL_RECEIPT"])
-        report_id = random.choice(self.report_ids)
-        contribution_date = self.report_ids_dict[report_id]
-
-        transaction_data["contact_1"] = contact_data
-        transaction_data["contact_1_id"] = contact_data["id"]
-        transaction_data["report_ids"].append(report_id)
-        transaction_data["contribution_date"] = contribution_date
-        transaction_data["contribution_amount"] = random.randrange(25, 10000)
-
-        response = self.client.post(
-            "/api/v1/transactions/",
-            name="create_new_schedule_a_transaction",
-            json=transaction_data,
-        )
-        if response.status_code != 200:
-            raise Exception("Failed to POST new schedule a transaction")
-
-    @task(100)  # This task will be picked 100 times more often than the default
-    def update_schedule_a_transaction(self):
-        if len(self.report_ids) > 0:
-            report_id = random.choice(self.report_ids)
-            transaction = self.get_first_individual_receipt_for_report(report_id)
-            if transaction:
-                response = self.client_get(
-                    f"/api/v1/transactions/{transaction["id"]}/",
-                    name="get_schedule_a_transaction_by_id",
-                    timeout=TIMEOUT,
-                )
-                if response and response.status_code == 200:
-                    data = response.json()
-                    data["contribution_amount"] = 1.23
-                    data["schedule_id"] = "A"
-                    data["schema_name"] = "INDIVIDUAL_RECEIPT"
-                    response = self.client.put(
-                        f"/api/v1/transactions/{data["id"]}/",
-                        name="update_schedule_a_transaction",
-                        json=data,
-                    )
-                if response.status_code == 200:
-                    return
-        raise Exception("Failed to PUT update schedule a transaction")
-
-    @task
-    def delete_schedule_a_transaction(self):
-        if len(self.report_ids) > 0:
-            report_id = random.choice(self.report_ids)
-            transaction = self.get_first_individual_receipt_for_report(report_id)
-            if transaction:
-                response = self.client.delete(
-                    f"/api/v1/transactions/{transaction['id']}/",
-                    name="delete_schedule_a_transaction",
-                )
-                if response.status_code == 204:
-                    return
-        raise Exception("Failed to DELETE schedule a transaction")
-
-    @task(100)  # This task will be picked 100 times more often than the default
-    def create_schedule_b_transaction(self):
-        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_2"])
-        transaction_data = deepcopy(self.transaction_payloads["OPERATING_EXPENDITURE"])
-        report_id = random.choice(self.report_ids)
-        expenditure_date = self.report_ids_dict[report_id]
-
-        transaction_data["contact_1"] = contact_data
-        transaction_data["contact_1_id"] = contact_data["id"]
-        transaction_data["report_ids"].append(report_id)
-        transaction_data["expenditure_date"] = expenditure_date
-        transaction_data["expenditure_amount"] = random.randrange(25, 10000)
-
-        response = self.client.post(
-            "/api/v1/transactions/",
-            name="create_new_schedule_b_transaction",
-            json=transaction_data,
-        )
-        if response.status_code != 200:
-            raise Exception("Failed to POST new schedule b transaction")
-
-    @task()
-    def create_schedule_c_transaction(self):
-        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_3"])
-        transaction_data = deepcopy(
-            self.transaction_payloads["LOAN_RECEIVED_FROM_INDIVIDUAL"]
-        )
-        report_id = random.choice(self.report_ids)
-        loan_incurred_date = self.report_ids_dict[report_id]
-
-        transaction_data["contact_1"] = contact_data
-        transaction_data["contact_1_id"] = contact_data["id"]
-        transaction_data["report_ids"].append(report_id)
-        transaction_data["loan_incurred_date"] = loan_incurred_date
-        transaction_data["loan_due_date"] = add_year_to_date_str(loan_incurred_date)
-        transaction_data["loan_amount"] = random.randrange(100, 10000)
-
-        child_transaction_data = transaction_data["children"][0]
-        child_transaction_data["contact_1"] = contact_data
-        child_transaction_data["contact_1_id"] = contact_data["id"]
-        child_transaction_data["contribution_date"] = transaction_data["loan_due_date"]
-        child_transaction_data["contribution_amount"] = transaction_data["loan_amount"]
-        child_transaction_data["contribution_aggregate"] = transaction_data["loan_amount"]
-
-        response = self.client.post(
-            "/api/v1/transactions/",
-            name="create_new_schedule_c_transaction",
-            json=transaction_data,
-        )
-        if response.status_code != 200:
-            raise Exception("Failed to POST new schedule c transaction")
-
-    @task(10)  # This task will be picked 10 times more often than the default
-    def create_schedule_d_transaction(self):
-        contact_data = deepcopy(self.contact_payloads["ORGANIZATION_CONTACT_1"])
-        transaction_data = deepcopy(self.transaction_payloads["DEBT_OWED_BY_COMMITTEE"])
-        report_id = random.choice(self.report_ids)
-
-        transaction_data["contact_1"] = contact_data
-        transaction_data["contact_1_id"] = contact_data["id"]
-        transaction_data["report_ids"].append(report_id)
-        transaction_data["incurred_amount"] = random.randrange(100, 10000)
-        transaction_data["balance_at_close"] = transaction_data["incurred_amount"]
-
-        response = self.client.post(
-            "/api/v1/transactions/",
-            name="create_new_schedule_d_transaction",
-            json=transaction_data,
-        )
-        if response.status_code != 200:
-            raise Exception("Failed to POST new schedule d transaction")
-
-    def client_get(self, *args, **kwargs):
-        kwargs["catch_response"] = True
-        with self.client.get(*args, **kwargs) as response:
-            if response.status_code != 200:
-                response.failure(f"Non-200 Response: {response.status_code}")
-            return response
-
     def get_first_individual_receipt_for_report(self, report_id):
         params = {
             "page": 1,
@@ -463,6 +456,13 @@ class Tasks(TaskSet):
                 if transaction["transaction_type_identifier"] == "INDIVIDUAL_RECEIPT":
                     return transaction
         return None
+
+    def client_get(self, *args, **kwargs):
+        kwargs["catch_response"] = True
+        with self.client.get(*args, **kwargs) as response:
+            if response.status_code != 200:
+                response.failure(f"Non-200 Response: {response.status_code}")
+            return response
 
 
 class Swarm(user.HttpUser):
