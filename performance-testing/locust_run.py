@@ -50,18 +50,18 @@ class Tasks(TaskSet):
         self.get_report_ids()
 
     def login(self):
+        self.client.request_name = "_log_in"
         authenticate_response = self.client.get(
-            "/api/v1/oidc/authenticate", name="oidc_authenticate", allow_redirects=False
+            "/api/v1/oidc/authenticate", allow_redirects=False
         )
         authenticate_redirect_uri = get_redirect_uri(authenticate_response)
         authorize_response = self.client.get(
             authenticate_redirect_uri,
-            name="oidc_authorize",
             allow_redirects=False,
         )
         authorize_redirect_uri = get_redirect_uri(authorize_response)
         self.client.get(
-            authorize_redirect_uri, name="oidc_callback", allow_redirects=False
+            authorize_redirect_uri, allow_redirects=False
         )
         self.client.headers["x-csrftoken"] = self.client.cookies["csrftoken"]
         self.client.headers["user-agent"] = "Locust testing"
@@ -72,7 +72,7 @@ class Tasks(TaskSet):
         committee_id = committee_id_list[self.user.user_index]
         response = self.client.post(
             f"/api/v1/committees/{committee_id}/activate/",
-            name="activate_committee",
+            name="_activate_committee",
         )
         if response.status_code != 200:
             raise Exception(
@@ -99,31 +99,42 @@ class Tasks(TaskSet):
             data = deepcopy(self.contact_payloads[key])
             response = self.client.post(
                 "/api/v1/contacts/",
-                name="POST_new_contact",
+                name="_create_new_contact",
                 json=data,
             )
             if response.status_code != 201:
                 raise Exception("Failed to POST new contact")
             self.contact_payloads[key]["id"] = response.json()["id"]
+            time.sleep(1)
 
     def get_report_ids(self):
         self.report_ids_dict = self.retrieve_report_ids_dict()
         self.report_ids = list(self.report_ids_dict.keys())
         self.report_ids_to_submit = self.report_ids.copy()
 
-    def calculate_summary_for_report_id_list(self, report_id_list):
-        retval = []
-        for report_id in report_id_list:
-            try:
-                retval.append(self.calculate_summary_for_report_id(report_id))
-            except Exception as e:
-                print(f"Error calculating summary for report_id {report_id}: {e}")
-        return retval
+    @task(500)
+    def prepare_and_submit_report(self):
+        if len(self.report_ids_to_submit) == 0:
+            logging.info("No more reports to submit")
+            return
+        report_id = random.choice(self.report_ids_to_submit)
+        report_json = self.retrieve_report(report_id)
 
-    def calculate_summary_for_report_id(self, report_id, poll_seconds=2):
+        self.calculate_summary_for_report_id(report_id, "filing_1_calculate_report_summary")
+        self.confirm_information_for_report_json(report_json)
+        self.submit_report(report_id, poll_seconds=40)
+        self.report_ids_to_submit.pop()
+
+    @task(100)
+    def calculate_summary_only(self):
+        self.client.request_name = "recalculate_report_summary"
+        report_id = random.choice(self.report_ids)
+        self.calculate_summary_for_report_id(report_id, "calculate_summary_for_report_id")
+
+    def calculate_summary_for_report_id(self, report_id, name, poll_seconds=2):
         response = self.client.post(
             "/api/v1/web-services/summary/calculate-summary/",
-            name="calculate_report_summary",
+            name=name,
             json={"report_id": report_id},
         )
         if response.status_code != 200:
@@ -134,15 +145,6 @@ class Tasks(TaskSet):
             if report_json.get("calculation_status", None) == "SUCCEEDED":
                 return report_json
         raise Exception("Failed to receive successful summary calculation status")
-
-    def confirm_information_for_report_json_list(self, report_json_list):
-        retval = []
-        for report_json in report_json_list:
-            try:
-                retval.append(self.confirm_information_for_report_json(report_json))
-            except Exception as e:
-                print(f"Failed to confirm report information for {report_json}: {e}")
-        return retval
 
     def confirm_information_for_report_json(self, report_json):
         fields_to_validate = [
@@ -163,7 +165,7 @@ class Tasks(TaskSet):
         report_json["hasChangeOfAddress"] = False
         response = self.client.put(
             f"/api/v1/reports/form-3x/{report_id}/",
-            name="confirm_report_info_for_submit",
+            name="filing_2_confirm_report_info_for_submit",
             params=params,
             json=report_json,
         )
@@ -192,7 +194,7 @@ class Tasks(TaskSet):
         report_json["treasurer_first_name"] = "test_treasurer_first_name"
         response = self.client.put(
             f"/api/v1/reports/form-3x/{report_id}/",
-            name="update_report_treasurer_for_submit",
+            name="filing_3_update_report_treasurer_for_submit",
             params=params,
             json=report_json,
         )
@@ -202,7 +204,7 @@ class Tasks(TaskSet):
     def submit_to_fec_and_poll_for_success(self, report_id, poll_seconds):
         with self.client.post(
             "/api/v1/web-services/submit-to-fec/",
-            name="submit_report_to_fec",
+            name="filing_4_submit_report_to_fec",
             json={"report_id": report_id, "password": "fake_pd"},
             catch_response=True,
         ) as response:
@@ -234,6 +236,7 @@ class Tasks(TaskSet):
     def retrieve_report_ids_dict(self):
         response = self.client_get(
             "/api/v1/reports/",
+            name="_get_report_ids",
             timeout=TIMEOUT,
         )
         if response and response.status_code == 200:
@@ -247,6 +250,7 @@ class Tasks(TaskSet):
     def retrieve_committee_id_list(self):
         response = self.client_get(
             "/api/v1/committees/",
+            name="_get_committee_list",
             timeout=TIMEOUT,
         )
         if response and response.status_code == 200:
@@ -283,32 +287,23 @@ class Tasks(TaskSet):
         )
 
     @task
-    def get_transactions(self):
+    def read_schedule_transactions(self):
         if len(self.report_ids) > 0:
             report_id = random.choice(self.report_ids)
-            schedules = random.choice(SCHEDULES)
             print(f"\n\n\nREPORT ID: {report_id}\n{self.report_ids}\n\n\n")
             params = {
                 "page": 1,
                 "ordering": "form_type",
-                "schedules": schedules,
                 "report_id": report_id,
             }
-            self.client_get(
-                "/api/v1/transactions/",
-                name="get_transactions",
-                timeout=TIMEOUT,
-                params=params,
-            )
-
-    @task
-    def submit_reports(self):
-        if len(self.report_ids_to_submit) == 0:
-            logging.info("No more reports to submit")
-            return
-        report_id = self.report_ids_to_submit.pop()
-        # poll_seconds Determined by INITIAL_POLLING_INTERVAL setting
-        self.submit_report(report_id, poll_seconds=40)
+            for schedule in SCHEDULES:
+                params["schedules"] = schedule
+                self.client_get(
+                    "/api/v1/transactions/",
+                    name=f"read_schedule_{schedule}_transactions",
+                    timeout=TIMEOUT,
+                    params=params,
+                )
 
     @task(100)  # This task will be picked 100 times more often than the default
     def create_schedule_a_transaction(self):
@@ -339,7 +334,7 @@ class Tasks(TaskSet):
             if transaction:
                 response = self.client_get(
                     f"/api/v1/transactions/{transaction["id"]}/",
-                    name="get_transaction_by_id",
+                    name="get_schedule_a_transaction_by_id",
                     timeout=TIMEOUT,
                 )
                 if response and response.status_code == 200:
@@ -404,7 +399,7 @@ class Tasks(TaskSet):
         transaction_data["contact_1_id"] = contact_data["id"]
         transaction_data["report_ids"].append(report_id)
         transaction_data["loan_incurred_date"] = loan_incurred_date
-        transaction_data["loan_due_date"] = self.add_year_to_date_str(loan_incurred_date)
+        transaction_data["loan_due_date"] = add_year_to_date_str(loan_incurred_date)
         transaction_data["loan_amount"] = random.randrange(100, 10000)
 
         child_transaction_data = transaction_data["children"][0]
@@ -449,14 +444,6 @@ class Tasks(TaskSet):
                 response.failure(f"Non-200 Response: {response.status_code}")
             return response
 
-    def add_year_to_date_str(self, date_str):
-        """Expects date_str in YYYY-MM-DD format"""
-        parts = date_str.split("-")
-        if len(parts) != 3:
-            raise Exception(f"Invalid date string: {date_str}")
-        year = int(parts[0]) + 1
-        return f"{year}-{parts[1]}-{parts[2]}"
-
     def get_first_individual_receipt_for_report(self, report_id):
         params = {
             "page": 1,
@@ -483,12 +470,21 @@ class Swarm(user.HttpUser):
         self.user_index = user_index_counter.get_and_increment()
 
     tasks = [Tasks]
-    wait_time = between(1.5, 4)
+    wait_time = between(3, 30)
 
 
 # Utils
-def get_redirect_uri(self, response):
+def get_redirect_uri(response):
     if response.status_code == 302:
         parsed_url = urlparse(response.headers["Location"])
         return f"{parsed_url.path}?{parsed_url.query}"
     return None
+
+
+def add_year_to_date_str(date_str):
+    """Expects date_str in YYYY-MM-DD format"""
+    parts = date_str.split("-")
+    if len(parts) != 3:
+        raise Exception(f"Invalid date string: {date_str}")
+    year = int(parts[0]) + 1
+    return f"{year}-{parts[1]}-{parts[2]}"
