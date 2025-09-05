@@ -212,7 +212,6 @@ MOCK_OIDC_PROVIDER_CACHE = env.get_credential("REDIS_URL")
 OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
 
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
-FFAPI_LOGIN_DOT_GOV_COOKIE_NAME = "ffapi_login_dot_gov"
 FFAPI_TIMEOUT_COOKIE_NAME = env.get_credential("FFAPI_TIMEOUT_COOKIE_NAME", "False")
 if not FFAPI_TIMEOUT_COOKIE_NAME:
     raise Exception("FFAPI_TIMEOUT_COOKIE_NAME is not set!")
