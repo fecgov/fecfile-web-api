@@ -53,13 +53,13 @@ class Tasks(TaskSet):
         authenticate_response = self.client.get(
             "/api/v1/oidc/authenticate", name="oidc_authenticate", allow_redirects=False
         )
-        authenticate_redirect_uri = self.get_redirect_uri(authenticate_response)
+        authenticate_redirect_uri = get_redirect_uri(authenticate_response)
         authorize_response = self.client.get(
             authenticate_redirect_uri,
             name="oidc_authorize",
             allow_redirects=False,
         )
-        authorize_redirect_uri = self.get_redirect_uri(authorize_response)
+        authorize_redirect_uri = get_redirect_uri(authorize_response)
         self.client.get(
             authorize_redirect_uri, name="oidc_callback", allow_redirects=False
         )
@@ -110,12 +110,6 @@ class Tasks(TaskSet):
         self.report_ids_dict = self.retrieve_report_ids_dict()
         self.report_ids = list(self.report_ids_dict.keys())
         self.report_ids_to_submit = self.report_ids.copy()
-
-    def get_redirect_uri(self, response):
-        if response.status_code == 302:
-            parsed_url = urlparse(response.headers["Location"])
-            return f"{parsed_url.path}?{parsed_url.query}"
-        return None
 
     def calculate_summary_for_report_id_list(self, report_id_list):
         retval = []
@@ -490,3 +484,11 @@ class Swarm(user.HttpUser):
 
     tasks = [Tasks]
     wait_time = between(1.5, 4)
+
+
+# Utils
+def get_redirect_uri(self, response):
+    if response.status_code == 302:
+        parsed_url = urlparse(response.headers["Location"])
+        return f"{parsed_url.path}?{parsed_url.query}"
+    return None
