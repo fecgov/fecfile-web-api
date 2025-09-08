@@ -328,14 +328,14 @@ def get_logging_config(log_format=LINE):
             },
             "cloud": {
                 "class": "logging.StreamHandler",
-                "formatter": "key_value",
+                "formatter": "json_formatter",
                 "stream": sys.stdout,
                 "filters": ["not_error"],
             },
             "cloud_error": {
                 "level": "ERROR",
                 "class": "logging.StreamHandler",
-                "formatter": "key_value",
+                "formatter": "json_formatter",
                 "stream": sys.stderr,
             },
         },
