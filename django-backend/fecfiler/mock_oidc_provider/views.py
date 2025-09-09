@@ -30,12 +30,14 @@ else:
 
 MOCK_OIDC_PROVIDER_DATA = "MOCK_OIDC_PROVIDER_DATA"
 MOCK_OIDC_PROVIDER_KDAT = "MOCK_OIDC_PROVIDER_KDAT"
+MOCK_OIDC_PROVIDER_USER_IDX = "MOCK_OIDC_PROVIDER_USER_IDX"
+
 
 logger = structlog.get_logger(__name__)
 
-user_idx = 0
 users = [{"email": "test@test.com", "username": "c34867d9-3a41-43ff-ae25-ca498f64b52d"}]
-test_user = None
+
+redis_instance.set(MOCK_OIDC_PROVIDER_USER_IDX, 0)
 
 
 @extend_schema(exclude=True)
@@ -81,12 +83,7 @@ def authorize(request):
         return HttpResponseBadRequest(
             "redirect_uri, state, nonce query params are required"
         )
-    global test_email
-    global test_username
-    test_email, test_username = users[user_idx].get("email"), users[user_idx].get(
-        "username"
-    )
-    user_idx += 1 if user_idx < len(users) - 1 else 0
+    increment_test_user_idx()
     redirect_uri = request.query_params.get("redirect_uri")
     state = request.query_params.get("state")
     nonce = request.query_params.get("nonce")
@@ -125,7 +122,7 @@ def token(request):
     c_hash = idp_base64_encode_left_128_bits_of_str(code)
     args = {
         "iss": request.build_absolute_uri().replace(request.path, ""),
-        "sub": test_user["username"],
+        "sub": get_test_user_username(),
         "aud": "test_client_id",
         "acr": "test_acr",
         "at_hash": at_hash,
@@ -160,8 +157,8 @@ def token(request):
 @require_http_methods(["GET"])
 def userinfo(request):
     retval = {
-        "sub": test_user["username"],
-        "email": test_user["email"],
+        "sub": get_test_user_username(),
+        "email": get_test_user_email(),
     }
     return JsonResponse(retval)
 
@@ -199,8 +196,18 @@ def get_or_create_kdat_dict():
 
 
 # Note: This is not thread safe, but is sufficient for basic testing
-def set_global_test_user():
-    global user_idx
-    global test_user
-    test_user = users[user_idx]
-    user_idx += 1 if user_idx < len(users) - 1 else 0
+def increment_test_user_idx():
+    user_idx = int(redis_instance.get(MOCK_OIDC_PROVIDER_USER_IDX))
+    redis_instance.set(
+        MOCK_OIDC_PROVIDER_USER_IDX, user_idx + 1 if user_idx < len(users) - 1 else 0
+    )
+
+
+def get_test_user_email():
+    user_idx = int(redis_instance.get(MOCK_OIDC_PROVIDER_USER_IDX))
+    return users[user_idx]["email"]
+
+
+def get_test_user_username():
+    user_idx = int(redis_instance.get(MOCK_OIDC_PROVIDER_USER_IDX))
+    return users[user_idx]["username"]
