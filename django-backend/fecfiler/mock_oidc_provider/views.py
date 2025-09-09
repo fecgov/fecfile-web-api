@@ -35,9 +35,10 @@ MOCK_OIDC_PROVIDER_USER_IDX = "MOCK_OIDC_PROVIDER_USER_IDX"
 
 logger = structlog.get_logger(__name__)
 
-users = [{"email": "test@test.com", "username": "c34867d9-3a41-43ff-ae25-ca498f64b52d"}]
-
-redis_instance.set(MOCK_OIDC_PROVIDER_USER_IDX, 0)
+users = [
+    {"email": "test@test.com", "username": "c34867d9-3a41-43ff-ae25-ca498f64b52d"},
+    {"email": "test333@test.com", "username": "944eac55-8280-4dc1-afaa-c4ca9526a35f"},
+]
 
 
 @extend_schema(exclude=True)
@@ -197,10 +198,13 @@ def get_or_create_kdat_dict():
 
 # Note: This is not thread safe, but is sufficient for basic testing
 def increment_test_user_idx():
-    user_idx = int(redis_instance.get(MOCK_OIDC_PROVIDER_USER_IDX))
-    redis_instance.set(
-        MOCK_OIDC_PROVIDER_USER_IDX, user_idx + 1 if user_idx < len(users) - 1 else 0
+    current_user_idx = redis_instance.get(MOCK_OIDC_PROVIDER_USER_IDX)
+    next_user_idx = (
+        int(current_user_idx) + 1
+        if current_user_idx and int(current_user_idx) < len(users) - 1
+        else 0
     )
+    redis_instance.set(MOCK_OIDC_PROVIDER_USER_IDX, next_user_idx)
 
 
 def get_test_user_email():
