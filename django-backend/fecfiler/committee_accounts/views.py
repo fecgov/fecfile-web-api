@@ -21,7 +21,7 @@ from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
 import structlog
-
+import time
 logger = structlog.get_logger(__name__)
 
 
@@ -93,6 +93,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 
     def list(self, request, *args, **kwargs):
         response = super(CommitteeViewSet, self).list(request, *args, **kwargs)
+        # time.sleep(30)
         response.data["results"] = [
             self.add_committee_account_data(committee_account)
             for committee_account in response.data["results"]

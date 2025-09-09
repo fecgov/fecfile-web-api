@@ -16,7 +16,7 @@ from rest_framework import viewsets, pagination, filters, status
 from .models import Contact
 from .serializers import ContactSerializer
 import fecfiler.settings as settings
-
+import time
 logger = structlog.get_logger(__name__)
 
 default_max_fec_results = 10
@@ -336,6 +336,11 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
             return super().update(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        time.sleep(60*15)
+        with transaction.atomic():
+            return super().create(request, *args, **kwargs)
 
     def get_int_param_value(
         self, request, param_name: str, default_param_value: int, max_param_value: int

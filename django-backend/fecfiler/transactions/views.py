@@ -33,7 +33,7 @@ from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_sav
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
 from fecfiler.transactions.schedule_f.models import ScheduleF
 import structlog
-
+import time
 import os
 import psycopg2
 
@@ -145,6 +145,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return queryset
 
     def create(self, request, *args, **kwargs):
+        time.sleep(30)
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
             logger.info(f"Created new transaction: {saved_transaction.id}")

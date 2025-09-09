@@ -27,14 +27,14 @@ services:
 
   api-worker:
     build:
-      context: './'
-      dockerfile: '${WORKER_DOCKERFILE:-Worker_Dockerfile}'
+      context: "./"
+      dockerfile: "${WORKER_DOCKERFILE:-Worker_Dockerfile}"
     image: fecfile-celery-worker
     container_name: fecfile-celery-worker
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - 'host.docker.internal:host-gateway'
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
       - redis
@@ -71,15 +71,15 @@ services:
 
   scheduler:
     build:
-      context: './'
-      dockerfile: '${SCHEDULER_DOCKERFILE:-Scheduler_Dockerfile}'
+      context: "./"
+      dockerfile: "${SCHEDULER_DOCKERFILE:-Scheduler_Dockerfile}"
     image: fecfile-celery-beat
     container_name: fecfile-scheduler
     command: celery -A fecfiler beat -l info
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - 'host.docker.internal:host-gateway'
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
       - redis
@@ -116,14 +116,14 @@ services:
 
   api:
     build:
-      context: './'
-      dockerfile: '${API_DOCKERFILE:-Dockerfile}'
+      context: "./"
+      dockerfile: "${API_DOCKERFILE:-Dockerfile}"
     image: fecfile-api
     container_name: fecfile-api
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - 'host.docker.internal:host-gateway'
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
       - redis
@@ -178,7 +178,7 @@ services:
           memory: 2G
 
   nginx:
-    build: https://github.com/fecgov/fecfile-api-proxy.git#develop
+    build: https://github.com/fecgov/fecfile-api-proxy.git#feature/2165
     container_name: fecfile-api-proxy
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1
