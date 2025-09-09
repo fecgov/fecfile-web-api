@@ -33,8 +33,9 @@ MOCK_OIDC_PROVIDER_KDAT = "MOCK_OIDC_PROVIDER_KDAT"
 
 logger = structlog.get_logger(__name__)
 
-test_username = "c34867d9-3a41-43ff-ae25-ca498f64b52d"
-test_email = "test@test.com"
+user_idx = 0
+users = [{"email": "test@test.com", "username": "c34867d9-3a41-43ff-ae25-ca498f64b52d"}]
+test_user = None
 
 
 @extend_schema(exclude=True)
@@ -80,6 +81,12 @@ def authorize(request):
         return HttpResponseBadRequest(
             "redirect_uri, state, nonce query params are required"
         )
+    global test_email
+    global test_username
+    test_email, test_username = users[user_idx].get("email"), users[user_idx].get(
+        "username"
+    )
+    user_idx += 1 if user_idx < len(users) - 1 else 0
     redirect_uri = request.query_params.get("redirect_uri")
     state = request.query_params.get("state")
     nonce = request.query_params.get("nonce")
@@ -118,7 +125,7 @@ def token(request):
     c_hash = idp_base64_encode_left_128_bits_of_str(code)
     args = {
         "iss": request.build_absolute_uri().replace(request.path, ""),
-        "sub": test_username,
+        "sub": test_user["username"],
         "aud": "test_client_id",
         "acr": "test_acr",
         "at_hash": at_hash,
@@ -153,8 +160,8 @@ def token(request):
 @require_http_methods(["GET"])
 def userinfo(request):
     retval = {
-        "sub": test_username,
-        "email": test_email,
+        "sub": test_user["username"],
+        "email": test_user["email"],
     }
     return JsonResponse(retval)
 
@@ -189,3 +196,11 @@ def get_or_create_kdat_dict():
         kdat = json.dumps({"kid": test_kid, "pubkey": pubkey, "pvtkey": pvtkey_pem})
         redis_instance.set(MOCK_OIDC_PROVIDER_KDAT, kdat, ex=3600)
     return json.loads(kdat)
+
+
+# Note: This is not thread safe, but is sufficient for basic testing
+def set_global_test_user():
+    global user_idx
+    global test_user
+    test_user = users[user_idx]
+    user_idx += 1 if user_idx < len(users) - 1 else 0
