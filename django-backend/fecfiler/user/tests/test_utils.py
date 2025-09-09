@@ -40,14 +40,14 @@ class UserUtilsTestCase(TestCase):
     @patch("fecfiler.user.utils.Session")
     @patch("fecfiler.user.utils.datetime")
     def test_delete_active_sessions_for_user_and_committee_missing_params(
-        self, mock_datetime, mock_Session
+        self, mock_datetime, mock_session_model
     ):
         mock_session = MagicMock()
         mock_session.get_decoded.return_value = {
             "_auth_user_id": "test_user_id_1",
             "committee_id": "test_committee_id_1",
         }
-        mock_Session.objects.filter.return_value = [mock_session]
+        mock_session_model.objects.filter.return_value = [mock_session]
 
         delete_active_sessions_for_user_and_committee("", "test_committee_id_1")
         mock_session.delete.assert_not_called()
@@ -58,14 +58,14 @@ class UserUtilsTestCase(TestCase):
     @patch("fecfiler.user.utils.Session")
     @patch("fecfiler.user.utils.datetime")
     def test_delete_active_sessions_for_user_and_committee_no_match(
-        self, mock_datetime, mock_Session
+        self, mock_datetime, mock_session_model
     ):
         mock_session = MagicMock()
         mock_session.get_decoded.return_value = {
             "_auth_user_id": "test_user_id_1",
             "committee_id": "test_committee_id_1",
         }
-        mock_Session.objects.filter.return_value = [mock_session]
+        mock_session_model.objects.filter.return_value = [mock_session]
 
         delete_active_sessions_for_user_and_committee(
             "test_user_id_2", "test_committee_id_2"
@@ -76,7 +76,7 @@ class UserUtilsTestCase(TestCase):
     @patch("fecfiler.user.utils.Session")
     @patch("fecfiler.user.utils.datetime")
     def test_delete_active_sessions_for_user_and_committee_happy_path(
-        self, mock_datetime, mock_Session
+        self, mock_datetime, mock_session_model
     ):
         mock_session_1 = MagicMock()
         mock_session_2 = MagicMock()
@@ -93,7 +93,7 @@ class UserUtilsTestCase(TestCase):
             "_auth_user_id": "test_user_id_3",
             "committee_id": "test_committee_id_3",
         }
-        mock_Session.objects.filter.return_value = [
+        mock_session_model.objects.filter.return_value = [
             mock_session_1,
             mock_session_2,
             mock_session_3,
