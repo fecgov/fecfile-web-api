@@ -233,7 +233,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
             member.delete()
             if member.user is not None:
                 delete_active_sessions_for_user_and_committee(
-                    member.user.id, committee_id
+                    str(member.user.id), committee_id
                 )
                 logger.info(
                     f"{request.user.id} removed user {member.user.id} "
