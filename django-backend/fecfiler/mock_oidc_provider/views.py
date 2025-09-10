@@ -37,7 +37,8 @@ logger = structlog.get_logger(__name__)
 
 users = [
     {"email": "test@test.com", "username": "c34867d9-3a41-43ff-ae25-ca498f64b52d"},
-    {"email": "test333@test.com", "username": "944eac55-8280-4dc1-afaa-c4ca9526a35f"},
+    # Uncomment if you want multiple test users (cycling through them each login)
+    # {"email": "test333@test.com", "username": "944eac55-8280-4dc1-afaa-c4ca9526a35f"},
 ]
 
 
