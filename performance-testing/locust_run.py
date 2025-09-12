@@ -401,7 +401,7 @@ class Tasks(TaskSet):
     def retrieve_report(self, report_id):
         response = self.client_get(
             f"/api/v1/reports/{report_id}/",
-            name="retrieve_report",
+            name="get_report_by_id",
             timeout=TIMEOUT,
         )
         if response and response.status_code == 200:
