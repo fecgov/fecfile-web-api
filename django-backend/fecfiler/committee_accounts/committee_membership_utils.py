@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from .models import CommitteeAccount, Membership
-from fecfiler.user.models import User
+from fecfiler.user.utils import get_user_by_email_or_id
 from django.db.models import Q
 import structlog
 
@@ -22,7 +22,7 @@ def add_user_to_committee(user_email, committee_id, role):
         )
 
     # Get user by email
-    user = User.objects.filter(email__iexact=user_email).first()
+    user = get_user_by_email_or_id(user_email)
 
     # Get committee account by ID
     committee_account = CommitteeAccount.objects.filter(committee_id=committee_id).first()

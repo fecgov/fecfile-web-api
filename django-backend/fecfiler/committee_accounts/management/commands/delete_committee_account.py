@@ -23,7 +23,7 @@ class Command(BaseCommand):
                 logger.error(f"Committee account with ID {committee_id} does not exist.")
                 return
             # because of how we've set up our cascade deletes, deleting the account
-            # will also delete all associated reports, transaactions and contacts
+            # will also delete all associated reports, transactions and contacts
             committee_account.hard_delete()
             logger.info(f"Committee account with ID {committee_id} has been deleted.")
         except Exception as e:
