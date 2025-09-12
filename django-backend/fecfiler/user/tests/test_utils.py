@@ -78,31 +78,48 @@ class UserUtilsTestCase(TestCase):
     def test_delete_active_sessions_for_user_and_committee_happy_path(
         self, mock_datetime, mock_session_model
     ):
-        mock_session_1 = MagicMock()
-        mock_session_2 = MagicMock()
-        mock_session_3 = MagicMock()
-        mock_session_1.get_decoded.return_value = {
-            "_auth_user_id": "test_user_id_1",
-            "committee_id": "test_committee_id_1",
+        session_to_delete_1 = MagicMock()
+        session_to_delete_2 = MagicMock()
+        session_to_leave_different_user = MagicMock()
+        session_to_leave_different_committee = MagicMock()
+        """
+        Delete these
+        """
+        session_to_delete_1.get_decoded.return_value = {
+            "_auth_user_id": "user_to_delete",
+            "committee_id": "committee_to_delete",
         }
-        mock_session_2.get_decoded.return_value = {
-            "_auth_user_id": "test_user_id_2",
-            "committee_id": "test_committee_id_2",
+        # another session to confirm both get deleted
+        session_to_delete_2.get_decoded.return_value = {
+            "_auth_user_id": "user_to_delete",
+            "committee_id": "committee_to_delete",
         }
-        mock_session_3.get_decoded.return_value = {
-            "_auth_user_id": "test_user_id_3",
-            "committee_id": "test_committee_id_3",
+
+        """
+        Leave the following alone
+        """
+        # correct committee but different user
+        session_to_leave_different_user.get_decoded.return_value = {
+            "_auth_user_id": "other_user",
+            "committee_id": "committee_to_delete",
+        }
+        #
+        session_to_leave_different_committee.get_decoded.return_value = {
+            "_auth_user_id": "user_to_delete",
+            "committee_id": "other_committee",
         }
         mock_session_model.objects.filter.return_value = [
-            mock_session_1,
-            mock_session_2,
-            mock_session_3,
+            session_to_delete_1,
+            session_to_delete_2,
+            session_to_leave_different_user,
+            session_to_leave_different_committee,
         ]
 
         delete_active_sessions_for_user_and_committee(
-            "test_user_id_1", "test_committee_id_1"
+            "user_to_delete", "committee_to_delete"
         )
 
-        mock_session_1.delete.assert_called_once()
-        mock_session_2.delete.assert_not_called()
-        mock_session_3.delete.assert_not_called()
+        session_to_delete_1.delete.assert_called_once()
+        session_to_delete_2.delete.assert_called_once()
+        session_to_leave_different_user.delete.assert_not_called()
+        session_to_leave_different_committee.delete.assert_not_called()
