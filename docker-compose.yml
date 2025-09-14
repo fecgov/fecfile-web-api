@@ -27,14 +27,14 @@ services:
 
   api-worker:
     build:
-      context: "./"
-      dockerfile: "${WORKER_DOCKERFILE:-Worker_Dockerfile}"
+      context: './'
+      dockerfile: '${WORKER_DOCKERFILE:-Worker_Dockerfile}'
     image: fecfile-celery-worker
     container_name: fecfile-celery-worker
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     depends_on:
       - db
       - redis
@@ -59,9 +59,10 @@ services:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
       ENABLE_PL_SQL_LOGGING: False # Django DEBUG base.py setting must also be set to True to see SQL output
+      OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
       FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
       ENABLE_RESTRICTED_COMMANDS: True
-      FEC_FORMAT_VERSION: 8.4
+      FEC_FORMAT_VERSION: 8.5
       INCLUDE_SILK: "${INCLUDE_SILK}"
     deploy:
       resources:
@@ -70,15 +71,15 @@ services:
 
   scheduler:
     build:
-      context: "./"
-      dockerfile: "${SCHEDULER_DOCKERFILE:-Scheduler_Dockerfile}"
+      context: './'
+      dockerfile: '${SCHEDULER_DOCKERFILE:-Scheduler_Dockerfile}'
     image: fecfile-celery-beat
     container_name: fecfile-scheduler
     command: celery -A fecfiler beat -l info
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     depends_on:
       - db
       - redis
@@ -103,9 +104,10 @@ services:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
       ENABLE_PL_SQL_LOGGING: False # Django DEBUG base.py setting must also be set to True to see SQL output
+      OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
       FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
       ENABLE_RESTRICTED_COMMANDS: True
-      FEC_FORMAT_VERSION: 8.4
+      FEC_FORMAT_VERSION: 8.5
       INCLUDE_SILK: "${INCLUDE_SILK}"
     deploy:
       resources:
@@ -114,14 +116,14 @@ services:
 
   api:
     build:
-      context: "./"
-      dockerfile: "${API_DOCKERFILE:-Dockerfile}"
+      context: './'
+      dockerfile: '${API_DOCKERFILE:-Dockerfile}'
     image: fecfile-api
     container_name: fecfile-api
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     depends_on:
       - db
       - redis
@@ -165,7 +167,7 @@ services:
       SECONDARY_POLLING_INTERVAL: 3600
       SECONDARY_POLLING_DURATION: 86400
       ENABLE_RESTRICTED_COMMANDS: True
-      FEC_FORMAT_VERSION: 8.4
+      FEC_FORMAT_VERSION: 8.5
       INCLUDE_SILK: "${INCLUDE_SILK}"
 
       # ---- FEATURE FLAGS ----

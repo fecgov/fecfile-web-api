@@ -38,6 +38,10 @@ def get_devops_status_report():
     db_connections_results = get_database_connections()
     logger.info(db_connections_results)
 
+
+@shared_task
+def size_analysis():
+
     db_size = check_database_size()
     log_database_size(db_size)
 
