@@ -228,7 +228,9 @@ class Tasks(TaskSet):
     def filing_calculate_summary_only(self):
         self.client.request_name = "recalculate_report_summary"
         report_id = random.choice(self.report_ids)
-        self.calculate_summary_for_report_id(report_id, "filing_calculate_summary_for_report_id")
+        self.calculate_summary_for_report_id(
+            report_id, "filing_calculate_summary_for_report_id"
+        )
 
     @task(500)
     def filing_prepare_and_submit_report(self):
@@ -238,7 +240,9 @@ class Tasks(TaskSet):
         report_id = random.choice(self.report_ids_to_submit)
         report_json = self.retrieve_report(report_id)
 
-        self.calculate_summary_for_report_id(report_id, "filing_1_calculate_report_summary")
+        self.calculate_summary_for_report_id(
+            report_id, "filing_1_calculate_report_summary"
+        )
         self.confirm_information_for_report_json(report_json)
         self.submit_report(report_id, poll_seconds=40)
         self.report_ids_to_submit.pop()
