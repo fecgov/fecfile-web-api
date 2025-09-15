@@ -409,6 +409,8 @@ CELERY_RESULT_BACKEND = env.get_credential("REDIS_URL")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
 DJANGO_STRUCTLOG_CELERY_ENABLED = True
 
 
@@ -435,7 +437,7 @@ if CELERY_WORKER_STORAGE != "local":
             "expires": 15.0,
         },
     }
-
+CELERY_BEAT_SCHEDULE = {}
 
 """FEC Webload settings
 """
