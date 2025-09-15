@@ -141,7 +141,7 @@ class IsCommitteeAdministrator(BasePermission):
 
     def has_permission(self, request, view):
         committee_uuid = request.session.get("committee_uuid")
-        if not committee_uuid or not request.user.is_authenticated:
+        if not committee_uuid:
             return False
         role = (
             Membership.objects.filter(
