@@ -17,7 +17,7 @@ GitPython==3.1.43
 gunicorn==23.0.0
 invoke==2.2.0
 jwcrypto==1.5.6
-psycopg2-binary==2.9.10
+psycopg==3.1.18
 PyJWT==2.10.1
 redis==4.5.5
 requests==2.32.4
