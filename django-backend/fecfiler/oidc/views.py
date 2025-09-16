@@ -23,8 +23,6 @@ from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
     OIDC_RP_CLIENT_ID,
     LOGOUT_REDIRECT_URL,
-    FFAPI_COOKIE_DOMAIN,
-    FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
     OIDC_ACR_VALUES,
     LOGIN_REDIRECT_URL,
 )
@@ -48,14 +46,7 @@ logger = structlog.get_logger(__name__)
 @api_view(["GET"])
 @require_http_methods(["GET"])
 def login_redirect(request):
-    redirect = HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
-    redirect.set_cookie(
-        FFAPI_LOGIN_DOT_GOV_COOKIE_NAME,
-        "true",
-        domain=FFAPI_COOKIE_DOMAIN,
-        secure=True,
-    )
-    return redirect
+    return HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
 
 
 @extend_schema(exclude=True)

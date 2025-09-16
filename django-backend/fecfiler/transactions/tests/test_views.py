@@ -49,12 +49,15 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         self.q2_report = create_form3x(self.committee, "2024-02-02", "2024-03-01", {})
         self.contact_1 = create_test_individual_contact(
-            "last name", "First name", self.committee.id, {
+            "last name",
+            "First name",
+            self.committee.id,
+            {
                 "street_1": "123 test street",
                 "city": "testville",
                 "state": "AK",
                 "zip": "12345",
-            }
+            },
         )
         self.contact_2 = create_test_candidate_contact(
             "last name", "First name", self.committee.id, "H8MA03131", "S", "AK", "01"
@@ -1188,9 +1191,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "2025-04-03",
             150.00,
         )
-        response = self.view.create(
-            self.post_request(test_schedule_f_debt_repayment)
-        )
+        response = self.view.create(self.post_request(test_schedule_f_debt_repayment))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             Transaction.objects.transaction_view().get(pk=test_debt.id).balance_at_close,
@@ -1269,8 +1270,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "street_1": "1234 Test Ln",
                 "street_2": None,
                 "telephone": None,
-                "zip": "12345"
-            }
+                "zip": "12345",
+            },
         )
         contact_can = create_test_candidate_contact(
             "Testerson",
@@ -1292,8 +1293,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "street_2": None,
                 "suffix": None,
                 "telephone": None,
-                "zip": "59624"
-            }
+                "zip": "59624",
+            },
         )
         contact_can_2 = create_test_candidate_contact(
             "Testerson",
@@ -1315,8 +1316,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "street_2": None,
                 "suffix": None,
                 "telephone": None,
-                "zip": "59624"
-            }
+                "zip": "59624",
+            },
         )
         contact_com = create_test_committee_contact(
             "Testersons United",
@@ -1328,8 +1329,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "state": "MT",
                 "street_1": "PO BOX 558",
                 "telephone": "+1 3144010501",
-                "zip": "59103"
-            }
+                "zip": "59103",
+            },
         )
         self.view.request.query_params["report_id"] = report.id
 
@@ -1343,8 +1344,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             schedule_data={
                 "expenditure_amount": 125.00,
                 "expenditure_date": "2023-02-11",
-                "general_election_year": "2024"
-            }
+                "general_election_year": "2024",
+            },
         )
         b = create_schedule_f(
             type="COORDINATED_PARTY_EXPENDITURE",
@@ -1356,8 +1357,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             schedule_data={
                 "expenditure_amount": 75.00,
                 "expenditure_date": "2023-02-15",
-                "general_election_year": "2024"
-            }
+                "general_election_year": "2024",
+            },
         )
         c = create_schedule_f(
             type="COORDINATED_PARTY_EXPENDITURE",
@@ -1369,8 +1370,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             schedule_data={
                 "expenditure_amount": 100.00,
                 "expenditure_date": "2023-02-20",
-                "general_election_year": "2024"
-            }
+                "general_election_year": "2024",
+            },
         )
         d = create_schedule_f(
             type="COORDINATED_PARTY_EXPENDITURE",
@@ -1382,8 +1383,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             schedule_data={
                 "expenditure_amount": 50.00,
                 "expenditure_date": "2023-02-25",
-                "general_election_year": "2024"
-            }
+                "general_election_year": "2024",
+            },
         )
 
         trans_a = Transaction.objects.get(id=a.id)
@@ -1420,8 +1421,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "street_1": "1234 Test Ln",
                 "street_2": None,
                 "telephone": None,
-                "zip": "12345"
-            }
+                "zip": "12345",
+            },
         )
         contact_can = create_test_candidate_contact(
             "Testerson",
@@ -1443,8 +1444,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "street_2": None,
                 "suffix": None,
                 "telephone": None,
-                "zip": "59624"
-            }
+                "zip": "59624",
+            },
         )
         contact_com = create_test_committee_contact(
             "Testersons United",
@@ -1456,8 +1457,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "state": "MT",
                 "street_1": "PO BOX 558",
                 "telephone": "+1 3144010501",
-                "zip": "59103"
-            }
+                "zip": "59103",
+            },
         )
 
         transaction_1_data = gen_schedule_f_request_data(
@@ -1467,7 +1468,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "2022",
             contact_org,
             contact_can,
-            contact_com
+            contact_com,
         )
         transaction_2_data = gen_schedule_f_request_data(
             str(report.id),
@@ -1476,7 +1477,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "2022",
             contact_org,
             contact_can,
-            contact_com
+            contact_com,
         )
 
         view_set = TransactionViewSet()
@@ -1494,12 +1495,11 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         move_transaction_1_data = {
             **transaction_1_data,
             "expenditure_date": "2024-01-15",
-            "id": transaction_1.id
+            "id": transaction_1.id,
         }
 
         transaction_1 = view_set.save_transaction(
-            move_transaction_1_data,
-            view_set.request
+            move_transaction_1_data, view_set.request
         )
         transaction_2.refresh_from_db()
 
@@ -1513,8 +1513,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         }
 
         transaction_1 = view_set.save_transaction(
-            move_transaction_1_again_data,
-            view_set.request
+            move_transaction_1_again_data, view_set.request
         )
         transaction_2.refresh_from_db()
 
@@ -1528,8 +1527,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         }
 
         transaction_1 = view_set.save_transaction(
-            change_ge_transaction_1_data,
-            view_set.request
+            change_ge_transaction_1_data, view_set.request
         )
         transaction_2.refresh_from_db()
 
@@ -1543,8 +1541,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         }
 
         transaction_1 = view_set.save_transaction(
-            change_ge_transaction_1_back_data,
-            view_set.request
+            change_ge_transaction_1_back_data, view_set.request
         )
         transaction_2.refresh_from_db()
 
@@ -1565,8 +1562,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "street_1": "1234 Test Ln",
                 "street_2": None,
                 "telephone": None,
-                "zip": "12345"
-            }
+                "zip": "12345",
+            },
         )
         contact_can = create_test_candidate_contact(
             "Testerson",
@@ -1588,8 +1585,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "street_2": None,
                 "suffix": None,
                 "telephone": None,
-                "zip": "59624"
-            }
+                "zip": "59624",
+            },
         )
         contact_com = create_test_committee_contact(
             "Testersons United",
@@ -1601,8 +1598,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "state": "MT",
                 "street_1": "PO BOX 558",
                 "telephone": "+1 3144010501",
-                "zip": "59103"
-            }
+                "zip": "59103",
+            },
         )
 
         transaction_1_data = gen_schedule_f_request_data(
@@ -1612,7 +1609,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "2022",
             contact_org,
             contact_can,
-            contact_com
+            contact_com,
         )
         transaction_2_data = gen_schedule_f_request_data(
             str(report.id),
@@ -1621,7 +1618,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "2022",
             contact_org,
             contact_can,
-            contact_com
+            contact_com,
         )
         transaction_3_data = gen_schedule_f_request_data(
             str(report.id),
@@ -1630,7 +1627,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "2021",
             contact_org,
             contact_can,
-            contact_com
+            contact_com,
         )
 
         view_set = TransactionViewSet()
@@ -1642,95 +1639,67 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         transaction_2 = view_set.save_transaction(transaction_2_data, view_set.request)
         transaction_3 = view_set.save_transaction(transaction_3_data, view_set.request)
 
-        response = view_set.previous_transaction_by_payee_candidate(
-            self.post_request(
-                {},
-                {
-                    "contact_2_id": str(contact_can.id),
-                    "date": "2024-01-10",
-                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
-                    "general_election_year": "2022"
-                },
-            )
-        )
-        self.assertEqual(response.status_code, 404)
+        params = {
+            "contact_2_id": str(contact_can.id),
+            "date": "2024-01-10",
+            "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
+            "general_election_year": "2022",
+        }
+        self._run_payee_candidate_test(view_set, params, 404)
 
+        # No date should return 400
+        params["date"] = ""
+        self._run_payee_candidate_test(view_set, params, 400)
+
+        # No Contact ID should return 400
+        params["date"] = "2024-01-12"
+        params["contact_2_id"] = ""
+        self._run_payee_candidate_test(view_set, params, 400)
+
+        # No aggregation_group should return 400
+        params["contact_2_id"] = str(contact_can.id)
+        params["aggregation_group"] = ""
+        self._run_payee_candidate_test(view_set, params, 400)
+
+        # No general_election_year should return 400
+        params["aggregation_group"] = "COORDINATED_PARTY_EXPENDITURES"
+        params["general_election_year"] = ""
+        self._run_payee_candidate_test(view_set, params, 400)
+
+        params["general_election_year"] = "2022"
         response = view_set.previous_transaction_by_payee_candidate(
-            self.post_request(
-                {},
-                {
-                    "contact_2_id": str(contact_can.id),
-                    "date": "2024-01-12",
-                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
-                    "general_election_year": "2022"
-                },
-            )
+            self.post_request({}, params)
         )
         self.assertEqual(response.data["id"], str(transaction_1.id))
 
+        params["date"] = "2024-01-13"
         response = view_set.previous_transaction_by_payee_candidate(
-            self.post_request(
-                {},
-                {
-                    "contact_2_id": str(contact_can.id),
-                    "date": "2024-01-13",
-                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
-                    "general_election_year": "2022"
-                },
-            )
+            self.post_request({}, params)
         )
         self.assertEqual(response.data["id"], str(transaction_2.id))
 
-        response = view_set.previous_transaction_by_payee_candidate(
-            self.post_request(
-                {},
-                {
-                    "contact_2_id": str(contact_can.id),
-                    "date": "2024-01-15",
-                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
-                    "general_election_year": "2020"
-                },
-            )
-        )
-        self.assertEqual(response.status_code, 404)
+        params["date"] = "2024-01-15"
+        params["contact_2_id"] = str(contact_com.id)
+        self._run_payee_candidate_test(view_set, params, 404)
 
-        response = view_set.previous_transaction_by_payee_candidate(
-            self.post_request(
-                {},
-                {
-                    "contact_2_id": str(contact_com.id),
-                    "date": "2024-01-15",
-                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
-                    "general_election_year": "2022"
-                },
-            )
-        )
-        self.assertEqual(response.status_code, 404)
+        params["general_election_year"] = "2020"
+        params["contact_2_id"] = str(contact_can.id)
+        self._run_payee_candidate_test(view_set, params, 404)
 
-        response = view_set.previous_transaction_by_payee_candidate(
-            self.post_request(
-                {},
-                {
-                    "contact_2_id": str(contact_can.id),
-                    "date": "2024-01-15",
-                    "aggregation_group": "THIS_DOESNT_MATCH_ANYTHING",
-                    "general_election_year": "2022"
-                },
-            )
-        )
-        self.assertEqual(response.status_code, 404)
+        params["aggregation_group"] = "THIS_DOESNT_MATCH_ANYTHING"
+        params["general_election_year"] = "2022"
+        self._run_payee_candidate_test(view_set, params, 404)
 
+        params["transaction_id"] = str(transaction_3.id)
+        params["aggregation_group"] = "COORDINATED_PARTY_EXPENDITURES"
         response = view_set.previous_transaction_by_payee_candidate(
-            self.post_request(
-                {},
-                {
-                    "transaction_id": str(transaction_3.id),
-                    "contact_2_id": str(contact_can.id),
-                    "date": "2024-01-15",
-                    "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
-                    "general_election_year": "2022"
-                },
-            )
+            self.post_request({}, params)
         )
         self.assertEqual(response.data["id"], str(transaction_2.id))
         self.assertEqual(response.data["aggregate_general_elec_expended"], "200.00")
+
+    def _run_payee_candidate_test(self, view_set, params, expected):
+        response = view_set.previous_transaction_by_payee_candidate(
+            self.post_request({}, params)
+        )
+        self.assertEqual(response.status_code, expected)
