@@ -159,7 +159,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 400)
 
-    def test_update_membership_unauthorized(self):
+    def test_update_membership_forbidden(self):
         user = User.objects.get(id="fb20ffc3-285e-448e-9e56-9ca1fd43e7d3")
         response = self.send_viewset_put_request(
             "/api/v1/committee-members/5e4ae4ff-60da-4522-a588-ccd97e124b01/",
@@ -181,10 +181,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             user=user,
             pk="5e4ae4ff-60da-4522-a588-ccd97e124b01",
         )
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(
-            response.data, "You don't have permission to perform this action."
-        )
+        self.assertEqual(response.status_code, 403)
 
     def test_update_membership_happy_path(self):
         response = self.send_viewset_put_request(

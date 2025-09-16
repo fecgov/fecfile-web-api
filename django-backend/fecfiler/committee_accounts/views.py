@@ -23,7 +23,6 @@ from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
 import structlog
 from rest_framework.permissions import BasePermission
-from fecfiler.committee_accounts.models import Membership
 
 logger = structlog.get_logger(__name__)
 
