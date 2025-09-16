@@ -338,7 +338,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
             return super().update(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
-        time.sleep(60*15)
+        time.sleep(60 * 15)
         with transaction.atomic():
             return super().create(request, *args, **kwargs)
 
