@@ -10,11 +10,11 @@ from invoke import task
 
 env = cfenv.AppEnv()
 
-APP_NAME = "fecfile-web-api"
-MIGRATOR_APP_NAME = "fecfile-api-migrator"  # THE APP WITH THIS NAME WILL GET DELETED!
-WEB_SERVICES_NAME = "fecfile-web-services"
-SCHEDULER_NAME = "fecfile-scheduler"
-PROXY_NAME = "fecfile-api-proxy"
+APP_NAME = "load-fecfile-web-api"
+MIGRATOR_APP_NAME = "load-fecfile-api-migrator"  # THE APP WITH THIS NAME WILL GET DELETED!
+WEB_SERVICES_NAME = "load-fecfile-web-services"
+SCHEDULER_NAME = "load-fecfile-scheduler"
+PROXY_NAME = "load-fecfile-api-proxy"
 ORG_NAME = "fec-fecfile"
 
 
@@ -51,7 +51,7 @@ DEPLOY_RULES = (
     ("prod", lambda _, branch: branch == "main"),
     ("test", lambda _, branch: branch == "release/test"),
     ("stage", lambda _, branch: branch.startswith("release/sprint")),
-    ("dev", lambda _, branch: branch == "develop"),
+    ("dev", lambda _, branch: branch == "feature/2427-test-celery-workers"),
 )
 
 
