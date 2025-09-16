@@ -72,7 +72,7 @@
         "model": "committee_accounts.Membership",
         "pk": "bf91318e-665e-48d5-b138-8265c56a800d",
         "fields": {
-            "role": "COMMITTEE_ADMINISTRATOR",
+            "role": "MANAGER",
             "committee_account_id": "c94c5d1a-9e73-464d-ad72-b73b5d8667a9",
             "user_id": "944eac55-8280-4dc1-afaa-c4ca9526a35f",
             "pending_email": null,
@@ -108,18 +108,6 @@
             "role": "COMMITTEE_ADMINISTRATOR",
             "committee_account_id": "7c176dc0-7062-49b5-bc35-58b4ef050d08",
             "user_id": "e100e1da-cbfc-4189-aece-d139048a8e0a",
-            "pending_email": null,
-            "created": "2022-02-09T00:00:00.000Z",
-            "updated": "2022-02-09T00:00:00.000Z"
-        }
-    },
-    {
-        "model": "committee_accounts.Membership",
-        "pk": "0cc49142-a2bd-4e9e-b06f-c4e4ec439b8b",
-        "fields": {
-            "role": "COMMITTEE_ADMINISTRATOR",
-            "committee_account_id": "7c176dc0-7062-49b5-bc35-58b4ef050d08",
-            "user_id": "944eac55-8280-4dc1-afaa-c4ca9526a35f",
             "pending_email": null,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z"

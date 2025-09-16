@@ -22,6 +22,8 @@ from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import Q, Value
 import structlog
+from rest_framework.permissions import BasePermission
+from fecfiler.committee_accounts.models import Membership
 
 logger = structlog.get_logger(__name__)
 
@@ -132,6 +134,25 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
         return Response(serializer.data)
 
 
+class IsCommitteeAdministrator(BasePermission):
+    """
+    Allows access only to committee administrators.
+    """
+
+    def has_permission(self, request, view):
+        committee_uuid = request.session.get("committee_uuid")
+        if not committee_uuid:
+            return False
+        role = (
+            Membership.objects.filter(
+                user=request.user, committee_account_id=committee_uuid
+            )
+            .values_list("role", flat=True)
+            .first()
+        )
+        return role == Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR
+
+
 class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     serializer_class = CommitteeMembershipSerializer
     pagination_class = CommitteeMemberListPagination
@@ -140,6 +161,17 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
     ordering = ["-created"]
 
     queryset = Membership.objects.all()
+
+    def get_permissions(self):
+        if self.action in (
+            "update",
+            "partial_update",
+            "destroy",
+            "remove_member",
+            "add_member",
+        ):
+            self.permission_classes = [IsCommitteeAdministrator]
+        return super().get_permissions()
 
     def get_queryset(self):
         return (
@@ -250,20 +282,6 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
             return Response({"error": str(e)}, status=400)
 
     def update(self, request, *args, **kwargs):
-        committee_uuid = request.session["committee_uuid"]
-        role = (
-            Membership.objects.filter(
-                user=request.user, committee_account_id=committee_uuid
-            )
-            .values_list("role", flat=True)
-            .first()
-        )
-        if role != Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR:
-            return Response(
-                "You don't have permission to perform this action.",
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
         existing_member = self.get_object()
         committee = existing_member.committee_account
         # member updates
