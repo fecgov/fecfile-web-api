@@ -17,6 +17,7 @@ fecfiler.user.utils
    .. autosummary::
       :toctree:                                          
    
+      delete_active_sessions_for_user_and_committee
       get_user_by_email_or_id
    
    

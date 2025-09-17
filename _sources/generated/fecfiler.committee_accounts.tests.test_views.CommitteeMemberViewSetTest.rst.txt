@@ -115,9 +115,10 @@ fecfiler.committee\_accounts.tests.test\_views.CommitteeMemberViewSetTest
       ~CommitteeMemberViewSetTest.test_add_membership_requires_correct_parameters
       ~CommitteeMemberViewSetTest.test_add_pending_membership
       ~CommitteeMemberViewSetTest.test_cannot_delete_self
+      ~CommitteeMemberViewSetTest.test_non_committee_admin_cannot_delete
       ~CommitteeMemberViewSetTest.test_remove_member
+      ~CommitteeMemberViewSetTest.test_update_membership_forbidden
       ~CommitteeMemberViewSetTest.test_update_membership_happy_path
-      ~CommitteeMemberViewSetTest.test_update_membership_unauthorized
    
    
 

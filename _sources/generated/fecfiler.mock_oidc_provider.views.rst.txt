@@ -21,6 +21,9 @@ fecfiler.mock\_oidc\_provider.views
       certs
       discovery
       get_or_create_kdat_dict
+      get_test_user_email
+      get_test_user_username
+      increment_test_user_idx
       logout
       token
       userinfo

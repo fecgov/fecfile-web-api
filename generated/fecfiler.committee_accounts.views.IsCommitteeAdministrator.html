@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>fecfiler.committee_accounts.views &#8212; FECFile Web API  documentation</title>
+    <title>fecfiler.committee_accounts.views.IsCommitteeAdministrator &#8212; FECFile Web API  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
@@ -13,8 +13,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.committee_accounts.views.CommitteeMemberListPagination" href="fecfiler.committee_accounts.views.CommitteeMemberListPagination.html" />
-    <link rel="prev" title="fecfiler.committee_accounts.utils.raise_if_cannot_create_committee_account" href="fecfiler.committee_accounts.utils.raise_if_cannot_create_committee_account.html" />
+    <link rel="next" title="fecfiler.contacts" href="fecfiler.contacts.html" />
+    <link rel="prev" title="fecfiler.committee_accounts.views.CommitteeViewSet" href="fecfiler.committee_accounts.views.CommitteeViewSet.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -32,31 +32,46 @@
 
           <div class="body" role="main">
             
-  <section id="module-fecfiler.committee_accounts.views">
-<span id="fecfiler-committee-accounts-views"></span><h1>fecfiler.committee_accounts.views<a class="headerlink" href="#module-fecfiler.committee_accounts.views" title="Link to this heading">¶</a></h1>
-<p class="rubric">Classes</p>
+  <section id="fecfiler-committee-accounts-views-iscommitteeadministrator">
+<h1>fecfiler.committee_accounts.views.IsCommitteeAdministrator<a class="headerlink" href="#fecfiler-committee-accounts-views-iscommitteeadministrator" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.views.IsCommitteeAdministrator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">fecfiler.committee_accounts.views.</span></span><span class="sig-name descname"><span class="pre">IsCommitteeAdministrator</span></span><a class="headerlink" href="#fecfiler.committee_accounts.views.IsCommitteeAdministrator" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BasePermission</span></code></p>
+<p>Allows access only to committee administrators.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.views.IsCommitteeAdministrator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.views.IsCommitteeAdministrator.__init__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeMemberListPagination.html#fecfiler.committee_accounts.views.CommitteeMemberListPagination" title="fecfiler.committee_accounts.views.CommitteeMemberListPagination"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CommitteeMemberListPagination</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.IsCommitteeAdministrator.__init__" title="fecfiler.committee_accounts.views.IsCommitteeAdministrator.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeMembershipViewSet.html#fecfiler.committee_accounts.views.CommitteeMembershipViewSet" title="fecfiler.committee_accounts.views.CommitteeMembershipViewSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CommitteeMembershipViewSet</span></code></a>(**kwargs)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.IsCommitteeAdministrator.has_object_permission" title="fecfiler.committee_accounts.views.IsCommitteeAdministrator.has_object_permission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_object_permission</span></code></a>(request, view, obj)</p></td>
+<td><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin.html#fecfiler.committee_accounts.views.CommitteeOwnedViewMixin" title="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CommitteeOwnedViewMixin</span></code></a>(**kwargs)</p></td>
-<td><p>ModelViewSet for models using CommitteeOwnedModel Inherit this view set to filter the queryset by the user's committee</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteePagination.html#fecfiler.committee_accounts.views.CommitteePagination" title="fecfiler.committee_accounts.views.CommitteePagination"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CommitteePagination</span></code></a>()</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeViewSet.html#fecfiler.committee_accounts.views.CommitteeViewSet" title="fecfiler.committee_accounts.views.CommitteeViewSet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CommitteeViewSet</span></code></a>(**kwargs)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.views.IsCommitteeAdministrator.html#fecfiler.committee_accounts.views.IsCommitteeAdministrator" title="fecfiler.committee_accounts.views.IsCommitteeAdministrator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">IsCommitteeAdministrator</span></code></a>()</p></td>
-<td><p>Allows access only to committee administrators.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.committee_accounts.views.IsCommitteeAdministrator.has_permission" title="fecfiler.committee_accounts.views.IsCommitteeAdministrator.has_permission"><code class="xref py py-obj docutils literal notranslate"><span class="pre">has_permission</span></code></a>(request, view)</p></td>
+<td><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p></td>
 </tr>
 </tbody>
 </table>
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.views.IsCommitteeAdministrator.has_object_permission">
+<span class="sig-name descname"><span class="pre">has_object_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.views.IsCommitteeAdministrator.has_object_permission" title="Link to this definition">¶</a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.committee_accounts.views.IsCommitteeAdministrator.has_permission">
+<span class="sig-name descname"><span class="pre">has_permission</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.committee_accounts.views.IsCommitteeAdministrator.has_permission" title="Link to this definition">¶</a></dt>
+<dd><p>Return <cite>True</cite> if permission is granted, <cite>False</cite> otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
 
@@ -92,13 +107,21 @@
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.tests.html">fecfiler.committee_accounts.tests</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.urls.html">fecfiler.committee_accounts.urls</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.utils.html">fecfiler.committee_accounts.utils</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.committee_accounts.views</a><ul>
+<li class="toctree-l4 current"><a class="reference internal" href="fecfiler.committee_accounts.views.html">fecfiler.committee_accounts.views</a><ul class="current">
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeMemberListPagination.html">fecfiler.committee_accounts.views.CommitteeMemberListPagination</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeMembershipViewSet.html">fecfiler.committee_accounts.views.CommitteeMembershipViewSet</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeOwnedViewMixin.html">fecfiler.committee_accounts.views.CommitteeOwnedViewMixin</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteePagination.html">fecfiler.committee_accounts.views.CommitteePagination</a></li>
 <li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.CommitteeViewSet.html">fecfiler.committee_accounts.views.CommitteeViewSet</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.views.IsCommitteeAdministrator.html">fecfiler.committee_accounts.views.IsCommitteeAdministrator</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.committee_accounts.views.IsCommitteeAdministrator</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#fecfiler.committee_accounts.views.IsCommitteeAdministrator"><code class="docutils literal notranslate"><span class="pre">IsCommitteeAdministrator</span></code></a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.views.IsCommitteeAdministrator.__init__"><code class="docutils literal notranslate"><span class="pre">IsCommitteeAdministrator.__init__()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.views.IsCommitteeAdministrator.has_object_permission"><code class="docutils literal notranslate"><span class="pre">IsCommitteeAdministrator.has_object_permission()</span></code></a></li>
+<li class="toctree-l7"><a class="reference internal" href="#fecfiler.committee_accounts.views.IsCommitteeAdministrator.has_permission"><code class="docutils literal notranslate"><span class="pre">IsCommitteeAdministrator.has_permission()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -138,8 +161,10 @@
   <li><a href="../api.html">API</a><ul>
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a><ul>
-      <li>Previous: <a href="fecfiler.committee_accounts.utils.raise_if_cannot_create_committee_account.html" title="previous chapter">fecfiler.committee_accounts.utils.raise_if_cannot_create_committee_account</a></li>
-      <li>Next: <a href="fecfiler.committee_accounts.views.CommitteeMemberListPagination.html" title="next chapter">fecfiler.committee_accounts.views.CommitteeMemberListPagination</a></li>
+  <li><a href="fecfiler.committee_accounts.views.html">fecfiler.committee_accounts.views</a><ul>
+      <li>Previous: <a href="fecfiler.committee_accounts.views.CommitteeViewSet.html" title="previous chapter">fecfiler.committee_accounts.views.CommitteeViewSet</a></li>
+      <li>Next: <a href="fecfiler.contacts.html" title="next chapter">fecfiler.contacts</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -176,7 +201,7 @@
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
-      <a href="../_sources/generated/fecfiler.committee_accounts.views.rst.txt"
+      <a href="../_sources/generated/fecfiler.committee_accounts.views.IsCommitteeAdministrator.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

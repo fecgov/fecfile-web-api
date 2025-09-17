@@ -27,6 +27,7 @@ fecfiler.committee\_accounts.views
       CommitteeOwnedViewMixin
       CommitteePagination
       CommitteeViewSet
+      IsCommitteeAdministrator
    
    
 

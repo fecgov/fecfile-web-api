@@ -99,6 +99,9 @@ fecfiler.user.tests.test\_utils.UserUtilsTestCase
       ~UserUtilsTestCase.subTest
       ~UserUtilsTestCase.tearDown
       ~UserUtilsTestCase.tearDownClass
+      ~UserUtilsTestCase.test_delete_active_sessions_for_user_and_committee_happy_path
+      ~UserUtilsTestCase.test_delete_active_sessions_for_user_and_committee_missing_params
+      ~UserUtilsTestCase.test_delete_active_sessions_for_user_and_committee_no_match
       ~UserUtilsTestCase.test_get_user_with_invalid_strings
       ~UserUtilsTestCase.test_get_user_with_valid_strings
    

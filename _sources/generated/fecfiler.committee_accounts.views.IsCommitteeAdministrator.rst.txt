@@ -1,0 +1,30 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.committee\_accounts.views.IsCommitteeAdministrator
+===========================================================
+
+.. currentmodule:: fecfiler.committee_accounts.views
+
+.. autoclass:: IsCommitteeAdministrator
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~IsCommitteeAdministrator.__init__
+      ~IsCommitteeAdministrator.has_object_permission
+      ~IsCommitteeAdministrator.has_permission
+   
+   
+
+   
+   
+   

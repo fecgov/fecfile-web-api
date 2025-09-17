@@ -1,0 +1,6 @@
+fecfiler.user.utils.delete\_active\_sessions\_for\_user\_and\_committee
+=======================================================================
+
+.. currentmodule:: fecfiler.user.utils
+
+.. autofunction:: delete_active_sessions_for_user_and_committee

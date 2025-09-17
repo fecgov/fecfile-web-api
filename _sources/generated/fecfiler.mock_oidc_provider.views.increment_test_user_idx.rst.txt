@@ -1,0 +1,6 @@
+fecfiler.mock\_oidc\_provider.views.increment\_test\_user\_idx
+==============================================================
+
+.. currentmodule:: fecfiler.mock_oidc_provider.views
+
+.. autofunction:: increment_test_user_idx

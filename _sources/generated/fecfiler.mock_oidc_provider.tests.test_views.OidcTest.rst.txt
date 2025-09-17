@@ -89,6 +89,7 @@ fecfiler.mock\_oidc\_provider.tests.test\_views.OidcTest
       ~OidcTest.fail
       ~OidcTest.id
       ~OidcTest.modify_settings
+      ~OidcTest.redis_get_mock
       ~OidcTest.run
       ~OidcTest.setUp
       ~OidcTest.setUpClass

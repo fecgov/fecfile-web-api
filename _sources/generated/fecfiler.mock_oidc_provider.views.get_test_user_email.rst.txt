@@ -1,0 +1,6 @@
+fecfiler.mock\_oidc\_provider.views.get\_test\_user\_email
+==========================================================
+
+.. currentmodule:: fecfiler.mock_oidc_provider.views
+
+.. autofunction:: get_test_user_email
