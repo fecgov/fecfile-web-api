@@ -1,6 +1,10 @@
 from django.test import TestCase
+from unittest.mock import patch, MagicMock
 from fecfiler.user.models import User
-from fecfiler.user.utils import get_user_by_email_or_id
+from fecfiler.user.utils import (
+    get_user_by_email_or_id,
+    delete_active_sessions_for_user_and_committee,
+)
 from uuid import uuid4
 
 
@@ -21,9 +25,8 @@ class UserUtilsTestCase(TestCase):
         self.assertEqual(get_user_by_email_or_id("test_user_4@test.com"), None)
         self.assertEqual(get_user_by_email_or_id("test_user_1ATtest.com"), None)
         self.assertEqual(get_user_by_email_or_id("-"), None)
-        self.assertEqual(get_user_by_email_or_id(
-            str(self.user_1.id).replace("-", "")),
-            None
+        self.assertEqual(
+            get_user_by_email_or_id(str(self.user_1.id).replace("-", "")), None
         )
 
     def test_get_user_with_valid_strings(self):
@@ -31,3 +34,92 @@ class UserUtilsTestCase(TestCase):
         self.assertEqual(get_user_by_email_or_id(self.user_1.email), self.user_1)
         self.assertEqual(get_user_by_email_or_id(self.user_2.email), self.user_2)
         self.assertEqual(get_user_by_email_or_id(str(self.user_3.id)), self.user_3)
+
+    # delete_active_sessions_for_user_and_committee
+
+    @patch("fecfiler.user.utils.Session")
+    @patch("fecfiler.user.utils.datetime")
+    def test_delete_active_sessions_for_user_and_committee_missing_params(
+        self, mock_datetime, mock_session_model
+    ):
+        mock_session = MagicMock()
+        mock_session.get_decoded.return_value = {
+            "_auth_user_id": "test_user_id_1",
+            "committee_id": "test_committee_id_1",
+        }
+        mock_session_model.objects.filter.return_value = [mock_session]
+
+        delete_active_sessions_for_user_and_committee("", "test_committee_id_1")
+        mock_session.delete.assert_not_called()
+
+        delete_active_sessions_for_user_and_committee("test_user_id_1", "")
+        mock_session.delete.assert_not_called()
+
+    @patch("fecfiler.user.utils.Session")
+    @patch("fecfiler.user.utils.datetime")
+    def test_delete_active_sessions_for_user_and_committee_no_match(
+        self, mock_datetime, mock_session_model
+    ):
+        mock_session = MagicMock()
+        mock_session.get_decoded.return_value = {
+            "_auth_user_id": "test_user_id_1",
+            "committee_id": "test_committee_id_1",
+        }
+        mock_session_model.objects.filter.return_value = [mock_session]
+
+        delete_active_sessions_for_user_and_committee(
+            "test_user_id_2", "test_committee_id_2"
+        )
+
+        mock_session.delete.assert_not_called()
+
+    @patch("fecfiler.user.utils.Session")
+    @patch("fecfiler.user.utils.datetime")
+    def test_delete_active_sessions_for_user_and_committee_happy_path(
+        self, mock_datetime, mock_session_model
+    ):
+        session_to_delete_1 = MagicMock()
+        session_to_delete_2 = MagicMock()
+        session_to_leave_different_user = MagicMock()
+        session_to_leave_different_committee = MagicMock()
+        """
+        Delete these
+        """
+        session_to_delete_1.get_decoded.return_value = {
+            "_auth_user_id": "user_to_delete",
+            "committee_id": "committee_to_delete",
+        }
+        # another session to confirm both get deleted
+        session_to_delete_2.get_decoded.return_value = {
+            "_auth_user_id": "user_to_delete",
+            "committee_id": "committee_to_delete",
+        }
+
+        """
+        Leave the following alone
+        """
+        # correct committee but different user
+        session_to_leave_different_user.get_decoded.return_value = {
+            "_auth_user_id": "other_user",
+            "committee_id": "committee_to_delete",
+        }
+        #
+        session_to_leave_different_committee.get_decoded.return_value = {
+            "_auth_user_id": "user_to_delete",
+            "committee_id": "other_committee",
+        }
+        mock_session_model.objects.filter.return_value = [
+            session_to_delete_1,
+            session_to_delete_2,
+            session_to_leave_different_user,
+            session_to_leave_different_committee,
+        ]
+
+        delete_active_sessions_for_user_and_committee(
+            "user_to_delete", "committee_to_delete"
+        )
+
+        session_to_delete_1.delete.assert_called_once()
+        session_to_delete_2.delete.assert_called_once()
+        session_to_leave_different_user.delete.assert_not_called()
+        session_to_leave_different_committee.delete.assert_not_called()

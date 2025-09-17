@@ -9,8 +9,10 @@ from fecfiler.mock_oidc_provider.views import (
     token,
     userinfo,
     logout,
-    test_username,
-    test_email,
+    MOCK_OIDC_PROVIDER_DATA,
+    MOCK_OIDC_PROVIDER_KDAT,
+    MOCK_OIDC_PROVIDER_USER_IDX,
+    users,
 )
 
 
@@ -19,6 +21,11 @@ class OidcTest(TestCase):
 
     def setUp(self):
         self.factory = RequestFactory()
+        self.test_auth_data = {
+            "code": "test_code",
+            "nonce": "test_nonce",
+            "access_token": "test_access_token",
+        }
 
     # discovery
 
@@ -124,16 +131,14 @@ class OidcTest(TestCase):
     @patch("fecfiler.mock_oidc_provider.views.redis.Redis.get")
     def test_token_no_auth_data_code(self, mock_redis_get):
         test_code = "test_code"
-        test_nonce = "test_nonce"
-        test_access_token = "test_access_token"
-        test_auth_data = {
-            "nonce": test_nonce,
-            "access_token": test_access_token,
-        }
         test_payload = {"code": test_code}
         expected_content = "call to authorize endpoint is required first"
 
-        mock_redis_get.side_effect = lambda _: json.dumps(test_auth_data).encode()
+        self.test_auth_data = {
+            "nonce": "test_nonce",
+            "access_token": "test_access_token",
+        }
+        mock_redis_get.side_effect = self.redis_get_mock
 
         request = self.factory.post("/", test_payload)
         retval = token(request)
@@ -143,19 +148,11 @@ class OidcTest(TestCase):
 
     @patch("fecfiler.mock_oidc_provider.views.redis.Redis.get")
     def test_token_authorize_code_invalid(self, mock_redis_get):
-        test_code = "test_code"
-        test_nonce = "test_nonce"
-        test_access_token = "test_access_token"
-        test_auth_data = {
-            "code": test_code,
-            "nonce": test_nonce,
-            "access_token": test_access_token,
-        }
         mismatched_test_code = "mismatched_test_code"
         test_payload = {"code": mismatched_test_code}
         expected_content = "authorize code is invalid"
 
-        mock_redis_get.side_effect = lambda _: json.dumps(test_auth_data).encode()
+        mock_redis_get.side_effect = self.redis_get_mock
 
         request = self.factory.post("/", test_payload)
         retval = token(request)
@@ -167,16 +164,10 @@ class OidcTest(TestCase):
     @patch("fecfiler.mock_oidc_provider.views.jwt.encode")
     def test_token_happy_path(self, mock_jwt_encode, mock_redis_get):
         test_code = "test_code"
-        test_nonce = "test_nonce"
         test_access_token = "test_access_token"
-        test_auth_data = {
-            "code": test_code,
-            "nonce": test_nonce,
-            "access_token": test_access_token,
-        }
         test_payload = {"code": test_code}
 
-        mock_redis_get.side_effect = lambda _: json.dumps(test_auth_data).encode()
+        mock_redis_get.side_effect = self.redis_get_mock
         mock_jwt_encode.side_effect = lambda *args, **kwargs: "test_jwt_encoded"
 
         request = self.factory.post("/", test_payload)
@@ -193,23 +184,16 @@ class OidcTest(TestCase):
 
     @patch("fecfiler.mock_oidc_provider.views.redis.Redis.get")
     def test_userinfo_happy_path(self, mock_redis_get):
-        test_code = "test_code"
-        test_nonce = "test_nonce"
         test_access_token = "test_access_token"
-        test_auth_data = {
-            "code": test_code,
-            "nonce": test_nonce,
-            "access_token": test_access_token,
-        }
         test_headers = {"Authorization": f"Bearer {test_access_token}"}
         expected_contents = json.dumps(
             {
-                "sub": test_username,
-                "email": test_email,
+                "sub": users[0]["username"],
+                "email": users[0]["email"],
             }
         )
 
-        mock_redis_get.side_effect = lambda _: json.dumps(test_auth_data).encode()
+        mock_redis_get.side_effect = self.redis_get_mock
 
         request = self.factory.get("/", headers=test_headers)
         retval = userinfo(request)
@@ -244,3 +228,18 @@ class OidcTest(TestCase):
 
         self.assertEqual(retval.status_code, 302)
         self.assertEqual(retval.url, expected_redirect_url)
+
+    def redis_get_mock(self, key):
+        if key == MOCK_OIDC_PROVIDER_DATA:
+            return json.dumps(self.test_auth_data).encode()
+        elif key == MOCK_OIDC_PROVIDER_KDAT:
+            return json.dumps(
+                {
+                    "kid": "test_kid",
+                    "pubkey": "test_pubkey",
+                    "pvtkey": "test_pvtkey",
+                }
+            )
+        elif key == MOCK_OIDC_PROVIDER_USER_IDX:
+            return 0
+        return None
