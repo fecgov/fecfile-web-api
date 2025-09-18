@@ -1,270 +1,270 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
-version: 2.1
+# # Use the latest 2.1 version of CircleCI pipeline process engine.
+# # See: https://circleci.com/docs/2.0/configuration-reference
+# version: 2.1
 
-# See: https://circleci.com/docs/2.0/orb-intro/
-orbs:
-  # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
-  python: circleci/python@3.2.0
-  browser-tools: circleci/browser-tools@2.2.1
-  node: circleci/node@7.1.1
+# # See: https://circleci.com/docs/2.0/orb-intro/
+# orbs:
+#   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
+#   python: circleci/python@3.2.0
+#   browser-tools: circleci/browser-tools@2.2.1
+#   node: circleci/node@7.1.1
 
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
-jobs:
-  test:
-    # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
-    # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
-    docker:
-      - image: cimg/python:3.13-node
-      - image: cimg/postgres:14.13
-      - image: cimg/redis:6.2.6
+# # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+# jobs:
+#   test:
+#     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
+#     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
+#     docker:
+#       - image: cimg/python:3.13-node
+#       - image: cimg/postgres:14.13
+#       - image: cimg/redis:6.2.6
 
-    steps:
-      - run:
-          name: Check for necessary environment variables
-          command: |
-            while read var; do
-              [ -z "${!var}" ] && { echo "Environment variable $var is needed for a successful test run, there is no default."; exit 1; }
-            done \<< EOF
-            FECFILE_FEC_WEBSITE_API_KEY
-            EOF
-            exit 0
+#     steps:
+#       - run:
+#           name: Check for necessary environment variables
+#           command: |
+#             while read var; do
+#               [ -z "${!var}" ] && { echo "Environment variable $var is needed for a successful test run, there is no default."; exit 1; }
+#             done \<< EOF
+#             FECFILE_FEC_WEBSITE_API_KEY
+#             EOF
+#             exit 0
 
-      - checkout
+#       - checkout
 
-      - run:
-          name: Create unified requirements so CircleCI can cache them
-          command: |
-            cd ~/project/
-            ls -l
-            cat requirements.txt > requirements-all.txt
-            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
-            cat requirements-test.txt >> requirements-all.txt
+#       - run:
+#           name: Create unified requirements so CircleCI can cache them
+#           command: |
+#             cd ~/project/
+#             ls -l
+#             cat requirements.txt > requirements-all.txt
+#             echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
+#             cat requirements-test.txt >> requirements-all.txt
 
-      - python/install-packages:
-          pkg-manager: pip
-          app-dir: ~/project/
-          pip-dependency-file: requirements-all.txt
+#       - python/install-packages:
+#           pkg-manager: pip
+#           app-dir: ~/project/
+#           pip-dependency-file: requirements-all.txt
 
-      - run:
-          name: Load test database fixure
-          command: |
-            psql ${DATABASE_URL} < e2e-test-db.sql
-          working_directory: ~/project/db
+#       - run:
+#           name: Load test database fixure
+#           command: |
+#             psql ${DATABASE_URL} < e2e-test-db.sql
+#           working_directory: ~/project/db
 
-      - run:
-          name: Check for missing migrations
-          command: |
-            python manage.py makemigrations --check
-          working_directory: ~/project/django-backend/
+#       - run:
+#           name: Check for missing migrations
+#           command: |
+#             python manage.py makemigrations --check
+#           working_directory: ~/project/django-backend/
 
-      - run:
-          name: Check for breaking change migrations
-          # After December 2024
-          command: |
-            python manage.py lintmigrations --git-commit-id d73068e23fc5b035af2b224b16d4726b7b20d67c --project-root-path '.'
-          working_directory: ~/project/django-backend/
+#       - run:
+#           name: Check for breaking change migrations
+#           # After December 2024
+#           command: |
+#             python manage.py lintmigrations --git-commit-id d73068e23fc5b035af2b224b16d4726b7b20d67c --project-root-path '.'
+#           working_directory: ~/project/django-backend/
 
-      - run:
-          name: Run migrations
-          command: |
-            python manage.py migrate --no-input --traceback --verbosity 3
-          working_directory: ~/project/django-backend/
+#       - run:
+#           name: Run migrations
+#           command: |
+#             python manage.py migrate --no-input --traceback --verbosity 3
+#           working_directory: ~/project/django-backend/
 
-      - run:
-          name: Run lint
-          command: |
-            flake8 --config django-backend/.flake8
+#       - run:
+#           name: Run lint
+#           command: |
+#             flake8 --config django-backend/.flake8
 
-      - run:
-          name: Run deptry
-          command: deptry ~/project/
+#       - run:
+#           name: Run deptry
+#           command: deptry ~/project/
 
-      - run:
-          name: Run tests
-          # Use built-in Django test module
-          command: coverage run --source='.' --rcfile=.coveragerc manage.py test
-          working_directory: ~/project/django-backend/
+#       - run:
+#           name: Run tests
+#           # Use built-in Django test module
+#           command: coverage run --source='.' --rcfile=.coveragerc manage.py test
+#           working_directory: ~/project/django-backend/
 
-      - run:
-          name: setup coverage dir
-          command: mkdir ~/project/coverage-reports
+#       - run:
+#           name: setup coverage dir
+#           command: mkdir ~/project/coverage-reports
 
-      - run:
-          name: Make XML coverage report
-          command: coverage xml -o ~/project/coverage-reports/coverage.xml
-          working_directory: ~/project/django-backend
+#       - run:
+#           name: Make XML coverage report
+#           command: coverage xml -o ~/project/coverage-reports/coverage.xml
+#           working_directory: ~/project/django-backend
 
-      # Sonar cloud setup and scanning
-      - run:
-          name: Create sonar-scanner cache directory if it doesn't exist
-          command: mkdir -p /tmp/cache/scanner
-      - restore_cache:
-          keys:
-            - v1-sonarcloud-scanner-7.1.0.4889
-      - run:
-          name: SonarCloud
-          command: |
-            set -e
-            VERSION=7.1.0.4889
-            if [ -z "$SONAR_TOKEN" ]; then
-                 echo "You must set SONAR_TOKEN environemnt variable"
-                 exit 1
-            fi
-            SCANNER_DIRECTORY=/tmp/cache/scanner
-            export SONAR_USER_HOME=$SCANNER_DIRECTORY/.sonar
-            OS="linux"
-            SUFFIX="$VERSION-$OS-x64"
-            SS_DIR="sonar-scanner-$SUFFIX"
-            SS_FILENAME="sonar-scanner-cli-$SUFFIX.zip"
-            echo $SONAR_USER_HOME
-            if [[ ! -x "$SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner" ]]; then
-              curl -Ol https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/$SS_FILENAME
-              unzip -qq -o $SS_FILENAME -d $SCANNER_DIRECTORY
-            fi
+#       # Sonar cloud setup and scanning
+#       - run:
+#           name: Create sonar-scanner cache directory if it doesn't exist
+#           command: mkdir -p /tmp/cache/scanner
+#       - restore_cache:
+#           keys:
+#             - v1-sonarcloud-scanner-7.1.0.4889
+#       - run:
+#           name: SonarCloud
+#           command: |
+#             set -e
+#             VERSION=7.1.0.4889
+#             if [ -z "$SONAR_TOKEN" ]; then
+#                  echo "You must set SONAR_TOKEN environemnt variable"
+#                  exit 1
+#             fi
+#             SCANNER_DIRECTORY=/tmp/cache/scanner
+#             export SONAR_USER_HOME=$SCANNER_DIRECTORY/.sonar
+#             OS="linux"
+#             SUFFIX="$VERSION-$OS-x64"
+#             SS_DIR="sonar-scanner-$SUFFIX"
+#             SS_FILENAME="sonar-scanner-cli-$SUFFIX.zip"
+#             echo $SONAR_USER_HOME
+#             if [[ ! -x "$SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner" ]]; then
+#               curl -Ol https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/$SS_FILENAME
+#               unzip -qq -o $SS_FILENAME -d $SCANNER_DIRECTORY
+#             fi
 
-            chmod +x $SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner
-            chmod +x $SCANNER_DIRECTORY/$SS_DIR/jre/bin/java
-            $SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner
-            mkdir -p /tmp/sonar_report
-            cp /home/circleci/project/coverage-reports/coverage.xml /tmp/sonar_report
-          environment:
-            SONARQUBE_SCANNER_PARAMS: '{"sonar.host.url":"https://sonarcloud.io"}'
-      - save_cache:
-          key: v1-sonarcloud-scanner-7.1.0.4889
-          paths: /tmp/cache/scanner
-      - store_artifacts:
-          path: /tmp/sonar_report
-          destination: sonar_report
+#             chmod +x $SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner
+#             chmod +x $SCANNER_DIRECTORY/$SS_DIR/jre/bin/java
+#             $SCANNER_DIRECTORY/$SS_DIR/bin/sonar-scanner
+#             mkdir -p /tmp/sonar_report
+#             cp /home/circleci/project/coverage-reports/coverage.xml /tmp/sonar_report
+#           environment:
+#             SONARQUBE_SCANNER_PARAMS: '{"sonar.host.url":"https://sonarcloud.io"}'
+#       - save_cache:
+#           key: v1-sonarcloud-scanner-7.1.0.4889
+#           paths: /tmp/cache/scanner
+#       - store_artifacts:
+#           path: /tmp/sonar_report
+#           destination: sonar_report
 
-  deploy-job:
-    docker:
-      - image: cimg/python:3.13
+#   deploy-job:
+#     docker:
+#       - image: cimg/python:3.13
 
-    steps:
-      - checkout
+#     steps:
+#       - checkout
 
-      - python/install-packages:
-          pkg-manager: pip
-          pip-dependency-file: requirements.txt
+#       - python/install-packages:
+#           pkg-manager: pip
+#           pip-dependency-file: requirements.txt
 
-      - run:
-          name: Installs for deploy
-          command: |
-            mkdir -p $HOME/bin
-            export PATH=$HOME/bin:$PATH
-            curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&version=8.12.0" | tar xzv -C $HOME/bin
+#       - run:
+#           name: Installs for deploy
+#           command: |
+#             mkdir -p $HOME/bin
+#             export PATH=$HOME/bin:$PATH
+#             curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&version=8.12.0" | tar xzv -C $HOME/bin
 
-      - run:
-          name: Deploy API
-          command: |
-            export PATH=$HOME/bin:$PATH
-            invoke deploy --branch $CIRCLE_BRANCH --login
+#       - run:
+#           name: Deploy API
+#           command: |
+#             export PATH=$HOME/bin:$PATH
+#             invoke deploy --branch $CIRCLE_BRANCH --login
 
-  docs-build:
-    docker:
-      - image: cimg/python:3.13
+#   docs-build:
+#     docker:
+#       - image: cimg/python:3.13
 
-    steps:
-      - checkout
+#     steps:
+#       - checkout
 
-      - run:
-          name: Create unified requirements so CircleCI can cache them
-          command: |
-            cd ~/project/
-            ls -l
-            cat requirements.txt > requirements-all.txt
-            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
-            cat requirements-test.txt >> requirements-all.txt
+#       - run:
+#           name: Create unified requirements so CircleCI can cache them
+#           command: |
+#             cd ~/project/
+#             ls -l
+#             cat requirements.txt > requirements-all.txt
+#             echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
+#             cat requirements-test.txt >> requirements-all.txt
 
-      - python/install-packages:
-          pkg-manager: pip
-          app-dir: ~/project/
-          pip-dependency-file: requirements-all.txt
+#       - python/install-packages:
+#           pkg-manager: pip
+#           app-dir: ~/project/
+#           pip-dependency-file: requirements-all.txt
 
-      - run:
-          name: Run Sphinx
-          command: make html
-          working_directory: ~/project/docs
+#       - run:
+#           name: Run Sphinx
+#           command: make html
+#           working_directory: ~/project/docs
 
-      - persist_to_workspace:
-          root: ~/project/docs/_build
-          paths: html
+#       - persist_to_workspace:
+#           root: ~/project/docs/_build
+#           paths: html
 
-  docs-deploy:
-    docker:
-      - image: cimg/node:lts
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/project/docs/_build
-      - run:
-          name: Disable jekyll builds
-          command: touch ~/project/docs/_build/html/.nojekyll
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          name: Configure git
-          command: |
-            git config user.email "apiinfo@fec.gov"
-            git config user.name "apiinfo"
-      - add_ssh_keys:
-          fingerprints:
-            - "0f:22:e1:9d:81:ea:82:a0:fa:18:f2:0f:25:f7:3f:6f"
-      - run:
-          name: Deploy docs to gh-pages branch
-          command: npx gh-pages --dotfiles --dist ~/project/docs/_build/html
+#   docs-deploy:
+#     docker:
+#       - image: cimg/node:lts
+#     steps:
+#       - checkout
+#       - attach_workspace:
+#           at: ~/project/docs/_build
+#       - run:
+#           name: Disable jekyll builds
+#           command: touch ~/project/docs/_build/html/.nojekyll
+#       - node/install-packages:
+#           pkg-manager: npm
+#       - run:
+#           name: Configure git
+#           command: |
+#             git config user.email "apiinfo@fec.gov"
+#             git config user.name "apiinfo"
+#       - add_ssh_keys:
+#           fingerprints:
+#             - "0f:22:e1:9d:81:ea:82:a0:fa:18:f2:0f:25:f7:3f:6f"
+#       - run:
+#           name: Deploy docs to gh-pages branch
+#           command: npx gh-pages --dotfiles --dist ~/project/docs/_build/html
 
-  # This job kicks off the e2e-test pipeline in the fecfile-web-app project.
-  # It is used to run the e2e tests when the api is deployed to dev/stage/test/prod.
-  # It uses the is-triggered-e2e-test parameter which is used in the fecfile-web-app
-  # circleci config file to differentiate it from the nightly runs.
-  trigger-e2e-test-pipeline:
-    docker:
-      - image: cimg/base:current
-    resource_class: small
-    steps:
-      - run:
-          name: Ping another pipeline
-          command: |
-            CREATED_PIPELINE=$(
-              curl -v https://circleci.com/api/v2/project/gh/fecgov/fecfile-web-app/pipeline \
-              --header "Content-Type: application/json" \
-              --header "Accept: application/json" \
-              --header "Circle-Token: $CIRCLE_TOKEN" \
-              --data '{"branch":"'$CIRCLE_BRANCH'","parameters":{"is-triggered-e2e-test":true}}' \
-              | jq -r '.id'
-            )
-            echo "created pipeline"
-            echo $CREATED_PIPELINE
+#   # This job kicks off the e2e-test pipeline in the fecfile-web-app project.
+#   # It is used to run the e2e tests when the api is deployed to dev/stage/test/prod.
+#   # It uses the is-triggered-e2e-test parameter which is used in the fecfile-web-app
+#   # circleci config file to differentiate it from the nightly runs.
+#   trigger-e2e-test-pipeline:
+#     docker:
+#       - image: cimg/base:current
+#     resource_class: small
+#     steps:
+#       - run:
+#           name: Ping another pipeline
+#           command: |
+#             CREATED_PIPELINE=$(
+#               curl -v https://circleci.com/api/v2/project/gh/fecgov/fecfile-web-app/pipeline \
+#               --header "Content-Type: application/json" \
+#               --header "Accept: application/json" \
+#               --header "Circle-Token: $CIRCLE_TOKEN" \
+#               --data '{"branch":"'$CIRCLE_BRANCH'","parameters":{"is-triggered-e2e-test":true}}' \
+#               | jq -r '.id'
+#             )
+#             echo "created pipeline"
+#             echo $CREATED_PIPELINE
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
-workflows:
-  primary: # This is the name of the workflow, feel free to change it to better match your workflow.
-    jobs:
-      - test
-      # This job is triggered whenever a commit is made to the dev/stage/test/prod branches.
-      # It kicks off the e2e-test pipeline in the fecfile-web-app project.
-      - trigger-e2e-test-pipeline:
-          filters:
-            branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
-      - deploy-job:
-          requires:
-            - test
-          filters:
-            branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
-      - docs-build:
-          requires:
-            - test
-          filters:
-            branches:
-              only: develop
-      - docs-deploy:
-          requires:
-            - docs-build
-          filters:
-            branches:
-              only: develop
+# # Invoke jobs via workflows
+# # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
+# workflows:
+#   primary: # This is the name of the workflow, feel free to change it to better match your workflow.
+#     jobs:
+#       - test
+#       # This job is triggered whenever a commit is made to the dev/stage/test/prod branches.
+#       # It kicks off the e2e-test pipeline in the fecfile-web-app project.
+#       - trigger-e2e-test-pipeline:
+#           filters:
+#             branches:
+#               only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+#       - deploy-job:
+#           requires:
+#             - test
+#           filters:
+#             branches:
+#               only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+#       - docs-build:
+#           requires:
+#             - test
+#           filters:
+#             branches:
+#               only: develop
+#       - docs-deploy:
+#           requires:
+#             - docs-build
+#           filters:
+#             branches:
+#               only: develop
