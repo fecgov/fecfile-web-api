@@ -85,6 +85,25 @@ class TasksTestCase(TestCase):
             if result_dot_fec.exists():
                 result_dot_fec.unlink()
 
+    def test_creating_dot_fec_is_restartable(self):
+        dot_fec_record_old = DotFEC.objects.create()
+        submission_record_old = WebPrintSubmission.objects.create(
+            dot_fec=dot_fec_record_old,
+        )
+        self.f3x.webprint_submission = submission_record_old
+        self.f3x.save()
+
+        new_dot_fec_id = create_dot_fec(
+            str(self.f3x.id),
+            None,
+            submission_record_old.id,
+            True
+        )
+
+        new_dot_fec_record = DotFEC.objects.get(id=new_dot_fec_id)
+        self.assertIsNotNone(new_dot_fec_record)
+        self.assertNotEqual(new_dot_fec_id, dot_fec_record_old.id)
+
     @tag("performance")
     def test_load(self):
         num_a = 2000
