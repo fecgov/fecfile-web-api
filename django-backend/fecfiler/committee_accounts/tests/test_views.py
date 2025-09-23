@@ -62,6 +62,27 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             response.data["error"], "You cannot remove yourself from the committee."
         )
 
+    def test_non_committee_admin_cannot_delete(self):
+        manager = User.objects.create_user(
+            email="admin1@admin.com", user_id="5e3c145f-a813-46c7-af5a-5739304acc27"
+        )
+        manager_membership = Membership.objects.create(
+            user=manager,
+            role=Membership.CommitteeRole.MANAGER,
+            committee_account=self.committee,
+        )
+        user = User.objects.get(id="fb20ffc3-285e-448e-9e56-9ca1fd43e7d3")
+        response = self.send_viewset_delete_request(
+            f"/api/v1/committee-members/{manager_membership.id}/remove-member",
+            CommitteeMembershipViewSet,
+            "remove_member",
+            user=user,
+            pk=manager_membership.id,
+        )
+        self.assertEqual(response.status_code, 403)
+        count = Membership.objects.filter(pk=manager_membership.id).count()
+        self.assertEqual(count, 1)
+
     def test_add_pending_membership(self):
         post_data = {
             "role": Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
@@ -159,7 +180,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 400)
 
-    def test_update_membership_unauthorized(self):
+    def test_update_membership_forbidden(self):
         user = User.objects.get(id="fb20ffc3-285e-448e-9e56-9ca1fd43e7d3")
         response = self.send_viewset_put_request(
             "/api/v1/committee-members/5e4ae4ff-60da-4522-a588-ccd97e124b01/",
@@ -181,10 +202,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             user=user,
             pk="5e4ae4ff-60da-4522-a588-ccd97e124b01",
         )
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(
-            response.data, "You don't have permission to perform this action."
-        )
+        self.assertEqual(response.status_code, 403)
 
     def test_update_membership_happy_path(self):
         response = self.send_viewset_put_request(

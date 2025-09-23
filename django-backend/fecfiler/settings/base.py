@@ -14,6 +14,7 @@ from corsheaders.defaults import default_headers
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
 from fecfiler.transactions.profilers import TRANSACTION_MANAGER_PROFILING
 from math import floor
+from celery.schedules import crontab
 
 
 class CeleryStorageType(Enum):
@@ -212,7 +213,6 @@ MOCK_OIDC_PROVIDER_CACHE = env.get_credential("REDIS_URL")
 OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
 
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
-FFAPI_LOGIN_DOT_GOV_COOKIE_NAME = "ffapi_login_dot_gov"
 FFAPI_TIMEOUT_COOKIE_NAME = env.get_credential("FFAPI_TIMEOUT_COOKIE_NAME", "False")
 if not FFAPI_TIMEOUT_COOKIE_NAME:
     raise Exception("FFAPI_TIMEOUT_COOKIE_NAME is not set!")
@@ -328,14 +328,14 @@ def get_logging_config(log_format=LINE):
             },
             "cloud": {
                 "class": "logging.StreamHandler",
-                "formatter": "key_value",
+                "formatter": "json_formatter",
                 "stream": sys.stdout,
                 "filters": ["not_error"],
             },
             "cloud_error": {
                 "level": "ERROR",
                 "class": "logging.StreamHandler",
-                "formatter": "key_value",
+                "formatter": "json_formatter",
                 "stream": sys.stderr,
             },
         },
@@ -425,6 +425,15 @@ CELERY_BEAT_SCHEDULE = {
         "options": {
             "expires": 15.0,
             "priority": 1,  # 0-9; 0 is the highest priority; 5 is the default
+        },
+    },
+    "size-analysis": {
+        "task": "fecfiler.devops.tasks.size_analysis",
+        "schedule": crontab(minute=0, hour=0),
+        "args": (),
+        "options": {
+            "expires": 15.0,
+            "priority": 5,  # 0-9; 0 is the highest priority; 5 is the default
         },
     },
 }

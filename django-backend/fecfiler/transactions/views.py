@@ -35,7 +35,7 @@ from fecfiler.transactions.schedule_f.models import ScheduleF
 import structlog
 
 import os
-import psycopg2
+import psycopg
 
 logger = structlog.get_logger(__name__)
 
@@ -797,7 +797,7 @@ def stringify_queryset(qs):
         )
         exit(1)
     logger.info("Testing connection...")
-    conn = psycopg2.connect(database_uri)
+    conn = psycopg.connect(database_uri)
     sql, params = qs.query.sql_with_params()
     with conn.cursor() as cursor:
         s = cursor.mogrify(sql, params)
