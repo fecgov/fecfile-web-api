@@ -5,7 +5,7 @@ from ..tasks import (
     check_database_size,
     log_database_size,
     log_s3_bucket_size,
-    get_devops_status_report,
+    size_analysis,
     delete_expired_s3_objects,
     LOGGED_DB_SIZE_REDIS_KEY,
     LOGGED_S3_SIZE_REDIS_KEY,
@@ -80,10 +80,10 @@ class DevopsTasksTestCase(TestCase):
         set_redis_value(LOGGED_DB_SIZE_REDIS_KEY, redis_initial_db_size, None)
 
     @patch("fecfiler.devops.tasks.S3_SESSION")
-    def test_get_db_status_report(self, mock_s3_session):
+    def test_size_analysis(self, mock_s3_session):
         redis_initial_db_size = get_redis_value(LOGGED_DB_SIZE_REDIS_KEY)
         set_redis_value(LOGGED_DB_SIZE_REDIS_KEY, None, None)
-        get_devops_status_report()
+        size_analysis()
         self.assertIsNotNone(get_redis_value(LOGGED_DB_SIZE_REDIS_KEY))
         set_redis_value(LOGGED_DB_SIZE_REDIS_KEY, redis_initial_db_size, None)
 
