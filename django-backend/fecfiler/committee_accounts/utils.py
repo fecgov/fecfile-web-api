@@ -2,7 +2,7 @@ import requests
 import re
 from rest_framework.exceptions import ValidationError
 from .models import CommitteeAccount, Membership
-
+from rest_framework.status import HTTP_404_NOT_FOUND
 from fecfiler import settings
 import redis
 import json
@@ -105,14 +105,29 @@ FEC API methods
 """
 
 
-def query_fec_api(endpoint, params):
+def get_environment():
+    ffapi = settings.FFAPI_TIMEOUT_COOKIE_NAME
+    prefix = "ffapi_timeout_"
+    return ffapi.replace(prefix, "")
+
+
+def query_fec_api_single(endpoint, params):
+    results = query_fec_api(endpoint, params)
+    return results[0] if results else None
+
+
+def query_fec_api(endpoint, params, include_404=True):
     """Shared method to query an EFO API"""
-    headers = {"Content-Type": "application/json"}
+
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": f"FECfile+ {get_environment()}",
+    }
     response = requests.get(endpoint, headers=headers, params=params)
-    response.raise_for_status()
+    if response.status_code != HTTP_404_NOT_FOUND or include_404:
+        response.raise_for_status()
     response_data = response.json()
-    committee_results = response_data.get("results", [])
-    return committee_results[0] if committee_results else None
+    return response_data.get("results", [])
 
 
 """
@@ -154,7 +169,7 @@ def get_processed_committee_data(committee_id):
         "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
         "committee_id": committee_id,
     }
-    committee_data = query_fec_api(
+    committee_data = query_fec_api_single(
         f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/", params
     )
 
@@ -181,7 +196,7 @@ def get_raw_committee_data(committee_id):
         "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
         "committee_id": committee_id,
     }
-    committee_data = query_fec_api(
+    committee_data = query_fec_api_single(
         f"{settings.PRODUCTION_OPEN_FEC_API}efile/form1/", params
     )
 
@@ -231,7 +246,7 @@ def get_committee_from_test_fec(committee_id):
         "committee_id": committee_id,
     }
     endpoint = f"{settings.STAGE_OPEN_FEC_API}efile/test-form1/"
-    committee_data = query_fec_api(endpoint, params)
+    committee_data = query_fec_api_single(endpoint, params)
     return committee_data if committee_data is not None else None
 
 
