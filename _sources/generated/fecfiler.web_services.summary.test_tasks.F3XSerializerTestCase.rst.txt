@@ -107,6 +107,7 @@ fecfiler.web\_services.summary.test\_tasks.F3XSerializerTestCase
       ~F3XSerializerTestCase.test_report_group_recalculation
       ~F3XSerializerTestCase.test_report_group_recalculation_year_to_year
       ~F3XSerializerTestCase.test_report_with_no_transactions
+      ~F3XSerializerTestCase.test_summary_calculation_is_restartable
       ~F3XSerializerTestCase.test_summary_task
    
    

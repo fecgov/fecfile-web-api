@@ -100,6 +100,7 @@ fecfiler.web\_services.tests.test\_tasks.TasksTestCase
       ~TasksTestCase.tearDown
       ~TasksTestCase.tearDownClass
       ~TasksTestCase.test_create_dot_fec
+      ~TasksTestCase.test_creating_dot_fec_is_restartable
       ~TasksTestCase.test_load
       ~TasksTestCase.test_submit_missing_file
       ~TasksTestCase.test_submit_no_password
