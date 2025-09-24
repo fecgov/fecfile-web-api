@@ -136,7 +136,7 @@ class TasksTestCase(TestCase):
     """
 
     # Not a test!  Run by other tests instead
-    def run_submission_tests(self, upload_submission):
+    def run_upload_submission_tests(self, upload_submission):
         dot_fec_id = create_dot_fec(
             str(self.f3x.id),
             upload_submission_id=upload_submission.id,
@@ -166,19 +166,19 @@ class TasksTestCase(TestCase):
     @patch("fecfiler.web_services.tasks.poll_for_fec_response")
     def test_submit_to_fec(self, _):
         upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
-        self.run_submission_tests(upload_submission)
+        self.run_upload_submission_tests(upload_submission)
 
     @patch("fecfiler.web_services.tasks.poll_for_fec_response")
-    def test_submit_from_failed(self, _):
+    def test_submit_to_fec_from_failed(self, _):
         upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
         upload_submission.save_state(FECSubmissionState.FAILED)
-        self.run_submission_tests(upload_submission)
+        self.run_upload_submission_tests(upload_submission)
 
     @patch("fecfiler.web_services.tasks.poll_for_fec_response")
-    def test_submit_from_submitting(self, _):
+    def test_submit_to_fec_from_submitting(self, _):
         upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
         upload_submission.save_state(FECSubmissionState.SUBMITTING)
-        self.run_submission_tests(upload_submission)
+        self.run_upload_submission_tests(upload_submission)
 
     def test_submit_no_password(self):
         upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
@@ -215,10 +215,7 @@ class TasksTestCase(TestCase):
     SUBMIT TO WEBPRINT TESTS
     """
 
-    def test_submit_to_webprint(self):
-        webprint_submission = WebPrintSubmission.objects.initiate_submission(
-            str(self.f3x.id)
-        )
+    def run_webprint_submission_tests(self, webprint_submission):
         dot_fec_id = create_dot_fec(
             str(self.f3x.id),
             webprint_submission_id=webprint_submission.id,
@@ -240,6 +237,26 @@ class TasksTestCase(TestCase):
         self.assertEqual(
             webprint_submission.fec_image_url, "https://www.fec.gov/static/img/seal.svg"
         )
+
+    def test_submit_to_webprint(self):
+        webprint_submission = WebPrintSubmission.objects.initiate_submission(
+            str(self.f3x.id)
+        )
+        self.run_webprint_submission_tests(webprint_submission)
+
+    def test_webprint_submit_from_failed(self):
+        webprint_submission = WebPrintSubmission.objects.initiate_submission(
+            str(self.f3x.id)
+        )
+        webprint_submission.save_state(FECSubmissionState.FAILED)
+        self.run_webprint_submission_tests(webprint_submission)
+
+    def test_webprint_submit_from_submitting(self):
+        webprint_submission = WebPrintSubmission.objects.initiate_submission(
+            str(self.f3x.id)
+        )
+        webprint_submission.save_state(FECSubmissionState.SUBMITTING)
+        self.run_webprint_submission_tests(webprint_submission)
 
 
 class UnitTestWebPrintSubmitter(WebPrintSubmitter):
