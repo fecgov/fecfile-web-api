@@ -18,6 +18,8 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
     EFOWebPrintSubmitter,
     MockWebPrintSubmitter,
 )
+from .summary.tasks import CalculationState, calculate_summary
+from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
 from .web_service_storage import get_file_bytes, store_file
 from fecfiler.settings import (
     INITIAL_POLLING_INTERVAL,
@@ -126,7 +128,8 @@ def log_polling_notice(attempts):
 
 @shared_task
 def submit_to_fec(
-    dot_fec_id,
+    report_id,
+    committee_uuid,
     submission_record_id,
     e_filing_password,
     force_read_from_disk=False,
@@ -134,55 +137,31 @@ def submit_to_fec(
     mock=False,
 ):
     submission = UploadSubmission.objects.get(id=submission_record_id)
-    if submission.fecfile_task_state == FECSubmissionState.FAILED:
-        return
-    submission.save_state(FECSubmissionState.SUBMITTING)
 
-    """Get Password"""
-    if not e_filing_password:
-        submission.save_error("No E-Filing Password provided")
-        return
-
-    """Get .FEC file bytes"""
-    try:
-        dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
-        file_name = dot_fec_record.file_name
-        dot_fec_bytes = get_file_bytes(file_name, force_read_from_disk)
-    except Exception:
-        submission.save_error("Could not retrieve .FEC bytes")
-        return
-
-    """Submit to FEC"""
-    try:
-        submission_type_key = EFO_SUBMITTER_KEY if not mock else MOCK_SUBMITTER_KEY
-        submitter = SUBMISSION_MANAGERS[submission_type_key]()
-        logger.info(f"Uploading {file_name} to FEC")
-        submission_json = submitter.get_submission_json(
-            dot_fec_record, e_filing_password, backdoor_code
-        )
-        submission_response_string = submitter.submit(
-            dot_fec_bytes, submission_json, dot_fec_record.report.report_id or None
-        )
-        submission.save_fec_response(submission_response_string)
-
-        """Poll FEC for status of submission"""
-        if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
-            log_polling_notice(submission.fecfile_polling_attempts)
-            """ apply_async()
-            The apply_async() method can only take json serializable values as arguments.
-            This means we can't pass objects with methods.  To get around that, we pass
-            the submission id and a key that we can use to determine the type of the
-            submission.  This lets us instantiate objects of the correct classes as we
-            need them."""
+    match(submission.fecfile_task_state):
+        case FECSubmissionState.INITIALIZING | FECSubmissionState.CREATING_FILE:
+            return initialize_submission_to_fec(
+                report_id,
+                committee_uuid,
+                e_filing_password,
+                backdoor_code,
+                mock
+            )
+        case FECSubmissionState.FILE_CREATED | FECSubmissionState.SUBMITTING:
+            return file_submission_with_fec(
+                submission_record_id,
+                e_filing_password,
+                force_read_from_disk,
+                backdoor_code,
+                mock
+            )
+        case FECSubmissionState.POLLING:
+            submission_type_key = EFO_SUBMITTER_KEY if not mock else MOCK_SUBMITTER_KEY
             return poll_for_fec_response.apply_async(
                 [submission.id, submission_type_key, "Dot FEC"]
             )
-        else:
+        case FECSubmissionState.FAILED | FECSubmissionState.SUCCEEDED:
             return resolve_final_submission_state(submission)
-    except Exception as e:
-        logger.error(f"Error before polling: {str(e)}")
-        submission.save_error("Failed submitting to FEC")
-        return resolve_final_submission_state(submission)
 
 
 @shared_task
@@ -230,11 +209,116 @@ def submit_to_webprint(
         return resolve_final_submission_state(submission)
 
 
+def get_calculation_task(report_id, committee_uuid):
+    report = Report.objects.filter(
+        id=report_id, committee_account_id=committee_uuid
+    ).first()
+    if (
+        report.get_form_name() in FORMS_TO_CALCULATE
+        and report.calculation_status != CalculationState.SUCCEEDED.value
+    ):
+        return calculate_summary.s(report_id)
+    return None
+
+
+@shared_task
+def initialize_submission_to_fec(
+    report_id,
+    committee_uuid,
+    e_filing_password,
+    backdoor_code=None,
+    mock=False,
+):
+    """Start tracking submission"""
+    submission_id = UploadSubmission.objects.initiate_submission(report_id).id
+
+    """Start Celery tasks in chain
+    Check to see if calculating the summary is necessary. If not, just start
+    then chain with create_dot_fec
+    """
+    task = get_calculation_task(report_id, committee_uuid)
+    if task:
+        task = task | create_dot_fec.s(upload_submission_id=submission_id)
+    else:
+        task = create_dot_fec.s(report_id, upload_submission_id=submission_id)
+
+    task = (
+        task
+        | submit_to_fec.s(
+            submission_id,
+            e_filing_password,
+            False,
+            backdoor_code,
+            mock,
+        )
+    ).apply_async(retry=False)
+
+
+@shared_task
+def file_submission_with_fec(
+    submission_record_id,
+    e_filing_password,
+    force_read_from_disk=False,
+    backdoor_code=None,
+    mock=False,
+):
+    submission = UploadSubmission.objects.get(id=submission_record_id)
+    submission.save_state(FECSubmissionState.SUBMITTING)
+    dot_fec_id = submission.dot_fec.id
+
+    """Get Password"""
+    if not e_filing_password:
+        submission.save_error("No E-Filing Password provided")
+        return
+
+    """Get .FEC file bytes"""
+    try:
+        dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
+        file_name = dot_fec_record.file_name
+        dot_fec_bytes = get_file_bytes(file_name, force_read_from_disk)
+    except Exception:
+        submission.save_error("Could not retrieve .FEC bytes")
+        return
+
+    try:
+        submission_type_key = EFO_SUBMITTER_KEY if not mock else MOCK_SUBMITTER_KEY
+        submitter = SUBMISSION_MANAGERS[submission_type_key]()
+        logger.info(f"Uploading {file_name} to FEC")
+        submission_json = submitter.get_submission_json(
+            dot_fec_record, e_filing_password, backdoor_code
+        )
+        submission_response_string = submitter.submit(
+            dot_fec_bytes, submission_json, dot_fec_record.report.report_id or None
+        )
+        submission.save_fec_response(submission_response_string)
+
+        """Poll FEC for status of submission"""
+        if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
+            """ apply_async()
+            The apply_async() method can only take json serializable values as arguments.
+            This means we can't pass objects with methods.  To get around that, we pass
+            the submission id and a key that we can use to determine the type of the
+            submission.  This lets us instantiate objects of the correct classes as we
+            need them."""
+            return poll_for_fec_response.apply_async(
+                [submission.id, submission_type_key, "Dot FEC"]
+            )
+        else:
+            return resolve_final_submission_state(submission)
+    except Exception as e:
+        logger.error(f"Error before polling: {str(e)}")
+        submission.save_error("Failed submitting to FEC")
+        return resolve_final_submission_state(submission)
+
 @shared_task
 def poll_for_fec_response(submission_id, submission_type_key, submission_name):
     try:
         submission = SUBMISSION_CLASSES[submission_type_key].objects.get(id=submission_id)
         submitter = SUBMISSION_MANAGERS[submission_type_key]()
+
+        if submission.fecfile_polling_attempts == 0:
+            submission.save_state(FECSubmissionState.POLLING)
+            log_polling_notice(submission.fecfile_polling_attempts)
 
         submission.fecfile_polling_attempts += 1
         logger.info(f"Polling status for {submission.fec_submission_id}.")

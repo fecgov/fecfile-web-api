@@ -9,13 +9,12 @@ from .tasks import (
     submit_to_fec,
     submit_to_webprint,
 )
-from .summary.tasks import CalculationState, calculate_summary
 from fecfiler.settings import MOCK_EFO_FILING
 from .serializers import ReportIdSerializer, SubmissionRequestSerializer
 from .renderers import DotFECRenderer
 from .web_service_storage import get_file
-from .models import DotFEC, UploadSubmission, WebPrintSubmission, FECSubmissionState
-from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
+from .models import DotFEC, WebPrintSubmission, FECSubmissionState
+from fecfiler.reports.models import Report
 from drf_spectacular.utils import extend_schema
 from celery.result import AsyncResult
 import structlog
@@ -123,51 +122,16 @@ class WebServicesViewSet(viewsets.ViewSet):
             mock = True
         report_id = serializer.validated_data["report_id"]
 
-        """Check if there's an already running submission"""
-        report = Report.objects.get(pk=report_id)
-        if (
-            report.upload_submission
-            and report.upload_submission.fecfile_task_state
-            not in [FECSubmissionState.SUCCEEDED, FECSubmissionState.FAILED]
-        ):
-            logger.debug(
-                f"""There is already an active upload being generated for report
-                {report_id}: {report.upload_submission.fecfile_task_state}"""
-            )
-            return Response(
-                {
-                    "status": f"""There is already an active upload
-                     being generated for report {report_id}"""
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         e_filing_password = serializer.validated_data["password"]
         backdoor_code = serializer.validated_data.get("backdoor_code", None)
+        committee_uuid = request.session["committee_uuid"]
 
-        """Start tracking submission"""
-        submission_id = UploadSubmission.objects.initiate_submission(report_id).id
-
-        """Start Celery tasks in chain
-        Check to see if calculating the summary is necessary. If not, just start
-        then chain with create_dot_fec
-        """
-        task = self.get_calculation_task(request, report_id)
-        if task:
-            task = task | create_dot_fec.s(upload_submission_id=submission_id)
-        else:
-            task = create_dot_fec.s(report_id, upload_submission_id=submission_id)
-
-        task = (
-            task
-            | submit_to_fec.s(
-                submission_id,
-                e_filing_password,
-                False,
-                backdoor_code,
-                mock,
-            )
-        ).apply_async(retry=False)
+        task = submit_to_fec(
+            e_filing_password,
+            force_read_from_disk,
+            backdoor_code,
+            mock
+        )
 
         logger.debug(f"submit_to_fec report {report_id}: {task.status}")
         return Response({"status": "Submit .FEC task created"})
@@ -221,7 +185,8 @@ class WebServicesViewSet(viewsets.ViewSet):
         Check to see if calculating the summary is necessary. If not, just start
         then chain with create_dot_fec
         """
-        task = self.get_calculation_task(request, report_id)
+        committee_uuid = request.session["committee_uuid"]
+        task = self.get_calculation_task(report_id, committee_uuid)
         if task:
             task = task | create_dot_fec.s(webprint_submission_id=submission_id)
         else:
@@ -233,15 +198,3 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         logger.debug(f"submit_to_webprint report {report_id}: {task.status}")
         return Response({"status": "Submit .FEC task created"})
-
-    def get_calculation_task(self, request, report_id):
-        committee_uuid = request.session["committee_uuid"]
-        report = Report.objects.filter(
-            id=report_id, committee_account_id=committee_uuid
-        ).first()
-        if (
-            report.get_form_name() in FORMS_TO_CALCULATE
-            and report.calculation_status != CalculationState.SUCCEEDED.value
-        ):
-            return calculate_summary.s(report_id)
-        return None
