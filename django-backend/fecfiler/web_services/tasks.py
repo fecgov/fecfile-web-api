@@ -27,6 +27,7 @@ from fecfiler.settings import (
     SECONDARY_POLLING_DURATION,
     SECONDARY_POLLING_MAX_ATTEMPTS,
 )
+import time
 
 import structlog
 
@@ -70,6 +71,8 @@ def create_dot_fec(
         submission.save_state(FECSubmissionState.CREATING_FILE)
 
     try:
+        for _ in range(10000):
+            time.sleep(1)
         file_content = compose_dot_fec(report_id)
         if file_name is None:
             file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"

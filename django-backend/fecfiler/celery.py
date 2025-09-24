@@ -8,6 +8,8 @@ from celery.signals import setup_logging
 from django_structlog.celery.steps import DjangoStructLogInitStep
 from fecfiler import settings
 
+import signal
+
 logger = structlog.get_logger(__name__)
 
 # Set the default Django settings module for the 'celery' program.
@@ -26,6 +28,18 @@ app.steps["worker"].add(DjangoStructLogInitStep)
 
 env = cfenv.AppEnv()
 
+worker_shutdown_requested = False
+
+
+def handle_sigterm(signum, frame):
+    logger.info("Received SIGTERM, shutting down...")
+    global worker_shutdown_requested
+    worker_shutdown_requested = True
+    raise SystemExit()
+
+
+signal.signal(signal.SIGTERM, handle_sigterm)
+
 
 @setup_logging.connect
 def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
@@ -43,6 +57,10 @@ def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
         cache_logger_on_first_use=True,
     )
 
+    logger.info("Starting Celery")
+
+
+logger.info("Starting Celery")
 
 if env.get_service(name="fecfile-api-redis"):
     app.conf["broker_use_ssl"] = {"ssl_cert_reqs": ssl.CERT_NONE}
