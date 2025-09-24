@@ -135,9 +135,8 @@ class TasksTestCase(TestCase):
     SUBMIT TO FEC TESTS
     """
 
-    @patch("fecfiler.web_services.tasks.poll_for_fec_response")
-    def test_submit_to_fec(self, mock_poll_for_fec_response):
-        upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
+    # Not a test!  Run by other tests instead
+    def run_submission_tests(self, upload_submission):
         dot_fec_id = create_dot_fec(
             str(self.f3x.id),
             upload_submission_id=upload_submission.id,
@@ -163,6 +162,23 @@ class TasksTestCase(TestCase):
             upload_submission.fec_message, "We didn't really send anything to FEC"
         )
         self.assertEqual(len(upload_submission.fec_report_id), 36)
+
+    @patch("fecfiler.web_services.tasks.poll_for_fec_response")
+    def test_submit_to_fec(self, _):
+        upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
+        self.run_submission_tests(upload_submission)
+
+    @patch("fecfiler.web_services.tasks.poll_for_fec_response")
+    def test_submit_from_failed(self, _):
+        upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
+        upload_submission.save_state(FECSubmissionState.FAILED)
+        self.run_submission_tests(upload_submission)
+
+    @patch("fecfiler.web_services.tasks.poll_for_fec_response")
+    def test_submit_from_submitting(self, _):
+        upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
+        upload_submission.save_state(FECSubmissionState.SUBMITTING)
+        self.run_submission_tests(upload_submission)
 
     def test_submit_no_password(self):
         upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
