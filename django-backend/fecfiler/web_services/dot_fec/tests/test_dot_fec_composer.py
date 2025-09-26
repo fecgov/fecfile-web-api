@@ -170,50 +170,12 @@ class DotFECSerializerTestCase(TestCase):
             compose_header(self.f3x.id)
         self.assertIn("FEC_FORMAT_VERSION is not set", str(cm.exception))
 
-    def test_schema_override_8_dot_4_f99(self):
-        content = compose_dot_fec(self.f99.id)
-        split_content = content.split(CRLF_STR)
-        split_report_row = split_content[1].split(FS_STR)
-        self.assertEqual(split_report_row[14], "ABC")
-        self.assertEqual(len(split_report_row), 15)
-
     def test_schema_override_8_dot_5_f99(self):
         content = compose_dot_fec(self.f99.id)
         split_content = content.split(CRLF_STR)
         split_report_row = split_content[1].split(FS_STR)
         self.assertEqual(split_report_row[14], "ABC")
         self.assertEqual(len(split_report_row), 17)
-
-    def test_schema_override_8_dot_4_C2(self):
-        _, _, _, c2 = create_loan_from_bank(
-            self.committee,
-            self.contact_1,
-            1000.00,
-            datetime.strptime("2024-01-10", "%Y-%m-%d"),
-            "5%",
-            loan_incurred_date=datetime.strptime("2024-01-02", "%Y-%m-%d"),
-            report=self.f3x,
-        )
-        c2.schedule_c2.guaranteed_amount = Decimal(10.00)
-        c2.schedule_c2.save()
-        c2.refresh_from_db()
-        compose_transaction(c2)
-        content = serialize_instance("SchC2", c2)
-        split_content = content.split(FS_STR)
-        self.assertEqual(split_content[0], "SC2/10")
-        self.assertEqual(split_content[4], self.contact_1.last_name)
-        self.assertEqual(split_content[5], self.contact_1.first_name)
-        self.assertEqual(split_content[6], self.contact_1.middle_name)
-        self.assertEqual(split_content[7], self.contact_1.prefix)
-        self.assertEqual(split_content[8], self.contact_1.suffix)
-        self.assertEqual(split_content[9], self.contact_1.street_1)
-        self.assertEqual(split_content[10], self.contact_1.street_2)
-        self.assertEqual(split_content[11], self.contact_1.city)
-        self.assertEqual(split_content[12], self.contact_1.state)
-        self.assertEqual(split_content[13], self.contact_1.zip)
-        self.assertEqual(split_content[14], self.contact_1.employer)
-        self.assertEqual(split_content[15], self.contact_1.occupation)
-        self.assertEqual(split_content[16], "10.00")
 
     def test_schema_override_8_dot_5_C2(self):
         loan, _, _, c2 = create_loan_from_bank(
