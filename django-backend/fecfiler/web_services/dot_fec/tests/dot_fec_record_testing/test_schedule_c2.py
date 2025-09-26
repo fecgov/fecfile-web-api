@@ -9,7 +9,6 @@ from fecfiler.transactions.tests.utils import create_loan_from_bank
 from fecfiler.contacts.models import Contact
 from datetime import datetime
 from fecfiler.web_services.models import UploadSubmission
-from unittest.mock import patch
 import structlog
 
 logger = structlog.get_logger(__name__)
