@@ -19,8 +19,7 @@ finance information. The project code is distributed across these repositories:
 
 ### Prerequisites
 
-Software necessary to run the application locally
-
+Software necessary to run the application locally:
 - [Docker](https://docs.docker.com/get-docker/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
@@ -50,21 +49,21 @@ export EFO_FILING_API_KEY="EFO_get_this_from_team_member"
 *Note* - the default PRODUCTION_OPEN_FEC_API_KEY and STAGE_OPEN_FEC_API_KEY key has a very low rate limit -
 for a better key, reach out to a team member or get one at https://api.open.fec.gov/developers/
 
-Go to http://localhost:8080/ to see the API documentation
+Go to http://localhost:8080/ to see the API documentation.
 
 ### Shut down the containers
 ```
 docker compose down
 ```
 
-### see all running containers
+### See all running containers
 ```
 docker ps
 ```
 
-### running commands in a running container
+### Running commands in a running container
 ```
-docker compose exec <container name> <command>
+docker exec <container name> <command>
 ```
 
 # Deployment (FEC team only)
