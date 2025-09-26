@@ -78,6 +78,7 @@ fecfiler.web\_services.models.FECSubmissionState
    
       ~FECSubmissionState.INITIALIZING
       ~FECSubmissionState.CREATING_FILE
+      ~FECSubmissionState.POLLING
       ~FECSubmissionState.SUBMITTING
       ~FECSubmissionState.SUCCEEDED
       ~FECSubmissionState.FAILED

@@ -90,6 +90,8 @@ fecfiler.web\_services.tests.test\_tasks.TasksTestCase
       ~TasksTestCase.id
       ~TasksTestCase.modify_settings
       ~TasksTestCase.run
+      ~TasksTestCase.run_upload_submission_tests
+      ~TasksTestCase.run_webprint_submission_tests
       ~TasksTestCase.setUp
       ~TasksTestCase.setUpClass
       ~TasksTestCase.setUpTestData
@@ -105,7 +107,11 @@ fecfiler.web\_services.tests.test\_tasks.TasksTestCase
       ~TasksTestCase.test_submit_missing_file
       ~TasksTestCase.test_submit_no_password
       ~TasksTestCase.test_submit_to_fec
+      ~TasksTestCase.test_submit_to_fec_from_failed
+      ~TasksTestCase.test_submit_to_fec_from_submitting
       ~TasksTestCase.test_submit_to_webprint
+      ~TasksTestCase.test_webprint_submit_from_failed
+      ~TasksTestCase.test_webprint_submit_from_submitting
    
    
 
