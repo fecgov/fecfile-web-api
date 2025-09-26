@@ -150,7 +150,6 @@ class DotFECSerializerTestCase(TestCase):
         row_str = add_row_to_content("", transaction_row)
         self.assertIn("75.00", row_str)
 
-    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.5")
     def test_f99(self):
         content = compose_dot_fec(self.f99.id)
         split_content = content.split(CRLF_STR)
@@ -178,7 +177,6 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_report_row[14], "ABC")
         self.assertEqual(len(split_report_row), 15)
 
-    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.5")
     def test_schema_override_8_dot_5_f99(self):
         content = compose_dot_fec(self.f99.id)
         split_content = content.split(CRLF_STR)
@@ -217,7 +215,6 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_content[15], self.contact_1.occupation)
         self.assertEqual(split_content[16], "10.00")
 
-    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.5")
     def test_schema_override_8_dot_5_C2(self):
         loan, _, _, c2 = create_loan_from_bank(
             self.committee,
