@@ -14,7 +14,6 @@ logger = structlog.get_logger(__name__)
 class ReportModelTestCase(TestCase):
 
     def setUp(self):
-        self.missing_type_transaction = {}
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.f24_report = create_form24(self.committee)
         self.f3x_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
