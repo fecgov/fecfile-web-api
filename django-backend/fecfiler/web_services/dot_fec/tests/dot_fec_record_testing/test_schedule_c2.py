@@ -16,7 +16,6 @@ logger = structlog.get_logger(__name__)
 
 
 class DotFECScheduleC2TestCase(TestCase):
-    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.5")
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         coverage_from = datetime.strptime("2024-01-01", "%Y-%m-%d")
