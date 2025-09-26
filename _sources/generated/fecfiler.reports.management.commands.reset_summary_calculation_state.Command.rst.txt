@@ -1,0 +1,54 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.management.commands.reset\_summary\_calculation\_state.Command
+===============================================================================
+
+.. currentmodule:: fecfiler.reports.management.commands.reset_summary_calculation_state
+
+.. autoclass:: Command
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Command.__init__
+      ~Command.add_arguments
+      ~Command.add_base_argument
+      ~Command.check
+      ~Command.check_migrations
+      ~Command.command
+      ~Command.create_parser
+      ~Command.execute
+      ~Command.get_check_kwargs
+      ~Command.get_version
+      ~Command.handle
+      ~Command.log
+      ~Command.print_help
+      ~Command.run_from_argv
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Command.base_stealth_options
+      ~Command.command_name
+      ~Command.help
+      ~Command.output_transaction
+      ~Command.requires_migrations_checks
+      ~Command.requires_system_checks
+      ~Command.stealth_options
+      ~Command.suppressed_base_arguments
+   
+   

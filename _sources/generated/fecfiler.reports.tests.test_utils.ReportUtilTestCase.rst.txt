@@ -1,0 +1,120 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.tests.test\_utils.ReportUtilTestCase
+=====================================================
+
+.. currentmodule:: fecfiler.reports.tests.test_utils
+
+.. autoclass:: ReportUtilTestCase
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ReportUtilTestCase.__init__
+      ~ReportUtilTestCase.addClassCleanup
+      ~ReportUtilTestCase.addCleanup
+      ~ReportUtilTestCase.addTypeEqualityFunc
+      ~ReportUtilTestCase.assertAlmostEqual
+      ~ReportUtilTestCase.assertContains
+      ~ReportUtilTestCase.assertCountEqual
+      ~ReportUtilTestCase.assertDictEqual
+      ~ReportUtilTestCase.assertEqual
+      ~ReportUtilTestCase.assertFalse
+      ~ReportUtilTestCase.assertFieldOutput
+      ~ReportUtilTestCase.assertFormError
+      ~ReportUtilTestCase.assertFormSetError
+      ~ReportUtilTestCase.assertGreater
+      ~ReportUtilTestCase.assertGreaterEqual
+      ~ReportUtilTestCase.assertHTMLEqual
+      ~ReportUtilTestCase.assertHTMLNotEqual
+      ~ReportUtilTestCase.assertIn
+      ~ReportUtilTestCase.assertInHTML
+      ~ReportUtilTestCase.assertIs
+      ~ReportUtilTestCase.assertIsInstance
+      ~ReportUtilTestCase.assertIsNone
+      ~ReportUtilTestCase.assertIsNot
+      ~ReportUtilTestCase.assertIsNotNone
+      ~ReportUtilTestCase.assertJSONEqual
+      ~ReportUtilTestCase.assertJSONNotEqual
+      ~ReportUtilTestCase.assertLess
+      ~ReportUtilTestCase.assertLessEqual
+      ~ReportUtilTestCase.assertListEqual
+      ~ReportUtilTestCase.assertLogs
+      ~ReportUtilTestCase.assertMultiLineEqual
+      ~ReportUtilTestCase.assertNoLogs
+      ~ReportUtilTestCase.assertNotAlmostEqual
+      ~ReportUtilTestCase.assertNotContains
+      ~ReportUtilTestCase.assertNotEqual
+      ~ReportUtilTestCase.assertNotIn
+      ~ReportUtilTestCase.assertNotInHTML
+      ~ReportUtilTestCase.assertNotIsInstance
+      ~ReportUtilTestCase.assertNotRegex
+      ~ReportUtilTestCase.assertNumQueries
+      ~ReportUtilTestCase.assertQuerySetEqual
+      ~ReportUtilTestCase.assertRaises
+      ~ReportUtilTestCase.assertRaisesMessage
+      ~ReportUtilTestCase.assertRaisesRegex
+      ~ReportUtilTestCase.assertRedirects
+      ~ReportUtilTestCase.assertRegex
+      ~ReportUtilTestCase.assertSequenceEqual
+      ~ReportUtilTestCase.assertSetEqual
+      ~ReportUtilTestCase.assertTemplateNotUsed
+      ~ReportUtilTestCase.assertTemplateUsed
+      ~ReportUtilTestCase.assertTrue
+      ~ReportUtilTestCase.assertTupleEqual
+      ~ReportUtilTestCase.assertURLEqual
+      ~ReportUtilTestCase.assertWarns
+      ~ReportUtilTestCase.assertWarnsMessage
+      ~ReportUtilTestCase.assertWarnsRegex
+      ~ReportUtilTestCase.assertXMLEqual
+      ~ReportUtilTestCase.assertXMLNotEqual
+      ~ReportUtilTestCase.captureOnCommitCallbacks
+      ~ReportUtilTestCase.countTestCases
+      ~ReportUtilTestCase.debug
+      ~ReportUtilTestCase.defaultTestResult
+      ~ReportUtilTestCase.doClassCleanups
+      ~ReportUtilTestCase.doCleanups
+      ~ReportUtilTestCase.ensure_connection_patch_method
+      ~ReportUtilTestCase.enterClassContext
+      ~ReportUtilTestCase.enterContext
+      ~ReportUtilTestCase.fail
+      ~ReportUtilTestCase.id
+      ~ReportUtilTestCase.modify_settings
+      ~ReportUtilTestCase.run
+      ~ReportUtilTestCase.setUp
+      ~ReportUtilTestCase.setUpClass
+      ~ReportUtilTestCase.setUpTestData
+      ~ReportUtilTestCase.settings
+      ~ReportUtilTestCase.shortDescription
+      ~ReportUtilTestCase.skipTest
+      ~ReportUtilTestCase.subTest
+      ~ReportUtilTestCase.tearDown
+      ~ReportUtilTestCase.tearDownClass
+      ~ReportUtilTestCase.test_reset_calculation_status
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ReportUtilTestCase.available_apps
+      ~ReportUtilTestCase.databases
+      ~ReportUtilTestCase.fixtures
+      ~ReportUtilTestCase.longMessage
+      ~ReportUtilTestCase.maxDiff
+      ~ReportUtilTestCase.reset_sequences
+      ~ReportUtilTestCase.serialized_rollback
+   
+   

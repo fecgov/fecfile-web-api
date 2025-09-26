@@ -32,4 +32,5 @@ fecfiler.reports.management.commands
    :recursive:
 
    fecfiler.reports.management.commands.delete_committee_reports
+   fecfiler.reports.management.commands.reset_summary_calculation_state
 

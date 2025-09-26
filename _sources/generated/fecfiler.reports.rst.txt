@@ -45,5 +45,6 @@ fecfiler.reports
    fecfiler.reports.signals
    fecfiler.reports.tests
    fecfiler.reports.urls
+   fecfiler.reports.utils
    fecfiler.reports.views
 

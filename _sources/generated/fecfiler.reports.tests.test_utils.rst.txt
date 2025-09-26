@@ -1,0 +1,34 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.reports.tests.test\_utils
+==================================
+
+.. automodule:: fecfiler.reports.tests.test_utils
+  
+   
+   
+   
+
+   
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      ReportUtilTestCase
+   
+   
+
+   
+   
+   
+
+
+

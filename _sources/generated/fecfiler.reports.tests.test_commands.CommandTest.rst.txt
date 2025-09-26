@@ -1,0 +1,121 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.reports.tests.test\_commands.CommandTest
+=================================================
+
+.. currentmodule:: fecfiler.reports.tests.test_commands
+
+.. autoclass:: CommandTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~CommandTest.__init__
+      ~CommandTest.addClassCleanup
+      ~CommandTest.addCleanup
+      ~CommandTest.addTypeEqualityFunc
+      ~CommandTest.assertAlmostEqual
+      ~CommandTest.assertContains
+      ~CommandTest.assertCountEqual
+      ~CommandTest.assertDictEqual
+      ~CommandTest.assertEqual
+      ~CommandTest.assertFalse
+      ~CommandTest.assertFieldOutput
+      ~CommandTest.assertFormError
+      ~CommandTest.assertFormSetError
+      ~CommandTest.assertGreater
+      ~CommandTest.assertGreaterEqual
+      ~CommandTest.assertHTMLEqual
+      ~CommandTest.assertHTMLNotEqual
+      ~CommandTest.assertIn
+      ~CommandTest.assertInHTML
+      ~CommandTest.assertIs
+      ~CommandTest.assertIsInstance
+      ~CommandTest.assertIsNone
+      ~CommandTest.assertIsNot
+      ~CommandTest.assertIsNotNone
+      ~CommandTest.assertJSONEqual
+      ~CommandTest.assertJSONNotEqual
+      ~CommandTest.assertLess
+      ~CommandTest.assertLessEqual
+      ~CommandTest.assertListEqual
+      ~CommandTest.assertLogs
+      ~CommandTest.assertMultiLineEqual
+      ~CommandTest.assertNoLogs
+      ~CommandTest.assertNotAlmostEqual
+      ~CommandTest.assertNotContains
+      ~CommandTest.assertNotEqual
+      ~CommandTest.assertNotIn
+      ~CommandTest.assertNotInHTML
+      ~CommandTest.assertNotIsInstance
+      ~CommandTest.assertNotRegex
+      ~CommandTest.assertNumQueries
+      ~CommandTest.assertQuerySetEqual
+      ~CommandTest.assertRaises
+      ~CommandTest.assertRaisesMessage
+      ~CommandTest.assertRaisesRegex
+      ~CommandTest.assertRedirects
+      ~CommandTest.assertRegex
+      ~CommandTest.assertSequenceEqual
+      ~CommandTest.assertSetEqual
+      ~CommandTest.assertTemplateNotUsed
+      ~CommandTest.assertTemplateUsed
+      ~CommandTest.assertTrue
+      ~CommandTest.assertTupleEqual
+      ~CommandTest.assertURLEqual
+      ~CommandTest.assertWarns
+      ~CommandTest.assertWarnsMessage
+      ~CommandTest.assertWarnsRegex
+      ~CommandTest.assertXMLEqual
+      ~CommandTest.assertXMLNotEqual
+      ~CommandTest.captureOnCommitCallbacks
+      ~CommandTest.countTestCases
+      ~CommandTest.debug
+      ~CommandTest.defaultTestResult
+      ~CommandTest.doClassCleanups
+      ~CommandTest.doCleanups
+      ~CommandTest.ensure_connection_patch_method
+      ~CommandTest.enterClassContext
+      ~CommandTest.enterContext
+      ~CommandTest.fail
+      ~CommandTest.id
+      ~CommandTest.modify_settings
+      ~CommandTest.run
+      ~CommandTest.setUp
+      ~CommandTest.setUpClass
+      ~CommandTest.setUpTestData
+      ~CommandTest.settings
+      ~CommandTest.shortDescription
+      ~CommandTest.skipTest
+      ~CommandTest.subTest
+      ~CommandTest.tearDown
+      ~CommandTest.tearDownClass
+      ~CommandTest.test_missing_report_id_raises_error
+      ~CommandTest.test_reset_summary_calculation_state_command
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CommandTest.available_apps
+      ~CommandTest.databases
+      ~CommandTest.fixtures
+      ~CommandTest.longMessage
+      ~CommandTest.maxDiff
+      ~CommandTest.reset_sequences
+      ~CommandTest.serialized_rollback
+   
+   
