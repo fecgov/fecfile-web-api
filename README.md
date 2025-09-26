@@ -33,9 +33,10 @@ When running docker compose you will need to be in the root directory of the pro
 You will need to define a DJANGO_SECRET_KEY.  Locally you can just add something like this your rc file:
 `export DJANGO_SECRET_KEY="thisismykey"`
 
-Spin up the containers
-
-`docker compose up -d`
+Spin up the containers:
+```
+docker compose up -d
+```
 
 By default EFO services (print/upload) will be mocked.
 To integrate with EFO, set the following environment variables:
@@ -52,34 +53,25 @@ for a better key, reach out to a team member or get one at https://api.open.fec.
 Go to http://localhost:8080/ to see the API documentation
 
 ### Shut down the containers
-
-`docker compose down`
+```
+docker compose down
+```
 
 ### see all running containers
-
-`docker ps`
+```
+docker ps
+```
 
 ### running commands in a running container
-
-`docker compose exec <container name> <command>`
+```
+docker compose exec <container name> <command>
+```
 
 # Deployment (FEC team only)
 
-[Deployment instructions...](https://github.com/fecgov/fecfile-web-api/wiki/Deployment)
+[Deployment instructions](https://github.com/fecgov/fecfile-web-api/wiki/Deployment)
 
-## Technical Environment Plan
-
-The fecfile-web-api is our system's backend while the fecfile-web-app is the single-page angular app. The fecfile-web-api is deployed as a cloud.gov application per environment (dev, stage, test, and prod). Each cloud.gov fecfile-web-api application has at least two instances running. Similarly, the fecfile-web-app is deployed as a cloud.gov application per environment (dev, stage, test, and prod). There are also at least two instances running per cloud.gov fecfile-web-app application.
-
-The following events occur for fecfile-web-api and fecfile-web-app independently of each other:
-
-- When a branch is merged into the develop branch, it is deployed to the dev environment on cloud.gov
-  - The Dev environment is used for the bulk of sprint integration and QA testing
-- When a release is cut (creating a release tag in git), that release is deployed to the stage environment on cloud.gov.
-  - The Stage environment is used for final deployment preparation, integration testing, and final QA testing.
-- When the release is merged into the main branch, it is deployed to the test and prod environments on cloud.gov
-  - The Test environment will be used by alpha users.
-  - The Production environment will be used by end users once the application launches.
+See also: [Technical Design](https://github.com/fecgov/fecfile-web-api/wiki/Technical-Design)
 
 ## Additional developer notes
 
