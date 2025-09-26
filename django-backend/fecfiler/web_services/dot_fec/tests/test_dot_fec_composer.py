@@ -171,7 +171,6 @@ class DotFECSerializerTestCase(TestCase):
             compose_header(self.f3x.id)
         self.assertIn("FEC_FORMAT_VERSION is not set", str(cm.exception))
 
-    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.4")
     def test_schema_override_8_dot_4_f99(self):
         content = compose_dot_fec(self.f99.id)
         split_content = content.split(CRLF_STR)
@@ -187,7 +186,6 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_report_row[14], "ABC")
         self.assertEqual(len(split_report_row), 17)
 
-    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.4")
     def test_schema_override_8_dot_4_C2(self):
         _, _, _, c2 = create_loan_from_bank(
             self.committee,
