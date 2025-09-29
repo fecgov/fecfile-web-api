@@ -1,3 +1,6 @@
-cd django-backend
+#!/bin/sh
+# Dockerfile entrypoint
+# Exit immediately if a command exits with a non-zero status.
+set -e
 
-celery -A fecfiler worker --loglevel=info --pool=threads
+exec celery -A fecfiler worker --loglevel=info --pool=threads

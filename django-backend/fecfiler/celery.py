@@ -4,11 +4,19 @@ import cfenv
 import logging
 import structlog
 from celery import Celery
-from celery.signals import setup_logging
+from celery.signals import setup_logging, worker_shutdown
 from django_structlog.celery.steps import DjangoStructLogInitStep
 from fecfiler import settings
 
 logger = structlog.get_logger(__name__)
+
+
+@worker_shutdown.connect
+def on_worker_shutdown(signal, sender, **kwargs):
+    logger.info("Worker shutting down, cleaning up in-flight tasks")
+    logger.info(f"     Signal: {signal}, Sender: {sender}, KWArgs: {kwargs}")
+    # do some clean-up
+
 
 # Set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "fecfiler.settings")
@@ -42,7 +50,10 @@ def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
+    logger.info("Starting Celery: logging set up")
 
+
+logger.info("Starting Celery")
 
 if env.get_service(name="fecfile-api-redis"):
     app.conf["broker_use_ssl"] = {"ssl_cert_reqs": ssl.CERT_NONE}
