@@ -2,7 +2,6 @@ from unittest.mock import patch
 from django.test import TestCase
 from fecfiler.web_services.dot_fec.dot_fec_composer import (
     compose_dot_fec,
-    compose_transaction,
     add_row_to_content,
     compose_header,
 )
@@ -15,16 +14,13 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x, create_form99, create_report_memo
 from fecfiler.transactions.tests.utils import (
     create_schedule_a,
-    create_test_transaction,
 )
-from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.contacts.tests.utils import (
     create_test_individual_contact,
     create_test_committee_contact,
 )
 from django.core.exceptions import ImproperlyConfigured
 from datetime import datetime
-from decimal import Decimal
 
 
 class DotFECSerializerTestCase(TestCase):
