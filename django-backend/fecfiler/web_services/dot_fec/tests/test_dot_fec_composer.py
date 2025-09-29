@@ -15,7 +15,6 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x, create_form99, create_report_memo
 from fecfiler.transactions.tests.utils import (
     create_schedule_a,
-    create_loan_from_bank,
     create_test_transaction,
 )
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
@@ -169,61 +168,3 @@ class DotFECSerializerTestCase(TestCase):
         with self.assertRaises(ImproperlyConfigured) as cm:
             compose_header(self.f3x.id)
         self.assertIn("FEC_FORMAT_VERSION is not set", str(cm.exception))
-
-        c2.schedule_c2.guaranteed_amount = Decimal(10.00)
-        c2.schedule_c2.save()
-        c2.refresh_from_db()
-        compose_transaction(c2)
-        content = serialize_instance("SchC2", c2)
-        split_content = content.split(FS_STR)
-        self.assertEqual(split_content[0], "SC2/10")
-        self.assertEqual(split_content[4], self.committee_contact.type)
-        self.assertEqual(split_content[5], self.committee_contact.name)
-        self.assertEqual(split_content[6], self.committee_contact.committee_id)
-
-        self.assertEqual(split_content[7], "")
-        self.assertEqual(split_content[8], "")
-        self.assertEqual(split_content[12], self.committee_contact.street_1)
-        self.assertEqual(split_content[13], self.committee_contact.street_2)
-        self.assertEqual(split_content[14], self.committee_contact.city)
-        self.assertEqual(split_content[15], self.committee_contact.state)
-        self.assertEqual(split_content[16], self.committee_contact.zip)
-        self.assertEqual(split_content[17], "")
-        self.assertEqual(split_content[18], "")
-        self.assertEqual(split_content[19], "10.00")
-
-        c2_individual = create_test_transaction(
-            "C2_LOAN_GUARANTOR",
-            ScheduleC2,
-            self.committee,
-            contact_1=self.contact_1,
-            group=None,
-            report=self.f3x,
-            schedule_data={},
-            transaction_data={"_form_type": "SC2/10", "parent_transaction_id": loan.id},
-        )
-
-        c2_individual.schedule_c2.guaranteed_amount = Decimal(20.00)
-        c2_individual.schedule_c2.save()
-        c2_individual.refresh_from_db()
-        compose_transaction(c2_individual)
-        content = serialize_instance("SchC2", c2_individual)
-        split_content = content.split(FS_STR)
-        self.assertEqual(split_content[0], "SC2/10")
-        self.assertEqual(split_content[4], self.contact_1.type)
-        self.assertEqual(split_content[5], "")
-        self.assertEqual(split_content[6], "")
-
-        self.assertEqual(split_content[7], self.contact_1.last_name)
-        self.assertEqual(split_content[8], self.contact_1.first_name)
-        self.assertEqual(split_content[9], self.contact_1.middle_name)
-        self.assertEqual(split_content[10], self.contact_1.prefix)
-        self.assertEqual(split_content[11], self.contact_1.suffix)
-        self.assertEqual(split_content[12], self.contact_1.street_1)
-        self.assertEqual(split_content[13], self.contact_1.street_2)
-        self.assertEqual(split_content[14], self.contact_1.city)
-        self.assertEqual(split_content[15], self.contact_1.state)
-        self.assertEqual(split_content[16], self.contact_1.zip)
-        self.assertEqual(split_content[17], self.contact_1.employer)
-        self.assertEqual(split_content[18], self.contact_1.occupation)
-        self.assertEqual(split_content[19], "20.00")
