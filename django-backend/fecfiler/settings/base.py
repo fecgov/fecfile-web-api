@@ -26,7 +26,8 @@ class CeleryStorageType(Enum):
 SPACE = env.get_credential("SPACE")
 if not SPACE:
     raise Exception(
-        "SPACE is not set! Set to match where the application is running (e.g. prod, dev, stage, test)"
+        "SPACE is not set! "
+        "Set to match where the application is running (e.g. prod, dev, stage, test)"
     )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
