@@ -22,6 +22,13 @@ class CeleryStorageType(Enum):
     LOCAL = "local"
 
 
+# Space where this will be run (prod, dev, stage, test)
+SPACE = env.get_credential("SPACE")
+if not SPACE:
+    raise Exception(
+        "SPACE is not set! Set to match where the application is running (e.g. prod, dev, stage, test)"
+    )
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -213,11 +220,9 @@ MOCK_OIDC_PROVIDER_CACHE = env.get_credential("REDIS_URL")
 OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
 
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
-FFAPI_TIMEOUT_COOKIE_NAME = env.get_credential("FFAPI_TIMEOUT_COOKIE_NAME", "False")
-if not FFAPI_TIMEOUT_COOKIE_NAME:
-    raise Exception("FFAPI_TIMEOUT_COOKIE_NAME is not set!")
 
-SPACE = FFAPI_TIMEOUT_COOKIE_NAME.replace("ffapi_timeout_", "")
+
+FFAPI_TIMEOUT_COOKIE_NAME = f"ffapi_timeout_{SPACE}"
 
 LOGIN_REDIRECT_URL = env.get_credential("LOGIN_REDIRECT_SERVER_URL")
 LOGIN_REDIRECT_CLIENT_URL = env.get_credential("LOGIN_REDIRECT_CLIENT_URL")

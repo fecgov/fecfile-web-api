@@ -41,6 +41,7 @@ services:
     links:
       - redis
     environment:
+      SPACE: local
       REDIS_URL: redis://redis:6379
       DATABASE_URL: postgres://postgres:postgres@db/postgres
       FECFILE_TEST_DB_NAME: postgres
@@ -86,6 +87,7 @@ services:
     links:
       - redis
     environment:
+      SPACE: local
       REDIS_URL: redis://redis:6379
       DATABASE_URL: postgres://postgres:postgres@db/postgres
       FECFILE_TEST_DB_NAME: postgres
@@ -130,13 +132,13 @@ services:
     links:
       - redis
     environment:
+      SPACE: local
       REDIS_URL: redis://redis:6379
       DATABASE_URL: postgres://postgres:postgres@db/postgres
       FECFILE_TEST_DB_NAME: postgres
       DJANGO_SETTINGS_MODULE: fecfiler.settings.local
       DJANGO_SECRET_KEY:
       FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
-      FFAPI_TIMEOUT_COOKIE_NAME: ffapi_timeout_local
       OIDC_RP_CLIENT_ID:
       OIDC_RP_CLIENT_SECRET:
       LOGIN_REDIRECT_SERVER_URL: http://localhost:8080/api/v1/oidc/login-redirect
