@@ -28,7 +28,7 @@ from fecfiler.settings import (
     SECONDARY_POLLING_MAX_ATTEMPTS,
 )
 
-import time
+# import time
 import structlog
 
 logger = structlog.get_logger(__name__)
