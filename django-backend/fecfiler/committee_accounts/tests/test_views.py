@@ -240,7 +240,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
     def test_get_committee_account_data_from_production(self):
         with patch("fecfiler.committee_accounts.utils.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
-            with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
+            with patch("fecfiler.shared.utilities.requests") as mock_requests:
                 mock_response = Mock()
                 mock_response.status_code = 200
                 mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
@@ -258,7 +258,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
             settings.STAGE_OPEN_FEC_API = "https://stage.not-real.api/"
             settings.STAGE_OPEN_FEC_API_KEY = "MOCK_KEY"
-            with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
+            with patch("fecfiler.shared.utilities.requests") as mock_requests:
                 mock_response = Mock()
                 mock_response.status_code = 200
                 mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}

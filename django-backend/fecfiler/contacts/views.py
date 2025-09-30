@@ -15,7 +15,7 @@ from rest_framework import viewsets, pagination, filters, status
 from .models import Contact
 from .serializers import ContactSerializer
 import fecfiler.settings as settings
-from fecfiler.committee_accounts.utils import query_fec_api, query_fec_api_single
+from fecfiler.shared.utilities import query_fec_api, query_fec_api_single
 
 logger = structlog.get_logger(__name__)
 
