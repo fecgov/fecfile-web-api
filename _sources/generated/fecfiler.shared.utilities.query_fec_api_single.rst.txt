@@ -1,0 +1,6 @@
+fecfiler.shared.utilities.query\_fec\_api\_single
+=================================================
+
+.. currentmodule:: fecfiler.shared.utilities
+
+.. autofunction:: query_fec_api_single

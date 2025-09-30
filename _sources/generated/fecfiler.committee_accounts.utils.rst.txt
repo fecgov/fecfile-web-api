@@ -34,7 +34,6 @@ fecfiler.committee\_accounts.utils
       is_production_efo_pac
       is_production_efo_pty
       is_test_efo_pty
-      query_fec_api
       raise_if_cannot_create_committee_account
    
    

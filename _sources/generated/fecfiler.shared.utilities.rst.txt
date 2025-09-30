@@ -21,6 +21,8 @@ fecfiler.shared.utilities
       get_boolean_from_string
       get_float_from_string
       get_model_data
+      query_fec_api
+      query_fec_api_single
    
    
 
