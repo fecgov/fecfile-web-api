@@ -25,7 +25,7 @@ services:
       - "6379:6379"
     command: redis-server
 
-  api-worker:
+  celery-worker:
     build:
       context: './'
       dockerfile: '${WORKER_DOCKERFILE:-Worker_Dockerfile}'
@@ -68,6 +68,8 @@ services:
       resources:
         limits:
           memory: 1G
+      #mode: replicated
+      #replicas: 2
 
   scheduler:
     build:
