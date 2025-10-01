@@ -60,23 +60,96 @@ def on_worker_shutdown(signal, sender, **kwargs):
     registry is empty or not accurate), attempt to query the broker via
     `current_app.control.inspect().active()`.
     """
-    logger.info("Worker shutting down, cleaning up in-flight tasks")
+    logger.info("DANTEST: Worker shutting down, cleaning up in-flight tasks")
     logger.info(f"     Signal: {signal}, Sender: {sender}, KWArgs: {kwargs}")
 
     if running_tasks:
         logger.warning(
-            "Worker shutdown with in-process running tasks", tasks=running_tasks
+            "DANTEST: Worker shutdown with in-process running tasks", tasks=running_tasks
         )
-        # Here you can add any cleanup or task-revocation logic you need.
+        for task_id, task in running_tasks.items():
+            fail_running_task(task)
         return
 
     # Fallback: try to inspect the worker's active tasks via the broker.
     try:
         inspector = current_app.control.inspect()
-        active = inspector.active() or {}
-        logger.info("Active tasks from inspector", active=active)
+        active_tasks = inspector.active() or {}
+        logger.info("DANTEST: Active tasks from inspector", active_tasks=active_tasks)
+        for task_list in active_tasks.values():
+            for task in task_list:
+                fail_running_task(task)
+
     except Exception as exc:  # pragma: no cover - broker/network failures
-        logger.exception("Failed to inspect active tasks during shutdown", exc=exc)
+        logger.exception(
+            "DANTEST: Failed to inspect active tasks during shutdown", exc=exc
+        )
+
+
+def fail_running_task(task: dict):
+    """Handles a task that was running when the worker was shut down"""
+    #    from fecfiler.web_services.models import UploadSubmission, WebPrintSubmission
+    #    from fecfiler.web_services.tasks import (
+    #        SUBMISSION_CLASSES,
+    #        Task,
+    #        create_dot_fec,
+    #        submit_to_fec,
+    #        submit_to_webprint,
+    #        poll_for_fec_response,
+    #    )
+
+    try:
+        task_name = task.get("name")
+        logger.info(f"DANTEST: Handling running task: {task_name}")
+    #        if task_name == create_dot_fec.name:
+    #            fail_create_dot_fec(task)
+    #        elif task_name == submit_to_fec.name:
+    #            fail_submit_to_fec(task)
+    #        elif task_name == submit_to_webprint.name:
+    #            fail_submit_to_webprint(task)
+    #        elif task_name == poll_for_fec_response.name:
+    #            fail_poll_for_fec_response(task)
+    except Exception:
+        id = task.get("id")
+        logger.exception(f"Failed to handle running task: {id}")
+
+
+# def fail_create_dot_fec(task: dict):
+#    """Handles create_dot_fec task"""
+#    upload_submission_id = task.get("kwargs", {}).get("upload_submission_id")
+#    if upload_submission_id:
+#        fail_submission(upload_submission_id, UploadSubmission)
+
+#    webprint_submission_id = task.get("kwargs", {}).get("webprint_submission_id")
+#    if webprint_submission_id:
+#        fail_submission(webprint_submission_id, WebPrintSubmission)
+
+
+# def fail_submit_to_fec(task: dict):
+#    """Handles submit_to_fec task"""
+#    submission_id = task.get("args")[1]
+#    fail_submission(submission_id, UploadSubmission)
+
+
+# def fail_submit_to_webprint(task: dict):
+#    """Handles submit_to_webprint task"""
+#    submission_id = task.get("args")[1]
+#    fail_submission(submission_id, WebPrintSubmission)
+
+
+# def fail_poll_for_fec_response(task: dict):
+#    """Handles poll_for_fec_response task"""
+#    submission_id = task.get("args")[0]
+#    submission_type_key = task.get("args")[1]
+#    SubmissionClass = SUBMISSION_CLASSES[submission_type_key]
+#    fail_submission(submission_id, SubmissionClass)
+
+
+# def fail_submission(submission_id: str, SubmissionClass: Task):
+#    """Marks a submission as failed"""
+#    submission = SubmissionClass.objects.get(id=submission_id)
+#    submission.save_error("Celery worker shutting down")
+#    logger.info(f"Report {submission_id} marked as failed")
 
 
 # Set the default Django settings module for the 'celery' program.
