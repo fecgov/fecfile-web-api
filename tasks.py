@@ -316,6 +316,14 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
             _rollback(ctx, app)
             return sys.exit(1)
 
+    # set any in-progress report submissions to FAILED
+    task = "django-backend/manage.py fail_open_submissions --no-input"
+    task_name = "Fail non-terminal report submissions"
+    ctx.run(
+        f"cf rt {APP_NAME} --command '{task}' --name '{task_name}'",
+        echo=True,
+    )
+
     # Allow proxy to connect to api via internal route
     add_network_policy = ctx.run(
         f"cf add-network-policy {PROXY_NAME} {APP_NAME}",
