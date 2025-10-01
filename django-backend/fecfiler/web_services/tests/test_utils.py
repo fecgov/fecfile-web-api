@@ -24,7 +24,6 @@ class WebServicesUtilTestCase(TestCase):
         self.assertEqual(
             submission_completed.fecfile_task_state, FECSubmissionState.SUCCEEDED.value
         )
-        submission_completed.refresh_from_db()
 
         # another report submission will be in-progress and should be marked as failed
         f3x_inprogress = create_form3x(self.committee, "2024-02-01", "2024-03-01", {})
@@ -35,12 +34,16 @@ class WebServicesUtilTestCase(TestCase):
             submission_inprogress.fecfile_task_state,
             FECSubmissionState.INITIALIZING.value,
         )
+
+        # fail open submissions, either with the method or command
         if use == "command":
             call_command("fail_open_submissions")
         else:
             fail_open_submissions()
-        submission_inprogress.refresh_from_db()
 
+        # refresh from db and validate states
+        submission_completed.refresh_from_db()
+        submission_inprogress.refresh_from_db()
         self.assertEqual(
             submission_completed.fecfile_task_state, FECSubmissionState.SUCCEEDED.value
         )
