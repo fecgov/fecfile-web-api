@@ -28,7 +28,6 @@ from fecfiler.settings import (
     SECONDARY_POLLING_MAX_ATTEMPTS,
 )
 
-# import time
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -69,11 +68,6 @@ def create_dot_fec(
     if webprint_submission_id:
         submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
-
-    #    logger.info("DANTEST: Sleeping for 2m.")
-    #    for _ in range(120):
-    #        time.sleep(1)
-    #    logger.info("DANTEST: Awake and proceeding.")
 
     try:
         file_content = compose_dot_fec(report_id)
