@@ -277,11 +277,8 @@ def get_logging_config(log_format=LINE):
                 "processors": [
                     structlog.stdlib.ProcessorFormatter.remove_processors_meta,
                     structlog.processors.ExceptionRenderer(
-                        structlog.processors.ExceptionDictTransformer(
-                            show_locals=False
-                        )
+                        structlog.processors.ExceptionDictTransformer(show_locals=False)
                     ),
-                    structlog.processors.dict_tracebacks,
                     structlog.processors.JSONRenderer(),
                 ],
             },
