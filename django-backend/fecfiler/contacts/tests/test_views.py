@@ -268,7 +268,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             settings.PRODUCTION_OPEN_FEC_API_KEY = "FAKE-KEY"
             expected_call = "https://not-real.api/committee/C12345678/"
             expected_params = {"api_key": "FAKE-KEY"}
-            with patch("fecfiler.contacts.views.requests") as mock_requests:
+            with patch("fecfiler.shared.utilities.requests") as mock_requests:
                 mock_requests.get = Mock()
                 mock_response = Mock()
                 mock_response.json = Mock()
