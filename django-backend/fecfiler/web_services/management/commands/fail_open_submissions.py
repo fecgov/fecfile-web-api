@@ -10,14 +10,6 @@ class Command(FECCommand):
     command_name = "fail_open_submissions"
 
     def command(self, *args, **options):
-        logger.info(
-            f"""
-                Beginning fail of all in-progress report submissions.
-                """
-        )
+        logger.info("Start: fail all in-progress report submissions.")
         fail_open_submissions()
-        logger.info(
-            f"""
-                Completed failing all in-progress report submissions.
-                """
-        )
+        logger.info("Completed: fail all in-progress report submissions.")
