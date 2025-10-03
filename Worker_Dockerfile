@@ -9,4 +9,8 @@ RUN pip install -r /opt/requirements.txt && pip install -r /opt/requirements-tes
 
 RUN mv /etc/localtime /etc/localtime.backup && ln -s /usr/share/zoneinfo/EST5EDT /etc/localtime
 
-ENTRYPOINT ["/bin/sh", "-c", "celery -A fecfiler worker --loglevel=info --pool=threads"]
+
+ADD bin/run-celery-worker.sh /opt
+RUN chmod +x /opt/run-celery-worker.sh
+
+ENTRYPOINT ["/opt/run-celery-worker.sh"]

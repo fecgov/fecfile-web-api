@@ -23,6 +23,7 @@ allowed_commands = [
     "update_creds_service",
     "disable_user",
     "reset_summary_calculation_state",
+    "fail_open_submissions",
 ]
 restricted_commands = [
     "loaddata",

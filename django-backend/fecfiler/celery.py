@@ -42,6 +42,7 @@ def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
+    logger.info("Starting Celery: logging set up")
 
 
 if env.get_service(name="fecfile-api-redis"):
