@@ -210,7 +210,7 @@ jobs:
             git config user.name "apiinfo"
       - add_ssh_keys:
           fingerprints:
-            - "68:57:8f:bd:0a:29:0c:91:9d:dc:0d:d7:aa:76:aa:46"
+            - "0f:22:e1:9d:81:ea:82:a0:fa:18:f2:0f:25:f7:3f:6f"
       - run:
           name: Deploy docs to gh-pages branch
           command: npx gh-pages --dotfiles --dist ~/project/docs/_build/html
@@ -243,7 +243,6 @@ jobs:
 workflows:
   primary: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
-      - test
       # This job is triggered whenever a commit is made to the dev/stage/test/prod branches.
       # It kicks off the e2e-test pipeline in the fecfile-web-app project.
       - trigger-e2e-test-pipeline:
@@ -251,14 +250,10 @@ workflows:
             branches:
               only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - deploy-job:
-          requires:
-            - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|feature\/2436-fail_command-sleep_test|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
-          requires:
-            - test
           filters:
             branches:
               only: develop
