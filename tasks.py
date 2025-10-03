@@ -317,7 +317,7 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
             return sys.exit(1)
 
     # set any in-progress report submissions to FAILED
-    task = "django-backend/manage.py fail_open_submissions --no-input"
+    task = "django-backend/manage.py fail_open_submissions"
     task_name = "Fail non-terminal report submissions"
     ctx.run(
         f"cf rt {APP_NAME} --command '{task}' --name '{task_name}'",
