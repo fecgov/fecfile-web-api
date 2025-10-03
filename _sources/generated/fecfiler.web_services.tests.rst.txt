@@ -33,6 +33,7 @@ fecfiler.web\_services.tests
 
    fecfiler.web_services.tests.test_models
    fecfiler.web_services.tests.test_tasks
+   fecfiler.web_services.tests.test_utils
    fecfiler.web_services.tests.test_views
    fecfiler.web_services.tests.test_web_service_storage
 

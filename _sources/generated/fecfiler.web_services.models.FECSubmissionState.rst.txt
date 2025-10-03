@@ -19,6 +19,8 @@ fecfiler.web\_services.models.FECSubmissionState
 
    .. autosummary::
    
+      ~FECSubmissionState.get_terminal_statuses
+      ~FECSubmissionState.get_terminal_statuses_strings
       ~FECSubmissionState.__init__
       ~FECSubmissionState.capitalize
       ~FECSubmissionState.casefold
