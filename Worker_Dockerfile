@@ -10,7 +10,7 @@ RUN pip install -r /opt/requirements.txt && pip install -r /opt/requirements-tes
 RUN mv /etc/localtime /etc/localtime.backup && ln -s /usr/share/zoneinfo/EST5EDT /etc/localtime
 
 
-ADD bin/run-celery-worker.sh /opt
-RUN chmod +x /opt/run-celery-worker.sh
+ADD bin/docker-celery-worker.sh /opt
+RUN chmod +x /opt/docker-celery-worker.sh
 
-ENTRYPOINT ["/opt/run-celery-worker.sh"]
+ENTRYPOINT ["/opt/docker-celery-worker.sh"]
