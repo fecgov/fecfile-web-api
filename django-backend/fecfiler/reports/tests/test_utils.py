@@ -2,7 +2,7 @@ from django.test import TestCase
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.web_services.summary.tasks import CalculationState
-from ..utils.report_utils import reset_summary_calculation_state
+from ..utils.report_utils import reset_submitting_report
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -17,6 +17,6 @@ class ReportUtilTestCase(TestCase):
     def test_reset_calculation_status(self):
         self.f3x_report.calculation_status = CalculationState.CALCULATING
         self.f3x_report.save()
-        reset_summary_calculation_state(str(self.f3x_report.id))
+        reset_submitting_report(str(self.f3x_report.id))
         self.f3x_report.refresh_from_db()
         self.assertEqual(self.f3x_report.calculation_status, None)

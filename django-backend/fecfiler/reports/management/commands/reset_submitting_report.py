@@ -1,13 +1,13 @@
 from fecfiler.devops.management.commands.fecfile_base import FECCommand
-from ...utils.report_utils import reset_summary_calculation_state
+from ...utils.report_utils import reset_submitting_report
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
 class Command(FECCommand):
-    help = "Reset Summary Calculation State"
-    command_name = "reset_summary_calculation_state"
+    help = "Reset all aspects of an in-progress report submission."
+    command_name = "reset_submitting_report"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -21,12 +21,12 @@ class Command(FECCommand):
         report_id = options["report_id"]
         logger.info(
             f"""
-                Begining reset of the calculation status of report with id {report_id}
+                Begining reset of the in-progress report submission with id {report_id}
                 """
         )
-        reset_summary_calculation_state(report_id)
+        reset_submitting_report(report_id)
         logger.info(
             f"""
-                Successfully reset the calculation status of report with id {report_id}
+                Successfully reset the in-progress report submission with id {report_id}
                 """
         )
