@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from uuid import uuid4
 
 from django.test import TestCase
 from .tasks import CalculationState, calculate_summary
@@ -49,6 +50,32 @@ class F3XSerializerTestCase(TestCase):
         generate_data(self.committee, self.contact_1, self.q1_report, ["a"])
         report_id = calculate_summary("not_an_existing_report")
         self.assertIsNone(report_id)
+
+        report_id = calculate_summary(self.q1_report.id)
+        report = Report.objects.get(id=report_id)
+        self.assertEqual(
+            report.form_3x.L15_offsets_to_operating_expenditures_refunds_period,
+            Decimal("2125.79"),
+        )
+        self.assertEqual(
+            report.form_3x.L37_offsets_to_operating_expenditures_period,
+            Decimal("2125.79"),
+        )
+        self.assertEqual(report.calculation_status, CalculationState.SUCCEEDED.value)
+
+    def test_summary_calculation_is_restartable(self):
+        generate_data(self.committee, self.contact_1, self.q1_report, ["a"])
+        calculation_token = uuid4()
+        Report.objects.filter(id=self.q1_report.id).update(
+            calculation_token=calculation_token,
+            calculation_status=CalculationState.CALCULATING,
+        )
+
+        self.q1_report.refresh_from_db()
+        self.assertEqual(
+            self.q1_report.calculation_status,
+            CalculationState.CALCULATING.value
+        )
 
         report_id = calculate_summary(self.q1_report.id)
         report = Report.objects.get(id=report_id)

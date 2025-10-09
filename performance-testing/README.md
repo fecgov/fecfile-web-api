@@ -91,10 +91,7 @@ the duration of the testing session.  There are (as of writing) five tasks:
 
 In addition to load testing, Silk query profiling can be installed to inspect queries and response times.
 
-For a jump-start in setting up for Silk testing, consider merging in the `silk-profiling-base` branch.
-The branch contains the necessary configuration changes and marks a selection of functions for profiling.
-Silk requires changes to the database, so after merging, be sure to run `python manage.py migrate`
-or spin up a fresh container.
+To run silk testing, `export INCLUDE_SILK=True` on your local environment.
 
 Once set up, silk profiling will run automatically as the API receives and processes requests.
 To view the results, visit the API's `/silk` endpoint (for local development: `localhost:8080/silk/`)

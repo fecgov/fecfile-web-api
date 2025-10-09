@@ -1,4 +1,7 @@
 import uuid
+import requests
+from rest_framework.status import HTTP_404_NOT_FOUND
+from fecfiler import settings
 
 
 def generate_fec_uid():
@@ -27,3 +30,27 @@ def get_float_from_string(string, fallback=None):
 
 def get_boolean_from_string(string):
     return string.lower() == "true"
+
+
+"""
+FEC API methods
+"""
+
+
+def query_fec_api_single(endpoint, params):
+    results = query_fec_api(endpoint, params)
+    return results[0] if results else None
+
+
+def query_fec_api(endpoint, params, raise_for_404=True):
+    """Shared method to query an EFO API"""
+
+    headers = {
+        "Content-Type": "application/json",
+        "User-Agent": f"FECfile+ {settings.SPACE}",
+    }
+    response = requests.get(endpoint, headers=headers, params=params)
+    if response.status_code != HTTP_404_NOT_FOUND or raise_for_404:
+        response.raise_for_status()
+    response_data = response.json()
+    return response_data.get("results", [])

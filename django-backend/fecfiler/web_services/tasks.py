@@ -134,8 +134,6 @@ def submit_to_fec(
     mock=False,
 ):
     submission = UploadSubmission.objects.get(id=submission_record_id)
-    if submission.fecfile_task_state == FECSubmissionState.FAILED:
-        return
     submission.save_state(FECSubmissionState.SUBMITTING)
 
     """Get Password"""
@@ -235,6 +233,7 @@ def poll_for_fec_response(submission_id, submission_type_key, submission_name):
     try:
         submission = SUBMISSION_CLASSES[submission_type_key].objects.get(id=submission_id)
         submitter = SUBMISSION_MANAGERS[submission_type_key]()
+        submission.save_state(FECSubmissionState.POLLING)
 
         submission.fecfile_polling_attempts += 1
         logger.info(f"Polling status for {submission.fec_submission_id}.")
