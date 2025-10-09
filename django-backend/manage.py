@@ -22,6 +22,8 @@ allowed_commands = [
     "install_login_dot_gov_cert",
     "update_creds_service",
     "disable_user",
+    "reset_summary_calculation_state",
+    "fail_open_submissions",
 ]
 restricted_commands = [
     "loaddata",

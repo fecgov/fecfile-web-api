@@ -139,7 +139,7 @@ class CommitteeAccountsUtilsTest(TestCase):
             self.assertTrue(get_production_committee_emails.called)
 
     def test_get_production_committee_emails(self):
-        with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
+        with patch("fecfiler.shared.utilities.requests") as mock_requests:
             production_committee_data = {
                 "email": "list_of_emails",
             }
@@ -175,7 +175,7 @@ class CommitteeAccountsUtilsTest(TestCase):
             self.assertEqual(production_emails, None)
 
     def test_get_test_committee_emails(self):
-        with patch("fecfiler.committee_accounts.utils.requests") as mock_requests:
+        with patch("fecfiler.shared.utilities.requests") as mock_requests:
             test_committee_data = {
                 "email": "list_of_emails",
             }
@@ -195,7 +195,7 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_get_committee_account_data_from_test_PAC(self):  # noqa N802
         with (
-            patch("fecfiler.committee_accounts.utils.requests") as mock_requests,
+            patch("fecfiler.shared.utilities.requests") as mock_requests,
             patch("fecfiler.committee_accounts.utils.settings") as settings,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
@@ -228,7 +228,7 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_get_committee_account_data_from_test_PTY(self):  # noqa N802
         with (
-            patch("fecfiler.committee_accounts.utils.requests") as mock_requests,
+            patch("fecfiler.shared.utilities.requests") as mock_requests,
             patch("fecfiler.committee_accounts.utils.settings") as settings,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
@@ -261,7 +261,7 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_get_committee_account_data_from_production_processed(self):
         with (
-            patch("fecfiler.committee_accounts.utils.requests") as mock_requests,
+            patch("fecfiler.shared.utilities.requests") as mock_requests,
             patch("fecfiler.committee_accounts.utils.settings") as settings,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
@@ -286,7 +286,7 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_get_committee_account_data_from_production_processed_pac_pty(self):
         with (
-            patch("fecfiler.committee_accounts.utils.requests") as mock_requests,
+            patch("fecfiler.shared.utilities.requests") as mock_requests,
             patch("fecfiler.committee_accounts.utils.settings") as settings,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
@@ -311,7 +311,7 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_get_committee_account_data_from_production_raw(self):
         with (
-            patch("fecfiler.committee_accounts.utils.requests") as mock_requests,
+            patch("fecfiler.shared.utilities.requests") as mock_requests,
             patch("fecfiler.committee_accounts.utils.settings") as settings,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"

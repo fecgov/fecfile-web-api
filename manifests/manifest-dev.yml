@@ -11,9 +11,9 @@ defaults: &defaults
     - fecfile-api-redis
     - fecfile-api-creds-dev
   env:
+    SPACE: dev
     DISABLE_COLLECTSTATIC: 1
     DJANGO_SETTINGS_MODULE: fecfiler.settings.production
-    FFAPI_TIMEOUT_COOKIE_NAME: ffapi_timeout_dev
     FFAPI_COOKIE_DOMAIN: fecfile.fec.gov
     LOGIN_REDIRECT_CLIENT_URL: https://dev.fecfile.fec.gov
     LOGIN_REDIRECT_SERVER_URL: https://dev-api.fecfile.fec.gov/api/v1/oidc/login-redirect

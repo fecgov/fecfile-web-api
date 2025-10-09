@@ -210,7 +210,7 @@ jobs:
             git config user.name "apiinfo"
       - add_ssh_keys:
           fingerprints:
-            - "0f:22:e1:9d:81:ea:82:a0:fa:18:f2:0f:25:f7:3f:6f"
+            - "68:57:8f:bd:0a:29:0c:91:9d:dc:0d:d7:aa:76:aa:46"
       - run:
           name: Deploy docs to gh-pages branch
           command: npx gh-pages --dotfiles --dist ~/project/docs/_build/html

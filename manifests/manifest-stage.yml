@@ -11,9 +11,9 @@ defaults: &defaults
     - fecfile-api-redis
     - fecfile-api-creds-stage
   env:
+    SPACE: stage
     DISABLE_COLLECTSTATIC: 1
     DJANGO_SETTINGS_MODULE: fecfiler.settings.production
-    FFAPI_TIMEOUT_COOKIE_NAME: ffapi_timeout_stage
     FFAPI_COOKIE_DOMAIN: fecfile.fec.gov
     LOGIN_REDIRECT_CLIENT_URL: https://stage.fecfile.fec.gov
     LOGIN_REDIRECT_SERVER_URL: https://stage-api.fecfile.fec.gov/api/v1/oidc/login-redirect

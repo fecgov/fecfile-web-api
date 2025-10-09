@@ -34,12 +34,24 @@ class FECSubmissionState(str, Enum):
 
     INITIALIZING = "INITIALIZING"
     CREATING_FILE = "CREATING_FILE"
+    POLLING = "POLLING"
     SUBMITTING = "SUBMITTING"
     SUCCEEDED = "SUCCEEDED"
     FAILED = "FAILED"
 
     def __str__(self):
         return str(self.value)
+
+    @classmethod
+    def get_terminal_statuses(cls):
+        return [
+            FECSubmissionState.SUCCEEDED,
+            FECSubmissionState.FAILED,
+        ]
+
+    @classmethod
+    def get_terminal_statuses_strings(cls):
+        return [status.value for status in FECSubmissionState.get_terminal_statuses()]
 
 
 class FECStatus(str, Enum):
@@ -162,19 +174,21 @@ class BaseSubmission(models.Model):
                 if self.dot_fec.report.committee_account is not None:
                     committee_uuid = str(self.dot_fec.report.committee_account.id)
 
-        submission_state = {"efo_submission_failure": {
-            "submission_id": str(self.id),
-            "report_id": report_id,
-            "committee_uuid": committee_uuid,
-            "dot_fec_filename": file_name,
-            "fecfile_task_state": self.fecfile_task_state,
-            "fecfile_polling_attempts": self.fecfile_polling_attempts,
-            "fecfile_error": self.fecfile_error,
-            "fec_submission_id": self.fec_submission_id,
-            "fec_status": self.fec_status,
-            "fec_message": self.fec_message,
-            "task_completed": str(self.task_completed)
-        }}
+        submission_state = {
+            "efo_submission_failure": {
+                "submission_id": str(self.id),
+                "report_id": report_id,
+                "committee_uuid": committee_uuid,
+                "dot_fec_filename": file_name,
+                "fecfile_task_state": self.fecfile_task_state,
+                "fecfile_polling_attempts": self.fecfile_polling_attempts,
+                "fecfile_error": self.fecfile_error,
+                "fec_submission_id": self.fec_submission_id,
+                "fec_status": self.fec_status,
+                "fec_message": self.fec_message,
+                "task_completed": str(self.task_completed),
+            }
+        }
 
         logger.warning(json.dumps(submission_state))
 
@@ -203,7 +217,7 @@ class UploadSubmission(BaseSubmission):
             logger.info(f"FEC upload is processing: {response_string}")
         elif fec_response_json.get("status") in (
             FECStatus.ACCEPTED.value,
-            FECStatus.COMPLETED.value
+            FECStatus.COMPLETED.value,
         ):
             logger.info(f"FEC upload successful: {response_string}")
         else:
@@ -243,7 +257,7 @@ class WebPrintSubmission(BaseSubmission):
             logger.info(f"FEC upload is processing: {response_string}")
         elif fec_response_json.get("status") in (
             FECStatus.ACCEPTED.value,
-            FECStatus.COMPLETED.value
+            FECStatus.COMPLETED.value,
         ):
             logger.info(f"FEC upload successful: {response_string}")
         else:

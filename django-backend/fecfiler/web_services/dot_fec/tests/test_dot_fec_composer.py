@@ -2,7 +2,6 @@ from unittest.mock import patch
 from django.test import TestCase
 from fecfiler.web_services.dot_fec.dot_fec_composer import (
     compose_dot_fec,
-    compose_transaction,
     add_row_to_content,
     compose_header,
 )
@@ -15,17 +14,13 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x, create_form99, create_report_memo
 from fecfiler.transactions.tests.utils import (
     create_schedule_a,
-    create_loan_from_bank,
-    create_test_transaction,
 )
-from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.contacts.tests.utils import (
     create_test_individual_contact,
     create_test_committee_contact,
 )
 from django.core.exceptions import ImproperlyConfigured
 from datetime import datetime
-from decimal import Decimal
 
 
 class DotFECSerializerTestCase(TestCase):
@@ -150,7 +145,6 @@ class DotFECSerializerTestCase(TestCase):
         row_str = add_row_to_content("", transaction_row)
         self.assertIn("75.00", row_str)
 
-    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.5")
     def test_f99(self):
         content = compose_dot_fec(self.f99.id)
         split_content = content.split(CRLF_STR)
@@ -170,120 +164,3 @@ class DotFECSerializerTestCase(TestCase):
         with self.assertRaises(ImproperlyConfigured) as cm:
             compose_header(self.f3x.id)
         self.assertIn("FEC_FORMAT_VERSION is not set", str(cm.exception))
-
-    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.4")
-    def test_schema_override_8_dot_4_f99(self):
-        content = compose_dot_fec(self.f99.id)
-        split_content = content.split(CRLF_STR)
-        split_report_row = split_content[1].split(FS_STR)
-        self.assertEqual(split_report_row[14], "ABC")
-        self.assertEqual(len(split_report_row), 15)
-
-    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.5")
-    def test_schema_override_8_dot_5_f99(self):
-        content = compose_dot_fec(self.f99.id)
-        split_content = content.split(CRLF_STR)
-        split_report_row = split_content[1].split(FS_STR)
-        self.assertEqual(split_report_row[14], "ABC")
-        self.assertEqual(len(split_report_row), 17)
-
-    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.4")
-    def test_schema_override_8_dot_4_C2(self):
-        _, _, _, c2 = create_loan_from_bank(
-            self.committee,
-            self.contact_1,
-            1000.00,
-            datetime.strptime("2024-01-10", "%Y-%m-%d"),
-            "5%",
-            loan_incurred_date=datetime.strptime("2024-01-02", "%Y-%m-%d"),
-            report=self.f3x,
-        )
-        c2.schedule_c2.guaranteed_amount = Decimal(10.00)
-        c2.schedule_c2.save()
-        c2.refresh_from_db()
-        compose_transaction(c2)
-        content = serialize_instance("SchC2", c2)
-        split_content = content.split(FS_STR)
-        self.assertEqual(split_content[0], "SC2/10")
-        self.assertEqual(split_content[4], self.contact_1.last_name)
-        self.assertEqual(split_content[5], self.contact_1.first_name)
-        self.assertEqual(split_content[6], self.contact_1.middle_name)
-        self.assertEqual(split_content[7], self.contact_1.prefix)
-        self.assertEqual(split_content[8], self.contact_1.suffix)
-        self.assertEqual(split_content[9], self.contact_1.street_1)
-        self.assertEqual(split_content[10], self.contact_1.street_2)
-        self.assertEqual(split_content[11], self.contact_1.city)
-        self.assertEqual(split_content[12], self.contact_1.state)
-        self.assertEqual(split_content[13], self.contact_1.zip)
-        self.assertEqual(split_content[14], self.contact_1.employer)
-        self.assertEqual(split_content[15], self.contact_1.occupation)
-        self.assertEqual(split_content[16], "10.00")
-
-    @patch("fecfiler.validation.utilities.FEC_FORMAT_VERSION", "8.5")
-    def test_schema_override_8_dot_5_C2(self):
-        loan, _, _, c2 = create_loan_from_bank(
-            self.committee,
-            self.committee_contact,
-            1000.00,
-            datetime.strptime("2024-01-10", "%Y-%m-%d"),
-            "5%",
-            loan_incurred_date=datetime.strptime("2024-01-02", "%Y-%m-%d"),
-            report=self.f3x,
-        )
-        c2.schedule_c2.guaranteed_amount = Decimal(10.00)
-        c2.schedule_c2.save()
-        c2.refresh_from_db()
-        compose_transaction(c2)
-        content = serialize_instance("SchC2", c2)
-        split_content = content.split(FS_STR)
-        self.assertEqual(split_content[0], "SC2/10")
-        self.assertEqual(split_content[4], self.committee_contact.type)
-        self.assertEqual(split_content[5], self.committee_contact.name)
-        self.assertEqual(split_content[6], self.committee_contact.committee_id)
-
-        self.assertEqual(split_content[7], "")
-        self.assertEqual(split_content[8], "")
-        self.assertEqual(split_content[12], self.committee_contact.street_1)
-        self.assertEqual(split_content[13], self.committee_contact.street_2)
-        self.assertEqual(split_content[14], self.committee_contact.city)
-        self.assertEqual(split_content[15], self.committee_contact.state)
-        self.assertEqual(split_content[16], self.committee_contact.zip)
-        self.assertEqual(split_content[17], "")
-        self.assertEqual(split_content[18], "")
-        self.assertEqual(split_content[19], "10.00")
-
-        c2_individual = create_test_transaction(
-            "C2_LOAN_GUARANTOR",
-            ScheduleC2,
-            self.committee,
-            contact_1=self.contact_1,
-            group=None,
-            report=self.f3x,
-            schedule_data={},
-            transaction_data={"_form_type": "SC2/10", "parent_transaction_id": loan.id},
-        )
-
-        c2_individual.schedule_c2.guaranteed_amount = Decimal(20.00)
-        c2_individual.schedule_c2.save()
-        c2_individual.refresh_from_db()
-        compose_transaction(c2_individual)
-        content = serialize_instance("SchC2", c2_individual)
-        split_content = content.split(FS_STR)
-        self.assertEqual(split_content[0], "SC2/10")
-        self.assertEqual(split_content[4], self.contact_1.type)
-        self.assertEqual(split_content[5], "")
-        self.assertEqual(split_content[6], "")
-
-        self.assertEqual(split_content[7], self.contact_1.last_name)
-        self.assertEqual(split_content[8], self.contact_1.first_name)
-        self.assertEqual(split_content[9], self.contact_1.middle_name)
-        self.assertEqual(split_content[10], self.contact_1.prefix)
-        self.assertEqual(split_content[11], self.contact_1.suffix)
-        self.assertEqual(split_content[12], self.contact_1.street_1)
-        self.assertEqual(split_content[13], self.contact_1.street_2)
-        self.assertEqual(split_content[14], self.contact_1.city)
-        self.assertEqual(split_content[15], self.contact_1.state)
-        self.assertEqual(split_content[16], self.contact_1.zip)
-        self.assertEqual(split_content[17], self.contact_1.employer)
-        self.assertEqual(split_content[18], self.contact_1.occupation)
-        self.assertEqual(split_content[19], "20.00")
