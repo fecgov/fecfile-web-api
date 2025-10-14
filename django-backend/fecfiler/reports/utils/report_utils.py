@@ -32,6 +32,7 @@ def reset_submitting_report(id):
 
     Report.objects.filter(id=report_uuid).update(
         calculation_status=None,
+        calculation_token=None,
         upload_submission_id=None,
         webprint_submission_id=None,
     )

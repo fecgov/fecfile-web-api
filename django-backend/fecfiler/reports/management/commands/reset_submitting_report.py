@@ -21,7 +21,7 @@ class Command(FECCommand):
         report_id = options["report_id"]
         logger.info(
             f"""
-                Begining reset of the in-progress report submission with id {report_id}
+                Beginning reset of the in-progress report submission with id {report_id}
                 """
         )
         reset_submitting_report(report_id)
