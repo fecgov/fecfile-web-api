@@ -23,9 +23,11 @@ class ReportUtilTestCase(TestCase):
         self.f3x = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
 
     def test_reset_calculation_status(self, use="method"):
+        # create mock calculation bits
         self.f3x.calculation_token = uuid4()  # mock token
         self.f3x.calculation_status = CalculationState.CALCULATING
 
+        # create mock dot fec record and associated upload/webprint submissions
         test_dot_fec_record = DotFEC.objects.create()
         test_upload_submission = UploadSubmission.objects.create(
             dot_fec=test_dot_fec_record
@@ -38,7 +40,7 @@ class ReportUtilTestCase(TestCase):
 
         self.f3x.save()
 
-        # fail open submissions, either with the method or command
+        # reset the submitting report, either with the method or command
         if use == "command":
             call_command(
                 "reset_submitting_report",
@@ -48,6 +50,7 @@ class ReportUtilTestCase(TestCase):
         else:
             reset_submitting_report(str(self.f3x.id))
 
+        # refresh from db and validate reset
         self.f3x.refresh_from_db()
         self.assertEqual(self.f3x.calculation_token, None)
         self.assertEqual(self.f3x.calculation_status, None)
