@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user',
             name='security_consent_version',
-            field=models.IntegerField(blank=True, null=True),
+            field=models.CharField(blank=True, null=True),
         ),
     ]
