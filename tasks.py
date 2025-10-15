@@ -224,7 +224,7 @@ def _run_migrations(ctx, space):
             print(f"Migration in progress... ({minutes_elapsed} minutes elapsed)")
 
             ctx.run(
-                f"cf logs {MIGRATOR_APP_NAME} | grep 'Run Migrations' ",
+                f"cf logs --recent {MIGRATOR_APP_NAME} | grep 'Run Migrations' ",
                 echo=True,
                 warn=True,
             )
