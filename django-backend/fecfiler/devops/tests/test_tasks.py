@@ -89,12 +89,14 @@ class DevopsTasksTestCase(TestCase):
 
     @patch("fecfiler.devops.tasks.S3_SESSION")
     def test_delete_expired_s3_objects(self, mock_s3_session):
-        test_s3_object_1 = {"key": "test_key_1", "last_modified": timezone.now()}
-        test_s3_object_2 = {
-            "key": "test_key_2",
-            "last_modified": timezone.now()
-            - timedelta(days=(S3_OBJECTS_MAX_AGE_DAYS + 10)),
-        }
+        test_s3_object_1 = MagicMock()
+        test_s3_object_1.key = "test_key_1"
+        test_s3_object_1.last_modified = timezone.now()
+        test_s3_object_2 = MagicMock()
+        test_s3_object_2.key = "test_key_2"
+        test_s3_object_2.last_modified = timezone.now() - timedelta(
+            days=(S3_OBJECTS_MAX_AGE_DAYS + 10)
+        )
         test_s3_objects = [test_s3_object_1, test_s3_object_2]
         mock_s3_session.Bucket.return_value.objects.all.return_value = test_s3_objects
 

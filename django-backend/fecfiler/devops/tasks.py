@@ -63,9 +63,9 @@ def delete_expired_s3_objects():
 
     object_expiry_datetime = timezone.now() - timedelta(days=S3_OBJECTS_MAX_AGE_DAYS)
     keys_to_delete = [
-        {"Key": object["key"]}
+        {"Key": object.key}
         for object in bucket.objects.all()
-        if object["last_modified"] < object_expiry_datetime
+        if object is not None and object.last_modified < object_expiry_datetime
     ]
     delete_count = len(keys_to_delete)
     if delete_count > 0:
