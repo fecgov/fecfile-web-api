@@ -20,7 +20,7 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
     MockWebPrintSubmitter,
 )
 
-# from .web_service_storage import get_file_bytes, store_file
+from .web_service_storage import get_file_bytes  # , store_file
 from fecfiler.settings import (
     INITIAL_POLLING_INTERVAL,
     INITIAL_POLLING_DURATION,
