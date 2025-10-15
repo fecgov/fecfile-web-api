@@ -199,6 +199,14 @@ def _check_for_migrations(ctx, space):
     return True
 
 
+def _print_recent_migrator_logs(ctx):
+    ctx.run(
+        f"cf logs --recent {MIGRATOR_APP_NAME} | grep 'Run Migrations' ",
+        echo=True,
+        warn=True,
+    )
+
+
 def _run_migrations(ctx, space):
     print("Running migrations...")
 
@@ -223,15 +231,12 @@ def _run_migrations(ctx, space):
             minutes_elapsed += 1
             print(f"Migration in progress... ({minutes_elapsed} minutes elapsed)")
 
-            ctx.run(
-                f"cf logs --recent {MIGRATOR_APP_NAME} | grep 'Run Migrations' ",
-                echo=True,
-                warn=True,
-            )
-
             # Check every second for the stop event
             for _ in range(60):
+                if _ != 0 and _ % 10 == 0:
+                    _print_recent_migrator_logs(ctx)
                 if heartbeat_stop_event.is_set():
+                    _print_recent_migrator_logs(ctx)
                     break
                 time.sleep(1)
 
