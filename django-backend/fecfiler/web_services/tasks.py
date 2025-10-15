@@ -1,5 +1,5 @@
-# from datetime import datetime
-# import math
+from datetime import datetime
+import math
 from celery import shared_task
 from fecfiler.web_services.models import (
     BaseSubmission,
@@ -10,7 +10,7 @@ from fecfiler.web_services.models import (
     FECStatus,
 )
 
-# from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
+from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
 from fecfiler.web_services.dot_fec.dot_fec_submitter import (
     EFODotFECSubmitter,
     MockDotFECSubmitter,
@@ -20,7 +20,7 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
     MockWebPrintSubmitter,
 )
 
-from .web_service_storage import get_file_bytes  # , store_file
+from .web_service_storage import get_file_bytes, store_file
 from fecfiler.settings import (
     INITIAL_POLLING_INTERVAL,
     INITIAL_POLLING_DURATION,
@@ -71,35 +71,32 @@ def create_dot_fec(
         submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
 
-    # bail out early to hang the submission
-    return None
+    try:
+        file_content = compose_dot_fec(report_id)
+        if file_name is None:
+            file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
 
-    # try:
-    #     file_content = compose_dot_fec(report_id)
-    #     if file_name is None:
-    #         file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
+        if not file_content:
+            raise Exception("No file created")
+        store_file(file_content, file_name, force_write_to_disk)
+        dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
+        dot_fec_record.save()
+    except Exception as e:
+        logger.error(f"Creating .FEC for report {report_id} failed: {e}")
+        if submission is not None:
+            submission.save_error("Creating .FEC failed")
+        raise e
 
-    #     if not file_content:
-    #         raise Exception("No file created")
-    #     store_file(file_content, file_name, force_write_to_disk)
-    #     dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
-    #     dot_fec_record.save()
-    # except Exception as e:
-    #     logger.error(f"Creating .FEC for report {report_id} failed: {e}")
-    #     if submission is not None:
-    #         submission.save_error("Creating .FEC failed")
-    #     raise e
+    if upload_submission_id:
+        UploadSubmission.objects.filter(id=upload_submission_id).update(
+            dot_fec=dot_fec_record
+        )
+    if webprint_submission_id:
+        WebPrintSubmission.objects.filter(id=webprint_submission_id).update(
+            dot_fec=dot_fec_record
+        )
 
-    # if upload_submission_id:
-    #     UploadSubmission.objects.filter(id=upload_submission_id).update(
-    #         dot_fec=dot_fec_record
-    #     )
-    # if webprint_submission_id:
-    #     WebPrintSubmission.objects.filter(id=webprint_submission_id).update(
-    #         dot_fec=dot_fec_record
-    #     )
-
-    # return dot_fec_record.id
+    return dot_fec_record.id
 
 
 def log_polling_notice(attempts):
