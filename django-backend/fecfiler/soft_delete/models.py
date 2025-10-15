@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from django.db import models
 from .managers import SoftDeleteManager
 
@@ -20,7 +20,7 @@ class SoftDeleteModel(models.Model):
         abstract = True
 
     def delete(self):
-        self.deleted = datetime.now()
+        self.deleted = datetime.now(timezone.utc)
         self.save()
 
     def hard_delete(self):
