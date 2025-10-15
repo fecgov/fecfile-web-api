@@ -34,7 +34,7 @@ def reset_submitting_report(id):
         WebPrintSubmission.objects.get(id=webprint_submission_id).delete()
 
     # clear the dot_fec record if matching report_id found and delete from S3
-    dot_fec_record = DotFEC.objects.get(report_id=report_uuid)
+    dot_fec_record = DotFEC.objects.filter(report_id=report_uuid).first()
     if dot_fec_record:
         if S3_SESSION is not None:
             file_name = dot_fec_record.file_name
