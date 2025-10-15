@@ -254,8 +254,6 @@ workflows:
             branches:
               only: /develop|feature\/2444-reset_submitting_report-DEV_test|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
-          requires:
-            - test
           filters:
             branches:
               only: develop
