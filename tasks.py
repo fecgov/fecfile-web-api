@@ -223,6 +223,12 @@ def _run_migrations(ctx, space):
             minutes_elapsed += 1
             print(f"Migration in progress... ({minutes_elapsed} minutes elapsed)")
 
+            ctx.run(
+                f"cf logs {MIGRATOR_APP_NAME} | grep 'Run Migrations' ",
+                echo=True,
+                warn=True,
+            )
+
             # Check every second for the stop event
             for _ in range(60):
                 if heartbeat_stop_event.is_set():
