@@ -31,7 +31,6 @@ fecfiler.reports.tests
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.reports.tests.test_commands
    fecfiler.reports.tests.test_models
    fecfiler.reports.tests.test_utils
    fecfiler.reports.tests.test_views

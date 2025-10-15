@@ -1,6 +1,0 @@
-fecfiler.reports.utils.report\_utils.reset\_summary\_calculation\_state
-=======================================================================
-
-.. currentmodule:: fecfiler.reports.utils.report_utils
-
-.. autofunction:: reset_summary_calculation_state

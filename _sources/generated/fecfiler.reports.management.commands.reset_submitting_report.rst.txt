@@ -1,10 +1,10 @@
 ..
     This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
     
-fecfiler.reports.management.commands.reset\_summary\_calculation\_state
-=======================================================================
+fecfiler.reports.management.commands.reset\_submitting\_report
+==============================================================
 
-.. automodule:: fecfiler.reports.management.commands.reset_summary_calculation_state
+.. automodule:: fecfiler.reports.management.commands.reset_submitting_report
   
    
    

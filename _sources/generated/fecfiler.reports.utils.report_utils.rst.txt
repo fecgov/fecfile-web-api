@@ -17,7 +17,7 @@ fecfiler.reports.utils.report\_utils
    .. autosummary::
       :toctree:                                          
    
-      reset_summary_calculation_state
+      reset_submitting_report
    
    
 
