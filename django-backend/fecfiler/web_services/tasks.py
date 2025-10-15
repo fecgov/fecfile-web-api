@@ -69,32 +69,35 @@ def create_dot_fec(
         submission = WebPrintSubmission.objects.get(id=webprint_submission_id)
         submission.save_state(FECSubmissionState.CREATING_FILE)
 
-    try:
-        file_content = compose_dot_fec(report_id)
-        if file_name is None:
-            file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
+    # bail out early to hang the submission
+    return None
 
-        if not file_content:
-            raise Exception("No file created")
-        store_file(file_content, file_name, force_write_to_disk)
-        dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
-        dot_fec_record.save()
-    except Exception as e:
-        logger.error(f"Creating .FEC for report {report_id} failed: {e}")
-        if submission is not None:
-            submission.save_error("Creating .FEC failed")
-        raise e
+    # try:
+    #     file_content = compose_dot_fec(report_id)
+    #     if file_name is None:
+    #         file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
 
-    if upload_submission_id:
-        UploadSubmission.objects.filter(id=upload_submission_id).update(
-            dot_fec=dot_fec_record
-        )
-    if webprint_submission_id:
-        WebPrintSubmission.objects.filter(id=webprint_submission_id).update(
-            dot_fec=dot_fec_record
-        )
+    #     if not file_content:
+    #         raise Exception("No file created")
+    #     store_file(file_content, file_name, force_write_to_disk)
+    #     dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
+    #     dot_fec_record.save()
+    # except Exception as e:
+    #     logger.error(f"Creating .FEC for report {report_id} failed: {e}")
+    #     if submission is not None:
+    #         submission.save_error("Creating .FEC failed")
+    #     raise e
 
-    return dot_fec_record.id
+    # if upload_submission_id:
+    #     UploadSubmission.objects.filter(id=upload_submission_id).update(
+    #         dot_fec=dot_fec_record
+    #     )
+    # if webprint_submission_id:
+    #     WebPrintSubmission.objects.filter(id=webprint_submission_id).update(
+    #         dot_fec=dot_fec_record
+    #     )
+
+    # return dot_fec_record.id
 
 
 def log_polling_notice(attempts):
@@ -163,20 +166,23 @@ def submit_to_fec(
         )
         submission.save_fec_response(submission_response_string)
 
-        """Poll FEC for status of submission"""
-        if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
-            log_polling_notice(submission.fecfile_polling_attempts)
-            """ apply_async()
-            The apply_async() method can only take json serializable values as arguments.
-            This means we can't pass objects with methods.  To get around that, we pass
-            the submission id and a key that we can use to determine the type of the
-            submission.  This lets us instantiate objects of the correct classes as we
-            need them."""
-            return poll_for_fec_response.apply_async(
-                [submission.id, submission_type_key, "Dot FEC"]
-            )
-        else:
-            return resolve_final_submission_state(submission)
+        # bail out early to hang before polling
+        return None
+
+        # """Poll FEC for status of submission"""
+        # if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
+        #     log_polling_notice(submission.fecfile_polling_attempts)
+        #     """ apply_async()
+        #     The apply_async() method can only take json serializable values as arguments.
+        #     This means we can't pass objects with methods.  To get around that, we pass
+        #     the submission id and a key that we can use to determine the type of the
+        #     submission.  This lets us instantiate objects of the correct classes as we
+        #     need them."""
+        #     return poll_for_fec_response.apply_async(
+        #         [submission.id, submission_type_key, "Dot FEC"]
+        #     )
+        # else:
+        #     return resolve_final_submission_state(submission)
     except Exception as e:
         logger.error(f"Error before polling: {str(e)}")
         submission.save_error("Failed submitting to FEC")
@@ -207,21 +213,24 @@ def submit_to_webprint(
         submission_response_string = submitter.submit(None, dot_fec_bytes)
         submission.save_fec_response(submission_response_string)
 
-        if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
-            log_polling_notice(submission.fecfile_polling_attempts)
-            """ apply_async()
-            The apply_async() method can only take json serializable values as arguments.
-            This means we can't pass objects with methods.  To get around that, we pass
-            the submission id and a key that we can use to determine the type of the
-            submission.  This lets us instantiate objects of the correct classes as we
-            need them."""
-            countdown = calculate_polling_interval(submission.fecfile_polling_attempts)
-            return poll_for_fec_response.apply_async(
-                [submission.id, submission_type_key, "WebPrint"],
-                countdown=countdown,
-            )
-        else:
-            return resolve_final_submission_state(submission)
+        # bail out early to hang before polling
+        return None
+
+        # if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
+        #     log_polling_notice(submission.fecfile_polling_attempts)
+        #     """ apply_async()
+        #     The apply_async() method can only take json serializable values as arguments.
+        #     This means we can't pass objects with methods.  To get around that, we pass
+        #     the submission id and a key that we can use to determine the type of the
+        #     submission.  This lets us instantiate objects of the correct classes as we
+        #     need them."""
+        #     countdown = calculate_polling_interval(submission.fecfile_polling_attempts)
+        #     return poll_for_fec_response.apply_async(
+        #         [submission.id, submission_type_key, "WebPrint"],
+        #         countdown=countdown,
+        #     )
+        # else:
+        #     return resolve_final_submission_state(submission)
     except Exception as e:
         logger.error(f"Error before polling: {str(e)}")
         submission.save_error("Failed submitting to WebPrint")
