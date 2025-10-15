@@ -1,5 +1,5 @@
-from datetime import datetime
-import math
+# from datetime import datetime
+# import math
 from celery import shared_task
 from fecfiler.web_services.models import (
     BaseSubmission,
@@ -9,7 +9,8 @@ from fecfiler.web_services.models import (
     FECSubmissionState,
     FECStatus,
 )
-from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
+
+# from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
 from fecfiler.web_services.dot_fec.dot_fec_submitter import (
     EFODotFECSubmitter,
     MockDotFECSubmitter,
@@ -18,7 +19,8 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
     EFOWebPrintSubmitter,
     MockWebPrintSubmitter,
 )
-from .web_service_storage import get_file_bytes, store_file
+
+# from .web_service_storage import get_file_bytes, store_file
 from fecfiler.settings import (
     INITIAL_POLLING_INTERVAL,
     INITIAL_POLLING_DURATION,
@@ -173,7 +175,7 @@ def submit_to_fec(
         # if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
         #     log_polling_notice(submission.fecfile_polling_attempts)
         #     """ apply_async()
-        #     The apply_async() method can only take json serializable values as arguments.
+        #     The apply_async() method can only take json serializable values as args.
         #     This means we can't pass objects with methods.  To get around that, we pass
         #     the submission id and a key that we can use to determine the type of the
         #     submission.  This lets us instantiate objects of the correct classes as we
@@ -219,7 +221,7 @@ def submit_to_webprint(
         # if submission.fec_status not in FECStatus.get_terminal_statuses_strings():
         #     log_polling_notice(submission.fecfile_polling_attempts)
         #     """ apply_async()
-        #     The apply_async() method can only take json serializable values as arguments.
+        #     The apply_async() method can only take json serializable values as args.
         #     This means we can't pass objects with methods.  To get around that, we pass
         #     the submission id and a key that we can use to determine the type of the
         #     submission.  This lets us instantiate objects of the correct classes as we
