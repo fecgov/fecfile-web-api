@@ -27,6 +27,9 @@ class UserViewSet(
                 days=365
             )
         else:
+            # If the user did not consent for one year, we need to clear the expiration date
+            if consent_for_one_year is False:
+                additional_data["security_consent_exp_date"] = None
             request.session[session_security_consented_key] = True
         serializer.save(**additional_data)
         return Response(serializer.data)
