@@ -201,7 +201,7 @@ def _check_for_migrations(ctx, space):
 
 def _print_recent_migrator_logs(ctx):
     ctx.run(
-        f"cf logs --recent {MIGRATOR_APP_NAME} | grep 'Run Migrations' ",
+        f"cf logs --recent {MIGRATOR_APP_NAME} | grep 'Run Migrations' | grep -i 'Apply all migrations:|Running migrations:|Applying .*\.\.\.' ",
         echo=True,
         warn=True,
     )
