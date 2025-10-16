@@ -200,8 +200,12 @@ def _check_for_migrations(ctx, space):
 
 
 def _print_recent_migrator_logs(ctx):
+    grep_apply_statements = (
+        "grep 'Apply all migrations:|Running migrations:|Applying .*...'"
+    )
+    grep_filter = f"grep 'Run Migrations' | {grep_apply_statements}"
     ctx.run(
-        f"cf logs --recent {MIGRATOR_APP_NAME} | grep 'Run Migrations' | grep -i 'Apply all migrations:|Running migrations:|Applying .*\.\.\.' ",
+        f"cf logs --recent {MIGRATOR_APP_NAME} | {grep_filter}",
         echo=True,
         warn=True,
     )
