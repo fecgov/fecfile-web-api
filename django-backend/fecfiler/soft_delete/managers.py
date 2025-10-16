@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from django.db import models
 
 """Manager to add soft delete functionality
@@ -35,7 +35,7 @@ class SoftDeleteQuerySet(models.QuerySet):
     """
 
     def delete(self):
-        return super(SoftDeleteQuerySet, self).update(deleted=datetime.now())
+        return super(SoftDeleteQuerySet, self).update(deleted=datetime.now(timezone.utc))
 
     def hard_delete(self):
         return super(SoftDeleteQuerySet, self).delete()
