@@ -101,6 +101,7 @@ fecfiler.user.models.User
       ~User.password
       ~User.pk
       ~User.security_consent_exp_date
+      ~User.security_consent_version
       ~User.user_permissions
       ~User.username
       ~User.username_validator
