@@ -15,16 +15,16 @@
             "date_joined": "2020-09-28T15:22:56.477Z"
         }
     },
-        {
+    {
         "model": "user.user",
-        "pk": "abcdef12-aaaa-bbbb-cccc-000000000001",
+        "pk": "e100e1da-cbfc-4189-aece-d139048a8e0b",
         "fields": {
-            "password": "pbkdf2_sha256$this0is0a0fake0password0it0doesnt0match0anything0at0all0it0just0needs0big=",
+            "password": "",
             "is_superuser": false,
-            "email": "test_user_0001@fec.gov",
-            "username": "test_user_0001@fec.gov",
-            "first_name": "First",
-            "last_name": "Last",
+            "email": "admin@admin.com",
+            "username": "c34867d9-3a41-43ff-ae25-ca498f64b52e",
+            "first_name": "Admin",
+            "last_name": "Adminson",
             "last_login": "2022-05-02T13:44:07.324Z",
             "is_staff": false,
             "is_active": true,
@@ -33,14 +33,14 @@
     },
     {
         "model": "user.user",
-        "pk": "abcdef12-aaaa-bbbb-cccc-000000000002",
+        "pk": "944eac55-8280-4dc1-afaa-c4ca9526a35f",
         "fields": {
-            "password": "pbkdf2_sha256$this0is0a0fake0password0it0doesnt0match0anything0at0all0it0just0needs0big=",
+            "password": "",
             "is_superuser": false,
-            "email": "test_user_0002@fec.gov",
-            "username": "test_user_0002fec.gov",
-            "first_name": "First",
-            "last_name": "Last",
+            "email": "test333@test.com",
+            "username": "e87801aa-d220-47e0-a908-a1d12dbe0a49",
+            "first_name": "Test333",
+            "last_name": "Testson333",
             "last_login": "2022-05-02T13:44:07.324Z",
             "is_staff": false,
             "is_active": true,
@@ -70,11 +70,23 @@
     },
     {
         "model": "committee_accounts.Membership",
-        "pk": "beb9d2a2-9102-4b7d-92a4-02cbfe134d11",
+        "pk": "bf91318e-665e-48d5-b138-8265c56a800d",
         "fields": {
             "role": "MANAGER",
             "committee_account_id": "c94c5d1a-9e73-464d-ad72-b73b5d8667a9",
-            "user_id": "abcdef12-aaaa-bbbb-cccc-000000000001",
+            "user_id": "944eac55-8280-4dc1-afaa-c4ca9526a35f",
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.Membership",
+        "pk": "beb9d2a2-9102-4b7d-92a4-02cbfe134d11",
+        "fields": {
+            "role": "COMMITTEE_ADMINISTRATOR",
+            "committee_account_id": "c94c5d1a-9e73-464d-ad72-b73b5d8667a9",
+            "user_id": "e100e1da-cbfc-4189-aece-d139048a8e0b",
             "pending_email": null,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z"
@@ -93,7 +105,7 @@
         "model": "committee_accounts.Membership",
         "pk": "d4ca18d2-06c1-42b7-a379-274d84535526",
         "fields": {
-            "role": "MANAGER",
+            "role": "COMMITTEE_ADMINISTRATOR",
             "committee_account_id": "7c176dc0-7062-49b5-bc35-58b4ef050d08",
             "user_id": "e100e1da-cbfc-4189-aece-d139048a8e0a",
             "pending_email": null,
@@ -101,13 +113,46 @@
             "updated": "2022-02-09T00:00:00.000Z"
         }
     },
-        {
+    {
+        "model": "committee_accounts.CommitteeAccount",
+        "pk": "7c176dc0-7062-49b5-bc35-58b4ef050d09",
+        "fields": {
+            "committee_id": "C99999997",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
         "model": "committee_accounts.Membership",
-        "pk": "d4ca18d2-06c1-42b7-a379-274d84535527",
+        "pk": "d4ca18d2-06c1-42b7-a379-274d84530000",
+        "fields": {
+            "role": "MANAGER",
+            "committee_account_id": "7c176dc0-7062-49b5-bc35-58b4ef050d09",
+            "user_id": "e100e1da-cbfc-4189-aece-d139048a8e0a",
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.Membership",
+        "pk": "d4ca18d2-06c1-42b7-a379-274d84535500",
         "fields": {
             "role": "COMMITTEE_ADMINISTRATOR",
-            "committee_account_id": "7c176dc0-7062-49b5-bc35-58b4ef050d08",
-            "user_id": "abcdef12-aaaa-bbbb-cccc-000000000001",
+            "committee_account_id": "7c176dc0-7062-49b5-bc35-58b4ef050d09",
+            "user_id": "e100e1da-cbfc-4189-aece-d139048a8e0b",
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.Membership",
+        "pk": "d4ca18d2-06c1-42b7-a379-274d84530001",
+        "fields": {
+            "role": "COMMITTEE_ADMINISTRATOR",
+            "committee_account_id": "7c176dc0-7062-49b5-bc35-58b4ef050d09",
+            "user_id": "944eac55-8280-4dc1-afaa-c4ca9526a35f",
             "pending_email": null,
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z"
