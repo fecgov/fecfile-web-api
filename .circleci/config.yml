@@ -253,22 +253,22 @@ workflows:
       - trigger-e2e-test-pipeline:
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|feature\/2578-circleci_blobless-DEV_test|release\/sprint-[\.\d]+|release\/test|main/
       - deploy-job:
           requires:
             - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|feature\/2578-circleci_blobless-DEV_test|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
           requires:
             - test
           filters:
             branches:
-              only: develop
+              only: /develop|feature\/2578-circleci_blobless-DEV_test/
       - docs-deploy:
           requires:
             - docs-build
           filters:
             branches:
-              only: develop
+              only: /develop|feature\/2578-circleci_blobless-DEV_test/
