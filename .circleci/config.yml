@@ -253,7 +253,7 @@ workflows:
       - deploy-job:
           filters:
             branches:
-              only: /feature\/2349|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - docs-build:
           requires:
             - test
