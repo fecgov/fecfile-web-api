@@ -30,7 +30,8 @@ jobs:
             EOF
             exit 0
 
-      - checkout
+      - checkout:
+          method: blobless
 
       - run:
           name: Create unified requirements so CircleCI can cache them
@@ -142,7 +143,8 @@ jobs:
       - image: cimg/python:3.13
 
     steps:
-      - checkout
+      - checkout:
+          method: blobless
 
       - python/install-packages:
           pkg-manager: pip
@@ -166,7 +168,8 @@ jobs:
       - image: cimg/python:3.13
 
     steps:
-      - checkout
+      - checkout:
+          method: blobless
 
       - run:
           name: Create unified requirements so CircleCI can cache them
@@ -195,7 +198,8 @@ jobs:
     docker:
       - image: cimg/node:lts
     steps:
-      - checkout
+      - checkout:
+          method: blobless
       - attach_workspace:
           at: ~/project/docs/_build
       - run:
