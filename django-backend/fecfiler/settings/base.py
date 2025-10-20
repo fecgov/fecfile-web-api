@@ -5,6 +5,7 @@ Django settings for the FECFile project.
 import os
 import dj_database_url
 import structlog
+from structlog.processors import CallsiteParameter
 import logging
 import sys
 
@@ -381,12 +382,25 @@ def get_logging_config(log_format=LINE):
     return logging_config
 
 
+def add_migration_logs(logger: logging.Logger, method_name: str, event_dict):
+    if "/migrations/" in event_dict.get("pathname", ""):
+        event_dict["MIGRATION_LOG"] = True
+    return event_dict
+
+
 def get_logging_processors():
     """
     get structlog processors
     We will need to set these explicitly for Celery too
     """
     return [
+        structlog.processors.CallsiteParameterAdder(
+            [
+                CallsiteParameter.PATHNAME,
+                CallsiteParameter.LINENO,
+            ]
+        ),
+        add_migration_logs,
         structlog.contextvars.merge_contextvars,
         structlog.stdlib.filter_by_level,
         structlog.stdlib.add_log_level,

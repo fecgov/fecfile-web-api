@@ -206,6 +206,7 @@ def _print_recent_migrator_logs(ctx):
             "Running migrations:",
             "No migrations to apply\\.",
             "Applying .*\\.\\.\\.",
+            "MIGRATION_LOG",
         ]
     )
     grep_filter = f"grep 'Run Migrations' | grep '{statements_to_log}'"
