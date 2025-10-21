@@ -1,5 +1,7 @@
 from fecfiler.transactions.models import Transaction
+from fecfiler.memo_text.models import MemoText
 from fecfiler.transactions.schedule_c2.utils import carry_forward_guarantor
+from fecfiler.memo_text.utils import copy_memo_between_records
 from django.forms.models import model_to_dict
 from fecfiler.utils import save_copy
 from django.db.models import Q
@@ -45,7 +47,7 @@ def carry_forward_loan(loan, report):
             loan.schedule_c,
             {"report_coverage_through_date": report.coverage_through_date},
         ),
-        "memo_text": save_copy(loan.memo_text) if loan.memo_text else None,
+        "memo_text": None, # save_copy(loan.memo_text) if loan.memo_text else None,
         "contact_1_id": loan.contact_1_id,
         "contact_2_id": loan.contact_2_id,
         "contact_3_id": loan.contact_3_id,
@@ -69,11 +71,15 @@ def carry_forward_loan(loan, report):
                     "loan",
                     "memo_text",
                 ],
-            )
+            ),
+            memo_text=MemoText(committee_account=loan.committee_account)
         ),
         loan_data,
         links={"reports": [report]},
     )
+
+    if loan.memo_text is not None:
+        copy_memo_between_records(loan, new_loan)
 
     for child in original_children:
         # If child is a guarantor transaction, copy it
