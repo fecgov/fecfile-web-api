@@ -25,6 +25,6 @@ def copy_memo_between_records(original_record, new_record):
         new_record.memo_text = new_memo
         new_memo.save()
     else:
-        for key, val in memo_values:
-            setattr(new_memo, key, val)
+        for key in memo_values.keys():
+            setattr(new_memo, key, memo_values[key])
             new_memo.save()

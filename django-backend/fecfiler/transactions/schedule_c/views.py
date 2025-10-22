@@ -57,6 +57,7 @@ def update_memo_text_in_future_reports(
     transaction, transaction_data: dict, transactions_to_update
 ):
     memo_text_id = transaction_data.get("memo_text_id")
+    print(memo_text_id)
     if not memo_text_id:
         for memo_text in MemoText.objects.filter(
             transaction__memo_text_id__in=Subquery(
@@ -70,22 +71,20 @@ def update_memo_text_in_future_reports(
             transaction__memo_text_id__in=Subquery(
                 transactions_to_update.values("memo_text_id")
             )
-        ).update(**{"text4000": transaction.memo_text.text4000})
+        ).update(text4000=transaction.memo_text.text4000)
 
         for transaction_to_update in transactions_to_update.filter(
             memo_text_id__isnull=True
         ):
             new_memo_text = MemoText.objects.create(
-                **{
-                    "rec_type": "TEXT",
-                    "transaction_id_number": transaction_to_update.transaction_id,
-                    "text4000": transaction.memo_text.text4000,
-                    "report_id": transaction.reports[0].id,
-                    "committee_account_id": transaction_to_update.committee_account.id,
-                    "transaction_uuid": transaction_to_update.id,
-                    "is_report_level_memo": False,
-                }
+                rec_type="TEXT",
+                transaction_id_number=transaction_to_update.transaction_id,
+                text4000=transaction.memo_text.text4000,
+                report_id=transaction.reports[0].id,
+                committee_account_id=transaction_to_update.committee_account.id,
+                transaction_uuid=transaction_to_update.id,
+                is_report_level_memo=False,
             )
             Transaction.objects.filter(id=transaction_to_update.id).update(
-                **{"memo_text": new_memo_text}
+                memo_text=new_memo_text
             )
