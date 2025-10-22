@@ -294,6 +294,15 @@ def _run_migrations(ctx, space):
     return True
 
 
+def cleanup_migrator_app(ctx, space):
+    _print_migrations_summary(ctx)
+    migrator_app_deleted = _delete_migrator_app(ctx, space)
+    if not migrator_app_deleted:
+        print("Failed to delete the migrator app.")
+        print("Check logs for more information.\nCanceling deploy...")
+        sys.exit(1)
+
+
 @task
 def deploy(ctx, space=None, branch=None, login=False, help=False):
     """Deploy app to Cloud Foundry.
@@ -346,23 +355,17 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     if not migrations_successful:
         print("Migrations failed.")
         print("Check logs for more information.\nCanceling deploy...")
-        _print_migrations_summary(ctx)
+        cleanup_migrator_app(ctx, space)
         sys.exit(1)
 
     for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
         new_deploy = _do_deploy(ctx, space, app)
         if not new_deploy.ok:
             _rollback(ctx, app)
-            _print_migrations_summary(ctx)
+            cleanup_migrator_app(ctx, space)
             return sys.exit(1)
 
-    _print_migrations_summary(ctx)
-
-    migrator_app_deleted = _delete_migrator_app(ctx, space)
-    if not migrator_app_deleted:
-        print("Failed to delete the migrator app.")
-        print("Check logs for more information.\nCanceling deploy...")
-        sys.exit(1)
+    cleanup_migrator_app(ctx, space)
 
     # set any in-progress report submissions to FAILED
     task = "django-backend/manage.py fail_open_submissions"
