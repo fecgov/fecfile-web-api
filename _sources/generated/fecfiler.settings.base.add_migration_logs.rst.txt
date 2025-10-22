@@ -1,0 +1,6 @@
+fecfiler.settings.base.add\_migration\_logs
+===========================================
+
+.. currentmodule:: fecfiler.settings.base
+
+.. autofunction:: add_migration_logs

@@ -28,6 +28,7 @@ fecfiler.settings.base
    .. autosummary::
       :toctree:                                          
    
+      add_migration_logs
       get_logging_config
       get_logging_processors
    
