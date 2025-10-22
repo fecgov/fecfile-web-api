@@ -303,7 +303,12 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         return super().update(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
+        you_first = request.query_params.get("you_first")
+        logger.info(you_first)
+        if you_first != "true":
+            return super().list(request)
         page_param = self.paginator.page_query_param if self.paginator else "page"
+
         is_first_page = request.query_params.get(page_param, "1") == "1"
         queryset = self.filter_queryset(self.get_queryset())
 
