@@ -170,6 +170,21 @@ def get_test_info_prefix(transaction):
     return ""
 
 
+def compose_report_level_memos(report_id):
+    rows = []
+    report_level_memos = MemoText.objects.filter(
+        report_id=report_id,
+        transaction_uuid=None,
+    )
+    for memo in report_level_memos:
+        serialized_memo = serialize_instance("Text", memo)
+        logger.debug("Serialized Report Level Memo:")
+        logger.debug(memo)
+        rows.append(serialized_memo)
+
+    return rows
+
+
 def compose_dot_fec(report_id):
     logger.info(f"composing .FEC for report: {report_id}")
     try:
@@ -203,14 +218,8 @@ def compose_dot_fec(report_id):
                 logger.debug(serialized_memo)
                 file_content = add_row_to_content(file_content, serialized_memo)
 
-        report_level_memos = MemoText.objects.filter(
-            report_id=report_id,
-            transaction_uuid=None,
-        )
-        for memo in report_level_memos:
-            serialized_memo = serialize_instance("Text", memo)
-            logger.debug("Serialized Report Level Memo:")
-            logger.debug(memo)
+        report_level_memos = compose_report_level_memos(report_id)
+        for serialized_memo in report_level_memos:
             file_content = add_row_to_content(file_content, serialized_memo)
 
         """Free text"""
