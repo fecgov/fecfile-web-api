@@ -5,6 +5,7 @@ from fecfiler.transactions.schedule_c.views import save_hook
 from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
 from fecfiler.reports.models import Report
+from fecfiler.web_services.dot_fec.dot_fec_composer import compose_report_level_memos
 
 
 class ScheduleCViewsTestCase(TestCase):
@@ -65,6 +66,26 @@ class ScheduleCViewsTestCase(TestCase):
         self.assertEqual(carried_over.count(), 1)
         self.assertEqual(carried_over.first().memo_text.text4000, "Memo!!!")
 
+    def test_loan_propogates_to_newly_created_report(self):
+        save_hook(self.loan, False)
+        report_3 = Report(
+            form_type="F3XN",
+            committee_account_id=self.loan.committee_account.id,
+            coverage_from_date="2023-03-01",
+            coverage_through_date="2023-03-02",
+            form_3x=self.form_3x,
+        )
+        report_3.save()
+        carried_over = Transaction.objects.filter(reports__id=report_3.id)
+        self.assertEqual(carried_over.count(), 1)
+        self.assertEqual(carried_over.first().schedule_c.loan_amount, 1234)
+        self.assertEqual(carried_over.first().memo_text.text4000, "Memo!!!")
+
+    def test_carried_over_loan_memo_not_included_as_report_memo(self):
+        save_hook(self.loan, False)
+        report_level_memos = compose_report_level_memos(self.report_1.id)
+        self.assertEqual(len(report_level_memos), 0)
+
     def test_update_loan_in_future_report(self):
         save_hook(self.loan, False)
         carried_over = Transaction.objects.filter(reports__id=self.report_2.id)
@@ -78,4 +99,6 @@ class ScheduleCViewsTestCase(TestCase):
         carried_over = Transaction.objects.filter(reports__id=self.report_2.id)
         self.assertEqual(carried_over.count(), 1)
         self.assertEqual(carried_over.first().schedule_c.loan_amount, 4321)
-        # self.assertEqual(carried_over.first().memo_text.text4000, "Different Memo!")  Bug needs fixing first
+
+        # Disabled the following assertion until the loan memo updating bug is fixed
+        # self.assertEqual(carried_over.first().memo_text.text4000, "Different Memo!")
