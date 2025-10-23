@@ -57,7 +57,6 @@ def update_memo_text_in_future_reports(
     transaction, transaction_data: dict, transactions_to_update
 ):
     memo_text_id = transaction_data.get("memo_text_id")
-    print(memo_text_id)
     if not memo_text_id:
         for memo_text in MemoText.objects.filter(
             transaction__memo_text_id__in=Subquery(
