@@ -1,5 +1,4 @@
 from fecfiler.transactions.models import Transaction
-from fecfiler.memo_text.models import MemoText
 from fecfiler.transactions.schedule_c2.utils import carry_forward_guarantor
 from fecfiler.memo_text.utils import copy_memo_between_records
 from django.forms.models import model_to_dict
@@ -47,7 +46,6 @@ def carry_forward_loan(loan, report):
             loan.schedule_c,
             {"report_coverage_through_date": report.coverage_through_date},
         ),
-        "memo_text": None, # save_copy(loan.memo_text) if loan.memo_text else None,
         "contact_1_id": loan.contact_1_id,
         "contact_2_id": loan.contact_2_id,
         "contact_3_id": loan.contact_3_id,

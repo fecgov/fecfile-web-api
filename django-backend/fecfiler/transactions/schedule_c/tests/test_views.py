@@ -14,7 +14,7 @@ class ScheduleCViewsTestCase(TestCase):
     ]
 
     def setUp(self):
-        test_committee_id="11111111-2222-3333-4444-555555555555"
+        test_committee_id = "11111111-2222-3333-4444-555555555555"
         self.form_3x = Form3X()
         self.form_3x.save()
         self.report_1 = Report(

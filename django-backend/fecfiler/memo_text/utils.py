@@ -12,7 +12,7 @@ def copy_memo_between_records(original_record, new_record):
     memo_values = {
         "committee_account": original_memo.committee_account,
         "rec_type": original_memo.rec_type,
-        "is_report_level_memo":  original_memo.is_report_level_memo,
+        "is_report_level_memo": original_memo.is_report_level_memo,
         "text4000": original_memo.text4000,
         "text_prefix": original_memo.text_prefix,
         "transaction_uuid": (
