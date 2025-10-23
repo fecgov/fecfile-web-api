@@ -42,7 +42,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 
     def get_queryset(self):
         user = self.request.user
-        return CommitteeAccount.objects.filter(members=user).order_by("committee_id")
+        return CommitteeAccount.objects.filter(members=user).order_by("-committee_id")
 
     @extend_schema(
         request=CommitteeAccountSerializer,
