@@ -16,7 +16,7 @@ def copy_memo_between_records(original_record, new_record):
         "text4000": original_memo.text4000,
         "text_prefix": original_memo.text_prefix,
         "transaction_uuid": (
-            original_record.id if isinstance(original_record, Transaction) else None
+            new_record.id if isinstance(new_record, Transaction) else None
         )
     }
 

@@ -65,6 +65,10 @@ class ScheduleCViewsTestCase(TestCase):
         carried_over = Transaction.objects.filter(reports__id=self.report_2.id)
         self.assertEqual(carried_over.count(), 1)
         self.assertEqual(carried_over.first().memo_text.text4000, "Memo!!!")
+        self.assertEqual(
+            carried_over.first().memo_text.transaction_uuid,
+            str(carried_over.first().id)
+        )
 
     def test_loan_propogates_to_newly_created_report(self):
         save_hook(self.loan, False)
