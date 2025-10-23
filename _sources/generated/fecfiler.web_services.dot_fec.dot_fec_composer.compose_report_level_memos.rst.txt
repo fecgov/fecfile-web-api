@@ -1,0 +1,6 @@
+fecfiler.web\_services.dot\_fec.dot\_fec\_composer.compose\_report\_level\_memos
+================================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.dot_fec_composer
+
+.. autofunction:: compose_report_level_memos

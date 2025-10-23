@@ -1,0 +1,33 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.memo\_text.utils
+=========================
+
+.. automodule:: fecfiler.memo_text.utils
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      copy_memo_between_records
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

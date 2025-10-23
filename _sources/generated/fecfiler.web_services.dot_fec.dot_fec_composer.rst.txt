@@ -22,6 +22,7 @@ fecfiler.web\_services.dot\_fec.dot\_fec\_composer
       compose_dot_fec
       compose_header
       compose_report
+      compose_report_level_memos
       compose_transaction
       compose_transactions
       get_schema_name

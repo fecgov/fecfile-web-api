@@ -99,7 +99,9 @@ fecfiler.transactions.schedule\_c.tests.test\_views.ScheduleCViewsTestCase
       ~ScheduleCViewsTestCase.subTest
       ~ScheduleCViewsTestCase.tearDown
       ~ScheduleCViewsTestCase.tearDownClass
+      ~ScheduleCViewsTestCase.test_carried_over_loan_memo_not_included_as_report_memo
       ~ScheduleCViewsTestCase.test_create_loan_in_future_report
+      ~ScheduleCViewsTestCase.test_loan_propogates_to_newly_created_report
       ~ScheduleCViewsTestCase.test_update_loan_in_future_report
    
    

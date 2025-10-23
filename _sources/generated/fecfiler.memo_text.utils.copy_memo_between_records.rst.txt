@@ -1,0 +1,6 @@
+fecfiler.memo\_text.utils.copy\_memo\_between\_records
+======================================================
+
+.. currentmodule:: fecfiler.memo_text.utils
+
+.. autofunction:: copy_memo_between_records
