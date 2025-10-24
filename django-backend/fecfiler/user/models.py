@@ -20,6 +20,7 @@ class User(AbstractUser):
     groups = None
     user_permissions = None
     security_consent_exp_date = models.DateField(null=True, blank=True)
+    security_consent_version = models.CharField(null=True, blank=True)
 
     objects = UserManager()
 
