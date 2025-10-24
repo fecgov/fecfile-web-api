@@ -31,7 +31,6 @@ from fecfiler.web_services.dot_fec.web_print_submitter import (
     MockWebPrintSubmitter,
 )
 from fecfiler.web_services.dot_fec.dot_fec_submitter import MockDotFECSubmitter
-from uuid import uuid4 as uuid
 from fecfiler.settings import (
     INITIAL_POLLING_MAX_ATTEMPTS,
     SECONDARY_POLLING_MAX_ATTEMPTS,
@@ -94,10 +93,7 @@ class TasksTestCase(TestCase):
         self.f3x.save()
 
         new_dot_fec_id = create_dot_fec(
-            str(self.f3x.id),
-            None,
-            submission_record_old.id,
-            True
+            str(self.f3x.id), None, submission_record_old.id, True
         )
 
         new_dot_fec_record = DotFEC.objects.get(id=new_dot_fec_id)
@@ -299,7 +295,7 @@ class UnitTestDotFecSubmitter(MockDotFECSubmitter):
                 "submission_id": "fake_submission_id",
                 "status": FECStatus.PROCESSING.value,
                 "message": "We didn't really send anything to FEC",
-                "report_id": fec_report_id or str(uuid()),
+                "report_id": fec_report_id or str(uuid4()),
             }
         )
 

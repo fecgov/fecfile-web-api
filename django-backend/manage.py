@@ -22,7 +22,7 @@ allowed_commands = [
     "install_login_dot_gov_cert",
     "update_creds_service",
     "disable_user",
-    "reset_summary_calculation_state",
+    "reset_submitting_report",
     "fail_open_submissions",
 ]
 restricted_commands = [

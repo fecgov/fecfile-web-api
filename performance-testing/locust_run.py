@@ -243,7 +243,22 @@ class Tasks(TaskSet):
         )
         self.confirm_information_for_report_json(report_json)
         self.submit_report(report_id, poll_seconds=40)
-        self.report_ids_to_submit.pop()
+        self.report_ids_to_amend.append(self.report_ids_to_submit.pop())
+
+    @task(100)
+    def prepare_and_amend_report(self):
+        if len(self.report_ids_to_amend) == 0:
+            if len(self.report_ids_to_submit) == 0:
+                logging.info("No more reports to amend")
+            else:
+                logging.info("No current reports to amend")
+            return
+
+        report_id = random.choice(self.report_ids_to_amend)
+        logging.info(f"Amending report {report_id}")
+
+        self.amend_report(report_id)
+        self.report_ids_to_amend.pop()
 
     def login(self):
         self.client.request_name = "_log_in"
@@ -256,9 +271,7 @@ class Tasks(TaskSet):
             allow_redirects=False,
         )
         authorize_redirect_uri = get_redirect_uri(authorize_response)
-        self.client.get(
-            authorize_redirect_uri, allow_redirects=False
-        )
+        self.client.get(authorize_redirect_uri, allow_redirects=False)
         self.client.headers["x-csrftoken"] = self.client.cookies["csrftoken"]
         self.client.headers["user-agent"] = "Locust testing"
         self.client.headers["Origin"] = self.client.base_url
@@ -307,6 +320,7 @@ class Tasks(TaskSet):
         self.report_ids_dict = self.retrieve_report_ids_dict()
         self.report_ids = list(self.report_ids_dict.keys())
         self.report_ids_to_submit = self.report_ids.copy()
+        self.report_ids_to_amend = list()
 
     def calculate_summary_for_report_id(self, report_id, name, poll_seconds=2):
         response = self.client.post(
@@ -354,6 +368,15 @@ class Tasks(TaskSet):
         self.update_report_for_submit(report_id)
         logging.info(f"================ SUBMITTING FOR: {report_id} ================")
         self.submit_to_fec_and_poll_for_success(report_id, poll_seconds)
+
+    def amend_report(self, report_id):
+        response = self.client.post(
+            f"/api/v1/reports/{report_id}/amend/",
+            name="amend_report",
+            json={},
+        )
+        if response.status_code != 200:
+            raise Exception(f"Failed to POST ammendment to report with id {report_id}")
 
     def update_report_for_submit(self, report_id):
         fields_to_validate = [
