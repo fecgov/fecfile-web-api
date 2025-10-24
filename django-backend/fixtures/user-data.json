@@ -112,5 +112,50 @@
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z"
         }
+    },
+    {
+        "model": "committee_accounts.CommitteeAccount",
+        "pk": "7c176dc0-7062-49b5-bc35-58b4ef050d09",
+        "fields": {
+            "committee_id": "C99999997",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.Membership",
+        "pk": "d4ca18d2-06c1-42b7-a379-274d84530000",
+        "fields": {
+            "role": "MANAGER",
+            "committee_account_id": "7c176dc0-7062-49b5-bc35-58b4ef050d09",
+            "user_id": "e100e1da-cbfc-4189-aece-d139048a8e0a",
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.Membership",
+        "pk": "d4ca18d2-06c1-42b7-a379-274d84535500",
+        "fields": {
+            "role": "COMMITTEE_ADMINISTRATOR",
+            "committee_account_id": "7c176dc0-7062-49b5-bc35-58b4ef050d09",
+            "user_id": "e100e1da-cbfc-4189-aece-d139048a8e0b",
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.Membership",
+        "pk": "d4ca18d2-06c1-42b7-a379-274d84530001",
+        "fields": {
+            "role": "COMMITTEE_ADMINISTRATOR",
+            "committee_account_id": "7c176dc0-7062-49b5-bc35-58b4ef050d09",
+            "user_id": "944eac55-8280-4dc1-afaa-c4ca9526a35f",
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
     }
 ]
