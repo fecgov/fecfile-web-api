@@ -1,11 +1,11 @@
-from django.core.management.base import BaseCommand
+from fecfiler.devops.management.commands.fecfile_base import FECCommand
 from fecfiler.reports.utils.report_utils import delete_committee_reports
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
-class Command(BaseCommand):
+class Command(FECCommand):
     help = "Delete all reports (and transactions) for a given committee"
     command_name = "delete_committee_reports"
 
