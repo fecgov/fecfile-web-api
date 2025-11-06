@@ -32,7 +32,7 @@ class UserUtilsTestCase(TestCase):
             username="gov",
             security_consent_exp_date=datetime.datetime.today(),
         )
-        self.test_user.save()
+        self.user_4.save()
 
     def test_get_user_with_invalid_strings(self):
         self.assertEqual(get_user_by_email_or_id(""), None)
@@ -105,7 +105,7 @@ class UserUtilsTestCase(TestCase):
             call_command("reset_security_consent_date", self.user_4.email)
         else:
             reset_security_consent_date(self.user_4.email)
-        self.test_user.refresh_from_db()
+        self.user_4.refresh_from_db()
         self.assertIsNone(self.user_4.security_consent_exp_date)
 
     def test_reset_security_consent_date_with_wrong_email(self, use="method"):
