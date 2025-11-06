@@ -4,8 +4,11 @@ from fecfiler.user.models import User
 from fecfiler.user.utils import (
     get_user_by_email_or_id,
     delete_active_sessions_for_user_and_committee,
+    disable_user,
 )
 from uuid import uuid4
+from django.core.management import call_command
+from django.core.management.base import CommandError
 
 
 class UserUtilsTestCase(TestCase):
@@ -34,6 +37,56 @@ class UserUtilsTestCase(TestCase):
         self.assertEqual(get_user_by_email_or_id(self.user_1.email), self.user_1)
         self.assertEqual(get_user_by_email_or_id(self.user_2.email), self.user_2)
         self.assertEqual(get_user_by_email_or_id(str(self.user_3.id)), self.user_3)
+
+    def test_disable_user_email(self, use="method"):
+        # get the test user
+        user = get_user_by_email_or_id(self.user_1.email)
+        self.assertTrue(user.is_active)
+
+        # disable the test user
+        if use == "command":
+            try:
+                call_command("disable_user", email=user.email)
+            except Exception as e:
+                print(f"Error running command: {e}")
+        else:
+            disable_user(None, user.email)
+
+        # re-get the test user
+        user = get_user_by_email_or_id(self.user_1.email)
+        self.assertFalse(user.is_active)
+
+    def test_disable_user_uuid(self, use="method"):
+        # get the test user
+        user = get_user_by_email_or_id(str(self.user_1.id))
+        self.assertTrue(user.is_active)
+
+        # disable the test user
+        if use == "command":
+            try:
+                call_command("disable_user", uuid=user.id)
+            except Exception as e:
+                print(f"Error running command: {e}")
+        else:
+            disable_user(str(user.id), None)
+
+        # re-get the test user
+        user = get_user_by_email_or_id(str(self.user_1.id))
+        self.assertFalse(user.is_active)
+
+    def test_disable_user_email_command(self):
+        self.test_disable_user_email(use="command")
+
+    def test_disable_user_uuid_command(self):
+        self.test_disable_user_uuid(use="command")
+
+    def test_disable_user_command_missing_arg(self):
+        with self.assertRaises(CommandError) as cm:
+            call_command("disable_user")
+
+        self.assertIn(
+            "the following arguments are required: --report_id", str(cm.exception)
+        )
 
     # delete_active_sessions_for_user_and_committee
 

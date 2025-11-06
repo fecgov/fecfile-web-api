@@ -1,7 +1,11 @@
 from fecfiler.user.models import User
 from django.db.models import Q
 from django.contrib.sessions.models import Session
+from django.contrib.auth import get_user_model
 from datetime import datetime
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 def get_user_by_email_or_id(email_or_id: str) -> User | None:
@@ -27,3 +31,25 @@ def delete_active_sessions_for_user_and_committee(
             and data.get("committee_id") == committee_id
         ):
             session.delete()
+
+
+def disable_user(uuid, email, enable=False):
+    user_model = get_user_model()
+
+    try:
+        # if they use both arguments, prefer UUID
+        if uuid is not None:
+            user = user_model.objects.get(id=uuid)
+        else:
+            user = user_model.objects.get(email=email)
+    except user_model.DoesNotExist:
+        logger.error("User does not exist")
+        return
+
+    user.is_active = enable
+    user.save()
+
+    logger.info(
+        f"The is_active flag for user [{user.id} | {user.email}] "
+        f"set to: {user.is_active}"
+    )
