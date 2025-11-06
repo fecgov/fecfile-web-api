@@ -5,10 +5,15 @@ from fecfiler.user.utils import (
     get_user_by_email_or_id,
     delete_active_sessions_for_user_and_committee,
     disable_user,
+    reset_security_consent_date,
 )
 from uuid import uuid4
 from django.core.management import call_command
 from django.core.management.base import CommandError
+import datetime
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class UserUtilsTestCase(TestCase):
@@ -20,7 +25,8 @@ class UserUtilsTestCase(TestCase):
             email="test_user_2@test.com", user_id=str(uuid4())
         )
         self.user_3 = User.objects.create_user(
-            email="test_user_3@test.com", user_id=str(uuid4())
+            email="test_user_3@test.com",
+            user_id=str(uuid4(), security_consent_exp_date=datetime.datetime.today()),
         )
 
     def test_get_user_with_invalid_strings(self):
@@ -87,6 +93,30 @@ class UserUtilsTestCase(TestCase):
         self.assertIn(
             "one of the arguments --uuid --email is required", str(cm.exception)
         )
+
+    def test_reset_security_consent_date_with_email(self, use="method"):
+        self.assertIsNotNone(self.user_3.security_consent_exp_date)
+        if use == "comand":
+            call_command("reset_security_consent_date", self.user_3.email)
+        else:
+            reset_security_consent_date(self.user_3.email)
+        self.test_user.refresh_from_db()
+        self.assertIsNone(self.user_3.security_consent_exp_date)
+
+    def test_reset_security_consent_date_with_wrong_email(self, use="method"):
+        self.assertIsNotNone(self.user_3.security_consent_exp_date)
+        if use == "command":
+            call_command("reset_security_consent_date", "t@fec.gov")
+        else:
+            reset_security_consent_date("t@fec.gov")
+        self.user_3.refresh_from_db()
+        self.assertIsNotNone(self.user_3.security_consent_exp_date)
+
+    def test_reset_security_consent_date_with_email_command(self):
+        self.test_reset_with_email(use="command")
+
+    def test_reset_security_consent_date_with_wrong_email_command(self):
+        self.test_reset_with_wrong_email(use="command")
 
     # delete_active_sessions_for_user_and_committee
 

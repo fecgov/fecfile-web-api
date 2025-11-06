@@ -53,3 +53,18 @@ def disable_user(uuid, email, enable=False):
         f"The is_active flag for user [{user.id} | {user.email}] "
         f"set to: {user.is_active}"
     )
+
+
+def reset_security_consent_date(email):
+    try:
+        user = User.objects.filter(email=email).first()
+        if user is None:
+            logger.error("No user found matching that email")
+            return
+
+        user.security_consent_exp_date = None
+        user.save()
+
+        logger.info("Successfully reset the security consent expiration date")
+    except Exception as e:
+        logger.error(f"An error occurred while reseting the security consent date: {e}")
