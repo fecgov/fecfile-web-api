@@ -56,10 +56,11 @@ def reset_submitting_report(id):
     )
 
 
-def delete_committee_reports(committee_id, delete_contacts=False):
-    if committee_id is None or len(committee_id) == 0:
+def delete_committee_reports(committee_ids, delete_contacts=False):
+    if committee_ids is None or len(committee_ids) == 0:
         logger.error("No committee ID provided")
         return
+    committee_id = committee_ids[0]
 
     cid_regex = re.compile("^C[0-9]{8}$")
     if not cid_regex.match(str(committee_id)):

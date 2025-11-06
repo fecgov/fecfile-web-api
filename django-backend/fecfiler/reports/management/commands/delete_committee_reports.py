@@ -18,6 +18,6 @@ class Command(FECCommand):
         )
 
     def command(self, *args, **options):
-        committee_id = options.get("committee_id", None)
+        committee_ids = options.get("committee_id", None)
         delete_contacts = options.get("delete_contacts", False)
-        delete_committee_reports(committee_id, delete_contacts)
+        delete_committee_reports(committee_ids, delete_contacts)
