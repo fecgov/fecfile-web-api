@@ -85,7 +85,7 @@ class UserUtilsTestCase(TestCase):
             call_command("disable_user")
 
         self.assertIn(
-            "the following arguments are required: --report_id", str(cm.exception)
+            "one of the arguments --uuid --email is required", str(cm.exception)
         )
 
     # delete_active_sessions_for_user_and_committee
