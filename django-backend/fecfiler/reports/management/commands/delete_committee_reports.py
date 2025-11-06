@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from ...utils.report_utils import delete_committee_reports
+from fecfiler.reports.utils.report_utils import delete_committee_reports
 import structlog
 
 logger = structlog.get_logger(__name__)
