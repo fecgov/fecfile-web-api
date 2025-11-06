@@ -25,9 +25,14 @@ class UserUtilsTestCase(TestCase):
             email="test_user_2@test.com", user_id=str(uuid4())
         )
         self.user_3 = User.objects.create_user(
-            email="test_user_3@test.com",
-            user_id=str(uuid4(), security_consent_exp_date=datetime.datetime.today()),
+            email="test_user_3@test.com", user_id=str(uuid4())
         )
+        self.user_4 = User.objects.create(
+            email="test@fec.gov",
+            username="gov",
+            security_consent_exp_date=datetime.datetime.today(),
+        )
+        self.test_user.save()
 
     def test_get_user_with_invalid_strings(self):
         self.assertEqual(get_user_by_email_or_id(""), None)
@@ -95,22 +100,22 @@ class UserUtilsTestCase(TestCase):
         )
 
     def test_reset_security_consent_date_with_email(self, use="method"):
-        self.assertIsNotNone(self.user_3.security_consent_exp_date)
+        self.assertIsNotNone(self.user_4.security_consent_exp_date)
         if use == "comand":
-            call_command("reset_security_consent_date", self.user_3.email)
+            call_command("reset_security_consent_date", self.user_4.email)
         else:
-            reset_security_consent_date(self.user_3.email)
+            reset_security_consent_date(self.user_4.email)
         self.test_user.refresh_from_db()
-        self.assertIsNone(self.user_3.security_consent_exp_date)
+        self.assertIsNone(self.user_4.security_consent_exp_date)
 
     def test_reset_security_consent_date_with_wrong_email(self, use="method"):
-        self.assertIsNotNone(self.user_3.security_consent_exp_date)
+        self.assertIsNotNone(self.user_4.security_consent_exp_date)
         if use == "command":
             call_command("reset_security_consent_date", "t@fec.gov")
         else:
             reset_security_consent_date("t@fec.gov")
-        self.user_3.refresh_from_db()
-        self.assertIsNotNone(self.user_3.security_consent_exp_date)
+        self.user_4.refresh_from_db()
+        self.assertIsNotNone(self.user_4.security_consent_exp_date)
 
     def test_reset_security_consent_date_with_email_command(self):
         self.test_reset_with_email(use="command")
