@@ -118,10 +118,10 @@ class UserUtilsTestCase(TestCase):
         self.assertIsNotNone(self.user_4.security_consent_exp_date)
 
     def test_reset_security_consent_date_with_email_command(self):
-        self.test_reset_with_email(use="command")
+        self.test_reset_security_consent_date_with_email(use="command")
 
     def test_reset_security_consent_date_with_wrong_email_command(self):
-        self.test_reset_with_wrong_email(use="command")
+        self.test_reset_security_consent_date_with_wrong_email(use="command")
 
     # delete_active_sessions_for_user_and_committee
 
