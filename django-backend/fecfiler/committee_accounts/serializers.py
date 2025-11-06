@@ -10,9 +10,33 @@ logger = structlog.get_logger(__name__)
 
 
 class CommitteeAccountSerializer(ModelSerializer):
+    active_members = SerializerMethodField()
+    pending_members = SerializerMethodField()
+
     class Meta:
         model = CommitteeAccount
-        fields = "__all__"
+        fields = [
+            "id",
+            "committee_id",
+            "members",
+            "active_members",
+            "pending_members",
+            "deleted",
+            "created",
+            "updated"
+        ]
+
+    def get_active_members(self, obj):
+        return Membership.objects.filter(
+            committee_account_id=obj.id,
+            user__isnull=False
+        ).count()
+
+    def get_pending_members(self, obj):
+        return Membership.objects.filter(
+            committee_account_id=obj.id,
+            user__isnull=True
+        ).count()
 
 
 class CommitteeOwnedSerializer(ModelSerializer):

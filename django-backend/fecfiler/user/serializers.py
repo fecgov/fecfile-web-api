@@ -19,7 +19,8 @@ class CurrentUserSerializer(ModelSerializer):
             "last_name",
             "email",
             "consent_for_one_year",
-            "security_consent_version"
+            "security_consent_version",
+            "is_staff"
         ]
         read_only_fields = ["email", "security_consented"]
 

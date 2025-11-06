@@ -20,7 +20,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
-from django.db.models import Q, Value, Case, When, IntegerField
+from django.db.models import Q, Value, Case, When, IntegerField, OuterRef
 import structlog
 from rest_framework.permissions import BasePermission
 
@@ -39,10 +39,13 @@ class CommitteePagination(pagination.PageNumberPagination):
 class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = CommitteeAccountSerializer
     pagination_class = CommitteePagination
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ["committee_id", "created"]
 
     def get_queryset(self):
         user = self.request.user
-        return CommitteeAccount.objects.filter(members=user).order_by("-committee_id")
+        queryset = CommitteeAccount.objects.filter(members=user).order_by("-committee_id")
+        return queryset
 
     @extend_schema(
         request=CommitteeAccountSerializer,
@@ -104,6 +107,23 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     def add_committee_account_data(self, committee_account):
         committee_data = get_committee_account_data(committee_account["committee_id"])
         return {**committee_account, **(committee_data or {})}
+
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request, *args, **kwargs):
+        ordering = request.query_params.get("ordering", "committee_id")
+        if not (request.user.is_authenticated and request.user.is_staff):
+            return Response(status=401)
+
+        queryset = CommitteeAccount.objects.all()
+        queryset = queryset.order_by(ordering)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
