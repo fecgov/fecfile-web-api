@@ -1,5 +1,5 @@
 from uuid import UUID
-from .committee_membership_utils import add_user_to_committee
+from .utils.committee_membership import add_user_to_committee
 from rest_framework import filters, viewsets, mixins, pagination, status
 from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.decorators import action
