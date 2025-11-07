@@ -144,12 +144,13 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_get_emails_environments(self):
         with (
-            patch("fecfiler.committee_accounts.utils.accountssettings") as settings,
+            patch("fecfiler.committee_accounts.utils.accounts.settings") as settings,
             patch(
-                "fecfiler.committee_accounts.utils.accounts.get_production_committee_emails"
+                "fecfiler.committee_accounts.utils.accounts"
+                ".get_production_committee_emails"
             ) as get_production_committee_emails,
             patch(
-                "fecfiler.committee_accounts.utils.accounts.get_test_committee_emails"
+                "fecfiler.committee_accounts.utils.accounts" ".get_test_committee_emails"
             ) as get_test_committee_emails,
             patch(
                 "fecfiler.committee_accounts.utils.accounts.get_mocked_committee_emails"
