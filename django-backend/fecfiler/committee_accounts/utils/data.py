@@ -63,8 +63,10 @@ fake.add_provider(phone_number)
 
 logger = structlog.get_logger(__name__)
 
+
 def serialize(queryset):
     return serializers.serialize("json", queryset)[1:-1]  # Strip square brackets
+
 
 def dump_model(Model, filter_args, order_by=None):
     queryset = Model.objects.filter(**filter_args)
@@ -77,11 +79,13 @@ def dump_model(Model, filter_args, order_by=None):
     else:
         return []
 
+
 def dump_model_list(model_list, filter_args, order_by=None):
     dumped_models = []
     for Model in model_list:
         dumped_models += dump_model(Model, filter_args, order_by)
     return dumped_models
+
 
 def dump_committee_and_users(committee):
     users = dump_model(User, {"committeeaccount": committee})
@@ -105,6 +109,7 @@ def dump_committee_and_users(committee):
 
     return dumped_data
 
+
 def dump_contacts(committee):
     contacts = dump_model(Contact, {"committee_account": committee})
 
@@ -120,6 +125,7 @@ def dump_contacts(committee):
 
     return contacts
 
+
 def dump_reports(committee):
     dumped_data = dump_model_list(
         FORM_MODELS, {"report__committee_account": committee}
@@ -127,6 +133,7 @@ def dump_reports(committee):
     dumped_data += dump_model(Report, {"committee_account": committee})
 
     return dumped_data
+
 
 def dump_transactions(committee):
     dumped_data = dump_model_list(
@@ -143,11 +150,14 @@ def dump_transactions(committee):
 
     return dumped_data
 
+
 def dump_memos(committee):
     return dump_model(MemoText, {"committee_account": committee})
 
+
 def dump_cash_on_hand(committee):
     return dump_model(CashOnHandYearly, {"committee_account": committee})
+
 
 def dump_submissions(committee):
     dumped_data = dump_model(DotFEC, {"report__committee_account": committee})
@@ -155,6 +165,7 @@ def dump_submissions(committee):
         SUBMISSION_MODELS, {"dot_fec__report__committee_account": committee}
     )
     return dumped_data
+
 
 def dump_all_committee_data(committee):
     dumplist = [
@@ -173,8 +184,10 @@ def dump_all_committee_data(committee):
 
     return dumplist
 
+
 def get_filename(options):
     return f"dumped_data_for_{options.get("committee_id")}.json"
+
 
 def save_to_s3(filename, formatted_json):
     try:
@@ -185,6 +198,7 @@ def save_to_s3(filename, formatted_json):
     except Exception as E:
         raise RuntimeError(f"Failed to upload to s3: {str(E)}")
 
+
 def save_to_local(filename, formatted_json):
     logger.info(f"Saving committee data to local file: {filename}")
 
@@ -192,9 +206,11 @@ def save_to_local(filename, formatted_json):
     file.write(formatted_json)
     file.close()
 
+
 def save_to_redis(filename, formatted_json):
     redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
     redis_instance.set(filename, formatted_json)
+
 
 def save_data(formatted_json, options):
     filename = get_filename(options)
@@ -205,6 +221,7 @@ def save_data(formatted_json, options):
         return save_to_s3(filename, formatted_json)
     else:
         return save_to_local(filename, formatted_json)
+
 
 def dump_committee_data(committee_id, options):
     committee = CommitteeAccount.objects.filter(committee_id=committee_id).first()
