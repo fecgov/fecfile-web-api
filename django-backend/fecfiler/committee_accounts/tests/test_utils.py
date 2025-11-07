@@ -1,5 +1,5 @@
 from django.test import TestCase
-from fecfiler.committee_accounts.utils import (
+from fecfiler.committee_accounts.utils.accounts import (
     create_committee_account,
     delete_committee_account,
     check_user_email_matches_committee_email,

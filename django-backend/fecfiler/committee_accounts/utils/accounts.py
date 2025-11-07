@@ -1,6 +1,6 @@
 import re
 from rest_framework.exceptions import ValidationError
-from .models import CommitteeAccount, Membership
+from ..models import CommitteeAccount, Membership
 from fecfiler import settings
 import redis
 import json

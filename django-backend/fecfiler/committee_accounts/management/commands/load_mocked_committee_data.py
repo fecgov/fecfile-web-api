@@ -8,7 +8,7 @@ from fecfiler.settings import (
 import redis
 import os
 from fecfiler.s3 import S3_SESSION
-from fecfiler.committee_accounts.utils import COMMITTEE_DATA_REDIS_KEY
+from fecfiler.committee_accounts.utils.accounts import COMMITTEE_DATA_REDIS_KEY
 
 
 class Command(BaseCommand):

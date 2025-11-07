@@ -2,7 +2,7 @@ from django.test import TestCase
 from unittest.mock import patch, MagicMock
 from django.core.exceptions import ValidationError
 from fecfiler.committee_accounts.models import Membership
-from fecfiler.committee_accounts.committee_membership_utils import add_user_to_committee
+from fecfiler.committee_accounts.utils.committee_membership import add_user_to_committee
 
 
 class AddUserToCommitteeTests(TestCase):

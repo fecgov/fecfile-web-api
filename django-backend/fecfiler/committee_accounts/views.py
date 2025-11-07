@@ -5,7 +5,7 @@ from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
-from fecfiler.committee_accounts.utils import (
+from fecfiler.committee_accounts.utils.accounts import (
     create_committee_account,
     get_committee_account_data,
     raise_if_cannot_create_committee_account,
