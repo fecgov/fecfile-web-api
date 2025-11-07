@@ -1,9 +1,11 @@
 from uuid import UUID
-from .committee_membership_utils import add_user_to_committee
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+from rest_framework.permissions import BasePermission, IsAdminUser, IsAuthenticated
 from rest_framework import filters, viewsets, mixins, pagination, status
-from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from .committee_membership_utils import add_user_to_committee
+from django.contrib.sessions.exceptions import SuspiciousSession
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.committee_accounts.utils import (
     create_committee_account,
@@ -16,13 +18,12 @@ from django.http import (
     HttpResponseServerError,
 )
 from django.core.exceptions import ValidationError
-from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
-from django.db.models import Q, Value, Case, When, IntegerField, OuterRef
+from django.db.models import Q, Value, Case, When, IntegerField
 import structlog
-from rest_framework.permissions import BasePermission
+
 
 logger = structlog.get_logger(__name__)
 
@@ -108,12 +109,14 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee_data = get_committee_account_data(committee_account["committee_id"])
         return {**committee_account, **(committee_data or {})}
 
-    @action(detail=False, methods=["get"], url_path="all")
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="all",
+        permission_classes=[IsAuthenticated, IsAdminUser]
+    )
     def list_all(self, request, *args, **kwargs):
         ordering = request.query_params.get("ordering", "committee_id")
-        if not (request.user.is_authenticated and request.user.is_staff):
-            return Response(status=401)
-
         queryset = CommitteeAccount.objects.all()
         queryset = queryset.order_by(ordering)
 
