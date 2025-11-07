@@ -2,8 +2,12 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+
 from fecfiler.user.utils import get_user_by_email_or_id, update_user_active_state
 from fecfiler.committee_accounts.committee_membership_utils import add_user_to_committee
+from fecfiler.reports.utils.report_utils import reset_submitting_report
+from fecfiler.web_services.utils.submission_utils import fail_open_submissions
+
 import structlog
 
 logger = structlog.getLogger(__name__)
@@ -14,7 +18,7 @@ class SystemAdministrationViewset(GenericViewSet):
 
     def generic_exception(self, exception):
         return Response(
-            {"error": exception}
+            {"error": str(exception)}
         )
 
     @action(detail=False, methods=["post"], url_path=r"disable-user")
@@ -62,4 +66,39 @@ class SystemAdministrationViewset(GenericViewSet):
 
         return Response(
             {"success": f"user {user_email} added to committee {committee_id}"}
+        )
+
+    @action(detail=False, methods=["post"], url_path=r"reset-submitting-report")
+    def _reset_submitting_report(self, request):
+        report_id = request.data.get("report_id")
+
+        if report_id is None:
+            return Response({
+                "error": "report_id is a required field"
+            })
+
+        try:
+            reset_submitting_report(report_id)
+        except Exception as e:
+            return self.generic_exception(e)
+
+        return Response(
+            {"success": f"Report {report_id} upload cleared"}
+        )
+
+    @action(detail=False, methods=["post"], url_path=r"fail-open-submissions")
+    def _fail_open_submissions(self, request):
+        admin_knows_what_admin_wants = request.data.get("admin_knows_what_admin_wants")
+        if admin_knows_what_admin_wants is not True:
+            return Response({
+                "error": "admin_knows_what_admin_wants is required to be True"
+            })
+
+        try:
+            fail_open_submissions()
+        except Exception as e:
+            return self.generic_exception(e)
+
+        return Response(
+            {"success": f"All open submissions have been closed"}
         )

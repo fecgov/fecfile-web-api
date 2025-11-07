@@ -15,6 +15,10 @@ logger = structlog.get_logger(__name__)
 def reset_submitting_report(id):
     report_uuid = UUID(id)
 
+    report = Report.objects.filter(id=report_uuid).first()
+    if report is None:
+        raise LookupError("No report matching the id was found")
+
     # fetch upload_submission_id and delete associated upload record
     upload_submission_id = (
         Report.objects.filter(id=report_uuid)
