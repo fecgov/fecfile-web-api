@@ -20,7 +20,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
 from django.db.models.fields import TextField
 from django.db.models.functions import Coalesce, Concat
-from django.db.models import Q, Value
+from django.db.models import Q, Value, Case, When, IntegerField
 import structlog
 from rest_framework.permissions import BasePermission
 
@@ -301,3 +301,33 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         )
 
         return super().update(request, *args, **kwargs)
+
+    def list(self, request, *args, **kwargs):
+        you_first = request.query_params.get("you_first")
+        logger.info(you_first)
+        if you_first != "true":
+            return super().list(request)
+        page_param = self.paginator.page_query_param if self.paginator else "page"
+
+        is_first_page = request.query_params.get(page_param, "1") == "1"
+        queryset = self.filter_queryset(self.get_queryset())
+
+        if is_first_page and request.user.is_authenticated:
+            queryset = queryset.annotate(
+                is_current_user=Case(
+                    When(user=request.user, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            )
+
+            existing_ordering = queryset.query.order_by
+            queryset = queryset.order_by("-is_current_user", *existing_ordering)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

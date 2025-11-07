@@ -199,6 +199,44 @@ def _check_for_migrations(ctx, space):
     return True
 
 
+def _print_recent_migrator_logs(ctx):
+    statements_to_log = "\\|".join(
+        [
+            "Apply all migrations:",
+            "Running migrations:",
+            "No migrations to apply\\.",
+            "Applying .*\\.\\.\\.",
+            "MIGRATION_LOG",
+        ]
+    )
+    grep_filter = f"grep 'Run Migrations' | grep '{statements_to_log}'"
+    ctx.run(
+        f"cf logs --recent {MIGRATOR_APP_NAME} | {grep_filter}",
+        echo=True,
+        warn=True,
+    )
+
+
+def _print_migrations_summary(ctx):
+    task = "django-backend/manage.py showmigrations --list --traceback --verbosity 3"
+    show_migrations_cmd = ctx.run(
+        f"cf rt {MIGRATOR_APP_NAME} --command '{task}' --name 'Migration Summary' --wait",
+        echo=True,
+        warn=True,
+    )
+    time.sleep(3)
+
+    if not show_migrations_cmd.ok:
+        print("Failed to run showmigrations command.  Check logs.")
+        return False
+    ctx.run(
+        f"cf logs --recent {MIGRATOR_APP_NAME} | grep 'Migration Summary'",
+        echo=True,
+        warn=True,
+    )
+    return True
+
+
 def _run_migrations(ctx, space):
     print("Running migrations...")
 
@@ -225,7 +263,10 @@ def _run_migrations(ctx, space):
 
             # Check every second for the stop event
             for _ in range(60):
+                if _ != 0 and _ % 10 == 0:
+                    _print_recent_migrator_logs(ctx)
                 if heartbeat_stop_event.is_set():
+                    _print_recent_migrator_logs(ctx)
                     break
                 time.sleep(1)
 
@@ -251,6 +292,15 @@ def _run_migrations(ctx, space):
 
     print("Migration process has finished successfully.")
     return True
+
+
+def cleanup_migrator_app(ctx, space):
+    _print_migrations_summary(ctx)
+    migrator_app_deleted = _delete_migrator_app(ctx, space)
+    if not migrator_app_deleted:
+        print("Failed to delete the migrator app.")
+        print("Check logs for more information.\nCanceling deploy...")
+        sys.exit(1)
 
 
 @task
@@ -302,19 +352,20 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
     # Runs migrations
     # tasks.py does not continue until the migrations task has completed
     migrations_successful = _run_migrations(ctx, space)
-    migrator_app_deleted = _delete_migrator_app(ctx, space)
-
-    if not (migrations_successful and migrator_app_deleted):
-        print("Migrations failed and/or the migrator app was not deleted successfully.")
+    if not migrations_successful:
+        print("Migrations failed.")
         print("Check logs for more information.\nCanceling deploy...")
+        cleanup_migrator_app(ctx, space)
         sys.exit(1)
 
     for app in [APP_NAME, WEB_SERVICES_NAME, SCHEDULER_NAME]:
         new_deploy = _do_deploy(ctx, space, app)
-
         if not new_deploy.ok:
             _rollback(ctx, app)
+            cleanup_migrator_app(ctx, space)
             return sys.exit(1)
+
+    cleanup_migrator_app(ctx, space)
 
     # set any in-progress report submissions to FAILED
     task = "django-backend/manage.py fail_open_submissions"
