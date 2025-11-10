@@ -54,83 +54,45 @@ class UserUtilsTestCase(TestCase):
     # disable_user
     ############################
 
-    def test_disable_user_email(self, use="method"):
+    def test_disable_user_email(self):
         # get the test user
         user = get_user_by_email_or_id(self.user_1.email)
         self.assertTrue(user.is_active)
 
         # disable the test user
-        if use == "command":
-            try:
-                call_command("disable_user", email=user.email)
-            except Exception as e:
-                print(f"Error running command: {e}")
-        else:
-            disable_user(None, user.email)
+        disable_user(None, user.email)
 
         # re-get the test user
         user = get_user_by_email_or_id(self.user_1.email)
         self.assertFalse(user.is_active)
 
-    def test_disable_user_uuid(self, use="method"):
+    def test_disable_user_uuid(self):
         # get the test user
         user = get_user_by_email_or_id(str(self.user_1.id))
         self.assertTrue(user.is_active)
 
         # disable the test user
-        if use == "command":
-            try:
-                call_command("disable_user", uuid=user.id)
-            except Exception as e:
-                print(f"Error running command: {e}")
-        else:
-            disable_user(str(user.id), None)
+        disable_user(str(user.id), None)
 
         # re-get the test user
         user = get_user_by_email_or_id(str(self.user_1.id))
         self.assertFalse(user.is_active)
-
-    def test_disable_user_email_command(self):
-        self.test_disable_user_email(use="command")
-
-    def test_disable_user_uuid_command(self):
-        self.test_disable_user_uuid(use="command")
-
-    def test_disable_user_command_missing_arg(self):
-        with self.assertRaises(CommandError) as cm:
-            call_command("disable_user")
-
-        self.assertIn(
-            "one of the arguments --uuid --email is required", str(cm.exception)
-        )
 
     ###############################
     # reset_security_consent_date
     ###############################
 
-    def test_reset_security_consent_date_with_email(self, use="method"):
+    def test_reset_security_consent_date_with_email(self):
         self.assertIsNotNone(self.user_3.security_consent_exp_date)
-        if use == "comand":
-            call_command("reset_security_consent_date", self.user_3.email)
-        else:
-            reset_security_consent_date(self.user_3.email)
+        reset_security_consent_date(self.user_3.email)
         self.user_3.refresh_from_db()
         self.assertIsNone(self.user_3.security_consent_exp_date)
 
-    def test_reset_security_consent_date_with_wrong_email(self, use="method"):
+    def test_reset_security_consent_date_with_wrong_email(self):
         self.assertIsNotNone(self.user_3.security_consent_exp_date)
-        if use == "command":
-            call_command("reset_security_consent_date", "t@fec.gov")
-        else:
-            reset_security_consent_date("t@fec.gov")
+        reset_security_consent_date("t@fec.gov")
         self.user_3.refresh_from_db()
         self.assertIsNotNone(self.user_3.security_consent_exp_date)
-
-    def test_reset_security_consent_date_with_email_command(self):
-        self.test_reset_security_consent_date_with_email(use="command")
-
-    def test_reset_security_consent_date_with_wrong_email_command(self):
-        self.test_reset_security_consent_date_with_wrong_email(use="command")
 
     #################################################
     # delete_active_sessions_for_user_and_committee
