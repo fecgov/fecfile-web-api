@@ -226,7 +226,7 @@ def save_data(formatted_json, committee_id, redis):
         return save_to_local(filename, formatted_json)
 
 
-def dump_committee_data(committee_id, redis):
+def dump_committee_data(committee_id, redis=False):
     committee = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if committee is None:
         raise RuntimeError("No Committee Account found matching that Committee ID")

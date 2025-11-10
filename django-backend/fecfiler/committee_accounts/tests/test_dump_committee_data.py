@@ -38,7 +38,7 @@ class DumpTestDataCommandTest(TestCase):
         Membership.objects.create(committee_account=self.committee, user=self.user)
 
     def get_committee_data(self, committee_id=COMMITTEE_ONE_ID):
-        dump_committee_data(committee_id, "--redis")
+        dump_committee_data(committee_id, True)
         return json.loads(self.redis_instance.get(f"dumped_data_for_{committee_id}.json"))
 
     def test_dump_user_data(self):
@@ -108,15 +108,15 @@ class DumpTestDataCommandTest(TestCase):
 
     # Ensure that there is no spillover into a second committee
     def test_dump_second_committee(self):
-        dump_committee_data(COMMITTEE_TWO_ID, "--redis")
+        dump_committee_data(COMMITTEE_TWO_ID, True)
         committee_data = self.get_committee_data(committee_id=COMMITTEE_TWO_ID)
 
         self.assertEqual(len(committee_data), 1)
 
     def test_dump_invalid_committee(self):
         self.assertRaises(
-            RuntimeError, dump_committee_data, "C30000003", "--redis"
+            RuntimeError, dump_committee_data, "C30000003", True
         )
 
     def test_dump_no_committee_id(self):
-        self.assertRaises(RuntimeError, dump_committee_data, "", "--redis")
+        self.assertRaises(RuntimeError, dump_committee_data, "", True)
