@@ -1,18 +1,16 @@
 from django.core import serializers
 from django.core.management import call_command
 from fecfiler.s3 import S3_SESSION
-from fecfiler.settings import AWS_STORAGE_BUCKET_NAME, MOCK_OPENFEC_REDIS_URL
-import redis
-import structlog
-import json
-import os
-
 from fecfiler.settings import (
     FLAG__COMMITTEE_DATA_SOURCE,
     MOCK_OPENFEC_REDIS_URL,
     BASE_DIR,
     AWS_STORAGE_BUCKET_NAME,
 )
+import redis
+import structlog
+import json
+import os
 
 # Committee Accounts and Users
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
