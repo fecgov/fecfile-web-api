@@ -8,8 +8,6 @@ from fecfiler.user.utils import (
     reset_security_consent_date,
 )
 from uuid import uuid4
-from django.core.management import call_command
-from django.core.management.base import CommandError
 import datetime
 import structlog
 
