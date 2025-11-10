@@ -275,7 +275,7 @@ def load_committee_data(user_identifier, filename):
 def load_mocked_committee_data(s3=False):
     if FLAG__COMMITTEE_DATA_SOURCE == "MOCKED":
         redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
-        if s3:
+        if not s3:
             path = os.path.join(
                 BASE_DIR, "committee_accounts/management/commands/committee_data.json"
             )
