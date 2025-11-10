@@ -119,4 +119,4 @@ class DumpTestDataCommandTest(TestCase):
         )
 
     def test_dump_no_committee_id(self):
-        self.assertRaises(RuntimeError, dump_committee_data, "--redis")
+        self.assertRaises(RuntimeError, dump_committee_data, "", "--redis")
