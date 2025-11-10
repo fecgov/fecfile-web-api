@@ -64,7 +64,7 @@ class DumpTestDataCommandTest(TestCase):
             logger.info("Successfully removed file")
 
     def test_load_user_data(self):
-        load_committee_data(self.user.id, self.filename)
+        load_committee_data(str(self.user.id), self.filename)
         self.assertIsNotNone(
             Membership.objects.filter(
                 committee_account=self.committee, user=self.user

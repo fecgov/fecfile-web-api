@@ -188,7 +188,7 @@ def dump_all_committee_data(committee):
     return dumplist
 
 
-def get_filename(committee_id):
+def get_dump_filename(committee_id):
     return f"dumped_data_for_{committee_id}.json"
 
 
@@ -216,7 +216,7 @@ def save_to_redis(filename, formatted_json):
 
 
 def save_data(formatted_json, committee_id, redis):
-    filename = get_filename(committee_id)
+    filename = get_dump_filename(committee_id)
 
     if redis:
         return save_to_redis(filename, formatted_json)
