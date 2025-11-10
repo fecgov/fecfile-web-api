@@ -1,4 +1,5 @@
 from django.core import serializers
+from django.core.management import call_command
 from fecfiler.s3 import S3_SESSION
 from fecfiler.settings import AWS_STORAGE_BUCKET_NAME, MOCK_OPENFEC_REDIS_URL
 import redis
@@ -7,7 +8,9 @@ import json
 
 # Committee Accounts and Users
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.committee_accounts.utils.committee_membership import add_user_to_committee
 from fecfiler.user.models import User
+from fecfiler.user.utils import get_user_by_email_or_id
 
 # Reports
 from fecfiler.reports.models import Report, ReportTransaction
@@ -232,3 +235,29 @@ def dump_committee_data(committee_id, redis):
     formatted_json = f"[{','.join(dumped_committee_data)}]"
 
     save_data(formatted_json, committee_id, redis)
+
+def get_committee_id_from_file(filename) -> str | None:
+    file = open(filename, "r")
+    data = json.load(file)
+    for data_model in data:
+        if data_model["model"] == "committee_accounts.committeeaccount":
+            return data_model["fields"]["committee_id"]
+
+def load_committee_data(user_identifier, filename):
+    user = get_user_by_email_or_id(user_identifier)
+    if user is None:
+        raise RuntimeError("No matching user found")
+
+    committee_id = get_committee_id_from_file(filename)
+
+    try:
+        logger.info(f"Loading data for committee {committee_id}")
+        call_command("loaddata", filename)
+        logger.info(f"Adding user {user.email} to new committee {committee_id}")
+        add_user_to_committee(
+            user_email,
+            committee_id,
+            Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+        )
+    except Exception as e:
+        logger.error(f"An error occurred while loading committee data: {e}")

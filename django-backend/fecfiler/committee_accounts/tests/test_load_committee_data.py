@@ -1,21 +1,22 @@
 from django.test import TestCase
-from django.core.management.base import CommandError
-from django.core.management import call_command
 import os
 
-from fecfiler.reports.utils.report_utils import delete_all_reports
+from fecfiler.contacts.models import Contact
 from fecfiler.contacts.views import delete_all_contacts
-
-from fecfiler.committee_accounts.models import CommitteeAccount, Membership
-from fecfiler.user.models import User
 from fecfiler.contacts.tests.utils import create_test_individual_contact
-from fecfiler.reports.tests.utils import create_form3x
-from fecfiler.transactions.tests.utils import create_schedule_a
+from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.committee_accounts.utils.data import (
+    load_committee_data,
+    dump_committee_data,
+)
+from fecfiler.user.models import User
 from fecfiler.reports.models import Report
 from fecfiler.reports.form_3x.models import Form3X
+from fecfiler.reports.utils.report_utils import delete_all_reports
+from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
-from fecfiler.contacts.models import Contact
+from fecfiler.transactions.tests.utils import create_schedule_a
 import structlog
 
 
@@ -48,7 +49,7 @@ class DumpTestDataCommandTest(TestCase):
         )
 
         self.filename = f"dumped_data_for_{TEST_COMMITTEE_ID}.json"
-        call_command("dump_committee_data", TEST_COMMITTEE_ID)
+        dump_committee_data(TEST_COMMITTEE_ID)
 
         delete_all_reports(committee_id=TEST_COMMITTEE_ID)
         delete_all_contacts(committee_id=TEST_COMMITTEE_ID)
@@ -63,7 +64,7 @@ class DumpTestDataCommandTest(TestCase):
             logger.info("Successfully removed file")
 
     def test_load_user_data(self):
-        call_command("load_committee_data", self.filename, self.user.id)
+        load_committee_data(self.user.id, self.filename)
         self.assertIsNotNone(
             Membership.objects.filter(
                 committee_account=self.committee, user=self.user
@@ -90,9 +91,8 @@ class DumpTestDataCommandTest(TestCase):
 
     def test_load_with_invalid_user(self):
         self.assertRaises(
-            CommandError,
-            call_command,
-            "load_committee_data",
-            self.filename,
+            RuntimeError,
+            load_committee_data,
             "bad_email@fake.gov",
+            self.filename,
         )
