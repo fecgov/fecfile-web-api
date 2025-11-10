@@ -5,9 +5,18 @@ from fecfiler.settings import AWS_STORAGE_BUCKET_NAME, MOCK_OPENFEC_REDIS_URL
 import redis
 import structlog
 import json
+import os
+
+from fecfiler.settings import (
+    FLAG__COMMITTEE_DATA_SOURCE,
+    MOCK_OPENFEC_REDIS_URL,
+    BASE_DIR,
+    AWS_STORAGE_BUCKET_NAME,
+)
 
 # Committee Accounts and Users
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.committee_accounts.utils.accounts import COMMITTEE_DATA_REDIS_KEY
 from fecfiler.committee_accounts.utils.committee_membership import add_user_to_committee
 from fecfiler.user.models import User
 from fecfiler.user.utils import get_user_by_email_or_id
@@ -263,3 +272,23 @@ def load_committee_data(user_identifier, filename):
         )
     except Exception as e:
         logger.error(f"An error occurred while loading committee data: {e}")
+
+
+def load_mocked_committee_data(s3=False):
+    if FLAG__COMMITTEE_DATA_SOURCE == "MOCKED":
+        redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
+        if s3:
+            path = os.path.join(
+                BASE_DIR, "committee_accounts/management/commands/committee_data.json"
+            )
+            with open(path) as file:
+                committee_data = file.read()
+        else:
+            s3_object = S3_SESSION.Object(
+                AWS_STORAGE_BUCKET_NAME, "mock_committee_data.json"
+            )
+            file = s3_object.get()["Body"]
+            committee_data = file.read()
+        redis_instance.set(COMMITTEE_DATA_REDIS_KEY, committee_data)
+
+        logger.info("Successfully loaded committees")

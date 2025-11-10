@@ -1,37 +1,19 @@
-from django.core.management.base import BaseCommand
-from fecfiler.settings import (
-    FLAG__COMMITTEE_DATA_SOURCE,
-    MOCK_OPENFEC_REDIS_URL,
-    BASE_DIR,
-    AWS_STORAGE_BUCKET_NAME,
+from fecfiler.devops.management.commands.fecfile_base import FECCommand
+from fecfiler.committee_accounts.utils.data import (
+    load_mocked_committee_data,
 )
-import redis
-import os
-from fecfiler.s3 import S3_SESSION
-from fecfiler.committee_accounts.utils.accounts import COMMITTEE_DATA_REDIS_KEY
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
-class Command(BaseCommand):
+class Command(FECCommand):
     help = "Load mock committee data into redis"
+    command_name = "load_mocked_committee_data"
 
     def add_arguments(self, parser):
         parser.add_argument("--s3", action="store_true")
 
-    def handle(self, *args, **options):
-        if FLAG__COMMITTEE_DATA_SOURCE == "MOCKED":
-            redis_instance = redis.Redis.from_url(MOCK_OPENFEC_REDIS_URL)
-            if not options.get("s3"):
-                path = os.path.join(
-                    BASE_DIR, "committee_accounts/management/commands/committee_data.json"
-                )
-                with open(path) as file:
-                    committee_data = file.read()
-            else:
-                s3_object = S3_SESSION.Object(
-                    AWS_STORAGE_BUCKET_NAME, "mock_committee_data.json"
-                )
-                file = s3_object.get()["Body"]
-                committee_data = file.read()
-            redis_instance.set(COMMITTEE_DATA_REDIS_KEY, committee_data)
-
-            self.stdout.write(self.style.SUCCESS("Successfully loaded committees"))
+    def command(self, *args, **options):
+        s3 = options.get("s3", False)
+        load_mocked_committee_data(s3)
