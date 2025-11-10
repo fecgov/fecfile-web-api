@@ -236,12 +236,14 @@ def dump_committee_data(committee_id, redis):
 
     save_data(formatted_json, committee_id, redis)
 
+
 def get_committee_id_from_file(filename) -> str | None:
     file = open(filename, "r")
     data = json.load(file)
     for data_model in data:
         if data_model["model"] == "committee_accounts.committeeaccount":
             return data_model["fields"]["committee_id"]
+
 
 def load_committee_data(user_identifier, filename):
     user = get_user_by_email_or_id(user_identifier)
@@ -255,7 +257,7 @@ def load_committee_data(user_identifier, filename):
         call_command("loaddata", filename)
         logger.info(f"Adding user {user.email} to new committee {committee_id}")
         add_user_to_committee(
-            user_email,
+            user.email,
             committee_id,
             Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
         )
