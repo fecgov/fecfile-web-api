@@ -19,4 +19,5 @@ class Command(FECCommand):
 
     def command(self, *args, **options):
         committee_id = options.get("committee_id")
-        dump_committee_data(committee_id, options)
+        redis = options.get("redis", False)
+        dump_committee_data(committee_id, redis)

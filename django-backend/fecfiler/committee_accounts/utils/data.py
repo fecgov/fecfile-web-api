@@ -185,8 +185,8 @@ def dump_all_committee_data(committee):
     return dumplist
 
 
-def get_filename(options):
-    return f"dumped_data_for_{options.get("committee_id")}.json"
+def get_filename(committee_id):
+    return f"dumped_data_for_{committee_id}.json"
 
 
 def save_to_s3(filename, formatted_json):
@@ -212,10 +212,10 @@ def save_to_redis(filename, formatted_json):
     redis_instance.set(filename, formatted_json)
 
 
-def save_data(formatted_json, options):
-    filename = get_filename(options)
+def save_data(formatted_json, committee_id, redis):
+    filename = get_filename(committee_id)
 
-    if options.get("redis", False):
+    if redis:
         return save_to_redis(filename, formatted_json)
     elif S3_SESSION is not None:
         return save_to_s3(filename, formatted_json)
@@ -223,7 +223,7 @@ def save_data(formatted_json, options):
         return save_to_local(filename, formatted_json)
 
 
-def dump_committee_data(committee_id, options):
+def dump_committee_data(committee_id, redis):
     committee = CommitteeAccount.objects.filter(committee_id=committee_id).first()
     if committee is None:
         raise RuntimeError("No Committee Account found matching that Committee ID")
@@ -231,4 +231,4 @@ def dump_committee_data(committee_id, options):
     dumped_committee_data = dump_all_committee_data(committee)
     formatted_json = f"[{','.join(dumped_committee_data)}]"
 
-    save_data(formatted_json, options)
+    save_data(formatted_json, committee_id, redis)
