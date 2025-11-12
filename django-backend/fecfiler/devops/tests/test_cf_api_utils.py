@@ -1,6 +1,6 @@
 from django.test import TestCase
 from unittest.mock import Mock, patch
-from fecfiler.devops.utils.cf_api_utils import (
+from fecfiler.devops.utils.cf_api import (
     check_api_status,
     get_organization_guid,
     get_space_guid,
@@ -19,7 +19,7 @@ class CfApiUtilsTestCase(TestCase):
     # check_api_status
 
     def test_check_api_status_error_response(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             mock_requests.get.return_value = mock_response = Mock()
             mock_response.raise_for_status.side_effect = Exception("FAIL")
             with self.assertRaisesMessage(
@@ -29,7 +29,7 @@ class CfApiUtilsTestCase(TestCase):
                 check_api_status()
 
     def test_check_api_status_happy_path(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             mock_requests.get.return_value = mock_response = Mock()
             mock_response.status_code = 200
             response = check_api_status()
@@ -37,7 +37,7 @@ class CfApiUtilsTestCase(TestCase):
 
     # retrieve_credentials
 
-    @patch("fecfiler.devops.utils.cf_api_utils.get_space_guid")
+    @patch("fecfiler.devops.utils.cf_api.get_space_guid")
     def test_retrieve_credentials_throws_exception(
         self,
         get_space_guid_mock,
@@ -63,9 +63,9 @@ class CfApiUtilsTestCase(TestCase):
                 test_service_instance_name,
             )
 
-    @patch("fecfiler.devops.utils.cf_api_utils.get_space_guid")
-    @patch("fecfiler.devops.utils.cf_api_utils.get_service_instance_guid_from_names")
-    @patch("fecfiler.devops.utils.cf_api_utils.get_credentials_by_guid")
+    @patch("fecfiler.devops.utils.cf_api.get_space_guid")
+    @patch("fecfiler.devops.utils.cf_api.get_service_instance_guid_from_names")
+    @patch("fecfiler.devops.utils.cf_api.get_credentials_by_guid")
     def test_retrieve_credentials_happy_path(
         self,
         get_credentials_by_guid_mock,
@@ -97,7 +97,7 @@ class CfApiUtilsTestCase(TestCase):
 
     # update_credentials
 
-    @patch("fecfiler.devops.utils.cf_api_utils.get_space_guid")
+    @patch("fecfiler.devops.utils.cf_api.get_space_guid")
     def test_update_credentials_throws_exception(
         self,
         get_space_guid_mock,
@@ -125,11 +125,11 @@ class CfApiUtilsTestCase(TestCase):
                 mock_credentials,
             )
 
-    @patch("fecfiler.devops.utils.cf_api_utils.get_space_guid")
-    @patch("fecfiler.devops.utils.cf_api_utils.get_service_instance_guid_from_names")
-    @patch("fecfiler.devops.utils.cf_api_utils.get_credentials_by_guid")
-    @patch("fecfiler.devops.utils.cf_api_utils.merge_credentials")
-    @patch("fecfiler.devops.utils.cf_api_utils.update_credentials_for_service")
+    @patch("fecfiler.devops.utils.cf_api.get_space_guid")
+    @patch("fecfiler.devops.utils.cf_api.get_service_instance_guid_from_names")
+    @patch("fecfiler.devops.utils.cf_api.get_credentials_by_guid")
+    @patch("fecfiler.devops.utils.cf_api.merge_credentials")
+    @patch("fecfiler.devops.utils.cf_api.update_credentials_for_service")
     def test_update_credentials_happy_path(
         self,
         update_credentials_for_service_mock,
@@ -166,7 +166,7 @@ class CfApiUtilsTestCase(TestCase):
     # get_organization_guid
 
     def test_get_organization_guid_throws_exception(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_organization_name = "test_organization_name"
             mock_requests.get.side_effect = Exception("FAIL")
@@ -177,7 +177,7 @@ class CfApiUtilsTestCase(TestCase):
                 get_organization_guid(test_token, test_organization_name)
 
     def test_get_organization_guid_empty_response(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_organization_name = "test_organization_name"
             test_guid = ""
@@ -193,7 +193,7 @@ class CfApiUtilsTestCase(TestCase):
                 get_organization_guid(test_token, test_organization_name)
 
     def test_get_organization_guid_happy_path(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_organization_name = "test_organization_name"
             test_guid = "fd1ab0ac-691e-4755-9703-f6e0401e7b7a"
@@ -208,7 +208,7 @@ class CfApiUtilsTestCase(TestCase):
     # get_space_guid
 
     def test_get_space_guid_throws_exception(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_space_name = "test_space_name"
             test_organization_guid = "4baa2f2b-a5db-49fb-bbc3-330a7a5fada8"
@@ -219,7 +219,7 @@ class CfApiUtilsTestCase(TestCase):
                 get_space_guid(test_token, test_space_name, test_organization_guid)
 
     def test_get_space_guid_empty_response(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_space_name = "test_space_name"
             test_organization_guid = "4baa2f2b-a5db-49fb-bbc3-330a7a5fada8"
@@ -235,7 +235,7 @@ class CfApiUtilsTestCase(TestCase):
                 get_space_guid(test_token, test_space_name, test_organization_guid)
 
     def test_get_space_guid_happy_path(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_space_name = "test_space_name"
             test_organization_guid = "4baa2f2b-a5db-49fb-bbc3-330a7a5fada8"
@@ -251,7 +251,7 @@ class CfApiUtilsTestCase(TestCase):
     # get_service_instance_guid_from_names
 
     def test_get_service_instance_guid_from_names_throws_exception(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_organization_name = "test_organization_name"
             test_space_name = "test_space_name"
@@ -272,7 +272,7 @@ class CfApiUtilsTestCase(TestCase):
                 )
 
     def test_get_service_instance_guid_from_names_happy_path(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_organization_name = "test_organization_name"
             test_organization_guid = "c7773c33-e79d-483c-b90c-18ab6fa7b226"
@@ -325,7 +325,7 @@ class CfApiUtilsTestCase(TestCase):
     # get_service_instance_guid
 
     def test_get_service_instance_guid_throws_exception(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_organization_guid = "7b9734d0-caf0-4c03-9b0c-063c0a9e0c30"
             test_space_guid = "fd1ab0ac-691e-4755-9703-f6e0401e7b7a"
@@ -346,7 +346,7 @@ class CfApiUtilsTestCase(TestCase):
                 )
 
     def test_get_service_instance_guid_empty_response(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_organization_guid = "7b9734d0-caf0-4c03-9b0c-063c0a9e0c30"
             test_space_guid = "fd1ab0ac-691e-4755-9703-f6e0401e7b7a"
@@ -372,7 +372,7 @@ class CfApiUtilsTestCase(TestCase):
                 )
 
     def test_get_service_instance_guid_happy_path(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_organization_guid = "7b9734d0-caf0-4c03-9b0c-063c0a9e0c30"
             test_space_guid = "fd1ab0ac-691e-4755-9703-f6e0401e7b7a"
@@ -394,7 +394,7 @@ class CfApiUtilsTestCase(TestCase):
     # get_credentials_by_guid
 
     def test_get_credentials_by_guid_throws_exception(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_service_instance_guid = "1c694e15-9ba9-4b5c-8c52-8c4fc391c126"
             mock_requests.get.side_effect = Exception("FAIL")
@@ -406,7 +406,7 @@ class CfApiUtilsTestCase(TestCase):
                 get_credentials_by_guid(test_token, test_service_instance_guid)
 
     def test_get_credentials_by_guid_happy_path(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_service_instance_guid = "1c694e15-9ba9-4b5c-8c52-8c4fc391c126"
             test_creds = {"test_key1": "test_val1"}
@@ -429,7 +429,7 @@ class CfApiUtilsTestCase(TestCase):
     # update_credentials_for_service
 
     def test_update_credentials_for_service_throws_exception(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_service_instance_guid = "1c694e15-9ba9-4b5c-8c52-8c4fc391c126"
             test_creds = {"test_key1": "test_val1"}
@@ -444,7 +444,7 @@ class CfApiUtilsTestCase(TestCase):
                 )
 
     def test_update_credentials_for_service_happy_path(self):
-        with patch("fecfiler.devops.utils.cf_api_utils.requests") as mock_requests:
+        with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             test_token = "test_token"
             test_service_instance_guid = "1c694e15-9ba9-4b5c-8c52-8c4fc391c126"
             test_creds = {"test_key1": "test_val1"}

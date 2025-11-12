@@ -12,7 +12,7 @@ from fecfiler.committee_accounts.utils.data import (
 from fecfiler.user.models import User
 from fecfiler.reports.models import Report
 from fecfiler.reports.form_3x.models import Form3X
-from fecfiler.reports.utils.report_utils import delete_all_reports
+from fecfiler.reports.utils.report import delete_all_reports
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA

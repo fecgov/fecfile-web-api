@@ -6,7 +6,7 @@ from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .models import Report
 from .report_code_label import report_code_label_case
 from fecfiler.web_services.models import UploadSubmission
-from fecfiler.reports.utils.report_utils import delete_all_reports
+from fecfiler.reports.utils.report import delete_all_reports
 from .serializers import ReportSerializer
 from django.db.models import Case, Value, When, CharField, IntegerField, F
 from django.db.models.functions import Concat, Trim

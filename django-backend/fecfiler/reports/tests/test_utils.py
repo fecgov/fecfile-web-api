@@ -7,7 +7,7 @@ from fecfiler.web_services.models import (
     UploadSubmission,
     WebPrintSubmission,
 )
-from ..utils.report_utils import reset_submitting_report
+from ..utils.report import reset_submitting_report
 from uuid import uuid4
 import structlog
 

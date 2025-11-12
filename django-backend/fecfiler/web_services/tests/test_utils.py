@@ -5,7 +5,7 @@ from fecfiler.web_services.models import (
     FECSubmissionState,
     UploadSubmission,
 )
-from ..utils.submission_utils import fail_open_submissions
+from ..utils.submission import fail_open_submissions
 
 
 class WebServicesUtilTestCase(TestCase):
