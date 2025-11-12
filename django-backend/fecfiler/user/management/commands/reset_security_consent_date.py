@@ -1,13 +1,11 @@
-from django.core.management.base import BaseCommand
-from fecfiler.user.models import User
-import structlog
-
-logger = structlog.get_logger(__name__)
+from fecfiler.devops.management.commands.fecfile_base import FECCommand
+from fecfiler.user.utils import reset_security_consent_date
 
 
-class Command(BaseCommand):
+class Command(FECCommand):
     help = """Resets the security consent expiration date
     for the user corresponding to the given email"""
+    command_name = "reset_security_consent_date"
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -17,19 +15,6 @@ class Command(BaseCommand):
             whose security consent date will be reset""",
         )
 
-    def handle(self, *args, **options):
+    def command(self, *args, **options):
         email = options["email"]
-        try:
-            user = User.objects.filter(email=email).first()
-            if user is None:
-                logger.error("No user found matching that email")
-                return
-
-            user.security_consent_exp_date = None
-            user.save()
-
-            logger.info("Successfully reset the security consent expiration date")
-        except Exception as e:
-            logger.error(
-                f"An error occurred while reseting the security consent date: {e}"
-            )
+        reset_security_consent_date(email)

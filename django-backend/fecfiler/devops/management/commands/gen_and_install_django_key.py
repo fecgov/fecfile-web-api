@@ -1,5 +1,5 @@
 from .fecfile_base import FECCommand
-from fecfiler.devops.utils.django_key_utils import gen_and_install_django_key
+from fecfiler.devops.utils.django_key import gen_and_install_django_key
 
 
 class Command(FECCommand):

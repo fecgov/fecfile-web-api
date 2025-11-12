@@ -1,5 +1,5 @@
 from .fecfile_base import FECCommand
-from fecfiler.devops.utils.cf_api_utils import update_credentials
+from fecfiler.devops.utils.cf_api import update_credentials
 import json
 
 

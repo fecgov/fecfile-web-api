@@ -1,5 +1,5 @@
 from .fecfile_base import FECCommand
-from fecfiler.devops.utils.django_key_utils import clear_fallback_django_keys
+from fecfiler.devops.utils.django_key import clear_fallback_django_keys
 
 
 class Command(FECCommand):

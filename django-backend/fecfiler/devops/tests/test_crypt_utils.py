@@ -1,6 +1,6 @@
 from django.test import TestCase
 from unittest.mock import patch
-from fecfiler.devops.utils.crypt_utils import (
+from fecfiler.devops.utils.crypt import (
     gen_rsa_pk,
     rsa_pk_to_bytes,
     gen_x509_cert,
@@ -68,7 +68,7 @@ class CfApiUtilsTestCase(TestCase):
 
     # gen_x509_cert
 
-    @patch("fecfiler.devops.utils.crypt_utils.x509")
+    @patch("fecfiler.devops.utils.crypt.x509")
     @patch("cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey")
     def test_gen_x509_cert_throws_exception(
         self,
@@ -102,7 +102,7 @@ class CfApiUtilsTestCase(TestCase):
                 rsa_pk_mock,
             )
 
-    @patch("fecfiler.devops.utils.crypt_utils.x509")
+    @patch("fecfiler.devops.utils.crypt.x509")
     @patch("cryptography.hazmat.primitives.asymmetric.rsa.RSAPrivateKey")
     def test_gen_x509_cert_happy_path(
         self,

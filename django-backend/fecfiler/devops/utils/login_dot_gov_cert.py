@@ -11,12 +11,12 @@ from fecfiler.settings import (
     LOGIN_DOT_GOV_RSA_PK_SIZE,
 )
 from fecfiler.s3 import S3_SESSION
-from fecfiler.devops.utils.cf_api_utils import (
+from fecfiler.devops.utils.cf_api import (
     check_api_status,
     retrieve_credentials,
     update_credentials,
 )
-from fecfiler.devops.utils.crypt_utils import (
+from fecfiler.devops.utils.crypt import (
     gen_rsa_pk,
     rsa_pk_to_bytes,
     gen_x509_cert,

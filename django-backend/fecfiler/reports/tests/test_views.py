@@ -1,5 +1,6 @@
 from django.http import QueryDict
-from fecfiler.reports.views import ReportViewSet, delete_all_reports
+from fecfiler.reports.views import ReportViewSet
+from fecfiler.reports.utils.report import delete_all_reports
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
 from fecfiler.user.models import User

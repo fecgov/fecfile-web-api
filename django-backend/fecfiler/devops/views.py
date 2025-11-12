@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from .tasks import DATABASE_STATUS, CELERY_STATUS, SCHEDULER_STATUS
 
-from .utils.redis_utils import get_redis_value
+from .utils.redis import get_redis_value
 
 
 logger = structlog.get_logger(__name__)

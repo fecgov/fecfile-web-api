@@ -1,5 +1,5 @@
 from .fecfile_base import FECCommand
-from fecfiler.devops.utils.login_dot_gov_cert_utils import (
+from fecfiler.devops.utils.login_dot_gov_cert import (
     gen_and_stage_login_dot_gov_cert,
 )
 

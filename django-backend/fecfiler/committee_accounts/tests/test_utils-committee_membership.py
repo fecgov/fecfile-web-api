@@ -2,13 +2,13 @@ from django.test import TestCase
 from unittest.mock import patch, MagicMock
 from django.core.exceptions import ValidationError
 from fecfiler.committee_accounts.models import Membership
-from fecfiler.committee_accounts.committee_membership_utils import add_user_to_committee
+from fecfiler.committee_accounts.utils.committee_membership import add_user_to_committee
 
 
 class AddUserToCommitteeTests(TestCase):
-    @patch("fecfiler.committee_accounts.committee_membership_utils.Membership")
+    @patch("fecfiler.committee_accounts.utils.committee_membership.Membership")
     @patch("fecfiler.user.utils.User")
-    @patch("fecfiler.committee_accounts.committee_membership_utils.CommitteeAccount")
+    @patch("fecfiler.committee_accounts.utils.committee_membership.CommitteeAccount")
     def test_user_already_member_raises(
         self, mock_committee_account, mock_user, mock_membership
     ):
@@ -25,9 +25,9 @@ class AddUserToCommitteeTests(TestCase):
         )
         mock_membership.objects.filter.assert_called_once()
 
-    @patch("fecfiler.committee_accounts.committee_membership_utils.Membership")
+    @patch("fecfiler.committee_accounts.utils.committee_membership.Membership")
     @patch("fecfiler.user.utils.User")
-    @patch("fecfiler.committee_accounts.committee_membership_utils.CommitteeAccount")
+    @patch("fecfiler.committee_accounts.utils.committee_membership.CommitteeAccount")
     def test_committee_does_not_exist_raises(
         self, mock_committee_account, mock_user, mock_membership
     ):
@@ -45,9 +45,9 @@ class AddUserToCommitteeTests(TestCase):
             committee_id="C00000000"
         )
 
-    @patch("fecfiler.committee_accounts.committee_membership_utils.Membership")
+    @patch("fecfiler.committee_accounts.utils.committee_membership.Membership")
     @patch("fecfiler.user.utils.User")
-    @patch("fecfiler.committee_accounts.committee_membership_utils.CommitteeAccount")
+    @patch("fecfiler.committee_accounts.utils.committee_membership.CommitteeAccount")
     def test_add_user_to_committee_success(
         self, mock_committee_account, mock_user, mock_membership
     ):
@@ -66,9 +66,9 @@ class AddUserToCommitteeTests(TestCase):
         mock_membership.assert_called_once()
         mock_new_member.save.assert_called_once()
 
-    @patch("fecfiler.committee_accounts.committee_membership_utils.Membership")
+    @patch("fecfiler.committee_accounts.utils.committee_membership.Membership")
     @patch("fecfiler.user.utils.User")
-    @patch("fecfiler.committee_accounts.committee_membership_utils.CommitteeAccount")
+    @patch("fecfiler.committee_accounts.utils.committee_membership.CommitteeAccount")
     def test_add_pending_email_if_user_none(
         self, mock_committee_account, mock_user, mock_membership
     ):

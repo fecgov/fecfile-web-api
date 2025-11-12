@@ -1,5 +1,5 @@
 from fecfiler.devops.management.commands.fecfile_base import FECCommand
-from ...utils.submission_utils import fail_open_submissions
+from ...utils.submission import fail_open_submissions
 import structlog
 
 logger = structlog.get_logger(__name__)

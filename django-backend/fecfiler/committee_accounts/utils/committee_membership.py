@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from .models import CommitteeAccount, Membership
+from ..models import CommitteeAccount, Membership
 from fecfiler.user.utils import get_user_by_email_or_id
 from django.db.models import Q
 import structlog

@@ -1,4 +1,4 @@
-from fecfiler.devops.utils.login_dot_gov_cert_utils import backout_login_dot_gov_cert
+from fecfiler.devops.utils.login_dot_gov_cert import backout_login_dot_gov_cert
 from .fecfile_base import FECCommand
 
 

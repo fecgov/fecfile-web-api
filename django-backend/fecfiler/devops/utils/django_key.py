@@ -1,4 +1,4 @@
-from fecfiler.devops.utils.cf_api_utils import retrieve_credentials, update_credentials
+from fecfiler.devops.utils.cf_api import retrieve_credentials, update_credentials
 from django.core.management.utils import get_random_secret_key
 import structlog
 

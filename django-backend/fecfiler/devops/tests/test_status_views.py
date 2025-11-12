@@ -5,7 +5,7 @@ from ..tasks import (
     CELERY_STATUS,
     SCHEDULER_STATUS,
 )
-from ..utils.redis_utils import (
+from ..utils.redis import (
     get_redis_value,
     set_redis_value,
     redis_instance,
