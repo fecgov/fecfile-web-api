@@ -3,9 +3,10 @@ from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
 import redis
 import json
 
-from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.user.models import User
 from fecfiler.contacts.tests.utils import create_test_individual_contact
+from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.committee_accounts.utils.data import dump_committee_data
 from fecfiler.reports.tests.utils import (
     create_form3x,
     create_form24,
@@ -16,9 +17,6 @@ from fecfiler.reports.tests.utils import (
 from fecfiler.cash_on_hand.tests.utils import create_cash_on_hand_yearly
 from fecfiler.transactions.tests.utils import create_schedule_a, create_transaction_memo
 from fecfiler.web_services.models import WebPrintSubmission, UploadSubmission, DotFEC
-from fecfiler.committee_accounts.utils.data import (
-    dump_committee_data,
-)
 
 
 COMMITTEE_ONE_ID = "C10000001"

@@ -1,7 +1,5 @@
 from fecfiler.devops.management.commands.fecfile_base import FECCommand
-from fecfiler.committee_accounts.utils.data import (
-    dump_committee_data,
-)
+from fecfiler.committee_accounts.utils.data import dump_committee_data
 import structlog
 
 logger = structlog.get_logger(__name__)

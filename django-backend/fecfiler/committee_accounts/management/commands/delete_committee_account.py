@@ -1,7 +1,5 @@
 from fecfiler.devops.management.commands.fecfile_base import FECCommand
-from fecfiler.committee_accounts.utils.accounts import (
-    delete_committee_account,
-)
+from fecfiler.committee_accounts.utils.accounts import delete_committee_account
 import structlog
 
 logger = structlog.get_logger(__name__)

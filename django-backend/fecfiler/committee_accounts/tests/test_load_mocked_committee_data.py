@@ -1,9 +1,7 @@
 from django.test import TestCase
 from fecfiler.settings import MOCK_OPENFEC_REDIS_URL
 from fecfiler.committee_accounts.utils.accounts import COMMITTEE_DATA_REDIS_KEY
-from fecfiler.committee_accounts.utils.data import (
-    load_mocked_committee_data,
-)
+from fecfiler.committee_accounts.utils.data import load_mocked_committee_data
 import redis
 import json
 
