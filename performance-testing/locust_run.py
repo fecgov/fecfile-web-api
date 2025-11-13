@@ -84,7 +84,10 @@ class Tasks(TaskSet):
             "exclude_ids": None
         }
         self.client_get(
-            "/api/v1/contacts/committee_lookup/", name="_lookup_committees", timeout=TIMEOUT, params=params
+            "/api/v1/contacts/committee_lookup/",
+            name="_lookup_committees",
+            timeout=TIMEOUT,
+            params=params
         )
 
     @task(100)
@@ -98,7 +101,10 @@ class Tasks(TaskSet):
             "exclude_ids": None
         }
         self.client_get(
-            "/api/v1/contacts/candidate_lookup/", name="_lookup_candidates", timeout=TIMEOUT, params=params
+            "/api/v1/contacts/candidate_lookup/",
+            name="_lookup_candidates",
+            timeout=TIMEOUT,
+            params=params
         )
 
     @task
