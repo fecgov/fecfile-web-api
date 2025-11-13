@@ -73,6 +73,34 @@ class Tasks(TaskSet):
             "/api/v1/reports/", name="get_reports", timeout=TIMEOUT, params=params
         )
 
+    @task(100)
+    def lookup_committees(self):
+        params = {
+            # Querying with only a single character avoids FEC lookups
+            "q": random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+            "max_fec_results": 10,
+            "max_fecfile_results": 5,
+            "exclude_fec_ids": None,
+            "exclude_ids": None
+        }
+        self.client_get(
+            "/api/v1/contacts/committee_lookup/", name="_lookup_committees", timeout=TIMEOUT, params=params
+        )
+
+    @task(100)
+    def lookup_candidates(self):
+        params = {
+            # Querying with only a single character avoids FEC lookups
+            "q": random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+            "max_fec_results": 10,
+            "max_fecfile_results": 5,
+            "exclude_fec_ids": None,
+            "exclude_ids": None
+        }
+        self.client_get(
+            "/api/v1/contacts/candidate_lookup/", name="_lookup_candidates", timeout=TIMEOUT, params=params
+        )
+
     @task
     def get_schedule_transactions(self):
         if len(self.report_ids) > 0:
