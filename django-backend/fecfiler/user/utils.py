@@ -27,3 +27,8 @@ def delete_active_sessions_for_user_and_committee(
             and data.get("committee_id") == committee_id
         ):
             session.delete()
+
+
+def update_user_active_state(user: User, state: bool):
+    user.is_active = state
+    user.save()

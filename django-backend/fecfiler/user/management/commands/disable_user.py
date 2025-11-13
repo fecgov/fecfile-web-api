@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from django.contrib.auth import get_user_model
+from fecfiler.user.utils import get_user_by_email_or_id, update_user_active_state
 
 
 class Command(BaseCommand):
@@ -17,19 +17,9 @@ class Command(BaseCommand):
                 help='Flag to instead (re-)enable the user.')
 
     def handle(self, *args, **options):
-        user_model = get_user_model()
-
-        try:
-            # if they use both arguments, prefer UUID
-            if options['uuid'] is not None:
-                user = user_model.objects.get(id=options['uuid'])
-            else:
-                user = user_model.objects.get(email=options['email'])
-        except user_model.DoesNotExist:
-            raise CommandError('User does not exist')
-
-        user.is_active = options['enable']
-        user.save()
+        email_or_id = options.get("email", options.get("uuid", ""))
+        user = get_user_by_email_or_id(email_or_id)
+        update_user_active_state(user, options.get("enable", False))
 
         self.stdout.write(self.style.SUCCESS(
             f'The is_active flag for user [{user.id} | {user.email}] '
