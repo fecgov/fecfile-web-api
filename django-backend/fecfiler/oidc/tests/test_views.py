@@ -1,4 +1,4 @@
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from django.test import RequestFactory, TestCase
 from django.contrib.auth import get_user_model
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -38,26 +38,6 @@ class OidcTest(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
-    def xtest_login_dot_gov_logout_happy_path(self):
-        test_state = "test_state"
-
-        mock_request = Mock()
-        mock_request.session = Mock()
-        mock_request.get_signed_cookie.return_value = test_state
-
-        retval = oidc_logout(mock_request)
-        self.maxDiff = None
-        self.assertEqual(
-            retval,
-            (
-                "https://idp.int.identitysandbox.gov"
-                "/openid_connect/logout?"
-                "client_id=None"
-                "&post_logout_redirect_uri=None"
-                "&state=test_state"
-            ),
-        )
-
     def test_login_redirect(self):
         request = self.factory.get("/")
         request.user = self.user
@@ -82,7 +62,6 @@ class OidcTest(TestCase):
         }
         retval = oidc_authenticate(request)
         self.assertEqual(retval.status_code, 302)
-        self.assertIsNotNone(retval.cookies.get("oidc_state"))
 
     def test_oidc_callback_error(self):
         test_state = "test_state"
@@ -130,10 +109,8 @@ class OidcTest(TestCase):
                 "test_state_3_key": {"nonce": "test_nonce_3", "added_on": time.time()},
             }
         }
-        auth_response = oidc_authenticate(auth_request)
-
+        oidc_authenticate(auth_request)
         request = self.get_request("/")
-        request.COOKIES["oidc_state"] = auth_response.cookies["oidc_state"].value
-
         retval = oidc_logout(request)
         self.assertEqual(retval.status_code, 302)
+        self.assertTrue("/logout?client_id=" in retval["Location"])

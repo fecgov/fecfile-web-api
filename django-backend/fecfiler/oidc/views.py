@@ -84,7 +84,6 @@ def oidc_authenticate(request):
         url=oidc_op_config.get_authorization_endpoint(), query=query
     )
     response = HttpResponseRedirect(redirect_url)
-    response.set_signed_cookie("oidc_state", state, secure=True, httponly=True)
     return response
 
 
@@ -117,7 +116,6 @@ def oidc_logout(request):
         params = {
             "client_id": OIDC_RP_CLIENT_ID,
             "post_logout_redirect_uri": LOGOUT_REDIRECT_URL,
-            "state": request.get_signed_cookie("oidc_state"),
         }
         query = urlencode(params)
         op_logout_url = oidc_op_config.get_logout_endpoint()
