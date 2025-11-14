@@ -113,4 +113,4 @@ class OidcTest(TestCase):
         request = self.get_request("/")
         retval = oidc_logout(request)
         self.assertEqual(retval.status_code, 302)
-        self.assertEquals("hihi", retval["Location"])
+        self.assertEqual("hihi", retval["Location"])
