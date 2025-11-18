@@ -107,7 +107,6 @@ fecfiler.oidc.tests.test\_views.OidcTest
       ~OidcTest.test_oidc_callback_happy_path
       ~OidcTest.test_oidc_callback_session_states_not_found
       ~OidcTest.test_oidc_logout_happy_path
-      ~OidcTest.xtest_login_dot_gov_logout_happy_path
    
    
 
