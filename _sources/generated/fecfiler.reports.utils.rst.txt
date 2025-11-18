@@ -31,5 +31,5 @@ fecfiler.reports.utils
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.reports.utils.report_utils
+   fecfiler.reports.utils.report
 

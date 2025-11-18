@@ -1,0 +1,6 @@
+fecfiler.user.utils.disable\_user
+=================================
+
+.. currentmodule:: fecfiler.user.utils
+
+.. autofunction:: disable_user

@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.data.dump\_cash\_on\_hand
+============================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.data
+
+.. autofunction:: dump_cash_on_hand

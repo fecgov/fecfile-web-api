@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.accounts.raise\_if\_cannot\_create\_committee\_account
+=========================================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.accounts
+
+.. autofunction:: raise_if_cannot_create_committee_account

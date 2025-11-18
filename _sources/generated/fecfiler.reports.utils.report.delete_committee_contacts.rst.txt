@@ -1,0 +1,6 @@
+fecfiler.reports.utils.report.delete\_committee\_contacts
+=========================================================
+
+.. currentmodule:: fecfiler.reports.utils.report
+
+.. autofunction:: delete_committee_contacts

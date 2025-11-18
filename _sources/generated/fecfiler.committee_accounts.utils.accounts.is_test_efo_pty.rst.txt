@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.accounts.is\_test\_efo\_pty
+==============================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.accounts
+
+.. autofunction:: is_test_efo_pty

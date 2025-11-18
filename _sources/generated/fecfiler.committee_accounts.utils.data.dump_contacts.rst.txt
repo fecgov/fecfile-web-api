@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.data.dump\_contacts
+======================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.data
+
+.. autofunction:: dump_contacts

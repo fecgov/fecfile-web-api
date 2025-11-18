@@ -1,6 +1,0 @@
-fecfiler.devops.utils.crypt\_utils.rsa\_pk\_to\_bytes
-=====================================================
-
-.. currentmodule:: fecfiler.devops.utils.crypt_utils
-
-.. autofunction:: rsa_pk_to_bytes

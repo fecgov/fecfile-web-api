@@ -18,7 +18,9 @@ fecfiler.user.utils
       :toctree:                                          
    
       delete_active_sessions_for_user_and_committee
+      disable_user
       get_user_by_email_or_id
+      reset_security_consent_date
    
    
 

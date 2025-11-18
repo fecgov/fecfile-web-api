@@ -1,6 +1,0 @@
-fecfiler.committee\_accounts.utils.is\_production\_efo\_pac
-===========================================================
-
-.. currentmodule:: fecfiler.committee_accounts.utils
-
-.. autofunction:: is_production_efo_pac

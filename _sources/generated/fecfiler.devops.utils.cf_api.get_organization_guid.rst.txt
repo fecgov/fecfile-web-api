@@ -1,0 +1,6 @@
+fecfiler.devops.utils.cf\_api.get\_organization\_guid
+=====================================================
+
+.. currentmodule:: fecfiler.devops.utils.cf_api
+
+.. autofunction:: get_organization_guid

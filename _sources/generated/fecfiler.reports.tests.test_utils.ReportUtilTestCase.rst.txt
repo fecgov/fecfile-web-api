@@ -100,8 +100,6 @@ fecfiler.reports.tests.test\_utils.ReportUtilTestCase
       ~ReportUtilTestCase.tearDown
       ~ReportUtilTestCase.tearDownClass
       ~ReportUtilTestCase.test_reset_submitting_report
-      ~ReportUtilTestCase.test_reset_submitting_report_command
-      ~ReportUtilTestCase.test_reset_submitting_report_command_missing_arg
    
    
 

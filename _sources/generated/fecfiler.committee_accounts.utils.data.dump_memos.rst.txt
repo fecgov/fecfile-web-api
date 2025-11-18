@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.data.dump\_memos
+===================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.data
+
+.. autofunction:: dump_memos

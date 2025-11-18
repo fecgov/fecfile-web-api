@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.data.dump\_all\_committee\_data
+==================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.data
+
+.. autofunction:: dump_all_committee_data

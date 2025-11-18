@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.accounts.delete\_committee\_account
+======================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.accounts
+
+.. autofunction:: delete_committee_account

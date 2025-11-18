@@ -1,0 +1,6 @@
+fecfiler.devops.utils.login\_dot\_gov\_cert.backout\_login\_dot\_gov\_cert
+==========================================================================
+
+.. currentmodule:: fecfiler.devops.utils.login_dot_gov_cert
+
+.. autofunction:: backout_login_dot_gov_cert

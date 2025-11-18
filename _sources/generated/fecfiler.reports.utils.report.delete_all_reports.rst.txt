@@ -1,0 +1,6 @@
+fecfiler.reports.utils.report.delete\_all\_reports
+==================================================
+
+.. currentmodule:: fecfiler.reports.utils.report
+
+.. autofunction:: delete_all_reports

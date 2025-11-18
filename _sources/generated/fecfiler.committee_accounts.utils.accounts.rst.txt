@@ -1,0 +1,51 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.committee\_accounts.utils.accounts
+===========================================
+
+.. automodule:: fecfiler.committee_accounts.utils.accounts
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      check_user_email_matches_committee_email
+      convert_raw_to_processed
+      create_committee_account
+      delete_committee_account
+      get_committee_account_data
+      get_committee_emails
+      get_committee_from_test_fec
+      get_mocked_committee_data
+      get_mocked_committee_emails
+      get_processed_committee_data
+      get_production_committee_data
+      get_production_committee_emails
+      get_raw_committee_data
+      get_test_committee_data
+      get_test_committee_emails
+      is_production_efo_pac
+      is_production_efo_pty
+      is_test_efo_pty
+      raise_if_cannot_create_committee_account
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

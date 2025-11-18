@@ -1,0 +1,6 @@
+fecfiler.devops.utils.redis.set\_redis\_value
+=============================================
+
+.. currentmodule:: fecfiler.devops.utils.redis
+
+.. autofunction:: set_redis_value

@@ -1,6 +1,0 @@
-fecfiler.committee\_accounts.utils.get\_committee\_account\_data
-================================================================
-
-.. currentmodule:: fecfiler.committee_accounts.utils
-
-.. autofunction:: get_committee_account_data

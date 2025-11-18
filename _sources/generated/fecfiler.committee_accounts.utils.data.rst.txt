@@ -1,0 +1,52 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.committee\_accounts.utils.data
+=======================================
+
+.. automodule:: fecfiler.committee_accounts.utils.data
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      dump_all_committee_data
+      dump_cash_on_hand
+      dump_committee_and_users
+      dump_committee_data
+      dump_contacts
+      dump_memos
+      dump_model
+      dump_model_list
+      dump_reports
+      dump_submissions
+      dump_transactions
+      get_committee_id_from_file
+      get_dump_filename
+      load_committee_data
+      load_mocked_committee_data
+      save_data
+      save_to_local
+      save_to_redis
+      save_to_s3
+      serialize
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

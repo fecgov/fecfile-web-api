@@ -1,0 +1,6 @@
+fecfiler.reports.utils.report.reset\_submitting\_report
+=======================================================
+
+.. currentmodule:: fecfiler.reports.utils.report
+
+.. autofunction:: reset_submitting_report

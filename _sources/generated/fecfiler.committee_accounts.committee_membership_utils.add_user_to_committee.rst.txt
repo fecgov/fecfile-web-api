@@ -1,6 +1,0 @@
-fecfiler.committee\_accounts.committee\_membership\_utils.add\_user\_to\_committee
-==================================================================================
-
-.. currentmodule:: fecfiler.committee_accounts.committee_membership_utils
-
-.. autofunction:: add_user_to_committee

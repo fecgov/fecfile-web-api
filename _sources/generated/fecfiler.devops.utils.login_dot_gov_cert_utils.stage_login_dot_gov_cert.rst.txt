@@ -1,6 +1,0 @@
-fecfiler.devops.utils.login\_dot\_gov\_cert\_utils.stage\_login\_dot\_gov\_cert
-===============================================================================
-
-.. currentmodule:: fecfiler.devops.utils.login_dot_gov_cert_utils
-
-.. autofunction:: stage_login_dot_gov_cert

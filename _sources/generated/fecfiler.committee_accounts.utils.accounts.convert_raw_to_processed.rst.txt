@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.accounts.convert\_raw\_to\_processed
+=======================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.accounts
+
+.. autofunction:: convert_raw_to_processed

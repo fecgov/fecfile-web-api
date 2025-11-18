@@ -1,0 +1,6 @@
+fecfiler.devops.utils.django\_key.gen\_and\_install\_django\_key
+================================================================
+
+.. currentmodule:: fecfiler.devops.utils.django_key
+
+.. autofunction:: gen_and_install_django_key

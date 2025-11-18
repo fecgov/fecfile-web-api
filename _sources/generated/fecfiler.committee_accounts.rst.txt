@@ -32,7 +32,6 @@ fecfiler.committee\_accounts
    :recursive:
 
    fecfiler.committee_accounts.apps
-   fecfiler.committee_accounts.committee_membership_utils
    fecfiler.committee_accounts.management
    fecfiler.committee_accounts.migrations
    fecfiler.committee_accounts.models

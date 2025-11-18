@@ -1,6 +1,0 @@
-fecfiler.committee\_accounts.utils.check\_user\_email\_matches\_committee\_email
-================================================================================
-
-.. currentmodule:: fecfiler.committee_accounts.utils
-
-.. autofunction:: check_user_email_matches_committee_email

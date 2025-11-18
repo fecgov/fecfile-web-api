@@ -1,0 +1,6 @@
+fecfiler.devops.utils.login\_dot\_gov\_cert.cleanup\_login\_dot\_gov\_certs
+===========================================================================
+
+.. currentmodule:: fecfiler.devops.utils.login_dot_gov_cert
+
+.. autofunction:: cleanup_login_dot_gov_certs

@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.data.get\_committee\_id\_from\_file
+======================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.data
+
+.. autofunction:: get_committee_id_from_file

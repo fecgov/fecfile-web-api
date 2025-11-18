@@ -1,6 +1,0 @@
-fecfiler.devops.utils.django\_key\_utils.clear\_fallback\_django\_keys
-======================================================================
-
-.. currentmodule:: fecfiler.devops.utils.django_key_utils
-
-.. autofunction:: clear_fallback_django_keys

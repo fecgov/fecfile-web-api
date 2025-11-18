@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.data.dump\_reports
+=====================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.data
+
+.. autofunction:: dump_reports

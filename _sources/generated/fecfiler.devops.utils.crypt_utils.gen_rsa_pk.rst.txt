@@ -1,6 +1,0 @@
-fecfiler.devops.utils.crypt\_utils.gen\_rsa\_pk
-===============================================
-
-.. currentmodule:: fecfiler.devops.utils.crypt_utils
-
-.. autofunction:: gen_rsa_pk

@@ -1,0 +1,6 @@
+fecfiler.user.utils.reset\_security\_consent\_date
+==================================================
+
+.. currentmodule:: fecfiler.user.utils
+
+.. autofunction:: reset_security_consent_date

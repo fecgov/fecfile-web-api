@@ -31,11 +31,11 @@ fecfiler.devops.utils
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.devops.utils.cf_api_utils
-   fecfiler.devops.utils.crypt_utils
-   fecfiler.devops.utils.django_key_utils
-   fecfiler.devops.utils.load_test_utils
+   fecfiler.devops.utils.cf_api
+   fecfiler.devops.utils.crypt
+   fecfiler.devops.utils.django_key
+   fecfiler.devops.utils.load_test
    fecfiler.devops.utils.locust_data_generator
-   fecfiler.devops.utils.login_dot_gov_cert_utils
-   fecfiler.devops.utils.redis_utils
+   fecfiler.devops.utils.login_dot_gov_cert
+   fecfiler.devops.utils.redis
 

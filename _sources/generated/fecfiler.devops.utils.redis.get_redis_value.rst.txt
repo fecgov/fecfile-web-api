@@ -1,0 +1,6 @@
+fecfiler.devops.utils.redis.get\_redis\_value
+=============================================
+
+.. currentmodule:: fecfiler.devops.utils.redis
+
+.. autofunction:: get_redis_value

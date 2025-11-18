@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.data.serialize
+=================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.data
+
+.. autofunction:: serialize

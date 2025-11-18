@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.data.load\_mocked\_committee\_data
+=====================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.data
+
+.. autofunction:: load_mocked_committee_data

@@ -1,0 +1,6 @@
+fecfiler.reports.utils.report.delete\_committee\_reports
+========================================================
+
+.. currentmodule:: fecfiler.reports.utils.report
+
+.. autofunction:: delete_committee_reports

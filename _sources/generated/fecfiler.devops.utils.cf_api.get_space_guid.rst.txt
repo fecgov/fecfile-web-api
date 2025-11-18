@@ -1,0 +1,6 @@
+fecfiler.devops.utils.cf\_api.get\_space\_guid
+==============================================
+
+.. currentmodule:: fecfiler.devops.utils.cf_api
+
+.. autofunction:: get_space_guid

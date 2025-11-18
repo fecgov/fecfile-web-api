@@ -100,7 +100,6 @@ fecfiler.web\_services.tests.test\_utils.WebServicesUtilTestCase
       ~WebServicesUtilTestCase.tearDown
       ~WebServicesUtilTestCase.tearDownClass
       ~WebServicesUtilTestCase.test_fail_open_submissions
-      ~WebServicesUtilTestCase.test_fail_open_submissions_command
    
    
 

@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.data.get\_dump\_filename
+===========================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.data
+
+.. autofunction:: get_dump_filename

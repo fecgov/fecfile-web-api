@@ -1,0 +1,6 @@
+fecfiler.devops.utils.redis.refresh\_cache
+==========================================
+
+.. currentmodule:: fecfiler.devops.utils.redis
+
+.. autofunction:: refresh_cache

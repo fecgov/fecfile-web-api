@@ -1,0 +1,6 @@
+fecfiler.devops.utils.crypt.gen\_x509\_cert
+===========================================
+
+.. currentmodule:: fecfiler.devops.utils.crypt
+
+.. autofunction:: gen_x509_cert

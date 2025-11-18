@@ -24,11 +24,13 @@ fecfiler.user.management.commands.reset\_security\_consent\_date.Command
       ~Command.add_base_argument
       ~Command.check
       ~Command.check_migrations
+      ~Command.command
       ~Command.create_parser
       ~Command.execute
       ~Command.get_check_kwargs
       ~Command.get_version
       ~Command.handle
+      ~Command.log
       ~Command.print_help
       ~Command.run_from_argv
    
@@ -41,6 +43,7 @@ fecfiler.user.management.commands.reset\_security\_consent\_date.Command
    .. autosummary::
    
       ~Command.base_stealth_options
+      ~Command.command_name
       ~Command.help
       ~Command.output_transaction
       ~Command.requires_migrations_checks
