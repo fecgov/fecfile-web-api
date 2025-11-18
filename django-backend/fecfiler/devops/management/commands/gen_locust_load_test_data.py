@@ -1,5 +1,5 @@
 from .fecfile_base import FECCommand
-from fecfiler.devops.utils.load_test_utils import LoadTestUtils
+from fecfiler.devops.utils.load_test import LoadTestUtils
 
 
 class Command(FECCommand):
