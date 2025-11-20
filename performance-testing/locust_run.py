@@ -8,6 +8,7 @@ import os
 from copy import deepcopy
 
 from locust import between, task, TaskSet, user
+from locust.exception import StopUser
 
 
 TIMEOUT = 30  # seconds
@@ -37,21 +38,19 @@ class Tasks(TaskSet):
         logging.info("Logging in")
         self.login()
 
-        print("user_index_counter._value", user_index_counter._value)
-        # For first user, check for enough committees and bail if not
-        if user_index_counter._value == 1:
-            num_cmtes = len(self.retrieve_committee_id_list())
-            print("num_cmtes", num_cmtes)
-            # print("var(self.environment)", vars(self.environment))
-            print("var(self.user.environment)", vars(self.user.environment))
-            print("dir(self.user.environment)", dir(self.user.environment))
-            print("self.user.environment.parsed_options", self.user.environment.parsed_options)
-            print("self.user.environment.parsed_options.users", self.user.environment.parsed_options.users)
-            total_num_users = self.user.environment.parsed_options.users
-            if num_cmtes < total_num_users:
-                raise Exception("Not enough committees - need 1 per user!")
-                # Stop trying to spin up users
-                self.interrupt()
+    #    print("user_index_counter._value", user_index_counter._value)
+    #    # For first user, check for enough committees and bail if not
+    #    if user_index_counter._value == 1:
+    #        num_cmtes = len(self.retrieve_committee_id_list())
+    #        print("num_cmtes", num_cmtes)
+    #        # print("var(self.environment)", vars(self.environment))
+    #        print("var(self.user.environment)", vars(self.user.environment))
+    #        print("dir(self.user.environment)", dir(self.user.environment))
+    #        print("self.user.environment.parsed_options", self.user.environment.parsed_options)
+    #        print("self.user.environment.parsed_options.users", self.user.environment.parsed_options.users)
+    #        total_num_users = self.user.environment.parsed_options.users
+    #        if num_cmtes < total_num_users:
+    #            raise StopUser("Not enough committees - need 1 per user!")
 
         logging.info("Getting and activating committee")
         self.get_and_activate_commmittee()
@@ -328,6 +327,9 @@ class Tasks(TaskSet):
 
     def get_and_activate_commmittee(self):
         committee_id_list = self.retrieve_committee_id_list()
+        if len(committee_id_list) <= self.user.user_index:
+            logging.info("Not enough committees - need 1 per user!")
+            raise StopUser()
         # Check if we have enough committees - 1 per user
         # This is going to run once per user (inefficient but so is all of it)
         committee_id = committee_id_list[self.user.user_index]
