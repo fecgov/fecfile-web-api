@@ -45,9 +45,13 @@ class Tasks(TaskSet):
             # print("var(self.environment)", vars(self.environment))
             print("var(self.user.environment)", vars(self.user.environment))
             print("dir(self.user.environment)", dir(self.user.environment))
-            if num_cmtes < self.user.environment.runner.user_count:
-                # self.interrupt()
+            print("self.user.environment.parsed_options", self.user.environment.parsed_options)
+            print("self.user.environment.parsed_options.users", self.user.environment.parsed_options.users)
+            total_num_users = self.user.environment.parsed_options.users
+            if num_cmtes < total_num_users:
                 raise Exception("Not enough committees - need 1 per user!")
+                # Stop trying to spin up users
+                self.interrupt()
 
         logging.info("Getting and activating committee")
         self.get_and_activate_commmittee()
