@@ -98,7 +98,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'list':
             return TransactionListSerializer
-        return TransactionSerializer              
+        return TransactionSerializer
 
     def get_queryset(self):
         # Use the table if writing
