@@ -37,6 +37,18 @@ class Tasks(TaskSet):
         logging.info("Logging in")
         self.login()
 
+        print("user_index_counter._value", user_index_counter._value)
+        # For first user, check for enough committees and bail if not
+        if user_index_counter._value == 1:
+            num_cmtes = len(self.retrieve_committee_id_list())
+            print("num_cmtes", num_cmtes)
+            # print("var(self.environment)", vars(self.environment))
+            print("var(self.user.environment)", vars(self.user.environment))
+            print("dir(self.user.environment)", dir(self.user.environment))
+            if num_cmtes < self.user.environment.runner.user_count:
+                # self.interrupt()
+                raise Exception("Not enough committees - need 1 per user!")
+
         logging.info("Getting and activating committee")
         self.get_and_activate_commmittee()
 
@@ -312,6 +324,8 @@ class Tasks(TaskSet):
 
     def get_and_activate_commmittee(self):
         committee_id_list = self.retrieve_committee_id_list()
+        # Check if we have enough committees - 1 per user
+        # This is going to run once per user (inefficient but so is all of it)
         committee_id = committee_id_list[self.user.user_index]
         response = self.client.post(
             f"/api/v1/committees/{committee_id}/activate/",
