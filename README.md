@@ -17,51 +17,11 @@ finance information. The project code is distributed across these repositories:
 
 ## Set up
 
-You can find the set up instructions for the backend of this project in our [wiki](https://github.com/fecgov/fecfile-web-api/wiki/Local-Setup).
+Set up instructions are found in the [wiki](https://github.com/fecgov/fecfile-web-api/wiki/Local-Setup), including [instructions specific to the API](https://github.com/fecgov/fecfile-web-api/wiki/Local-setup#running-the-backend-locally) and an [overview of Docker usage](https://github.com/fecgov/fecfile-web-api/wiki/Local-setup#docker-basic-usage). 
 
 ## Local testing
 
 Local testing instructions can also be found within the [wiki](https://github.com/fecgov/fecfile-web-api/wiki/Local-Testing).
-
-### Running unit tests locally
-Drop into the API container with:
-```
-docker exec -it fecfile-api bash -H
-```
-
-You can then run unit tests with:
-```
-python3 manage.py test [-k <test name>]
-```
-
-### Monitoring containers
-```
-docker stats
-```
-
-#### Viewing logs
-View logs for a single container:
-```
-docker logs <container ID> [-f]
-```
-
-View logs for all containers:
-```
-docker compose logs [-f]
-```
-
-To view only the error logs:
-```
-docker logs <container ID> [-f] 1>/dev/null
-```
-
-To view only the access logs:
-```
-docker logs <container-id> [-f] 2>/dev/null
-```
-
-The `-f` (follow) flag causes the command to continue to output log messages as they occur until the user issues a break.
-
 
 # Deployment (FEC team only)
 
@@ -72,5 +32,3 @@ See also: [Technical Design](https://github.com/fecgov/fecfile-web-api/wiki/Tech
 ## Additional developer notes
 
 Once the web API application is running, you may go to http://localhost:8080/ to see the API documentation.
-
-See [Additional Developer Notes](https://github.com/fecgov/fecfile-web-api/wiki/Additional-Developer-Notes).
