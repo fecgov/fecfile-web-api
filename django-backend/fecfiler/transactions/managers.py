@@ -198,28 +198,32 @@ class TransactionManager(SoftDeleteManager):
                 schedule=self.SCHEDULE_CLAUSE(),
                 date=self.DATE_CLAUSE,
                 amount=self.AMOUNT_CLAUSE,
-                incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
-                payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
+                incurred_prior=F("schedule_d__incurred_prior"),
+                payment_prior=F("schedule_d__payment_prior"),
+                beginning_balance=F("schedule_d__beginning_balance"),
+                balance_at_close=F("schedule_d__balance_at_close"),
+                # incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
+                # payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
                 payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
                 form_type=self.FORM_TYPE_CLAUSE,
                 name=self.DISPLAY_NAME_CLAUSE,
                 transaction_ptr_id=F("id"),
                 back_reference_tran_id_number=self.BACK_REFERENCE_CLAUSE,
                 back_reference_sched_name=self.BACK_REFERENCE_NAME_CLAUSE,
-                beginning_balance=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=F("incurred_prior") - F("payment_prior"),
-                    ),
-                ),
-                balance_at_close=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=F("beginning_balance")
-                        + F("schedule_d__incurred_amount")
-                        - F("payment_amount"),
-                    ),
-                ),
+                # beginning_balance=Case(
+                #     When(
+                #         schedule_d__isnull=False,
+                #         then=F("incurred_prior") - F("payment_prior"),
+                #     ),
+                # ),
+                # balance_at_close=Case(
+                #     When(
+                #         schedule_d__isnull=False,
+                #         then=F("beginning_balance")
+                #         + F("schedule_d__incurred_amount")
+                #         - F("payment_amount"),
+                #     ),
+                # ),
                 loan_balance=Case(
                     When(
                         schedule_c__isnull=False,
@@ -230,7 +234,7 @@ class TransactionManager(SoftDeleteManager):
                 balance=Case(
                     When(
                         schedule_d__isnull=False,
-                        then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+                        then=Coalesce(F("schedule_d__balance_at_close"), Value(Decimal(0.0))),
                     ),
                     When(
                         schedule_c__isnull=False,

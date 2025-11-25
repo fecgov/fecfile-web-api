@@ -31,6 +31,7 @@ from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
+from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_f.models import ScheduleF
 import structlog
 
@@ -578,6 +579,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 case Schedule.F:
                     self.process_aggregation_by_payee_candidate(transaction_instance)
 
+        if transaction_instance.debt or transaction_instance.schedule_d is not None:
+            self.process_aggregation_for_debts(transaction_instance)
+
     # If a transaction has been moved forward, update the aggregate values
     # for any transactions that were "leaped over"
     # Returns a boolean value based on whether or not a leapfrogging event occurred
@@ -720,6 +724,96 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         transaction.reports.remove(report)
         return Response("Transaction removed from report")
+
+    def process_aggregation_for_debts(self, transaction_instance):
+        # Get the transaction out of the queryset in order to populate annotated fields
+        transaction = self.get_queryset().filter(id=transaction_instance.id).first()
+        if transaction is None:
+            return
+
+        logger.info("WE IN IT NOW")
+
+        debt = transaction if transaction.schedule_d is not None else transaction.debt
+        if debt is None:
+            return
+
+        transaction_view = Transaction.objects.transaction_view()
+        original_debt_trans_id = debt.transaction_id
+        if debt.parent_transaction is not None:
+            original_debt_trans_id = debt.parent_transaction.transaction_id
+
+        original_debt = transaction_view.filter(
+            committee_account_id=debt.committee_account_id,
+            transaction_id=original_debt_trans_id
+        ).first()
+
+        print("\n\n\nORIGINAL DEBT", original_debt, "\n\n\n")
+
+        child_debts = transaction_view.filter(
+            schedule_d__isnull=False,
+            committee_account_id=debt.committee_account_id,
+            back_reference_tran_id_number=original_debt_trans_id
+        ).order_by("schedule_d__report_coverage_from_date")
+
+        print("\n\n\nCHILD DEBT COUNT", child_debts.count(), "\n\n\n")
+
+        incurred_prior = original_debt.schedule_d.incurred_amount
+        repayed_amount = 0
+        schedule_ds = []
+        for debt in [original_debt, *child_debts]:
+            debt.schedule_d.incurred_prior = incurred_prior
+            debt.schedule_d.payment_prior = repayed_amount
+            debt.schedule_d.beginning_balance = incurred_prior - repayed_amount
+
+            repayments = transaction_view.filter(
+                debt__id=debt.id,
+            )
+            for repayment in repayments:
+                repayed_amount += repayment.amount
+
+            debt.schedule_d.balance_at_close = debt.schedule_d.beginning_balance - repayed_amount
+            schedule_ds.append(debt.schedule_d)
+
+        ScheduleD.objects.bulk_update(
+            schedule_ds,
+            [
+                "incurred_prior",
+                "payment_prior",
+                "beginning_balance",
+                "balance_at_close"
+            ],
+            batch_size=64
+        )
+
+        """
+        return Case(
+            When(
+                schedule_d__isnull=False,
+                then=Coalesce(
+                    Subquery(
+                        (
+                            super()
+                            .get_queryset()
+                            .filter(
+                                ~Q(debt_id=OuterRef("id")),
+                                transaction_id=OuterRef("transaction_id"),
+                                schedule_d__report_coverage_from_date__lt=OuterRef(
+                                    "schedule_d__report_coverage_from_date"
+                                ),
+                            )
+                            .values("committee_account_id")
+                            .annotate(
+                                incurred_prior=Sum("schedule_d__incurred_amount"),
+                            )
+                            .values("incurred_prior")
+                        )
+                    ),
+                    Value(Decimal(0)),
+                ),
+            ),
+            default=None,
+        )
+        """
 
     def process_aggregation_by_payee_candidate(self, transaction_instance):
         # Get the transaction out of the queryset in order to populate annotated fields

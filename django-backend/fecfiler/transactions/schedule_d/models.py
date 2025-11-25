@@ -15,6 +15,18 @@ class ScheduleD(models.Model):
     incurred_amount = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
+    incurred_prior = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
+    payment_prior = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
+    beginning_balance = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
+    balance_at_close = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
     # saved on schedule record to avoid joining on report
     report_coverage_from_date = models.DateField(null=True, blank=True)
 
