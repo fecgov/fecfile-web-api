@@ -1,7 +1,7 @@
 from django.db import connection
 from celery import shared_task
 from datetime import datetime, timedelta
-from .utils.redis_utils import set_redis_value, get_redis_value
+from .utils.redis import set_redis_value, get_redis_value
 from fecfiler.settings import (
     SYSTEM_STATUS_CACHE_AGE,
     AWS_STORAGE_BUCKET_NAME,

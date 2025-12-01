@@ -1,6 +1,7 @@
 from django.test import TestCase
-from fecfiler.committee_accounts.utils import (
+from fecfiler.committee_accounts.utils.accounts import (
     create_committee_account,
+    delete_committee_account,
     check_user_email_matches_committee_email,
     get_committee_account_data,
     get_committee_emails,
@@ -9,6 +10,9 @@ from fecfiler.committee_accounts.utils import (
 )
 
 from fecfiler.user.models import User
+from fecfiler.contacts.models import Contact
+from fecfiler.reports.models import Report
+from fecfiler.transactions.models import Transaction
 from django.core.management import call_command
 from unittest.mock import Mock, patch
 
@@ -40,13 +44,13 @@ class CommitteeAccountsUtilsTest(TestCase):
     # create_committee_account
 
     def test_create_committee_account(self):
-        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+        with patch("fecfiler.committee_accounts.utils.accounts.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
             self.assertEqual(account.committee_id, "C12345678")
 
     def test_create_committee_account_existing(self):
-        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+        with patch("fecfiler.committee_accounts.utils.accounts.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             account = create_committee_account("C12345678", self.test_user)
             self.assertEqual(account.committee_id, "C12345678")
@@ -59,7 +63,7 @@ class CommitteeAccountsUtilsTest(TestCase):
             )
 
     def test_create_committee_account_mismatch_email(self):
-        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+        with patch("fecfiler.committee_accounts.utils.accounts.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             self.assertRaisesMessage(
                 Exception,
@@ -70,7 +74,7 @@ class CommitteeAccountsUtilsTest(TestCase):
             )
 
     def test_create_committee_account_case_insensitive(self):
-        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+        with patch("fecfiler.committee_accounts.utils.accounts.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             self.test_user.email = self.test_user.email.upper()
             account = create_committee_account("C12345678", self.test_user)
@@ -82,6 +86,29 @@ class CommitteeAccountsUtilsTest(TestCase):
                 committee_id="C12345678",
                 user=self.test_user,
             )
+
+    # delete_committee_account
+
+    def test_delete_committee_account(self):
+        with patch("fecfiler.committee_accounts.utils.accounts.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
+            account = create_committee_account("C12345678", self.test_user)
+            self.assertEqual(account.committee_id, "C12345678")
+            report = account.report_set.create()
+            transaction = report.transactions.create(committee_account=account)
+            transaction.contact_1 = Contact.objects.create(committee_account=account)
+            transaction.save()
+            self.assertEqual(Report.objects.filter(committee_account=account).count(), 1)
+            self.assertEqual(
+                Transaction.objects.filter(committee_account=account).count(), 1
+            )
+            self.assertEqual(Contact.objects.filter(committee_account=account).count(), 1)
+            delete_committee_account("C12345678")
+            self.assertEqual(Report.objects.filter(committee_account=account).count(), 0)
+            self.assertEqual(
+                Transaction.objects.filter(committee_account=account).count(), 0
+            )
+            self.assertEqual(Contact.objects.filter(committee_account=account).count(), 0)
 
     # check_user_email_matches_committee_email
 
@@ -117,15 +144,16 @@ class CommitteeAccountsUtilsTest(TestCase):
 
     def test_get_emails_environments(self):
         with (
-            patch("fecfiler.committee_accounts.utils.settings") as settings,
+            patch("fecfiler.committee_accounts.utils.accounts.settings") as settings,
             patch(
-                "fecfiler.committee_accounts.utils.get_production_committee_emails"
+                "fecfiler.committee_accounts.utils.accounts"
+                ".get_production_committee_emails"
             ) as get_production_committee_emails,
             patch(
-                "fecfiler.committee_accounts.utils.get_test_committee_emails"
+                "fecfiler.committee_accounts.utils.accounts" ".get_test_committee_emails"
             ) as get_test_committee_emails,
             patch(
-                "fecfiler.committee_accounts.utils.get_mocked_committee_emails"
+                "fecfiler.committee_accounts.utils.accounts.get_mocked_committee_emails"
             ) as get_mocked_committee_emails,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
@@ -196,7 +224,7 @@ class CommitteeAccountsUtilsTest(TestCase):
     def test_get_committee_account_data_from_test_PAC(self):  # noqa N802
         with (
             patch("fecfiler.shared.utilities.requests") as mock_requests,
-            patch("fecfiler.committee_accounts.utils.settings") as settings,
+            patch("fecfiler.committee_accounts.utils.accounts.settings") as settings,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
             test_efo_committee_data = {
@@ -229,7 +257,7 @@ class CommitteeAccountsUtilsTest(TestCase):
     def test_get_committee_account_data_from_test_PTY(self):  # noqa N802
         with (
             patch("fecfiler.shared.utilities.requests") as mock_requests,
-            patch("fecfiler.committee_accounts.utils.settings") as settings,
+            patch("fecfiler.committee_accounts.utils.accounts.settings") as settings,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
             test_efo_committee_data = {
@@ -262,7 +290,7 @@ class CommitteeAccountsUtilsTest(TestCase):
     def test_get_committee_account_data_from_production_processed(self):
         with (
             patch("fecfiler.shared.utilities.requests") as mock_requests,
-            patch("fecfiler.committee_accounts.utils.settings") as settings,
+            patch("fecfiler.committee_accounts.utils.accounts.settings") as settings,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             production_committee_data = {
@@ -287,7 +315,7 @@ class CommitteeAccountsUtilsTest(TestCase):
     def test_get_committee_account_data_from_production_processed_pac_pty(self):
         with (
             patch("fecfiler.shared.utilities.requests") as mock_requests,
-            patch("fecfiler.committee_accounts.utils.settings") as settings,
+            patch("fecfiler.committee_accounts.utils.accounts.settings") as settings,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             production_committee_data = {
@@ -312,7 +340,7 @@ class CommitteeAccountsUtilsTest(TestCase):
     def test_get_committee_account_data_from_production_raw(self):
         with (
             patch("fecfiler.shared.utilities.requests") as mock_requests,
-            patch("fecfiler.committee_accounts.utils.settings") as settings,
+            patch("fecfiler.committee_accounts.utils.accounts.settings") as settings,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             production_committee_data = {

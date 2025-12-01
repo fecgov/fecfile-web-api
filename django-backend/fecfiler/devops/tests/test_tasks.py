@@ -10,7 +10,7 @@ from ..tasks import (
     LOGGED_DB_SIZE_REDIS_KEY,
     LOGGED_S3_SIZE_REDIS_KEY,
 )
-from ..utils.redis_utils import get_redis_value, set_redis_value
+from ..utils.redis import get_redis_value, set_redis_value
 from django.test import TestCase
 from django.utils import timezone
 from fecfiler.settings import (
