@@ -30,7 +30,8 @@ jobs:
             EOF
             exit 0
 
-      - checkout
+      - checkout:
+          method: full
 
       - run:
           name: Create unified requirements so CircleCI can cache them
