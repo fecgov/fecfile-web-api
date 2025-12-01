@@ -40,8 +40,6 @@ def process_aggregation_for_debts(transaction_instance):
         back_reference_tran_id_number=original_debt_trans_id
     ).order_by("schedule_d__report_coverage_from_date")
 
-    print("CHILD DEBTS:", child_debts.count())
-
     incurred_prior = original_debt.schedule_d.incurred_amount
     repayed_amount = 0
     schedule_ds = []
