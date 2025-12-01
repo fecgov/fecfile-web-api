@@ -13,6 +13,7 @@ from fecfiler.contacts.tests.utils import (
     create_test_committee_contact,
     create_test_candidate_contact,
 )
+from fecfiler.transactions.aggregation import process_aggregation_for_debts
 
 sc10 = "SC/10"
 
@@ -904,8 +905,10 @@ def gen_schedule_d(transaction_data, f3x, committee, contact):
             contact,
             data["amount"],
             data["form_type"],
+            "DEBT_OWED_BY_COMMITTEE",
+            f3x
         )
-        schd.reports.add(f3x)
+        process_aggregation_for_debts(schd)
 
 
 def gen_schedule_e(transaction_data, f3x, committee, contact, candidate):

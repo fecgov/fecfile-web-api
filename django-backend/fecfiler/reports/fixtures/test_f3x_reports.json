@@ -637,7 +637,11 @@
     "comment": "Debt to move forward",
     "model": "transactions.scheduled",
     "fields": {
-      "incurred_amount": "3.00"
+      "incurred_amount": "3.00",
+      "beginning_balance": "0.00",
+      "balance_at_close": "3.00",
+      "payment_prior": "0.00",
+      "payment_amount": "0.00"
     },
     "pk": "dddd267c-6bfb-4ebf-ad0d-a2233d597718"
   },
