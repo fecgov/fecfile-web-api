@@ -31,8 +31,10 @@ from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
-from fecfiler.transactions.schedule_d.models import ScheduleD
-from fecfiler.transactions.schedule_f.models import ScheduleF
+from fecfiler.transactions.aggregation import (
+    process_aggregation_for_debts,
+    process_aggregation_by_payee_candidate,
+)
 import structlog
 
 import os
@@ -164,6 +166,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             response = super().destroy(request, *args, **kwargs)
             # update parents that depend on this transaction
             update_dependent_parent(transaction)
+            if transaction.debt:
+                process_aggregation_for_debts(transaction.debt)
+
         return response
 
     def partial_update(self, request, pk=None):
@@ -577,10 +582,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     # process_aggregation_by_election()
                     pass
                 case Schedule.F:
-                    self.process_aggregation_by_payee_candidate(transaction_instance)
+                    process_aggregation_by_payee_candidate(transaction_instance)
 
         if transaction_instance.debt or transaction_instance.schedule_d is not None:
-            self.process_aggregation_for_debts(transaction_instance)
+            process_aggregation_for_debts(transaction_instance)
 
     # If a transaction has been moved forward, update the aggregate values
     # for any transactions that were "leaped over"
@@ -635,7 +640,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
             to_recalculate = leapfrogged_sch_f_transactions.first()
             if to_recalculate is not None:
-                self.process_aggregation_by_payee_candidate(to_recalculate)
+                process_aggregation_by_payee_candidate(to_recalculate)
 
     # If a transaction has been updated in such a way that would change which transactions
     # it would aggregate with, such as switching to a different contact or election code,
@@ -691,7 +696,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
             to_recalculate = leapfrogged_sch_f_transactions.first()
             if to_recalculate is not None:
-                self.process_aggregation_by_payee_candidate(to_recalculate)
+                process_aggregation_by_payee_candidate(to_recalculate)
 
     @action(detail=False, methods=["post"], url_path=r"add-to-report")
     def add_transaction_to_report(self, request):
@@ -724,148 +729,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         transaction.reports.remove(report)
         return Response("Transaction removed from report")
-
-    def process_aggregation_for_debts(self, transaction_instance):
-        # Get the transaction out of the queryset in order to populate annotated fields
-        transaction = self.get_queryset().filter(id=transaction_instance.id).first()
-        if transaction is None:
-            return
-
-        logger.info("WE IN IT NOW")
-
-        debt = transaction if transaction.schedule_d is not None else transaction.debt
-        if debt is None:
-            return
-
-        transaction_view = Transaction.objects.transaction_view()
-        original_debt_trans_id = debt.transaction_id
-        if debt.parent_transaction is not None:
-            original_debt_trans_id = debt.parent_transaction.transaction_id
-
-        original_debt = transaction_view.filter(
-            committee_account_id=debt.committee_account_id,
-            transaction_id=original_debt_trans_id
-        ).first()
-
-        print("\n\n\nORIGINAL DEBT", original_debt, "\n\n\n")
-
-        child_debts = transaction_view.filter(
-            schedule_d__isnull=False,
-            committee_account_id=debt.committee_account_id,
-            back_reference_tran_id_number=original_debt_trans_id
-        ).order_by("schedule_d__report_coverage_from_date")
-
-        print("\n\n\nCHILD DEBT COUNT", child_debts.count(), "\n\n\n")
-
-        incurred_prior = original_debt.schedule_d.incurred_amount
-        repayed_amount = 0
-        schedule_ds = []
-        for debt in [original_debt, *child_debts]:
-            debt.schedule_d.incurred_prior = incurred_prior
-            debt.schedule_d.payment_prior = repayed_amount
-            debt.schedule_d.beginning_balance = incurred_prior - repayed_amount
-
-            repayments = transaction_view.filter(
-                debt__id=debt.id,
-            )
-            for repayment in repayments:
-                repayed_amount += repayment.amount
-
-            debt.schedule_d.balance_at_close = debt.schedule_d.beginning_balance - repayed_amount
-            schedule_ds.append(debt.schedule_d)
-
-        ScheduleD.objects.bulk_update(
-            schedule_ds,
-            [
-                "incurred_prior",
-                "payment_prior",
-                "beginning_balance",
-                "balance_at_close"
-            ],
-            batch_size=64
-        )
-
-        """
-        return Case(
-            When(
-                schedule_d__isnull=False,
-                then=Coalesce(
-                    Subquery(
-                        (
-                            super()
-                            .get_queryset()
-                            .filter(
-                                ~Q(debt_id=OuterRef("id")),
-                                transaction_id=OuterRef("transaction_id"),
-                                schedule_d__report_coverage_from_date__lt=OuterRef(
-                                    "schedule_d__report_coverage_from_date"
-                                ),
-                            )
-                            .values("committee_account_id")
-                            .annotate(
-                                incurred_prior=Sum("schedule_d__incurred_amount"),
-                            )
-                            .values("incurred_prior")
-                        )
-                    ),
-                    Value(Decimal(0)),
-                ),
-            ),
-            default=None,
-        )
-        """
-
-    def process_aggregation_by_payee_candidate(self, transaction_instance):
-        # Get the transaction out of the queryset in order to populate annotated fields
-        transaction = self.get_queryset().filter(id=transaction_instance.id).first()
-        if transaction is None:
-            return
-
-        queryset = self.get_queryset()
-
-        shared_entity_transactions = queryset.filter(
-            date__year=transaction.date.year,
-            contact_2=transaction.contact_2,
-            aggregation_group=transaction.aggregation_group,
-            schedule_f__isnull=False,
-            schedule_f__general_election_year=transaction.schedule_f.general_election_year,  # noqa: E501
-        )
-
-        previous_transactions = filter_queryset_for_previous_transactions_in_aggregation(
-            shared_entity_transactions,
-            transaction.date,
-            transaction.aggregation_group,
-            transaction.id,
-            None,
-            transaction.contact_2.id,
-            None,
-            transaction.schedule_f.general_election_year,
-        )
-
-        to_update = shared_entity_transactions.filter(
-            Q(id=transaction.id)
-            | Q(date__gt=transaction.date)
-            | Q(Q(date=transaction.date) & Q(created__gt=transaction.created))
-        ).order_by("date", "created")
-
-        previous_transaction = previous_transactions.first()
-        updated_schedule_fs = []
-        for trans in to_update:
-            previous_aggregate = 0
-            if previous_transaction:
-                previous_aggregate = (
-                    previous_transaction.schedule_f.aggregate_general_elec_expended
-                )
-
-            trans.schedule_f.aggregate_general_elec_expended = (
-                trans.schedule_f.expenditure_amount + previous_aggregate
-            )
-            updated_schedule_fs.append(trans.schedule_f)
-            previous_transaction = trans
-
-        ScheduleF.objects.bulk_update(
-            updated_schedule_fs, ["aggregate_general_elec_expended"], batch_size=64
-        )
 
 
 def noop(transaction, is_existing):
@@ -937,3 +800,4 @@ def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_i
             )
             for transaction_to_delete in transactions_to_delete:
                 transaction_to_delete.delete()
+        process_aggregation_for_debts(current_debt)

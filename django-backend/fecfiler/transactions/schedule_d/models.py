@@ -21,6 +21,9 @@ class ScheduleD(models.Model):
     payment_prior = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
+    payment_amount = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
     beginning_balance = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
