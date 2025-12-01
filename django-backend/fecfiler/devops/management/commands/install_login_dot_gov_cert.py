@@ -1,5 +1,5 @@
 from .fecfile_base import FECCommand
-from fecfiler.devops.utils.login_dot_gov_cert_utils import install_login_dot_gov_cert
+from fecfiler.devops.utils.login_dot_gov_cert import install_login_dot_gov_cert
 
 
 class Command(FECCommand):

@@ -238,7 +238,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
         super().setUp()
 
     def test_get_committee_account_data_from_production(self):
-        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+        with patch("fecfiler.committee_accounts.utils.accounts.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
             with patch("fecfiler.shared.utilities.requests") as mock_requests:
                 mock_response = Mock()
@@ -254,7 +254,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 self.assertEqual(response.status_code, 200)
 
     def test_get_committee_account_data_from_test(self):
-        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+        with patch("fecfiler.committee_accounts.utils.accounts.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "TEST"
             settings.STAGE_OPEN_FEC_API = "https://stage.not-real.api/"
             settings.STAGE_OPEN_FEC_API_KEY = "MOCK_KEY"
@@ -277,10 +277,10 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 )
 
     def test_get_committee_account_data_from_redis(self):
-        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+        with patch("fecfiler.committee_accounts.utils.accounts.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             with patch(
-                "fecfiler.committee_accounts.utils.get_mocked_committee_data"
+                "fecfiler.committee_accounts.utils.accounts.get_mocked_committee_data"
             ) as mock_committee:
                 mock_committee.return_value = {
                     "name": "TEST",
@@ -297,10 +297,10 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 self.assertEqual(response.data["name"], "TEST")
 
     def test_get_committee_account_data_from_redis_no_data(self):
-        with patch("fecfiler.committee_accounts.utils.settings") as settings:
+        with patch("fecfiler.committee_accounts.utils.accounts.settings") as settings:
             settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
             with patch(
-                "fecfiler.committee_accounts.utils.get_mocked_committee_data"
+                "fecfiler.committee_accounts.utils.accounts.get_mocked_committee_data"
             ) as mock_committee:
                 mock_committee.return_value = None
                 response = self.send_viewset_get_request(

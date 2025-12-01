@@ -4,8 +4,14 @@ from fecfiler.user.models import User
 from fecfiler.user.utils import (
     get_user_by_email_or_id,
     delete_active_sessions_for_user_and_committee,
+    disable_user,
+    reset_security_consent_date,
 )
 from uuid import uuid4
+import datetime
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class UserUtilsTestCase(TestCase):
@@ -16,9 +22,16 @@ class UserUtilsTestCase(TestCase):
         self.user_2 = User.objects.create_user(
             email="test_user_2@test.com", user_id=str(uuid4())
         )
-        self.user_3 = User.objects.create_user(
-            email="test_user_3@test.com", user_id=str(uuid4())
+        self.user_3 = User.objects.create(
+            email="test_user_3@test.com",
+            username="gov",
+            security_consent_exp_date=datetime.datetime.today(),
         )
+        self.user_3.save()
+
+    ############################
+    # get_user_by_email_or_id
+    ############################
 
     def test_get_user_with_invalid_strings(self):
         self.assertEqual(get_user_by_email_or_id(""), None)
@@ -35,7 +48,53 @@ class UserUtilsTestCase(TestCase):
         self.assertEqual(get_user_by_email_or_id(self.user_2.email), self.user_2)
         self.assertEqual(get_user_by_email_or_id(str(self.user_3.id)), self.user_3)
 
+    ############################
+    # disable_user
+    ############################
+
+    def test_disable_user_email(self):
+        # get the test user
+        user = get_user_by_email_or_id(self.user_1.email)
+        self.assertTrue(user.is_active)
+
+        # disable the test user
+        disable_user(None, user.email)
+
+        # re-get the test user
+        user = get_user_by_email_or_id(self.user_1.email)
+        self.assertFalse(user.is_active)
+
+    def test_disable_user_uuid(self):
+        # get the test user
+        user = get_user_by_email_or_id(str(self.user_1.id))
+        self.assertTrue(user.is_active)
+
+        # disable the test user
+        disable_user(str(user.id), None)
+
+        # re-get the test user
+        user = get_user_by_email_or_id(str(self.user_1.id))
+        self.assertFalse(user.is_active)
+
+    ###############################
+    # reset_security_consent_date
+    ###############################
+
+    def test_reset_security_consent_date_with_email(self):
+        self.assertIsNotNone(self.user_3.security_consent_exp_date)
+        reset_security_consent_date(self.user_3.email)
+        self.user_3.refresh_from_db()
+        self.assertIsNone(self.user_3.security_consent_exp_date)
+
+    def test_reset_security_consent_date_with_wrong_email(self):
+        self.assertIsNotNone(self.user_3.security_consent_exp_date)
+        reset_security_consent_date("t@fec.gov")
+        self.user_3.refresh_from_db()
+        self.assertIsNotNone(self.user_3.security_consent_exp_date)
+
+    #################################################
     # delete_active_sessions_for_user_and_committee
+    #################################################
 
     @patch("fecfiler.user.utils.Session")
     @patch("fecfiler.user.utils.datetime")

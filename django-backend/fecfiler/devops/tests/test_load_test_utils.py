@@ -1,6 +1,6 @@
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
-from fecfiler.devops.utils.load_test_utils import LoadTestUtils
+from fecfiler.devops.utils.load_test import LoadTestUtils
 
 
 class LoadTestUtilsTestCase(TestCase):
@@ -25,7 +25,7 @@ class LoadTestUtilsTestCase(TestCase):
             "C33333335", 2, 4, 5, 0.5
         )
 
-    @patch("fecfiler.devops.utils.load_test_utils.LocustDataGenerator")
+    @patch("fecfiler.devops.utils.load_test.LocustDataGenerator")
     def test_create_load_test_committee_and_data(self, mock_locust_data_generator):
         mock_committee = MagicMock()
         mock_generator = MagicMock()
@@ -44,9 +44,9 @@ class LoadTestUtilsTestCase(TestCase):
             mock_generator.generate_single_schedule_a_transactions.assert_called_once()
             mock_generator.generate_tiered_schedule_a_transactions.assert_called_once()
 
-    @patch("fecfiler.devops.utils.load_test_utils.User")
-    @patch("fecfiler.devops.utils.load_test_utils.CommitteeAccount")
-    @patch("fecfiler.devops.utils.load_test_utils.Membership")
+    @patch("fecfiler.devops.utils.load_test.User")
+    @patch("fecfiler.devops.utils.load_test.CommitteeAccount")
+    @patch("fecfiler.devops.utils.load_test.Membership")
     def test_create_new_committee(
         self, mock_membership_model, mock_committee_account, mock_user_model
     ):
