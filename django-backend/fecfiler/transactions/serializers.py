@@ -364,6 +364,7 @@ class TransactionListSerializer(ModelSerializer):
     date = DateField(read_only=True)
     memo_code = BooleanField(read_only=True)
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     report_code_label = CharField(read_only=True)
 
@@ -382,6 +383,7 @@ class TransactionListSerializer(ModelSerializer):
             "date",
             "memo_code",
             "amount",
+            "balance",
             "aggregate",
             "report_code_label",
         ]
