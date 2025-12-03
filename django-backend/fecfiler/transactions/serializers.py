@@ -350,7 +350,7 @@ class TransactionSerializer(
 
 
 class TransactionListSerializer(ModelSerializer):
-    id = UUIDField(required=False)
+    id = UUIDField()
     transaction_type_identifier = CharField(read_only=True)
     back_reference_tran_id_number = CharField(
         required=False, allow_null=True, read_only=True
