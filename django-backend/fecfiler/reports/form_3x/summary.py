@@ -459,6 +459,11 @@ def calculate_cash_on_hand_fields(report, column_a, column_b):
     if cash_on_hand_override is not None:
         column_b["line_6a"] = cash_on_hand_override
     elif closest_report_from_prior_years is not None:
+        logger.error(
+            "Using closest report from prior years for cash on hand calculation",
+            report_id=report.id,
+            closest_report_id=closest_report_from_prior_years.id,
+        )
         column_b["line_6a"] = (
             closest_report_from_prior_years.form_3x.L8_cash_on_hand_close_ytd
         )  # noqa: E501
