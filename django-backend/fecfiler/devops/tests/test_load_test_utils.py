@@ -12,17 +12,17 @@ class LoadTestUtilsTestCase(TestCase):
         # Should call create_load_test_committee_and_data correct number of times
         # with correct args
         self.utils.create_load_test_committees_and_data(
-            33333333, 3, 2, 4, 5, 0.5
+            33333333, 3, 2, 4, 5, 2, 0.5
         )
         self.assertEqual(mock_create_committee_and_data.call_count, 3)
         mock_create_committee_and_data.assert_any_call(
-            "C33333333", 2, 4, 5, 0.5
+            "C33333333", 2, 4, 5, 2, 0.5
         )
         mock_create_committee_and_data.assert_any_call(
-            "C33333334", 2, 4, 5, 0.5
+            "C33333334", 2, 4, 5, 2, 0.5
         )
         mock_create_committee_and_data.assert_any_call(
-            "C33333335", 2, 4, 5, 0.5
+            "C33333335", 2, 4, 5, 2, 0.5
         )
 
     @patch("fecfiler.devops.utils.load_test.LocustDataGenerator")
@@ -34,7 +34,7 @@ class LoadTestUtilsTestCase(TestCase):
             self.utils, "create_new_committee", return_value=mock_committee
         ) as mock_create_new_committee:
             self.utils.create_load_test_committee_and_data(
-                "C33333333", 2, 3, 4, 0.6
+                "C33333333", 2, 3, 4, 2, 0.6
             )
             mock_create_new_committee.assert_called_once_with(
                 "C33333333"
