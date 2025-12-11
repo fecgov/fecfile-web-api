@@ -241,6 +241,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
+        view_set.action = "previous_transaction_by_entity"
+
         # leave out required params
         response = view_set.previous_transaction_by_entity(view_set.request)
         self.assertEqual(response.status_code, 400)
@@ -273,6 +275,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
+        view_set.action = "previous_transaction_by_entity"
 
         first_transaction = create_schedule_a(
             "IND",
@@ -322,6 +325,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
+        view_set.action = "previous_transaction_by_entity"
 
         first_transaction = create_schedule_a(
             "IND",
@@ -427,6 +431,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
+        view_set.action = "previous_transaction_by_entity"
 
         first_transaction = create_schedule_a(
             "IND",
@@ -512,6 +517,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "candidate_office": "S",
             },
         )
+        view_set.action = "previous_transaction_by_election"
+
         # leave out required params
         response = view_set.previous_transaction_by_election(view_set.request)
         self.assertEqual(response.status_code, 400)
@@ -561,6 +568,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "candidate_district": "01",
             },
         )
+        view_set.action = "previous_transaction_by_election"
+
         response = view_set.previous_transaction_by_election(view_set.request)
         transaction = response.data
 
@@ -1633,6 +1642,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request(transaction_1_data)
+        view_set.action = "previous_transaction_by_payee_candidate"
 
         # Test standard aggregation
         transaction_1 = view_set.save_transaction(transaction_1_data, view_set.request)
