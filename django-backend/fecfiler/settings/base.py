@@ -158,7 +158,7 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGIN_REGEXES = [r"https://(.*?)fecfile\.fec\.gov$"]
+CORS_ALLOWED_ORIGIN_REGEXES = [r"https://(.*?)\.app\.cloud\.gov$"]
 
 CORS_ALLOW_HEADERS = (
     *default_headers,
