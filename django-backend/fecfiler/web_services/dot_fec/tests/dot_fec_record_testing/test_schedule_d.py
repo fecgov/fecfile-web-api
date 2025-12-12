@@ -9,6 +9,7 @@ from fecfiler.transactions.tests.utils import create_debt
 from fecfiler.contacts.models import Contact
 from datetime import datetime
 from fecfiler.web_services.models import UploadSubmission
+from fecfiler.transactions.aggregation import process_aggregation_for_debts
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -72,6 +73,9 @@ class DotFECScheduleDTestCase(TestCase):
         self.debt_organization.entity_type = "ORG"
         self.debt_organization.save()
 
+        process_aggregation_for_debts(self.debt_individual)
+        process_aggregation_for_debts(self.debt_organization)
+
         transactions = compose_transactions(self.f3x.id)
         serialized_transaction = serialize_instance("SchD", transactions[0])
         self.split_row = serialized_transaction.split(FS_STR)
@@ -121,7 +125,7 @@ class DotFECScheduleDTestCase(TestCase):
         self.assertEqual(self.split_row[15], "TEST DEBT")
 
     def test_balance(self):
-        self.assertEqual(self.split_row[16], "0")
+        self.assertEqual(self.split_row[16], "0.00")
         self.assertEqual(self.split_row[17], "123.00")
-        self.assertEqual(self.split_row[18], "0")
+        self.assertEqual(self.split_row[18], "0.00")
         self.assertEqual(self.split_row[19], "123.00")

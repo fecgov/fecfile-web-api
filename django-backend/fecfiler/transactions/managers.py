@@ -13,8 +13,6 @@ from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
     OuterRef,
     Subquery,
-    Sum,
-    Q,
     F,
     Case,
     When,
@@ -110,80 +108,6 @@ class TransactionManager(SoftDeleteManager):
         output_field=TextField(),
     )
 
-    def INCURRED_PRIOR_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(
-                schedule_d__isnull=False,
-                then=Coalesce(
-                    Subquery(
-                        (
-                            super()
-                            .get_queryset()
-                            .filter(
-                                ~Q(debt_id=OuterRef("id")),
-                                transaction_id=OuterRef("transaction_id"),
-                                schedule_d__report_coverage_from_date__lt=OuterRef(
-                                    "schedule_d__report_coverage_from_date"
-                                ),
-                            )
-                            .values("committee_account_id")
-                            .annotate(
-                                incurred_prior=Sum("schedule_d__incurred_amount"),
-                            )
-                            .values("incurred_prior")
-                        )
-                    ),
-                    Value(Decimal(0)),
-                ),
-            ),
-            default=None,
-        )
-
-    def PAYMENT_PRIOR_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(
-                schedule_d__isnull=False,
-                then=Coalesce(
-                    Subquery(
-                        super()
-                        .get_queryset()
-                        .annotate(date=self.DATE_CLAUSE, amount=self.AMOUNT_CLAUSE)
-                        .filter(
-                            ~Q(debt_id=OuterRef("id")),
-                            debt__transaction_id=OuterRef("transaction_id"),
-                            schedule_d__isnull=True,
-                            date__lt=OuterRef("schedule_d__report_coverage_from_date"),
-                        )
-                        .values("committee_account_id")
-                        .annotate(debt_payments_prior=Sum("amount"))
-                        .values("debt_payments_prior")
-                    ),
-                    Value(Decimal(0)),
-                ),
-            ),
-            default=None,
-        )
-
-    def PAYMENT_AMOUNT_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(
-                schedule_d__isnull=False,
-                then=Coalesce(
-                    Subquery(
-                        super()
-                        .get_queryset()
-                        .filter(debt_id=OuterRef("id"), schedule_d__isnull=True)
-                        .annotate(amount=self.AMOUNT_CLAUSE)
-                        .values("committee_account_id")
-                        .annotate(payment_to_date=Sum("amount"))
-                        .values("payment_to_date")
-                    ),
-                    Value(Decimal(0)),
-                ),
-            ),
-            default=None,
-        )
-
     def transaction_view(self):
         REPORT_CODE_LABEL_CLAUSE = Subquery(  # noqa: N806
             Report.objects.filter(transactions=OuterRef("pk"))
@@ -198,28 +122,16 @@ class TransactionManager(SoftDeleteManager):
                 schedule=self.SCHEDULE_CLAUSE(),
                 date=self.DATE_CLAUSE,
                 amount=self.AMOUNT_CLAUSE,
-                incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
-                payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
-                payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
+                incurred_prior=F("schedule_d__incurred_prior"),
+                payment_prior=F("schedule_d__payment_prior"),
+                payment_amount=F("schedule_d__payment_amount"),
+                beginning_balance=F("schedule_d__beginning_balance"),
+                balance_at_close=F("schedule_d__balance_at_close"),
                 form_type=self.FORM_TYPE_CLAUSE,
                 name=self.DISPLAY_NAME_CLAUSE,
                 transaction_ptr_id=F("id"),
                 back_reference_tran_id_number=self.BACK_REFERENCE_CLAUSE,
                 back_reference_sched_name=self.BACK_REFERENCE_NAME_CLAUSE,
-                beginning_balance=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=F("incurred_prior") - F("payment_prior"),
-                    ),
-                ),
-                balance_at_close=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=F("beginning_balance")
-                        + F("schedule_d__incurred_amount")
-                        - F("payment_amount"),
-                    ),
-                ),
                 loan_balance=Case(
                     When(
                         schedule_c__isnull=False,
@@ -230,7 +142,9 @@ class TransactionManager(SoftDeleteManager):
                 balance=Case(
                     When(
                         schedule_d__isnull=False,
-                        then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+                        then=Coalesce(
+                            F("schedule_d__balance_at_close"), Value(Decimal(0.0))
+                        ),
                     ),
                     When(
                         schedule_c__isnull=False,

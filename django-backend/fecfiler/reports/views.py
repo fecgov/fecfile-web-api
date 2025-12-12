@@ -8,8 +8,10 @@ from .report_code_label import report_code_label_case
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.reports.utils.report import delete_all_reports
 from .serializers import ReportSerializer
+from fecfiler.transactions.aggregation import process_aggregation_for_debts
 from django.db.models import Case, Value, When, CharField, IntegerField, F
 from django.db.models.functions import Concat, Trim
+from django.db import transaction as db_transaction
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -176,6 +178,17 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def partial_update(self, request, pk=None):
         response = {"message": "Update function is not offered in this path."}
         return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def destroy(self, request, *args, **kwargs):
+        report = self.get_object()
+        with db_transaction.atomic():
+            debts = list(report.transactions.filter(schedule_d__isnull=False))
+            response = super().destroy(request, *args, **kwargs)
+            for debt in debts:
+                if debt.debt:
+                    process_aggregation_for_debts(debt.debt)
+
+        return response
 
     def list(self, request, *args, **kwargs):
         ordering = request.query_params.get("ordering")
