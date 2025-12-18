@@ -18,7 +18,9 @@ class LoadTestUtils:
         number_of_reports,
         number_of_contacts,
         number_of_transactions,
+        number_of_debts,
         single_to_tiered_transaction_ratio,
+        repayments_per_debt,
     ):
         test_user = User.objects.filter(email__iexact=TEST_USER_EMAIL).first()
         if not test_user:
@@ -32,7 +34,9 @@ class LoadTestUtils:
                 number_of_reports,
                 number_of_contacts,
                 number_of_transactions,
+                number_of_debts,
                 single_to_tiered_transaction_ratio,
+                repayments_per_debt
             )
 
     def create_load_test_committee_and_data(
@@ -41,7 +45,9 @@ class LoadTestUtils:
         number_of_reports,
         number_of_contacts,
         number_of_transactions,
+        number_of_debts,
         single_to_tiered_transaction_ratio,
+        repayments_per_debt
     ):
         logger.info(f"Creating and activating new committee: {new_committee_id}")
         committee = self.create_new_committee(new_committee_id)
@@ -81,6 +87,14 @@ class LoadTestUtils:
         logger.info(f"Creating {tiered_transactions_needed} Sch B tiered transactions")
         self.locust_data_generator.generate_tiered_schedule_b_transactions(
             tiered_transactions_needed,
+            reports,
+            contacts,
+        )
+
+        logger.info(f"Creating {number_of_debts} debts with {repayments_per_debt} repayments each")  # NOQA: E501
+        self.locust_data_generator.generate_debt_transactions(
+            number_of_debts,
+            repayments_per_debt,
             reports,
             contacts,
         )
