@@ -169,19 +169,22 @@ CORS_ALLOW_HEADERS = (
 
 CORS_ALLOW_CREDENTIALS = True
 
+# In cloud environemnt, name will be from VCAP_APPLICATION
+# - otherwise from DJANGO_APPLICATION which we set in docker-compose.yml
+APPLICATION_NAME = env.name or env.get_credential("DJANGO_APPLICATION", "FECFILE")
+APPLICATION_INDEX = env.get_credential("CF_INSTANCE_INDEX", "0")
+
+
+# Pull Database config from environment.  Via DATABASE_URL, by default
+database = dj_database_url.config(
+    conn_max_age=600,
+    conn_health_checks=True,
+)
+database.setdefault("OPTIONS", {})
+database["OPTIONS"]["application_name"] = f"{APPLICATION_NAME}_{APPLICATION_INDEX}"
 
 # Database
-DATABASES = {
-    # Be sure to set the DATABASE_URL environment variable on your local
-    # development machine so that the local database can be connected to.
-    "default": dj_database_url.config(
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
-}
-
-# Connection string for connecting directly
-DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASES = {"default": database}
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 MIGRATION_LINTER_OVERRIDE_MAKEMIGRATIONS = True

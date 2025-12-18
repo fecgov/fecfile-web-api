@@ -30,7 +30,8 @@ jobs:
             EOF
             exit 0
 
-      - checkout
+      - checkout:
+          method: full
 
       - run:
           name: Create unified requirements so CircleCI can cache them
@@ -232,7 +233,7 @@ jobs:
               --header "Content-Type: application/json" \
               --header "Accept: application/json" \
               --header "Circle-Token: $CIRCLE_TOKEN" \
-              --data '{"branch":"'$CIRCLE_BRANCH'","parameters":{"is-triggered-e2e-test":true}}' \
+              --data '{"branch":"'$CIRCLE_BRANCH'","parameters":{"is-triggered-e2e-smoke-test":true}}' \
               | jq -r '.id'
             )
             echo "created pipeline"

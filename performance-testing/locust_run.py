@@ -8,6 +8,7 @@ import os
 from copy import deepcopy
 
 from locust import between, task, TaskSet, user
+from locust.exception import StopUser
 
 
 TIMEOUT = 30  # seconds
@@ -312,6 +313,11 @@ class Tasks(TaskSet):
 
     def get_and_activate_commmittee(self):
         committee_id_list = self.retrieve_committee_id_list()
+        if len(committee_id_list) <= self.user.user_index:
+            logging.info("Not enough committees - need 1 per user!")
+            raise StopUser()
+        # Check if we have enough committees - 1 per user
+        # This is going to run once per user (inefficient but so is all of it)
         committee_id = committee_id_list[self.user.user_index]
         response = self.client.post(
             f"/api/v1/committees/{committee_id}/activate/",

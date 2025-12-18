@@ -3,7 +3,7 @@
 1. Run Locust locally using the following command (you may not need `sudo`).  You may
    need to add the `--force-recreate` flag if you are having trouble with your
    containers:
-   `sudo docker compose --profile locust up`
+   `docker compose --profile locust up`
 2. Run the following data load management command in the environment to test against
    (optional additional command arguments as desired):
    `./manage.py gen_locust_load_test_data`
