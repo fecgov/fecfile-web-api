@@ -35,19 +35,26 @@ def update_in_future_reports(transaction):
     ).first()
     future_reports = current_report.get_future_reports()
 
-    transaction_copy = copy.deepcopy(model_to_dict(transaction))
-    # model_to_dict doesn't copy id
-    del transaction_copy["reports"]
+    transaction_copy = model_to_dict(transaction)
+    fields_to_exclude = ["reports", "id", "pk", "parent_transaction", "schedule_c2"]
+
+    for field in fields_to_exclude:
+        if field in transaction_copy:
+            del transaction_copy[field]
+
     transactions_to_update = Transaction.objects.filter(
         transaction_id=transaction.transaction_id,
         reports__id__in=Subquery(future_reports.values("id")),
     )
-    transactions_to_update.update(**transaction_copy)
 
-    schedule_c2_copy = copy.deepcopy(model_to_dict(transaction.schedule_c2))
+    schedule_c2_copy = model_to_dict(transaction.schedule_c2)
+    if "id" in schedule_c2_copy:
+        del schedule_c2_copy["id"]
     schedule_c2s_to_update = ScheduleC2.objects.filter(
         transaction__schedule_c2_id__in=Subquery(
             transactions_to_update.values("schedule_c2_id")
         )
     )
+
     schedule_c2s_to_update.update(**schedule_c2_copy)
+    transactions_to_update.update(**transaction_copy)
