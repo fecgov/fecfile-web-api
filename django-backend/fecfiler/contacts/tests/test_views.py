@@ -3,6 +3,7 @@ from unittest.mock import patch, Mock
 import uuid
 
 from ..models import Contact
+from fecfiler.committee_accounts.models import CommitteeAccount
 from ..views import ContactViewSet, DeletedContactsViewSet
 from .utils import create_test_individual_contact
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
@@ -318,6 +319,119 @@ class ContactViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, ["a5061946-0000-0000-82f6-f1782c333d70"])
+
+    @patch("fecfiler.contacts.views.settings")
+    def test_e2e_purge_deleted_contacts(self, mock_settings):
+        mock_settings.E2E_TEST = True
+
+        active_contact = Contact.objects.create(
+            type=Contact.ContactType.INDIVIDUAL,
+            last_name="Active",
+            first_name="Contact",
+            committee_account_id=self.default_committee.id,
+        )
+        deleted_contact = Contact.objects.create(
+            type=Contact.ContactType.INDIVIDUAL,
+            last_name="Deleted",
+            first_name="Contact",
+            committee_account_id=self.default_committee.id,
+        )
+        deleted_contact.delete()
+        expected_count = Contact.all_objects.filter(
+            deleted__isnull=False,
+            committee_account_id=self.default_committee.id,
+        ).count()
+
+        response = self.send_viewset_post_request(
+            "/api/v1/contacts-deleted/e2e-purge-deleted-contacts",
+            {},
+            DeletedContactsViewSet,
+            "e2e_purge_deleted_contacts",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"purged": expected_count})
+        self.assertTrue(Contact.objects.filter(id=active_contact.id).exists())
+        self.assertFalse(Contact.all_objects.filter(id=deleted_contact.id).exists())
+
+    @patch("fecfiler.contacts.views.settings")
+    def test_e2e_purge_deleted_contacts_requires_e2e_flag(self, mock_settings):
+        mock_settings.E2E_TEST = False
+
+        deleted_contact = Contact.objects.create(
+            type=Contact.ContactType.INDIVIDUAL,
+            last_name="Deleted",
+            first_name="Contact",
+            committee_account_id=self.default_committee.id,
+        )
+        deleted_contact.delete()
+
+        response = self.send_viewset_post_request(
+            "/api/v1/contacts-deleted/e2e-purge-deleted-contacts",
+            {},
+            DeletedContactsViewSet,
+            "e2e_purge_deleted_contacts",
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Contact.all_objects.filter(id=deleted_contact.id).exists())
+
+    @patch("fecfiler.contacts.views.settings")
+    def test_e2e_purge_deleted_contacts_scoped_to_committee(self, mock_settings):
+        mock_settings.E2E_TEST = True
+
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000002")
+        other_deleted_contact = Contact.objects.create(
+            type=Contact.ContactType.INDIVIDUAL,
+            last_name="Deleted",
+            first_name="Other",
+            committee_account_id=other_committee.id,
+        )
+        other_deleted_contact.delete()
+
+        deleted_contact = Contact.objects.create(
+            type=Contact.ContactType.INDIVIDUAL,
+            last_name="Deleted",
+            first_name="Primary",
+            committee_account_id=self.default_committee.id,
+        )
+        deleted_contact.delete()
+        expected_count = Contact.all_objects.filter(
+            deleted__isnull=False,
+            committee_account_id=self.default_committee.id,
+        ).count()
+
+        response = self.send_viewset_post_request(
+            "/api/v1/contacts-deleted/e2e-purge-deleted-contacts",
+            {},
+            DeletedContactsViewSet,
+            "e2e_purge_deleted_contacts",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"purged": expected_count})
+        self.assertFalse(Contact.all_objects.filter(id=deleted_contact.id).exists())
+        self.assertTrue(Contact.all_objects.filter(id=other_deleted_contact.id).exists())
+
+    @patch("fecfiler.contacts.views.settings")
+    def test_e2e_purge_deleted_contacts_no_deleted_contacts(self, mock_settings):
+        mock_settings.E2E_TEST = True
+
+        expected_count = Contact.all_objects.filter(
+            deleted__isnull=False,
+            committee_account_id=self.default_committee.id,
+        ).count()
+        self.assertEqual(expected_count, 0)
+
+        response = self.send_viewset_post_request(
+            "/api/v1/contacts-deleted/e2e-purge-deleted-contacts",
+            {},
+            DeletedContactsViewSet,
+            "e2e_purge_deleted_contacts",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"purged": 0})
 
     def test_update(self):
         contact = Contact.objects.create(
