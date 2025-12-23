@@ -348,8 +348,13 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         contacts = Contact.all_objects.filter(committee_account_id=committee_uuid)
         contacts_count = contacts.count()
         contacts.hard_delete()
-        logger.info("E2E delete all contacts", committee_id=committee_uuid, purged=contacts_count)
+        logger.info(
+            "E2E delete all contacts",
+            committee_id=committee_uuid,
+            purged=contacts_count,
+        )
         return Response({"purged": contacts_count})
+
 
 class DeletedContactsViewSet(
     CommitteeOwnedViewMixin,
