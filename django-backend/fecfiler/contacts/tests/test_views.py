@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from unittest.mock import patch, Mock
 import uuid
 
@@ -8,54 +9,40 @@ from ..views import ContactViewSet, DeletedContactsViewSet
 from .utils import create_test_individual_contact
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
-mock_results = {
-    "results": [
-        {"name": "LNAME, FNAME I", "candidate_id": "P60012143", "office_sought": "P"},
-        {
-            "name": "LNAME, FNAME",
-            "candidate_id": "P60012465",
-            "office_sought": "P",
-        },
-    ]
-}
+CANDIDATE_RESULTS = [
+    {"name": "LNAME, FNAME I", "candidate_id": "P60012143", "office_sought": "P"},
+    {
+        "name": "LNAME, FNAME",
+        "candidate_id": "P60012465",
+        "office_sought": "P",
+    },
+]
+COMMITTEE_RESULTS = [
+    {"name": "BIDEN FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
+    {"name": "BIDEN VICTORY FUND", "id": "C00744946", "is_active": "true"},
+]
+MOCK_CANDIDATE_RESULTS = {"results": CANDIDATE_RESULTS}
+MOCK_COMMITTEE_RESULTS = {"results": COMMITTEE_RESULTS}
+
+
+class MockResponse:
+    def __init__(self, json_data, status_code):
+        self.json_data = deepcopy(json_data)
+        self.status_code = status_code
+
+    def json(self):
+        return self.json_data
+
+    def raise_for_status(self):
+        return
 
 
 def mocked_requests_get_candidates(*args, **kwargs):
-    class MockResponse:
-        def __init__(self, json_data, status_code):
-            self.json_data = json_data
-            self.status_code = status_code
-
-        def json(self):
-            return self.json_data
-
-        def raise_for_status(self):
-            return
-
-    return MockResponse(mock_results, 200)
+    return MockResponse(MOCK_CANDIDATE_RESULTS, 200)
 
 
 def mocked_requests_get_committees(*args, **kwargs):
-    class MockResponse:
-        def __init__(self, json_data, status_code):
-            self.json_data = json_data
-            self.status_code = status_code
-
-        def json(self):
-            return self.json_data
-
-        def raise_for_status(self):
-            return
-
-    return MockResponse(
-        {
-            "results": [
-                {"name": "BIDEN FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
-                {"name": "BIDEN VICTORY FUND", "id": "C00744946", "is_active": "true"},
-            ]
-        },
-        200,
-    )
+    return MockResponse(MOCK_COMMITTEE_RESULTS, 200)
 
 
 class ContactViewSetTest(FecfilerViewSetTest):
@@ -81,11 +68,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             ContactViewSet,
             "candidate",
         )
-        expected_json = {
-            "name": "LNAME, FNAME I",
-            "candidate_id": "P60012143",
-            "office_sought": "P",
-        }
+        expected_json = CANDIDATE_RESULTS[0]
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
@@ -116,13 +99,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             "candidate_lookup",
         )
         expected_json = {
-            "fec_api_candidates": [
-                {
-                    "name": "LNAME, FNAME",
-                    "candidate_id": "P60012465",
-                    "office_sought": "P",
-                },
-            ],
+            "fec_api_candidates": [CANDIDATE_RESULTS[1]],
             "fecfile_candidates": [],
         }
         self.assertEqual(response.status_code, 200)
@@ -155,10 +132,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             "committee_lookup",
         )
         expected_json = {
-            "fec_api_committees": [
-                {"name": "BIDEN FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
-                {"name": "BIDEN VICTORY FUND", "id": "C00744946", "is_active": "true"},
-            ],
+            "fec_api_committees": COMMITTEE_RESULTS,
             "fecfile_committees": [
                 {
                     "deleted": None,

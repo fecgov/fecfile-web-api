@@ -36,27 +36,6 @@ FEC_API_CANDIDATE_ENDPOINT = (
 )
 
 
-def delete_all_contacts(
-    committee_id="C99999999",
-    committee_uuid=None,
-    log_method=logger.warn,
-):
-    if committee_uuid:
-        contacts = Contact.all_objects.filter(committee_account_id=committee_uuid)
-        scope_label = committee_uuid
-    else:
-        contacts = Contact.all_objects.filter(
-            committee_account__committee_id=committee_id
-        )
-        scope_label = committee_id
-    contacts_count = contacts.count()
-    if log_method:
-        log_method(f"Deleting Contacts for {scope_label}")
-        log_method(f"Contacts: {contacts_count}")
-    contacts.hard_delete()
-    return contacts_count
-
-
 def validate_and_sanitize_candidate(candidate_id):
     if candidate_id is None:
         raise AssertionError("No Candidate ID provided")
@@ -418,3 +397,16 @@ class DeletedContactsViewSet(
             )
         contacts.update(deleted=None)
         return Response(ids_to_restore)
+
+
+def delete_all_contacts(committee_uuid, log_method=None) -> int:
+    contacts = Contact.all_objects.filter(committee_account_id=committee_uuid)
+    contacts_count = contacts.count()
+    contacts.hard_delete()
+    if log_method:
+        log_method(
+            "Deleted all contacts for committee",
+            committee_id=committee_uuid,
+            purged=contacts_count,
+        )
+    return contacts_count
