@@ -340,19 +340,16 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         )
         return max_fecfile_results, max_fec_results
 
-    @action(
-        detail=False,
-        methods=["post"],
-        url_path="e2e-delete-all-contacts",
-    )
+    @action(detail=False, methods=["post"], url_path="e2e-delete-all-contacts")
     def e2e_delete_all_contacts(self, request):
-        contacts = Contact.objects.filter(committee_account__committee_id="C99999999")
-        contact_count = contacts.count()
-
-        delete_all_contacts()
-        delete_all_contacts("C99999998")
-        return Response(f"Deleted {contact_count} Contacts")
-
+        if not settings.E2E_TEST:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        committee_uuid = str(self.get_committee_uuid())
+        contacts = Contact.all_objects.filter(committee_account_id=committee_uuid)
+        contacts_count = contacts.count()
+        contacts.hard_delete()
+        logger.info("E2E delete all contacts", committee_id=committee_uuid, purged=contacts_count)
+        return Response({"purged": contacts_count})
 
 class DeletedContactsViewSet(
     CommitteeOwnedViewMixin,
@@ -394,27 +391,3 @@ class DeletedContactsViewSet(
             )
         contacts.update(deleted=None)
         return Response(ids_to_restore)
-
-    @action(detail=False, methods=["post"], url_path="e2e-purge-deleted-contacts")
-    def e2e_purge_deleted_contacts(self, request):
-        if not settings.E2E_TEST:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        contacts = self.get_queryset().filter(deleted__isnull=False)
-        contact_count = contacts.count()
-        contacts.hard_delete()
-        logger.info(
-            "E2E purge deleted contacts",
-            committee_id=str(self.get_committee_uuid()),
-            purged=contact_count,
-        )
-        return Response({"purged": contact_count})
-
-
-def delete_all_contacts(committee_id="C99999999", log_method=logger.warn):
-    contacts = Contact.objects.filter(committee_account__committee_id=committee_id)
-    contact_count = contacts.count()
-
-    log_method(f"Deleting Contacts for {committee_id}")
-    log_method(f"Deleting Contacts: {contact_count}")
-
-    contacts.delete()
