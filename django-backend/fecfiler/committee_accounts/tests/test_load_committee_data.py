@@ -31,7 +31,7 @@ class DumpTestDataCommandTest(TestCase):
         delete_all_reports(committee_id=TEST_COMMITTEE_ID)
         self.committee = CommitteeAccount.objects.create(committee_id=TEST_COMMITTEE_ID)
         delete_all_contacts(committee_uuid=self.committee.id)
-        
+
         self.user = User.objects.create(
             email="tester@fake.gov", first_name="Tester", last_name="Testerson"
         )
