@@ -36,6 +36,27 @@ FEC_API_CANDIDATE_ENDPOINT = (
 )
 
 
+def delete_all_contacts(
+    committee_id="C99999999",
+    committee_uuid=None,
+    log_method=logger.warn,
+):
+    if committee_uuid:
+        contacts = Contact.all_objects.filter(committee_account_id=committee_uuid)
+        scope_label = committee_uuid
+    else:
+        contacts = Contact.all_objects.filter(
+            committee_account__committee_id=committee_id
+        )
+        scope_label = committee_id
+    contacts_count = contacts.count()
+    if log_method:
+        log_method(f"Deleting Contacts for {scope_label}")
+        log_method(f"Contacts: {contacts_count}")
+    contacts.hard_delete()
+    return contacts_count
+
+
 def validate_and_sanitize_candidate(candidate_id):
     if candidate_id is None:
         raise AssertionError("No Candidate ID provided")
@@ -345,9 +366,10 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         if not settings.E2E_TEST:
             return Response(status=status.HTTP_404_NOT_FOUND)
         committee_uuid = str(self.get_committee_uuid())
-        contacts = Contact.all_objects.filter(committee_account_id=committee_uuid)
-        contacts_count = contacts.count()
-        contacts.hard_delete()
+        contacts_count = delete_all_contacts(
+            committee_uuid=committee_uuid,
+            log_method=None,
+        )
         logger.info(
             "E2E delete all contacts",
             committee_id=committee_uuid,
