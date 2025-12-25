@@ -1,3 +1,5 @@
+version: "3"
+
 services:
   db:
     build:
@@ -63,7 +65,7 @@ services:
       ENABLE_RESTRICTED_COMMANDS: True
       FEC_FORMAT_VERSION: 8.5
       INCLUDE_SILK: "${INCLUDE_SILK}"
-      DJANGO_APPLICATION: FECFILE_CELERY_WORKER
+      E2E_TEST: "${E2E_TEST:-False}" # E2E-only endpoints disabled by default, set to True to enable
     deploy:
       resources:
         limits:
@@ -112,6 +114,7 @@ services:
       ENABLE_RESTRICTED_COMMANDS: True
       FEC_FORMAT_VERSION: 8.5
       INCLUDE_SILK: "${INCLUDE_SILK}"
+      E2E_TEST: "${E2E_TEST:-False}"
     deploy:
       resources:
         limits:
@@ -172,7 +175,7 @@ services:
       ENABLE_RESTRICTED_COMMANDS: True
       FEC_FORMAT_VERSION: 8.5
       INCLUDE_SILK: "${INCLUDE_SILK}"
-      DJANGO_APPLICATION: FECFILE_API
+      E2E_TEST: "${E2E_TEST:-False}"
 
       # ---- FEATURE FLAGS ----
       FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
@@ -203,14 +206,14 @@ services:
       - ./:/mnt/locust
     # command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
     command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080 -r .5
-    profiles: [locust]
+    profiles: [ locust ]
 
   locust-follower:
     image: locustio/locust
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
-    profiles: [locust]
+    profiles: [ locust ]
 
   locust-leader-app:
     image: locustio/locust
@@ -219,11 +222,11 @@ services:
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run_app.py --master -H https://dev.fecfile.fec.gov
-    profiles: [locust-app]
+    profiles: [ locust-app ]
 
   locust-follower-app:
     image: locustio/locust
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run_app.py --worker --master-host locust-leader-app -L DEBUG
-    profiles: [locust-app]
+    profiles: [ locust-app ]
