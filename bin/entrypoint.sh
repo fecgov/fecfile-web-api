@@ -8,12 +8,15 @@ echo "Running migrations..."
 python manage.py migrate
 
 # Conditionally run collectstatic
-if [ "$INCLUDE_SILK" = "True" ]; then
-  echo "INCLUDE_SILK is True, running collectstatic..."
+case "$(printf '%s' "$FECFILE_SILK_ENABLED" | tr '[:upper:]' '[:lower:]')" in
+  true|1|yes|y)
+  echo "FECFILE_SILK_ENABLED is True, running collectstatic..."
   python manage.py collectstatic --no-input
-else
-  echo "INCLUDE_SILK is not 'True', skipping collectstatic."
-fi
+  ;;
+*)
+  echo "FECFILE_SILK_ENABLED is not 'True', skipping collectstatic."
+  ;;
+esac
 
 # Load application data
 echo "Loading initial data..."

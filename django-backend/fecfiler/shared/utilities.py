@@ -29,7 +29,7 @@ def get_float_from_string(string, fallback=None):
 
 
 def get_boolean_from_string(string):
-    return string.lower() == "true"
+    return str(string).strip().lower() in {"true", "1", "yes", "y"}
 
 
 """
