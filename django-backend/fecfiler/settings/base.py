@@ -10,6 +10,7 @@ import logging
 import sys
 
 from enum import Enum
+from django.core.exceptions import ImproperlyConfigured
 from .env import env
 from corsheaders.defaults import default_headers
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
@@ -26,7 +27,7 @@ class CeleryStorageType(Enum):
 # Space where this will be run (prod, dev, stage, test)
 SPACE = env.get_credential("SPACE")
 if not SPACE:
-    raise Exception(
+    raise ImproperlyConfigured(
         "SPACE is not set! "
         "Set to match where the application is running (e.g. prod, dev, stage, test)"
     )
@@ -40,6 +41,7 @@ TEMPLATE_DEBUG = DEBUG
 
 LINE = "LINE"
 KEY_VALUE = "KEY_VALUE"
+LOGGING_STREAM_HANDLER_CLASS = "logging.StreamHandler"
 
 APPEND_SLASH = False
 
@@ -56,7 +58,7 @@ CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
-    raise Exception("DJANGO_SECRET_KEY is not set!")
+    raise ImproperlyConfigured("DJANGO_SECRET_KEY is not set!")
 SECRET_KEY_FALLBACKS = env.get_credential("DJANGO_SECRET_KEY_FALLBACKS", [])
 
 
@@ -233,14 +235,14 @@ OIDC_OP_AUTODISCOVER_ENDPOINT = env.get_credential(
     "OIDC_OP_AUTODISCOVER_ENDPOINT",
 )
 if not OIDC_OP_AUTODISCOVER_ENDPOINT:
-    raise Exception("OIDC_OP_AUTODISCOVER_ENDPOINT is not set!")
+    raise ImproperlyConfigured("OIDC_OP_AUTODISCOVER_ENDPOINT is not set!")
 
 MOCK_OIDC_PROVIDER = get_boolean_from_string(
     env.get_credential("MOCK_OIDC_PROVIDER", "False")
 )
 MOCK_OIDC_PROVIDER_CACHE = env.get_credential("REDIS_URL")
 
-OIDC_ACR_VALUES = "http://idmanagement.gov/ns/assurance/ial/1"
+OIDC_ACR_VALUES = "https://idmanagement.gov/ns/assurance/ial/1"
 
 FFAPI_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
 
@@ -346,26 +348,26 @@ def get_logging_config(log_format=LINE):
         },
         "handlers": {
             "console": {
-                "class": "logging.StreamHandler",
+                "class": LOGGING_STREAM_HANDLER_CLASS,
                 "formatter": "plain_console",
                 "stream": sys.stdout,
                 "filters": ["not_error"],
             },
             "console_error": {
                 "level": "ERROR",
-                "class": "logging.StreamHandler",
+                "class": LOGGING_STREAM_HANDLER_CLASS,
                 "formatter": "plain_console",
                 "stream": sys.stderr,
             },
             "cloud": {
-                "class": "logging.StreamHandler",
+                "class": LOGGING_STREAM_HANDLER_CLASS,
                 "formatter": "json_formatter",
                 "stream": sys.stdout,
                 "filters": ["not_error"],
             },
             "cloud_error": {
                 "level": "ERROR",
-                "class": "logging.StreamHandler",
+                "class": LOGGING_STREAM_HANDLER_CLASS,
                 "formatter": "json_formatter",
                 "stream": sys.stderr,
             },
@@ -497,9 +499,13 @@ EFO_FILING_API = env.get_credential("EFO_FILING_API")
 EFO_FILING_API_KEY = env.get_credential("EFO_FILING_API_KEY")
 if not MOCK_EFO_FILING:
     if EFO_FILING_API is None:
-        raise Exception("EFO_FILING_API must be set if MOCK_EFO_FILING is False")
+        raise ImproperlyConfigured(
+            "EFO_FILING_API must be set if MOCK_EFO_FILING is False"
+        )
     if EFO_FILING_API_KEY is None:
-        raise Exception("EFO_FILING_API_KEY must be set if MOCK_EFO_FILING is False")
+        raise ImproperlyConfigured(
+            "EFO_FILING_API_KEY must be set if MOCK_EFO_FILING is False"
+        )
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 FEC_FORMAT_VERSION = env.get_credential("FEC_FORMAT_VERSION")
 
@@ -548,7 +554,7 @@ S3_OBJECTS_MAX_AGE_DAYS = get_float_from_string(
 FLAG__COMMITTEE_DATA_SOURCE = env.get_credential("FLAG__COMMITTEE_DATA_SOURCE")
 valid_sources = ["PRODUCTION", "TEST", "MOCKED"]
 if FLAG__COMMITTEE_DATA_SOURCE not in valid_sources:
-    raise Exception(
+    raise ImproperlyConfigured(
         f'FLAG__COMMITTEE_DATA_SOURCE "{FLAG__COMMITTEE_DATA_SOURCE}"'
         + f" must be valid source ({valid_sources})"
     )

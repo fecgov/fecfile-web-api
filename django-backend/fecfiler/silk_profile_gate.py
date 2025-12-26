@@ -1,5 +1,5 @@
 import os
-import random
+import secrets
 from typing import Any, Dict, Mapping, Optional, Tuple
 
 from fecfiler.shared.utilities import get_boolean_from_string, get_float_from_string
@@ -19,7 +19,7 @@ E2E_HEADER_NAMES = (
     "x-fecfile-e2e-seq",
 )
 ALL_PROFILE_HEADER_NAMES = tuple(
-    {name for names in PROFILE_HEADER_NAMES.values() for name in names}
+    name for names in PROFILE_HEADER_NAMES.values() for name in names
 )
 
 
@@ -98,6 +98,15 @@ def _locust_sample_pct() -> float:
     )
 
 
+def _locust_should_record(sample_pct: float) -> bool:
+    if sample_pct <= 0:
+        return False
+    if sample_pct >= 100:
+        return True
+    threshold = min(10000, max(0, int(round(sample_pct * 100))))
+    return secrets.randbelow(10000) < threshold
+
+
 def should_record(request) -> bool:
     if not request.path.startswith("/api/"):
         return False
@@ -118,7 +127,7 @@ def should_record(request) -> bool:
     if client == "locust":
         if not _locust_enabled():
             return False
-        return random.random() < (_locust_sample_pct() / 100.0)
+        return _locust_should_record(_locust_sample_pct())
 
     return True
 

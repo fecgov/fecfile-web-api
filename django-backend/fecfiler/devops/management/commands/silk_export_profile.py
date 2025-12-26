@@ -20,6 +20,7 @@ SQL_QUERY_EXPORT_LIMIT = 5000
 SQL_QUERY_TEXT_LIMIT = 2000
 SAFE_PATH_RE = re.compile(r"[^A-Za-z0-9._-]+")
 SAFE_NAME_MAX = 80
+SLOW_ITEM_LIMIT = 25
 
 
 def _normalize_header_value(value: Any) -> str:
@@ -28,39 +29,54 @@ def _normalize_header_value(value: Any) -> str:
     return str(value)
 
 
+def _decode_header_bytes(raw_value: Any) -> Any:
+    if isinstance(raw_value, bytes):
+        try:
+            return raw_value.decode("utf-8")
+        except UnicodeDecodeError:
+            return raw_value.decode("latin-1", errors="ignore")
+    return raw_value
+
+
+def _parse_header_payload(raw_value: Any) -> Any:
+    if isinstance(raw_value, str):
+        try:
+            return json.loads(raw_value)
+        except json.JSONDecodeError:
+            return None
+    return raw_value
+
+
+def _normalize_header_mapping(mapping: Dict[Any, Any]) -> Dict[str, str]:
+    return {
+        str(key).lower(): _normalize_header_value(value)
+        for key, value in mapping.items()
+    }
+
+
+def _normalize_header_list(items: List[Any]) -> Dict[str, str]:
+    headers: Dict[str, str] = {}
+    for item in items:
+        if isinstance(item, (list, tuple)) and len(item) == 2:
+            headers[str(item[0]).lower()] = _normalize_header_value(item[1])
+            continue
+        if isinstance(item, dict):
+            headers.update(_normalize_header_mapping(item))
+    return headers
+
+
 def _decode_encoded_headers(encoded_headers: Any) -> Dict[str, str]:
     if not encoded_headers:
         return {}
 
-    raw_value = encoded_headers
-    if isinstance(raw_value, bytes):
-        try:
-            raw_value = raw_value.decode("utf-8")
-        except UnicodeDecodeError:
-            raw_value = raw_value.decode("latin-1", errors="ignore")
-
-    if isinstance(raw_value, str):
-        try:
-            raw_value = json.loads(raw_value)
-        except json.JSONDecodeError:
-            return {}
-
+    raw_value = _decode_header_bytes(encoded_headers)
+    raw_value = _parse_header_payload(raw_value)
+    if raw_value is None:
+        return {}
     if isinstance(raw_value, dict):
-        return {
-            str(key).lower(): _normalize_header_value(value)
-            for key, value in raw_value.items()
-        }
-
+        return _normalize_header_mapping(raw_value)
     if isinstance(raw_value, list):
-        headers: Dict[str, str] = {}
-        for item in raw_value:
-            if isinstance(item, (list, tuple)) and len(item) == 2:
-                headers[str(item[0]).lower()] = _normalize_header_value(item[1])
-            elif isinstance(item, dict):
-                for key, value in item.items():
-                    headers[str(key).lower()] = _normalize_header_value(value)
-        return headers
-
+        return _normalize_header_list(raw_value)
     return {}
 
 
@@ -267,6 +283,241 @@ def _render_index_html(run_meta: Dict[str, Any], groups: List[Dict[str, Any]]) -
 """
 
 
+def _ensure_silk_enabled() -> None:
+    if "silk" not in settings.INSTALLED_APPS:
+        raise CommandError(
+            "Silk is not enabled. Set FECFILE_SILK_ENABLED=1 and run migrations."
+        )
+
+
+def _normalize_client_filter(client_filter: Optional[str]) -> Optional[str]:
+    if not client_filter:
+        return None
+    normalized = client_filter.lower()
+    if normalized not in ["cypress", "locust"]:
+        raise CommandError("client must be cypress or locust")
+    return normalized
+
+
+def _build_request_queryset(request_model, minutes: Optional[int]):
+    queryset = request_model.objects.filter(path__startswith="/api/")
+    if minutes:
+        cutoff = timezone.now() - timedelta(minutes=minutes)
+        queryset = queryset.filter(start_time__gte=cutoff)
+    return queryset
+
+
+def _match_profile_headers(
+    profile_headers: Dict[str, Optional[str]],
+    run_id: str,
+    client_filter: Optional[str],
+    group_filter: Optional[str],
+) -> Optional[Tuple[str, str]]:
+    if profile_headers.get("run_id") != run_id:
+        return None
+
+    client = profile_headers.get("client") or "unknown-client"
+    group = profile_headers.get("group") or "unknown-group"
+    if client_filter and client != client_filter:
+        return None
+    if group_filter and group != group_filter:
+        return None
+    return client, group
+
+
+def _extract_request_metrics(request) -> Tuple[float, float, int]:
+    time_taken = _format_duration(getattr(request, "time_taken", None))
+    sql_time = _format_duration(getattr(request, "time_spent_on_sql", None))
+    num_queries = getattr(request, "num_sql_queries", 0) or 0
+    return time_taken, sql_time, num_queries
+
+
+def _update_totals(
+    totals: Dict[str, Any], time_taken: float, sql_time: float, num_queries: int
+) -> None:
+    totals["total_requests"] += 1
+    totals["total_time_taken"] += time_taken
+    totals["total_sql_time"] += sql_time
+    totals["total_queries"] += num_queries
+
+
+def _build_request_entry(
+    request,
+    profile_headers: Dict[str, Optional[str]],
+    time_taken: float,
+    sql_time: float,
+    num_queries: int,
+) -> Dict[str, Any]:
+    return {
+        "id": request.id,
+        "method": request.method,
+        "path": request.path,
+        "status_code": request.status_code,
+        "start_time": request.start_time,
+        "time_taken": time_taken,
+        "num_queries": num_queries,
+        "time_spent_on_sql": sql_time,
+        "profile_headers": profile_headers,
+    }
+
+
+def _collect_requests(
+    queryset,
+    run_id: str,
+    client_filter: Optional[str],
+    group_filter: Optional[str],
+) -> Tuple[
+    Dict[Tuple[str, str], List[Dict[str, Any]]],
+    Dict[Tuple[str, str], Dict[str, Any]],
+    Dict[int, Tuple[str, str]],
+    Dict[int, str],
+]:
+    requests_by_group: Dict[Tuple[str, str], List[Dict[str, Any]]] = defaultdict(
+        list
+    )
+    totals_by_group: Dict[Tuple[str, str], Dict[str, Any]] = {}
+    request_group_index: Dict[int, Tuple[str, str]] = {}
+    request_path_index: Dict[int, str] = {}
+
+    for request in queryset.iterator():
+        headers = _decode_encoded_headers(request.encoded_headers)
+        profile_headers = extract_profile_headers(headers)
+        group_key = _match_profile_headers(
+            profile_headers, run_id, client_filter, group_filter
+        )
+        if not group_key:
+            continue
+
+        time_taken, sql_time, num_queries = _extract_request_metrics(request)
+        totals = totals_by_group.setdefault(
+            group_key,
+            {
+                "total_requests": 0,
+                "total_time_taken": 0.0,
+                "total_sql_time": 0.0,
+                "total_queries": 0,
+            },
+        )
+        _update_totals(totals, time_taken, sql_time, num_queries)
+
+        requests_by_group[group_key].append(
+            _build_request_entry(
+                request, profile_headers, time_taken, sql_time, num_queries
+            )
+        )
+        request_group_index[request.id] = group_key
+        request_path_index[request.id] = request.path
+
+    return (
+        requests_by_group,
+        totals_by_group,
+        request_group_index,
+        request_path_index,
+    )
+
+
+def _load_slow_queries(
+    sql_query_model,
+    request_group_index: Dict[int, Tuple[str, str]],
+    request_path_index: Dict[int, str],
+) -> Dict[Tuple[str, str], List[Dict[str, Any]]]:
+    slow_queries_by_group: Dict[Tuple[str, str], List[Dict[str, Any]]] = defaultdict(
+        list
+    )
+    if request_group_index:
+        request_ids = list(request_group_index.keys())
+        for query in sql_query_model.objects.filter(
+            request_id__in=request_ids
+        ).order_by("-time_taken"):
+            group_key = request_group_index.get(query.request_id)
+            if not group_key:
+                continue
+            group_queries = slow_queries_by_group[group_key]
+            if len(group_queries) >= SQL_QUERY_EXPORT_LIMIT:
+                continue
+            group_queries.append(
+                {
+                    "time_taken": _format_duration(getattr(query, "time_taken", None)),
+                    "query": _truncate_query(getattr(query, "query", None)),
+                    "request_path": request_path_index.get(query.request_id),
+                }
+            )
+    return slow_queries_by_group
+
+
+def _write_group_exports(
+    outdir: Path,
+    safe_run_id: str,
+    run_id: str,
+    requests_by_group: Dict[Tuple[str, str], List[Dict[str, Any]]],
+    totals_by_group: Dict[Tuple[str, str], Dict[str, Any]],
+    slow_queries_by_group: Dict[Tuple[str, str], List[Dict[str, Any]]],
+) -> List[Dict[str, Any]]:
+    group_summaries: List[Dict[str, Any]] = []
+
+    for (client, group), entries in requests_by_group.items():
+        safe_client = _sanitize_path_segment(client, "unknown-client")
+        safe_group = _sanitize_path_segment(group, "unknown-group")
+        group_dir = outdir / safe_run_id / safe_client / safe_group
+
+        totals = totals_by_group[(client, group)]
+        entries_sorted = sorted(
+            entries, key=lambda item: item.get("time_taken", 0), reverse=True
+        )
+        slow_requests = entries_sorted[:SLOW_ITEM_LIMIT]
+        slow_queries = slow_queries_by_group.get((client, group), [])[:SLOW_ITEM_LIMIT]
+
+        profile_payload = {
+            "run_id": run_id,
+            "client": client,
+            "group": group,
+            "generated_at": timezone.now(),
+            "totals": totals,
+            "requests": entries_sorted,
+            "slow_queries": slow_queries_by_group.get((client, group), []),
+        }
+
+        _write_json(group_dir / "profile.json", profile_payload)
+
+        summary_html = _render_summary_html(
+            run_id, client, group, totals, slow_requests, slow_queries
+        )
+        _write_text(group_dir / "summary.html", summary_html)
+
+        group_summaries.append(
+            {
+                "client": client,
+                "group": group,
+                "total_requests": totals["total_requests"],
+                "total_time_taken": totals["total_time_taken"],
+                "total_sql_time": totals["total_sql_time"],
+                "summary_path": f"./{safe_client}/{safe_group}/summary.html",
+            }
+        )
+
+    group_summaries.sort(
+        key=lambda item: (item["total_time_taken"], item["total_sql_time"]),
+        reverse=True,
+    )
+    return group_summaries
+
+
+def _build_run_meta(
+    run_id: str, group_summaries: List[Dict[str, Any]]
+) -> Dict[str, Any]:
+    with_locust = any(item["client"] == "locust" for item in group_summaries)
+    with_locust = with_locust or get_boolean_from_string(
+        os.environ.get("FECFILE_PROFILE_WITH_LOCUST", "False")
+    )
+    return {
+        "run_id": run_id,
+        "generated_at": timezone.now().isoformat(),
+        "with_locust": with_locust,
+        "silky_analyze_queries": getattr(settings, "SILKY_ANALYZE_QUERIES", False),
+        "locust_sample_pct": os.environ.get("FECFILE_LOCUST_SILK_SAMPLE_PCT", "2.0"),
+    }
+
+
 class Command(FECCommand):
     help = "Export Silk profiling artifacts grouped by profiling headers."
     command_name = "silk_export_profile"
@@ -279,173 +530,45 @@ class Command(FECCommand):
         parser.add_argument("--minutes", type=int)
 
     def command(self, *args, **options):
-        if "silk" not in settings.INSTALLED_APPS:
-            raise CommandError(
-                "Silk is not enabled. Set FECFILE_SILK_ENABLED=1 and run migrations."
-            )
-
-        Request, SQLQuery = _get_silk_models()
+        _ensure_silk_enabled()
+        request_model, sql_query_model = _get_silk_models()
 
         run_id = options["run_id"]
         safe_run_id = _sanitize_run_id(run_id)
         outdir = Path(options["outdir"])
-        client_filter = options.get("client")
+        client_filter = _normalize_client_filter(options.get("client"))
         group_filter = options.get("group")
         minutes = options.get("minutes")
 
-        if client_filter:
-            client_filter = client_filter.lower()
-            if client_filter not in ["cypress", "locust"]:
-                raise CommandError("client must be cypress or locust")
-
-        queryset = Request.objects.filter(path__startswith="/api/")
-        if minutes:
-            cutoff = timezone.now() - timedelta(minutes=minutes)
-            queryset = queryset.filter(start_time__gte=cutoff)
-
-        requests_by_group: Dict[Tuple[str, str], List[Dict[str, Any]]] = defaultdict(
-            list
-        )
-        totals_by_group: Dict[Tuple[str, str], Dict[str, Any]] = {}
-        request_group_index: Dict[int, Tuple[str, str]] = {}
-        request_path_index: Dict[int, str] = {}
-
-        for request in queryset.iterator():
-            headers = _decode_encoded_headers(request.encoded_headers)
-            profile_headers = extract_profile_headers(headers)
-            if profile_headers.get("run_id") != run_id:
-                continue
-
-            client = profile_headers.get("client") or "unknown-client"
-            group = profile_headers.get("group") or "unknown-group"
-            if client_filter and client != client_filter:
-                continue
-            if group_filter and group != group_filter:
-                continue
-
-            key = (client, group)
-            total = totals_by_group.setdefault(
-                key,
-                {
-                    "total_requests": 0,
-                    "total_time_taken": 0.0,
-                    "total_sql_time": 0.0,
-                    "total_queries": 0,
-                },
-            )
-
-            time_taken = _format_duration(getattr(request, "time_taken", None))
-            sql_time = _format_duration(getattr(request, "time_spent_on_sql", None))
-            num_queries = getattr(request, "num_sql_queries", 0) or 0
-
-            total["total_requests"] += 1
-            total["total_time_taken"] += time_taken
-            total["total_sql_time"] += sql_time
-            total["total_queries"] += num_queries
-
-            requests_by_group[key].append(
-                {
-                    "id": request.id,
-                    "method": request.method,
-                    "path": request.path,
-                    "status_code": request.status_code,
-                    "start_time": request.start_time,
-                    "time_taken": time_taken,
-                    "num_queries": num_queries,
-                    "time_spent_on_sql": sql_time,
-                    "profile_headers": profile_headers,
-                }
-            )
-            request_group_index[request.id] = key
-            request_path_index[request.id] = request.path
+        queryset = _build_request_queryset(request_model, minutes)
+        (
+            requests_by_group,
+            totals_by_group,
+            request_group_index,
+            request_path_index,
+        ) = _collect_requests(queryset, run_id, client_filter, group_filter)
 
         if not requests_by_group:
             self.log("No matching Silk requests found.", Levels.WARNING)
 
-        request_ids = list(request_group_index.keys())
-        slow_queries_by_group: Dict[Tuple[str, str], List[Dict[str, Any]]] = defaultdict(
-            list
-        )
-        if request_ids:
-            for query in SQLQuery.objects.filter(request_id__in=request_ids).order_by(
-                "-time_taken"
-            ):
-                group_key = request_group_index.get(query.request_id)
-                if not group_key:
-                    continue
-                group_queries = slow_queries_by_group[group_key]
-                if len(group_queries) >= SQL_QUERY_EXPORT_LIMIT:
-                    continue
-                group_queries.append(
-                    {
-                        "time_taken": _format_duration(
-                            getattr(query, "time_taken", None)
-                        ),
-                        "query": _truncate_query(getattr(query, "query", None)),
-                        "request_path": request_path_index.get(query.request_id),
-                    }
-                )
-
-        group_summaries: List[Dict[str, Any]] = []
-        for (client, group), entries in requests_by_group.items():
-            safe_client = _sanitize_path_segment(client, "unknown-client")
-            safe_group = _sanitize_path_segment(group, "unknown-group")
-            group_dir = outdir / safe_run_id / safe_client / safe_group
-
-            totals = totals_by_group[(client, group)]
-            entries_sorted = sorted(
-                entries, key=lambda item: item.get("time_taken", 0), reverse=True
-            )
-            slow_requests = entries_sorted[:25]
-            slow_queries = slow_queries_by_group.get((client, group), [])[:25]
-
-            profile_payload = {
-                "run_id": run_id,
-                "client": client,
-                "group": group,
-                "generated_at": timezone.now(),
-                "totals": totals,
-                "requests": entries_sorted,
-                "slow_queries": slow_queries_by_group.get((client, group), []),
-            }
-
-            _write_json(group_dir / "profile.json", profile_payload)
-
-            summary_html = _render_summary_html(
-                run_id, client, group, totals, slow_requests, slow_queries
-            )
-            _write_text(group_dir / "summary.html", summary_html)
-
-            group_summaries.append(
-                {
-                    "client": client,
-                    "group": group,
-                    "total_requests": totals["total_requests"],
-                    "total_time_taken": totals["total_time_taken"],
-                    "total_sql_time": totals["total_sql_time"],
-                    "summary_path": f"./{safe_client}/{safe_group}/summary.html",
-                }
-            )
-
-        group_summaries.sort(
-            key=lambda item: (item["total_time_taken"], item["total_sql_time"]),
-            reverse=True,
+        slow_queries_by_group = _load_slow_queries(
+            sql_query_model, request_group_index, request_path_index
         )
 
-        run_meta = {
-            "run_id": run_id,
-            "generated_at": timezone.now().isoformat(),
-            "with_locust": any(item["client"] == "locust" for item in group_summaries)
-            or get_boolean_from_string(
-                os.environ.get("FECFILE_PROFILE_WITH_LOCUST", "False")
-            ),
-            "silky_analyze_queries": getattr(settings, "SILKY_ANALYZE_QUERIES", False),
-            "locust_sample_pct": os.environ.get("FECFILE_LOCUST_SILK_SAMPLE_PCT", "2.0"),
-        }
+        group_summaries = _write_group_exports(
+            outdir,
+            safe_run_id,
+            run_id,
+            requests_by_group,
+            totals_by_group,
+            slow_queries_by_group,
+        )
 
+        run_meta = _build_run_meta(run_id, group_summaries)
         index_html = _render_index_html(run_meta, group_summaries)
         _write_text(outdir / safe_run_id / "index.html", index_html)
 
         self.log(
-            f"Wrote Silk profiling export to {outdir / safe_run_id}", Levels.SUCCESS
+            f"Wrote Silk profiling export to {outdir / safe_run_id}",
+            Levels.SUCCESS,
         )
