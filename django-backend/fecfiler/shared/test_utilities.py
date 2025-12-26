@@ -37,3 +37,9 @@ class SharedUtilitiesTestCase(TestCase):
         self.assertFalse(value)
         value = get_boolean_from_string("")
         self.assertFalse(value)
+
+    def test_get_boolean_from_yes_string(self):
+        value = get_boolean_from_string("yes")
+        self.assertTrue(value)
+        value = get_boolean_from_string("Y")
+        self.assertTrue(value)
