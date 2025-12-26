@@ -1,13 +1,13 @@
 from django.conf.urls import include
 from django.urls import re_path, path
 from django.views.generic.base import RedirectView
-from fecfiler.settings import MOCK_OIDC_PROVIDER, INCLUDE_SILK
+from fecfiler.settings import MOCK_OIDC_PROVIDER, FECFILE_SILK_ENABLED
 from django.conf.urls.static import static
 
 BASE_V1_URL = r"^api/v1/"
 
 urlpatterns = []
-if INCLUDE_SILK:
+if FECFILE_SILK_ENABLED:
     from fecfiler.settings import (
         STATIC_ROOT,
         STATIC_URL,

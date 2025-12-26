@@ -75,7 +75,15 @@ SESSION_COOKIE_AGE = int(
 SESSION_SAVE_EVERY_REQUEST = True
 
 
-INCLUDE_SILK = get_boolean_from_string(env.get_credential("INCLUDE_SILK", "False"))
+FECFILE_SILK_ENABLED = get_boolean_from_string(
+    env.get_credential("FECFILE_SILK_ENABLED", "False")
+)
+LEGACY_INCLUDE_SILK = get_boolean_from_string(env.get_credential("INCLUDE_SILK", "False"))
+if LEGACY_INCLUDE_SILK and not FECFILE_SILK_ENABLED:
+    FECFILE_SILK_ENABLED = True
+FECFILE_PROFILE_WITH_LOCUST = get_boolean_from_string(
+    env.get_credential("FECFILE_PROFILE_WITH_LOCUST", "False")
+)
 INSTALLED_APPS = [
     # "django.contrib.admin",
     "django.contrib.auth",
@@ -106,7 +114,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = []
 
 
-if INCLUDE_SILK:
+if FECFILE_SILK_ENABLED:
     STATIC_URL = "/static/"
     STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
     STATIC_ROOT = "static"
@@ -121,6 +129,16 @@ if INCLUDE_SILK:
 
     SILKY_PYTHON_PROFILER = True
     SILKY_PYTHON_PROFILER_BINARY = True
+    SILKY_PYTHON_PROFILER_FUNC = "fecfiler.silk_profile_gate.should_profile"
+    SILKY_PYTHON_PROFILER_RESULT_PATH = env.get_credential(
+        "SILKY_PYTHON_PROFILER_RESULT_PATH", "silk-profiles"
+    )
+    SILKY_PYTHON_PROFILER_EXTENDED_FILE_NAME = True
+    SILKY_INTERCEPT_FUNC = "fecfiler.silk_profile_gate.should_record"
+    SILKY_META = True
+    SILKY_ANALYZE_QUERIES = not FECFILE_PROFILE_WITH_LOCUST
+    SILKY_MAX_REQUEST_BODY_SIZE = 0
+    SILKY_MAX_RESPONSE_BODY_SIZE = 0
 
     # the sub-directories of media and static files
     STATICFILES_LOCATION = "static"
