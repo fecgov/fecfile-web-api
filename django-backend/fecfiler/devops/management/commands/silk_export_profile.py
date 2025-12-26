@@ -1,3 +1,4 @@
+import importlib
 import json
 import os
 import re
@@ -11,8 +12,6 @@ from django.core.management.base import CommandError
 from django.utils import timezone
 from django.utils.html import escape
 from django.core.serializers.json import DjangoJSONEncoder
-from silk.models import Request, SQLQuery
-
 from fecfiler.devops.management.commands.fecfile_base import FECCommand, Levels
 from fecfiler.shared.utilities import get_boolean_from_string
 from fecfiler.silk_profile_gate import extract_profile_headers
@@ -77,6 +76,11 @@ def _sanitize_path_segment(value: Optional[str], fallback: str) -> str:
 
 def _sanitize_run_id(run_id: str) -> str:
     return _sanitize_path_segment(str(run_id), "unknown-run")
+
+
+def _get_silk_models():
+    silk_models = importlib.import_module("silk.models")
+    return silk_models.Request, silk_models.SQLQuery
 
 
 def _format_duration(value: Optional[float]) -> float:
@@ -279,6 +283,8 @@ class Command(FECCommand):
             raise CommandError(
                 "Silk is not enabled. Set FECFILE_SILK_ENABLED=1 and run migrations."
             )
+
+        Request, SQLQuery = _get_silk_models()
 
         run_id = options["run_id"]
         safe_run_id = _sanitize_run_id(run_id)
