@@ -1,6 +1,7 @@
 import importlib
 import sys
 import types
+from pathlib import Path
 
 from django.test import SimpleTestCase
 
@@ -17,7 +18,8 @@ class UrlsTest(SimpleTestCase):
         try:
             fec_settings.FECFILE_SILK_ENABLED = True
             fec_settings.STATIC_URL = "/static/"
-            fec_settings.STATIC_ROOT = "/tmp/static"
+            static_root_path = Path(__file__).resolve().parent / "static-root"
+            fec_settings.STATIC_ROOT = str(static_root_path)
 
             silk_module = types.ModuleType("silk")
             silk_urls = types.ModuleType("silk.urls")
