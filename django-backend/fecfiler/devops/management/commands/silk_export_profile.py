@@ -125,7 +125,9 @@ def _render_summary_html(
             f"<td>{request.get('time_spent_on_sql', 0):.4f}</td>"
             "</tr>"
         )
-    request_table = "\n".join(rows) or "<tr><td colspan='5'>No requests found.</td></tr>"
+    request_table = "\n".join(rows) or (
+        "<tr><td colspan='5'>No requests found.</td></tr>"
+    )
 
     query_rows = []
     for query in slow_queries:
@@ -136,7 +138,9 @@ def _render_summary_html(
             f"<td><pre>{escape(str(query.get('query', '')))}</pre></td>"
             "</tr>"
         )
-    query_table = "\n".join(query_rows) or "<tr><td colspan='3'>No queries found.</td></tr>"
+    query_table = "\n".join(query_rows) or (
+        "<tr><td colspan='3'>No queries found.</td></tr>"
+    )
 
     return f"""<!doctype html>
 <html>
@@ -211,6 +215,12 @@ def _render_index_html(run_meta: Dict[str, Any], groups: List[Dict[str, Any]]) -
         )
     body_rows = "\n".join(rows) or "<tr><td colspan='6'>No groups found.</td></tr>"
 
+    run_id_display = escape(str(run_meta.get("run_id", "")))
+    generated_display = escape(str(run_meta.get("generated_at", "")))
+    with_locust_display = escape(str(run_meta.get("with_locust", False)))
+    analyze_display = escape(str(run_meta.get("silky_analyze_queries", False)))
+    sample_display = escape(str(run_meta.get("locust_sample_pct", "")))
+
     return f"""<!doctype html>
 <html>
   <head>
@@ -227,11 +237,11 @@ def _render_index_html(run_meta: Dict[str, Any], groups: List[Dict[str, Any]]) -
   <body>
     <h1>Silk Profile Index</h1>
     <div class="meta">
-      <div><strong>Run ID:</strong> {escape(str(run_meta.get('run_id', '')))}</div>
-      <div><strong>Generated:</strong> {escape(str(run_meta.get('generated_at', '')))}</div>
-      <div><strong>With Locust:</strong> {escape(str(run_meta.get('with_locust', False)))}</div>
-      <div><strong>Silky Analyze Queries:</strong> {escape(str(run_meta.get('silky_analyze_queries', False)))}</div>
-      <div><strong>Locust Sample Pct:</strong> {escape(str(run_meta.get('locust_sample_pct', '')))}</div>
+      <div><strong>Run ID:</strong> {run_id_display}</div>
+      <div><strong>Generated:</strong> {generated_display}</div>
+      <div><strong>With Locust:</strong> {with_locust_display}</div>
+      <div><strong>Silky Analyze Queries:</strong> {analyze_display}</div>
+      <div><strong>Locust Sample Pct:</strong> {sample_display}</div>
     </div>
     <table>
       <thead>
@@ -362,7 +372,9 @@ class Command(FECCommand):
                     continue
                 group_queries.append(
                     {
-                        "time_taken": _format_duration(getattr(query, "time_taken", None)),
+                        "time_taken": _format_duration(
+                            getattr(query, "time_taken", None)
+                        ),
                         "query": _truncate_query(getattr(query, "query", None)),
                         "request_path": request_path_index.get(query.request_id),
                     }
