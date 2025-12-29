@@ -92,7 +92,9 @@ class Command(BaseCommand):
         try:
             from silk.models import Request
         except Exception as exc:
-            raise CommandError("django-silk is not available in this environment.") from exc
+            raise CommandError(
+                "django-silk is not available in this environment."
+            ) from exc
 
         spec_filter = _sanitize_spec_name(spec_filter) if spec_filter else None
         run_dir = os.path.join(outdir, run_id)
