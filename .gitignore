@@ -88,3 +88,4 @@ django-backend/celerybeat-schedule
 #profiling
 static/
 *.prof
+django-backend/silk/

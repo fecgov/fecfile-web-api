@@ -15,6 +15,7 @@ from .env import env
 from corsheaders.defaults import default_headers
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
 from fecfiler.transactions.profilers import TRANSACTION_MANAGER_PROFILING
+from fecfiler.silk_profile_gate import should_record, should_profile
 from math import floor
 from celery.schedules import crontab
 
@@ -77,9 +78,11 @@ SESSION_COOKIE_AGE = int(
 SESSION_SAVE_EVERY_REQUEST = True
 
 
+E2E_TEST = get_boolean_from_string(env.get_credential("E2E_TEST", "False"))
+
 FECFILE_SILK_ENABLED = get_boolean_from_string(
     env.get_credential("FECFILE_SILK_ENABLED", "False")
-)
+) and not E2E_TEST
 LEGACY_INCLUDE_SILK = get_boolean_from_string(env.get_credential("INCLUDE_SILK", "False"))
 if LEGACY_INCLUDE_SILK and not FECFILE_SILK_ENABLED:
     FECFILE_SILK_ENABLED = True
@@ -131,12 +134,24 @@ if FECFILE_SILK_ENABLED:
 
     SILKY_PYTHON_PROFILER = True
     SILKY_PYTHON_PROFILER_BINARY = True
-    SILKY_PYTHON_PROFILER_FUNC = "fecfiler.silk_profile_gate.should_profile"
+    SILKY_PYTHON_PROFILER_FUNC = should_profile
     SILKY_PYTHON_PROFILER_RESULT_PATH = env.get_credential(
         "SILKY_PYTHON_PROFILER_RESULT_PATH", "silk-profiles"
     )
+    if not os.path.isabs(SILKY_PYTHON_PROFILER_RESULT_PATH):
+        SILKY_PYTHON_PROFILER_RESULT_PATH = os.path.join(
+            BASE_DIR, SILKY_PYTHON_PROFILER_RESULT_PATH
+        )
+    try:
+        os.makedirs(SILKY_PYTHON_PROFILER_RESULT_PATH, exist_ok=True)
+    except OSError as exc:
+        structlog.get_logger(__name__).warning(
+            "Failed to create Silk profiler output directory",
+            path=SILKY_PYTHON_PROFILER_RESULT_PATH,
+            error=str(exc),
+        )
     SILKY_PYTHON_PROFILER_EXTENDED_FILE_NAME = True
-    SILKY_INTERCEPT_FUNC = "fecfiler.silk_profile_gate.should_record"
+    SILKY_INTERCEPT_FUNC = should_record
     SILKY_META = True
     SILKY_ANALYZE_QUERIES = not FECFILE_PROFILE_WITH_LOCUST
     SILKY_MAX_REQUEST_BODY_SIZE = 0
@@ -574,5 +589,3 @@ TEST_RUNNER = "fecfiler.test_runner.CustomTestRunner"
 ENABLE_RESTRICTED_COMMANDS = get_boolean_from_string(
     env.get_credential("ENABLE_RESTRICTED_COMMANDS", "False")
 )
-
-E2E_TEST = get_boolean_from_string(env.get_credential("E2E_TEST", "False"))

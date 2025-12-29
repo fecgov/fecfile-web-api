@@ -158,11 +158,25 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         url_path="e2e-delete-all-reports",
     )
     def e2e_delete_all_reports(self, request):
+        request.silk_disable = True  # Avoid Silk recursion during bulk cleanup
         reports = Report.objects.filter(committee_account__committee_id="C99999999")
         report_count = reports.count()
 
-        delete_all_reports()
-        delete_all_reports("C99999998")
+        try:
+            delete_all_reports()
+            delete_all_reports("C99999998")
+        except Exception as exc:  # noqa: BLE001 - log and surface 500 for e2e visibility
+            logger.exception(
+                "e2e-delete-all-reports failed",
+                committee_ids=["C99999999", "C99999998"],
+                report_count=report_count,
+                error=str(exc),
+            )
+            return Response(
+                {"message": "e2e-delete-all-reports failed", "detail": str(exc)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
         return Response(f"Deleted {report_count} Reports")
 
     def create(self, request):

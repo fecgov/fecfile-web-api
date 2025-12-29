@@ -24,6 +24,8 @@ allowed_commands = [
     "disable_user",
     "reset_submitting_report",
     "fail_open_submissions",
+    # PROFILING COMMANDS #
+    "silk_export_profile",
 ]
 restricted_commands = [
     "loaddata",

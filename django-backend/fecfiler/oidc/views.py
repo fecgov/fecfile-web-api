@@ -10,6 +10,7 @@ https://github.com/mozilla/mozilla-django-oidc/blob/main/mozilla_django_oidc/vie
 """
 
 from django.http import HttpResponseRedirect, HttpResponseServerError
+from django.conf import settings
 from django.contrib.auth import logout
 from django.utils.crypto import get_random_string
 from django.urls import reverse
@@ -19,6 +20,7 @@ from rest_framework.decorators import (
     permission_classes,
     api_view,
 )
+from rest_framework.exceptions import PermissionDenied
 from fecfiler.settings import (
     LOGIN_REDIRECT_CLIENT_URL,
     OIDC_RP_CLIENT_ID,
@@ -45,7 +47,14 @@ logger = structlog.get_logger(__name__)
 @extend_schema(exclude=True)
 @api_view(["GET"])
 @require_http_methods(["GET"])
+@permission_classes([])
 def login_redirect(request):
+    allow_public = bool(
+        getattr(settings, "E2E_TEST", False)
+        or getattr(settings, "MOCK_OIDC_PROVIDER", False)
+    )
+    if not allow_public and not request.user.is_authenticated:
+        raise PermissionDenied()
     return HttpResponseRedirect(LOGIN_REDIRECT_CLIENT_URL)
 
 

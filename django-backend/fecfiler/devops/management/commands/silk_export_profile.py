@@ -332,6 +332,16 @@ def _extract_request_metrics(request) -> Tuple[float, float, int]:
     return time_taken, sql_time, num_queries
 
 
+def _get_request_status_code(request) -> Optional[int]:
+    try:
+        response = request.response
+    except Exception:
+        response = None
+    if response is not None:
+        return getattr(response, "status_code", None)
+    return getattr(request, "status_code", None)
+
+
 def _update_totals(
     totals: Dict[str, Any], time_taken: float, sql_time: float, num_queries: int
 ) -> None:
@@ -352,7 +362,7 @@ def _build_request_entry(
         "id": request.id,
         "method": request.method,
         "path": request.path,
-        "status_code": request.status_code,
+        "status_code": _get_request_status_code(request),
         "start_time": request.start_time,
         "time_taken": time_taken,
         "num_queries": num_queries,

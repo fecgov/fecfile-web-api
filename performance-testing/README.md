@@ -98,7 +98,7 @@ Mode A (Silk + Cypress):
 
 Mode B (Silk + Locust + Cypress):
 - `export FECFILE_PROFILE_WITH_LOCUST=1` (SILKY_ANALYZE_QUERIES is False)
-- Optional sampling: `export FECFILE_LOCUST_SILK_SAMPLE_PCT=2.0`
+- Optional sampling: `export FECFILE_LOCUST_SILK_SAMPLE_PCT=2.0` i.e. 2% out of 100
 
 If you want Locust traffic tagged for profiling, use `performance-testing/locustfile.py` and set
 `FECFILE_PROFILE_RUN_ID` to match the Cypress run.

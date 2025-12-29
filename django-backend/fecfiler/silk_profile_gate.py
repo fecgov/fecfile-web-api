@@ -111,6 +111,12 @@ def should_record(request) -> bool:
     if not request.path.startswith("/api/"):
         return False
 
+    if request.path in (
+        "/api/v1/reports/e2e-delete-all-reports",
+        "/api/v1/reports/e2e-delete-all-reports/",
+    ):
+        return False
+
     profile_headers = get_profile_headers(request)
     run_id = profile_headers.get("run_id")
     if not run_id:
