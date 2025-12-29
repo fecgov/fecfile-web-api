@@ -32,3 +32,20 @@ See also: [Technical Design](https://github.com/fecgov/fecfile-web-api/wiki/Tech
 ## Additional developer notes
 
 Once the web API application is running, you may go to http://localhost:8080/ to see the API documentation.
+
+## Silk profiling (local/dev)
+
+Enable Silk locally by setting `FECFILE_SILK_ENABLED=1` and restart the API. The UI is available at
+`/silk/` and only `/api/` requests with the `x-silk-profile: 1` header are recorded.
+
+When running Cypress from `fecfile-web-app`, set `FECFILE_WEB_API_DIR` to this repo's
+`django-backend` directory so the after-spec hook can call the exporter.
+
+To export Cypress profiling summaries manually, run:
+
+```
+python manage.py silk_export --run-id <uuid> --spec <specname> --outdir silk-artifacts
+```
+
+Artifacts are written to `silk-artifacts/<run-id>/` (per-spec summaries plus `index.json` and
+`summary.json` for the full run).

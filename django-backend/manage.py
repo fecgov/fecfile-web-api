@@ -13,6 +13,7 @@ allowed_commands = [
     "lintmigrations",
     "makemigrations",
     "showmigrations",
+    "silk_export",
     # DEVOPS COMMANDS #
     "backout_login_dot_gov_cert",
     "cleanup_login_dot_gov_certs",

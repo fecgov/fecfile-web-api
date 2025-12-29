@@ -8,11 +8,11 @@ echo "Running migrations..."
 python manage.py migrate
 
 # Conditionally run collectstatic
-if [ "$INCLUDE_SILK" = "True" ]; then
-  echo "INCLUDE_SILK is True, running collectstatic..."
+if [ "$FECFILE_SILK_ENABLED" = "1" ] || [ "$FECFILE_SILK_ENABLED" = "true" ] || [ "$FECFILE_SILK_ENABLED" = "True" ] || [ "$INCLUDE_SILK" = "True" ]; then
+  echo "Silk is enabled, running collectstatic..."
   python manage.py collectstatic --no-input
 else
-  echo "INCLUDE_SILK is not 'True', skipping collectstatic."
+  echo "Silk is not enabled, skipping collectstatic."
 fi
 
 # Load application data

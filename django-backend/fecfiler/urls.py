@@ -13,7 +13,7 @@ if INCLUDE_SILK:
         STATIC_URL,
     )
 
-    urlpatterns = [re_path(r"^silk/", include("silk.urls", namespace="silk"))] + static(
+    urlpatterns = [path("silk/", include("silk.urls", namespace="silk"))] + static(
         STATIC_URL, document_root=STATIC_ROOT
     )
 

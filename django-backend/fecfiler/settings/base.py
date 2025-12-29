@@ -75,7 +75,18 @@ SESSION_COOKIE_AGE = int(
 SESSION_SAVE_EVERY_REQUEST = True
 
 
-INCLUDE_SILK = get_boolean_from_string(env.get_credential("INCLUDE_SILK", "False"))
+def _is_truthy_env(value):
+    if value is None:
+        return False
+    return str(value).strip().lower() in ("1", "true", "yes")
+
+
+FECFILE_SILK_ENABLED = _is_truthy_env(
+    env.get_credential("FECFILE_SILK_ENABLED", "False")
+)
+INCLUDE_SILK = FECFILE_SILK_ENABLED or _is_truthy_env(
+    env.get_credential("INCLUDE_SILK", "False")
+)
 INSTALLED_APPS = [
     # "django.contrib.admin",
     "django.contrib.auth",
@@ -107,6 +118,8 @@ MIDDLEWARE = []
 
 
 if INCLUDE_SILK:
+    from fecfiler.silk import should_silk_record
+
     STATIC_URL = "/static/"
     STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
     STATIC_ROOT = "static"
@@ -121,6 +134,7 @@ if INCLUDE_SILK:
 
     SILKY_PYTHON_PROFILER = True
     SILKY_PYTHON_PROFILER_BINARY = True
+    SILKY_INTERCEPT_FUNC = should_silk_record
 
     # the sub-directories of media and static files
     STATICFILES_LOCATION = "static"

@@ -89,3 +89,4 @@ django-backend/celerybeat-schedule
 static/
 *.prof
 django-backend/silk/
+silk-artifacts/
