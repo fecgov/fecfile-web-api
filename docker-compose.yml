@@ -63,6 +63,7 @@ services:
       ENABLE_RESTRICTED_COMMANDS: True
       FEC_FORMAT_VERSION: 8.5
       INCLUDE_SILK: "${INCLUDE_SILK}"
+      DJANGO_APPLICATION: FECFILE_CELERY_WORKER
       E2E_TEST: "${E2E_TEST:-False}" # E2E-only endpoints disabled by default, set to True to enable
     deploy:
       resources:
@@ -173,6 +174,7 @@ services:
       ENABLE_RESTRICTED_COMMANDS: True
       FEC_FORMAT_VERSION: 8.5
       INCLUDE_SILK: "${INCLUDE_SILK}"
+      DJANGO_APPLICATION: FECFILE_API
       E2E_TEST: "${E2E_TEST:-False}"
 
       # ---- FEATURE FLAGS ----
