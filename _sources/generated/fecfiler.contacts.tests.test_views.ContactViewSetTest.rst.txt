@@ -118,6 +118,10 @@ fecfiler.contacts.tests.test\_views.ContactViewSetTest
       ~ContactViewSetTest.test_committee_lookup_happy_path
       ~ContactViewSetTest.test_committee_lookup_no_auth
       ~ContactViewSetTest.test_committee_lookup_no_q
+      ~ContactViewSetTest.test_e2e_delete_all_contacts
+      ~ContactViewSetTest.test_e2e_delete_all_contacts_no_contacts
+      ~ContactViewSetTest.test_e2e_delete_all_contacts_requires_e2e_flag
+      ~ContactViewSetTest.test_e2e_delete_all_contacts_scoped_to_committee
       ~ContactViewSetTest.test_get_committee
       ~ContactViewSetTest.test_get_committee_invalid
       ~ContactViewSetTest.test_get_contact_id_finds_contact

@@ -31,6 +31,7 @@ fecfiler.contacts.tests.test\_views
       :template: custom-class-template.rst               
    
       ContactViewSetTest
+      MockResponse
    
    
 
