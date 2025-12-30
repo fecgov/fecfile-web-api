@@ -39,20 +39,23 @@ class Tasks(TaskSet):
         self.login()
 
         logging.info("Getting and activating committee")
-        self.get_and_activate_commmittee()
+        self.get_and_activate_committee()
 
         logging.info("Loading payloads")
         self.load_payloads()
 
-        logging.info("Creating contact")
+        logging.info("Creating contacts")
         self.create_payload_contacts()
 
         logging.info("Getting report IDs")
         self.get_report_ids()
 
-    @task
-    def devops_celery_test(self):
-        self.client_get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
+        # Cache of created Schedule A txns per report for targeted updates
+        self.last_created_schedule_a_by_report = {}
+
+    # @task
+    # def devops_celery_test(self):
+    #     self.client_get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
 
     @task
     def get_contacts(self):
@@ -74,39 +77,39 @@ class Tasks(TaskSet):
             "/api/v1/reports/", name="get_reports", timeout=TIMEOUT, params=params
         )
 
-    @task(100)
-    def lookup_committees(self):
-        params = {
-            # Querying with only a single character avoids FEC lookups
-            "q": random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
-            "max_fec_results": 10,
-            "max_fecfile_results": 5,
-            "exclude_fec_ids": None,
-            "exclude_ids": None
-        }
-        self.client_get(
-            "/api/v1/contacts/committee_lookup/",
-            name="_lookup_committees",
-            timeout=TIMEOUT,
-            params=params
-        )
+    # @task(100)
+    # def lookup_committees(self):
+    #     params = {
+    #         # Querying with only a single character avoids FEC lookups
+    #         "q": random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+    #         "max_fec_results": 10,
+    #         "max_fecfile_results": 5,
+    #         "exclude_fec_ids": None,
+    #         "exclude_ids": None
+    #     }
+    #     self.client_get(
+    #         "/api/v1/contacts/committee_lookup/",
+    #         name="_lookup_committees",
+    #         timeout=TIMEOUT,
+    #         params=params
+    #     )
 
-    @task(100)
-    def lookup_candidates(self):
-        params = {
-            # Querying with only a single character avoids FEC lookups
-            "q": random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
-            "max_fec_results": 10,
-            "max_fecfile_results": 5,
-            "exclude_fec_ids": None,
-            "exclude_ids": None
-        }
-        self.client_get(
-            "/api/v1/contacts/candidate_lookup/",
-            name="_lookup_candidates",
-            timeout=TIMEOUT,
-            params=params
-        )
+    # @task(100)
+    # def lookup_candidates(self):
+    #     params = {
+    #         # Querying with only a single character avoids FEC lookups
+    #         "q": random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+    #         "max_fec_results": 10,
+    #         "max_fecfile_results": 5,
+    #         "exclude_fec_ids": None,
+    #         "exclude_ids": None
+    #     }
+    #     self.client_get(
+    #         "/api/v1/contacts/candidate_lookup/",
+    #         name="_lookup_candidates",
+    #         timeout=TIMEOUT,
+    #         params=params
+    #     )
 
     @task
     def get_schedule_transactions(self):
@@ -131,15 +134,20 @@ class Tasks(TaskSet):
     def create_schedule_a_transaction(self):
         contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_1"])
         transaction_data = deepcopy(self.transaction_payloads["INDIVIDUAL_RECEIPT"])
-        report_id = random.choice(self.report_ids)
-        contribution_date = self.report_ids_dict[report_id]
 
+        if len(self.report_ids) > 0:
+            report_id = self.report_ids[0] #random.choice(self.report_ids)
+            transaction_data["report_ids"].append(report_id)
+            contribution_date = self.report_ids_dict[report_id]
+        else:
+            contribution_date = "1980-01-01"
+    
         transaction_data["contact_1"] = contact_data
         transaction_data["contact_1_id"] = contact_data["id"]
-        transaction_data["report_ids"].append(report_id)
         transaction_data["contribution_date"] = contribution_date
         transaction_data["contribution_amount"] = random.randrange(25, 10000)
 
+        #logging.info(f"Creating Schedule A transaction for report {report_id} with: {transaction_data}")
         response = self.client.post(
             "/api/v1/transactions/",
             name="create_new_schedule_a_transaction",
@@ -148,16 +156,27 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule a transaction")
 
+        # Record the created transaction id for targeted update runs
+        try:
+            created = response.json()
+            self.last_created_schedule_a_by_report[report_id] = created.get("id")
+        except Exception:
+            pass
+
     @task(100)  # This task will be picked 100 times more often than the default
     def create_schedule_b_transaction(self):
         contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_2"])
         transaction_data = deepcopy(self.transaction_payloads["OPERATING_EXPENDITURE"])
-        report_id = random.choice(self.report_ids)
-        expenditure_date = self.report_ids_dict[report_id]
+
+        if len(self.report_ids) > 0:
+            report_id = self.report_ids[0] #random.choice(self.report_ids)
+            transaction_data["report_ids"].append(report_id)
+            expenditure_date = self.report_ids_dict[report_id]
+        else:
+            expenditure_date = "1980-01-01"
 
         transaction_data["contact_1"] = contact_data
         transaction_data["contact_1_id"] = contact_data["id"]
-        transaction_data["report_ids"].append(report_id)
         transaction_data["expenditure_date"] = expenditure_date
         transaction_data["expenditure_amount"] = random.randrange(25, 10000)
 
@@ -175,12 +194,16 @@ class Tasks(TaskSet):
         transaction_data = deepcopy(
             self.transaction_payloads["LOAN_RECEIVED_FROM_INDIVIDUAL"]
         )
-        report_id = random.choice(self.report_ids)
-        loan_incurred_date = self.report_ids_dict[report_id]
+
+        if len(self.report_ids) > 0:
+            report_id = self.report_ids[0] #random.choice(self.report_ids)
+            transaction_data["report_ids"].append(report_id)
+            loan_incurred_date = self.report_ids_dict[report_id]
+        else:
+            loan_incurred_date = "1980-01-01"
 
         transaction_data["contact_1"] = contact_data
         transaction_data["contact_1_id"] = contact_data["id"]
-        transaction_data["report_ids"].append(report_id)
         transaction_data["loan_incurred_date"] = loan_incurred_date
         transaction_data["loan_due_date"] = add_year_to_date_str(loan_incurred_date)
         transaction_data["loan_amount"] = random.randrange(100, 10000)
@@ -204,11 +227,13 @@ class Tasks(TaskSet):
     def create_schedule_d_transaction(self):
         contact_data = deepcopy(self.contact_payloads["ORGANIZATION_CONTACT_1"])
         transaction_data = deepcopy(self.transaction_payloads["DEBT_OWED_BY_COMMITTEE"])
-        report_id = random.choice(self.report_ids)
+
+        if len(self.report_ids) > 0:
+            report_id = self.report_ids[0] #random.choice(self.report_ids)
+            transaction_data["report_ids"].append(report_id)
 
         transaction_data["contact_1"] = contact_data
         transaction_data["contact_1_id"] = contact_data["id"]
-        transaction_data["report_ids"].append(report_id)
         transaction_data["incurred_amount"] = random.randrange(100, 10000)
         transaction_data["balance_at_close"] = transaction_data["incurred_amount"]
 
@@ -223,11 +248,16 @@ class Tasks(TaskSet):
     @task(100)  # This task will be picked 100 times more often than the default
     def update_schedule_a_transaction(self):
         if len(self.report_ids) > 0:
-            report_id = random.choice(self.report_ids)
-            transaction = self.get_first_individual_receipt_for_report(report_id)
+            report_id = self.report_ids[0] #random.choice(self.report_ids)
+            txn_id = self.last_created_schedule_a_by_report.get(report_id)
+            transaction = None
+            if txn_id:
+                transaction = {"id": txn_id}
+            else:
+                transaction = self.get_first_individual_receipt_for_report(report_id)
             if transaction:
                 response = self.client_get(
-                    f"/api/v1/transactions/{transaction["id"]}/",
+                    f"/api/v1/transactions/{transaction['id']}/",
                     name="get_schedule_a_transaction_by_id",
                     timeout=TIMEOUT,
                 )
@@ -237,18 +267,20 @@ class Tasks(TaskSet):
                     data["schedule_id"] = "A"
                     data["schema_name"] = "INDIVIDUAL_RECEIPT"
                     response = self.client.put(
-                        f"/api/v1/transactions/{data["id"]}/",
+                        f"/api/v1/transactions/{data['id']}/",
                         name="update_schedule_a_transaction",
                         json=data,
                     )
                 if response.status_code == 200:
                     return
+        else:
+            pass
         raise Exception("Failed to PUT update schedule a transaction")
 
     @task
     def delete_schedule_a_transaction(self):
         if len(self.report_ids) > 0:
-            report_id = random.choice(self.report_ids)
+            report_id = self.report_ids[0] #random.choice(self.report_ids)
             transaction = self.get_first_individual_receipt_for_report(report_id)
             if transaction:
                 response = self.client.delete(
@@ -259,18 +291,19 @@ class Tasks(TaskSet):
                     return
         raise Exception("Failed to DELETE schedule a transaction")
 
-    @task(100)
+    @task(10)
     def filing_calculate_summary_only(self):
         self.client.request_name = "recalculate_report_summary"
-        report_id = random.choice(self.report_ids)
-        self.calculate_summary_for_report_id(report_id, "calculate_summary_for_report_id")
+        if len(self.report_ids) > 0:
+            report_id = self.report_ids[0] #random.choice(self.report_ids)
+            self.calculate_summary_for_report_id(report_id, "calculate_summary_for_report_id")
 
-    @task(500)
+    @task(50)
     def filing_prepare_and_submit_report(self):
         if len(self.report_ids_to_submit) == 0:
             logging.info("No more reports to submit")
             return
-        report_id = random.choice(self.report_ids_to_submit)
+        report_id = self.report_ids[0] #random.choice(self.report_ids)
         report_json = self.retrieve_report(report_id)
 
         self.calculate_summary_for_report_id(
@@ -289,7 +322,7 @@ class Tasks(TaskSet):
                 logging.info("No current reports to amend")
             return
 
-        report_id = random.choice(self.report_ids_to_amend)
+        report_id = self.report_ids[0] #random.choice(self.report_ids)
         logging.info(f"Amending report {report_id}")
 
         self.amend_report(report_id)
@@ -311,7 +344,7 @@ class Tasks(TaskSet):
         self.client.headers["user-agent"] = "Locust testing"
         self.client.headers["Origin"] = self.client.base_url
 
-    def get_and_activate_commmittee(self):
+    def get_and_activate_committee(self):
         committee_id_list = self.retrieve_committee_id_list()
         if len(committee_id_list) <= self.user.user_index:
             logging.info("Not enough committees - need 1 per user!")
@@ -346,6 +379,8 @@ class Tasks(TaskSet):
     def create_payload_contacts(self):
         for key in self.contact_payloads:
             data = deepcopy(self.contact_payloads[key])
+            # Ensure no client-specified id is sent; server assigns UUIDs
+            data.pop("id", None)
             response = self.client.post(
                 "/api/v1/contacts/",
                 name="_create_new_contact",

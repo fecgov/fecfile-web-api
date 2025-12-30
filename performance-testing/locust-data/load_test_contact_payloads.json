@@ -1,5 +1,6 @@
 {
   "INDIVIDUAL_CONTACT_1": {
+    "id": "INDIVIDUALCONTACTONE",
     "type": "IND",
     "street_1": "test_street_1",
     "city": "test_city_1",
@@ -17,6 +18,7 @@
     "occupation": "test_occupation_1"
   },
   "INDIVIDUAL_CONTACT_2": {
+    "id": "INDIVIDUALCONTACTTWO",
     "type": "IND",
     "street_1": "test_street_2",
     "city": "test_city_2",
@@ -34,6 +36,7 @@
     "occupation": "test_occupation_2"
   },
   "INDIVIDUAL_CONTACT_3": {
+    "id": "INDIVIDUALCONTACTTHREE",
     "type": "IND",
     "street_1": "test_street_3",
     "city": "test_city_3",
@@ -51,6 +54,7 @@
     "occupation": "test_occupation_3"
   },
   "ORGANIZATION_CONTACT_1": {
+    "id": "ORGANIZATIONCONTACTONE",
     "type": "ORG",
     "street_1": "test_street_1",
     "city": "test_city_1",
