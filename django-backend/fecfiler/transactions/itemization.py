@@ -12,17 +12,24 @@ Only Schedule A/B over_two_hundred_types have the $200 threshold.
 Schedule E transactions are always itemized.
 """
 
+from enum import Enum
 from typing import List
 from uuid import UUID
 from .managers import (
     schedule_a_over_two_hundred_types,
     schedule_b_over_two_hundred_types,
     Schedule,
-    ITEMIZATION_THRESHOLD,
 )
+from .constants import ITEMIZATION_THRESHOLD
 import structlog
 
 logger = structlog.get_logger(__name__)
+
+
+class CascadeDirection(Enum):
+    """Direction for cascading itemization changes."""
+    TO_PARENTS = 'up'
+    TO_CHILDREN = 'down'
 
 
 def has_itemized_children(transaction) -> bool:
@@ -102,25 +109,27 @@ def get_all_parent_ids(transaction) -> List[UUID]:
 
 
 def _cascade_itemization_generic(
-    transaction, direction: str, target_value: bool
+    transaction,
+    direction: CascadeDirection,
+    should_be_itemized: bool
 ) -> None:
     """
     Generic cascade function for itemization changes.
 
     Args:
         transaction: Starting transaction
-        direction: 'up' for parents, 'down' for children
-        target_value: True for itemized, False for unitemized
+        direction: CascadeDirection.TO_PARENTS or CascadeDirection.TO_CHILDREN
+        should_be_itemized: True for itemized, False for unitemized
     """
     # Only cascade if transaction is in the appropriate state
-    if direction == 'up' and not transaction.itemized:
+    if direction == CascadeDirection.TO_PARENTS and not transaction.itemized:
         return
-    if direction == 'down' and transaction.itemized:
+    if direction == CascadeDirection.TO_CHILDREN and transaction.itemized:
         return
 
     # Get related transaction IDs
     related_ids = (
-        get_all_parent_ids(transaction) if direction == 'up'
+        get_all_parent_ids(transaction) if direction == CascadeDirection.TO_PARENTS
         else get_all_children_ids(transaction.id)
     )
 
@@ -128,26 +137,28 @@ def _cascade_itemization_generic(
         return
 
     from .models import Transaction
-    related = Transaction.objects.filter(
-        id__in=related_ids, deleted__isnull=True
-    )
+    related = Transaction.objects.filter(id__in=related_ids, deleted__isnull=True)
 
     from .signals import set_in_cascade
     set_in_cascade(True)
     try:
         for related_txn in related:
             # Skip if parent has force_itemized=False when cascading up
-            if direction == 'up' and related_txn.force_itemized is False:
+            if (direction == CascadeDirection.TO_PARENTS
+                    and related_txn.force_itemized is False):
                 continue
 
-            if related_txn.itemized != target_value:
-                related_txn.itemized = target_value
+            if related_txn.itemized != should_be_itemized:
+                related_txn.itemized = should_be_itemized
                 related_txn.save(update_fields=['itemized'])
-                direction_name = 'parent' if direction == 'up' else 'child'
-                action = '' if target_value else 'un'
+                direction_name = (
+                    'parent' if direction == CascadeDirection.TO_PARENTS
+                    else 'child'
+                )
+                action = '' if should_be_itemized else 'un'
                 logger.debug(
-                    f"Cascaded {action}itemization to "
-                    f"{direction_name} {related_txn.id}"
+                    f"Cascaded {action}itemization to {direction_name} "
+                    f"{related_txn.id}"
                 )
     finally:
         set_in_cascade(False)
@@ -221,7 +232,7 @@ def cascade_itemization_to_parents(transaction) -> None:
     Args:
         transaction: Transaction instance that was just itemized
     """
-    _cascade_itemization_generic(transaction, 'up', True)
+    _cascade_itemization_generic(transaction, CascadeDirection.TO_PARENTS, True)
 
 
 def cascade_unitemization_to_children(transaction) -> None:
@@ -231,4 +242,4 @@ def cascade_unitemization_to_children(transaction) -> None:
     Args:
         transaction: Transaction instance that became unitemized
     """
-    _cascade_itemization_generic(transaction, 'down', False)
+    _cascade_itemization_generic(transaction, CascadeDirection.TO_CHILDREN, False)

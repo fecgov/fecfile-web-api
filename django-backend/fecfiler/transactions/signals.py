@@ -19,7 +19,7 @@ from decimal import Decimal
 from typing import Optional
 from .models import Transaction
 from .aggregate_service import recalculate_aggregates_for_transaction
-from .managers import ITEMIZATION_THRESHOLD
+from .constants import ITEMIZATION_THRESHOLD
 import structlog
 import threading
 
@@ -50,7 +50,7 @@ def _log_transaction_action(instance, created: bool) -> None:
 
 
 def _should_cascade_unitemization(
-    instance, old_aggregate: Optional[Decimal], is_threshold_type: bool
+    instance, old_aggregate: Optional[Decimal], uses_itemization_threshold: bool
 ) -> bool:
     """
     Determine if unitemization should cascade to children.
@@ -62,14 +62,14 @@ def _should_cascade_unitemization(
     Args:
         instance: Transaction instance
         old_aggregate: Previous aggregate value
-        is_threshold_type: Whether this transaction type uses $200 threshold
+        uses_itemization_threshold: Whether this transaction type uses $200 threshold
 
     Returns:
         Boolean indicating if unitemization should cascade
     """
     from .itemization import has_itemized_children
 
-    if not is_threshold_type or instance.force_itemized is not None:
+    if not uses_itemization_threshold or instance.force_itemized is not None:
         return False
 
     if old_aggregate is None or instance.aggregate is None:
@@ -93,7 +93,7 @@ def _should_cascade_unitemization(
 
 def _handle_itemization_update(
     instance, created: bool, old_aggregate: Optional[Decimal],
-    is_threshold_type: bool
+    uses_itemization_threshold: bool
 ) -> None:
     """
     Handle itemization calculation and cascading.
@@ -102,7 +102,7 @@ def _handle_itemization_update(
         instance: Transaction instance
         created: Boolean indicating if transaction was just created
         old_aggregate: Previous aggregate value
-        is_threshold_type: Whether this transaction type uses $200 threshold
+        uses_itemization_threshold: Whether this transaction type uses $200 threshold
     """
     from .itemization import (
         get_all_children_ids,
@@ -124,7 +124,7 @@ def _handle_itemization_update(
         instance.itemized = False
 
     # Determine if we should cascade unitemization to children
-    if _should_cascade_unitemization(instance, old_aggregate, is_threshold_type):
+    if _should_cascade_unitemization(instance, old_aggregate, uses_itemization_threshold):
         child_ids = get_all_children_ids(instance.id)
         if child_ids:
             Transaction.objects.filter(
@@ -194,8 +194,6 @@ def log_post_save(sender, instance, created, **kwargs):
     """Handle post-save actions: logging, aggregates, and itemization."""
     _log_transaction_action(instance, created)
 
-    _log_transaction_action(instance, created)
-
     # Save the old aggregate value BEFORE recalculating
     # This allows us to detect if aggregate dropped below threshold
     old_aggregate = instance.aggregate
@@ -220,10 +218,14 @@ def log_post_save(sender, instance, created, **kwargs):
         schedule_a_over_two_hundred_types
         + schedule_b_over_two_hundred_types
     )
-    is_threshold_type = instance.transaction_type_identifier in a_b_over_two_hundred_types
+    uses_itemization_threshold = (
+        instance.transaction_type_identifier in a_b_over_two_hundred_types
+    )
 
     # Handle itemization updates and cascading
-    _handle_itemization_update(instance, created, old_aggregate, is_threshold_type)
+    _handle_itemization_update(
+        instance, created, old_aggregate, uses_itemization_threshold
+    )
 
     # Always check if parent needs to be updated when a child has a
     # parent_transaction. This handles cases where child's parent

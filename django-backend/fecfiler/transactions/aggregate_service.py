@@ -21,12 +21,11 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-def _calculate_aggregates_generic(
+def _update_aggregate_running_sum(
     transactions, aggregate_field_name: str, log_context: str
 ) -> int:
     """
-    Generic aggregate calculation logic shared by entity and election
-    aggregates.
+    Calculate and update running sum aggregates for transactions.
 
     Calculates running sum of effective amounts for transactions and updates
     the specified aggregate field.
@@ -41,9 +40,7 @@ def _calculate_aggregates_generic(
         Number of transactions updated
     """
     if not transactions.exists():
-        logger.debug(
-            f"No transactions found for aggregation: {log_context}"
-        )
+        logger.debug(f"No transactions found for aggregation: {log_context}")
         return 0
 
     update_count = 0
@@ -59,10 +56,7 @@ def _calculate_aggregates_generic(
                 txn.save(update_fields=[aggregate_field_name])
                 update_count += 1
 
-    logger.info(
-        f"Updated {update_count} transactions for aggregation: "
-        f"{log_context}"
-    )
+    logger.info(f"Updated {update_count} transactions for aggregation: {log_context}")
     return update_count
 
 
@@ -94,17 +88,10 @@ def calculate_entity_aggregates(
         force_unaggregated__isnull=True,
     ).filter(
         Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False)
-    ).order_by("date", "created").select_related(
-        "schedule_a", "schedule_b"
-    )
+    ).order_by("date", "created").select_related("schedule_a", "schedule_b")
 
-    log_context = (
-        f"contact_1={contact_1_id}, year={year}, "
-        f"group={aggregation_group}"
-    )
-    return _calculate_aggregates_generic(
-        transactions, "aggregate", log_context
-    )
+    log_context = f"contact_1={contact_1_id}, year={year}, group={aggregation_group}"
+    return _update_aggregate_running_sum(transactions, "aggregate", log_context)
 
 
 def calculate_calendar_ytd_per_election_office(
@@ -171,12 +158,38 @@ def calculate_calendar_ytd_per_election_office(
 
     log_context = (
         f"election_code={election_code}, office={candidate_office}, "
-        f"state={candidate_state}, district={candidate_district}, "
-        f"year={year}"
+        f"state={candidate_state}, district={candidate_district}, year={year}"
     )
-    return _calculate_aggregates_generic(
+    return _update_aggregate_running_sum(
         transactions, "_calendar_ytd_per_election_office", log_context
     )
+
+
+def _get_schedule_amount(transaction) -> Optional[Decimal]:
+    """
+    Extract the base amount from related schedule.
+
+    Args:
+        transaction: Transaction instance
+
+    Returns:
+        Decimal amount from the transaction's schedule, or None if not found
+    """
+    if transaction.schedule_a_id and transaction.schedule_a:
+        return transaction.schedule_a.contribution_amount
+    elif transaction.schedule_b_id and transaction.schedule_b:
+        return transaction.schedule_b.expenditure_amount
+    elif transaction.schedule_c2_id and transaction.schedule_c2:
+        return transaction.schedule_c2.guaranteed_amount
+    elif transaction.schedule_e_id and transaction.schedule_e:
+        return transaction.schedule_e.expenditure_amount
+    elif transaction.schedule_f_id and transaction.schedule_f:
+        return transaction.schedule_f.expenditure_amount
+    elif transaction.schedule_d_id and transaction.schedule_d:
+        return transaction.schedule_d.incurred_amount
+    elif transaction.debt_id and transaction.debt and transaction.debt.schedule_d:
+        return transaction.debt.schedule_d.incurred_amount
+    return None
 
 
 def calculate_effective_amount(transaction) -> Decimal:
@@ -193,39 +206,28 @@ def calculate_effective_amount(transaction) -> Decimal:
     Returns:
         Decimal: The effective amount for aggregation
     """
-    from fecfiler.transactions.schedule_b.managers import refunds as schedule_b_refunds
+    from .constants import SCHEDULE_B_REFUND_TYPES
 
     # Schedule C transactions have no effective amount for aggregation
     if transaction.schedule_c_id is not None:
         return Decimal(0)
 
     # Get the base amount from related schedule
-    amount = None
-    if transaction.schedule_a_id and transaction.schedule_a:
-        amount = transaction.schedule_a.contribution_amount
-    elif transaction.schedule_b_id and transaction.schedule_b:
-        amount = transaction.schedule_b.expenditure_amount
-    elif transaction.schedule_c2_id and transaction.schedule_c2:
-        amount = transaction.schedule_c2.guaranteed_amount
-    elif transaction.schedule_e_id and transaction.schedule_e:
-        amount = transaction.schedule_e.expenditure_amount
-    elif transaction.schedule_f_id and transaction.schedule_f:
-        amount = transaction.schedule_f.expenditure_amount
-    elif transaction.schedule_d_id and transaction.schedule_d:
-        amount = transaction.schedule_d.incurred_amount
-    elif transaction.debt_id and transaction.debt and transaction.debt.schedule_d:
-        amount = transaction.debt.schedule_d.incurred_amount
+    amount = _get_schedule_amount(transaction)
+
+    if amount is None:
+        return Decimal(0)
 
     # Refunds are negated
-    if amount and transaction.transaction_type_identifier in schedule_b_refunds:
+    if transaction.transaction_type_identifier in SCHEDULE_B_REFUND_TYPES:
         amount = amount * Decimal(-1)
 
-    return amount if amount else Decimal(0)
+    return amount
 
 
-def _extract_year(date_obj) -> int:
+def _get_calendar_year_from_date(date_obj) -> int:
     """
-    Extract year from date object or date string.
+    Parse calendar year from date object or date string in YYYY-MM-DD format.
 
     Args:
         date_obj: Date object with .year attribute or date string
@@ -329,7 +331,7 @@ def recalculate_aggregates_for_transaction(transaction_instance) -> None:
     try:
         if schedule in [Schedule.A, Schedule.B]:
             # Recalculate entity aggregates
-            year = _extract_year(transaction_date)
+            year = _get_calendar_year_from_date(transaction_date)
             calculate_entity_aggregates(
                 transaction_instance.contact_1_id,
                 year,
@@ -348,7 +350,7 @@ def recalculate_aggregates_for_transaction(transaction_instance) -> None:
             contact_2 = transaction_instance.contact_2
 
             if schedule_e and contact_2:
-                year = _extract_year(transaction_date)
+                year = _get_calendar_year_from_date(transaction_date)
                 calculate_calendar_ytd_per_election_office(
                     schedule_e.election_code,
                     contact_2.candidate_office,

@@ -10,11 +10,8 @@ from fecfiler.transactions.schedule_b.managers import (
 )
 from fecfiler.transactions.schedule_c.managers import line_labels as line_labels_c
 from fecfiler.transactions.schedule_d.managers import line_labels as line_labels_d
-from fecfiler.transactions.schedule_e.managers import (
-    line_labels as line_labels_e,
-    over_two_hundred_types as schedule_e_over_two_hundred_types,
-)
 from fecfiler.transactions.schedule_f.managers import line_labels as line_labels_f
+from .constants import SCHEDULE_E_OVER_200_TYPES as schedule_e_over_two_hundred_types
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
     OuterRef,
@@ -35,9 +32,7 @@ from decimal import Decimal
 from enum import Enum
 from ..reports.models import Report
 from fecfiler.reports.report_code_label import report_code_label_case
-
-# FEC threshold for itemization requirement
-ITEMIZATION_THRESHOLD = Decimal(200)
+from .constants import ITEMIZATION_THRESHOLD
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -378,7 +373,7 @@ class TransactionManager(SoftDeleteManager):
             **line_labels_b,
             **line_labels_c,
             **line_labels_d,
-            **line_labels_e,
+            "SE": "24",  # Schedule E line label
             **line_labels_f,
         }
         return Case(
