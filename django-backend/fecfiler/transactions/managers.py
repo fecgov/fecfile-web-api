@@ -10,6 +10,7 @@ from fecfiler.transactions.schedule_b.managers import (
 )
 from fecfiler.transactions.schedule_c.managers import line_labels as line_labels_c
 from fecfiler.transactions.schedule_d.managers import line_labels as line_labels_d
+from fecfiler.transactions.schedule_e.managers import line_labels as line_labels_e
 from fecfiler.transactions.schedule_f.managers import line_labels as line_labels_f
 from .constants import SCHEDULE_E_OVER_200_TYPES as schedule_e_over_two_hundred_types
 from django.db.models.functions import Coalesce, Concat
@@ -373,7 +374,7 @@ class TransactionManager(SoftDeleteManager):
             **line_labels_b,
             **line_labels_c,
             **line_labels_d,
-            "SE": "24",  # Schedule E line label
+            **line_labels_e,
             **line_labels_f,
         }
         return Case(
