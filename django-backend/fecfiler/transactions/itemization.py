@@ -34,7 +34,7 @@ def has_itemized_children(transaction):
         Boolean indicating if any children are itemized
     """
     from django.db import connection
-    
+
     # Force refresh of query cache to ensure we get the latest itemized status
     # This is important because children may have been updated in a separate save cycle
     with connection.cursor() as cursor:
@@ -47,7 +47,7 @@ def has_itemized_children(transaction):
             )
         """, [str(transaction.id)])
         result = cursor.fetchone()[0]
-    
+
     return result
 
 
@@ -57,7 +57,7 @@ def get_all_children_ids(transaction_id):
 
     Args:
         transaction_id: UUID of parent transaction
-        
+
     Returns:
         List of UUIDs of all descendants
     """
@@ -80,7 +80,7 @@ def get_all_children_ids(transaction_id):
 def get_all_parent_ids(transaction):
     """
     Get all parent and grandparent transaction IDs up the chain.
-    
+
     Args:
         transaction: Transaction instance
 
@@ -216,13 +216,13 @@ def cascade_itemization_to_parents(transaction):
 
 def cascade_unitemization_to_children(transaction):
     """
-    When a parent becomes unitemized (for any reason), 
+    When a parent becomes unitemized (for any reason),
     ensure all children are also unitemized.
     Children should not be itemized if their parent is not itemized.
 
     IMPORTANT: We only set force_itemized=False on children if the parent was EXPLICITLY
     force-unitemized (force_itemized=False was set manually). If the parent is naturally
-    unitemized due to aggregate, we just unitemize children without setting 
+    unitemized due to aggregate, we just unitemize children without setting
     force_itemized.
 
     Args:

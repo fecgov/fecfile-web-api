@@ -58,7 +58,7 @@ def log_post_save(sender, instance, created, **kwargs):
     # Save the old aggregate value BEFORE recalculating
     # This allows us to detect if aggregate dropped below threshold
     old_aggregate = instance.aggregate
-    
+
     # Recalculate aggregates for the transaction
     recalculate_aggregates_for_transaction(instance)
 
@@ -108,16 +108,18 @@ def log_post_save(sender, instance, created, **kwargs):
 
     if is_threshold_type and instance.force_itemized is None:
         # Check if aggregate dropped below threshold (from explicitly above to below)
-        if (old_aggregate is not None and old_aggregate > Decimal('200') and
-            instance.aggregate is not None and instance.aggregate <= Decimal('200')):
+        if (old_aggregate is not None and old_aggregate > Decimal('200')
+                and instance.aggregate is not None
+                and instance.aggregate <= Decimal('200')):
             should_cascade_unitemization = True
 
         # Check if aggregate is ≤ $200 and CHANGED (but not from None)
         # and we have itemized children
         # This handles when a parent's amount changes after children are added
-        elif (old_aggregate is not None and  # Had a previous non-None aggregate
-              old_aggregate != instance.aggregate and  # Aggregate actually changed
-              instance.aggregate is not None and instance.aggregate <= Decimal('200')):
+        elif (old_aggregate is not None  # Had a previous non-None aggregate
+              and old_aggregate != instance.aggregate  # Aggregate actually changed
+              and instance.aggregate is not None
+              and instance.aggregate <= Decimal('200')):
             has_itemized = has_itemized_children(instance)
             if has_itemized:
                 should_cascade_unitemization = True
@@ -157,7 +159,8 @@ def log_post_save(sender, instance, created, **kwargs):
             # First try standard itemization update based on parent's aggregate
             parent_changed_by_aggregate = update_itemization(parent)
 
-            # If parent is not itemized, check if it should be itemized because child is itemized
+            # If parent is not itemized, check if it should be itemized
+            # because child is itemized
             if not parent.itemized and instance.itemized:
                 parent.itemized = True
                 parent_changed_by_aggregate = True  # Mark as changed to trigger cascade

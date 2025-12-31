@@ -135,7 +135,7 @@ def calculate_calendar_ytd_per_election_office(
         "schedule_e__isnull": False,
         "force_unaggregated__isnull": True,
     }
-    
+
     # Filter by committee_account_id if provided
     if committee_account_id:
         query_filters["committee_account_id"] = committee_account_id
@@ -317,18 +317,19 @@ def recalculate_aggregates_for_transaction(transaction_instance):
         if schedule in [Schedule.A, Schedule.B]:
             # Recalculate entity aggregates
             year = (
-                    transaction_date.year if hasattr(transaction_date, 'year') 
-                    else int(str(transaction_date)[:4])
-                )
+                transaction_date.year if hasattr(transaction_date, 'year')
+                else int(str(transaction_date)[:4])
+            )
             calculate_entity_aggregates(
                 transaction_instance.contact_1_id,
                 year,
                 transaction_instance.aggregation_group,
             )
 
-            # If this is a loan repayment, recalculate loan_payment_to_date for the associated loan
-            if (transaction_instance.transaction_type_identifier == "LOAN_REPAYMENT_MADE" 
-                and transaction_instance.loan_id):
+            # If this is a loan repayment, recalculate loan_payment_to_date
+            # for the associated loan
+            if (transaction_instance.transaction_type_identifier == "LOAN_REPAYMENT_MADE"
+                    and transaction_instance.loan_id):
                 calculate_loan_payment_to_date(transaction_instance.loan_id)
 
         elif schedule == Schedule.E:
@@ -338,7 +339,7 @@ def recalculate_aggregates_for_transaction(transaction_instance):
 
             if schedule_e and contact_2:
                 year = (
-                    transaction_date.year if hasattr(transaction_date, 'year') 
+                    transaction_date.year if hasattr(transaction_date, 'year')
                     else int(str(transaction_date)[:4])
                 )
                 calculate_calendar_ytd_per_election_office(
