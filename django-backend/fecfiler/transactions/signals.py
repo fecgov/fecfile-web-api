@@ -16,13 +16,10 @@ parent/child itemization cascading.
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from decimal import Decimal
+from typing import Optional
 from .models import Transaction
 from .aggregate_service import recalculate_aggregates_for_transaction
-from .itemization import (
-    update_itemization,
-    cascade_itemization_to_parents,
-    cascade_unitemization_to_children,
-)
+from .managers import ITEMIZATION_THRESHOLD
 import structlog
 import threading
 
@@ -42,33 +39,77 @@ def set_in_cascade(value):
     _thread_locals.in_cascade = value
 
 
-@receiver(post_save, sender=Transaction)
-def log_post_save(sender, instance, created, **kwargs):
-    action = "updated"
-    if created:
-        action = "created"
-    elif instance.deleted:
-        action = "deleted"
+def _log_transaction_action(instance, created: bool) -> None:
+    """Log the transaction action."""
+    action = "created" if created else ("deleted" if instance.deleted else "updated")
     schedule = instance.get_schedule_name()
     logger.info(
         f"{schedule} Transaction: {instance.id} "
         f"({instance.transaction_id}) was {action}"
     )
 
-    # Save the old aggregate value BEFORE recalculating
-    # This allows us to detect if aggregate dropped below threshold
-    old_aggregate = instance.aggregate
 
-    # Recalculate aggregates for the transaction
-    recalculate_aggregates_for_transaction(instance)
+def _should_cascade_unitemization(
+    instance, old_aggregate: Optional[Decimal], is_threshold_type: bool
+) -> bool:
+    """
+    Determine if unitemization should cascade to children.
 
-    # Refresh the instance to get the updated aggregate from the database
-    instance.refresh_from_db()
+    This happens when:
+    1. Aggregate dropped below threshold (from above to below), OR
+    2. Aggregate changed to ≤ threshold and has itemized children
 
-    # Skip itemization logic if we're in a cascade operation
-    # (to prevent infinite recursion when cascading itemization to children/parents)
-    if is_in_cascade():
-        return
+    Args:
+        instance: Transaction instance
+        old_aggregate: Previous aggregate value
+        is_threshold_type: Whether this transaction type uses $200 threshold
+
+    Returns:
+        Boolean indicating if unitemization should cascade
+    """
+    from .itemization import has_itemized_children
+
+    if not is_threshold_type or instance.force_itemized is not None:
+        return False
+
+    if old_aggregate is None or instance.aggregate is None:
+        return False
+
+    # Aggregate dropped below threshold
+    aggregate_dropped_below = (
+        old_aggregate > ITEMIZATION_THRESHOLD
+        and instance.aggregate <= ITEMIZATION_THRESHOLD
+    )
+
+    # Aggregate changed while at or below threshold and has itemized children
+    aggregate_changed_at_or_below = (
+        old_aggregate != instance.aggregate
+        and instance.aggregate <= ITEMIZATION_THRESHOLD
+        and has_itemized_children(instance)
+    )
+
+    return aggregate_dropped_below or aggregate_changed_at_or_below
+
+
+def _handle_itemization_update(
+    instance, created: bool, old_aggregate: Optional[Decimal],
+    is_threshold_type: bool
+) -> None:
+    """
+    Handle itemization calculation and cascading.
+
+    Args:
+        instance: Transaction instance
+        created: Boolean indicating if transaction was just created
+        old_aggregate: Previous aggregate value
+        is_threshold_type: Whether this transaction type uses $200 threshold
+    """
+    from .itemization import (
+        get_all_children_ids,
+        update_itemization,
+        cascade_itemization_to_parents,
+        cascade_unitemization_to_children,
+    )
 
     # Track if itemization changed
     old_itemized = instance.itemized
@@ -82,44 +123,8 @@ def log_post_save(sender, instance, created, **kwargs):
         old_itemized = False
         instance.itemized = False
 
-    # Calculate what the new itemization should be
-    from fecfiler.transactions.managers import (
-        schedule_a_over_two_hundred_types,
-        schedule_b_over_two_hundred_types,
-    )
-    a_b_over_two_hundred_types = (
-        schedule_a_over_two_hundred_types
-        + schedule_b_over_two_hundred_types
-    )
-
-    # Check if this is a Schedule A/B type where we need to handle the threshold logic
-    schedule = instance.get_schedule_name()
-    is_threshold_type = instance.transaction_type_identifier in a_b_over_two_hundred_types
-
     # Determine if we should cascade unitemization to children
-    # This happens when:
-    # 1. Aggregate DROPPED below $200 (from above to below), OR
-    # 2. Aggregate is ≤ $200 and CHANGED (and was previously > $200
-    #    or non-None) and we have itemized children
-    from .itemization import get_all_children_ids, has_itemized_children
-
-    should_cascade_unitemization = False
-
-    if is_threshold_type and instance.force_itemized is None:
-        # Check if aggregate dropped below threshold
-        if (old_aggregate is not None and old_aggregate > Decimal('200')
-                and instance.aggregate is not None
-                and instance.aggregate <= Decimal('200')):
-            should_cascade_unitemization = True
-        # Check if aggregate changed to ≤ $200 and has itemized children
-        elif (old_aggregate is not None
-              and old_aggregate != instance.aggregate
-              and instance.aggregate is not None
-              and instance.aggregate <= Decimal('200')):
-            if has_itemized_children(instance):
-                should_cascade_unitemization = True
-
-    if should_cascade_unitemization:
+    if _should_cascade_unitemization(instance, old_aggregate, is_threshold_type):
         child_ids = get_all_children_ids(instance.id)
         if child_ids:
             Transaction.objects.filter(
@@ -140,36 +145,91 @@ def log_post_save(sender, instance, created, **kwargs):
         elif not instance.itemized and old_itemized:
             cascade_unitemization_to_children(instance)
 
+
+def _update_parent_itemization(instance) -> None:
+    """
+    Update parent transaction itemization when child changes.
+
+    Args:
+        instance: Transaction instance (the child)
+    """
+    from .itemization import (
+        update_itemization,
+        cascade_itemization_to_parents,
+        cascade_unitemization_to_children,
+    )
+
+    parent = instance.parent_transaction
+    if not parent:
+        return
+
+    parent.refresh_from_db()
+    parent_old_itemized = parent.itemized
+
+    # First try standard itemization update based on parent's aggregate
+    parent_changed_by_aggregate = update_itemization(parent)
+
+    # If parent is not itemized, check if it should be itemized
+    # because child is itemized
+    if not parent.itemized and instance.itemized:
+        parent.itemized = True
+        parent_changed_by_aggregate = True
+
+    if parent_changed_by_aggregate:
+        # Clear force_itemized so it doesn't retain stale values
+        parent.force_itemized = None
+        parent.save(update_fields=["itemized", "force_itemized"])
+        parent.refresh_from_db()
+
+        # If parent became itemized, cascade to grandparents
+        if parent.itemized and not parent_old_itemized:
+            cascade_itemization_to_parents(parent)
+        # If parent became unitemized, cascade to children
+        elif not parent.itemized and parent_old_itemized:
+            cascade_unitemization_to_children(parent)
+
+
+@receiver(post_save, sender=Transaction)
+def log_post_save(sender, instance, created, **kwargs):
+    """Handle post-save actions: logging, aggregates, and itemization."""
+    _log_transaction_action(instance, created)
+
+    _log_transaction_action(instance, created)
+
+    # Save the old aggregate value BEFORE recalculating
+    # This allows us to detect if aggregate dropped below threshold
+    old_aggregate = instance.aggregate
+
+    # Recalculate aggregates for the transaction
+    recalculate_aggregates_for_transaction(instance)
+
+    # Refresh the instance to get the updated aggregate from the database
+    instance.refresh_from_db()
+
+    # Skip itemization logic if we're in a cascade operation
+    # (to prevent infinite recursion when cascading itemization to children/parents)
+    if is_in_cascade():
+        return
+
+    # Determine if this transaction type uses $200 threshold
+    from fecfiler.transactions.managers import (
+        schedule_a_over_two_hundred_types,
+        schedule_b_over_two_hundred_types,
+    )
+    a_b_over_two_hundred_types = (
+        schedule_a_over_two_hundred_types
+        + schedule_b_over_two_hundred_types
+    )
+    is_threshold_type = instance.transaction_type_identifier in a_b_over_two_hundred_types
+
+    # Handle itemization updates and cascading
+    _handle_itemization_update(instance, created, old_aggregate, is_threshold_type)
+
     # Always check if parent needs to be updated when a child has a
     # parent_transaction. This handles cases where child's parent
     # relationship affects parent's itemization
     if instance.parent_transaction_id and not is_in_cascade():
-        parent = instance.parent_transaction
-        if parent:
-            parent.refresh_from_db()
-            parent_old_itemized = parent.itemized
-
-            # First try standard itemization update based on parent's aggregate
-            parent_changed_by_aggregate = update_itemization(parent)
-
-            # If parent is not itemized, check if it should be itemized
-            # because child is itemized
-            if not parent.itemized and instance.itemized:
-                parent.itemized = True
-                parent_changed_by_aggregate = True
-
-            if parent_changed_by_aggregate:
-                # Clear force_itemized so it doesn't retain stale values
-                parent.force_itemized = None
-                parent.save(update_fields=["itemized", "force_itemized"])
-                parent.refresh_from_db()
-
-                # If parent became itemized, cascade to grandparents
-                if parent.itemized and not parent_old_itemized:
-                    cascade_itemization_to_parents(parent)
-                # If parent became unitemized, cascade to children
-                elif not parent.itemized and parent_old_itemized:
-                    cascade_unitemization_to_children(parent)
+        _update_parent_itemization(instance)
 
 
 @receiver(post_delete, sender=Transaction)

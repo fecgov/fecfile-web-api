@@ -12,18 +12,20 @@ Only Schedule A/B over_two_hundred_types have the $200 threshold.
 Schedule E transactions are always itemized.
 """
 
-from decimal import Decimal
+from typing import List
+from uuid import UUID
 from .managers import (
     schedule_a_over_two_hundred_types,
     schedule_b_over_two_hundred_types,
     Schedule,
+    ITEMIZATION_THRESHOLD,
 )
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
-def has_itemized_children(transaction):
+def has_itemized_children(transaction) -> bool:
     """
     Check if a transaction has any itemized children.
 
@@ -33,23 +35,16 @@ def has_itemized_children(transaction):
     Returns:
         Boolean indicating if any children are itemized
     """
-    from django.db import connection
+    from .models import Transaction
 
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT EXISTS(
-                SELECT 1 FROM transactions_transaction
-                WHERE parent_transaction_id = %s
-                AND deleted IS NULL
-                AND itemized = true
-            )
-        """, [str(transaction.id)])
-        result = cursor.fetchone()[0]
-
-    return result
+    return Transaction.objects.filter(
+        parent_transaction_id=transaction.id,
+        deleted__isnull=True,
+        itemized=True
+    ).exists()
 
 
-def get_all_children_ids(transaction_id):
+def get_all_children_ids(transaction_id: UUID) -> List[UUID]:
     """
     Recursively get all child and grandchild transaction IDs.
 
@@ -62,20 +57,26 @@ def get_all_children_ids(transaction_id):
     from .models import Transaction
 
     all_children = []
-    direct_children = Transaction.objects.filter(
-        parent_transaction_id=transaction_id,
-        deleted__isnull=True
-    ).values_list('id', flat=True)
+    max_depth = 10  # Prevent infinite loops
 
-    for child_id in direct_children:
-        all_children.append(child_id)
-        # Recursively get grandchildren
-        all_children.extend(get_all_children_ids(child_id))
+    def _recurse(parent_id, depth):
+        if depth >= max_depth:
+            return
 
+        direct_children = Transaction.objects.filter(
+            parent_transaction_id=parent_id,
+            deleted__isnull=True
+        ).values_list('id', flat=True)
+
+        for child_id in direct_children:
+            all_children.append(child_id)
+            _recurse(child_id, depth + 1)
+
+    _recurse(transaction_id, 0)
     return all_children
 
 
-def get_all_parent_ids(transaction):
+def get_all_parent_ids(transaction) -> List[UUID]:
     """
     Get all parent and grandparent transaction IDs up the chain.
 
@@ -100,7 +101,59 @@ def get_all_parent_ids(transaction):
     return all_parents
 
 
-def calculate_itemization(transaction):
+def _cascade_itemization_generic(
+    transaction, direction: str, target_value: bool
+) -> None:
+    """
+    Generic cascade function for itemization changes.
+
+    Args:
+        transaction: Starting transaction
+        direction: 'up' for parents, 'down' for children
+        target_value: True for itemized, False for unitemized
+    """
+    # Only cascade if transaction is in the appropriate state
+    if direction == 'up' and not transaction.itemized:
+        return
+    if direction == 'down' and transaction.itemized:
+        return
+
+    # Get related transaction IDs
+    related_ids = (
+        get_all_parent_ids(transaction) if direction == 'up'
+        else get_all_children_ids(transaction.id)
+    )
+
+    if not related_ids:
+        return
+
+    from .models import Transaction
+    related = Transaction.objects.filter(
+        id__in=related_ids, deleted__isnull=True
+    )
+
+    from .signals import set_in_cascade
+    set_in_cascade(True)
+    try:
+        for related_txn in related:
+            # Skip if parent has force_itemized=False when cascading up
+            if direction == 'up' and related_txn.force_itemized is False:
+                continue
+
+            if related_txn.itemized != target_value:
+                related_txn.itemized = target_value
+                related_txn.save(update_fields=['itemized'])
+                direction_name = 'parent' if direction == 'up' else 'child'
+                action = '' if target_value else 'un'
+                logger.debug(
+                    f"Cascaded {action}itemization to "
+                    f"{direction_name} {related_txn.id}"
+                )
+    finally:
+        set_in_cascade(False)
+
+
+def calculate_itemization(transaction) -> bool:
     """
     Calculate whether a transaction should be itemized.
 
@@ -130,7 +183,7 @@ def calculate_itemization(transaction):
 
     if transaction.transaction_type_identifier in a_b_over_two_hundred_types:
         if agg_value is not None:
-            is_itemized = agg_value > Decimal(200)
+            is_itemized = agg_value > ITEMIZATION_THRESHOLD
         else:
             is_itemized = False
 
@@ -142,7 +195,7 @@ def calculate_itemization(transaction):
     return True
 
 
-def update_itemization(transaction):
+def update_itemization(transaction) -> bool:
     """
     Update the itemized field on a transaction based on calculated value.
 
@@ -161,72 +214,21 @@ def update_itemization(transaction):
     return False
 
 
-def cascade_itemization_to_parents(transaction):
+def cascade_itemization_to_parents(transaction) -> None:
     """
     When a child becomes itemized, ensure all parents are also itemized.
 
     Args:
         transaction: Transaction instance that was just itemized
     """
-    from .models import Transaction
-
-    if not transaction.itemized:
-        return
-
-    parent_ids = get_all_parent_ids(transaction)
-    if not parent_ids:
-        return
-
-    parents = Transaction.objects.filter(
-        id__in=parent_ids,
-        deleted__isnull=True
-    )
-
-    from .signals import set_in_cascade
-    set_in_cascade(True)
-    try:
-        for parent in parents:
-            if parent.force_itemized is False:
-                continue
-
-            if not parent.itemized:
-                parent.itemized = True
-                parent.save(update_fields=['itemized'])
-                logger.debug(f"Cascaded itemization to parent {parent.id}")
-    finally:
-        set_in_cascade(False)
+    _cascade_itemization_generic(transaction, 'up', True)
 
 
-def cascade_unitemization_to_children(transaction):
+def cascade_unitemization_to_children(transaction) -> None:
     """
     When a parent becomes unitemized, ensure all children are also unitemized.
 
     Args:
         transaction: Transaction instance that became unitemized
     """
-    from .models import Transaction
-
-    if transaction.itemized:
-        return
-
-    child_ids = get_all_children_ids(transaction.id)
-    if not child_ids:
-        return
-
-    transaction.refresh_from_db()
-
-    children = Transaction.objects.filter(
-        id__in=child_ids,
-        deleted__isnull=True
-    )
-
-    from .signals import set_in_cascade
-    set_in_cascade(True)
-    try:
-        for child in children:
-            if child.itemized:
-                child.itemized = False
-                child.save(update_fields=['itemized'])
-                logger.debug(f"Cascaded unitemization to child {child.id}")
-    finally:
-        set_in_cascade(False)
+    _cascade_itemization_generic(transaction, 'down', False)

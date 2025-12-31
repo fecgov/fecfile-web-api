@@ -36,6 +36,9 @@ from enum import Enum
 from ..reports.models import Report
 from fecfiler.reports.report_code_label import report_code_label_case
 
+# FEC threshold for itemization requirement
+ITEMIZATION_THRESHOLD = Decimal(200)
+
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
 
@@ -124,7 +127,7 @@ class TransactionManager(SoftDeleteManager):
             When(aggregate__lt=Value(Decimal(0)), then=Value(True)),
             When(
                 transaction_type_identifier__in=over_two_hundred_types,
-                aggregate__gt=Value(Decimal(200)),
+                aggregate__gt=Value(ITEMIZATION_THRESHOLD),
                 then=Value(True),
             ),
             When(

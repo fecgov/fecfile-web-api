@@ -10,6 +10,8 @@ that logic into Django code for better maintainability and testability.
 """
 
 from decimal import Decimal
+from typing import Optional
+from uuid import UUID
 from django.db.models import Q
 from django.db import transaction as db_transaction
 from .models import Transaction
@@ -19,7 +21,54 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-def calculate_entity_aggregates(contact_1_id, year, aggregation_group):
+def _calculate_aggregates_generic(
+    transactions, aggregate_field_name: str, log_context: str
+) -> int:
+    """
+    Generic aggregate calculation logic shared by entity and election
+    aggregates.
+
+    Calculates running sum of effective amounts for transactions and updates
+    the specified aggregate field.
+
+    Args:
+        transactions: QuerySet of transactions to aggregate (ordered)
+        aggregate_field_name: Name of field to update ('aggregate' or
+            '_calendar_ytd_per_election_office')
+        log_context: String with logging context info
+
+    Returns:
+        Number of transactions updated
+    """
+    if not transactions.exists():
+        logger.debug(
+            f"No transactions found for aggregation: {log_context}"
+        )
+        return 0
+
+    update_count = 0
+    running_sum = Decimal(0)
+
+    with db_transaction.atomic():
+        for txn in transactions:
+            effective_amount = calculate_effective_amount(txn)
+            running_sum += effective_amount
+
+            if getattr(txn, aggregate_field_name) != running_sum:
+                setattr(txn, aggregate_field_name, running_sum)
+                txn.save(update_fields=[aggregate_field_name])
+                update_count += 1
+
+    logger.info(
+        f"Updated {update_count} transactions for aggregation: "
+        f"{log_context}"
+    )
+    return update_count
+
+
+def calculate_entity_aggregates(
+    contact_1_id: UUID, year: int, aggregation_group: str
+) -> int:
     """
     Calculate and update aggregate values for Schedule A/B transactions.
 
@@ -37,62 +86,36 @@ def calculate_entity_aggregates(contact_1_id, year, aggregation_group):
     """
     # Get all matching transactions ordered by date and created
     # Exclude force_unaggregated transactions as they don't participate in aggregation
-    transactions = (
-        Transaction.objects.filter(
-            contact_1_id=contact_1_id,
-            date__year=year,
-            aggregation_group=aggregation_group,
-            deleted__isnull=True,
-            schedule_a__isnull=False,
-            force_unaggregated__isnull=True,
-        )
-        | Transaction.objects.filter(
-            contact_1_id=contact_1_id,
-            date__year=year,
-            aggregation_group=aggregation_group,
-            deleted__isnull=True,
-            schedule_b__isnull=False,
-            force_unaggregated__isnull=True,
-        )
+    transactions = Transaction.objects.filter(
+        contact_1_id=contact_1_id,
+        date__year=year,
+        aggregation_group=aggregation_group,
+        deleted__isnull=True,
+        force_unaggregated__isnull=True,
+    ).filter(
+        Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False)
     ).order_by("date", "created").select_related(
         "schedule_a", "schedule_b"
     )
 
-    if not transactions.exists():
-        logger.debug(
-            f"No transactions found for entity aggregation: "
-            f"contact_1={contact_1_id}, year={year}, group={aggregation_group}"
-        )
-        return 0
-
-    update_count = 0
-    running_sum = Decimal(0)
-
-    with db_transaction.atomic():
-        for txn in transactions:
-            # Calculate effective amount for this transaction
-            effective_amount = calculate_effective_amount(txn)
-
-            running_sum += effective_amount
-            aggregate_value = running_sum
-
-            # Update the transaction's aggregate field
-            if txn.aggregate != aggregate_value:
-                txn.aggregate = aggregate_value
-                txn.save(update_fields=["aggregate"])
-                update_count += 1
-
-    logger.info(
-        f"Updated {update_count} transactions for entity aggregation: "
-        f"contact_1={contact_1_id}, year={year}, group={aggregation_group}"
+    log_context = (
+        f"contact_1={contact_1_id}, year={year}, "
+        f"group={aggregation_group}"
     )
-    return update_count
+    return _calculate_aggregates_generic(
+        transactions, "aggregate", log_context
+    )
 
 
 def calculate_calendar_ytd_per_election_office(
-    election_code, candidate_office, candidate_state, candidate_district, year,
-    aggregation_group, committee_account_id=None
-):
+    election_code: str,
+    candidate_office: str,
+    candidate_state: Optional[str],
+    candidate_district: Optional[str],
+    year: int,
+    aggregation_group: str,
+    committee_account_id: Optional[UUID] = None
+) -> int:
     """
     Calculate and update calendar YTD aggregates for Schedule E transactions.
 
@@ -142,44 +165,21 @@ def calculate_calendar_ytd_per_election_office(
 
     transactions = Transaction.objects.filter(
         **query_filters
-    ).filter(state_filter, district_filter).order_by("date", "created").select_related(
-        "schedule_e", "contact_2"
-    )
+    ).filter(state_filter, district_filter).order_by(
+        "date", "created"
+    ).select_related("schedule_e", "contact_2")
 
-    if not transactions.exists():
-        logger.debug(
-            f"No transactions found for election YTD aggregation: "
-            f"election_code={election_code}, office={candidate_office}, "
-            f"state={candidate_state}, district={candidate_district}, year={year}"
-        )
-        return 0
-
-    update_count = 0
-    running_sum = Decimal(0)
-
-    with db_transaction.atomic():
-        for txn in transactions:
-            # Calculate effective amount for this transaction
-            effective_amount = calculate_effective_amount(txn)
-
-            running_sum += effective_amount
-            aggregate_value = running_sum
-
-            # Update the transaction's _calendar_ytd_per_election_office field
-            if txn._calendar_ytd_per_election_office != aggregate_value:
-                txn._calendar_ytd_per_election_office = aggregate_value
-                txn.save(update_fields=["_calendar_ytd_per_election_office"])
-                update_count += 1
-
-    logger.info(
-        f"Updated {update_count} transactions for election YTD aggregation: "
+    log_context = (
         f"election_code={election_code}, office={candidate_office}, "
-        f"state={candidate_state}, district={candidate_district}, year={year}"
+        f"state={candidate_state}, district={candidate_district}, "
+        f"year={year}"
     )
-    return update_count
+    return _calculate_aggregates_generic(
+        transactions, "_calendar_ytd_per_election_office", log_context
+    )
 
 
-def calculate_effective_amount(transaction):
+def calculate_effective_amount(transaction) -> Decimal:
     """
     Calculate the effective amount for a transaction.
 
@@ -223,7 +223,20 @@ def calculate_effective_amount(transaction):
     return amount if amount else Decimal(0)
 
 
-def calculate_loan_payment_to_date(loan_id):
+def _extract_year(date_obj) -> int:
+    """
+    Extract year from date object or date string.
+
+    Args:
+        date_obj: Date object with .year attribute or date string
+
+    Returns:
+        Integer year value
+    """
+    return date_obj.year if hasattr(date_obj, 'year') else int(str(date_obj)[:4])
+
+
+def calculate_loan_payment_to_date(loan_id: UUID) -> int:
     """
     Calculate the cumulative loan payment to date for a given loan.
 
@@ -291,7 +304,7 @@ def calculate_loan_payment_to_date(loan_id):
     return 0
 
 
-def recalculate_aggregates_for_transaction(transaction_instance):
+def recalculate_aggregates_for_transaction(transaction_instance) -> None:
     """
     Recalculate aggregates for a transaction and any affected related transactions.
 
@@ -316,10 +329,7 @@ def recalculate_aggregates_for_transaction(transaction_instance):
     try:
         if schedule in [Schedule.A, Schedule.B]:
             # Recalculate entity aggregates
-            year = (
-                transaction_date.year if hasattr(transaction_date, 'year')
-                else int(str(transaction_date)[:4])
-            )
+            year = _extract_year(transaction_date)
             calculate_entity_aggregates(
                 transaction_instance.contact_1_id,
                 year,
@@ -338,10 +348,7 @@ def recalculate_aggregates_for_transaction(transaction_instance):
             contact_2 = transaction_instance.contact_2
 
             if schedule_e and contact_2:
-                year = (
-                    transaction_date.year if hasattr(transaction_date, 'year')
-                    else int(str(transaction_date)[:4])
-                )
+                year = _extract_year(transaction_date)
                 calculate_calendar_ytd_per_election_office(
                     schedule_e.election_code,
                     contact_2.candidate_office,
