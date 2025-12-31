@@ -80,7 +80,6 @@ def log_post_save(sender, instance, created, **kwargs):
     # on aggregate)
     if created:
         old_itemized = False
-        # Reset to False so calculate_itemization changes it to proper value
         instance.itemized = False
 
     # Calculate what the new itemization should be
@@ -107,27 +106,22 @@ def log_post_save(sender, instance, created, **kwargs):
     should_cascade_unitemization = False
 
     if is_threshold_type and instance.force_itemized is None:
-        # Check if aggregate dropped below threshold (from explicitly above to below)
+        # Check if aggregate dropped below threshold
         if (old_aggregate is not None and old_aggregate > Decimal('200')
                 and instance.aggregate is not None
                 and instance.aggregate <= Decimal('200')):
             should_cascade_unitemization = True
-
-        # Check if aggregate is ≤ $200 and CHANGED (but not from None)
-        # and we have itemized children
-        # This handles when a parent's amount changes after children are added
-        elif (old_aggregate is not None  # Had a previous non-None aggregate
-              and old_aggregate != instance.aggregate  # Aggregate actually changed
+        # Check if aggregate changed to ≤ $200 and has itemized children
+        elif (old_aggregate is not None
+              and old_aggregate != instance.aggregate
               and instance.aggregate is not None
               and instance.aggregate <= Decimal('200')):
-            has_itemized = has_itemized_children(instance)
-            if has_itemized:
+            if has_itemized_children(instance):
                 should_cascade_unitemization = True
 
     if should_cascade_unitemization:
         child_ids = get_all_children_ids(instance.id)
         if child_ids:
-            # Update children's itemized to False directly to avoid their signals
             Transaction.objects.filter(
                 id__in=child_ids,
                 deleted__isnull=True
@@ -142,9 +136,8 @@ def log_post_save(sender, instance, created, **kwargs):
         # If transaction became itemized, cascade to parents
         if instance.itemized and not old_itemized:
             cascade_itemization_to_parents(instance)
-
         # If transaction became unitemized, cascade to children
-        if not instance.itemized and old_itemized:
+        elif not instance.itemized and old_itemized:
             cascade_unitemization_to_children(instance)
 
     # Always check if parent needs to be updated when a child has a
@@ -163,14 +156,14 @@ def log_post_save(sender, instance, created, **kwargs):
             # because child is itemized
             if not parent.itemized and instance.itemized:
                 parent.itemized = True
-                parent_changed_by_aggregate = True  # Mark as changed to trigger cascade
+                parent_changed_by_aggregate = True
 
             if parent_changed_by_aggregate:
                 # Clear force_itemized so it doesn't retain stale values
-                # from previous operations
                 parent.force_itemized = None
                 parent.save(update_fields=["itemized", "force_itemized"])
                 parent.refresh_from_db()
+
                 # If parent became itemized, cascade to grandparents
                 if parent.itemized and not parent_old_itemized:
                     cascade_itemization_to_parents(parent)

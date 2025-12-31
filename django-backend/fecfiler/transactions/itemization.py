@@ -35,8 +35,6 @@ def has_itemized_children(transaction):
     """
     from django.db import connection
 
-    # Force refresh of query cache to ensure we get the latest itemized status
-    # This is important because children may have been updated in a separate save cycle
     with connection.cursor() as cursor:
         cursor.execute("""
             SELECT EXISTS(
@@ -113,46 +111,34 @@ def calculate_itemization(transaction):
     Returns:
         Boolean indicating if transaction should be itemized
     """
-    # If force_itemized is explicitly set, use that value
     if transaction.force_itemized is not None:
         return transaction.force_itemized
 
-    # Determine which aggregate field to use
     schedule = transaction.get_schedule_name()
     if schedule == Schedule.E:
         agg_value = transaction._calendar_ytd_per_election_office
     else:
         agg_value = transaction.aggregate
 
-    # Negative aggregates are always itemized
     if agg_value is not None and agg_value < 0:
         return True
 
-    # Only Schedule A/B have the $200 threshold
-    # Schedule E and other types default to itemized=True
     a_b_over_two_hundred_types = (
         schedule_a_over_two_hundred_types
         + schedule_b_over_two_hundred_types
     )
 
     if transaction.transaction_type_identifier in a_b_over_two_hundred_types:
-        # For Schedule A/B types, itemize if:
-        # 1. aggregate > $200, OR
-        # 2. aggregate <= $200 but has itemized children
         if agg_value is not None:
             is_itemized = agg_value > Decimal(200)
         else:
-            # If aggregate is NULL, not itemized yet
             is_itemized = False
 
-        # If aggregate-based check says not itemized, check if has itemized children
-        # If has itemized children, must stay itemized
         if not is_itemized and has_itemized_children(transaction):
             is_itemized = True
 
         return is_itemized
 
-    # Default: itemize all other transaction types (including Schedule E)
     return True
 
 
@@ -191,18 +177,15 @@ def cascade_itemization_to_parents(transaction):
     if not parent_ids:
         return
 
-    # Update all parents to be itemized (unless they have force_itemized=False)
     parents = Transaction.objects.filter(
         id__in=parent_ids,
         deleted__isnull=True
     )
 
-    # Set cascade flag to prevent recursion
     from .signals import set_in_cascade
     set_in_cascade(True)
     try:
         for parent in parents:
-            # If parent has force_itemized=False, don't override it
             if parent.force_itemized is False:
                 continue
 
@@ -216,21 +199,13 @@ def cascade_itemization_to_parents(transaction):
 
 def cascade_unitemization_to_children(transaction):
     """
-    When a parent becomes unitemized (for any reason),
-    ensure all children are also unitemized.
-    Children should not be itemized if their parent is not itemized.
-
-    IMPORTANT: We only set force_itemized=False on children if the parent was EXPLICITLY
-    force-unitemized (force_itemized=False was set manually). If the parent is naturally
-    unitemized due to aggregate, we just unitemize children without setting
-    force_itemized.
+    When a parent becomes unitemized, ensure all children are also unitemized.
 
     Args:
         transaction: Transaction instance that became unitemized
     """
     from .models import Transaction
 
-    # Only cascade if the transaction is not itemized
     if transaction.itemized:
         return
 
@@ -238,24 +213,17 @@ def cascade_unitemization_to_children(transaction):
     if not child_ids:
         return
 
-    # Refresh from DB to get latest state
     transaction.refresh_from_db()
 
-    # Update all children to be unitemized
-    # If parent was EXPLICITLY force-unitemized, also clear children's force_itemized
     children = Transaction.objects.filter(
         id__in=child_ids,
         deleted__isnull=True
     )
 
-    # Set cascade flag to prevent recursion
     from .signals import set_in_cascade
     set_in_cascade(True)
     try:
         for child in children:
-            # Only unitemize the child; don't set force_itemized
-            # This allows calculate_itemization to properly determine the correct value
-            # based on the child's aggregate and type
             if child.itemized:
                 child.itemized = False
                 child.save(update_fields=['itemized'])
