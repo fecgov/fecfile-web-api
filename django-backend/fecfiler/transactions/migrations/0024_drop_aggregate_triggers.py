@@ -13,15 +13,22 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunSQL(
             """
-            -- Drop all aggregate-related triggers from transactions_transaction table
-            DROP TRIGGER IF EXISTS calculate_aggregates_trigger ON transactions_transaction;
-            DROP TRIGGER IF EXISTS after_transactions_transaction_trigger ON transactions_transaction;
-            DROP TRIGGER IF EXISTS after_transactions_transaction_infinite_trigger ON transactions_transaction;
-            DROP TRIGGER IF EXISTS before_transactions_transaction_trigger ON transactions_transaction;
+            -- Drop all aggregate-related triggers from
+            -- transactions_transaction table
+            DROP TRIGGER IF EXISTS calculate_aggregates_trigger
+                ON transactions_transaction;
+            DROP TRIGGER IF EXISTS after_transactions_transaction_trigger
+                ON transactions_transaction;
+            DROP TRIGGER IF EXISTS
+                after_transactions_transaction_infinite_trigger
+                ON transactions_transaction;
+            DROP TRIGGER IF EXISTS before_transactions_transaction_trigger
+                ON transactions_transaction;
             """,
             reverse_sql="""
-            -- This SQL is intentionally left empty as we don't want to recreate the triggers
-            -- The triggers are now handled by Django signals and the aggregate_service module
+            -- This SQL is intentionally left empty as we don't want to
+            -- recreate the triggers. The triggers are now handled by
+            -- Django signals and the aggregate_service module
             """
         ),
         migrations.RunSQL(
@@ -32,7 +39,8 @@ class Migration(migrations.Migration):
             ) CASCADE;
             """,
             reverse_sql="""
-            -- This SQL is intentionally left empty as we don't want to recreate the function
+            -- This SQL is intentionally left empty as we don't want
+            -- to recreate the function
             """
         ),
         migrations.RunSQL(
@@ -43,18 +51,21 @@ class Migration(migrations.Migration):
             ) CASCADE;
             """,
             reverse_sql="""
-            -- This SQL is intentionally left empty as we don't want to recreate the function
+            -- This SQL is intentionally left empty as we don't want to
+            -- recreate the function
             """
         ),
         migrations.RunSQL(
             """
             -- Drop the calculate_effective_amount function
             DROP FUNCTION IF EXISTS calculate_effective_amount(
-                transaction_type_identifier TEXT, amount NUMERIC, schedule_c_id UUID
+                transaction_type_identifier TEXT, amount NUMERIC,
+                schedule_c_id UUID
             ) CASCADE;
             """,
             reverse_sql="""
-            -- This SQL is intentionally left empty as we don't want to recreate the function
+            -- This SQL is intentionally left empty as we don't want to
+            -- recreate the function
             """
         ),
         migrations.RunSQL(
@@ -71,7 +82,8 @@ class Migration(migrations.Migration):
             ) CASCADE;
             """,
             reverse_sql="""
-            -- This SQL is intentionally left empty as we don't want to recreate the function
+            -- This SQL is intentionally left empty as we don't want
+            -- to recreate the function
             """
         ),
         migrations.RunSQL(
@@ -82,30 +94,43 @@ class Migration(migrations.Migration):
             ) CASCADE;
             """,
             reverse_sql="""
-            -- This SQL is intentionally left empty as we don't want to recreate the function
+            -- This SQL is intentionally left empty as we don't want
+            -- to recreate the function
             """
         ),
         migrations.RunSQL(
             """
             -- Drop the trigger handler functions
-            DROP FUNCTION IF EXISTS after_transactions_transaction() CASCADE;
-            DROP FUNCTION IF EXISTS after_transactions_transaction_infinite() CASCADE;
-            DROP FUNCTION IF EXISTS before_transactions_transaction() CASCADE;
-            DROP FUNCTION IF EXISTS before_transactions_transaction_insert_or_update() CASCADE;
-            DROP FUNCTION IF EXISTS after_transactions_transaction_insert_or_update() CASCADE;
+            DROP FUNCTION IF EXISTS after_transactions_transaction()
+                CASCADE;
+            DROP FUNCTION IF EXISTS
+                after_transactions_transaction_infinite() CASCADE;
+            DROP FUNCTION IF EXISTS before_transactions_transaction()
+                CASCADE;
+            DROP FUNCTION IF EXISTS
+                before_transactions_transaction_insert_or_update()
+                CASCADE;
+            DROP FUNCTION IF EXISTS
+                after_transactions_transaction_insert_or_update()
+                CASCADE;
             """,
             reverse_sql="""
-            -- This SQL is intentionally left empty as we don't want to recreate the function
+            -- This SQL is intentionally left empty as we don't want
+            -- to recreate the function
             """
         ),
         migrations.RunSQL(
             """
-            -- Drop the main calculate_aggregates function that was called by triggers
-            DROP FUNCTION IF EXISTS calculate_aggregates(old RECORD, new RECORD, tg_op TEXT) CASCADE;
+            -- Drop the main calculate_aggregates function that was
+            -- called by triggers
+            DROP FUNCTION IF EXISTS calculate_aggregates(
+                old RECORD, new RECORD, tg_op TEXT
+            ) CASCADE;
             DROP FUNCTION IF EXISTS calculate_aggregates() CASCADE;
             """,
             reverse_sql="""
-            -- This SQL is intentionally left empty as we don't want to recreate the function
+            -- This SQL is intentionally left empty as we don't want to
+            -- recreate the function
             """
         ),
     ]
