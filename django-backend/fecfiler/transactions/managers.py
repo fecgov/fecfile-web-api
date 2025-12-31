@@ -1,13 +1,19 @@
 from fecfiler.soft_delete.managers import SoftDeleteManager
 from fecfiler.transactions.schedule_a.managers import (
     line_labels as line_labels_a,
+    over_two_hundred_types as schedule_a_over_two_hundred_types,
 )
 from fecfiler.transactions.schedule_b.managers import (
     line_labels as line_labels_b,
+    over_two_hundred_types as schedule_b_over_two_hundred_types,
+    refunds as schedule_b_refunds,
 )
 from fecfiler.transactions.schedule_c.managers import line_labels as line_labels_c
 from fecfiler.transactions.schedule_d.managers import line_labels as line_labels_d
-from fecfiler.transactions.schedule_e.managers import line_labels as line_labels_e
+from fecfiler.transactions.schedule_e.managers import (
+    line_labels as line_labels_e,
+    over_two_hundred_types as schedule_e_over_two_hundred_types,
+)
 from fecfiler.transactions.schedule_f.managers import line_labels as line_labels_f
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
@@ -19,7 +25,12 @@ from django.db.models import (
     Case,
     When,
     Value,
+    BooleanField,
+    DecimalField,
+    RowRange,
+    Window,
     TextField,
+    Manager,
 )
 from decimal import Decimal
 from enum import Enum
@@ -31,6 +42,28 @@ but are called different names"""
 
 
 class TransactionManager(SoftDeleteManager):
+    # Window definitions for aggregate calculations
+    entity_aggregate_window = {
+        "partition_by": [
+            F("contact_1_id"),
+            F("date__year"),
+            F("aggregation_group"),
+        ],
+        "order_by": ["date", "created"],
+        "frame": RowRange(None, 0),
+    }
+    election_aggregate_window = {
+        "partition_by": [
+            F("schedule_e__election_code"),
+            F("contact_2__candidate_office"),
+            F("contact_2__candidate_state"),
+            F("contact_2__candidate_district"),
+            F("date__year"),
+            F("aggregation_group"),
+        ],
+        "order_by": ["date", "created"],
+        "frame": RowRange(None, 0),
+    }
 
     def get_queryset(self):
         return super().get_queryset().annotate(date=self.DATE_CLAUSE)
@@ -56,6 +89,16 @@ class TransactionManager(SoftDeleteManager):
         "schedule_f__expenditure_date",
     )
 
+    EFFECTIVE_AMOUNT_CLAUSE = Case(
+        When(
+            transaction_type_identifier__in=schedule_b_refunds,
+            then=F("amount") * Value(Decimal(-1)),
+        ),
+        When(schedule_c__isnull=False, then=None),
+        default="amount",
+        output_field=DecimalField(),
+    )
+
     AMOUNT_CLAUSE = Coalesce(
         "schedule_a__contribution_amount",
         "schedule_b__expenditure_amount",
@@ -66,6 +109,38 @@ class TransactionManager(SoftDeleteManager):
         "debt__schedule_d__incurred_amount",
         "schedule_d__incurred_amount",
     )
+
+    AGGREGATE = Case(
+        When(force_unaggregated=True, then=Decimal(0)), default=F("effective_amount")
+    )
+
+    def ITEMIZATION_CLAUSE(self):  # noqa: N802
+        over_two_hundred_types = (
+            schedule_a_over_two_hundred_types
+            + schedule_b_over_two_hundred_types
+            + schedule_e_over_two_hundred_types
+        )
+        return Case(
+            When(force_itemized__isnull=False, then=F("force_itemized")),
+            When(aggregate__lt=Value(Decimal(0)), then=Value(True)),
+            When(
+                transaction_type_identifier__in=over_two_hundred_types,
+                aggregate__gt=Value(Decimal(200)),
+                then=Value(True),
+            ),
+            When(
+                transaction_type_identifier__in=over_two_hundred_types,
+                then=Value(False),
+            ),
+            default=Value(True),
+            output_field=BooleanField(),
+        )
+
+    def ENTITY_AGGREGGATE_CLAUSE(self):  # noqa: N802
+        return Window(expression=Sum(self.AGGREGATE), **self.entity_aggregate_window)
+
+    def ELECTION_AGGREGATE_CLAUSE(self):  # noqa: N802
+        return Window(expression=Sum(self.AGGREGATE), **self.election_aggregate_window)
 
     BACK_REFERENCE_CLAUSE = Coalesce(
         F("reatt_redes__transaction_id"),
