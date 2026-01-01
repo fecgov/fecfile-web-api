@@ -1,7 +1,5 @@
 """
-Transaction constants shared across modules.
-
-This module contains shared constants used for transaction processing,
+Transaction constants shared across transaction processing,
 including transaction type lists for itemization thresholds and refunds.
 """
 

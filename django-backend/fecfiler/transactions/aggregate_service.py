@@ -1,11 +1,11 @@
 """
-Service module for calculating and updating transaction aggregates.
+Functions for calculating and updating transaction aggregates.
 
-This module handles the calculation of aggregates for Schedule A and Schedule B
+These functions handles the calculation of aggregates for Schedule A and Schedule B
 transactions that are grouped by entity (contact, calendar year, and aggregation group),
 as well as aggregates for Schedule E transactions grouped by election office.
 
-Previously, these calculations were handled by database triggers. This service moves
+Previously, these calculations were done in database triggers. This moves
 that logic into Django code for better maintainability and testability.
 """
 
@@ -79,7 +79,7 @@ def calculate_entity_aggregates(
         Number of transactions updated
     """
     # Get all matching transactions ordered by date and created
-    # Exclude force_unaggregated transactions as they don't participate in aggregation
+    # Exclude force_unaggregated transactions as they don't get aggregated
     transactions = Transaction.objects.filter(
         contact_1_id=contact_1_id,
         date__year=year,
@@ -135,7 +135,7 @@ def calculate_calendar_ytd_per_election_office(
         )
 
     # Get all matching Schedule E transactions ordered by date and created
-    # Exclude force_unaggregated transactions as they don't participate in aggregation
+    # Exclude force_unaggregated transactions as they don't get aggregated
     query_filters = {
         "schedule_e__election_code": election_code,
         "contact_2__candidate_office": candidate_office,
@@ -339,7 +339,6 @@ def recalculate_aggregates_for_transaction(transaction_instance) -> None:
             )
 
             # If this is a loan repayment, recalculate loan_payment_to_date
-            # for the associated loan
             if (transaction_instance.transaction_type_identifier == "LOAN_REPAYMENT_MADE"
                     and transaction_instance.loan_id):
                 calculate_loan_payment_to_date(transaction_instance.loan_id)

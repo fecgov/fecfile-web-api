@@ -19,6 +19,10 @@ from decimal import Decimal
 from typing import Optional
 from .models import Transaction
 from .aggregate_service import recalculate_aggregates_for_transaction
+from .managers import (
+    schedule_a_over_two_hundred_types,
+    schedule_b_over_two_hundred_types,
+)
 from .constants import ITEMIZATION_THRESHOLD
 import structlog
 import threading
@@ -210,10 +214,6 @@ def log_post_save(sender, instance, created, **kwargs):
         return
 
     # Determine if this transaction type uses $200 threshold
-    from fecfiler.transactions.managers import (
-        schedule_a_over_two_hundred_types,
-        schedule_b_over_two_hundred_types,
-    )
     a_b_over_two_hundred_types = (
         schedule_a_over_two_hundred_types
         + schedule_b_over_two_hundred_types
