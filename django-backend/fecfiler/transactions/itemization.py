@@ -172,17 +172,7 @@ def _cascade_itemization_generic(
     query_to_update = base_query.filter(itemized=not should_be_itemized)
 
     # Perform bulk update
-    update_count = query_to_update.update(itemized=should_be_itemized)
-
-    if update_count > 0:
-        direction_name = (
-            'parent' if direction == CascadeDirection.TO_PARENTS else 'child'
-        )
-        action = '' if should_be_itemized else 'un'
-        logger.debug(
-            f"Bulk updated {update_count} {direction_name}(s) for "
-            f"{action}itemization"
-        )
+    query_to_update.update(itemized=should_be_itemized)
 
 
 def calculate_itemization(transaction) -> bool:

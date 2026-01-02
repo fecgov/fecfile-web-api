@@ -179,9 +179,9 @@ def _get_schedule_amount(transaction) -> Optional[Decimal]:
         "schedule_a": "contribution_amount",
         "schedule_b": "expenditure_amount",
         "schedule_c2": "guaranteed_amount",
+        "schedule_d": "incurred_amount",
         "schedule_e": "expenditure_amount",
         "schedule_f": "expenditure_amount",
-        "schedule_d": "incurred_amount",
     }
 
     for schedule_name, amount_field in schedule_map.items():
