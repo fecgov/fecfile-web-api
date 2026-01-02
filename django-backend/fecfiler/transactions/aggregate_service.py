@@ -175,20 +175,23 @@ def _get_schedule_amount(transaction) -> Optional[Decimal]:
     Returns:
         Decimal amount from the transaction's schedule, or None if not found
     """
-    if transaction.schedule_a_id and transaction.schedule_a:
-        return transaction.schedule_a.contribution_amount
-    elif transaction.schedule_b_id and transaction.schedule_b:
-        return transaction.schedule_b.expenditure_amount
-    elif transaction.schedule_c2_id and transaction.schedule_c2:
-        return transaction.schedule_c2.guaranteed_amount
-    elif transaction.schedule_e_id and transaction.schedule_e:
-        return transaction.schedule_e.expenditure_amount
-    elif transaction.schedule_f_id and transaction.schedule_f:
-        return transaction.schedule_f.expenditure_amount
-    elif transaction.schedule_d_id and transaction.schedule_d:
-        return transaction.schedule_d.incurred_amount
-    elif transaction.debt_id and transaction.debt and transaction.debt.schedule_d:
+    schedule_map = {
+        "schedule_a": "contribution_amount",
+        "schedule_b": "expenditure_amount",
+        "schedule_c2": "guaranteed_amount",
+        "schedule_e": "expenditure_amount",
+        "schedule_f": "expenditure_amount",
+        "schedule_d": "incurred_amount",
+    }
+
+    for schedule_name, amount_field in schedule_map.items():
+        schedule = getattr(transaction, schedule_name, None)
+        if schedule:
+            return getattr(schedule, amount_field, None)
+
+    if transaction.debt and transaction.debt.schedule_d:
         return transaction.debt.schedule_d.incurred_amount
+
     return None
 
 
