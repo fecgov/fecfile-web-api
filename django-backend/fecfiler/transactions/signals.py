@@ -17,6 +17,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from decimal import Decimal
 from typing import Optional
+from contextlib import contextmanager
 from .models import Transaction
 from .aggregate_service import recalculate_aggregates_for_transaction
 from .managers import (
@@ -46,6 +47,22 @@ def is_in_cascade():
 def set_in_cascade(value):
     """Set the cascade operation flag"""
     _thread_locals.in_cascade = value
+
+
+@contextmanager
+def skip_aggregate_recalc():
+    """Context manager to skip aggregate recalculation during cascade ops."""
+    old_value = getattr(_thread_locals, 'skip_aggregate_recalc', False)
+    _thread_locals.skip_aggregate_recalc = True
+    try:
+        yield
+    finally:
+        _thread_locals.skip_aggregate_recalc = old_value
+
+
+def should_skip_aggregate_recalc():
+    """Check if aggregate recalculation should be skipped"""
+    return getattr(_thread_locals, 'skip_aggregate_recalc', False)
 
 
 def _log_transaction_action(instance, created: bool) -> None:
@@ -172,7 +189,8 @@ def _update_parent_itemization(instance) -> None:
     if not parent:
         return
 
-    parent.refresh_from_db()
+    # Refresh only necessary fields to minimize database I/O
+    parent.refresh_from_db(fields=['itemized', 'force_itemized', 'aggregate'])
     parent_old_itemized = parent.itemized
 
     # First try standard itemization update based on parent's aggregate
@@ -188,7 +206,6 @@ def _update_parent_itemization(instance) -> None:
         # Clear force_itemized so it doesn't retain stale values
         parent.force_itemized = None
         parent.save(update_fields=["itemized", "force_itemized"])
-        parent.refresh_from_db()
 
         # If parent became itemized, cascade to grandparents
         if parent.itemized and not parent_old_itemized:
@@ -207,14 +224,16 @@ def log_post_save(sender, instance, created, **kwargs):
     # This allows us to detect if aggregate dropped below threshold
     old_aggregate = instance.aggregate
 
-    # Recalculate aggregates for the transaction
-    recalculate_aggregates_for_transaction(instance)
+    # Skip aggregate recalculation if flagged to prevent redundant processing
+    if not should_skip_aggregate_recalc():
+        # Recalculate aggregates for the transaction
+        recalculate_aggregates_for_transaction(instance)
 
-    # Refresh the instance to get the updated aggregate from the database
-    instance.refresh_from_db()
+        # Refresh the instance to get updated aggregate from database
+        instance.refresh_from_db()
 
     # Skip itemization logic if we're in a cascade operation
-    # (to prevent infinite recursion when cascading itemization to children/parents)
+    # (to prevent infinite recursion when cascading itemization to children)
     if is_in_cascade():
         return
 

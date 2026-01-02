@@ -25,6 +25,11 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
+# List of transaction types that use the $200 itemization threshold
+A_B_OVER_TWO_HUNDRED_TYPES = (
+    schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
+)
+
 
 class CascadeDirection(Enum):
     """Direction for cascading itemization changes."""
@@ -53,7 +58,9 @@ def has_itemized_children(transaction) -> bool:
 
 def get_all_children_ids(transaction_id: UUID) -> List[UUID]:
     """
-    Recursively get all child and grandchild transaction IDs.
+    Get all child and grandchild transaction IDs using recursive CTE.
+
+    Uses a single SQL recursive query instead of O(depth) Python queries.
 
     Args:
         transaction_id: UUID of parent transaction
@@ -61,31 +68,33 @@ def get_all_children_ids(transaction_id: UUID) -> List[UUID]:
     Returns:
         List of UUIDs of all descendants
     """
-    from .models import Transaction
+    from django.db import connection
 
-    all_children = []
-    max_depth = 10  # Prevent infinite loops
+    # Use recursive CTE for efficient tree traversal
+    query = """
+    WITH RECURSIVE descendants AS (
+        SELECT id FROM transactions_transaction
+        WHERE parent_transaction_id = %s AND deleted IS NULL
 
-    def _recurse(parent_id, depth):
-        if depth >= max_depth:
-            return
+        UNION ALL
 
-        direct_children = Transaction.objects.filter(
-            parent_transaction_id=parent_id,
-            deleted__isnull=True
-        ).values_list('id', flat=True)
+        SELECT t.id FROM transactions_transaction t
+        INNER JOIN descendants d ON t.parent_transaction_id = d.id
+        WHERE t.deleted IS NULL
+    )
+    SELECT id FROM descendants;
+    """
 
-        for child_id in direct_children:
-            all_children.append(child_id)
-            _recurse(child_id, depth + 1)
-
-    _recurse(transaction_id, 0)
-    return all_children
+    with connection.cursor() as cursor:
+        cursor.execute(query, [transaction_id])
+        return [row[0] for row in cursor.fetchall()]
 
 
 def get_all_parent_ids(transaction) -> List[UUID]:
     """
-    Get all parent and grandparent transaction IDs up the chain.
+    Get all parent and grandparent transaction IDs using recursive CTE.
+
+    Uses a single SQL recursive query for efficient tree traversal.
 
     Args:
         transaction: Transaction instance
@@ -93,19 +102,30 @@ def get_all_parent_ids(transaction) -> List[UUID]:
     Returns:
         List of UUIDs of all ancestors
     """
-    all_parents = []
-    current = transaction
-    max_depth = 10  # Prevent infinite loops
-    depth = 0
+    from django.db import connection
 
-    while current.parent_transaction_id and depth < max_depth:
-        all_parents.append(current.parent_transaction_id)
-        current = current.parent_transaction
-        if not current:
-            break
-        depth += 1
+    if not transaction.parent_transaction_id:
+        return []
 
-    return all_parents
+    # Use recursive query for more efficient tree traversal up the parent chain
+    query = """
+    WITH RECURSIVE ancestors AS (
+        SELECT id, parent_transaction_id FROM transactions_transaction
+        WHERE id = %s AND deleted IS NULL
+
+        UNION ALL
+
+        SELECT t.id, t.parent_transaction_id
+        FROM transactions_transaction t
+        INNER JOIN ancestors a ON t.id = a.parent_transaction_id
+        WHERE t.deleted IS NULL
+    )
+    SELECT id FROM ancestors WHERE id != %s;
+    """
+
+    with connection.cursor() as cursor:
+        cursor.execute(query, [transaction.parent_transaction_id, transaction.id])
+        return [row[0] for row in cursor.fetchall()]
 
 
 def _cascade_itemization_generic(
@@ -137,31 +157,32 @@ def _cascade_itemization_generic(
         return
 
     from .models import Transaction
-    related = Transaction.objects.filter(id__in=related_ids, deleted__isnull=True)
 
-    from .signals import set_in_cascade
-    set_in_cascade(True)
-    try:
-        for related_txn in related:
-            # Skip if parent has force_itemized=False when cascading up
-            if (direction == CascadeDirection.TO_PARENTS
-                    and related_txn.force_itemized is False):
-                continue
+    # Build query for transactions that need updating
+    base_query = Transaction.objects.filter(
+        id__in=related_ids,
+        deleted__isnull=True
+    )
 
-            if related_txn.itemized != should_be_itemized:
-                related_txn.itemized = should_be_itemized
-                related_txn.save(update_fields=['itemized'])
-                direction_name = (
-                    'parent' if direction == CascadeDirection.TO_PARENTS
-                    else 'child'
-                )
-                action = '' if should_be_itemized else 'un'
-                logger.debug(
-                    f"Cascaded {action}itemization to {direction_name} "
-                    f"{related_txn.id}"
-                )
-    finally:
-        set_in_cascade(False)
+    # For cascading to parents, exclude those with force_itemized=False
+    if direction == CascadeDirection.TO_PARENTS:
+        base_query = base_query.exclude(force_itemized=False)
+
+    # Only include transactions that need updating (different from target state)
+    query_to_update = base_query.filter(itemized=not should_be_itemized)
+
+    # Perform bulk update
+    update_count = query_to_update.update(itemized=should_be_itemized)
+
+    if update_count > 0:
+        direction_name = (
+            'parent' if direction == CascadeDirection.TO_PARENTS else 'child'
+        )
+        action = '' if should_be_itemized else 'un'
+        logger.debug(
+            f"Bulk updated {update_count} {direction_name}(s) for "
+            f"{action}itemization"
+        )
 
 
 def calculate_itemization(transaction) -> bool:
@@ -187,12 +208,7 @@ def calculate_itemization(transaction) -> bool:
     if agg_value is not None and agg_value < 0:
         return True
 
-    a_b_over_two_hundred_types = (
-        schedule_a_over_two_hundred_types
-        + schedule_b_over_two_hundred_types
-    )
-
-    if transaction.transaction_type_identifier in a_b_over_two_hundred_types:
+    if transaction.transaction_type_identifier in A_B_OVER_TWO_HUNDRED_TYPES:
         if agg_value is not None:
             is_itemized = agg_value > ITEMIZATION_THRESHOLD
         else:

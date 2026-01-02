@@ -287,7 +287,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             self.schedule_b
             and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATED_FROM"
         ):
-            self.parent_transaction.delete()
+            # Refresh parent's state from DB before calling delete
+            parent = self.parent_transaction
+            parent.refresh_from_db(fields=['deleted'])
+            parent.delete()
 
         # If this reattribution/redesignation is tied to a copy of
         # the original transaction, delete the copy
@@ -303,7 +306,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 == "REDESIGNATED"
             )
         ):
-            self.reatt_redes.delete()
+            # Refresh reatt_redes' state from DB before calling delete
+            reatt_redes = self.reatt_redes
+            reatt_redes.refresh_from_db(fields=['deleted'])
+            reatt_redes.delete()
 
         # Delete any reattribution/redesignation transactions
         # related to this transaction (copy/from/to)"
@@ -316,7 +322,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             self.parent_transaction
             and self.transaction_type_identifier in COUPLED_TRANSACTION_TYPES
         ):
-            self.parent_transaction.delete()
+            # Refresh parent's state from DB before calling delete
+            # to ensure we have the current deleted status
+            parent = self.parent_transaction
+            parent.refresh_from_db(fields=['deleted'])
+            parent.delete()
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
