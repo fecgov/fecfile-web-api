@@ -29,6 +29,11 @@ import threading
 
 logger = structlog.get_logger(__name__)
 
+# List of transaction types that use the $200 itemization threshold
+A_B_OVER_TWO_HUNDRED_TYPES = (
+    schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
+)
+
 # Thread-local storage for tracking cascade operations
 _thread_locals = threading.local()
 
@@ -213,13 +218,8 @@ def log_post_save(sender, instance, created, **kwargs):
     if is_in_cascade():
         return
 
-    # Determine if this transaction type uses $200 threshold
-    a_b_over_two_hundred_types = (
-        schedule_a_over_two_hundred_types
-        + schedule_b_over_two_hundred_types
-    )
     uses_itemization_threshold = (
-        instance.transaction_type_identifier in a_b_over_two_hundred_types
+        instance.transaction_type_identifier in A_B_OVER_TWO_HUNDRED_TYPES
     )
 
     # Handle itemization updates and cascading
