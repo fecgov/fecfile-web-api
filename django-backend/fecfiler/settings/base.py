@@ -126,6 +126,16 @@ if INCLUDE_SILK:
     STATICFILES_LOCATION = "static"
     SILKY_DYNAMIC_PROFILING = TRANSACTION_MANAGER_PROFILING
 
+    def silk_should_profile(request):
+        path = request.path or ""
+        is_api_v1 = path.startswith("/api/v1/")
+        is_api = path.startswith("/api/") and not path.startswith("/api/docs/")
+        if not (is_api_v1 or is_api):
+            return False
+        return request.headers.get("X-Test-Source") == "cypress"
+
+    SILKY_INTERCEPT_FUNC = silk_should_profile
+
 
 MIDDLEWARE += [
     "corsheaders.middleware.CorsMiddleware",

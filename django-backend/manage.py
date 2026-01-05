@@ -44,6 +44,8 @@ restricted_commands = [
 
 if __name__ == "__main__":
     subcommand = sys.argv[1]
+    if subcommand == "silk_clear_request_log" and settings.INCLUDE_SILK:
+        allowed_commands.append("silk_clear_request_log")
     if subcommand in allowed_commands or (
         settings.ENABLE_RESTRICTED_COMMANDS and subcommand in restricted_commands
     ):
