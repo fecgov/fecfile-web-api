@@ -39,7 +39,11 @@ class Tasks(TaskSet):
         self.login()
 
         logging.info("Getting and activating committee")
+        # TODO: cross-reference with front-end behavior
         self.get_and_activate_commmittee()
+
+        logging.info("Loading default page")
+        self.get_post_login_page()
 
         logging.info("Loading payloads")
         self.load_payloads()
@@ -327,6 +331,22 @@ class Tasks(TaskSet):
             raise Exception(
                 f"Failed to activate committee for user_index {self.user.user_index}"
             )
+
+    def get_post_login_page(self):
+        # TO-DO: Does F24 get called twice?
+        params = {
+            "page": 1,
+            "ordering": "report_code_label",
+            "page_size": 5
+        }
+        for form in ("3x", "24", "1m", "99"):
+            response = self.client_get(
+                f"/api/v1/reports/form-{form}/", name="_get_post_login_page", timeout=TIMEOUT, params=params
+            )
+            if response.status_code != 200:
+                raise Exception(
+                    f"Failed to load initial page for user_index {self.user.user_index}"
+                )
 
     def load_payloads(self):
         directory = os.path.dirname(os.path.abspath(__file__))
