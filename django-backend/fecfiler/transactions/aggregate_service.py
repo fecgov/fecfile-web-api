@@ -12,7 +12,7 @@ that logic into Django code for better maintainability and testability.
 from decimal import Decimal
 from typing import Optional
 from uuid import UUID
-from django.db.models import Q, Subquery, OuterRef
+from django.db.models import Q
 from .models import Transaction
 from .managers import Schedule, TransactionManager
 import structlog
