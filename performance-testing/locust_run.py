@@ -16,7 +16,7 @@ SCHEDULES = ["A", "B,E,F", "C,D"]
 
 
 class AtomicInteger:
-    def __init__(self, initial_value=0):
+    def __init__(self, initial_value=-1):
         self._value = initial_value
         self._lock = threading.Lock()
 
@@ -51,6 +51,12 @@ class Tasks(TaskSet):
         logging.info("Loading payloads")
         self.load_payloads()
 
+        # Create F3X report
+        logging.info("Creating 2026 Q1")
+        self.create_one_report()
+
+        # Load report page for that report
+
         logging.info("Creating contact")
         self.create_payload_contacts()
 
@@ -58,11 +64,8 @@ class Tasks(TaskSet):
         self.get_report_ids()
 
     @task
-    def devops_celery_test(self):
-        self.client_get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
-
-    @task
     def get_contacts(self):
+        # TODO: Make this more realistic
         params = {
             "page": 1,
             "ordering": "form_type",
@@ -336,21 +339,22 @@ class Tasks(TaskSet):
             )
 
     def get_committee_admins(self):
+        test_name = "check_admins"
         response = self.client.get(
             f"/api/v1/users/get_current/",
-            name="_check_admins",
+            name=f"_{test_name}",
         )
         if response.status_code != 200:
             raise Exception(
-                f"Failed to get committee admins for user_index {self.user.user_index}"
+                f"Failed {test_name} for user_index {self.user.user_index}"
             )
         response = self.client.get(
             f"/api/v1/committee-members/",
-            name="_check_admins",
+            name=f"_{test_name}",
         )
         if response.status_code != 200:
             raise Exception(
-                f"Failed to get committee admins for user_index {self.user.user_index}"
+                f"Failed {test_name} for user_index {self.user.user_index}"
             )
 
     def get_post_login_page(self):
@@ -368,6 +372,75 @@ class Tasks(TaskSet):
                 raise Exception(
                     f"Failed to load initial page for user_index {self.user.user_index}"
                 )
+
+    def create_one_report(self):
+        test_name = "create_one_report"
+        response = self.client.get(
+            f"/api/v1/reports/form-3x/report_code_map/",
+            name=f"_{test_name}",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed {test_name} for user_index {self.user.user_index}"
+            )
+        response = self.client.get(
+            f"/api/v1/reports/form-3x/coverage_dates/",
+            name=f"_{test_name}",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed {test_name} for user_index {self.user.user_index}"
+            )
+        fields_to_validate = "filing_frequency,report_type_category,report_code,coverage_from_date,coverage_through_date,date_of_election,state_of_election,form_type"
+        # [
+        #     "filing_frequency",
+        #     "report_type_category",
+        #     "report_code",
+        #     "coverage_from_date",
+        #     "coverage_through_date",
+        #     "date_of_election",
+        #     "state_of_election",
+        #     "form_type"
+        # ]
+        #TODO: Why do we do this? list of fields_to_validate
+        params = {
+            "fields_to_validate": fields_to_validate
+        }
+        json = {
+            "hasChangeOfAddress": "true",
+            "can_delete": "false",
+            "can_unamend": "false",
+            "report_type": "F3X",
+            "form_type": "F3XN",
+            "report_code": "Q1",
+            "date_of_election": None,
+            "state_of_election": None,
+            "coverage_from_date": "2026-01-01",
+            "coverage_through_date": "2026-03-31",
+            "filing_frequency": "Q",
+            "report_type_category": "Election Year"
+        }
+        response = self.client.post(
+            "/api/v1/reports/form-3x/",
+            name=f"_{test_name}",
+            params=params,
+            json=json
+        )
+        # TODO: Why are some of these 200s and some 201s?
+        if response.status_code != 201:
+            raise Exception(
+                f"Failed {test_name} for user_index {self.user.user_index}"
+            )
+        new_report_id = response.json()["id"]
+        response = self.client.get(
+            f"/api/v1/reports/{new_report_id}/",
+            name=f"_{test_name}",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed {test_name} for user_index {self.user.user_index}"
+            )
+
 
     def load_payloads(self):
         directory = os.path.dirname(os.path.abspath(__file__))
