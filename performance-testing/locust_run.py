@@ -42,6 +42,9 @@ class Tasks(TaskSet):
         # TODO: cross-reference with front-end behavior
         self.get_and_activate_commmittee()
 
+        logging.info("Checking for committee administrators")
+        self.get_committee_admins()
+
         logging.info("Loading default page")
         self.get_post_login_page()
 
@@ -330,6 +333,24 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception(
                 f"Failed to activate committee for user_index {self.user.user_index}"
+            )
+
+    def get_committee_admins(self):
+        response = self.client.get(
+            f"/api/v1/users/get_current/",
+            name="_check_admins",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed to get committee admins for user_index {self.user.user_index}"
+            )
+        response = self.client.get(
+            f"/api/v1/committee-members/",
+            name="_check_admins",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed to get committee admins for user_index {self.user.user_index}"
             )
 
     def get_post_login_page(self):
