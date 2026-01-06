@@ -52,6 +52,8 @@ class Tasks(TaskSet):
 
         # Cache of created Schedule A txns per report for targeted updates
         self.last_created_schedule_a_by_report = {}
+        self.last_created_schedule_b_by_report = {}
+        self.last_created_schedule_c_by_report = {}
 
     # @task
     # def devops_celery_test(self):
@@ -159,7 +161,8 @@ class Tasks(TaskSet):
         # Record the created transaction id for targeted update runs
         try:
             created = response.json()
-            self.last_created_schedule_a_by_report[report_id] = created.get("id")
+            if len(self.report_ids) > 0:
+                self.last_created_schedule_a_by_report[report_id] = created.get("id")
         except Exception:
             pass
 
@@ -187,6 +190,13 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule b transaction")
+
+        try:
+            created = response.json()
+            if len(self.report_ids) > 0:
+                self.last_created_schedule_b_by_report[report_id] = created.get("id")
+        except Exception:
+            pass
 
     @task
     def create_schedule_c_transaction(self):
@@ -223,6 +233,13 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule c transaction")
 
+        try:
+            created = response.json()
+            if len(self.report_ids) > 0:
+                self.last_created_schedule_c_by_report[report_id] = created.get("id")
+        except Exception:
+            pass
+
     @task(10)  # This task will be picked 10 times more often than the default
     def create_schedule_d_transaction(self):
         contact_data = deepcopy(self.contact_payloads["ORGANIZATION_CONTACT_1"])
@@ -254,7 +271,9 @@ class Tasks(TaskSet):
             if txn_id:
                 transaction = {"id": txn_id}
             else:
-                transaction = self.get_first_individual_receipt_for_report(report_id)
+                transaction = self.get_first_transaction_for_report(
+                    report_id, "A", "INDIVIDUAL_RECEIPT"
+                )
             if transaction:
                 response = self.client_get(
                     f"/api/v1/transactions/{transaction['id']}/",
@@ -265,17 +284,91 @@ class Tasks(TaskSet):
                     data = response.json()
                     data["contribution_amount"] = 1.23
                     data["schedule_id"] = "A"
-                    data["schema_name"] = "INDIVIDUAL_RECEIPT"
+                    data["schema_name"] = data.get(
+                        "schema_name",
+                        self.transaction_payloads["INDIVIDUAL_RECEIPT"].get(
+                            "schema_name", "INDIVIDUAL_RECEIPT"
+                        ),
+                    )
                     response = self.client.put(
                         f"/api/v1/transactions/{data['id']}/",
                         name="update_schedule_a_transaction",
                         json=data,
                     )
                 if response.status_code == 200:
+                    self.last_created_schedule_a_by_report[report_id] = data["id"]
                     return
         else:
             pass
         raise Exception("Failed to PUT update schedule a transaction")
+
+    @task(100)
+    def update_schedule_b_transaction(self):
+        if len(self.report_ids) > 0:
+            report_id = self.report_ids[0]
+            txn_id = self.last_created_schedule_b_by_report.get(report_id)
+            transaction = {"id": txn_id} if txn_id else self.get_first_transaction_for_report(
+                report_id, "B", "OPERATING_EXPENDITURE"
+            )
+            if transaction:
+                response = self.client_get(
+                    f"/api/v1/transactions/{transaction['id']}/",
+                    name="get_schedule_b_transaction_by_id",
+                    timeout=TIMEOUT,
+                )
+                if response and response.status_code == 200:
+                    data = response.json()
+                    data["expenditure_amount"] = 1.23
+                    data["schedule_id"] = "B"
+                    data["schema_name"] = data.get(
+                        "schema_name",
+                        self.transaction_payloads["OPERATING_EXPENDITURE"].get(
+                            "schema_name", "DISBURSEMENTS"
+                        ),
+                    )
+                    response = self.client.put(
+                        f"/api/v1/transactions/{data['id']}/",
+                        name="update_schedule_b_transaction",
+                        json=data,
+                    )
+                if response.status_code == 200:
+                    self.last_created_schedule_b_by_report[report_id] = data["id"]
+                    return
+        raise Exception("Failed to PUT update schedule b transaction")
+
+    @task
+    def update_schedule_c_transaction(self):
+        if len(self.report_ids) > 0:
+            report_id = self.report_ids[0]
+            txn_id = self.last_created_schedule_c_by_report.get(report_id)
+            transaction = {"id": txn_id} if txn_id else self.get_first_transaction_for_report(
+                report_id, "C", "LOAN_RECEIVED_FROM_INDIVIDUAL"
+            )
+            if transaction:
+                response = self.client_get(
+                    f"/api/v1/transactions/{transaction['id']}/",
+                    name="get_schedule_c_transaction_by_id",
+                    timeout=TIMEOUT,
+                )
+                if response and response.status_code == 200:
+                    data = response.json()
+                    data["loan_amount"] = 123.45
+                    data["schedule_id"] = "C"
+                    data["schema_name"] = data.get(
+                        "schema_name",
+                        self.transaction_payloads["LOAN_RECEIVED_FROM_INDIVIDUAL"].get(
+                            "schema_name", "LOANS"
+                        ),
+                    )
+                    response = self.client.put(
+                        f"/api/v1/transactions/{data['id']}/",
+                        name="update_schedule_c_transaction",
+                        json=data,
+                    )
+                if response.status_code == 200:
+                    self.last_created_schedule_c_by_report[report_id] = data["id"]
+                    return
+        raise Exception("Failed to PUT update schedule c transaction")
 
     @task
     def delete_schedule_a_transaction(self):
@@ -538,22 +631,32 @@ class Tasks(TaskSet):
         raise Exception("Failed to retrieve committee ids for load test setup")
 
     def get_first_individual_receipt_for_report(self, report_id):
+        return self.get_first_transaction_for_report(
+            report_id, "A", "INDIVIDUAL_RECEIPT"
+        )
+
+    def get_first_transaction_for_report(
+        self, report_id, schedule_id, transaction_type_identifier=None
+    ):
         params = {
             "page": 1,
             "ordering": "-created",
-            "schedules": "A",
+            "schedules": schedule_id,
             "report_id": report_id,
         }
         response = self.client_get(
             "/api/v1/transactions/",
-            name="get_transactions",
+            name=f"get_schedule_{schedule_id}_transactions",
             timeout=TIMEOUT,
             params=params,
         )
         if response and response.status_code == 200:
-            results = response.json().get("results", [])
+            payload = response.json()
+            results = payload.get("results", []) if isinstance(payload, dict) else payload
+            if not isinstance(results, list):
+                return None
             for transaction in results:
-                if transaction["transaction_type_identifier"] == "INDIVIDUAL_RECEIPT":
+                if not transaction_type_identifier or transaction.get("transaction_type_identifier") == transaction_type_identifier:
                     return transaction
         return None
 
