@@ -51,11 +51,8 @@ class Tasks(TaskSet):
         logging.info("Loading payloads")
         self.load_payloads()
 
-        # Create F3X report
         logging.info("Creating 2026 Q1")
         self.create_one_report()
-
-        # Load report page for that report
 
         logging.info("Creating contact")
         self.create_payload_contacts()
@@ -406,6 +403,17 @@ class Tasks(TaskSet):
         params = {
             "fields_to_validate": fields_to_validate
         }
+        # TODO: From locust data generator - make a function?
+        reports_and_dates = [
+            ["Q1", "01-01", "03-31"],
+            ["Q2", "04-01", "06-30"],
+            ["Q3", "07-01", "09-30"],
+            ["YE", "10-01", "12-31"],
+        ]
+        quarter, from_date, through_date = random.choice(reports_and_dates)
+        year = random.randrange(1000, 9999)
+        hashable_date = f"{year}, {quarter}"
+
         json = {
             "hasChangeOfAddress": "true",
             "can_delete": "false",
@@ -415,8 +423,8 @@ class Tasks(TaskSet):
             "report_code": "Q1",
             "date_of_election": None,
             "state_of_election": None,
-            "coverage_from_date": "2026-01-01",
-            "coverage_through_date": "2026-03-31",
+            "coverage_from_date": f"{year}-{from_date}",
+            "coverage_through_date": f"{year}-{through_date}",
             "filing_frequency": "Q",
             "report_type_category": "Election Year"
         }
@@ -431,15 +439,32 @@ class Tasks(TaskSet):
             raise Exception(
                 f"Failed {test_name} for user_index {self.user.user_index}"
             )
-        new_report_id = response.json()["id"]
+        report_id = response.json()["id"]
         response = self.client.get(
-            f"/api/v1/reports/{new_report_id}/",
+            f"/api/v1/reports/{report_id}/",
             name=f"_{test_name}",
         )
         if response.status_code != 200:
             raise Exception(
                 f"Failed {test_name} for user_index {self.user.user_index}"
             )
+        params = {
+            "page": 1,
+            "ordering": "line_label,created",
+            "report_id": report_id,
+            "page_size": 5,
+        }
+        for schedules in SCHEDULES:
+            response = self.client_get(
+                    "/api/v1/transactions/",
+                    name=f"_{test_name}",
+                    timeout=TIMEOUT,
+                    params=params,
+                )
+            if response.status_code != 200:
+                raise Exception(
+                    f"Failed {test_name} for user_index {self.user.user_index}"
+                )
 
 
     def load_payloads(self):
