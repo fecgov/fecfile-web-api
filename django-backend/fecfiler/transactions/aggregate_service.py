@@ -12,10 +12,9 @@ that logic into Django code for better maintainability and testability.
 from decimal import Decimal
 from typing import Optional
 from uuid import UUID
-from django.db.models import Q
-from django.db import transaction as db_transaction
+from django.db.models import Q, Subquery, OuterRef
 from .models import Transaction
-from .managers import Schedule
+from .managers import Schedule, TransactionManager
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -28,7 +27,7 @@ def _update_aggregate_running_sum(
     Calculate and update running sum aggregates for transactions.
 
     Calculates running sum of effective amounts for transactions and updates
-    the specified aggregate field.
+    the specified aggregate field using a database subquery for efficiency.
 
     Args:
         transactions: QuerySet of transactions to aggregate (ordered)
@@ -43,20 +42,31 @@ def _update_aggregate_running_sum(
         logger.debug(f"No transactions found for aggregation: {log_context}")
         return 0
 
-    update_count = 0
-    running_sum = Decimal(0)
+    # Annotate running sums in the database (window function), then bulk update
+    txn_manager = TransactionManager()
+    window_clause = (
+        txn_manager.ENTITY_AGGREGATE_CLAUSE()
+        if aggregate_field_name == "aggregate"
+        else txn_manager.ELECTION_AGGREGATE_CLAUSE()
+    )
 
-    with db_transaction.atomic():
-        for txn in transactions:
-            effective_amount = calculate_effective_amount(txn)
-            running_sum += effective_amount
+    annotated = transactions.annotate(
+        amount=txn_manager.AMOUNT_CLAUSE,
+        effective_amount=txn_manager.EFFECTIVE_AMOUNT_CLAUSE,
+        sub_agg=window_clause,
+    )
 
-            if getattr(txn, aggregate_field_name) != running_sum:
-                setattr(txn, aggregate_field_name, running_sum)
-                txn.save(update_fields=[aggregate_field_name])
-                update_count += 1
+    updates = [
+        Transaction(id=row.id, **{aggregate_field_name: row.sub_agg})
+        for row in annotated
+    ]
 
-    logger.info(f"Updated {update_count} transactions for aggregation: {log_context}")
+    Transaction.objects.bulk_update(updates, [aggregate_field_name])
+    update_count = len(updates)
+
+    logger.info(
+        f"Updated {update_count} transactions for aggregation: {log_context}"
+    )
     return update_count
 
 
@@ -304,6 +314,13 @@ def calculate_loan_payment_to_date(loan_id: UUID) -> int:
         logger.info(
             f"Updated loan_payment_to_date for loan {loan_id}: {total_payment}"
         )
+        # Propagate updated totals to any carried-forward child loans
+        child_loans = Transaction.objects.filter(
+            loan_id=loan_id,
+            deleted__isnull=True,
+        ).exclude(id=loan_id).values_list("id", flat=True)
+        for child_loan_id in child_loans:
+            calculate_loan_payment_to_date(child_loan_id)
         return 1
 
     return 0

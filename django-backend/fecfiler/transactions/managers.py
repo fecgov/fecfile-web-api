@@ -134,7 +134,7 @@ class TransactionManager(SoftDeleteManager):
             output_field=BooleanField(),
         )
 
-    def ENTITY_AGGREGGATE_CLAUSE(self):  # noqa: N802
+    def ENTITY_AGGREGATE_CLAUSE(self):  # noqa: N802
         return Window(expression=Sum(self.AGGREGATE), **self.entity_aggregate_window)
 
     def ELECTION_AGGREGATE_CLAUSE(self):  # noqa: N802
