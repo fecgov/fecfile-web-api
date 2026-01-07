@@ -229,10 +229,8 @@ def _update_parent_itemization(instance) -> None:
 def log_post_save(sender, instance, created, **kwargs):
     action = "created" if created else "updated"
     _log_transaction_action(instance, action)
-    return
 
 
 @receiver(post_delete, sender=Transaction)
 def log_post_delete(sender, instance, **kwargs):
     _log_transaction_action(instance, "deleted")
-    return
