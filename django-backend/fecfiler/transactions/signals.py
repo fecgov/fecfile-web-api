@@ -20,8 +20,6 @@ from decimal import Decimal
 from typing import Optional
 from contextlib import contextmanager
 from .models import Transaction
-# Aggregation and itemization now run via explicit service calls from model
-# save/delete and view flows. Signals retain logging only.
 from .managers import (
     schedule_a_over_two_hundred_types,
     schedule_b_over_two_hundred_types,
@@ -73,16 +71,6 @@ def _get_old_state_map():
     return _thread_locals.old_txn_state
 
 
-@receiver(pre_save, sender=Transaction)
-def capture_pre_save(sender, instance, **kwargs):
-    """Signals-free aggregation: no-op snapshot capture."""
-    return
-
-
-@receiver(pre_delete, sender=Transaction)
-def capture_pre_delete(sender, instance, **kwargs):
-    """Signals-free aggregation: no-op snapshot capture."""
-    return
 
 
 def _log_transaction_action(instance, action: str) -> None:
@@ -239,7 +227,6 @@ def _update_parent_itemization(instance) -> None:
 
 @receiver(post_save, sender=Transaction)
 def log_post_save(sender, instance, created, **kwargs):
-    """Signals-free aggregation: keep logging, skip recalculation and itemization."""
     action = "created" if created else "updated"
     _log_transaction_action(instance, action)
     return
