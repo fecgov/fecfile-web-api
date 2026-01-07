@@ -40,14 +40,12 @@ def process_aggregation_for_debts(transaction_instance):
         back_reference_tran_id_number=original_debt_trans_id
     ).order_by("schedule_d__report_coverage_from_date")
 
-    incurred_prior = original_debt.schedule_d.incurred_amount
+    incurred_prior = 0
     repayed_amount = 0
     schedule_ds = []
     for debt in [original_debt, *child_debts]:
-        if debt != original_debt:
-            debt.schedule_d.incurred_prior = incurred_prior
-        else:
-            debt.schedule_d.incurred_prior = 0
+        debt.schedule_d.incurred_prior = incurred_prior
+        incurred_prior += debt.schedule_d.incurred_amount
 
         debt.schedule_d.payment_prior = repayed_amount
         debt.schedule_d.beginning_balance = (
