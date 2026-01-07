@@ -31,6 +31,7 @@ from fecfiler.transactions.aggregation import (
     process_aggregation_for_debts,
     process_aggregation_by_payee_candidate
 )
+from fecfiler.transactions.schedule_d.views import create_in_future_reports
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -1249,24 +1250,32 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
     def test_debt_incurred_prior_aggregation(self):
-        # create q1 and associated debt
+        # create three reports
         test_q1_report_2026 = create_form3x(
             self.committee, "2026-01-01", "2026-03-31", {}
         )
+        test_q2_report_2026 = create_form3x(
+            self.committee, "2026-04-01", "2026-06-30", {}
+        )
+        test_q3_report_2026 = create_form3x(
+            self.committee, "2026-07-01", "2026-08-31", {}
+        )
+
+        # create debt on first report
+        self.assertEqual(Transaction.objects.all().count(), 3)
         test_debt = create_debt(
             self.committee,
             self.test_org_contact,
             "1000.00",
             report=test_q1_report_2026,
         )
-        # create q2 and q3 reports
-        test_q2_report_2026 = create_form3x(
-            self.committee, "2026-04-01", "2025-06-30", {}
-        )
-        test_q3_report_2026 = create_form3x(
-            self.committee, "2026-07-01", "2025-08-31", {}
-        )
+        self.assertEqual(Transaction.objects.all().count(), 4)
 
+        # carry forward
+        create_in_future_reports(test_debt)
+        self.assertEqual(Transaction.objects.all().count(), 6)
+
+        # get child debts
         q2_debt = Transaction.objects.transaction_view().filter(
             schedule_d__isnull=False,
             committee_account_id=test_debt.committee_account_id,
@@ -1279,15 +1288,21 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             reports__id=test_q3_report_2026.id
         ).first()
 
+        self.assertIsNotNone(q2_debt)
+        self.assertIsNotNone(q3_debt)
+
+        # Set debt 2's incurred amount
         q2_debt.schedule_d.incurred_amount = 500.00
-        q2_debt.save()
+        q2_debt.schedule_d.save()
 
         process_aggregation_for_debts(test_debt)
 
+        # Test assertions
         test_debt.refresh_from_db()
         q2_debt.refresh_from_db()
         q3_debt.refresh_from_db()
 
+        # Check to make sure that schedule d id's are still unique
         self.assertEqual(test_debt.schedule_d.incurred_prior, 0.00)
         self.assertEqual(test_debt.schedule_d.incurred_amount, 1000.00)
         self.assertEqual(test_debt.schedule_d.balance_at_close, 1000.00)
