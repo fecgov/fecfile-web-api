@@ -68,7 +68,7 @@ class ScheduleDViewsTestCase(TestCase):
         self.assertEqual(carried_over.count(), 1)
 
         # incurred amounts are independent across reports so they would not be updated
-        # by previous ones.  same reason we set it to 0 when whe carry a debt over
+        # by previous ones.  same reason we set it to 0 when we carry a debt over
         self.assertEqual(carried_over.first().schedule_d.incurred_amount, 0.00)
 
     def test_updating_debt_preserves_unique_ids_of_descendants(self):
