@@ -13,6 +13,8 @@ from locust.exception import StopUser
 
 TIMEOUT = 30  # seconds
 SCHEDULES = ["A", "B,E,F", "C,D"]
+DATA_ENTRY_WEIGHT = 100
+FILING_WEIGHT = 1
 
 
 class AtomicInteger:
@@ -51,21 +53,24 @@ class Tasks(TaskSet):
         logging.info("Loading payloads")
         self.load_payloads()
 
-        logging.info("Creating 2026 Q1")
+        logging.info("Creating one report")
         self.create_one_report()
 
-        logging.info("Creating contact")
+        # Setup for tests
+        logging.info("Creating contacts")
         self.create_payload_contacts()
 
         logging.info("Getting report IDs")
         self.get_report_ids()
 
+        time.sleep(5)
+
     @task
     def get_contacts(self):
-        # TODO: Make this more realistic
         params = {
             "page": 1,
-            "ordering": "form_type",
+            "ordering": "sort_name",
+            "page_size": random.choice([5, 10, 15, 20])
         }
         self.client_get(
             "/api/v1/contacts/", name="get_contacts", timeout=TIMEOUT, params=params
@@ -73,15 +78,9 @@ class Tasks(TaskSet):
 
     @task
     def get_reports(self):
-        params = {
-            "page": 1,
-            "ordering": "form_type",
-        }
-        self.client_get(
-            "/api/v1/reports/", name="get_reports", timeout=TIMEOUT, params=params
-        )
+        self.load_report_page()
 
-    @task(100)
+    @task
     def lookup_committees(self):
         params = {
             # Querying with only a single character avoids FEC lookups
@@ -98,7 +97,7 @@ class Tasks(TaskSet):
             params=params
         )
 
-    @task(100)
+    @task
     def lookup_candidates(self):
         params = {
             # Querying with only a single character avoids FEC lookups
@@ -115,7 +114,7 @@ class Tasks(TaskSet):
             params=params
         )
 
-    @task
+    @task(DATA_ENTRY_WEIGHT)
     def get_schedule_transactions(self):
         if len(self.report_ids) > 0:
             report_id = random.choice(self.report_ids)
@@ -134,7 +133,7 @@ class Tasks(TaskSet):
                     params=params,
                 )
 
-    @task(100)  # This task will be picked 100 times more often than the default
+    @task(DATA_ENTRY_WEIGHT)
     def create_schedule_a_transaction(self):
         contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_1"])
         transaction_data = deepcopy(self.transaction_payloads["INDIVIDUAL_RECEIPT"])
@@ -155,7 +154,7 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule a transaction")
 
-    @task(100)  # This task will be picked 100 times more often than the default
+    @task(DATA_ENTRY_WEIGHT)
     def create_schedule_b_transaction(self):
         contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_2"])
         transaction_data = deepcopy(self.transaction_payloads["OPERATING_EXPENDITURE"])
@@ -207,7 +206,7 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule c transaction")
 
-    @task(10)  # This task will be picked 10 times more often than the default
+    @task
     def create_schedule_d_transaction(self):
         contact_data = deepcopy(self.contact_payloads["ORGANIZATION_CONTACT_1"])
         transaction_data = deepcopy(self.transaction_payloads["DEBT_OWED_BY_COMMITTEE"])
@@ -227,7 +226,7 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule d transaction")
 
-    @task(100)  # This task will be picked 100 times more often than the default
+    @task(DATA_ENTRY_WEIGHT)
     def update_schedule_a_transaction(self):
         if len(self.report_ids) > 0:
             report_id = random.choice(self.report_ids)
@@ -266,13 +265,13 @@ class Tasks(TaskSet):
                     return
         raise Exception("Failed to DELETE schedule a transaction")
 
-    @task(100)
+    @task(FILING_WEIGHT)
     def filing_calculate_summary_only(self):
         self.client.request_name = "recalculate_report_summary"
         report_id = random.choice(self.report_ids)
         self.calculate_summary_for_report_id(report_id, "calculate_summary_for_report_id")
 
-    @task(500)
+    @task(FILING_WEIGHT)
     def filing_prepare_and_submit_report(self):
         if len(self.report_ids_to_submit) == 0:
             logging.info("No more reports to submit")
@@ -287,7 +286,7 @@ class Tasks(TaskSet):
         self.submit_report(report_id, poll_seconds=40)
         self.report_ids_to_amend.append(self.report_ids_to_submit.pop())
 
-    @task(100)
+    @task(FILING_WEIGHT)
     def prepare_and_amend_report(self):
         if len(self.report_ids_to_amend) == 0:
             if len(self.report_ids_to_submit) == 0:
@@ -317,6 +316,7 @@ class Tasks(TaskSet):
         self.client.headers["x-csrftoken"] = self.client.cookies["csrftoken"]
         self.client.headers["user-agent"] = "Locust testing"
         self.client.headers["Origin"] = self.client.base_url
+        time.sleep(5)
 
     def get_and_activate_commmittee(self):
         committee_id_list = self.retrieve_committee_id_list()
@@ -326,6 +326,7 @@ class Tasks(TaskSet):
         # Check if we have enough committees - 1 per user
         # This is going to run once per user (inefficient but so is all of it)
         committee_id = committee_id_list[self.user.user_index]
+        time.sleep(3)
         response = self.client.post(
             f"/api/v1/committees/{committee_id}/activate/",
             name="_activate_committee",
@@ -356,6 +357,9 @@ class Tasks(TaskSet):
 
     def get_post_login_page(self):
         # TO-DO: Does F24 get called twice?
+        self.load_report_page()
+
+    def load_report_page(self):
         params = {
             "page": 1,
             "ordering": "report_code_label",
