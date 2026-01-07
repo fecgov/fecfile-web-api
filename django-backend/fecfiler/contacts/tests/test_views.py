@@ -1,60 +1,48 @@
 import json
+from copy import deepcopy
 from unittest.mock import patch, Mock
 import uuid
 
 from ..models import Contact
+from fecfiler.committee_accounts.models import CommitteeAccount
 from ..views import ContactViewSet, DeletedContactsViewSet
 from .utils import create_test_individual_contact
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
-mock_results = {
-    "results": [
-        {"name": "LNAME, FNAME I", "candidate_id": "P60012143", "office_sought": "P"},
-        {
-            "name": "LNAME, FNAME",
-            "candidate_id": "P60012465",
-            "office_sought": "P",
-        },
-    ]
-}
+CANDIDATE_RESULTS = [
+    {"name": "LNAME, FNAME I", "candidate_id": "P60012143", "office_sought": "P"},
+    {
+        "name": "LNAME, FNAME",
+        "candidate_id": "P60012465",
+        "office_sought": "P",
+    },
+]
+COMMITTEE_RESULTS = [
+    {"name": "BIDEN FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
+    {"name": "BIDEN VICTORY FUND", "id": "C00744946", "is_active": "true"},
+]
+MOCK_CANDIDATE_RESULTS = {"results": CANDIDATE_RESULTS}
+MOCK_COMMITTEE_RESULTS = {"results": COMMITTEE_RESULTS}
+
+
+class MockResponse:
+    def __init__(self, json_data, status_code):
+        self.json_data = deepcopy(json_data)
+        self.status_code = status_code
+
+    def json(self):
+        return self.json_data
+
+    def raise_for_status(self):
+        return
 
 
 def mocked_requests_get_candidates(*args, **kwargs):
-    class MockResponse:
-        def __init__(self, json_data, status_code):
-            self.json_data = json_data
-            self.status_code = status_code
-
-        def json(self):
-            return self.json_data
-
-        def raise_for_status(self):
-            return
-
-    return MockResponse(mock_results, 200)
+    return MockResponse(MOCK_CANDIDATE_RESULTS, 200)
 
 
 def mocked_requests_get_committees(*args, **kwargs):
-    class MockResponse:
-        def __init__(self, json_data, status_code):
-            self.json_data = json_data
-            self.status_code = status_code
-
-        def json(self):
-            return self.json_data
-
-        def raise_for_status(self):
-            return
-
-    return MockResponse(
-        {
-            "results": [
-                {"name": "BIDEN FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
-                {"name": "BIDEN VICTORY FUND", "id": "C00744946", "is_active": "true"},
-            ]
-        },
-        200,
-    )
+    return MockResponse(MOCK_COMMITTEE_RESULTS, 200)
 
 
 class ContactViewSetTest(FecfilerViewSetTest):
@@ -62,6 +50,51 @@ class ContactViewSetTest(FecfilerViewSetTest):
 
     def setUp(self):
         super().setUp()
+
+    def _create_active_and_deleted_contacts(
+        self,
+        committee_uuid,
+        active_first="Contact",
+        active_last="Active",
+        deleted_first="Contact",
+        deleted_last="Deleted",
+    ):
+        active_contact = Contact.objects.create(
+            type=Contact.ContactType.INDIVIDUAL,
+            last_name=active_last,
+            first_name=active_first,
+            committee_account_id=committee_uuid,
+        )
+        deleted_contact = Contact.objects.create(
+            type=Contact.ContactType.INDIVIDUAL,
+            last_name=deleted_last,
+            first_name=deleted_first,
+            committee_account_id=committee_uuid,
+        )
+        deleted_contact.delete()
+        return active_contact, deleted_contact
+
+    def _get_committee_contact_count(self, committee_uuid):
+        return Contact.all_objects.filter(committee_account_id=committee_uuid).count()
+
+    def _post_e2e_delete_all_contacts(self, committee=None):
+        return self.send_viewset_post_request(
+            "/api/v1/contacts/e2e-delete-all-contacts",
+            {},
+            ContactViewSet,
+            "e2e_delete_all_contacts",
+            committee=committee,
+        )
+
+    def _assert_committee_contacts_purged(
+        self, committee_uuid, active_contact_id, deleted_contact_id
+    ):
+        self.assertFalse(Contact.all_objects.filter(id=active_contact_id).exists())
+        self.assertFalse(Contact.all_objects.filter(id=deleted_contact_id).exists())
+        self.assertEqual(self._get_committee_contact_count(committee_uuid), 0)
+        self.assertEqual(
+            Contact.objects.filter(committee_account_id=committee_uuid).count(), 0
+        )
 
     @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_no_candidate_id(self, mock_get):
@@ -80,11 +113,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             ContactViewSet,
             "candidate",
         )
-        expected_json = {
-            "name": "LNAME, FNAME I",
-            "candidate_id": "P60012143",
-            "office_sought": "P",
-        }
+        expected_json = CANDIDATE_RESULTS[0]
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
@@ -115,13 +144,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             "candidate_lookup",
         )
         expected_json = {
-            "fec_api_candidates": [
-                {
-                    "name": "LNAME, FNAME",
-                    "candidate_id": "P60012465",
-                    "office_sought": "P",
-                },
-            ],
+            "fec_api_candidates": [CANDIDATE_RESULTS[1]],
             "fecfile_candidates": [],
         }
         self.assertEqual(response.status_code, 200)
@@ -154,10 +177,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             "committee_lookup",
         )
         expected_json = {
-            "fec_api_committees": [
-                {"name": "BIDEN FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
-                {"name": "BIDEN VICTORY FUND", "id": "C00744946", "is_active": "true"},
-            ],
+            "fec_api_committees": COMMITTEE_RESULTS,
             "fecfile_committees": [
                 {
                     "deleted": None,
@@ -318,6 +338,88 @@ class ContactViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, ["a5061946-0000-0000-82f6-f1782c333d70"])
+
+    @patch("fecfiler.contacts.views.settings")
+    def test_e2e_delete_all_contacts(self, mock_settings):
+        mock_settings.E2E_TEST = True
+
+        active_contact, deleted_contact = self._create_active_and_deleted_contacts(
+            self.default_committee.id
+        )
+        expected_count = self._get_committee_contact_count(self.default_committee.id)
+        response = self._post_e2e_delete_all_contacts()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"purged": expected_count})
+        self._assert_committee_contacts_purged(
+            self.default_committee.id, active_contact.id, deleted_contact.id
+        )
+
+    @patch("fecfiler.contacts.views.settings")
+    def test_e2e_delete_all_contacts_requires_e2e_flag(self, mock_settings):
+        mock_settings.E2E_TEST = False
+
+        active_contact, deleted_contact = self._create_active_and_deleted_contacts(
+            self.default_committee.id
+        )
+        response = self._post_e2e_delete_all_contacts()
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Contact.objects.filter(id=active_contact.id).exists())
+        self.assertTrue(Contact.all_objects.filter(id=deleted_contact.id).exists())
+
+    @patch("fecfiler.contacts.views.settings")
+    def test_e2e_delete_all_contacts_scoped_to_committee(self, mock_settings):
+        mock_settings.E2E_TEST = True
+
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000002")
+        other_active_contact, other_deleted_contact = (
+            self._create_active_and_deleted_contacts(
+                other_committee.id,
+                active_first="Other",
+                deleted_first="Other",
+            )
+        )
+        active_contact, deleted_contact = self._create_active_and_deleted_contacts(
+            self.default_committee.id,
+            active_first="Primary",
+            deleted_first="Primary",
+        )
+        expected_count = self._get_committee_contact_count(self.default_committee.id)
+        response = self._post_e2e_delete_all_contacts()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"purged": expected_count})
+        self._assert_committee_contacts_purged(
+            self.default_committee.id, active_contact.id, deleted_contact.id
+        )
+        self.assertTrue(Contact.objects.filter(id=other_active_contact.id).exists())
+        self.assertTrue(Contact.all_objects.filter(id=other_deleted_contact.id).exists())
+        self.assertEqual(
+            Contact.objects.filter(
+                committee_account_id=other_committee.id
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            Contact.all_objects.filter(
+                committee_account_id=self.default_committee.id
+            ).count(),
+            0,
+        )
+
+    @patch("fecfiler.contacts.views.settings")
+    def test_e2e_delete_all_contacts_no_contacts(self, mock_settings):
+        mock_settings.E2E_TEST = True
+
+        empty_committee = CommitteeAccount.objects.create(committee_id="C00000003")
+        expected_count = self._get_committee_contact_count(empty_committee.id)
+        self.assertEqual(expected_count, 0)
+
+        response = self._post_e2e_delete_all_contacts(committee=empty_committee)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"purged": 0})
 
     def test_update(self):
         contact = Contact.objects.create(

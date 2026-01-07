@@ -418,7 +418,7 @@ def calculate_summary_column_b(report):
 def calculate_cash_on_hand_fields(report, column_a, column_b):
 
     reports_from_prior_years = Report.objects.filter(
-        Q(form_3x__isnull=False) | Q(form_3__isnull=False),
+        Q(form_3x__isnull=False),
         committee_account=report.committee_account,
         coverage_through_date__year__lt=report.coverage_from_date.year,
     ).order_by("coverage_from_date")
@@ -448,7 +448,7 @@ def calculate_cash_on_hand_fields(report, column_a, column_b):
     previous_report_this_year = (
         Report.objects.filter(
             ~Q(id=report.id),
-            Q(form_3x__isnull=False) | Q(form_3__isnull=False),
+            Q(form_3x__isnull=False),
             committee_account=report.committee_account,
             coverage_through_date__year=report.coverage_from_date.year,
             coverage_through_date__lt=report.coverage_from_date,
@@ -458,7 +458,10 @@ def calculate_cash_on_hand_fields(report, column_a, column_b):
     )
     if cash_on_hand_override is not None:
         column_b["line_6a"] = cash_on_hand_override
-    elif closest_report_from_prior_years is not None:
+    elif (
+        closest_report_from_prior_years is not None
+        and closest_report_from_prior_years.form_3x is not None
+    ):
         column_b["line_6a"] = (
             closest_report_from_prior_years.form_3x.L8_cash_on_hand_close_ytd
         )  # noqa: E501
@@ -466,7 +469,10 @@ def calculate_cash_on_hand_fields(report, column_a, column_b):
         # user defined cash on hand
         column_b["line_6a"] = 0
 
-    if previous_report_this_year:
+    if (
+        previous_report_this_year is not None
+        and previous_report_this_year.form_3x is not None
+    ):
         column_a["line_6b"] = (
             previous_report_this_year.form_3x.L8_cash_on_hand_at_close_period
         )  # noqa: E501
