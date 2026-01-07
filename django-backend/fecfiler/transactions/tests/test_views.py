@@ -1248,6 +1248,58 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             Transaction.all_objects.get(pk=test_q2_carried_over_debt.id).deleted
         )
 
+    def test_debt_incurred_prior_aggregation(self):
+        # create q1 and associated debt
+        test_q1_report_2026 = create_form3x(
+            self.committee, "2026-01-01", "2026-03-31", {}
+        )
+        test_debt = create_debt(
+            self.committee,
+            self.test_org_contact,
+            "1000.00",
+            report=test_q1_report_2026,
+        )
+        # create q2 and q3 reports
+        test_q2_report_2026 = create_form3x(
+            self.committee, "2026-04-01", "2025-06-30", {}
+        )
+        test_q3_report_2026 = create_form3x(
+            self.committee, "2026-07-01", "2025-08-31", {}
+        )
+
+        q2_debt = Transaction.objects.transaction_view().filter(
+            schedule_d__isnull=False,
+            committee_account_id=test_debt.committee_account_id,
+            reports__id=test_q2_report_2026.id
+        ).first()
+
+        q3_debt = Transaction.objects.transaction_view().filter(
+            schedule_d__isnull=False,
+            committee_account_id=test_debt.committee_account_id,
+            reports__id=test_q3_report_2026.id
+        ).first()
+
+        q2_debt.schedule_d.incurred_amount = 500.00
+        q2_debt.save()
+
+        process_aggregation_for_debts(test_debt)
+
+        test_debt.refresh_from_db()
+        q2_debt.refresh_from_db()
+        q3_debt.refresh_from_db()
+
+        self.assertEqual(test_debt.schedule_d.incurred_prior, 0.00)
+        self.assertEqual(test_debt.schedule_d.incurred_amount, 1000.00)
+        self.assertEqual(test_debt.schedule_d.balance_at_close, 1000.00)
+
+        self.assertEqual(q2_debt.schedule_d.incurred_prior, 1000.00)
+        self.assertEqual(q2_debt.schedule_d.incurred_amount, 500.00)
+        self.assertEqual(q2_debt.schedule_d.balance_at_close, 1500.00)
+
+        self.assertEqual(q3_debt.schedule_d.incurred_prior, 1500.00)
+        self.assertEqual(q3_debt.schedule_d.incurred_amount, 0.00)
+        self.assertEqual(q3_debt.schedule_d.balance_at_close, 1500.00)
+
     def test_create_schedule_f_debt_repayment(self):
         """Making a schedule f debt repayment should reduce the balance accordingly"""
         # create q1 and associated debt
