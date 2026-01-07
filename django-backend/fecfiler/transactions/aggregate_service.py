@@ -27,7 +27,7 @@ def _update_aggregate_running_sum(
     Calculate and update running sum aggregates for transactions.
 
     Calculates running sum of effective amounts for transactions and updates
-    the specified aggregate field using a database subquery for efficiency.
+    the specified aggregate field.
 
     Args:
         transactions: QuerySet of transactions to aggregate (ordered)
