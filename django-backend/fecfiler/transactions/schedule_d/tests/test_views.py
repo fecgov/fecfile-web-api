@@ -4,6 +4,7 @@ from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_d.views import save_hook
 from fecfiler.transactions.models import Transaction
 from fecfiler.reports.models import Report
+from fecfiler.transactions.aggregation import process_aggregation_for_debts
 
 
 class ScheduleDViewsTestCase(TestCase):
@@ -65,6 +66,21 @@ class ScheduleDViewsTestCase(TestCase):
             reports__id=self.report_2.id, schedule_d__isnull=False
         )
         self.assertEqual(carried_over.count(), 1)
+
         # incurred amounts are independent across reports so they would not be updated
         # by previous ones.  same reason we set it to 0 when whe carry a debt over
-        self.assertEqual(carried_over.first().schedule_d.incurred_amount, 1234)
+        self.assertEqual(carried_over.first().schedule_d.incurred_amount, 0.00)
+
+    def test_updating_debt_preserves_unique_ids_of_descendants(self):
+        save_hook(self.debt, False)
+        carried_over = Transaction.objects.filter(
+            reports__id=self.report_2.id, schedule_d__isnull=False
+        )
+        self.assertNotEqual(self.debt.schedule_d.id, carried_over.first().schedule_d.id)
+
+        self.debt.schedule_d.incurred_amount = 5
+        save_hook(self.debt, True)
+        carried_over = Transaction.objects.filter(
+            reports__id=self.report_2.id, schedule_d__isnull=False
+        )
+        self.assertNotEqual(self.debt.schedule_d.id, carried_over.first().schedule_d.id)
