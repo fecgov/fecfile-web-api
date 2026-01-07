@@ -56,5 +56,39 @@ def update_in_future_reports(transaction):
         )
     )
 
+    # Capture old snapshots before bulk update
+    snapshots = {}
+    for t in transactions_to_update.select_related(
+        "schedule_c2",
+        "contact_1",
+        "contact_2",
+    ):
+        snap = {
+            "schedule": t.get_schedule_name(),
+            "contact_1_id": t.contact_1_id,
+            "aggregation_group": t.aggregation_group,
+            "committee_account_id": t.committee_account_id,
+            "date": t.get_date(),
+            "created": t.created,
+        }
+        try:
+            from fecfiler.transactions.aggregate_service import (
+                calculate_effective_amount,
+            )
+            eff = calculate_effective_amount(t)
+            snap.update({"effective_amount": eff})
+        except Exception:
+            pass
+        snapshots[str(t.id)] = snap
+
     schedule_c2s_to_update.update(**schedule_c2_copy)
     transactions_to_update.update(**transaction_copy)
+
+    # Explicitly invoke aggregation service for updated transactions
+    from fecfiler.transactions.aggregate_service import (
+        update_aggregates_for_affected_transactions,
+    )
+    for updated in Transaction.objects.filter(id__in=snapshots.keys()):
+        update_aggregates_for_affected_transactions(
+            updated, "update", old_snapshot=snapshots[str(updated.id)]
+        )

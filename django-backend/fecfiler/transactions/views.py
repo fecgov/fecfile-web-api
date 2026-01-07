@@ -457,6 +457,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 Transaction.objects.filter(id=child_transaction_data).update(
                     parent_transaction_id=transaction_instance.id
                 )
+                # Explicitly update aggregates and itemization for the child
+                try:
+                    child_instance = Transaction.objects.get(id=child_transaction_data)
+                    from fecfiler.transactions.aggregate_service import (
+                        update_aggregates_for_affected_transactions,
+                    )
+                    update_aggregates_for_affected_transactions(child_instance, "update")
+                except Transaction.DoesNotExist:
+                    pass
             else:
                 child_transaction_data["parent_transaction_id"] = transaction_instance.id
                 child_transaction_data.pop("parent_transaction", None)

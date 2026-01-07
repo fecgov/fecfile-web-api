@@ -38,6 +38,51 @@ def update_in_future_reports(transaction: Transaction):
         transaction_id=transaction.transaction_id,
         reports__id__in=Subquery(future_reports.values("id")),
     )
+    # Capture old snapshots for delta-based aggregate updates before bulk update
+    from fecfiler.transactions.aggregate_service import (
+        update_aggregates_for_affected_transactions,
+        calculate_effective_amount,
+    )
+
+    pre_update_instances = list(
+        Transaction.objects.filter(
+            transaction_id=transaction.transaction_id,
+            reports__id__in=Subquery(future_reports.values("id")),
+        ).select_related(
+            "schedule_a",
+            "schedule_b",
+            "schedule_c",
+            "schedule_e",
+            "contact_2",
+        )
+    )
+
+    old_snapshots_by_id = {}
+    for inst in pre_update_instances:
+        try:
+            eff = calculate_effective_amount(inst)
+        except Exception:
+            eff = None
+        snap = {
+            "schedule": inst.get_schedule_name(),
+            "contact_1_id": inst.contact_1_id,
+            "aggregation_group": inst.aggregation_group,
+            "committee_account_id": inst.committee_account_id,
+            "date": inst.get_date(),
+            "created": inst.created,
+            "effective_amount": eff,
+        }
+        if inst.schedule_e_id and getattr(inst, "contact_2", None):
+            snap.update(
+                {
+                    "election_code": inst.schedule_e.election_code,
+                    "candidate_office": inst.contact_2.candidate_office,
+                    "candidate_state": inst.contact_2.candidate_state,
+                    "candidate_district": inst.contact_2.candidate_district,
+                }
+            )
+        old_snapshots_by_id[str(inst.id)] = snap
+
     transactions_to_update.update(**transaction_copy)
 
     schedule_c_copy = copy.deepcopy(model_to_dict(transaction.schedule_c))
@@ -51,6 +96,16 @@ def update_in_future_reports(transaction: Transaction):
     update_memo_text_in_future_reports(
         transaction, transaction_copy, transactions_to_update
     )
+
+    # Invoke signals-free aggregation service for each updated transaction
+    for tx_id_str, old_snap in old_snapshots_by_id.items():
+        try:
+            updated_inst = Transaction.objects.get(id=tx_id_str)
+            update_aggregates_for_affected_transactions(
+                updated_inst, "update", old_snapshot=old_snap
+            )
+        except Transaction.DoesNotExist:
+            continue
 
 
 def update_memo_text_in_future_reports(

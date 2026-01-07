@@ -86,3 +86,18 @@ class ScheduleC2ViewsTestCase(TestCase):
         )
         self.assertEqual(carried_over.count(), 1)
         self.assertEqual(carried_over.first().schedule_c2.guaranteed_amount, 5)
+
+    def test_update_guarantor_bulk_triggers_aggregate_service(self):
+        # Verify that after bulk update, the aggregation service is invoked
+        from unittest.mock import patch
+        from fecfiler.transactions.schedule_c2.views import update_in_future_reports
+
+        # Ensure the future guarantor exists first
+        c2_hook(self.guarantor, False)
+
+        with patch(
+            "fecfiler.transactions.aggregate_service."
+            "update_aggregates_for_affected_transactions"
+        ) as mock_update:
+            update_in_future_reports(self.guarantor)
+            self.assertGreaterEqual(mock_update.call_count, 1)

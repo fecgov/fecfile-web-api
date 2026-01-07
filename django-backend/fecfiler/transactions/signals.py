@@ -20,12 +20,8 @@ from decimal import Decimal
 from typing import Optional
 from contextlib import contextmanager
 from .models import Transaction
-from .aggregate_service import (
-    recalculate_aggregates_for_transaction,
-    apply_delta_aggregates,
-    apply_delete_delta_aggregates,
-    calculate_effective_amount,
-)
+# Aggregation and itemization now run via explicit service calls from model
+# save/delete and view flows. Signals retain logging only.
 from .managers import (
     schedule_a_over_two_hundred_types,
     schedule_b_over_two_hundred_types,
@@ -79,65 +75,14 @@ def _get_old_state_map():
 
 @receiver(pre_save, sender=Transaction)
 def capture_pre_save(sender, instance, **kwargs):
-    """Capture previous state needed for efficient delta updates."""
-    if not instance.id:
-        # New instance; nothing to snapshot
-        return
-    try:
-        old = Transaction.objects.select_related(
-            'schedule_a', 'schedule_b', 'schedule_c', 'schedule_e', 'contact_2'
-        ).get(id=instance.id)
-    except Transaction.DoesNotExist:
-        return
-
-    snapshot = {
-        'schedule': old.get_schedule_name(),
-        'contact_1_id': old.contact_1_id,
-        'aggregation_group': old.aggregation_group,
-        'committee_account_id': old.committee_account_id,
-        'date': old.get_date(),
-        'created': old.created,
-        'effective_amount': calculate_effective_amount(old),
-    }
-    if old.schedule_e and old.contact_2:
-        snapshot.update({
-            'election_code': old.schedule_e.election_code,
-            'candidate_office': old.contact_2.candidate_office,
-            'candidate_state': old.contact_2.candidate_state,
-            'candidate_district': old.contact_2.candidate_district,
-        })
-
-    _get_old_state_map()[instance.id] = snapshot
+    """Signals-free aggregation: no-op snapshot capture."""
+    return
 
 
 @receiver(pre_delete, sender=Transaction)
 def capture_pre_delete(sender, instance, **kwargs):
-    """Capture previous state for delete delta updates."""
-    try:
-        old = Transaction.objects.select_related(
-            'schedule_a', 'schedule_b', 'schedule_c', 'schedule_e', 'contact_2'
-        ).get(id=instance.id)
-    except Transaction.DoesNotExist:
-        return
-
-    snapshot = {
-        'schedule': old.get_schedule_name(),
-        'contact_1_id': old.contact_1_id,
-        'aggregation_group': old.aggregation_group,
-        'committee_account_id': old.committee_account_id,
-        'date': old.get_date(),
-        'created': old.created,
-        'effective_amount': calculate_effective_amount(old),
-    }
-    if old.schedule_e and old.contact_2:
-        snapshot.update({
-            'election_code': old.schedule_e.election_code,
-            'candidate_office': old.contact_2.candidate_office,
-            'candidate_state': old.contact_2.candidate_state,
-            'candidate_district': old.contact_2.candidate_district,
-        })
-
-    _get_old_state_map()[instance.id] = snapshot
+    """Signals-free aggregation: no-op snapshot capture."""
+    return
 
 
 def _log_transaction_action(instance, action: str) -> None:
@@ -294,52 +239,13 @@ def _update_parent_itemization(instance) -> None:
 
 @receiver(post_save, sender=Transaction)
 def log_post_save(sender, instance, created, **kwargs):
-    """Handle post-save actions: logging, aggregates, and itemization."""
+    """Signals-free aggregation: keep logging, skip recalculation and itemization."""
     action = "created" if created else "updated"
     _log_transaction_action(instance, action)
-
-    # Save the old aggregate value BEFORE recalculating
-    # This allows us to detect if aggregate dropped below threshold
-    old_aggregate = instance.aggregate
-
-    # Skip aggregate recalculation if flagged to prevent redundant processing
-    if not should_skip_aggregate_recalc():
-        # Efficient delta-based aggregate updates
-        old_snapshot = _get_old_state_map().pop(instance.id, None)
-        apply_delta_aggregates(instance, old_snapshot, created)
-
-        # Handle loan recalculation (kept in recalculate_aggregates_for_transaction)
-        recalculate_aggregates_for_transaction(instance)
-
-        # Refresh the instance to get updated aggregate from database
-        instance.refresh_from_db()
-
-    # Skip itemization logic if we're in a cascade operation
-    # (to prevent infinite recursion when cascading itemization to children)
-    if is_in_cascade():
-        return
-
-    uses_itemization_threshold = (
-        instance.transaction_type_identifier in A_B_OVER_TWO_HUNDRED_TYPES
-    )
-
-    # Handle itemization updates and cascading
-    _handle_itemization_update(
-        instance, created, old_aggregate, uses_itemization_threshold
-    )
-
-    # Always check if parent needs to be updated when a child has a
-    # parent_transaction. This handles cases where child's parent
-    # relationship affects parent's itemization
-    if instance.parent_transaction_id and not is_in_cascade():
-        _update_parent_itemization(instance)
+    return
 
 
 @receiver(post_delete, sender=Transaction)
 def log_post_delete(sender, instance, **kwargs):
     _log_transaction_action(instance, "deleted")
-
-    # Apply delete delta to downstream aggregates
-    old_snapshot = _get_old_state_map().pop(instance.id, None)
-    if old_snapshot and not should_skip_aggregate_recalc():
-        apply_delete_delta_aggregates(old_snapshot)
+    return

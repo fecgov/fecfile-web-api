@@ -15,7 +15,13 @@ from uuid import UUID
 from django.db.models import Q, F, Value
 from django.db.models.fields import DecimalField
 from .models import Transaction
-from .managers import Schedule, TransactionManager
+from .managers import (
+    Schedule,
+    TransactionManager,
+    schedule_a_over_two_hundred_types,
+    schedule_b_over_two_hundred_types,
+)
+from .constants import ITEMIZATION_THRESHOLD
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -850,3 +856,231 @@ def recalculate_aggregates_for_transaction(transaction_instance) -> None:
             exc_info=True,
         )
         raise
+
+
+def _should_cascade_unitemization_service(
+    instance, old_aggregate: Optional[Decimal], uses_itemization_threshold: bool
+) -> bool:
+    """
+    Service-side determination if unitemization should cascade to children.
+
+    Mirrors logic used in signal handler, used when explicitly invoking
+    aggregate updates without signals.
+    """
+    from .itemization import has_itemized_children
+
+    if not uses_itemization_threshold or instance.force_itemized is not None:
+        return False
+
+    if old_aggregate is None or instance.aggregate is None:
+        return False
+
+    aggregate_dropped_below = (
+        old_aggregate > ITEMIZATION_THRESHOLD
+        and instance.aggregate <= ITEMIZATION_THRESHOLD
+    )
+
+    aggregate_changed_at_or_below = (
+        old_aggregate != instance.aggregate
+        and instance.aggregate <= ITEMIZATION_THRESHOLD
+        and has_itemized_children(instance)
+    )
+
+    return aggregate_dropped_below or aggregate_changed_at_or_below
+
+
+def _update_parent_itemization_service(instance) -> None:
+    """
+    Update parent transaction itemization when child changes, for service path.
+    """
+    from .itemization import (
+        update_itemization,
+        cascade_itemization_to_parents,
+        cascade_unitemization_to_children,
+    )
+
+    parent = instance.parent_transaction
+    if not parent:
+        return
+
+    parent.refresh_from_db(fields=["itemized", "force_itemized", "aggregate"])
+    parent_old_itemized = parent.itemized
+
+    logger.debug(
+        "Parent itemization check",
+        parent_id=str(parent.id),
+        parent_itemized=parent.itemized,
+        parent_force_itemized=parent.force_itemized,
+        parent_aggregate=parent.aggregate,
+        child_id=str(instance.id),
+        child_itemized=instance.itemized,
+    )
+
+    parent_changed_by_aggregate = update_itemization(parent)
+
+    if not parent.itemized and instance.itemized:
+        parent.itemized = True
+        parent_changed_by_aggregate = True
+
+    if parent_changed_by_aggregate:
+        parent.force_itemized = None
+        parent.save(update_fields=["itemized", "force_itemized"])
+
+        logger.debug(
+            "Parent itemization updated",
+            parent_id=str(parent.id),
+            new_itemized=parent.itemized,
+            cleared_force_itemized=True,
+        )
+
+        if parent.itemized and not parent_old_itemized:
+            cascade_itemization_to_parents(parent)
+        elif not parent.itemized and parent_old_itemized:
+            cascade_unitemization_to_children(parent)
+
+
+def update_aggregates_for_affected_transactions(
+    instance: Transaction,
+    action: str,
+    old_snapshot: Optional[Dict[str, Any]] = None,
+) -> None:
+    """
+    Explicit, signals-free entry point to update aggregates and itemization.
+
+    Call this after creating or updating a `Transaction` instance, or prior to
+    deleting, providing `action` as one of: "create", "update", "delete".
+
+    - For create/update: applies delta-based aggregate updates, recalculates
+      schedule-specific totals, then updates itemization and cascades as needed.
+    - For delete: applies a negative delta to downstream aggregates using the
+      provided or derived snapshot.
+
+    Args:
+        instance: The Transaction instance being changed.
+        action: One of "create", "update", or "delete".
+        old_snapshot: Optional prior-state snapshot used for efficient deltas.
+                      If not provided for update/delete, it will be derived.
+    """
+    if action not in {"create", "update", "delete"}:
+        raise ValueError("action must be one of 'create', 'update', 'delete'")
+
+    # For delete, we operate purely on the old snapshot and return early
+    if action == "delete":
+        if not old_snapshot and getattr(instance, "id", None):
+            try:
+                old = Transaction.objects.select_related(
+                    "schedule_a", "schedule_b", "schedule_c", "schedule_e", "contact_2"
+                ).get(id=instance.id)
+            except Transaction.DoesNotExist:
+                old = None
+            if old:
+                eff = calculate_effective_amount(old)
+                old_snapshot = {
+                    "schedule": old.get_schedule_name(),
+                    "contact_1_id": old.contact_1_id,
+                    "aggregation_group": old.aggregation_group,
+                    "committee_account_id": old.committee_account_id,
+                    "date": old.get_date(),
+                    "created": old.created,
+                    "effective_amount": eff,
+                }
+                if old.schedule_e and old.contact_2:
+                    old_snapshot.update(
+                        {
+                            "election_code": old.schedule_e.election_code,
+                            "candidate_office": old.contact_2.candidate_office,
+                            "candidate_state": old.contact_2.candidate_state,
+                            "candidate_district": old.contact_2.candidate_district,
+                        }
+                    )
+        apply_delete_delta_aggregates(old_snapshot or {})
+        return
+
+    # Create or update path
+    created = action == "create"
+
+    # Derive old snapshot if not provided and this is an update
+    if not created and not old_snapshot and getattr(instance, "id", None):
+        try:
+            old = Transaction.objects.select_related(
+                "schedule_a", "schedule_b", "schedule_c", "schedule_e", "contact_2"
+            ).get(id=instance.id)
+        except Transaction.DoesNotExist:
+            old = None
+        if old:
+            eff = calculate_effective_amount(old)
+            old_snapshot = {
+                "schedule": old.get_schedule_name(),
+                "contact_1_id": old.contact_1_id,
+                "aggregation_group": old.aggregation_group,
+                "committee_account_id": old.committee_account_id,
+                "date": old.get_date(),
+                "created": old.created,
+                "effective_amount": eff,
+            }
+            if old.schedule_e and old.contact_2:
+                old_snapshot.update(
+                    {
+                        "election_code": old.schedule_e.election_code,
+                        "candidate_office": old.contact_2.candidate_office,
+                        "candidate_state": old.contact_2.candidate_state,
+                        "candidate_district": old.contact_2.candidate_district,
+                    }
+                )
+
+    # Keep previous aggregate for itemization cascade checks
+    old_aggregate = instance.aggregate
+
+    # Delta-based aggregate updates
+    apply_delta_aggregates(instance, old_snapshot, created)
+
+    # Handle loan recalculation and other schedule specifics
+    recalculate_aggregates_for_transaction(instance)
+
+    # Refresh with updated aggregate values
+    instance.refresh_from_db()
+
+    # Itemization calculations and cascading
+    from .itemization import (
+        get_all_children_ids,
+        update_itemization,
+        cascade_itemization_to_parents,
+        cascade_unitemization_to_children,
+    )
+
+    uses_itemization_threshold = (
+        instance.transaction_type_identifier
+        in (schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types)
+    )
+
+    # Track previous itemization state; on create, treat as False to enable cascade
+    previous_itemized = False if created else instance.itemized
+
+    # For newly created transactions, ensure the transient state mirrors signals
+    if created:
+        instance.itemized = False
+
+    # Determine if we should cascade unitemization to children
+    if _should_cascade_unitemization_service(
+        instance, old_aggregate, uses_itemization_threshold
+    ):
+        child_ids = get_all_children_ids(instance.id)
+        if child_ids:
+            Transaction.objects.filter(id__in=child_ids, deleted__isnull=True).update(
+                itemized=False
+            )
+
+    # Update itemization based on current aggregate
+    itemization_changed = update_itemization(instance)
+
+    if itemization_changed:
+        instance.save(update_fields=["itemized"])
+
+        if instance.itemized and not previous_itemized:
+            cascade_itemization_to_parents(instance)
+        elif not instance.itemized and previous_itemized:
+            cascade_unitemization_to_children(instance)
+
+    # Update parent itemization when a child changes
+    if instance.parent_transaction_id:
+        _update_parent_itemization_service(instance)
