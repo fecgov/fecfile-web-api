@@ -13,6 +13,7 @@ We also trigger itemization calculation after aggregates are set, including
 parent/child itemization cascading.
 """
 
+from django.db import transaction
 from django.db.models.signals import post_save, post_delete, pre_save, pre_delete
 from django.dispatch import receiver
 from decimal import Decimal
@@ -139,13 +140,15 @@ def capture_pre_delete(sender, instance, **kwargs):
     _get_old_state_map()[instance.id] = snapshot
 
 
-def _log_transaction_action(instance, created: bool) -> None:
+def _log_transaction_action(instance, action: str) -> None:
     """Log the transaction action."""
-    action = "created" if created else ("deleted" if instance.deleted else "updated")
     schedule = instance.get_schedule_name()
-    logger.info(
-        f"{schedule} Transaction: {instance.id} "
-        f"({instance.transaction_id}) was {action}"
+    txn_id = instance.id
+    txn_tid = instance.transaction_id
+    transaction.on_commit(
+        lambda s=schedule, i=txn_id, t=txn_tid, a=action: logger.info(
+            f"{s} Transaction: {i} ({t}) was {a}"
+        )
     )
 
 
@@ -292,7 +295,8 @@ def _update_parent_itemization(instance) -> None:
 @receiver(post_save, sender=Transaction)
 def log_post_save(sender, instance, created, **kwargs):
     """Handle post-save actions: logging, aggregates, and itemization."""
-    _log_transaction_action(instance, created)
+    action = "created" if created else "updated"
+    _log_transaction_action(instance, action)
 
     # Save the old aggregate value BEFORE recalculating
     # This allows us to detect if aggregate dropped below threshold
@@ -333,11 +337,7 @@ def log_post_save(sender, instance, created, **kwargs):
 
 @receiver(post_delete, sender=Transaction)
 def log_post_delete(sender, instance, **kwargs):
-    schedule = instance.get_schedule_name()
-    logger.info(
-        f"{schedule} Transaction: {instance.id} "
-        f"({instance.transaction_id}) was deleted"
-    )
+    _log_transaction_action(instance, "deleted")
 
     # Apply delete delta to downstream aggregates
     old_snapshot = _get_old_state_map().pop(instance.id, None)
