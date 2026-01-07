@@ -10,9 +10,10 @@ that logic into Django code for better maintainability and testability.
 """
 
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, Dict, Any
 from uuid import UUID
-from django.db.models import Q
+from django.db.models import Q, F, Value
+from django.db.models.fields import DecimalField
 from .models import Transaction
 from .managers import Schedule, TransactionManager
 import structlog
@@ -231,6 +232,10 @@ def calculate_effective_amount(transaction) -> Decimal:
     if amount is None:
         return Decimal(0)
 
+    # Ensure Decimal type for downstream arithmetic before any operations
+    if not isinstance(amount, Decimal):
+        amount = Decimal(str(amount))
+
     # Refunds are negated
     if transaction.transaction_type_identifier in SCHEDULE_B_REFUND_TYPES:
         amount = amount * Decimal(-1)
@@ -249,6 +254,417 @@ def _get_calendar_year_from_date(date_obj) -> int:
         Integer year value
     """
     return date_obj.year if hasattr(date_obj, 'year') else int(str(date_obj)[:4])
+
+
+def _update_suffix_delta(
+    base_qs,
+    aggregate_field_name: str,
+    key_date,
+    key_created,
+    delta: Decimal,
+    include_self: bool,
+) -> int:
+    """
+    Apply a delta to aggregates for the suffix of a partition.
+
+    Updates rows with date > key_date, and rows with date == key_date and
+    created >= key_created (or >, based on include_self) by adding `delta` to
+    the specified aggregate field.
+
+    Args:
+        base_qs: Partition-filtered queryset
+        aggregate_field_name: Field name to update ('aggregate' or election YTD)
+        key_date: Date anchor for suffix selection
+        key_created: Created timestamp anchor for suffix selection
+        delta: Decimal delta to add (can be negative)
+        include_self: Whether to include the anchor row itself in the update
+
+    Returns:
+        Number of rows updated (sum of both updates)
+    """
+    if delta == 0:
+        return 0
+
+    op_equal = "created__gte" if include_self else "created__gt"
+
+    # Update all rows strictly after the anchor date
+    updated_after = base_qs.filter(date__gt=key_date).update(
+        **{aggregate_field_name: F(aggregate_field_name) + Value(delta, output_field=DecimalField())}
+    )
+
+    # Update rows on the same date and at/after the anchor creation time
+    updated_same_day = base_qs.filter(date=key_date).filter(
+        **{op_equal: key_created}
+    ).update(
+        **{aggregate_field_name: F(aggregate_field_name) + Value(delta, output_field=DecimalField())}
+    )
+
+    return int(updated_after) + int(updated_same_day)
+
+
+def _get_previous_aggregate_value(
+    base_qs,
+    aggregate_field_name: str,
+    key_date,
+    key_created,
+) -> Decimal:
+    """
+    Get the aggregate value from the row immediately preceding the anchor.
+
+    Args:
+        base_qs: Partition-filtered queryset
+        aggregate_field_name: Field name to read
+        key_date: Anchor date
+        key_created: Anchor created timestamp
+
+    Returns:
+        Decimal previous aggregate value (0 if none)
+    """
+    prev = (
+        base_qs.filter(Q(date__lt=key_date) | Q(date=key_date, created__lt=key_created))
+        .order_by("-date", "-created")
+        .values_list(aggregate_field_name, flat=True)
+        .first()
+    )
+    return prev if isinstance(prev, Decimal) else Decimal(prev or 0)
+
+
+def apply_delta_aggregates(transaction_instance, old_state: Optional[Dict[str, Any]], created: bool) -> None:
+    """
+    Apply efficient delta-based updates to aggregates for a single change.
+
+    Handles create, update, and partition moves by adjusting only the suffix
+    within affected partitions using set-based updates.
+
+    Args:
+        transaction_instance: The saved Transaction instance
+        old_state: Snapshot dict of prior key fields and effective amount
+        created: Whether this is a creation event
+    """
+    if transaction_instance.deleted:
+        return
+
+    schedule = transaction_instance.get_schedule_name()
+    transaction_date = transaction_instance.get_date()
+    if not transaction_date:
+        return
+
+    new_created = transaction_instance.created
+
+    if schedule in [Schedule.A, Schedule.B]:
+        # Build new partition queryset
+        year = _get_calendar_year_from_date(transaction_date)
+        new_qs = (
+            Transaction.objects.filter(
+                contact_1_id=transaction_instance.contact_1_id,
+                date__year=year,
+                aggregation_group=transaction_instance.aggregation_group,
+                deleted__isnull=True,
+                force_unaggregated__isnull=True,
+            )
+            .filter(Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False))
+        )
+
+        new_eff = calculate_effective_amount(transaction_instance)
+        new_force_unagg = transaction_instance.force_unaggregated is not None
+        new_eff_contrib = Decimal(0) if new_force_unagg else (new_eff or Decimal(0))
+
+        # If created, set this row's aggregate explicitly and bump suffix
+        if created or not old_state:
+            base = _get_previous_aggregate_value(
+                new_qs, "aggregate", transaction_date, new_created
+            )
+            if not new_force_unagg:
+                new_value = base + new_eff_contrib
+                if transaction_instance.aggregate != new_value:
+                    transaction_instance.aggregate = new_value
+                    transaction_instance.save(update_fields=["aggregate"])
+            _update_suffix_delta(
+                new_qs, "aggregate", transaction_date, new_created, new_eff_contrib, include_self=False
+            )
+            return
+
+        # Update with delta or handle partition move
+        old_year = _get_calendar_year_from_date(old_state["date"]) if old_state.get("date") else year
+        same_partition = (
+            old_state.get("contact_1_id") == transaction_instance.contact_1_id
+            and old_year == year
+            and old_state.get("aggregation_group") == transaction_instance.aggregation_group
+        )
+
+        old_eff = old_state.get("effective_amount", Decimal(0))
+        old_force_unagg = old_state.get("force_unaggregated") is not None
+        old_eff_contrib = Decimal(0) if old_force_unagg else (old_eff or Decimal(0))
+        delta = new_eff_contrib - old_eff_contrib
+
+        moved = (
+            old_state.get("date") != transaction_date
+            or old_state.get("created") != new_created
+        )
+
+        # Derive expected anchor value at new position regardless of snapshot
+        derived_base = _get_previous_aggregate_value(new_qs, "aggregate", transaction_date, new_created)
+
+        if same_partition and not moved:
+            if delta != 0:
+                _update_suffix_delta(
+                    new_qs, "aggregate", transaction_date, new_created, delta, include_self=True
+                )
+            else:
+                # If aggregate at new position does not match expected, recompute partition
+                expected = derived_base + new_eff_contrib
+                if transaction_instance.aggregate != expected:
+                    recompute_qs = new_qs.order_by("date", "created").select_related("schedule_a", "schedule_b")
+                    _update_aggregate_running_sum(recompute_qs, "aggregate", "entity derive-mismatch")
+            return
+
+        if same_partition and moved:
+            # Fallback: recompute entire partition when ordering changes
+            recompute_qs = new_qs.order_by("date", "created").select_related("schedule_a", "schedule_b")
+            _update_aggregate_running_sum(recompute_qs, "aggregate", "entity move")
+            return
+
+        # Partition changed: subtract from old partition suffix, then add to new
+        old_qs = (
+            Transaction.objects.filter(
+                contact_1_id=old_state.get("contact_1_id"),
+                date__year=old_year,
+                aggregation_group=old_state.get("aggregation_group"),
+                deleted__isnull=True,
+                force_unaggregated__isnull=True,
+            )
+            .filter(Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False))
+        )
+        _update_suffix_delta(
+            old_qs,
+            "aggregate",
+            old_state.get("date"),
+            old_state.get("created"),
+            -old_eff_contrib,
+            include_self=False,
+        )
+
+        # Set new row aggregate explicitly based on previous agg in new partition
+        base = _get_previous_aggregate_value(new_qs, "aggregate", transaction_date, new_created)
+        if not new_force_unagg:
+            new_value = base + new_eff_contrib
+            if transaction_instance.aggregate != new_value:
+                transaction_instance.aggregate = new_value
+                transaction_instance.save(update_fields=["aggregate"])
+        _update_suffix_delta(
+            new_qs, "aggregate", transaction_date, new_created, new_eff_contrib, include_self=False
+        )
+        return
+
+    elif schedule == Schedule.E:
+        schedule_e = transaction_instance.schedule_e
+        contact_2 = transaction_instance.contact_2
+        if not schedule_e or not contact_2:
+            return
+
+        year = _get_calendar_year_from_date(transaction_date)
+
+        state_filter = Q(contact_2__candidate_state=contact_2.candidate_state)
+        if not contact_2.candidate_state:
+            state_filter = Q(contact_2__candidate_state__isnull=True) | Q(contact_2__candidate_state="")
+
+        district_filter = Q(contact_2__candidate_district=contact_2.candidate_district)
+        if not contact_2.candidate_district:
+            district_filter = Q(contact_2__candidate_district__isnull=True) | Q(contact_2__candidate_district="")
+
+        base_filters = dict(
+            schedule_e__election_code=schedule_e.election_code,
+            contact_2__candidate_office=contact_2.candidate_office,
+            date__year=year,
+            aggregation_group=transaction_instance.aggregation_group,
+            deleted__isnull=True,
+            schedule_e__isnull=False,
+            force_unaggregated__isnull=True,
+        )
+        if transaction_instance.committee_account_id:
+            base_filters["committee_account_id"] = transaction_instance.committee_account_id
+        new_qs = Transaction.objects.filter(**base_filters).filter(state_filter, district_filter)
+
+        new_eff = calculate_effective_amount(transaction_instance)
+        new_force_unagg = transaction_instance.force_unaggregated is not None
+        new_eff_contrib = Decimal(0) if new_force_unagg else (new_eff or Decimal(0))
+
+        if created or not old_state:
+            base = _get_previous_aggregate_value(
+                new_qs, "_calendar_ytd_per_election_office", transaction_date, new_created
+            )
+            if not new_force_unagg:
+                new_value = base + new_eff_contrib
+                if transaction_instance._calendar_ytd_per_election_office != new_value:
+                    transaction_instance._calendar_ytd_per_election_office = new_value
+                    transaction_instance.save(update_fields=["_calendar_ytd_per_election_office"])
+            _update_suffix_delta(
+                new_qs,
+                "_calendar_ytd_per_election_office",
+                transaction_date,
+                new_created,
+                new_eff_contrib,
+                include_self=False,
+            )
+            return
+
+        old_year = _get_calendar_year_from_date(old_state["date"]) if old_state.get("date") else year
+        same_partition = (
+            old_state.get("election_code") == schedule_e.election_code
+            and old_state.get("candidate_office") == contact_2.candidate_office
+            and old_state.get("candidate_state") == contact_2.candidate_state
+            and old_state.get("candidate_district") == contact_2.candidate_district
+            and old_year == year
+            and old_state.get("aggregation_group") == transaction_instance.aggregation_group
+            and old_state.get("committee_account_id") == transaction_instance.committee_account_id
+        )
+
+        old_eff = old_state.get("effective_amount", Decimal(0))
+        old_force_unagg = old_state.get("force_unaggregated") is not None
+        old_eff_contrib = Decimal(0) if old_force_unagg else (old_eff or Decimal(0))
+        delta = new_eff_contrib - old_eff_contrib
+
+        moved = (
+            old_state.get("date") != transaction_date
+            or old_state.get("created") != new_created
+        )
+
+        if same_partition and not moved:
+            if delta != 0:
+                _update_suffix_delta(
+                    new_qs,
+                    "_calendar_ytd_per_election_office",
+                    transaction_date,
+                    new_created,
+                    delta,
+                    include_self=True,
+                )
+            return
+
+        # Handle partition move: subtract from old partition, then add in new
+        old_state_state = old_state.get("candidate_state")
+        old_state_filter = Q(contact_2__candidate_state=old_state_state)
+        if not old_state_state:
+            old_state_filter = Q(contact_2__candidate_state__isnull=True) | Q(contact_2__candidate_state="")
+
+        old_district = old_state.get("candidate_district")
+        old_district_filter = Q(contact_2__candidate_district=old_district)
+        if not old_district:
+            old_district_filter = Q(contact_2__candidate_district__isnull=True) | Q(contact_2__candidate_district="")
+
+        old_base_filters = dict(
+            schedule_e__election_code=old_state.get("election_code"),
+            contact_2__candidate_office=old_state.get("candidate_office"),
+            date__year=old_year,
+            aggregation_group=old_state.get("aggregation_group"),
+            deleted__isnull=True,
+            schedule_e__isnull=False,
+            force_unaggregated__isnull=True,
+        )
+        if old_state.get("committee_account_id"):
+            old_base_filters["committee_account_id"] = old_state.get("committee_account_id")
+        old_qs = Transaction.objects.filter(**old_base_filters).filter(old_state_filter, old_district_filter)
+
+        _update_suffix_delta(
+            old_qs,
+            "_calendar_ytd_per_election_office",
+            old_state.get("date"),
+            old_state.get("created"),
+            -old_eff_contrib,
+            include_self=False,
+        )
+
+        base = _get_previous_aggregate_value(
+            new_qs, "_calendar_ytd_per_election_office", transaction_date, new_created
+        )
+        if not new_force_unagg:
+            new_value = base + new_eff_contrib
+            if transaction_instance._calendar_ytd_per_election_office != new_value:
+                transaction_instance._calendar_ytd_per_election_office = new_value
+                transaction_instance.save(update_fields=["_calendar_ytd_per_election_office"])
+        _update_suffix_delta(
+            new_qs,
+            "_calendar_ytd_per_election_office",
+            transaction_date,
+            new_created,
+            new_eff_contrib,
+            include_self=False,
+        )
+        return
+
+
+def apply_delete_delta_aggregates(old_state: Dict[str, Any]) -> None:
+    """
+    Apply a negative delta for a deleted transaction to downstream aggregates.
+
+    Uses the snapshot of the deleted row to subtract its effective amount from
+    the suffix of the appropriate partition.
+    """
+    if not old_state:
+        return
+
+    schedule = old_state.get("schedule")
+    old_date = old_state.get("date")
+    old_created = old_state.get("created")
+    if not old_date or not old_created:
+        return
+
+    if schedule in [Schedule.A, Schedule.B]:
+        old_year = _get_calendar_year_from_date(old_date)
+        old_qs = (
+            Transaction.objects.filter(
+                contact_1_id=old_state.get("contact_1_id"),
+                date__year=old_year,
+                aggregation_group=old_state.get("aggregation_group"),
+                deleted__isnull=True,
+                force_unaggregated__isnull=True,
+            )
+            .filter(Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False))
+        )
+        old_eff = old_state.get("effective_amount", Decimal(0))
+        _update_suffix_delta(
+            old_qs, "aggregate", old_date, old_created, -(old_eff or Decimal(0)), include_self=False
+        )
+        return
+
+    if schedule == Schedule.E:
+        old_year = _get_calendar_year_from_date(old_date)
+
+        old_state_state = old_state.get("candidate_state")
+        old_state_filter = Q(contact_2__candidate_state=old_state_state)
+        if not old_state_state:
+            old_state_filter = Q(contact_2__candidate_state__isnull=True) | Q(contact_2__candidate_state="")
+
+        old_district = old_state.get("candidate_district")
+        old_district_filter = Q(contact_2__candidate_district=old_district)
+        if not old_district:
+            old_district_filter = Q(contact_2__candidate_district__isnull=True) | Q(contact_2__candidate_district="")
+
+        old_qs = (
+            Transaction.objects.filter(
+                schedule_e__election_code=old_state.get("election_code"),
+                contact_2__candidate_office=old_state.get("candidate_office"),
+                date__year=old_year,
+                aggregation_group=old_state.get("aggregation_group"),
+                deleted__isnull=True,
+                schedule_e__isnull=False,
+                force_unaggregated__isnull=True,
+                committee_account_id=old_state.get("committee_account_id"),
+            )
+            .filter(old_state_filter, old_district_filter)
+        )
+        old_eff = old_state.get("effective_amount", Decimal(0))
+        _update_suffix_delta(
+            old_qs,
+            "_calendar_ytd_per_election_office",
+            old_date,
+            old_created,
+            -(old_eff or Decimal(0)),
+            include_self=False,
+        )
+        return
+
+    
 
 
 def calculate_loan_payment_to_date(loan_id: UUID) -> int:
@@ -350,35 +766,18 @@ def recalculate_aggregates_for_transaction(transaction_instance) -> None:
 
     try:
         if schedule in [Schedule.A, Schedule.B]:
-            # Recalculate entity aggregates
-            year = _get_calendar_year_from_date(transaction_date)
-            calculate_entity_aggregates(
-                transaction_instance.contact_1_id,
-                year,
-                transaction_instance.aggregation_group,
-            )
-
             # If this is a loan repayment, recalculate loan_payment_to_date
             if (transaction_instance.transaction_type_identifier == "LOAN_REPAYMENT_MADE"
                     and transaction_instance.loan_id):
                 calculate_loan_payment_to_date(transaction_instance.loan_id)
 
         elif schedule == Schedule.E:
-            # Recalculate calendar YTD per election office aggregates
             schedule_e = transaction_instance.schedule_e
             contact_2 = transaction_instance.contact_2
 
             if schedule_e and contact_2:
-                year = _get_calendar_year_from_date(transaction_date)
-                calculate_calendar_ytd_per_election_office(
-                    schedule_e.election_code,
-                    contact_2.candidate_office,
-                    contact_2.candidate_state,
-                    contact_2.candidate_district,
-                    year,
-                    transaction_instance.aggregation_group,
-                    transaction_instance.committee_account_id,
-                )
+                # Election aggregates handled by delta updates in signals
+                pass
     except Exception as e:
         logger.error(
             f"Error recalculating aggregates for transaction "
