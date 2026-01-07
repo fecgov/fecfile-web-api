@@ -16,15 +16,12 @@ parent/child itemization cascading.
 from django.db import transaction
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from decimal import Decimal
-from typing import Optional
 from contextlib import contextmanager
 from .models import Transaction
 from .managers import (
     schedule_a_over_two_hundred_types,
     schedule_b_over_two_hundred_types,
 )
-from .constants import ITEMIZATION_THRESHOLD
 import structlog
 import threading
 
