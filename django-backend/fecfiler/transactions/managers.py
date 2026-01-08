@@ -34,6 +34,9 @@ from enum import Enum
 from ..reports.models import Report
 from fecfiler.reports.report_code_label import report_code_label_case
 from .constants import ITEMIZATION_THRESHOLD
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -78,25 +81,23 @@ class TransactionManager(SoftDeleteManager):
             # Only schedules A, B, and E get aggregated
             if schedule in [Schedule.A, Schedule.B, Schedule.E]:
                 try:
-                    from fecfiler.transactions.utils_aggregation import (
+                    from .utils_aggregation import (
                         update_aggregates_for_affected_transactions,
                     )
                     update_aggregates_for_affected_transactions(instance, "create")
                 except Exception:
-                    import structlog
-                    structlog.get_logger(__name__).error(
+                    logger.error(
                         "Failed to update aggregates via service on create",
                         transaction_id=instance.id,
                     )
             else:
                 # For non-aggregating schedules, still update itemization
                 try:
-                    from fecfiler.transactions.itemization import update_itemization
+                    from .itemization import update_itemization
                     update_itemization(instance)
                     instance.save(update_fields=["itemized"])
                 except Exception:
-                    import structlog
-                    structlog.get_logger(__name__).error(
+                    logger.error(
                         "Failed to update itemization on create",
                         transaction_id=instance.id,
                     )
