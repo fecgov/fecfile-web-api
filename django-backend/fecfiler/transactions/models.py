@@ -283,9 +283,39 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         # Invoke service after save for create/update
         if not is_internal_update:
             try:
-                from .aggregate_service import update_aggregates_for_affected_transactions
+                from .aggregate_service import (
+                    update_aggregates_for_affected_transactions,
+                    calculate_effective_amount,
+                )
                 action = "create" if is_create else "update"
-                update_aggregates_for_affected_transactions(self, action, old_snapshot)
+                # Only schedules A, B, and E participate in aggregates.
+                schedule = self.get_schedule_name()
+                if schedule in [Schedule.A, Schedule.B, Schedule.E]:
+                    # Gate tighter: run only on create, or if aggregate-relevant
+                    # fields changed (date, amount, group, contact_1)
+                    should_run = is_create
+                    if not is_create and old_snapshot:
+                        new_date = self.get_date()
+                        new_eff = calculate_effective_amount(self)
+                        new_group = self.aggregation_group
+                        new_contact_1 = self.contact_1_id
+
+                        old_date = old_snapshot.get("date")
+                        old_eff = old_snapshot.get("effective_amount")
+                        old_group = old_snapshot.get("aggregation_group")
+                        old_contact_1 = old_snapshot.get("contact_1_id")
+
+                        should_run = (
+                            new_date != old_date
+                            or new_group != old_group
+                            or new_contact_1 != old_contact_1
+                            or new_eff != old_eff
+                        )
+
+                    if should_run:
+                        update_aggregates_for_affected_transactions(
+                            self, action, old_snapshot
+                        )
             except Exception:
                 # Do not raise to avoid breaking save on service failure; log instead
                 import structlog
@@ -324,9 +354,12 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                             "candidate_district": self.contact_2.candidate_district,
                         }
                     )
-                update_aggregates_for_affected_transactions(
-                    self, "delete", old_snapshot
-                )
+                # Only schedules A, B, and E participate in aggregates
+                schedule = self.get_schedule_name()
+                if schedule in [Schedule.A, Schedule.B, Schedule.E]:
+                    update_aggregates_for_affected_transactions(
+                        self, "delete", old_snapshot
+                    )
             except Exception:
                 import structlog
                 structlog.get_logger(__name__).error(

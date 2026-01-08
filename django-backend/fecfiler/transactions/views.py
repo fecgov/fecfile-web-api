@@ -463,7 +463,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     from fecfiler.transactions.aggregate_service import (
                         update_aggregates_for_affected_transactions,
                     )
-                    update_aggregates_for_affected_transactions(child_instance, "update")
+                    # Only trigger service for schedules A, B, and E
+                    if child_instance.get_schedule_name() in [
+                        Schedule.A,
+                        Schedule.B,
+                        Schedule.E,
+                    ]:
+                        update_aggregates_for_affected_transactions(
+                            child_instance, "update"
+                        )
                 except Transaction.DoesNotExist:
                     pass
             else:
