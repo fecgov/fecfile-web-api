@@ -93,7 +93,7 @@ def filter_queryset_for_previous_transactions_in_aggregation(
     state=None,
     district=None,
 ):
-    """Returns the set of transactions whose amounts factor into an aggregate for a date."""
+    """Get transactions whose amounts factor into an aggregate for a date."""
     previous_transactions_in_aggregation = queryset.filter(
         ~Q(id=transaction_id or None),  # Filter out the initial transaction
         Q(aggregation_group=aggregation_group),  # Only transactions in same group

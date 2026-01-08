@@ -1,5 +1,4 @@
 from fecfiler.contacts.models import Contact
-from django.db.models import Q
 
 
 def add_org_ind_contact(data, contact: Contact, identifier: str):
