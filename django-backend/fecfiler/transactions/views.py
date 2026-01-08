@@ -97,7 +97,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     queryset = Transaction.objects
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action == "list":
             return TransactionListSerializer
         return TransactionSerializer
 
@@ -149,7 +149,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 | Q(contact_5=contact_id)
             )
 
-        return queryset
+        return queryset.prefetch_related("reports")
 
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():

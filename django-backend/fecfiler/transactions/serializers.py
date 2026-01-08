@@ -13,6 +13,7 @@ from rest_framework.serializers import (
     CharField,
     DateField,
     DecimalField,
+    PrimaryKeyRelatedField,
 )
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.serializers import ScheduleASerializer
@@ -351,6 +352,7 @@ class TransactionSerializer(
 
 class TransactionListSerializer(ModelSerializer):
     id = UUIDField()
+    parent_transaction_id = CharField(read_only=True)
     transaction_type_identifier = CharField(read_only=True)
     back_reference_tran_id_number = CharField(
         required=False, allow_null=True, read_only=True
@@ -367,11 +369,13 @@ class TransactionListSerializer(ModelSerializer):
     balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     report_code_label = CharField(read_only=True)
+    report_ids = PrimaryKeyRelatedField(many=True, read_only=True, source="reports")
 
     class Meta:
         model = Transaction
         fields = [
             "id",
+            "parent_transaction_id",
             "transaction_type_identifier",
             "back_reference_tran_id_number",
             "form_type",
@@ -386,6 +390,7 @@ class TransactionListSerializer(ModelSerializer):
             "balance",
             "aggregate",
             "report_code_label",
+            "report_ids",
         ]
 
 
