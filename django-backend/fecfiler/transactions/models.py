@@ -295,9 +295,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 # Only schedules A, B, and E participate in aggregates.
                 schedule = self.get_schedule_name()
                 if schedule in [Schedule.A, Schedule.B, Schedule.E]:
-                    # Always run service on create. On update, always run for A/B/E
-                    # to capture related schedule changes (date/amount) that may
-                    # have been saved prior to this call and are not detectable here.
                     should_run = True
 
                     if should_run:
