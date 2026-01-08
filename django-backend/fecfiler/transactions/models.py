@@ -235,6 +235,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         return self.debt is not None and self.schedule_d is None
 
     def save(self, *args, **kwargs):
+        from .utils_aggregation import (
+            update_aggregates_for_affected_transactions,
+            calculate_effective_amount,
+        )
         if self.memo_text:
             if self.memo_text.text4000 is None or self.memo_text.text4000 == "":
                 self.memo_text.hard_delete()
@@ -242,12 +246,110 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             else:
                 self.memo_text.transaction_uuid = self.id
                 self.memo_text.save()
+        # Avoid recursion when service adjusts fields via save(update_fields=...)
+        update_fields = kwargs.get("update_fields")
+        is_internal_update = update_fields is not None
+
+        # Capture old snapshot for updates
+        old_snapshot = None
+        is_create = self.pk is None
+        if not is_create and not is_internal_update:
+            try:
+                old = Transaction.objects.select_related(
+                    "schedule_a", "schedule_b", "schedule_c", "schedule_e", "contact_2"
+                ).get(pk=self.pk)
+            except Transaction.DoesNotExist:
+                old = None
+            if old:
+                eff = calculate_effective_amount(old)
+                old_snapshot = {
+                    "schedule": old.get_schedule_name(),
+                    "contact_1_id": old.contact_1_id,
+                    "aggregation_group": old.aggregation_group,
+                    "committee_account_id": old.committee_account_id,
+                    "date": old.get_date(),
+                    "created": old.created,
+                    "effective_amount": eff,
+                    # Itemization-affecting fields
+                    "force_itemized": old.force_itemized,
+                    "force_unaggregated": old.force_unaggregated,
+                    "memo_code": old.memo_code,
+                    "reatt_redes_id": old.reatt_redes_id,
+                }
+                if old.schedule_e and old.contact_2:
+                    old_snapshot.update(
+                        {
+                            "election_code": old.schedule_e.election_code,
+                            "candidate_office": old.contact_2.candidate_office,
+                            "candidate_state": old.contact_2.candidate_state,
+                            "candidate_district": old.contact_2.candidate_district,
+                        }
+                    )
+
         super(Transaction, self).save(*args, **kwargs)
+
+        # Invoke service after save for create/update
+        if not is_internal_update:
+            try:
+                action = "create" if is_create else "update"
+                # Only schedules A, B, and E participate in aggregates.
+                schedule = self.get_schedule_name()
+                if schedule in [Schedule.A, Schedule.B, Schedule.E]:
+                    should_run = True
+
+                    if should_run:
+                        update_aggregates_for_affected_transactions(
+                            self, action, old_snapshot
+                        )
+            except Exception:
+                # Do not raise to avoid breaking save on service failure; log instead
+                logger.error(
+                    "Failed to update aggregates via service on save",
+                    transaction_id=self.id,
+                )
 
     def delete(self):
         if not self.can_delete:
             raise AttributeError("Transaction cannot be deleted")
         if not self.deleted:
+            # Capture snapshot and apply delete delta before deleting
+            old_snapshot = None
+            try:
+                from .utils_aggregation import (
+                    calculate_effective_amount,
+                    update_aggregates_for_affected_transactions,
+                )
+                eff = calculate_effective_amount(self)
+                old_snapshot = {
+                    "schedule": self.get_schedule_name(),
+                    "contact_1_id": self.contact_1_id,
+                    "aggregation_group": self.aggregation_group,
+                    "committee_account_id": self.committee_account_id,
+                    "date": self.get_date(),
+                    "created": self.created,
+                    "effective_amount": eff,
+                }
+                if self.schedule_e and self.contact_2:
+                    old_snapshot.update(
+                        {
+                            "election_code": self.schedule_e.election_code,
+                            "candidate_office": self.contact_2.candidate_office,
+                            "candidate_state": self.contact_2.candidate_state,
+                            "candidate_district": self.contact_2.candidate_district,
+                        }
+                    )
+                # Only schedules A, B, and E participate in aggregates
+                schedule = self.get_schedule_name()
+                if schedule in [Schedule.A, Schedule.B, Schedule.E]:
+                    update_aggregates_for_affected_transactions(
+                        self, "delete", old_snapshot
+                    )
+            except Exception:
+                logger.error(
+                    "Failed to update aggregates via service on delete",
+                    transaction_id=self.id,
+                )
+
             super(Transaction, self).delete()
             self.delete_children()
             self.delete_debts()

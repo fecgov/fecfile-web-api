@@ -22,9 +22,10 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.transactions.utils import (
+from fecfiler.transactions.utils_aggregation import (
     filter_queryset_for_previous_transactions_in_aggregation,
-)  # noqa: E501
+    update_aggregates_for_affected_transactions,
+)
 from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
@@ -457,6 +458,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 Transaction.objects.filter(id=child_transaction_data).update(
                     parent_transaction_id=transaction_instance.id
                 )
+                # Explicitly update aggregates and itemization for the child
+                try:
+                    child_instance = Transaction.objects.get(id=child_transaction_data)
+                    # Only trigger service for schedules A, B, and E
+                    if child_instance.get_schedule_name() in [
+                        Schedule.A,
+                        Schedule.B,
+                        Schedule.E,
+                    ]:
+                        update_aggregates_for_affected_transactions(
+                            child_instance, "update"
+                        )
+                except Transaction.DoesNotExist:
+                    pass
             else:
                 child_transaction_data["parent_transaction_id"] = transaction_instance.id
                 child_transaction_data.pop("parent_transaction", None)

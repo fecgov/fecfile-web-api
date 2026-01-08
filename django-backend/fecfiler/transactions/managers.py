@@ -34,6 +34,9 @@ from enum import Enum
 from ..reports.models import Report
 from fecfiler.reports.report_code_label import report_code_label_case
 from .constants import ITEMIZATION_THRESHOLD
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -65,6 +68,43 @@ class TransactionManager(SoftDeleteManager):
 
     def get_queryset(self):
         return super().get_queryset().annotate(date=self.DATE_CLAUSE)
+
+    def create(self, **kwargs):
+        """Override create to aggregate schedules A/B/E, run itemization for all."""
+        instance = super().create(**kwargs)
+
+        # After direct INSERT, refresh and invoke service
+        instance.refresh_from_db()
+
+        try:
+            schedule = instance.get_schedule_name()
+            # Only schedules A, B, and E get aggregated
+            if schedule in [Schedule.A, Schedule.B, Schedule.E]:
+                try:
+                    from .utils_aggregation import (
+                        update_aggregates_for_affected_transactions,
+                    )
+                    update_aggregates_for_affected_transactions(instance, "create")
+                except Exception:
+                    logger.error(
+                        "Failed to update aggregates via service on create",
+                        transaction_id=instance.id,
+                    )
+            else:
+                # For non-aggregating schedules, still update itemization
+                try:
+                    from .itemization import update_itemization
+                    update_itemization(instance)
+                    instance.save(update_fields=["itemized"])
+                except Exception:
+                    logger.error(
+                        "Failed to update itemization on create",
+                        transaction_id=instance.id,
+                    )
+        except Exception:
+            # If get_schedule_name() fails, just return the instance
+            pass
+        return instance
 
     def SCHEDULE_CLAUSE(self):  # noqa: N802
         return Case(
@@ -134,7 +174,7 @@ class TransactionManager(SoftDeleteManager):
             output_field=BooleanField(),
         )
 
-    def ENTITY_AGGREGGATE_CLAUSE(self):  # noqa: N802
+    def ENTITY_AGGREGATE_CLAUSE(self):  # noqa: N802
         return Window(expression=Sum(self.AGGREGATE), **self.entity_aggregate_window)
 
     def ELECTION_AGGREGATE_CLAUSE(self):  # noqa: N802

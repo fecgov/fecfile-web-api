@@ -164,15 +164,14 @@ def _cascade_itemization_generic(
         deleted__isnull=True
     )
 
-    # For cascading to parents, exclude those with force_itemized=False
-    if direction == CascadeDirection.TO_PARENTS:
-        base_query = base_query.exclude(force_itemized=False)
-
     # Only include transactions that need updating (different from target state)
     query_to_update = base_query.filter(itemized=not should_be_itemized)
 
-    # Perform bulk update
-    query_to_update.update(itemized=should_be_itemized)
+    # Perform bulk update; when cascading to parents to itemize, also clear force flags
+    if direction == CascadeDirection.TO_PARENTS and should_be_itemized:
+        query_to_update.update(itemized=True, force_itemized=None)
+    else:
+        query_to_update.update(itemized=should_be_itemized)
 
 
 def calculate_itemization(transaction) -> bool:
