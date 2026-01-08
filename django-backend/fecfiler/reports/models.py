@@ -160,11 +160,7 @@ class Report(CommitteeOwnedModel):
             tranaction"""
             from fecfiler.transactions.models import Transaction
 
-            # Delete transactions via instance delete to ensure
-            # aggregation/itemization services are invoked
-            transactions_qs = Transaction.objects.filter(reports=self)
-            for tx in transactions_qs:
-                tx.delete()
+            Transaction.objects.filter(reports=self).delete()
 
         """delete report-transaction links"""
         ReportTransaction.objects.filter(report=self).delete()
