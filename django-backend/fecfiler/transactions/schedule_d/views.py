@@ -57,4 +57,3 @@ def update_in_future_reports(transaction):
         )
     )
     schedule_ds_to_update.update(**schedule_d_copy)
-

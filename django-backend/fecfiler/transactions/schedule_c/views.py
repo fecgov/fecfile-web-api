@@ -53,7 +53,6 @@ def update_in_future_reports(transaction: Transaction):
     )
 
 
-
 def update_memo_text_in_future_reports(
     transaction, transaction_data: dict, transactions_to_update
 ):
