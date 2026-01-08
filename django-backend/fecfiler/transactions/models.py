@@ -267,6 +267,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     "date": old.get_date(),
                     "created": old.created,
                     "effective_amount": eff,
+                    # Itemization-affecting fields
+                    "force_itemized": old.force_itemized,
+                    "force_unaggregated": old.force_unaggregated,
+                    "memo_code": old.memo_code,
+                    "reatt_redes_id": old.reatt_redes_id,
                 }
                 if old.schedule_e and old.contact_2:
                     old_snapshot.update(
@@ -291,26 +296,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 # Only schedules A, B, and E participate in aggregates.
                 schedule = self.get_schedule_name()
                 if schedule in [Schedule.A, Schedule.B, Schedule.E]:
-                    # Gate tighter: run only on create, or if aggregate-relevant
-                    # fields changed (date, amount, group, contact_1)
-                    should_run = is_create
-                    if not is_create and old_snapshot:
-                        new_date = self.get_date()
-                        new_eff = calculate_effective_amount(self)
-                        new_group = self.aggregation_group
-                        new_contact_1 = self.contact_1_id
-
-                        old_date = old_snapshot.get("date")
-                        old_eff = old_snapshot.get("effective_amount")
-                        old_group = old_snapshot.get("aggregation_group")
-                        old_contact_1 = old_snapshot.get("contact_1_id")
-
-                        should_run = (
-                            new_date != old_date
-                            or new_group != old_group
-                            or new_contact_1 != old_contact_1
-                            or new_eff != old_eff
-                        )
+                    # Always run service on create. On update, always run for A/B/E
+                    # to capture related schedule changes (date/amount) that may
+                    # have been saved prior to this call and are not detectable here.
+                    should_run = True
 
                     if should_run:
                         update_aggregates_for_affected_transactions(
@@ -525,3 +514,4 @@ class OverTwoHundredTypesScheduleB(models.Model):
     class Meta:
         db_table = "over_two_hundred_types_scheduleb"
         indexes = [models.Index(fields=["type"])]
+
