@@ -235,6 +235,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         return self.debt is not None and self.schedule_d is None
 
     def save(self, *args, **kwargs):
+        from .utils_aggregation import (
+            update_aggregates_for_affected_transactions,
+            calculate_effective_amount,
+        )
         if self.memo_text:
             if self.memo_text.text4000 is None or self.memo_text.text4000 == "":
                 self.memo_text.hard_delete()
@@ -257,7 +261,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             except Transaction.DoesNotExist:
                 old = None
             if old:
-                from .utils_aggregation import calculate_effective_amount
                 eff = calculate_effective_amount(old)
                 old_snapshot = {
                     "schedule": old.get_schedule_name(),
@@ -288,10 +291,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         # Invoke service after save for create/update
         if not is_internal_update:
             try:
-                from .utils_aggregation import (
-                    update_aggregates_for_affected_transactions,
-                    calculate_effective_amount,
-                )
                 action = "create" if is_create else "update"
                 # Only schedules A, B, and E participate in aggregates.
                 schedule = self.get_schedule_name()
@@ -307,8 +306,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                         )
             except Exception:
                 # Do not raise to avoid breaking save on service failure; log instead
-                import structlog
-                structlog.get_logger(__name__).error(
+                logger.error(
                     "Failed to update aggregates via service on save",
                     transaction_id=self.id,
                 )
@@ -350,8 +348,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                         self, "delete", old_snapshot
                     )
             except Exception:
-                import structlog
-                structlog.get_logger(__name__).error(
+                logger.error(
                     "Failed to update aggregates via service on delete",
                     transaction_id=self.id,
                 )
