@@ -2,7 +2,7 @@
 
 from django.db import migrations
 from django.db.models import F
-from fecfiler.transactions.utils import filter_queryset_for_previous_transactions_in_aggregation  # noqa: E501
+from fecfiler.transactions.aggregate_service import filter_queryset_for_previous_transactions_in_aggregation  # noqa: E501
 
 
 def calculate_schedule_f_aggregates(apps, schema_editor):
