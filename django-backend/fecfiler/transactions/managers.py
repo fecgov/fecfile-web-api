@@ -72,7 +72,7 @@ class TransactionManager(SoftDeleteManager):
         # After direct INSERT, refresh and invoke service to set aggregates/itemization
         instance.refresh_from_db()
         try:
-            from fecfiler.transactions.aggregate_service import (
+            from fecfiler.transactions.utils_aggregation import (
                 update_aggregates_for_affected_transactions,
             )
             update_aggregates_for_affected_transactions(instance, "create")

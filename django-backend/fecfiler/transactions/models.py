@@ -257,7 +257,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             except Transaction.DoesNotExist:
                 old = None
             if old:
-                from .aggregate_service import calculate_effective_amount
+                from .utils_aggregation import calculate_effective_amount
                 eff = calculate_effective_amount(old)
                 old_snapshot = {
                     "schedule": old.get_schedule_name(),
@@ -288,7 +288,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         # Invoke service after save for create/update
         if not is_internal_update:
             try:
-                from .aggregate_service import (
+                from .utils_aggregation import (
                     update_aggregates_for_affected_transactions,
                     calculate_effective_amount,
                 )
@@ -320,7 +320,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             # Capture snapshot and apply delete delta before deleting
             old_snapshot = None
             try:
-                from .aggregate_service import (
+                from .utils_aggregation import (
                     calculate_effective_amount,
                     update_aggregates_for_affected_transactions,
                 )

@@ -22,7 +22,7 @@ from fecfiler.transactions.serializers import (
     TransactionSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.transactions.aggregate_service import (
+from fecfiler.transactions.utils_aggregation import (
     filter_queryset_for_previous_transactions_in_aggregation,
     update_aggregates_for_affected_transactions,
 )
