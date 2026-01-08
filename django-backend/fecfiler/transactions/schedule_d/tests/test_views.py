@@ -4,7 +4,6 @@ from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_d.views import save_hook
 from fecfiler.transactions.models import Transaction
 from fecfiler.reports.models import Report
-from fecfiler.transactions.aggregation import process_aggregation_for_debts
 
 
 class ScheduleDViewsTestCase(TestCase):
