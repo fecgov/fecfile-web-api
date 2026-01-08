@@ -514,4 +514,3 @@ class OverTwoHundredTypesScheduleB(models.Model):
     class Meta:
         db_table = "over_two_hundred_types_scheduleb"
         indexes = [models.Index(fields=["type"])]
-
