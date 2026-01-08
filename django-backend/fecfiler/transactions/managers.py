@@ -67,21 +67,42 @@ class TransactionManager(SoftDeleteManager):
         return super().get_queryset().annotate(date=self.DATE_CLAUSE)
 
     def create(self, **kwargs):
-        """Override create to ensure aggregation/itemization runs for all schedules."""
+        """Override create to aggregate schedules A/B/E, run itemization for all."""
         instance = super().create(**kwargs)
-        # After direct INSERT, refresh and invoke service to set aggregates/itemization
+
+        # After direct INSERT, refresh and invoke service
         instance.refresh_from_db()
+
         try:
-            from fecfiler.transactions.utils_aggregation import (
-                update_aggregates_for_affected_transactions,
-            )
-            update_aggregates_for_affected_transactions(instance, "create")
+            schedule = instance.get_schedule_name()
+            # Only schedules A, B, and E get aggregated
+            if schedule in [Schedule.A, Schedule.B, Schedule.E]:
+                try:
+                    from fecfiler.transactions.utils_aggregation import (
+                        update_aggregates_for_affected_transactions,
+                    )
+                    update_aggregates_for_affected_transactions(instance, "create")
+                except Exception:
+                    import structlog
+                    structlog.get_logger(__name__).error(
+                        "Failed to update aggregates via service on create",
+                        transaction_id=instance.id,
+                    )
+            else:
+                # For non-aggregating schedules, still update itemization
+                try:
+                    from fecfiler.transactions.itemization import update_itemization
+                    update_itemization(instance)
+                    instance.save(update_fields=["itemized"])
+                except Exception:
+                    import structlog
+                    structlog.get_logger(__name__).error(
+                        "Failed to update itemization on create",
+                        transaction_id=instance.id,
+                    )
         except Exception:
-            import structlog
-            structlog.get_logger(__name__).error(
-                "Failed to update aggregates via service on create",
-                transaction_id=instance.id,
-            )
+            # If get_schedule_name() fails, just return the instance
+            pass
         return instance
 
     def SCHEDULE_CLAUSE(self):  # noqa: N802
