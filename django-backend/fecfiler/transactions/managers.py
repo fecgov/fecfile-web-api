@@ -10,9 +10,11 @@ from fecfiler.transactions.schedule_b.managers import (
 )
 from fecfiler.transactions.schedule_c.managers import line_labels as line_labels_c
 from fecfiler.transactions.schedule_d.managers import line_labels as line_labels_d
-from fecfiler.transactions.schedule_e.managers import line_labels as line_labels_e
+from fecfiler.transactions.schedule_e.managers import (
+    line_labels as line_labels_e,
+    over_two_hundred_types as schedule_e_over_two_hundred_types,
+)
 from fecfiler.transactions.schedule_f.managers import line_labels as line_labels_f
-from .constants import SCHEDULE_E_OVER_200_TYPES as schedule_e_over_two_hundred_types
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
     OuterRef,
@@ -33,10 +35,16 @@ from decimal import Decimal
 from enum import Enum
 from ..reports.models import Report
 from fecfiler.reports.report_code_label import report_code_label_case
-from .constants import ITEMIZATION_THRESHOLD
 import structlog
+import threading
 
 logger = structlog.get_logger(__name__)
+
+# Itemization threshold defined by FEC regulations
+ITEMIZATION_THRESHOLD = Decimal(200)
+
+# Thread-local storage to track if we're inside Manager.create()
+_thread_local = threading.local()
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -71,7 +79,12 @@ class TransactionManager(SoftDeleteManager):
 
     def create(self, **kwargs):
         """Override create to aggregate schedules A/B/E, run itemization for all."""
-        instance = super().create(**kwargs)
+        # Signal to save() that this is a Manager.create() invocation
+        _thread_local.in_manager_create = True
+        try:
+            instance = super().create(**kwargs)
+        finally:
+            _thread_local.in_manager_create = False
 
         # After direct INSERT, refresh and invoke service
         instance.refresh_from_db()

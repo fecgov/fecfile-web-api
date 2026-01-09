@@ -19,8 +19,8 @@ from .managers import (
     schedule_a_over_two_hundred_types,
     schedule_b_over_two_hundred_types,
     Schedule,
+    ITEMIZATION_THRESHOLD,
 )
-from .constants import ITEMIZATION_THRESHOLD
 import structlog
 
 logger = structlog.get_logger(__name__)

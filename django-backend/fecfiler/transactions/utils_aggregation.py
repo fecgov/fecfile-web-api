@@ -20,8 +20,9 @@ from .managers import (
     TransactionManager,
     schedule_a_over_two_hundred_types,
     schedule_b_over_two_hundred_types,
+    schedule_b_refunds,
+    ITEMIZATION_THRESHOLD,
 )
-from .constants import ITEMIZATION_THRESHOLD
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -312,8 +313,6 @@ def calculate_effective_amount(transaction) -> Decimal:
     Returns:
         Decimal: The effective amount for aggregation
     """
-    from .constants import SCHEDULE_B_REFUND_TYPES
-
     # Schedule C transactions have no effective amount for aggregation
     if transaction.schedule_c_id is not None:
         return Decimal(0)
@@ -329,7 +328,7 @@ def calculate_effective_amount(transaction) -> Decimal:
         amount = Decimal(str(amount))
 
     # Refunds are negated
-    if transaction.transaction_type_identifier in SCHEDULE_B_REFUND_TYPES:
+    if transaction.transaction_type_identifier in schedule_b_refunds:
         amount = amount * Decimal(-1)
 
     return amount

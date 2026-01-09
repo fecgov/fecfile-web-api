@@ -1241,6 +1241,75 @@ class TransactionModelTestCase(TestCase):
             our_later_ie._calendar_ytd_per_election_office, Decimal("2000.00")
         )
 
+    def test_insert_transaction_between_existing_no_double_counting(self):
+        """Test that inserting a transaction chronologically between two existing
+        transactions in the same entity/aggregation chain does not result in
+        double-counting in the aggregate for later transactions."""
+
+        # Create first transaction on Jan 10
+        first_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-10",
+            "100.00",
+        )
+        first_transaction.refresh_from_db()
+
+        # Verify first transaction has correct aggregate
+        self.assertEqual(first_transaction.aggregate, Decimal("100.00"))
+
+        # Create second transaction on Jan 20
+        second_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-20",
+            "150.00",
+        )
+        second_transaction.refresh_from_db()
+
+        # Verify second transaction aggregate includes first transaction
+        self.assertEqual(second_transaction.aggregate, Decimal("250.00"))
+
+        # Now create a third transaction on Jan 15 (between the first two)
+        middle_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-15",
+            "75.00",
+        )
+        middle_transaction.refresh_from_db()
+
+        # Verify middle transaction aggregate includes only first transaction
+        self.assertEqual(middle_transaction.aggregate, Decimal("175.00"))
+
+        # Refresh all transactions to get updated aggregates
+        first_transaction.refresh_from_db()
+        second_transaction.refresh_from_db()
+
+        # Verify first transaction aggregate is unchanged
+        self.assertEqual(first_transaction.aggregate, Decimal("100.00"))
+
+        # Verify second transaction now includes all three without double-counting
+        # Should be: 100 (first) + 75 (third) + 150 (second) = 325
+        self.assertEqual(second_transaction.aggregate, Decimal("325.00"))
+
+        # Create a fourth transaction on Jan 25 to verify the chain continues correctly
+        fourth_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-25",
+            "200.00",
+        )
+        fourth_transaction.refresh_from_db()
+
+        # Verify fourth transaction aggregate includes all previous transactions
+        # Should be: 100 (first) + 75 (third) + 150 (second) + 200 (fourth) = 525
+        self.assertEqual(fourth_transaction.aggregate, Decimal("525.00"))
+
 
 def undelete(transaction):
     transaction.deleted = None

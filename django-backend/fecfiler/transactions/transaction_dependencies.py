@@ -219,7 +219,7 @@ PARTNERSHIP_ATTRIBUTIONS = [
 
 # Subquery to check if a transaction has children.
 HAS_CHILDREN = Exists(
-    Transaction.objects.filter(parent_transaction=OuterRef("transaction__id")).values(
+    Transaction.objects.filter(parent_transaction_id=OuterRef("transaction__id")).values(
         "id"
     )[:1]
 )
