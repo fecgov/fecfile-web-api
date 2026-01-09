@@ -36,11 +36,15 @@ from enum import Enum
 from ..reports.models import Report
 from fecfiler.reports.report_code_label import report_code_label_case
 import structlog
+import threading
 
 logger = structlog.get_logger(__name__)
 
 # Itemization threshold defined by FEC regulations
 ITEMIZATION_THRESHOLD = Decimal(200)
+
+# Thread-local storage to track if we're inside Manager.create()
+_thread_local = threading.local()
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -75,7 +79,12 @@ class TransactionManager(SoftDeleteManager):
 
     def create(self, **kwargs):
         """Override create to aggregate schedules A/B/E, run itemization for all."""
-        instance = super().create(**kwargs)
+        # Signal to save() that this is a Manager.create() invocation
+        _thread_local.in_manager_create = True
+        try:
+            instance = super().create(**kwargs)
+        finally:
+            _thread_local.in_manager_create = False
 
         # After direct INSERT, refresh and invoke service
         instance.refresh_from_db()
