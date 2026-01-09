@@ -1246,7 +1246,6 @@ class TransactionModelTestCase(TestCase):
         transactions in the same entity/aggregation chain does not result in
         double-counting in the aggregate for later transactions."""
 
-        # Use contact_3 which has no existing transactions in setUp
         # Create first transaction on Jan 10
         first_transaction = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -1294,7 +1293,7 @@ class TransactionModelTestCase(TestCase):
         self.assertEqual(first_transaction.aggregate, Decimal("100.00"))
 
         # Verify second transaction now includes all three without double-counting
-        # Should be: 100 (first) + 75 (middle) + 150 (second) = 325
+        # Should be: 100 (first) + 75 (third) + 150 (second) = 325
         self.assertEqual(second_transaction.aggregate, Decimal("325.00"))
 
         # Create a fourth transaction on Jan 25 to verify the chain continues correctly
@@ -1308,7 +1307,7 @@ class TransactionModelTestCase(TestCase):
         fourth_transaction.refresh_from_db()
 
         # Verify fourth transaction aggregate includes all previous transactions
-        # Should be: 100 + 75 + 150 + 200 = 525
+        # Should be: 100 (first) + 75 (third) + 150 (second) + 200 (fourth) = 525
         self.assertEqual(fourth_transaction.aggregate, Decimal("525.00"))
 
 
