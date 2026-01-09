@@ -20,6 +20,7 @@ from fecfiler.transactions.models import (
 )
 from fecfiler.transactions.serializers import (
     TransactionSerializer,
+    TransactionListSerializer,
     SCHEDULE_SERIALIZERS,
 )
 from fecfiler.transactions.utils import (
@@ -95,6 +96,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     ordering = ["-created"]
     queryset = Transaction.objects
 
+    def get_serializer_class(self):
+        if self.action == "list":
+            return TransactionListSerializer
+        return TransactionSerializer
+
     def get_queryset(self):
         # Use the table if writing
         if hasattr(self, "action") and self.action in [
@@ -143,7 +149,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 | Q(contact_5=contact_id)
             )
 
-        return queryset
+        return queryset.prefetch_related("reports")
 
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():

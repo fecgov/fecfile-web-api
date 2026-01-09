@@ -5,7 +5,7 @@ from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from fecfiler.reports.serializers import ReportSerializer
 from fecfiler.contacts.serializers import ContactSerializer
 from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import empty
+from rest_framework.serializers import empty, ModelSerializer
 from collections import OrderedDict
 from rest_framework.serializers import (
     BooleanField,
@@ -13,6 +13,7 @@ from rest_framework.serializers import (
     CharField,
     DateField,
     DecimalField,
+    PrimaryKeyRelatedField,
 )
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.serializers import ScheduleASerializer
@@ -347,6 +348,50 @@ class TransactionSerializer(
         for property in schedule:
             if not representation.get(property):
                 representation[property] = schedule[property]
+
+
+class TransactionListSerializer(ModelSerializer):
+    id = UUIDField()
+    parent_transaction_id = CharField(read_only=True)
+    transaction_type_identifier = CharField(read_only=True)
+    back_reference_tran_id_number = CharField(
+        required=False, allow_null=True, read_only=True
+    )
+    form_type = CharField(required=False, allow_null=True)
+    transaction_id = UUIDField(read_only=True)
+    line_label = CharField(read_only=True)
+    itemized = BooleanField(read_only=True)
+    force_unaggregated = BooleanField(read_only=True)
+    name = CharField(read_only=True)
+    date = DateField(read_only=True)
+    memo_code = BooleanField(read_only=True)
+    amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    report_code_label = CharField(read_only=True)
+    report_ids = PrimaryKeyRelatedField(many=True, read_only=True, source="reports")
+
+    class Meta:
+        model = Transaction
+        fields = [
+            "id",
+            "parent_transaction_id",
+            "transaction_type_identifier",
+            "back_reference_tran_id_number",
+            "form_type",
+            "transaction_id",
+            "line_label",
+            "itemized",
+            "force_unaggregated",
+            "name",
+            "date",
+            "memo_code",
+            "amount",
+            "balance",
+            "aggregate",
+            "report_code_label",
+            "report_ids",
+        ]
 
 
 class TransactionReportSerializer(CommitteeOwnedSerializer):
