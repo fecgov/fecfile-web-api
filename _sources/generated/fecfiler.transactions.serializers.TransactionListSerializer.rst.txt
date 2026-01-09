@@ -1,0 +1,80 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.serializers.TransactionListSerializer
+===========================================================
+
+.. currentmodule:: fecfiler.transactions.serializers
+
+.. autoclass:: TransactionListSerializer
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~TransactionListSerializer.__init__
+      ~TransactionListSerializer.bind
+      ~TransactionListSerializer.build_field
+      ~TransactionListSerializer.build_nested_field
+      ~TransactionListSerializer.build_property_field
+      ~TransactionListSerializer.build_relational_field
+      ~TransactionListSerializer.build_standard_field
+      ~TransactionListSerializer.build_unknown_field
+      ~TransactionListSerializer.build_url_field
+      ~TransactionListSerializer.create
+      ~TransactionListSerializer.fail
+      ~TransactionListSerializer.get_attribute
+      ~TransactionListSerializer.get_default
+      ~TransactionListSerializer.get_default_field_names
+      ~TransactionListSerializer.get_extra_kwargs
+      ~TransactionListSerializer.get_field_names
+      ~TransactionListSerializer.get_fields
+      ~TransactionListSerializer.get_initial
+      ~TransactionListSerializer.get_unique_for_date_validators
+      ~TransactionListSerializer.get_unique_together_constraints
+      ~TransactionListSerializer.get_unique_together_validators
+      ~TransactionListSerializer.get_uniqueness_extra_kwargs
+      ~TransactionListSerializer.get_validators
+      ~TransactionListSerializer.get_value
+      ~TransactionListSerializer.include_extra_kwargs
+      ~TransactionListSerializer.is_valid
+      ~TransactionListSerializer.many_init
+      ~TransactionListSerializer.run_validation
+      ~TransactionListSerializer.run_validators
+      ~TransactionListSerializer.save
+      ~TransactionListSerializer.set_value
+      ~TransactionListSerializer.to_internal_value
+      ~TransactionListSerializer.to_representation
+      ~TransactionListSerializer.update
+      ~TransactionListSerializer.validate
+      ~TransactionListSerializer.validate_empty_values
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TransactionListSerializer.context
+      ~TransactionListSerializer.data
+      ~TransactionListSerializer.default_error_messages
+      ~TransactionListSerializer.default_validators
+      ~TransactionListSerializer.errors
+      ~TransactionListSerializer.fields
+      ~TransactionListSerializer.initial
+      ~TransactionListSerializer.root
+      ~TransactionListSerializer.serializer_field_mapping
+      ~TransactionListSerializer.url_field_name
+      ~TransactionListSerializer.validated_data
+      ~TransactionListSerializer.validators
+   
+   
