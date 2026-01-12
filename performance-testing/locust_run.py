@@ -136,7 +136,7 @@ class Tasks(TaskSet):
     def create_schedule_a_transaction(self):
         contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_1"])
         transaction_data = deepcopy(self.transaction_payloads["INDIVIDUAL_RECEIPT"])
-        report_id = self.report_ids[0] #random.choice(self.report_ids)
+        report_id = self.report_ids[0]  # random.choice(self.report_ids)
         contribution_date = self.report_ids_dict[report_id]
 
         transaction_data["contact_1"] = contact_data
@@ -165,7 +165,7 @@ class Tasks(TaskSet):
     def create_schedule_b_transaction(self):
         contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_2"])
         transaction_data = deepcopy(self.transaction_payloads["OPERATING_EXPENDITURE"])
-        report_id = self.report_ids[0] #random.choice(self.report_ids)
+        report_id = self.report_ids[0]  # random.choice(self.report_ids)
         expenditure_date = self.report_ids_dict[report_id]
 
         transaction_data["contact_1"] = contact_data
@@ -195,7 +195,7 @@ class Tasks(TaskSet):
         transaction_data = deepcopy(
             self.transaction_payloads["LOAN_RECEIVED_FROM_INDIVIDUAL"]
         )
-        report_id = self.report_ids[0] #random.choice(self.report_ids)
+        report_id = self.report_ids[0]  # random.choice(self.report_ids)
         loan_incurred_date = self.report_ids_dict[report_id]
 
         transaction_data["contact_1"] = contact_data
@@ -231,7 +231,7 @@ class Tasks(TaskSet):
     def create_schedule_d_transaction(self):
         contact_data = deepcopy(self.contact_payloads["ORGANIZATION_CONTACT_1"])
         transaction_data = deepcopy(self.transaction_payloads["DEBT_OWED_BY_COMMITTEE"])
-        report_id = self.report_ids[0] #random.choice(self.report_ids)
+        report_id = self.report_ids[0]  # random.choice(self.report_ids)
 
         transaction_data["contact_1"] = contact_data
         transaction_data["contact_1_id"] = contact_data["id"]
@@ -250,7 +250,7 @@ class Tasks(TaskSet):
     @task(100)  # This task will be picked 100 times more often than the default
     def update_schedule_a_transaction(self):
         if len(self.report_ids) > 0:
-            report_id = self.report_ids[0] #random.choice(self.report_ids)
+            report_id = self.report_ids[0]  # random.choice(self.report_ids)
             txn_id = self.last_created_schedule_a_by_report.get(report_id)
             transaction = None
             if txn_id:
@@ -263,7 +263,7 @@ class Tasks(TaskSet):
                 response = self.client_get(
                     f"/api/v1/transactions/{transaction['id']}/",
                     name="get_schedule_a_transaction_by_id",
-                    timeout=TIMEOUT,
+                    timeout=TIMEOUT
                 )
                 if response and response.status_code == 200:
                     data = response.json()
@@ -292,8 +292,12 @@ class Tasks(TaskSet):
         if len(self.report_ids) > 0:
             report_id = self.report_ids[0]
             txn_id = self.last_created_schedule_b_by_report.get(report_id)
-            transaction = {"id": txn_id} if txn_id else self.get_first_transaction_for_report(
-                report_id, "B", "OPERATING_EXPENDITURE"
+            transaction = (
+                {"id": txn_id}
+                if txn_id
+                else self.get_first_transaction_for_report(
+                    report_id, "B", "OPERATING_EXPENDITURE"
+                )
             )
             if transaction:
                 response = self.client_get(
@@ -326,8 +330,12 @@ class Tasks(TaskSet):
         if len(self.report_ids) > 0:
             report_id = self.report_ids[0]
             txn_id = self.last_created_schedule_c_by_report.get(report_id)
-            transaction = {"id": txn_id} if txn_id else self.get_first_transaction_for_report(
-                report_id, "C", "LOAN_RECEIVED_FROM_INDIVIDUAL"
+            transaction = (
+                {"id": txn_id}
+                if txn_id
+                else self.get_first_transaction_for_report(
+                    report_id, "C", "LOAN_RECEIVED_FROM_INDIVIDUAL"
+                )
             )
             if transaction:
                 response = self.client_get(
@@ -358,7 +366,7 @@ class Tasks(TaskSet):
     @task
     def delete_schedule_a_transaction(self):
         if len(self.report_ids) > 0:
-            report_id = self.report_ids[0] #random.choice(self.report_ids)
+            report_id = self.report_ids[0]  # random.choice(self.report_ids)
             transaction = self.get_first_individual_receipt_for_report(report_id)
             if transaction:
                 response = self.client.delete(
@@ -372,7 +380,7 @@ class Tasks(TaskSet):
     @task(100)
     def filing_calculate_summary_only(self):
         self.client.request_name = "recalculate_report_summary"
-        report_id = self.report_ids[0] #random.choice(self.report_ids)
+        report_id = self.report_ids[0]  # random.choice(self.report_ids)
         self.calculate_summary_for_report_id(report_id, "calculate_summary_for_report_id")
 
     @task(500)
@@ -380,7 +388,7 @@ class Tasks(TaskSet):
         if len(self.report_ids_to_submit) == 0:
             logging.info("No more reports to submit")
             return
-        report_id = self.report_ids[0] #random.choice(self.report_ids)
+        report_id = self.report_ids[0]  # random.choice(self.report_ids)
         report_json = self.retrieve_report(report_id)
 
         self.calculate_summary_for_report_id(
@@ -399,7 +407,7 @@ class Tasks(TaskSet):
                 logging.info("No current reports to amend")
             return
 
-        report_id = self.report_ids[0] #random.choice(self.report_ids)
+        report_id = self.report_ids[0]  # random.choice(self.report_ids)
         logging.info(f"Amending report {report_id}")
 
         self.amend_report(report_id)
@@ -636,11 +644,19 @@ class Tasks(TaskSet):
         )
         if response and response.status_code == 200:
             payload = response.json()
-            results = payload.get("results", []) if isinstance(payload, dict) else payload
+            results = (
+                payload.get("results", [])
+                if isinstance(payload, dict)
+                else payload
+            )
             if not isinstance(results, list):
                 return None
             for transaction in results:
-                if not transaction_type_identifier or transaction.get("transaction_type_identifier") == transaction_type_identifier:
+                if (
+                    not transaction_type_identifier
+                    or transaction.get("transaction_type_identifier")
+                    == transaction_type_identifier
+                ):
                     return transaction
         return None
 
