@@ -33,7 +33,59 @@ but are called different names"""
 class TransactionManager(SoftDeleteManager):
 
     def get_queryset(self):
-        return super().get_queryset().annotate(date=self.DATE_CLAUSE)
+        return super().get_queryset().annotate(
+            schedule=self.SCHEDULE_CLAUSE(),
+            date=self.DATE_CLAUSE,
+            amount=self.AMOUNT_CLAUSE,
+            incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
+            payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
+            payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
+            form_type=self.FORM_TYPE_CLAUSE,
+            name=self.DISPLAY_NAME_CLAUSE,
+            transaction_ptr_id=F("id"),
+            back_reference_tran_id_number=self.BACK_REFERENCE_CLAUSE,
+            back_reference_sched_name=self.BACK_REFERENCE_NAME_CLAUSE,
+            beginning_balance=Case(
+                When(
+                    schedule_d__isnull=False,
+                    then=F("incurred_prior") - F("payment_prior"),
+                ),
+            ),
+            balance_at_close=Case(
+                When(
+                    schedule_d__isnull=False,
+                    then=F("beginning_balance")
+                    + F("schedule_d__incurred_amount")
+                    - F("payment_amount"),
+                ),
+            ),
+            loan_balance=Case(
+                When(
+                    schedule_c__isnull=False,
+                    then=F("amount")
+                    - Coalesce(F("loan_payment_to_date"), Decimal(0.0)),
+                ),
+            ),
+            balance=Case(
+                When(
+                    schedule_d__isnull=False,
+                    then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+                ),
+                When(
+                    schedule_c__isnull=False,
+                    then=Coalesce(F("loan_balance"), Decimal(0)),
+                ),
+            ),
+            calendar_ytd_per_election_office=Coalesce(
+                "parent_transaction__parent_transaction___calendar_ytd_per_election_office",  # noqa
+                "parent_transaction___calendar_ytd_per_election_office",
+                "_calendar_ytd_per_election_office",
+            ),
+            line_label=self.LINE_LABEL_CLAUSE(),
+            report_code_label=self.REPORT_CODE_LABEL_CLAUSE(),
+        ).alias(
+            order_key=self.ORDER_KEY_CLAUSE()
+        ).order_by("order_key")
 
     def SCHEDULE_CLAUSE(self):  # noqa: N802
         return Case(
@@ -110,6 +162,16 @@ class TransactionManager(SoftDeleteManager):
         output_field=TextField(),
     )
 
+    def REPORT_CODE_LABEL_CLAUSE(self):
+        return Coalesce(
+            Subquery(  # noqa: N806
+                Report.objects.filter(transactions=OuterRef("pk"))
+                .annotate(report_code_label=report_code_label_case)
+                .values("report_code_label")[:1]
+            ),
+            Value("")
+        )
+
     def INCURRED_PRIOR_CLAUSE(self):  # noqa: N802
         return Case(
             When(
@@ -182,71 +244,6 @@ class TransactionManager(SoftDeleteManager):
                 ),
             ),
             default=None,
-        )
-
-    def transaction_view(self):
-        REPORT_CODE_LABEL_CLAUSE = Subquery(  # noqa: N806
-            Report.objects.filter(transactions=OuterRef("pk"))
-            .annotate(report_code_label=report_code_label_case)
-            .values("report_code_label")[:1]
-        )
-
-        return (
-            super()
-            .get_queryset()
-            .annotate(
-                schedule=self.SCHEDULE_CLAUSE(),
-                date=self.DATE_CLAUSE,
-                amount=self.AMOUNT_CLAUSE,
-                incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
-                payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
-                payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
-                form_type=self.FORM_TYPE_CLAUSE,
-                name=self.DISPLAY_NAME_CLAUSE,
-                transaction_ptr_id=F("id"),
-                back_reference_tran_id_number=self.BACK_REFERENCE_CLAUSE,
-                back_reference_sched_name=self.BACK_REFERENCE_NAME_CLAUSE,
-                beginning_balance=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=F("incurred_prior") - F("payment_prior"),
-                    ),
-                ),
-                balance_at_close=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=F("beginning_balance")
-                        + F("schedule_d__incurred_amount")
-                        - F("payment_amount"),
-                    ),
-                ),
-                loan_balance=Case(
-                    When(
-                        schedule_c__isnull=False,
-                        then=F("amount")
-                        - Coalesce(F("loan_payment_to_date"), Decimal(0.0)),
-                    ),
-                ),
-                balance=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
-                    ),
-                    When(
-                        schedule_c__isnull=False,
-                        then=Coalesce(F("loan_balance"), Decimal(0)),
-                    ),
-                ),
-                calendar_ytd_per_election_office=Coalesce(
-                    "parent_transaction__parent_transaction___calendar_ytd_per_election_office",  # noqa
-                    "parent_transaction___calendar_ytd_per_election_office",
-                    "_calendar_ytd_per_election_office",
-                ),
-                line_label=self.LINE_LABEL_CLAUSE(),
-                report_code_label=REPORT_CODE_LABEL_CLAUSE,
-            )
-            .alias(order_key=self.ORDER_KEY_CLAUSE())
-            .order_by("order_key")
         )
 
     def ORDER_KEY_CLAUSE(self):  # noqa: N802
