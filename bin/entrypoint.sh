@@ -19,7 +19,6 @@ fi
 echo "Loading initial data..."
 python manage.py loaddata fixtures/user-data.json
 python manage.py load_mocked_committee_data
-python manage.py gen_locust_load_test_data #--number_of_committees 1 --number_of_contacts 1
 
 # Start the Gunicorn server
 echo "Starting Gunicorn server..."
