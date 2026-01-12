@@ -34,6 +34,7 @@ fecfiler.web\_services
    fecfiler.web_services.dot_fec
    fecfiler.web_services.migrations
    fecfiler.web_services.models
+   fecfiler.web_services.profilers
    fecfiler.web_services.renderers
    fecfiler.web_services.serializers
    fecfiler.web_services.summary
