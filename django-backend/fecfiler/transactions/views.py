@@ -167,9 +167,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             response = super().destroy(request, *args, **kwargs)
             # update parents that depend on this transaction
             update_dependent_parent(transaction)
-            if transaction.debt:
+            if transaction.is_debt_repayment():
                 process_aggregation_for_debts(transaction.debt)
-
+            elif transaction.schedule_d is not None:
+                process_aggregation_for_debts(transaction)
         return response
 
     def partial_update(self, request, pk=None):
