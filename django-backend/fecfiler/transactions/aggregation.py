@@ -138,3 +138,20 @@ def process_aggregation_by_payee_candidate(transaction_instance):
     ScheduleF.objects.bulk_update(
         updated_schedule_fs, ["aggregate_general_elec_expended"], batch_size=64
     )
+
+
+def recalculate_aggregation_for_debt_chain(original_debt_ids):
+    """
+    Handles the batching of aggregation processing to avoid redundant operations
+    when multiple transactions reference the same debt chain.
+
+    Args:
+        original_debt_ids: An iterable (set, list) of original debt transaction IDs
+    """
+    for original_debt_id in original_debt_ids:
+        try:
+            original_debt = Transaction.objects.get(id=original_debt_id)
+            process_aggregation_for_debts(original_debt)
+        except Transaction.DoesNotExist:
+            # Debt may have been deleted in cascade
+            pass

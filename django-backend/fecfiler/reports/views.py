@@ -8,7 +8,7 @@ from .report_code_label import report_code_label_case
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.reports.utils.report import delete_all_reports
 from .serializers import ReportSerializer
-from fecfiler.transactions.aggregation import process_aggregation_for_debts
+from fecfiler.transactions.aggregation import recalculate_aggregation_for_debt_chain
 from django.db.models import Case, Value, When, CharField, IntegerField, F
 from django.db.models.functions import Concat, Trim
 from django.db import transaction as db_transaction
@@ -182,11 +182,24 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         report = self.get_object()
         with db_transaction.atomic():
+            # Collect all debt-related transactions: debts (Schedule D) and repayments
             debts = list(report.transactions.filter(schedule_d__isnull=False))
+            repayments = list(report.transactions.filter(
+                debt__isnull=False, schedule_d__isnull=True
+            ))
             response = super().destroy(request, *args, **kwargs)
+            # Deduplicate by original debt ID to avoid redundant aggregation processing
+            original_debt_ids = set()
             for debt in debts:
-                if debt.debt:
-                    process_aggregation_for_debts(debt.debt)
+                original_debt_id = debt.debt_id or debt.id
+                original_debt_ids.add(original_debt_id)
+            for repayment in repayments:
+                # For repayments, traverse to the original debt via the debt reference
+                if repayment.debt:
+                    original_debt_id = repayment.debt.debt_id or repayment.debt.id
+                    original_debt_ids.add(original_debt_id)
+
+            recalculate_aggregation_for_debt_chain(original_debt_ids)
 
         return response
 

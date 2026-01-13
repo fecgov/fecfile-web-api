@@ -167,8 +167,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             response = super().destroy(request, *args, **kwargs)
             # update parents that depend on this transaction
             update_dependent_parent(transaction)
-            if transaction.debt:
+            if transaction.is_debt_repayment():
                 process_aggregation_for_debts(transaction.debt)
+            elif transaction.schedule_d is not None:
+                process_aggregation_for_debts(transaction)
 
         return response
 
@@ -585,7 +587,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 case Schedule.F:
                     process_aggregation_by_payee_candidate(transaction_instance)
 
-        if transaction_instance.debt or transaction_instance.schedule_d is not None:
+        if transaction_instance.is_debt_repayment() or (
+            transaction_instance.schedule_d is not None
+        ):
             process_aggregation_for_debts(transaction_instance)
 
     # If a transaction has been moved forward, update the aggregate values
