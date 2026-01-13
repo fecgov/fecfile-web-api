@@ -25,25 +25,18 @@ def process_aggregation_for_debts(transaction_instance):
     if given_debt is None:
         return
 
-    original_debt_trans_id = given_debt.transaction_id
-    if given_debt.parent_transaction is not None:
-        original_debt_trans_id = given_debt.parent_transaction.transaction_id
+    debt_transaction_id = given_debt.transaction_id
 
-    original_debt = transaction_view.filter(
-        committee_account_id=given_debt.committee_account_id,
-        transaction_id=original_debt_trans_id
-    ).first()
-
-    child_debts = transaction_view.filter(
+    debt_chain = transaction_view.filter(
         schedule_d__isnull=False,
         committee_account_id=given_debt.committee_account_id,
-        back_reference_tran_id_number=original_debt_trans_id
+        transaction_id=debt_transaction_id,
     ).order_by("schedule_d__report_coverage_from_date")
 
     incurred_prior = 0
     repayed_amount = 0
     schedule_ds = []
-    for debt in [original_debt, *child_debts]:
+    for debt in debt_chain:
         debt.schedule_d.incurred_prior = incurred_prior
         incurred_prior += debt.schedule_d.incurred_amount
 
@@ -77,9 +70,9 @@ def process_aggregation_for_debts(transaction_instance):
             "payment_prior",
             "payment_amount",
             "beginning_balance",
-            "balance_at_close"
+            "balance_at_close",
         ],
-        batch_size=64
+        batch_size=64,
     )
 
 
