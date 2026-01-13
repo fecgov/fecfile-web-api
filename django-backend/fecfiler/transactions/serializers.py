@@ -8,6 +8,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import empty, ModelSerializer
 from collections import OrderedDict
 from rest_framework.serializers import (
+    SerializerMethodField,
     BooleanField,
     UUIDField,
     CharField,
@@ -357,7 +358,7 @@ class TransactionListSerializer(ModelSerializer):
     back_reference_tran_id_number = CharField(
         required=False, allow_null=True, read_only=True
     )
-    form_type = CharField(required=False, allow_null=True)
+    form_type = SerializerMethodField()
     transaction_id = UUIDField(read_only=True)
     line_label = CharField(read_only=True)
     itemized = BooleanField(read_only=True)
@@ -370,6 +371,12 @@ class TransactionListSerializer(ModelSerializer):
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     report_code_label = CharField(read_only=True)
     report_ids = PrimaryKeyRelatedField(many=True, read_only=True, source="reports")
+
+    def get_form_type(self, obj):
+        reports = obj.reports.all()
+        if reports:
+            return reports[0].get_form_name()
+        return None
 
     class Meta:
         model = Transaction
