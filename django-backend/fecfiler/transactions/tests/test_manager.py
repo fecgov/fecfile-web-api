@@ -18,6 +18,7 @@ from fecfiler.transactions.tests.utils import (
     create_loan,
 )
 from fecfiler.transactions.schedule_c.utils import carry_forward_loans
+from fecfiler.transactions.aggregation import process_aggregation_for_debts
 from decimal import Decimal
 from django.db import transaction
 import structlog
@@ -309,6 +310,7 @@ class TransactionViewTestCase(TestCase):
         )
         second_repayment.debt = original_debt
         second_repayment.save()
+        process_aggregation_for_debts(original_debt)
 
         view = Transaction.objects.transaction_view().filter(
             committee_account__id=self.committee.id
