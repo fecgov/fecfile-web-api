@@ -54,4 +54,5 @@ fecfiler.transactions.migrations
    fecfiler.transactions.migrations.0021_alter_transaction_reports
    fecfiler.transactions.migrations.0022_schedule_f_aggregation
    fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date
+   fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more
 

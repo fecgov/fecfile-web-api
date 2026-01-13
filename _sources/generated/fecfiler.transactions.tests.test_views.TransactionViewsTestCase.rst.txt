@@ -121,10 +121,13 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.test_add_transaction_family_to_report_from_parent
       ~TransactionViewsTestCase.test_add_transaction_to_report
       ~TransactionViewsTestCase.test_create_schedule_f_debt_repayment
+      ~TransactionViewsTestCase.test_debt_incurred_prior_aggregation
       ~TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_carried_forward_debt
       ~TransactionViewsTestCase.test_delete_carried_forward_debt_on_repayment_to_orignal_debt
       ~TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_carried_forward_loan
       ~TransactionViewsTestCase.test_delete_carried_forward_loan_on_repayment_to_orignal_loan
+      ~TransactionViewsTestCase.test_delete_middle_of_debt_chain
+      ~TransactionViewsTestCase.test_delete_schedule_f_debt_repayment
       ~TransactionViewsTestCase.test_destroy
       ~TransactionViewsTestCase.test_destroy_with_dependent_parent
       ~TransactionViewsTestCase.test_get_entity_date_leapfrogging

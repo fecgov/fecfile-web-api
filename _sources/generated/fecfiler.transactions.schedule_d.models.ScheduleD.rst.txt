@@ -51,9 +51,14 @@ fecfiler.transactions.schedule\_d.models.ScheduleD
 
    .. autosummary::
    
+      ~ScheduleD.balance_at_close
+      ~ScheduleD.beginning_balance
       ~ScheduleD.id
       ~ScheduleD.incurred_amount
+      ~ScheduleD.incurred_prior
       ~ScheduleD.objects
+      ~ScheduleD.payment_amount
+      ~ScheduleD.payment_prior
       ~ScheduleD.pk
       ~ScheduleD.purpose_of_debt_or_obligation
       ~ScheduleD.receipt_line_number

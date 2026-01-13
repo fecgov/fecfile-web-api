@@ -101,6 +101,7 @@ fecfiler.transactions.schedule\_d.tests.test\_views.ScheduleDViewsTestCase
       ~ScheduleDViewsTestCase.tearDownClass
       ~ScheduleDViewsTestCase.test_create_debt_in_future_report
       ~ScheduleDViewsTestCase.test_update_debt_in_future_report
+      ~ScheduleDViewsTestCase.test_updating_debt_preserves_unique_ids_of_descendants
    
    
 

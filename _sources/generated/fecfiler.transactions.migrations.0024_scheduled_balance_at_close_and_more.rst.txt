@@ -1,0 +1,41 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.transactions.migrations.0024\_scheduled\_balance\_at\_close\_and\_more
+===============================================================================
+
+.. automodule:: fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      run_aggregations_for_all_debts
+   
+   
+
+   
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+      :toctree:                                          
+      :template: custom-class-template.rst               
+   
+      Migration
+   
+   
+
+   
+   
+   
+
+
+

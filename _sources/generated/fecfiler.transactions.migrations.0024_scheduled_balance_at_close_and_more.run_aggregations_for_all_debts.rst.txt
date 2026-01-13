@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0024\_scheduled\_balance\_at\_close\_and\_more.run\_aggregations\_for\_all\_debts
+==================================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more
+
+.. autofunction:: run_aggregations_for_all_debts

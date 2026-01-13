@@ -1,0 +1,6 @@
+fecfiler.transactions.aggregation.process\_aggregation\_for\_debts
+==================================================================
+
+.. currentmodule:: fecfiler.transactions.aggregation
+
+.. autofunction:: process_aggregation_for_debts

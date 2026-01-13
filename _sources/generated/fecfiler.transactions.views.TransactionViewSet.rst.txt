@@ -78,7 +78,6 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.previous_transaction_by_entity
       ~TransactionViewSet.previous_transaction_by_payee_candidate
       ~TransactionViewSet.process_aggregation
-      ~TransactionViewSet.process_aggregation_by_payee_candidate
       ~TransactionViewSet.raise_uncaught_exception
       ~TransactionViewSet.remove_transaction_from_report
       ~TransactionViewSet.retrieve
