@@ -358,6 +358,7 @@ class TransactionListSerializer(ModelSerializer):
         required=False, allow_null=True, read_only=True
     )
     form_type = CharField(required=False, allow_null=True)
+    report_type = CharField(read_only=True)
     transaction_id = UUIDField(read_only=True)
     line_label = CharField(read_only=True)
     itemized = BooleanField(read_only=True)
@@ -379,6 +380,7 @@ class TransactionListSerializer(ModelSerializer):
             "transaction_type_identifier",
             "back_reference_tran_id_number",
             "form_type",
+            "report_type",
             "transaction_id",
             "line_label",
             "itemized",
@@ -392,6 +394,16 @@ class TransactionListSerializer(ModelSerializer):
             "report_code_label",
             "report_ids",
         ]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        # Get the first report's type for the transaction
+        # This will be used to display the form name (e.g., Form 3X)
+        if instance.reports.exists():
+            representation["report_type"] = instance.reports.first().report_type
+        else:
+            representation["report_type"] = None
+        return representation
 
 
 class TransactionReportSerializer(CommitteeOwnedSerializer):
