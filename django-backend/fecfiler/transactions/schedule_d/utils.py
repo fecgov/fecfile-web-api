@@ -1,5 +1,4 @@
 from fecfiler.transactions.models import Transaction
-from fecfiler.transactions.aggregation import process_aggregation_for_debts
 from django.forms.models import model_to_dict
 from fecfiler.utils import save_copy
 from django.db.models import Q
