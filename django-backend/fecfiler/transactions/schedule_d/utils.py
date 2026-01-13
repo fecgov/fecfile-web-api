@@ -1,5 +1,4 @@
 from fecfiler.transactions.models import Transaction
-from fecfiler.transactions.aggregation import recalculate_aggregation_for_debt_chain
 from django.forms.models import model_to_dict
 from fecfiler.utils import save_copy
 from django.db.models import Q
@@ -30,7 +29,6 @@ def carry_forward_debts(report):
             reports=previous_report,
         )
 
-        # Track original debt IDs to batch aggregation processing at the end.
         for debt in all_debts_for_committee:
             if debt.balance_at_close != Decimal(0) and debt.balance_at_close is not None:
                 carry_forward_debt(debt, report)
