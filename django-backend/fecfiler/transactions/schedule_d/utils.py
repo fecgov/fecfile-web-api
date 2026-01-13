@@ -31,12 +31,9 @@ def carry_forward_debts(report):
         )
 
         # Track original debt IDs to batch aggregation processing at the end.
-        original_debt_ids = set()
         for debt in all_debts_for_committee:
             if debt.balance_at_close != Decimal(0) and debt.balance_at_close is not None:
                 carry_forward_debt(debt, report)
-                original_debt_ids.add(debt.debt_id or debt.id)
-        recalculate_aggregation_for_debt_chain(original_debt_ids)
 
 
 def carry_forward_debt(debt, report):
