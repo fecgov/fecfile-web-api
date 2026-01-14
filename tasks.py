@@ -11,7 +11,7 @@ from invoke import task
 env = cfenv.AppEnv()
 
 APP_NAME = "load-fecfile-web-api"
-MIGRATOR_APP_NAME = "load-fecfile-api-migrator"  # THE APP WITH THIS NAME WILL GET DELETED!
+MIGRATOR_APP_NAME = "load-fecfile-api-migrator"  # APP WITH THIS NAME WILL GET DELETED!
 WEB_SERVICES_NAME = "load-fecfile-web-services"
 SCHEDULER_NAME = "load-fecfile-scheduler"
 PROXY_NAME = "load-fecfile-api-proxy"
