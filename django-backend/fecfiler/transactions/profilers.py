@@ -9,18 +9,10 @@ TRANSACTION_MANAGER_PROFILING = [
     },
     {
         "module": "fecfiler.transactions.managers",
-        "function": "TransactionManager.INCURRED_PRIOR_CLAUSE",
-    },
-    {
-        "module": "fecfiler.transactions.managers",
-        "function": "TransactionManager.PAYMENT_PRIOR_CLAUSE",
-    },
-    {
-        "module": "fecfiler.transactions.managers",
-        "function": "TransactionManager.PAYMENT_AMOUNT_CLAUSE",
-    },
-    {
-        "module": "fecfiler.transactions.managers",
         "function": "TransactionManager.ORDER_KEY_CLAUSE",
+    },
+    {
+        "module": "fecfiler.transactions.views",
+        "function": "TransactionViewSet.save_transaction"
     },
 ]

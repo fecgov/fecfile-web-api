@@ -5,6 +5,7 @@ from fecfiler.user.models import User
 from fecfiler.reports.models import Report
 import json
 from copy import deepcopy
+from fecfiler.reports.views import ReportViewSet
 from fecfiler.transactions.views import TransactionViewSet, TransactionOrderingFilter
 from fecfiler.transactions.models import Transaction
 from fecfiler.committee_accounts.models import CommitteeAccount
@@ -26,6 +27,11 @@ from fecfiler.transactions.tests.utils import (
 )
 from fecfiler.transactions.serializers import TransactionSerializer
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
+from fecfiler.transactions.aggregation import (
+    process_aggregation_for_debts,
+    process_aggregation_by_payee_candidate
+)
+from fecfiler.transactions.schedule_d.views import create_in_future_reports
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -1068,6 +1074,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             debt_id=original_debt.id,
             report=q1_report,
         )
+        process_aggregation_for_debts(original_debt)
 
         # create q2 and confirm debt carry forward
         q2_report = create_form3x(self.committee, "2025-04-01", "2025-06-30", {})
@@ -1101,6 +1108,74 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertTrue(Transaction.all_objects.get(id=q2_carried_over_debt.id).deleted)
         self.assertTrue(Transaction.all_objects.get(id=q3_carried_over_debt.id).deleted)
 
+    def test_delete_middle_of_debt_chain(self):
+        """Paying off a debt in one report should delete any carried forward
+        copies in future reports"""
+        # create q1 and associated debt
+        test_q1_report_2025 = create_form3x(
+            self.committee, "2025-01-01", "2025-03-31", {}
+        )
+        test_debt = create_debt(
+            self.committee,
+            self.test_org_contact,
+            "1500.00",
+            report=test_q1_report_2025,
+        )
+        create_schedule_b(
+            "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
+            self.committee,
+            self.test_org_contact,
+            "2025-01-02",
+            Decimal("400.00"),
+            debt_id=test_debt.id,
+            report=test_q1_report_2025,
+        )
+        process_aggregation_for_debts(test_debt)
+
+        # create q2 and confirm debt carry forward
+        test_q2_report_2025 = create_form3x(
+            self.committee, "2025-04-01", "2025-06-30", {}
+        )
+        test_q2_carried_over_debt = (
+            Transaction.objects
+            .filter(reports__id=test_q2_report_2025.id, debt_id=test_debt.id)
+            .get()
+        )
+        self.assertEqual(test_q2_carried_over_debt.balance_at_close, Decimal(1100.00))
+
+        # create q3 and confirm debt carry forward
+        test_q3_report_2025 = create_form3x(
+            self.committee, "2025-07-01", "2025-09-30", {}
+        )
+        test_q3_carried_over_debt = test_q3_report_2025.transactions.filter(
+            schedule_d__isnull=False
+        ).first()
+        self.assertEqual(test_q3_carried_over_debt.schedule_d.balance_at_close, 1100.00)
+
+        # make repayment in q2
+        create_schedule_b(
+            "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
+            self.committee,
+            self.test_org_contact,
+            "2025-04-02",
+            "300.00",
+            debt_id=test_q2_carried_over_debt.id,
+            report=test_q2_report_2025,
+        )
+        process_aggregation_for_debts(test_q2_carried_over_debt)
+        test_q3_carried_over_debt.refresh_from_db()
+        self.assertEqual(test_q3_carried_over_debt.schedule_d.balance_at_close, 800.00)
+
+        # Delete q2 report and confirm that later debts are recalculated
+        self.send_viewset_delete_request(
+            f"api/v1/reports/{test_q2_report_2025.id}/",
+            ReportViewSet,
+            "destroy",
+            pk=test_q2_report_2025.id,
+        )
+        test_q3_carried_over_debt.refresh_from_db()
+        self.assertEqual(test_q3_carried_over_debt.schedule_d.balance_at_close, 1100.00)
+
     def test_delete_carried_forward_debt_on_repayment_to_carried_forward_debt(self):
         """Paying off a debt in one report should delete any carried forward
         copies in future reports"""
@@ -1123,6 +1198,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             debt_id=test_debt.id,
             report=test_q1_report_2025,
         )
+        process_aggregation_for_debts(test_debt)
 
         # create q2 and confirm debt carry forward
         test_q2_report_2025 = create_form3x(
@@ -1145,6 +1221,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             debt_id=test_q2_carried_over_debt.id,
             report=test_q2_report_2025,
         )
+        process_aggregation_for_debts(test_q2_carried_over_debt)
 
         # create q3 and confirm debt carry forward
         test_q3_report_2025 = create_form3x(
@@ -1181,6 +1258,72 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             Transaction.all_objects.get(pk=test_q2_carried_over_debt.id).deleted
         )
 
+    def test_debt_incurred_prior_aggregation(self):
+        # create three reports
+        test_q1_report_2026 = create_form3x(
+            self.committee, "2026-01-01", "2026-03-31", {}
+        )
+        test_q2_report_2026 = create_form3x(
+            self.committee, "2026-04-01", "2026-06-30", {}
+        )
+        test_q3_report_2026 = create_form3x(
+            self.committee, "2026-07-01", "2026-08-31", {}
+        )
+
+        # create debt on first report
+        self.assertEqual(Transaction.objects.all().count(), 3)
+        test_debt = create_debt(
+            self.committee,
+            self.test_org_contact,
+            "1000.00",
+            report=test_q1_report_2026,
+        )
+        self.assertEqual(Transaction.objects.all().count(), 4)
+
+        # carry forward
+        create_in_future_reports(test_debt)
+        self.assertEqual(Transaction.objects.all().count(), 6)
+
+        # get child debts
+        q2_debt = Transaction.objects.filter(
+            schedule_d__isnull=False,
+            committee_account_id=test_debt.committee_account_id,
+            reports__id=test_q2_report_2026.id
+        ).first()
+
+        q3_debt = Transaction.objects.filter(
+            schedule_d__isnull=False,
+            committee_account_id=test_debt.committee_account_id,
+            reports__id=test_q3_report_2026.id
+        ).first()
+
+        self.assertIsNotNone(q2_debt)
+        self.assertIsNotNone(q3_debt)
+
+        # Set debt 2's incurred amount
+        q2_debt.schedule_d.incurred_amount = 500.00
+        q2_debt.schedule_d.save()
+
+        process_aggregation_for_debts(test_debt)
+
+        # Test assertions
+        test_debt.refresh_from_db()
+        q2_debt.refresh_from_db()
+        q3_debt.refresh_from_db()
+
+        # Check to make sure that schedule d id's are still unique
+        self.assertEqual(test_debt.schedule_d.incurred_prior, 0.00)
+        self.assertEqual(test_debt.schedule_d.incurred_amount, 1000.00)
+        self.assertEqual(test_debt.schedule_d.balance_at_close, 1000.00)
+
+        self.assertEqual(q2_debt.schedule_d.incurred_prior, 1000.00)
+        self.assertEqual(q2_debt.schedule_d.incurred_amount, 500.00)
+        self.assertEqual(q2_debt.schedule_d.balance_at_close, 1500.00)
+
+        self.assertEqual(q3_debt.schedule_d.incurred_prior, 1500.00)
+        self.assertEqual(q3_debt.schedule_d.incurred_amount, 0.00)
+        self.assertEqual(q3_debt.schedule_d.balance_at_close, 1500.00)
+
     def test_create_schedule_f_debt_repayment(self):
         """Making a schedule f debt repayment should reduce the balance accordingly"""
         # create q1 and associated debt
@@ -1193,6 +1336,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "1000.00",
             report=test_q1_report_2025,
         )
+        process_aggregation_for_debts(test_debt)
+
         # pay off debt on q2 and confirm q3 carry foward debt deleted
         test_schedule_f_debt_repayment = self.create_schedule_f_debt_repayment_payload(
             test_debt,
@@ -1200,12 +1345,51 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "2025-04-03",
             150.00,
         )
+
         response = self.view.create(self.post_request(test_schedule_f_debt_repayment))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             Transaction.objects.get(pk=test_debt.id).balance_at_close,
             850.00,
         )
+
+    def test_delete_schedule_f_debt_repayment(self):
+        """Making a schedule f debt repayment should reduce the balance accordingly"""
+        # create q1 and associated debt
+        test_q1_report_2025 = create_form3x(
+            self.committee, "2025-01-01", "2025-03-31", {}
+        )
+        test_debt = create_debt(
+            self.committee,
+            self.test_org_contact,
+            "1000.00",
+            report=test_q1_report_2025,
+        )
+        process_aggregation_for_debts(test_debt)
+
+        test_schedule_f_debt_repayment = self.create_schedule_f_debt_repayment_payload(
+            test_debt,
+            test_q1_report_2025,
+            "2025-04-03",
+            350.00,
+        )
+
+        response = self.view.create(self.post_request(test_schedule_f_debt_repayment))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            Transaction.objects.get(pk=test_debt.id).balance_at_close,
+            650.00,
+        )
+        repayment = Transaction.objects.filter(debt_id=test_debt.id).first()
+
+        self.send_viewset_delete_request(
+            f"api/v1/transactions/{self.transaction.id}/",
+            TransactionViewSet,
+            "destroy",
+            pk=repayment.id,
+        )
+        test_debt.refresh_from_db()
+        self.assertEqual(test_debt.schedule_d.balance_at_close, 1000.00)
 
     def create_loan_repayment_payload(
         self,
@@ -1404,8 +1588,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(trans_a.schedule_f.general_election_year, "2024")
         self.assertEqual(trans_a.schedule_f.expenditure_amount, 125.00)
 
-        self.view.process_aggregation_by_payee_candidate(trans_c)
-        self.view.process_aggregation_by_payee_candidate(trans_a)
+        process_aggregation_by_payee_candidate(trans_c)
+        process_aggregation_by_payee_candidate(trans_a)
 
         trans_b.refresh_from_db()
         self.assertEqual(trans_b.schedule_f.aggregate_general_elec_expended, 200.00)
