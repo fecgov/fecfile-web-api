@@ -248,6 +248,8 @@ workflows:
       # This job is triggered whenever a commit is made to the dev/stage/test/prod branches.
       # It kicks off the e2e-test pipeline in the fecfile-web-app project.
       - deploy-job:
+          requires:
+            - test
           filters:
             branches:
               only: /develop|feature\/2726-locust_testing-load|release\/sprint-[\.\d]+|release\/test|main/
