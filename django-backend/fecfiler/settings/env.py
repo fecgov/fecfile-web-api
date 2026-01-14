@@ -3,8 +3,8 @@ import os
 
 env = cfenv.AppEnv()
 
-redis = env.get_service(name="fecfile-api-redis")
-s3 = env.get_service(name="fecfile-api-s3")
+redis = env.get_service(name="load-fecfile-api-redis")
+s3 = env.get_service(name="load-fecfile-api-s3")
 
 if redis:
     password = redis.credentials.get("password")

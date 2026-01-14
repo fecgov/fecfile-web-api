@@ -6,19 +6,19 @@ defaults: &defaults
     - python_buildpack
   memory: 1G
   services:
-    - fecfile-api-rds
-    - fecfile-api-s3
-    - fecfile-api-redis
-    - fecfile-api-creds-dev
+    - load-fecfile-api-rds
+    - load-fecfile-api-s3
+    - load-fecfile-api-redis
+    - fecfile-api-creds-dev # Can use dev's creds
   env:
     SPACE: dev
     DISABLE_COLLECTSTATIC: 1
     DJANGO_SETTINGS_MODULE: fecfiler.settings.production
-    FFAPI_COOKIE_DOMAIN: fecfile.fec.gov
+    FFAPI_COOKIE_DOMAIN: app.cloud.gov
     LOGIN_REDIRECT_CLIENT_URL: https://dev.fecfile.fec.gov
     LOGIN_REDIRECT_SERVER_URL: https://dev-api.fecfile.fec.gov/api/v1/oidc/login-redirect
     LOGOUT_REDIRECT_URL: https://dev-api.fecfile.fec.gov/api/v1/oidc/logout-redirect
-    MOCK_OIDC_PROVIDER: False
+    MOCK_OIDC_PROVIDER: True
     OIDC_OP_AUTODISCOVER_ENDPOINT: https://idp.int.identitysandbox.gov/.well-known/openid-configuration
     PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
     STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
@@ -36,27 +36,28 @@ defaults: &defaults
     FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, MOCKED
     ENABLE_RESTRICTED_COMMANDS: True
     FEC_FORMAT_VERSION: 8.5
+    OIDC_OP_AUTODISCOVER_ENDPOINT: https://load-dev-api.app.cloud.gov/api/v1/mock_oidc_provider/.well-known/openid-configuration
 
 applications:
-  - name: fecfile-web-api
+  - name: load-fecfile-web-api
     <<: *defaults
     instances: 2
     routes:
-      - route: fecfile-web-api-dev.apps.internal
+      - route: load-fecfile-web-api-dev.apps.internal
     command: bin/run-api.sh
     memory: 2G
-  - name: fecfile-web-services
+  - name: load-fecfile-web-services
     <<: *defaults
     instances: 2
     no-route: true
     health-check-type: process
     command: bin/run-celery-worker.sh
-  - name: fecfile-api-migrator
+  - name: load-fecfile-api-migrator
     <<: *defaults
     command: bin/run-api.sh
     memory: 2G
     no-route: true
-  - name: fecfile-scheduler
+  - name: load-fecfile-scheduler
     <<: *defaults
     no-route: true
     health-check-type: process
