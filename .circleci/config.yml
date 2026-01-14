@@ -249,4 +249,4 @@ workflows:
       - deploy-job:
           filters:
             branches:
-              only: /develop|2414-load-test-mirror|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|feature\/2726-locust_testing-load|release\/sprint-[\.\d]+|release\/test|main/
