@@ -19,6 +19,7 @@ from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
     OuterRef,
     Subquery,
+    Sum,
     F,
     Case,
     When,
