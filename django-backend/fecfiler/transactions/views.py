@@ -95,6 +95,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         "back_reference_tran_id_number",
         "form_type",
         "report_code_label",
+        "report_type",
     ]
     ordering = ["-created"]
     queryset = Transaction.objects
@@ -105,6 +106,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return TransactionSerializer
 
     def get_queryset(self):
+        committee_uuid = self.get_committee_uuid()
+        schedule_filters = self.request.query_params.get("schedules")
+        schedules_to_include = schedule_filters.split(",") if schedule_filters else []
         # Use the table if writing
         if hasattr(self, "action") and self.action in [
             "create",
@@ -113,10 +117,23 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             "save_transactions",
         ]:
             queryset = super().get_queryset()
+        # Use list table for listing
+        elif hasattr(self, "action") and self.action == "list":
+            queryset = Transaction.objects.transaction_list_view(
+                schedules_to_include=schedules_to_include
+            ).filter(
+                committee_account__id=committee_uuid,
+            )
         else:  # Otherwise, use the view for reading
-            committee_uuid = self.get_committee_uuid()
             queryset = Transaction.objects.transaction_view().filter(
                 committee_account__id=committee_uuid
+            )
+
+        if schedules_to_include:
+            queryset = queryset.filter(
+                schedule__in=[
+                    Schedule[schedule].value for schedule in schedules_to_include
+                ]
             )
 
         report_id = (
@@ -128,15 +145,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             else None
         )
         queryset = queryset.filter(reports__id=report_id) if report_id else queryset
-
-        schedule_filters = self.request.query_params.get("schedules")
-        if schedule_filters is not None:
-            schedules_to_include = schedule_filters.split(",") if schedule_filters else []
-            queryset = queryset.filter(
-                schedule__in=[
-                    Schedule[schedule].value for schedule in schedules_to_include
-                ]
-            )
 
         parent_id = self.request.query_params.get("parent")
         if parent_id:
@@ -152,7 +160,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 | Q(contact_5=contact_id)
             )
 
-        return queryset.prefetch_related("reports")
+        return queryset
 
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():

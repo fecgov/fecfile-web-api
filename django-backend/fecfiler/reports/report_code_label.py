@@ -41,6 +41,15 @@ report_code_label_case = Case(
     output_field=CharField(),
 )
 
+report_type_case = Case(
+    When(form_3__isnull=False, then=Value("Form 3")),
+    When(form_3x__isnull=False, then=Value("Form 3X")),
+    When(form_24__isnull=False, then=Value("Form 24")),
+    When(form_99__isnull=False, then=Value("Form 99")),
+    When(form_1m__isnull=False, then=Value("Form 1M")),
+    output_field=CharField(),
+)
+
 
 def get_report_code_label(report: Report):
     if report.form_3x or report.form_3:

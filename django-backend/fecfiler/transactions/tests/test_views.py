@@ -29,7 +29,7 @@ from fecfiler.transactions.serializers import TransactionSerializer
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
 from fecfiler.transactions.aggregation import (
     process_aggregation_for_debts,
-    process_aggregation_by_payee_candidate
+    process_aggregation_by_payee_candidate,
 )
 from fecfiler.transactions.schedule_d.views import create_in_future_reports
 import structlog
@@ -236,12 +236,16 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             )
 
         view_set = TransactionViewSet()
-        view_set.request = self.post_request({}, {"schedules": "A,B,C,C2,D,E"})
-        self.assertEqual(view_set.get_queryset().count(), 13)
-        view_set.request = self.post_request({}, {"schedules": "A,B,D,E"})
-        self.assertEqual(view_set.get_queryset().count(), 11)
-        view_set.request = self.post_request({}, {"schedules": ""})
+        view_set.request = self.post_request({}, {"schedules": "A"})
+        self.assertEqual(view_set.get_queryset().count(), 8)
+        view_set.request = self.post_request({}, {"schedules": "B,E,F"})
+        self.assertEqual(view_set.get_queryset().count(), 3)
+        view_set.request = self.post_request({}, {"schedules": "C,D"})
+        self.assertEqual(view_set.get_queryset().count(), 2)
+        view_set.request = self.post_request({}, {"schedules": "C2"})
         self.assertEqual(view_set.get_queryset().count(), 0)
+        view_set.request = self.post_request({}, {"schedules": ""})
+        self.assertEqual(view_set.get_queryset().count(), 13)
 
     def test_get_previous_entity(self):
         view_set = TransactionViewSet()
@@ -1285,17 +1289,25 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(Transaction.objects.all().count(), 6)
 
         # get child debts
-        q2_debt = Transaction.objects.transaction_view().filter(
-            schedule_d__isnull=False,
-            committee_account_id=test_debt.committee_account_id,
-            reports__id=test_q2_report_2026.id
-        ).first()
+        q2_debt = (
+            Transaction.objects.transaction_view()
+            .filter(
+                schedule_d__isnull=False,
+                committee_account_id=test_debt.committee_account_id,
+                reports__id=test_q2_report_2026.id,
+            )
+            .first()
+        )
 
-        q3_debt = Transaction.objects.transaction_view().filter(
-            schedule_d__isnull=False,
-            committee_account_id=test_debt.committee_account_id,
-            reports__id=test_q3_report_2026.id
-        ).first()
+        q3_debt = (
+            Transaction.objects.transaction_view()
+            .filter(
+                schedule_d__isnull=False,
+                committee_account_id=test_debt.committee_account_id,
+                reports__id=test_q3_report_2026.id,
+            )
+            .first()
+        )
 
         self.assertIsNotNone(q2_debt)
         self.assertIsNotNone(q3_debt)

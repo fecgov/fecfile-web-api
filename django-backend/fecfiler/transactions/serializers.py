@@ -357,7 +357,6 @@ class TransactionListSerializer(ModelSerializer):
     back_reference_tran_id_number = CharField(
         required=False, allow_null=True, read_only=True
     )
-    form_type = CharField(required=False, allow_null=True)
     transaction_id = UUIDField(read_only=True)
     line_label = CharField(read_only=True)
     itemized = BooleanField(read_only=True)
@@ -369,7 +368,9 @@ class TransactionListSerializer(ModelSerializer):
     balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     report_code_label = CharField(read_only=True)
+    report_type = CharField(read_only=True)
     report_ids = PrimaryKeyRelatedField(many=True, read_only=True, source="reports")
+    loan_agreement_id = UUIDField(read_only=True, allow_null=True)
 
     class Meta:
         model = Transaction
@@ -378,7 +379,6 @@ class TransactionListSerializer(ModelSerializer):
             "parent_transaction_id",
             "transaction_type_identifier",
             "back_reference_tran_id_number",
-            "form_type",
             "transaction_id",
             "line_label",
             "itemized",
@@ -390,7 +390,14 @@ class TransactionListSerializer(ModelSerializer):
             "balance",
             "aggregate",
             "report_code_label",
+            "report_type",
             "report_ids",
+            "can_delete",
+            "loan_id",
+            "debt_id",
+            "force_itemized",
+            "loan_agreement_id",
+            "form_type",
         ]
 
 
