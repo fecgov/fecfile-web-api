@@ -190,6 +190,11 @@ class TransactionManager(SoftDeleteManager):
             .annotate(report_code_label=report_code_label_case)
             .values("report_code_label")[:1]
         )
+        PRIMARY_REPORT_FORM_TYPE_CLAUSE = Subquery(  # noqa: N806
+            Report.objects.filter(
+                transactions=OuterRef("pk"), form_24__isnull=True
+            ).values("report_type")[:1]
+        )
 
         return (
             super()
@@ -244,6 +249,7 @@ class TransactionManager(SoftDeleteManager):
                 ),
                 line_label=self.LINE_LABEL_CLAUSE(),
                 report_code_label=REPORT_CODE_LABEL_CLAUSE,
+                primary_report_form_type=PRIMARY_REPORT_FORM_TYPE_CLAUSE,
             )
             .alias(order_key=self.ORDER_KEY_CLAUSE())
             .order_by("order_key")
