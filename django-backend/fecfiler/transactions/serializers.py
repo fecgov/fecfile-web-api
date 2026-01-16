@@ -371,12 +371,6 @@ class TransactionListSerializer(ModelSerializer):
     report_code_label = CharField(read_only=True)
     report_ids = PrimaryKeyRelatedField(many=True, read_only=True, source="reports")
 
-    def get_form_type(self, obj):
-        reports = obj.reports.all()
-        if reports:
-            return reports[0].get_form_name()
-        return None
-
     class Meta:
         model = Transaction
         fields = [
