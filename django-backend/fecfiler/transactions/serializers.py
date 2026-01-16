@@ -369,7 +369,7 @@ class TransactionListSerializer(ModelSerializer):
     balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     report_code_label = CharField(read_only=True)
-    report_ids = PrimaryKeyRelatedField(many=True, read_only=True, source="reports")
+    report_ids = PrimaryKeyRelatedField(many=True, read_only=True, source="report_set")
 
     class Meta:
         model = Transaction

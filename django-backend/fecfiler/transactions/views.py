@@ -149,7 +149,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 | Q(contact_5=contact_id)
             )
 
-        return queryset.prefetch_related("reports")
+        return queryset
 
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
