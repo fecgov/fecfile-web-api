@@ -248,6 +248,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             else:
                 self.memo_text.transaction_uuid = self.id
                 self.memo_text.save()
+
         # Avoid recursion when service adjusts fields via save(update_fields=...)
         update_fields = kwargs.get("update_fields")
         is_internal_update = update_fields is not None
@@ -257,6 +258,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
         # Capture old snapshot for updates
         old_snapshot = None
+
         schedule = self.get_schedule_name()
         is_create = self.pk is None
         if not is_create and not is_internal_update and not from_manager_create and schedule in [Schedule.A, Schedule.B, Schedule.E]:
@@ -298,9 +300,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         # Skip if this is from Manager.create() as it will handle aggregation
         if not is_internal_update and not from_manager_create:
             try:
-                action = "create" if is_create else "update"
                 # Only schedules A, B, and E participate in aggregates.
                 if schedule in [Schedule.A, Schedule.B, Schedule.E]:
+                    action = "create" if is_create else "update"
                     update_aggregates_for_affected_transactions(
                         self, action, old_snapshot
                     )
