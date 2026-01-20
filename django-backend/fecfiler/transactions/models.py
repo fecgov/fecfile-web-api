@@ -6,6 +6,7 @@ from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import (
     TransactionManager,
     Schedule,
+    AGGREGATE_SCHEDULES,
 )
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
@@ -261,7 +262,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
         schedule = self.get_schedule_name()
         is_create = self.pk is None
-        if not is_create and not is_internal_update and not from_manager_create and schedule in [Schedule.A, Schedule.B, Schedule.E]:
+        should_capture_snapshot = (
+            not is_create
+            and not is_internal_update
+            and not from_manager_create
+            and schedule in AGGREGATE_SCHEDULES
+        )
+        if should_capture_snapshot:
             try:
                 old = Transaction.objects.select_related(
                     "schedule_a", "schedule_b", "schedule_c", "schedule_e", "contact_2"
@@ -301,7 +308,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         if not is_internal_update and not from_manager_create:
             try:
                 # Only schedules A, B, and E participate in aggregates.
-                if schedule in [Schedule.A, Schedule.B, Schedule.E]:
+                if schedule in AGGREGATE_SCHEDULES:
                     action = "create" if is_create else "update"
                     update_aggregates_for_affected_transactions(
                         self, action, old_snapshot
@@ -324,7 +331,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 )
                 # Only schedules A, B, and E participate in aggregates
                 schedule = self.get_schedule_name()
-                if schedule in [Schedule.A, Schedule.B, Schedule.E]:
+                if schedule in AGGREGATE_SCHEDULES:
                     # Capture snapshot and apply delete delta before deleting
                     eff = calculate_effective_amount(self)
                     old_snapshot = {

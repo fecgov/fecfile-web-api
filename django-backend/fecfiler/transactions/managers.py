@@ -92,7 +92,7 @@ class TransactionManager(SoftDeleteManager):
         try:
             schedule = instance.get_schedule_name()
             # Only schedules A, B, and E get aggregated
-            if schedule in [Schedule.A, Schedule.B, Schedule.E]:
+            if schedule in AGGREGATE_SCHEDULES:
                 try:
                     from .utils_aggregation import (
                         update_aggregates_for_affected_transactions,
@@ -447,3 +447,7 @@ class Schedule(Enum):
     D = Value("D")
     E = Value("E")
     F = Value("F")
+
+
+# Schedules that participate in aggregation calculations
+AGGREGATE_SCHEDULES = [Schedule.A, Schedule.B, Schedule.E]
