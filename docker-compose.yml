@@ -57,7 +57,7 @@ services:
       FEC_AGENCY_ID:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
-      ENABLE_PL_SQL_LOGGING: False # Django DEBUG base.py setting must also be set to True to see SQL output
+      ENABLE_PL_SQL_LOGGING: "${ENABLE_PL_SQL_LOGGING}"
       OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
       FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
       ENABLE_RESTRICTED_COMMANDS: True
@@ -107,7 +107,7 @@ services:
       FEC_AGENCY_ID:
       OUTPUT_TEST_INFO_IN_DOT_FEC:
       LOG_FORMAT:
-      ENABLE_PL_SQL_LOGGING: False # Django DEBUG base.py setting must also be set to True to see SQL output
+      ENABLE_PL_SQL_LOGGING: "${ENABLE_PL_SQL_LOGGING}"
       OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
       FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
       ENABLE_RESTRICTED_COMMANDS: True
@@ -163,7 +163,7 @@ services:
       STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
       STAGE_OPEN_FEC_API_KEY: DEMO_KEY
       LOG_FORMAT:
-      ENABLE_PL_SQL_LOGGING: False # Django DEBUG base.py setting must also be set to True to see SQL output
+      ENABLE_PL_SQL_LOGGING: "${ENABLE_PL_SQL_LOGGING}"
       FECFILE_GITHUB_TOKEN:
       MOCK_OIDC_PROVIDER: True
       OIDC_OP_AUTODISCOVER_ENDPOINT: http://localhost:8080/api/v1/mock_oidc_provider/.well-known/openid-configuration
