@@ -6,6 +6,7 @@ from fecfiler.shared.utilities import generate_fec_uid
 from fecfiler.transactions.managers import (
     TransactionManager,
     Schedule,
+    AGGREGATE_SCHEDULES,
 )
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
@@ -90,7 +91,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     entity_type = models.TextField(null=True, blank=True)
     memo_code = models.BooleanField(null=True, blank=True, default=False)
 
-    itemized = models.BooleanField(db_default=True)
+    itemized = models.BooleanField(db_default=False)
 
     force_itemized = models.BooleanField(null=True, blank=True)
     force_unaggregated = models.BooleanField(null=True, blank=True)
@@ -235,6 +236,12 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         return self.debt is not None and self.schedule_d is None
 
     def save(self, *args, **kwargs):
+        from .utils_aggregation import (
+            update_aggregates_for_affected_transactions,
+            calculate_effective_amount,
+        )
+        from .managers import _thread_local
+
         if self.memo_text:
             if self.memo_text.text4000 is None or self.memo_text.text4000 == "":
                 self.memo_text.hard_delete()
@@ -242,12 +249,118 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             else:
                 self.memo_text.transaction_uuid = self.id
                 self.memo_text.save()
+
+        # Avoid recursion when service adjusts fields via save(update_fields=...)
+        update_fields = kwargs.get("update_fields")
+        is_internal_update = update_fields is not None
+
+        # Check if this save is being called from Manager.create()
+        from_manager_create = getattr(_thread_local, 'in_manager_create', False)
+
+        # Capture old snapshot for updates
+        old_snapshot = None
+
+        schedule = self.get_schedule_name()
+        is_create = self.pk is None
+        should_capture_snapshot = (
+            not is_create
+            and not is_internal_update
+            and not from_manager_create
+            and schedule in AGGREGATE_SCHEDULES
+        )
+        if should_capture_snapshot:
+            try:
+                old = Transaction.objects.select_related(
+                    "schedule_a", "schedule_b", "schedule_c", "schedule_e", "contact_2"
+                ).get(pk=self.pk)
+            except Transaction.DoesNotExist:
+                old = None
+            if old:
+                eff = calculate_effective_amount(old)
+                old_snapshot = {
+                    "schedule": old.get_schedule_name(),
+                    "contact_1_id": old.contact_1_id,
+                    "aggregation_group": old.aggregation_group,
+                    "committee_account_id": old.committee_account_id,
+                    "date": old.get_date(),
+                    "created": old.created,
+                    "effective_amount": eff,
+                    # Itemization-affecting fields
+                    "force_itemized": old.force_itemized,
+                    "force_unaggregated": old.force_unaggregated,
+                    "memo_code": old.memo_code,
+                    "reatt_redes_id": old.reatt_redes_id,
+                }
+                if old.schedule_e and old.contact_2:
+                    old_snapshot.update(
+                        {
+                            "election_code": old.schedule_e.election_code,
+                            "candidate_office": old.contact_2.candidate_office,
+                            "candidate_state": old.contact_2.candidate_state,
+                            "candidate_district": old.contact_2.candidate_district,
+                        }
+                    )
+
         super(Transaction, self).save(*args, **kwargs)
+
+        # Invoke service after save for create/update
+        # Skip if this is from Manager.create() as it will handle aggregation
+        if not is_internal_update and not from_manager_create:
+            try:
+                # Only schedules A, B, and E participate in aggregates.
+                if schedule in AGGREGATE_SCHEDULES:
+                    action = "create" if is_create else "update"
+                    update_aggregates_for_affected_transactions(
+                        self, action, old_snapshot
+                    )
+            except Exception:
+                # Do not raise to avoid breaking save on service failure; log instead
+                logger.error(
+                    "Failed to update aggregates via service on save",
+                    transaction_id=self.id,
+                )
 
     def delete(self):
         if not self.can_delete:
             raise AttributeError("Transaction cannot be deleted")
         if not self.deleted:
+            try:
+                from .utils_aggregation import (
+                    calculate_effective_amount,
+                    update_aggregates_for_affected_transactions,
+                )
+                # Only schedules A, B, and E participate in aggregates
+                schedule = self.get_schedule_name()
+                if schedule in AGGREGATE_SCHEDULES:
+                    # Capture snapshot and apply delete delta before deleting
+                    eff = calculate_effective_amount(self)
+                    old_snapshot = {
+                        "schedule": schedule,
+                        "contact_1_id": self.contact_1_id,
+                        "aggregation_group": self.aggregation_group,
+                        "committee_account_id": self.committee_account_id,
+                        "date": self.get_date(),
+                        "created": self.created,
+                        "effective_amount": eff,
+                    }
+                    if self.schedule_e and self.contact_2:
+                        old_snapshot.update(
+                            {
+                                "election_code": self.schedule_e.election_code,
+                                "candidate_office": self.contact_2.candidate_office,
+                                "candidate_state": self.contact_2.candidate_state,
+                                "candidate_district": self.contact_2.candidate_district,
+                            }
+                        )
+                    update_aggregates_for_affected_transactions(
+                        self, "delete", old_snapshot
+                    )
+            except Exception:
+                logger.error(
+                    "Failed to update aggregates via service on delete",
+                    transaction_id=self.id,
+                )
+
             super(Transaction, self).delete()
             self.delete_children()
             self.delete_debts()
@@ -287,7 +400,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             self.schedule_b
             and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATED_FROM"
         ):
-            self.parent_transaction.delete()
+            # Refresh parent's state from DB before calling delete
+            parent = self.parent_transaction
+            parent.refresh_from_db(fields=['deleted'])
+            parent.delete()
 
         # If this reattribution/redesignation is tied to a copy of
         # the original transaction, delete the copy
@@ -303,7 +419,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 == "REDESIGNATED"
             )
         ):
-            self.reatt_redes.delete()
+            # Refresh reatt_redes' state from DB before calling delete
+            reatt_redes = self.reatt_redes
+            reatt_redes.refresh_from_db(fields=['deleted'])
+            reatt_redes.delete()
 
         # Delete any reattribution/redesignation transactions
         # related to this transaction (copy/from/to)"
@@ -316,7 +435,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             self.parent_transaction
             and self.transaction_type_identifier in COUPLED_TRANSACTION_TYPES
         ):
-            self.parent_transaction.delete()
+            # Refresh parent's state from DB before calling delete
+            # to ensure we have the current deleted status
+            parent = self.parent_transaction
+            parent.refresh_from_db(fields=['deleted'])
+            parent.delete()
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]

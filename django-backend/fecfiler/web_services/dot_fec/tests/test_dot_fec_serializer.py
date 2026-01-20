@@ -195,6 +195,6 @@ class DotFECSerializerTestCase(TestCase):
         contribution_date = get_value_from_path(
             self.transaction, "schedule_a.contribution_date"
         )
-        self.assertEqual(contribution_date.date(), date(2020, 4, 19))
+        self.assertEqual(contribution_date, date(2020, 4, 19))
         bogus_value = get_value_from_path(self.transaction, "not.real.path")
         self.assertIsNone(bogus_value)
