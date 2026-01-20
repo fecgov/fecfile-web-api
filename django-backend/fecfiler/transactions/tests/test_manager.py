@@ -21,6 +21,7 @@ from fecfiler.transactions.schedule_c.utils import carry_forward_loans
 from fecfiler.transactions.aggregation import process_aggregation_for_debts
 from decimal import Decimal
 from django.db import transaction
+from datetime import date
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -542,3 +543,132 @@ class TransactionViewTestCase(TestCase):
         )
         obs = Transaction.objects.transaction_view().filter(id=ie.id)
         self.assertTrue(obs[0].itemized)
+
+
+class TransactionListViewTestCase(TestCase):
+    def setUp(self):
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        self.contact_1 = Contact.objects.create(committee_account_id=self.committee.id)
+
+    def test_list_view_optimization_logic(self):
+        sch_a = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            "100.00",
+            "GENERAL",
+        )
+        sch_b = create_schedule_b(
+            "OPERATING_EXPENDITURE",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            "200.00",
+            "GENERAL_DISBURSEMENT",
+        )
+
+        view = Transaction.objects.transaction_list_view(schedules_to_include=["A"])
+
+        row_a = view.get(id=sch_a.id)
+        row_b = view.get(id=sch_b.id)
+
+        self.assertEqual(row_a.date, date(2024, 1, 1))
+        self.assertEqual(row_a.amount, Decimal("100.00"))
+        self.assertEqual(row_a.schedule, "A")
+
+        self.assertIsNone(row_b.date)
+        self.assertIsNone(row_b.amount)
+        self.assertIsNone(row_b.schedule)
+
+        view = Transaction.objects.transaction_list_view(schedules_to_include=["B"])
+        row_a = view.get(id=sch_a.id)
+        row_b = view.get(id=sch_b.id)
+
+        self.assertIsNone(row_a.date)
+
+        self.assertEqual(row_b.date, date(2024, 1, 2))
+        self.assertEqual(row_b.amount, Decimal("200.00"))
+
+    def test_list_view_loan_calculations(self):
+        loan = create_loan(
+            self.committee,
+            self.contact_1,
+            "5000.00",
+            "2024-07-01",
+            "7%",
+            loan_incurred_date="2024-01-01",
+        )
+        create_schedule_b(
+            "LOAN_REPAYMENT_MADE",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            "1000.00",
+            loan_id=loan.id,
+        )
+
+        loan.loan_payment_to_date = Decimal("1000.00")
+        loan.save()
+
+        view = Transaction.objects.transaction_list_view(schedules_to_include=["C"])
+        row = view.get(id=loan.id)
+
+        self.assertEqual(row.amount, Decimal("5000.00"))
+        self.assertEqual(row.loan_balance, Decimal("4000.00"))
+        self.assertEqual(row.balance, Decimal("4000.00"))
+
+    def test_list_view_debt_calculations(self):
+        debt = create_debt(self.committee, self.contact_1, Decimal("500.00"))
+        debt.schedule_d.incurred_amount = Decimal("500.00")
+        debt.schedule_d.balance_at_close = Decimal("500.00")
+        debt.schedule_d.save()
+
+        view = Transaction.objects.transaction_list_view(schedules_to_include=["D"])
+        row = view.get(id=debt.id)
+
+        self.assertEqual(row.amount, Decimal("500.00"))
+        self.assertEqual(row.balance, Decimal("500.00"))
+
+    def test_list_view_loan_agreement_subquery(self):
+        loan = create_loan(
+            self.committee,
+            self.contact_1,
+            "5000.00",
+            "2024-07-01",
+            "7%",
+            loan_incurred_date="2024-01-01",
+        )
+        c1_agreement = create_schedule_a(
+            "C1_LOAN_AGREEMENT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            "0.00",
+        )
+        c1_agreement.parent_transaction = loan
+        c1_agreement.save()
+
+        view = Transaction.objects.transaction_list_view(schedules_to_include=["C"])
+        row_loan = view.get(id=loan.id)
+        self.assertEqual(row_loan.loan_agreement_id, c1_agreement.id)
+
+    def test_list_view_default_behavior(self):
+        sch_a = create_schedule_a(
+            "INDIVIDUAL_RECEIPT", self.committee, self.contact_1, "2024-01-01", "100.00"
+        )
+        sch_b = create_schedule_b(
+            "OPERATING_EXPENDITURE",
+            self.committee,
+            self.contact_1,
+            "2024-01-02",
+            "200.00",
+        )
+
+        view = Transaction.objects.transaction_list_view(schedules_to_include=None)
+
+        row_a = view.get(id=sch_a.id)
+        row_b = view.get(id=sch_b.id)
+
+        self.assertIsNotNone(row_a.date)
+        self.assertIsNotNone(row_b.date)
