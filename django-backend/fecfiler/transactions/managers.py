@@ -449,5 +449,11 @@ class Schedule(Enum):
     F = Value("F")
 
 
-# Schedules that participate in aggregation calculations
-AGGREGATE_SCHEDULES = [Schedule.A, Schedule.B, Schedule.E]
+# Schedules that use contact/year-based aggregation
+CONTACT_AGGREGATE_SCHEDULES = [Schedule.A, Schedule.B]
+
+# Schedules that use election-based aggregation
+ELECTION_AGGREGATE_SCHEDULES = [Schedule.E]
+
+# All schedules that participate in aggregation calculations
+AGGREGATE_SCHEDULES = CONTACT_AGGREGATE_SCHEDULES + ELECTION_AGGREGATE_SCHEDULES

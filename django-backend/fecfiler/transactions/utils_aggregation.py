@@ -22,6 +22,7 @@ from .managers import (
     schedule_b_over_two_hundred_types,
     schedule_b_refunds,
     ITEMIZATION_THRESHOLD,
+    CONTACT_AGGREGATE_SCHEDULES,
 )
 import structlog
 
@@ -448,7 +449,7 @@ def apply_delta_aggregates(
 
     new_created = transaction_instance.created
 
-    if schedule in [Schedule.A, Schedule.B]:
+    if schedule in CONTACT_AGGREGATE_SCHEDULES:
         # Build new partition queryset
         year = _get_calendar_year_from_date(transaction_date)
         new_qs = (
@@ -759,7 +760,7 @@ def apply_delete_delta_aggregates(old_state: Dict[str, Any]) -> None:
     if not old_date or not old_created:
         return
 
-    if schedule in [Schedule.A, Schedule.B]:
+    if schedule in CONTACT_AGGREGATE_SCHEDULES:
         old_year = _get_calendar_year_from_date(old_date)
         old_qs = (
             Transaction.objects.filter(
@@ -921,7 +922,7 @@ def recalculate_aggregates_for_transaction(transaction_instance) -> None:
         return
 
     try:
-        if schedule in [Schedule.A, Schedule.B]:
+        if schedule in CONTACT_AGGREGATE_SCHEDULES:
             # If this is a loan repayment, recalculate loan_payment_to_date
             if (transaction_instance.transaction_type_identifier == "LOAN_REPAYMENT_MADE"
                     and transaction_instance.loan_id):
