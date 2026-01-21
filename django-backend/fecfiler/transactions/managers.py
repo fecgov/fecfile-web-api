@@ -22,7 +22,7 @@ from django.db.models import (
 from decimal import Decimal
 from enum import Enum
 from ..reports.models import Report
-from fecfiler.reports.report_code_label import report_code_label_case
+from fecfiler.reports.report_code_label import report_code_label_case, report_type_case
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -108,13 +108,21 @@ class TransactionManager(SoftDeleteManager):
         output_field=TextField(),
     )
 
-    def transaction_view(self):
-        REPORT_CODE_LABEL_CLAUSE = Subquery(  # noqa: N806
+    def REPORT_CODE_LABEL_CLAUSE(self):
+        return Subquery(  # noqa: N806
             Report.objects.filter(transactions=OuterRef("pk"))
             .annotate(report_code_label=report_code_label_case)
             .values("report_code_label")[:1]
         )
 
+    def REPORT_TYPE_CLAUSE(self):
+        return Subquery(  # noqa: N806
+            Report.objects.filter(transactions=OuterRef("pk"))
+            .annotate(report_type=report_type_case)
+            .values("report_type")[:1]
+        )
+
+    def transaction_view(self):
         return (
             super()
             .get_queryset()
@@ -157,7 +165,8 @@ class TransactionManager(SoftDeleteManager):
                     "_calendar_ytd_per_election_office",
                 ),
                 line_label=self.LINE_LABEL_CLAUSE(),
-                report_code_label=REPORT_CODE_LABEL_CLAUSE,
+                report_code_label=self.REPORT_CODE_LABEL_CLAUSE(),
+                report_type=self.REPORT_TYPE_CLAUSE(),
             )
             .alias(order_key=self.ORDER_KEY_CLAUSE())
             .order_by("order_key")
