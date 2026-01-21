@@ -193,22 +193,22 @@ class TransactionSerializer(
         representation["form_type"] = instance.form_type
 
         # represent parent
-        if instance.parent_transaction:
+        if getattr(instance, "parent_transaction"):
             representation["parent_transaction"] = (
                 TransactionSerializer().to_representation(instance.parent_transaction)
             )
         # represent loan
-        if instance.loan:
+        if getattr(instance, "loan"):
             representation["loan"] = TransactionSerializer().to_representation(
                 instance.loan
             )
         # represent debt
-        if instance.debt:
+        if getattr(instance, "debt"):
             representation["debt"] = TransactionSerializer().to_representation(
                 instance.debt
             )
         # represent original reattribution/redesignation transaction
-        if instance.reatt_redes:
+        if getattr(instance, "reatt_redes"):
             representation["reatt_redes"] = TransactionSerializer().to_representation(
                 instance.reatt_redes
             )
