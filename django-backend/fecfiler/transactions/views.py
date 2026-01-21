@@ -187,6 +187,30 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         response = super().retrieve(request, *args, **kwargs)
         return response
 
+    @action(detail=True, methods=["put"], url_path="update-itemization-aggregation")
+    def update_itemization_aggregation(self, request, pk=None):
+
+        transaction: Transaction = self.get_object()
+        transaction_data = self.get_serializer(transaction).data
+        transaction_data["report_ids"] = [
+            str(rep_id) for rep_id in transaction.reports.values_list("id", flat=True)
+        ]
+
+        allowed_fields = [
+            "force_itemized",
+            "force_unaggregated",
+            "schedule_id",
+            "schema_name",
+        ]
+        for field in allowed_fields:
+            if field in request.data:
+                transaction_data[field] = request.data[field]
+
+        with db_transaction.atomic():
+            self.save_transaction(transaction_data, request)
+
+        return Response(transaction.id)
+
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
     def previous_transaction_by_entity(self, request):
         """Retrieves transaction that comes before this transactions,
