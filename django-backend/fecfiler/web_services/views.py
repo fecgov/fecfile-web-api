@@ -121,10 +121,9 @@ class WebServicesViewSet(viewsets.ViewSet):
         if MOCK_EFO_FILING:
             """If the server is set to mock, all submissions will be mocked"""
             mock = True
+        report = serializer.validated_data["report_instance"]
         report_id = serializer.validated_data["report_id"]
 
-        """Check if there's an already running submission"""
-        report = Report.objects.get(pk=report_id)
         if (
             report.upload_submission
             and report.upload_submission.fecfile_task_state
@@ -193,7 +192,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         report_id = serializer.validated_data["report_id"]
 
         """Check if there's an already running submission"""
-        report = Report.objects.get(pk=report_id)
+        report = serializer.validated_data["report_instance"]
         if (
             report.webprint_submission
             and report.webprint_submission.fecfile_task_state
