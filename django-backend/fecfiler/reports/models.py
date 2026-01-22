@@ -122,9 +122,10 @@ class Report(CommitteeOwnedModel):
         )
 
     def get_form_name(self):
-        for form_key in TABLE_TO_FORM:
-            if getattr(self, form_key, None):
-                return TABLE_TO_FORM.get(form_key)
+        for form_field, form_code in TABLE_TO_FORM.items():
+            if getattr(self, f"{form_field}_id") is not None:
+                return form_code
+        return None
 
     def amend(self):
         self.form_type = self.get_form_name() + "A"
