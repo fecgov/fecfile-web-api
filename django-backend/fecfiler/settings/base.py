@@ -120,10 +120,14 @@ if INCLUDE_SILK:
     # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
     SILKY_PYTHON_PROFILER = True
-    SILKY_PYTHON_PROFILER_BINARY = True
+    # SILKY_PYTHON_PROFILER_BINARY = True
+    # https://github.com/jazzband/django-silk?tab=readme-ov-file#profiling
 
-    # the sub-directories of media and static files
-    STATICFILES_LOCATION = "static"
+    def custom_silk_filter(request):
+        return STATIC_URL not in request.path
+    SILKY_INTERCEPT_FUNC = custom_silk_filter
+    # Don't profile static assets
+
     SILKY_DYNAMIC_PROFILING = WEB_SERVICES_PROFILING
 
 
