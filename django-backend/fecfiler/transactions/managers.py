@@ -110,14 +110,14 @@ class TransactionManager(SoftDeleteManager):
 
     def REPORT_CODE_LABEL_CLAUSE(self):
         return Subquery(  # noqa: N806
-            Report.objects.filter(transactions=OuterRef("pk"))
+            Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
             .annotate(report_code_label=report_code_label_case)
             .values("report_code_label")[:1]
         )
 
     def REPORT_TYPE_CLAUSE(self):
         return Subquery(  # noqa: N806
-            Report.objects.filter(transactions=OuterRef("pk"))
+            Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
             .annotate(report_type=report_type_case)
             .values("report_type")[:1]
         )
