@@ -11,6 +11,7 @@ from fecfiler.transactions.schedule_e.managers import line_labels as line_labels
 from fecfiler.transactions.schedule_f.managers import line_labels as line_labels_f
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
+    UUIDField,
     OuterRef,
     Subquery,
     F,
@@ -22,7 +23,7 @@ from django.db.models import (
 from decimal import Decimal
 from enum import Enum
 from ..reports.models import Report
-from fecfiler.reports.report_code_label import report_code_label_case
+from fecfiler.reports.report_code_label import report_code_label_case, report_type_case
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -68,7 +69,9 @@ class TransactionManager(SoftDeleteManager):
                 "_calendar_ytd_per_election_office",
             ),
             line_label=self.LINE_LABEL_CLAUSE(),
+            loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
             report_code_label=self.REPORT_CODE_LABEL_CLAUSE(),
+            report_type=self.REPORT_TYPE_CLAUSE(),
         ).alias(
             order_key=self.ORDER_KEY_CLAUSE()
         ).order_by("order_key")
@@ -149,13 +152,27 @@ class TransactionManager(SoftDeleteManager):
     )
 
     def REPORT_CODE_LABEL_CLAUSE(self):
-        return Coalesce(
-            Subquery(  # noqa: N806
-                Report.objects.filter(transactions=OuterRef("pk"))
-                .annotate(report_code_label=report_code_label_case)
-                .values("report_code_label")[:1]
-            ),
-            Value("")
+        return Subquery(  # noqa: N806
+            Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
+            .annotate(report_code_label=report_code_label_case)
+            .values("report_code_label")[:1]
+        )
+
+    def REPORT_TYPE_CLAUSE(self):
+        return Subquery(  # noqa: N806
+            Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
+            .annotate(report_type=report_type_case)
+            .values("report_type")[:1]
+        )
+
+    def LOAN_AGREEMENT_CLAUSE(self):
+        return Subquery(
+            self.model._base_manager.filter(
+                parent_transaction_id=OuterRef("pk"),
+                transaction_type_identifier="C1_LOAN_AGREEMENT",
+                deleted__isnull=True,
+            ).values("id")[:1],
+            output_field=UUIDField(),
         )
 
     def ORDER_KEY_CLAUSE(self):  # noqa: N802
