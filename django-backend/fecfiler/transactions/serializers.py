@@ -369,6 +369,7 @@ class TransactionListSerializer(ModelSerializer):
     balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     report_code_label = CharField(read_only=True)
+    report_type = CharField(read_only=True)
     report_ids = PrimaryKeyRelatedField(many=True, read_only=True, source="reports")
     loan_agreement_id = UUIDField(read_only=True, allow_null=True)
 
@@ -391,6 +392,7 @@ class TransactionListSerializer(ModelSerializer):
             "balance",
             "aggregate",
             "report_code_label",
+            "report_type",
             "report_ids",
             "can_delete",
             "loan_id",
