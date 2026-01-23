@@ -21,6 +21,8 @@ fecfiler.transactions.managers.TransactionManager
    
       ~TransactionManager.LINE_LABEL_CLAUSE
       ~TransactionManager.ORDER_KEY_CLAUSE
+      ~TransactionManager.REPORT_CODE_LABEL_CLAUSE
+      ~TransactionManager.REPORT_TYPE_CLAUSE
       ~TransactionManager.SCHEDULE_CLAUSE
       ~TransactionManager.__init__
       ~TransactionManager.aaggregate
