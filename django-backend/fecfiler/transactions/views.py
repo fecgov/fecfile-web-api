@@ -558,13 +558,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     .order_by("date")
                 )
 
-            next_entity = next_transactions_by_entity.first()
-            next_election = next_transactions_by_election.first()
+            # next_entity = next_transactions_by_entity.first()
+            # next_election = next_transactions_by_election.first()
 
-            if next_entity is not None:
-                next_entity.save()
-            if next_election is not None:
-                next_election.save()
+            # if next_entity is not None:
+            #     next_entity.save()
+            # if next_election is not None:
+            #     next_election.save()
 
         return self.queryset.get(id=transaction_instance.id)
 
