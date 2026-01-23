@@ -81,7 +81,7 @@ class TransactionModelTestCase(TestCase):
 
         carry_forward_loans(self.m2_report)
         self.carried_forward_loan = (
-            Transaction.objects.transaction_view()
+            Transaction.objects
             .filter(committee_account_id=self.committee.id)
             .order_by("created")
             .last()

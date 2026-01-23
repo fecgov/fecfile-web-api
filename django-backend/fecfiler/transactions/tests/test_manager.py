@@ -48,7 +48,7 @@ class TransactionViewTestCase(TestCase):
                 receipt_data["group"],
             )
 
-        view: QuerySet = Transaction.objects.transaction_view()
+        view: QuerySet = Transaction.objects
         transactions = (
             view.filter(committee_account_id=self.committee.id).all().order_by("date")
         )
@@ -83,7 +83,7 @@ class TransactionViewTestCase(TestCase):
             },
         )
 
-        view: QuerySet = Transaction.objects.transaction_view()
+        view: QuerySet = Transaction.objects
         transactions = view.filter(committee_account_id=self.committee.id).order_by(
             "date"
         )
@@ -112,7 +112,7 @@ class TransactionViewTestCase(TestCase):
         parnership_attribution.parent_transaction = partnership_receipt
         parnership_attribution.save()
 
-        view: QuerySet = Transaction.objects.transaction_view()
+        view: QuerySet = Transaction.objects
         view = view.filter(
             committee_account_id=self.committee.id,
             transaction_type_identifier="PARTNERSHIP_ATTRIBUTION",
@@ -158,7 +158,7 @@ class TransactionViewTestCase(TestCase):
             parnership_attribution_jf_transfer_memo.save()
 
         view = (
-            Transaction.objects.transaction_view()
+            Transaction.objects
             .filter(committee_account__id=self.committee.id)
             .order_by("date")
         )
@@ -187,7 +187,7 @@ class TransactionViewTestCase(TestCase):
             "100.00",
             "NATIONAL_PARTY_HEADQUARTERS_ACCOUNT",
         )
-        view: QuerySet = Transaction.objects.transaction_view()
+        view: QuerySet = Transaction.objects
         transactions = view.filter(committee_account_id=self.committee.id).order_by(
             "date"
         )
@@ -312,7 +312,7 @@ class TransactionViewTestCase(TestCase):
         second_repayment.save()
         process_aggregation_for_debts(original_debt)
 
-        view = Transaction.objects.transaction_view().filter(
+        view = Transaction.objects.filter(
             committee_account__id=self.committee.id
         )
         original_debt_view = view.filter(id=original_debt.id).first()
@@ -362,7 +362,7 @@ class TransactionViewTestCase(TestCase):
             "SB21B",
         )
 
-        view = Transaction.objects.transaction_view().filter(
+        view = Transaction.objects.filter(
             committee_account__id=self.committee.id
         )
         self.assertEqual(view[0].line_label, "11(a)(i)")
@@ -399,7 +399,7 @@ class TransactionViewTestCase(TestCase):
             loan_id=loan.id,
             report=m1_report,
         )
-        view: QuerySet = Transaction.objects.transaction_view()
+        view: QuerySet = Transaction.objects
         transactions = view.filter(committee_account_id=self.committee.id).order_by(
             "date"
         )
@@ -470,7 +470,7 @@ class TransactionViewTestCase(TestCase):
             False,
             None,
         )
-        obs = Transaction.objects.transaction_view().filter(id=scha.id)
+        obs = Transaction.objects.filter(id=scha.id)
         self.assertFalse(obs[0].itemized)
 
         schb = create_schedule_b(
@@ -482,7 +482,7 @@ class TransactionViewTestCase(TestCase):
             "GENERAL_DISBURSEMENT",
             "SB21B",
         )
-        obs = Transaction.objects.transaction_view().filter(id=schb.id)
+        obs = Transaction.objects.filter(id=schb.id)
         self.assertFalse(obs[0].itemized)
 
         scha = create_schedule_a(
@@ -496,7 +496,7 @@ class TransactionViewTestCase(TestCase):
             False,
             None,
         )
-        obs = Transaction.objects.transaction_view().filter(id=scha.id)
+        obs = Transaction.objects.filter(id=scha.id)
         self.assertTrue(obs[0].itemized)
 
         schb = create_schedule_b(
@@ -508,7 +508,7 @@ class TransactionViewTestCase(TestCase):
             "GENERAL_DISBURSEMENT",
             "SB21B",
         )
-        obs = Transaction.objects.transaction_view().filter(id=schb.id)
+        obs = Transaction.objects.filter(id=schb.id)
         self.assertTrue(obs[0].itemized)
 
         candidate_a = Contact.objects.create(
@@ -527,7 +527,7 @@ class TransactionViewTestCase(TestCase):
             "H2024",
             candidate_a,
         )
-        obs = Transaction.objects.transaction_view().filter(id=ie.id)
+        obs = Transaction.objects.filter(id=ie.id)
         self.assertTrue(obs[0].itemized)
 
         ie = create_ie(
@@ -540,5 +540,5 @@ class TransactionViewTestCase(TestCase):
             "H2024",
             candidate_a,
         )
-        obs = Transaction.objects.transaction_view().filter(id=ie.id)
+        obs = Transaction.objects.filter(id=ie.id)
         self.assertTrue(obs[0].itemized)

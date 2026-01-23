@@ -24,6 +24,7 @@ allowed_commands = [
     "disable_user",
     "reset_submitting_report",
     "fail_open_submissions",
+    "dump_committee_data",
 ]
 restricted_commands = [
     "loaddata",
@@ -34,7 +35,6 @@ restricted_commands = [
     "gen_locust_load_test_data",
     "delete_committee_account",
     "add_user_to_committee",
-    "dump_committee_data",  # Can be unrestricted AFTER fuzzing is implemented
     "load_committee_data",
     # REPORT COMMANDS #
     "delete_committee_reports",

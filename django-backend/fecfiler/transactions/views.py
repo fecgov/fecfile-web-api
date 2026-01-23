@@ -105,20 +105,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return TransactionSerializer
 
     def get_queryset(self):
-        # Use the table if writing
-        if hasattr(self, "action") and self.action in [
-            "create",
-            "update",
-            "destroy",
-            "save_transactions",
-        ]:
-            queryset = super().get_queryset()
-        else:  # Otherwise, use the view for reading
-            committee_uuid = self.get_committee_uuid()
-            queryset = Transaction.objects.transaction_view().filter(
-                committee_account__id=committee_uuid
-            )
-
+        queryset = super().get_queryset()
         report_id = (
             (
                 self.request.query_params.get("report_id")
@@ -186,6 +173,30 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
         return response
+
+    @action(detail=True, methods=["put"], url_path="update-itemization-aggregation")
+    def update_itemization_aggregation(self, request, pk=None):
+
+        transaction: Transaction = self.get_object()
+        transaction_data = self.get_serializer(transaction).data
+        transaction_data["report_ids"] = [
+            str(rep_id) for rep_id in transaction.reports.values_list("id", flat=True)
+        ]
+
+        allowed_fields = [
+            "force_itemized",
+            "force_unaggregated",
+            "schedule_id",
+            "schema_name",
+        ]
+        for field in allowed_fields:
+            if field in request.data:
+                transaction_data[field] = request.data[field]
+
+        with db_transaction.atomic():
+            self.save_transaction(transaction_data, request)
+
+        return Response(transaction.id)
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
     def previous_transaction_by_entity(self, request):
@@ -774,7 +785,7 @@ def stringify_queryset(qs):
 
 def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_id):
     if transaction.is_loan_repayment() is True:
-        current_loan = Transaction.objects.transaction_view().get(pk=transaction.loan_id)
+        current_loan = Transaction.objects.get(pk=transaction.loan_id)
         current_loan_balance = current_loan.loan_balance
         original_loan_id = current_loan.loan_id or current_loan.id
         if current_loan_balance == 0:
@@ -794,7 +805,7 @@ def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_i
 
 def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_id):
     if transaction.is_debt_repayment() is True:
-        current_debt = Transaction.objects.transaction_view().get(pk=transaction.debt_id)
+        current_debt = Transaction.objects.get(pk=transaction.debt_id)
         current_debt_balance = current_debt.balance_at_close
         original_debt_id = current_debt.debt_id or current_debt.id
         if current_debt_balance == 0:
