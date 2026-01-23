@@ -88,7 +88,6 @@ fecfiler.transactions.managers.TransactionManager
       ~TransactionManager.reverse
       ~TransactionManager.select_for_update
       ~TransactionManager.select_related
-      ~TransactionManager.transaction_view
       ~TransactionManager.union
       ~TransactionManager.update
       ~TransactionManager.update_or_create
