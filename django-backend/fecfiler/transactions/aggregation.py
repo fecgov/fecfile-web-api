@@ -139,6 +139,7 @@ def process_aggregation_for_entity(transaction_instance, earliest_date=None):
             aggregation_group=transaction_instance.aggregation_group,
             contact_1=transaction_instance.contact_1,
             date__gte=earliest_date,
+            # dont want to calculate year after both
             force_unaggregated__isnull=True,
         )
         .order_by("date", "created")

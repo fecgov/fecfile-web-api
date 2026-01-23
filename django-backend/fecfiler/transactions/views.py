@@ -625,8 +625,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             process_aggregation_for_debts(transaction_instance)
 
         # process entity aggregation
+
+        # better way to get date exists
+        transaction_instance = Transaction.objects.get(id=transaction_instance.id)
         process_aggregation_for_entity(
-            transaction_instance, min(transaction_instance.date, original_values["date"])
+            transaction_instance,
+            min(
+                transaction_instance.date,
+                original_values["date"] or datetime.fromtimestamp(0).date(),
+            ),
         )
 
     # If a transaction has been moved forward, update the aggregate values
