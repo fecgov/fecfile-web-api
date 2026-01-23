@@ -4,6 +4,7 @@ from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
+from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.reports.models import ReportTransaction
 from fecfiler.contacts.models import Contact
 
@@ -92,7 +93,7 @@ class LocustDataGenerator:
 
         return Contact.objects.bulk_create(contact_list)
 
-    def generate_single_schedule_a_transactions(self, count, reports, contacts):
+    def generate_single_schedule_a_transactions(self, count, reports, contacts, debts=[]):
         schedule_a_list = []
         transaction_list = []
         report_transaction_list = []
@@ -128,6 +129,7 @@ class LocustDataGenerator:
                         "form_type": form_type,
                         "entity_type": contact.type,
                         "schedule_a_id": schedule_a.id,
+                        "debt_id": None if len(debts) == 0 else choice(debts).id
                     }
                 )
             )
@@ -237,3 +239,63 @@ class LocustDataGenerator:
         Transaction.objects.bulk_update(tier2_transactions, ["parent_transaction_id"])
 
         return tier1_transactions
+
+    def generate_debt_transactions(self, count, repayments, reports, contacts):
+        schedule_d_list = []
+        transaction_list = []
+        report_transaction_list = []
+        for _ in range(count):
+            transaction_type_identifier = "DEBT_OWED_TO_COMMITTEE"
+            contact = choice(contacts)
+            report = choice(reports)
+            incurred_amount = randrange(10000, 40000)
+            form_type = "SD9"
+
+            schedule_d_list.append(
+                ScheduleD(
+                    **{
+                        "receipt_line_number": "9",
+                        "purpose_of_debt_or_obligation": report.id,
+                        "incurred_amount": incurred_amount,
+                        "report_coverage_from_date": report.coverage_from_date,
+                    }
+                )
+            )
+
+        schedule_d_list = ScheduleD.objects.bulk_create(schedule_d_list)
+        for schedule_d in schedule_d_list:
+            transaction_list.append(
+                Transaction(
+                    **{
+                        "transaction_type_identifier": transaction_type_identifier,
+                        "committee_account_id": self.committee.id,
+                        "contact_1_id": contact.id,
+                        "form_type": form_type,
+                        "entity_type": contact.type,
+                        "schedule_d_id": schedule_d.id,
+                    }
+                )
+            )
+
+        transaction_list = Transaction.objects.bulk_create(transaction_list)
+
+        for transaction in transaction_list:
+            report_transaction_list.append(
+                ReportTransaction(
+                    **{
+                        # Retrieve report ID from purpose field
+                        "report_id": transaction.schedule_d.purpose_of_debt_or_obligation,
+                        "transaction_id": transaction.id,
+                    }
+                )
+            )
+        ReportTransaction.objects.bulk_create(report_transaction_list)
+
+        for report_transaction in report_transaction_list:
+            report = report_transaction.report
+            debt = report_transaction.transaction
+            self.generate_single_schedule_a_transactions(
+                repayments, [report], contacts, [debt]
+            )
+
+        return transaction_list

@@ -18,8 +18,8 @@ CANDIDATE_RESULTS = [
     },
 ]
 COMMITTEE_RESULTS = [
-    {"name": "BIDEN FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
-    {"name": "BIDEN VICTORY FUND", "id": "C00744946", "is_active": "true"},
+    {"name": "GUY FOR PRESIDENT", "id": "C00703975", "is_active": "true"},
+    {"name": "GUY VICTORY FUND", "id": "C00744946", "is_active": "true"},
 ]
 MOCK_CANDIDATE_RESULTS = {"results": CANDIDATE_RESULTS}
 MOCK_COMMITTEE_RESULTS = {"results": COMMITTEE_RESULTS}

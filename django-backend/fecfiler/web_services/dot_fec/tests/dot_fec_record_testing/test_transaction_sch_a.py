@@ -155,7 +155,7 @@ class DotFECSchARecordsTestCase(TestCase):
         trans_donor_id = trans_donor.id
         create_transaction_memo(self.committee, trans_donor, "TRANSACTION_MEMO_TEXT")
 
-        transaction_view_model = Transaction.objects.transaction_view().filter(
+        transaction_view_model = Transaction.objects.filter(
             committee_account__id=self.committee.id,
         )
         self.transaction_com = transaction_view_model.get(id=trans_com_id)

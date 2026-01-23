@@ -9,14 +9,16 @@ class ReportIdSerializer(serializers.Serializer):
     def validate(self, data):
         request = self.context["request"]
         committee_uuid = request.session["committee_uuid"]
-        report_result = Report.objects.filter(
+        report = Report.objects.filter(
             id=data["report_id"], committee_account_id=committee_uuid
-        )
-        if not report_result.exists():
+        ).first()
+        if not report:
             raise serializers.ValidationError(
                 f"No report found with report id: {data['report_id']}"
             )
-        return super().validate(data)
+        data["report_instance"] = report
+        super().validate(data)
+        return data
 
 
 class SubmissionRequestSerializer(ReportIdSerializer):
