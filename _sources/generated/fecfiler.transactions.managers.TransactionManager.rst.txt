@@ -20,6 +20,7 @@ fecfiler.transactions.managers.TransactionManager
    .. autosummary::
    
       ~TransactionManager.LINE_LABEL_CLAUSE
+      ~TransactionManager.LOAN_AGREEMENT_CLAUSE
       ~TransactionManager.ORDER_KEY_CLAUSE
       ~TransactionManager.REPORT_CODE_LABEL_CLAUSE
       ~TransactionManager.REPORT_TYPE_CLAUSE

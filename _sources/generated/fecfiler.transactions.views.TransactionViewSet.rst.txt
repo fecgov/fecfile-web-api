@@ -87,6 +87,7 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.setup
       ~TransactionViewSet.throttled
       ~TransactionViewSet.update
+      ~TransactionViewSet.update_itemization_aggregation
    
    
 
