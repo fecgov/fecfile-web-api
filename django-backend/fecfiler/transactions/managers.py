@@ -29,6 +29,7 @@ from django.db.models import (
     RowRange,
     Window,
     TextField,
+    Sum,
 )
 from decimal import Decimal
 from enum import Enum
@@ -81,6 +82,7 @@ class TransactionManager(SoftDeleteManager):
                 schedule=self.SCHEDULE_CLAUSE(),
                 date=self.DATE_CLAUSE,
                 amount=self.AMOUNT_CLAUSE,
+                effective_amount=self.EFFECTIVE_AMOUNT_CLAUSE,
                 incurred_prior=F("schedule_d__incurred_prior"),
                 payment_prior=F("schedule_d__payment_prior"),
                 payment_amount=F("schedule_d__payment_amount"),
@@ -122,49 +124,49 @@ class TransactionManager(SoftDeleteManager):
             .order_by("order_key")
         )
 
-    def create(self, **kwargs):
-        """Override create to aggregate schedules A/B/E, run itemization for all."""
-        # Signal to save() that this is a Manager.create() invocation
-        _thread_local.in_manager_create = True
-        try:
-            instance = super().create(**kwargs)
-        finally:
-            _thread_local.in_manager_create = False
+    # def create(self, **kwargs):
+    #     """Override create to aggregate schedules A/B/E, run itemization for all."""
+    #     # Signal to save() that this is a Manager.create() invocation
+    #     _thread_local.in_manager_create = True
+    #     try:
+    #         instance = super().create(**kwargs)
+    #     finally:
+    #         _thread_local.in_manager_create = False
 
-        # After direct INSERT, refresh and invoke service
-        instance.refresh_from_db()
+    #     # After direct INSERT, refresh and invoke service
+    #     instance.refresh_from_db()
 
-        try:
-            schedule = instance.get_schedule_name()
-            # Only schedules A, B, and E get aggregated
-            if schedule in AGGREGATE_SCHEDULES:
-                try:
-                    from .utils_aggregation import (
-                        update_aggregates_for_affected_transactions,
-                    )
+    #     try:
+    #         schedule = instance.get_schedule_name()
+    #         # Only schedules A, B, and E get aggregated
+    #         if schedule in AGGREGATE_SCHEDULES:
+    #             try:
+    #                 from .utils_aggregation import (
+    #                     update_aggregates_for_affected_transactions,
+    #                 )
 
-                    update_aggregates_for_affected_transactions(instance, "create")
-                except Exception:
-                    logger.error(
-                        "Failed to update aggregates via service on create",
-                        transaction_id=instance.id,
-                    )
-            else:
-                # For non-aggregating schedules, still update itemization
-                try:
-                    from .itemization import update_itemization
+    #                 update_aggregates_for_affected_transactions(instance, "create")
+    #             except Exception:
+    #                 logger.error(
+    #                     "Failed to update aggregates via service on create",
+    #                     transaction_id=instance.id,
+    #                 )
+    #         else:
+    #             # For non-aggregating schedules, still update itemization
+    #             try:
+    #                 from .itemization import update_itemization
 
-                    update_itemization(instance)
-                    instance.save(update_fields=["itemized"])
-                except Exception:
-                    logger.error(
-                        "Failed to update itemization on create",
-                        transaction_id=instance.id,
-                    )
-        except Exception:
-            # If get_schedule_name() fails, just return the instance
-            pass
-        return instance
+    #                 update_itemization(instance)
+    #                 instance.save(update_fields=["itemized"])
+    #             except Exception:
+    #                 logger.error(
+    #                     "Failed to update itemization on create",
+    #                     transaction_id=instance.id,
+    #                 )
+    #     except Exception:
+    #         # If get_schedule_name() fails, just return the instance
+    #         pass
+    #     return instance
 
     def SCHEDULE_CLAUSE(self):  # noqa: N802
         return Case(
@@ -235,7 +237,7 @@ class TransactionManager(SoftDeleteManager):
         )
 
     def ENTITY_AGGREGATE_CLAUSE(self):  # noqa: N802
-        return Window(expression=Sum(self.AGGREGATE), **self.entity_aggregate_window)
+        return Window(expression=Sum("effective_amount"), **self.entity_aggregate_window)
 
     def ELECTION_AGGREGATE_CLAUSE(self):  # noqa: N802
         return Window(expression=Sum(self.AGGREGATE), **self.election_aggregate_window)

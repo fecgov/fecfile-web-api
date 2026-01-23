@@ -36,6 +36,7 @@ from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_
 from fecfiler.transactions.aggregation import (
     process_aggregation_for_debts,
     process_aggregation_by_payee_candidate,
+    process_aggregation_for_entity,
 )
 import structlog
 
@@ -622,6 +623,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             transaction_instance.schedule_d is not None
         ):
             process_aggregation_for_debts(transaction_instance)
+
+        # process entity aggregation
+        process_aggregation_for_entity(
+            transaction_instance, min(transaction_instance.date, original_values["date"])
+        )
 
     # If a transaction has been moved forward, update the aggregate values
     # for any transactions that were "leaped over"

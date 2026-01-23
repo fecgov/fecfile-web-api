@@ -1,7 +1,7 @@
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_f.models import ScheduleF
-from fecfiler.transactions.utils import (
+from fecfiler.transactions.utils_aggregation import (
     filter_queryset_for_previous_transactions_in_aggregation,
 )  # noqa: E501
 
@@ -130,3 +130,24 @@ def process_aggregation_by_payee_candidate(transaction_instance):
     ScheduleF.objects.bulk_update(
         updated_schedule_fs, ["aggregate_general_elec_expended"], batch_size=64
     )
+
+
+def process_aggregation_for_entity(transaction_instance, earliest_date=None):
+    dependent_transactions = (
+        Transaction.objects.filter(
+            committee_account_id=transaction_instance.committee_account_id,
+            aggregation_group=transaction_instance.aggregation_group,
+            contact_1=transaction_instance.contact_1,
+            date__gte=earliest_date,
+            force_unaggregated__isnull=True,
+        )
+        .order_by("date", "created")
+        .annotate(agg=Transaction.objects.ENTITY_AGGREGATE_CLAUSE())
+    )
+    logger.error(
+        f"Processing entity aggregation for transactions {dependent_transactions}"
+    )
+    for transaction in dependent_transactions:
+        transaction.aggregate = transaction.agg
+
+    Transaction.objects.bulk_update(dependent_transactions, ["aggregate"])
