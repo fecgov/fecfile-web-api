@@ -371,6 +371,7 @@ class TransactionListSerializer(ModelSerializer):
     report_code_label = CharField(read_only=True)
     report_type = CharField(read_only=True)
     report_ids = PrimaryKeyRelatedField(many=True, read_only=True, source="reports")
+    loan_agreement_id = UUIDField(read_only=True, allow_null=True)
 
     class Meta:
         model = Transaction
@@ -393,6 +394,12 @@ class TransactionListSerializer(ModelSerializer):
             "report_code_label",
             "report_type",
             "report_ids",
+            "can_delete",
+            "loan_id",
+            "debt_id",
+            "force_itemized",
+            "loan_agreement_id",
+            "form_type",
         ]
 
 

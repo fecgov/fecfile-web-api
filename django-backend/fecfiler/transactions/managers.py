@@ -11,6 +11,7 @@ from fecfiler.transactions.schedule_e.managers import line_labels as line_labels
 from fecfiler.transactions.schedule_f.managers import line_labels as line_labels_f
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
+    UUIDField,
     OuterRef,
     Subquery,
     F,
@@ -108,6 +109,16 @@ class TransactionManager(SoftDeleteManager):
         output_field=TextField(),
     )
 
+    def LOAN_AGREEMENT_CLAUSE(self):
+        return Subquery(
+            self.model._base_manager.filter(
+                parent_transaction_id=OuterRef("pk"),
+                transaction_type_identifier="C1_LOAN_AGREEMENT",
+                deleted__isnull=True,
+            ).values("id")[:1],
+            output_field=UUIDField(),
+        )
+
     def REPORT_CODE_LABEL_CLAUSE(self):
         return Subquery(  # noqa: N806
             Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
@@ -165,6 +176,7 @@ class TransactionManager(SoftDeleteManager):
                     "_calendar_ytd_per_election_office",
                 ),
                 line_label=self.LINE_LABEL_CLAUSE(),
+                loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
                 report_code_label=self.REPORT_CODE_LABEL_CLAUSE(),
                 report_type=self.REPORT_TYPE_CLAUSE(),
             )
