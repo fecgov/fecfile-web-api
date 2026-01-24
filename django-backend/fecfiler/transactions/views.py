@@ -517,54 +517,54 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         delete_carried_forward_debts_if_needed(transaction_instance, committee_id)
 
         # Set the earlier date in order to detect when a transaction has moved forward
-        if original_date and original_date < schedule_instance.get_date():
-            next_transactions_by_entity = (
-                Transaction.objects.get_queryset()
-                .filter(
-                    ~Q(id=original_instance.id),
-                    Q(date__year=original_date.year),
-                    Q(contact_1=original_contact_1),
-                    Q(date__gt=original_date)
-                    | Q(date=original_date, created__gt=original_instance.created),
-                )
-                .order_by("date")
-            )
+        # if original_date and original_date < schedule_instance.get_date():
+        #     next_transactions_by_entity = (
+        #         Transaction.objects.get_queryset()
+        #         .filter(
+        #             ~Q(id=original_instance.id),
+        #             Q(date__year=original_date.year),
+        #             Q(contact_1=original_contact_1),
+        #             Q(date__gt=original_date)
+        #             | Q(date=original_date, created__gt=original_instance.created),
+        #         )
+        #         .order_by("date")
+        #     )
 
-            # Default next_transactions_by_election the same queryset as entities
-            next_transactions_by_election = next_transactions_by_entity[:0]
+        #     # Default next_transactions_by_election the same queryset as entities
+        #     #next_transactions_by_election = next_transactions_by_entity[:0]
 
-            if original_contact_2 is not None:
-                # Capturing these in variables to cut down on line width
-                original_district = original_contact_2.candidate_district
-                original_office = original_contact_2.candidate_office
-                original_state = original_contact_2.candidate_state
+        #     if original_contact_2 is not None:
+        #         # Capturing these in variables to cut down on line width
+        #         original_district = original_contact_2.candidate_district
+        #         original_office = original_contact_2.candidate_office
+        #         original_state = original_contact_2.candidate_state
 
-                next_transactions_by_election = (
-                    self.get_queryset()
-                    .filter(
-                        ~Q(id=original_instance.id),
-                        Q(
-                            contact_2__candidate_district=original_district,
-                            contact_2__candidate_office=original_office,
-                            contact_2__candidate_state=original_state,
-                        ),
-                        Q(date__gt=original_date)
-                        | Q(date=original_date, created__gt=original_instance.created),
-                        Q(
-                            schedule_e__isnull=False,
-                            schedule_e__election_code=original_election_code,
-                        ),
-                    )
-                    .order_by("date")
-                )
+        #         next_transactions_by_election = (
+        #             self.get_queryset()
+        #             .filter(
+        #                 ~Q(id=original_instance.id),
+        #                 Q(
+        #                     contact_2__candidate_district=original_district,
+        #                     contact_2__candidate_office=original_office,
+        #                     contact_2__candidate_state=original_state,
+        #                 ),
+        #                 Q(date__gt=original_date)
+        #                 | Q(date=original_date, created__gt=original_instance.created),
+        #                 Q(
+        #                     schedule_e__isnull=False,
+        #                     schedule_e__election_code=original_election_code,
+        #                 ),
+        #             )
+        #             .order_by("date")
+        #         )
 
-            # next_entity = next_transactions_by_entity.first()
-            # next_election = next_transactions_by_election.first()
+        #     # next_entity = next_transactions_by_entity.first()
+        #     # next_election = next_transactions_by_election.first()
 
-            # if next_entity is not None:
-            #     next_entity.save()
-            # if next_election is not None:
-            #     next_election.save()
+        #     # if next_entity is not None:
+        #     #     next_entity.save()
+        #     # if next_election is not None:
+        #     #     next_election.save()
 
         return self.queryset.get(id=transaction_instance.id)
 
@@ -628,12 +628,39 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         # better way to get date exists
         transaction_instance = Transaction.objects.get(id=transaction_instance.id)
+
+        # Calculate earliest date for aggregation
+        original_date = original_values["date"]
+        original_contact_1 = original_values["contact_1"]
+
+        if original_date is None:
+            earliest_date = transaction_instance.date
+        else:
+            earliest_date = min(transaction_instance.date, original_date)
+
+        # If contact changed, recalculate aggregates for the old contact
+        if (
+            original_contact_1
+            and transaction_instance.contact_1_id != original_contact_1.id
+        ):
+            # Recalculate chain for old contact
+            old_contact_transactions = Transaction.objects.filter(
+                contact_1_id=original_contact_1.id,
+                committee_account_id=transaction_instance.committee_account_id,
+                aggregation_group=transaction_instance.aggregation_group,
+                deleted__isnull=True,
+            ).order_by("date", "created").first()
+
+            if old_contact_transactions:
+                process_aggregation_for_entity(
+                    old_contact_transactions,
+                    original_date if original_date else transaction_instance.date,
+                )
+
+        # Recalculate aggregates for the current (possibly new) contact
         process_aggregation_for_entity(
             transaction_instance,
-            min(
-                transaction_instance.date,
-                original_values["date"] or datetime.fromtimestamp(0).date(),
-            ),
+            earliest_date,
         )
 
     # If a transaction has been moved forward, update the aggregate values

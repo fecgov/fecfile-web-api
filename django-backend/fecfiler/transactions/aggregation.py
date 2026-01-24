@@ -133,15 +133,19 @@ def process_aggregation_by_payee_candidate(transaction_instance):
 
 
 def process_aggregation_for_entity(transaction_instance, earliest_date=None):
+    query_filter = {
+        "committee_account_id": transaction_instance.committee_account_id,
+        "aggregation_group": transaction_instance.aggregation_group,
+        "contact_1": transaction_instance.contact_1,
+        "force_unaggregated__isnull": True,
+    }
+
+    # Only add date filter if earliest_date is provided
+    if earliest_date is not None:
+        query_filter["date__gte"] = earliest_date
+
     dependent_transactions = (
-        Transaction.objects.filter(
-            committee_account_id=transaction_instance.committee_account_id,
-            aggregation_group=transaction_instance.aggregation_group,
-            contact_1=transaction_instance.contact_1,
-            date__gte=earliest_date,
-            # dont want to calculate year after both
-            force_unaggregated__isnull=True,
-        )
+        Transaction.objects.filter(**query_filter)
         .order_by("date", "created")
         .annotate(agg=Transaction.objects.ENTITY_AGGREGATE_CLAUSE())
     )
