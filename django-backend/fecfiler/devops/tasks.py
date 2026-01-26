@@ -176,7 +176,7 @@ def check_database_running():
     """
     with connection.cursor() as cursor:
         cursor.execute(
-            "select * from pg_stat_activity where datname = current_database()"
+            "select * from pg_stat_activity where datname = current_database() limit 1"
         )
         status_data = cursor.fetchone()
 
