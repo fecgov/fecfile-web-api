@@ -17,10 +17,9 @@ from fecfiler.transactions.schedule_e.managers import (
 from fecfiler.transactions.schedule_f.managers import line_labels as line_labels_f
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
+    UUIDField,
     OuterRef,
     Subquery,
-    Sum,
-    Q,
     F,
     Case,
     When,
@@ -30,11 +29,12 @@ from django.db.models import (
     RowRange,
     Window,
     TextField,
+    Sum,
 )
 from decimal import Decimal
 from enum import Enum
 from ..reports.models import Report
-from fecfiler.reports.report_code_label import report_code_label_case
+from fecfiler.reports.report_code_label import report_code_label_case, report_type_case
 import structlog
 import threading
 
@@ -75,49 +75,98 @@ class TransactionManager(SoftDeleteManager):
     }
 
     def get_queryset(self):
-        return super().get_queryset().annotate(date=self.DATE_CLAUSE)
+        return (
+            super()
+            .get_queryset()
+            .annotate(
+                schedule=self.SCHEDULE_CLAUSE(),
+                date=self.DATE_CLAUSE,
+                amount=self.AMOUNT_CLAUSE,
+                effective_amount=self.EFFECTIVE_AMOUNT_CLAUSE,
+                incurred_prior=F("schedule_d__incurred_prior"),
+                payment_prior=F("schedule_d__payment_prior"),
+                payment_amount=F("schedule_d__payment_amount"),
+                beginning_balance=F("schedule_d__beginning_balance"),
+                balance_at_close=F("schedule_d__balance_at_close"),
+                form_type=self.FORM_TYPE_CLAUSE,
+                name=self.DISPLAY_NAME_CLAUSE,
+                transaction_ptr_id=F("id"),
+                back_reference_tran_id_number=self.BACK_REFERENCE_CLAUSE,
+                back_reference_sched_name=self.BACK_REFERENCE_NAME_CLAUSE,
+                loan_balance=Case(
+                    When(
+                        schedule_c__isnull=False,
+                        then=F("amount")
+                        - Coalesce(F("loan_payment_to_date"), Decimal(0.0)),
+                    ),
+                ),
+                balance=Case(
+                    When(
+                        schedule_d__isnull=False,
+                        then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+                    ),
+                    When(
+                        schedule_c__isnull=False,
+                        then=Coalesce(F("loan_balance"), Decimal(0)),
+                    ),
+                ),
+                calendar_ytd_per_election_office=Coalesce(
+                    "parent_transaction__parent_transaction___calendar_ytd_per_election_office",  # noqa
+                    "parent_transaction___calendar_ytd_per_election_office",
+                    "_calendar_ytd_per_election_office",
+                ),
+                line_label=self.LINE_LABEL_CLAUSE(),
+                loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
+                report_code_label=self.REPORT_CODE_LABEL_CLAUSE(),
+                report_type=self.REPORT_TYPE_CLAUSE(),
+            )
+            .alias(order_key=self.ORDER_KEY_CLAUSE())
+            .order_by("order_key")
+        )
 
-    def create(self, **kwargs):
-        """Override create to aggregate schedules A/B/E, run itemization for all."""
-        # Signal to save() that this is a Manager.create() invocation
-        _thread_local.in_manager_create = True
-        try:
-            instance = super().create(**kwargs)
-        finally:
-            _thread_local.in_manager_create = False
+    # def create(self, **kwargs):
+    #     """Override create to aggregate schedules A/B/E, run itemization for all."""
+    #     # Signal to save() that this is a Manager.create() invocation
+    #     _thread_local.in_manager_create = True
+    #     try:
+    #         instance = super().create(**kwargs)
+    #     finally:
+    #         _thread_local.in_manager_create = False
 
-        # After direct INSERT, refresh and invoke service
-        instance.refresh_from_db()
+    #     # After direct INSERT, refresh and invoke service
+    #     instance.refresh_from_db()
 
-        try:
-            schedule = instance.get_schedule_name()
-            # Only schedules A, B, and E get aggregated
-            if schedule in AGGREGATE_SCHEDULES:
-                try:
-                    from .utils_aggregation import (
-                        update_aggregates_for_affected_transactions,
-                    )
-                    update_aggregates_for_affected_transactions(instance, "create")
-                except Exception:
-                    logger.error(
-                        "Failed to update aggregates via service on create",
-                        transaction_id=instance.id,
-                    )
-            else:
-                # For non-aggregating schedules, still update itemization
-                try:
-                    from .itemization import update_itemization
-                    update_itemization(instance)
-                    instance.save(update_fields=["itemized"])
-                except Exception:
-                    logger.error(
-                        "Failed to update itemization on create",
-                        transaction_id=instance.id,
-                    )
-        except Exception:
-            # If get_schedule_name() fails, just return the instance
-            pass
-        return instance
+    #     try:
+    #         schedule = instance.get_schedule_name()
+    #         # Only schedules A, B, and E get aggregated
+    #         if schedule in AGGREGATE_SCHEDULES:
+    #             try:
+    #                 from .utils_aggregation import (
+    #                     update_aggregates_for_affected_transactions,
+    #                 )
+
+    #                 update_aggregates_for_affected_transactions(instance, "create")
+    #             except Exception:
+    #                 logger.error(
+    #                     "Failed to update aggregates via service on create",
+    #                     transaction_id=instance.id,
+    #                 )
+    #         else:
+    #             # For non-aggregating schedules, still update itemization
+    #             try:
+    #                 from .itemization import update_itemization
+
+    #                 update_itemization(instance)
+    #                 instance.save(update_fields=["itemized"])
+    #             except Exception:
+    #                 logger.error(
+    #                     "Failed to update itemization on create",
+    #                     transaction_id=instance.id,
+    #                 )
+    #     except Exception:
+    #         # If get_schedule_name() fails, just return the instance
+    #         pass
+    #     return instance
 
     def SCHEDULE_CLAUSE(self):  # noqa: N802
         return Case(
@@ -188,7 +237,7 @@ class TransactionManager(SoftDeleteManager):
         )
 
     def ENTITY_AGGREGATE_CLAUSE(self):  # noqa: N802
-        return Window(expression=Sum(self.AGGREGATE), **self.entity_aggregate_window)
+        return Window(expression=Sum("effective_amount"), **self.entity_aggregate_window)
 
     def ELECTION_AGGREGATE_CLAUSE(self):  # noqa: N802
         return Window(expression=Sum(self.AGGREGATE), **self.election_aggregate_window)
@@ -236,143 +285,28 @@ class TransactionManager(SoftDeleteManager):
         output_field=TextField(),
     )
 
-    def INCURRED_PRIOR_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(
-                schedule_d__isnull=False,
-                then=Coalesce(
-                    Subquery(
-                        (
-                            super()
-                            .get_queryset()
-                            .filter(
-                                ~Q(debt_id=OuterRef("id")),
-                                transaction_id=OuterRef("transaction_id"),
-                                schedule_d__report_coverage_from_date__lt=OuterRef(
-                                    "schedule_d__report_coverage_from_date"
-                                ),
-                            )
-                            .values("committee_account_id")
-                            .annotate(
-                                incurred_prior=Sum("schedule_d__incurred_amount"),
-                            )
-                            .values("incurred_prior")
-                        )
-                    ),
-                    Value(Decimal(0)),
-                ),
-            ),
-            default=None,
-        )
-
-    def PAYMENT_PRIOR_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(
-                schedule_d__isnull=False,
-                then=Coalesce(
-                    Subquery(
-                        super()
-                        .get_queryset()
-                        .annotate(date=self.DATE_CLAUSE, amount=self.AMOUNT_CLAUSE)
-                        .filter(
-                            ~Q(debt_id=OuterRef("id")),
-                            debt__transaction_id=OuterRef("transaction_id"),
-                            schedule_d__isnull=True,
-                            date__lt=OuterRef("schedule_d__report_coverage_from_date"),
-                        )
-                        .values("committee_account_id")
-                        .annotate(debt_payments_prior=Sum("amount"))
-                        .values("debt_payments_prior")
-                    ),
-                    Value(Decimal(0)),
-                ),
-            ),
-            default=None,
-        )
-
-    def PAYMENT_AMOUNT_CLAUSE(self):  # noqa: N802
-        return Case(
-            When(
-                schedule_d__isnull=False,
-                then=Coalesce(
-                    Subquery(
-                        super()
-                        .get_queryset()
-                        .filter(debt_id=OuterRef("id"), schedule_d__isnull=True)
-                        .annotate(amount=self.AMOUNT_CLAUSE)
-                        .values("committee_account_id")
-                        .annotate(payment_to_date=Sum("amount"))
-                        .values("payment_to_date")
-                    ),
-                    Value(Decimal(0)),
-                ),
-            ),
-            default=None,
-        )
-
-    def transaction_view(self):
-        REPORT_CODE_LABEL_CLAUSE = Subquery(  # noqa: N806
-            Report.objects.filter(transactions=OuterRef("pk"))
+    def REPORT_CODE_LABEL_CLAUSE(self):
+        return Subquery(  # noqa: N806
+            Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
             .annotate(report_code_label=report_code_label_case)
             .values("report_code_label")[:1]
         )
 
-        return (
-            super()
-            .get_queryset()
-            .annotate(
-                schedule=self.SCHEDULE_CLAUSE(),
-                date=self.DATE_CLAUSE,
-                amount=self.AMOUNT_CLAUSE,
-                incurred_prior=self.INCURRED_PRIOR_CLAUSE(),
-                payment_prior=self.PAYMENT_PRIOR_CLAUSE(),
-                payment_amount=self.PAYMENT_AMOUNT_CLAUSE(),
-                form_type=self.FORM_TYPE_CLAUSE,
-                name=self.DISPLAY_NAME_CLAUSE,
-                transaction_ptr_id=F("id"),
-                back_reference_tran_id_number=self.BACK_REFERENCE_CLAUSE,
-                back_reference_sched_name=self.BACK_REFERENCE_NAME_CLAUSE,
-                beginning_balance=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=F("incurred_prior") - F("payment_prior"),
-                    ),
-                ),
-                balance_at_close=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=F("beginning_balance")
-                        + F("schedule_d__incurred_amount")
-                        - F("payment_amount"),
-                    ),
-                ),
-                loan_balance=Case(
-                    When(
-                        schedule_c__isnull=False,
-                        then=F("amount")
-                        - Coalesce(F("loan_payment_to_date"), Decimal(0.0)),
-                    ),
-                ),
-                balance=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
-                    ),
-                    When(
-                        schedule_c__isnull=False,
-                        then=Coalesce(F("loan_balance"), Decimal(0)),
-                    ),
-                ),
-                calendar_ytd_per_election_office=Coalesce(
-                    "parent_transaction__parent_transaction___calendar_ytd_per_election_office",  # noqa
-                    "parent_transaction___calendar_ytd_per_election_office",
-                    "_calendar_ytd_per_election_office",
-                ),
-                line_label=self.LINE_LABEL_CLAUSE(),
-                report_code_label=REPORT_CODE_LABEL_CLAUSE,
-            )
-            .alias(order_key=self.ORDER_KEY_CLAUSE())
-            .order_by("order_key")
+    def REPORT_TYPE_CLAUSE(self):
+        return Subquery(  # noqa: N806
+            Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
+            .annotate(report_type=report_type_case)
+            .values("report_type")[:1]
+        )
+
+    def LOAN_AGREEMENT_CLAUSE(self):
+        return Subquery(
+            self.model._base_manager.filter(
+                parent_transaction_id=OuterRef("pk"),
+                transaction_type_identifier="C1_LOAN_AGREEMENT",
+                deleted__isnull=True,
+            ).values("id")[:1],
+            output_field=UUIDField(),
         )
 
     def ORDER_KEY_CLAUSE(self):  # noqa: N802

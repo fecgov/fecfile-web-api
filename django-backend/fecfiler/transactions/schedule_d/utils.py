@@ -22,7 +22,7 @@ def carry_forward_debts(report):
     previous_report = report.previous_report
     if previous_report:
 
-        all_debts_for_committee = Transaction.objects.transaction_view().filter(
+        all_debts_for_committee = Transaction.objects.filter(
             ~Q(memo_code=True),
             schedule_d_id__isnull=False,
             committee_account__id=report.committee_account.id,

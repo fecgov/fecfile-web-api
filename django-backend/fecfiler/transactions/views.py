@@ -20,6 +20,7 @@ from fecfiler.transactions.models import (
 )
 from fecfiler.transactions.serializers import (
     TransactionSerializer,
+    TransactionListSerializer,
     SCHEDULE_SERIALIZERS,
 )
 from fecfiler.transactions.utils_aggregation import (
@@ -32,7 +33,11 @@ from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
-from fecfiler.transactions.schedule_f.models import ScheduleF
+from fecfiler.transactions.aggregation import (
+    process_aggregation_for_debts,
+    process_aggregation_by_payee_candidate,
+    process_aggregation_for_entity,
+)
 import structlog
 
 import os
@@ -96,21 +101,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     ordering = ["-created"]
     queryset = Transaction.objects
 
-    def get_queryset(self):
-        # Use the table if writing
-        if hasattr(self, "action") and self.action in [
-            "create",
-            "update",
-            "destroy",
-            "save_transactions",
-        ]:
-            queryset = super().get_queryset()
-        else:  # Otherwise, use the view for reading
-            committee_uuid = self.get_committee_uuid()
-            queryset = Transaction.objects.transaction_view().filter(
-                committee_account__id=committee_uuid
-            )
+    def get_serializer_class(self):
+        if self.action == "list":
+            return TransactionListSerializer
+        return TransactionSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
         report_id = (
             (
                 self.request.query_params.get("report_id")
@@ -144,7 +141,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 | Q(contact_5=contact_id)
             )
 
-        return queryset
+        return queryset.prefetch_related("reports")
 
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
@@ -165,6 +162,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             response = super().destroy(request, *args, **kwargs)
             # update parents that depend on this transaction
             update_dependent_parent(transaction)
+            if transaction.is_debt_repayment():
+                process_aggregation_for_debts(transaction.debt)
+            elif transaction.schedule_d is not None:
+                process_aggregation_for_debts(transaction)
         return response
 
     def partial_update(self, request, pk=None):
@@ -174,6 +175,30 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
         return response
+
+    @action(detail=True, methods=["put"], url_path="update-itemization-aggregation")
+    def update_itemization_aggregation(self, request, pk=None):
+
+        transaction: Transaction = self.get_object()
+        transaction_data = self.get_serializer(transaction).data
+        transaction_data["report_ids"] = [
+            str(rep_id) for rep_id in transaction.reports.values_list("id", flat=True)
+        ]
+
+        allowed_fields = [
+            "force_itemized",
+            "force_unaggregated",
+            "schedule_id",
+            "schema_name",
+        ]
+        for field in allowed_fields:
+            if field in request.data:
+                transaction_data[field] = request.data[field]
+
+        with db_transaction.atomic():
+            self.save_transaction(transaction_data, request)
+
+        return Response(transaction.id)
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
     def previous_transaction_by_entity(self, request):
@@ -533,13 +558,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     .order_by("date")
                 )
 
-            next_entity = next_transactions_by_entity.first()
-            next_election = next_transactions_by_election.first()
+            # next_entity = next_transactions_by_entity.first()
+            # next_election = next_transactions_by_election.first()
 
-            if next_entity is not None:
-                next_entity.save()
-            if next_election is not None:
-                next_election.save()
+            # if next_entity is not None:
+            #     next_entity.save()
+            # if next_election is not None:
+            #     next_election.save()
 
         return self.queryset.get(id=transaction_instance.id)
 
@@ -592,7 +617,24 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     # process_aggregation_by_election()
                     pass
                 case Schedule.F:
-                    self.process_aggregation_by_payee_candidate(transaction_instance)
+                    process_aggregation_by_payee_candidate(transaction_instance)
+
+        if transaction_instance.is_debt_repayment() or (
+            transaction_instance.schedule_d is not None
+        ):
+            process_aggregation_for_debts(transaction_instance)
+
+        # process entity aggregation
+
+        # better way to get date exists
+        transaction_instance = Transaction.objects.get(id=transaction_instance.id)
+        process_aggregation_for_entity(
+            transaction_instance,
+            min(
+                transaction_instance.date,
+                original_values["date"] or datetime.fromtimestamp(0).date(),
+            ),
+        )
 
     # If a transaction has been moved forward, update the aggregate values
     # for any transactions that were "leaped over"
@@ -647,7 +689,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
             to_recalculate = leapfrogged_sch_f_transactions.first()
             if to_recalculate is not None:
-                self.process_aggregation_by_payee_candidate(to_recalculate)
+                process_aggregation_by_payee_candidate(to_recalculate)
 
     # If a transaction has been updated in such a way that would change which transactions
     # it would aggregate with, such as switching to a different contact or election code,
@@ -703,7 +745,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
             to_recalculate = leapfrogged_sch_f_transactions.first()
             if to_recalculate is not None:
-                self.process_aggregation_by_payee_candidate(to_recalculate)
+                process_aggregation_by_payee_candidate(to_recalculate)
 
     @action(detail=False, methods=["post"], url_path=r"add-to-report")
     def add_transaction_to_report(self, request):
@@ -736,58 +778,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         transaction.reports.remove(report)
         return Response("Transaction removed from report")
-
-    def process_aggregation_by_payee_candidate(self, transaction_instance):
-        # Get the transaction out of the queryset in order to populate annotated fields
-        transaction = self.get_queryset().filter(id=transaction_instance.id).first()
-        if transaction is None:
-            return
-
-        queryset = self.get_queryset()
-
-        shared_entity_transactions = queryset.filter(
-            date__year=transaction.date.year,
-            contact_2=transaction.contact_2,
-            aggregation_group=transaction.aggregation_group,
-            schedule_f__isnull=False,
-            schedule_f__general_election_year=transaction.schedule_f.general_election_year,  # noqa: E501
-        )
-
-        previous_transactions = filter_queryset_for_previous_transactions_in_aggregation(
-            shared_entity_transactions,
-            transaction.date,
-            transaction.aggregation_group,
-            transaction.id,
-            None,
-            transaction.contact_2.id,
-            None,
-            transaction.schedule_f.general_election_year,
-        )
-
-        to_update = shared_entity_transactions.filter(
-            Q(id=transaction.id)
-            | Q(date__gt=transaction.date)
-            | Q(Q(date=transaction.date) & Q(created__gt=transaction.created))
-        ).order_by("date", "created")
-
-        previous_transaction = previous_transactions.first()
-        updated_schedule_fs = []
-        for trans in to_update:
-            previous_aggregate = 0
-            if previous_transaction:
-                previous_aggregate = (
-                    previous_transaction.schedule_f.aggregate_general_elec_expended
-                )
-
-            trans.schedule_f.aggregate_general_elec_expended = (
-                trans.schedule_f.expenditure_amount + previous_aggregate
-            )
-            updated_schedule_fs.append(trans.schedule_f)
-            previous_transaction = trans
-
-        ScheduleF.objects.bulk_update(
-            updated_schedule_fs, ["aggregate_general_elec_expended"], batch_size=64
-        )
 
 
 def noop(transaction, is_existing):
@@ -823,7 +813,7 @@ def stringify_queryset(qs):
 
 def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_id):
     if transaction.is_loan_repayment() is True:
-        current_loan = Transaction.objects.transaction_view().get(pk=transaction.loan_id)
+        current_loan = Transaction.objects.get(pk=transaction.loan_id)
         current_loan_balance = current_loan.loan_balance
         original_loan_id = current_loan.loan_id or current_loan.id
         if current_loan_balance == 0:
@@ -843,7 +833,7 @@ def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_i
 
 def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_id):
     if transaction.is_debt_repayment() is True:
-        current_debt = Transaction.objects.transaction_view().get(pk=transaction.debt_id)
+        current_debt = Transaction.objects.get(pk=transaction.debt_id)
         current_debt_balance = current_debt.balance_at_close
         original_debt_id = current_debt.debt_id or current_debt.id
         if current_debt_balance == 0:
@@ -859,3 +849,4 @@ def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_i
             )
             for transaction_to_delete in transactions_to_delete:
                 transaction_to_delete.delete()
+        process_aggregation_for_debts(current_debt)
