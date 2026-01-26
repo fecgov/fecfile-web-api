@@ -35,9 +35,6 @@ def get_devops_status_report():
     set_redis_value(DATABASE_STATUS, db_running, age=SYSTEM_STATUS_CACHE_AGE)
     logger.info(db_running)
 
-    db_connections_results = get_database_connections()
-    logger.info(db_connections_results)
-
 
 @shared_task
 def size_analysis():
@@ -168,40 +165,6 @@ def log_resource_size(
 
     logger.info(log_dict)
     return log_dict
-
-
-def get_database_connections():
-
-    column_labels = (
-        "total_connections",
-        "non_idle_connections",
-        "max_connections",
-        "connections_utilization_pctg",
-    )
-
-    sql = """
-        SELECT
-        A.total_connections::text AS {},
-        A.non_idle_connections::text AS {},
-        B.max_connections::text AS {},
-        ROUND(
-            100 * (A.total_connections::numeric / B.max_connections::numeric), 2)::text
-            AS {}
-        FROM
-        (SELECT count(1) AS total_connections,
-         SUM(CASE WHEN state!='idle' THEN 1 ELSE 0 END) AS non_idle_connections
-         FROM pg_stat_activity) A,
-        (SELECT setting AS max_connections FROM pg_settings
-         WHERE name='max_connections') B;
-        """.format(
-        *column_labels
-    )
-
-    with connection.cursor() as cursor:
-        cursor.execute(sql)
-        results = cursor.fetchall()
-
-    return {"results": dict(zip(column_labels, row)) for row in results}
 
 
 def check_database_running():
