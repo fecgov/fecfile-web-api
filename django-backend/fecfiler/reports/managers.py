@@ -9,6 +9,13 @@ STATUS_CODE_PENDING = 2
 STATUS_CODE_IN_PROGRESS = 3
 STATUS_CODE_SUCCESS = 4
 
+REPORT_STATUS_MAP = {
+    STATUS_CODE_FAILED: "Submission failure",
+    STATUS_CODE_PENDING: "Submission pending",
+    STATUS_CODE_IN_PROGRESS: "In progress",
+    STATUS_CODE_SUCCESS: "Submission success",
+}
+
 
 def get_status_mapping():
     """returns Django Case that determines report status based on upload submission"""

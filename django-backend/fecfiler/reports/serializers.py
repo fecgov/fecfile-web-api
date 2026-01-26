@@ -1,9 +1,12 @@
 from .models import Report
 from rest_framework.serializers import (
+    SerializerMethodField,
     ModelSerializer,
     CharField,
     UUIDField,
 )
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.web_services.serializers import (
     UploadSubmissionSerializer,
@@ -18,6 +21,7 @@ from fecfiler.reports.form_99.models import Form99
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_1m.utils import add_form_1m_contact_fields
 from rest_framework.serializers import ValidationError
+from .managers import REPORT_STATUS_MAP, STATUS_CODE_IN_PROGRESS
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -104,9 +108,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     webprint_submission = WebPrintSubmissionSerializer(
         read_only=True,
     )
-    report_status = CharField(
-        read_only=True,
-    )
+    report_status = SerializerMethodField(read_only=True)
     report_code_label = CharField(read_only=True)
     version_label = CharField(read_only=True)
 
@@ -189,3 +191,8 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
 
         fields = get_fields()
         read_only_fields = ["id", "created", "updated"]
+
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_report_status(self, instance):
+        status_code = getattr(instance, "report_status", STATUS_CODE_IN_PROGRESS)
+        return REPORT_STATUS_MAP.get(status_code, "In progress")
