@@ -39,6 +39,7 @@ fecfiler.reports.serializers.ReportSerializer
       ~ReportSerializer.get_fields
       ~ReportSerializer.get_foreign_key_fields
       ~ReportSerializer.get_initial
+      ~ReportSerializer.get_report_status
       ~ReportSerializer.get_schema_name
       ~ReportSerializer.get_unique_for_date_validators
       ~ReportSerializer.get_unique_together_constraints

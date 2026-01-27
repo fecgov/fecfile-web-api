@@ -39,6 +39,7 @@ fecfiler.reports.form\_3x.serializers.Form3XSerializer
       ~Form3XSerializer.get_fields
       ~Form3XSerializer.get_foreign_key_fields
       ~Form3XSerializer.get_initial
+      ~Form3XSerializer.get_report_status
       ~Form3XSerializer.get_schema_name
       ~Form3XSerializer.get_transaction_date_outside_coverage_dates_clause
       ~Form3XSerializer.get_unique_for_date_validators

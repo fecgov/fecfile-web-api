@@ -39,6 +39,7 @@ fecfiler.reports.form\_1m.serializers.Form1MSerializer
       ~Form1MSerializer.get_fields
       ~Form1MSerializer.get_foreign_key_fields
       ~Form1MSerializer.get_initial
+      ~Form1MSerializer.get_report_status
       ~Form1MSerializer.get_schema_name
       ~Form1MSerializer.get_unique_for_date_validators
       ~Form1MSerializer.get_unique_together_constraints
