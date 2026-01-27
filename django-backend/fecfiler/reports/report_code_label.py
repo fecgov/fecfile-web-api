@@ -29,6 +29,14 @@ report_code_label_mapping = {
     "M12": "DECEMBER 20 MONTHLY (M12)",
 }
 
+text_code_mapping = {
+    "MST": "Miscellaneous Report to the FEC",
+    "MSM": "Filing Frequency Change Notice",
+    "MSW": "Loan Agreement / Loan Forgiveness",
+    "MSI": "Disavowal Response",
+    "MSR": "Form 3L Filing Frequency Change Notice",
+}
+
 # Generate the Case object
 report_code_label_case = Case(
     *[When(report_code=k, then=Value(v)) for k, v in report_code_label_mapping.items()],
@@ -36,7 +44,17 @@ report_code_label_case = Case(
         form_24__isnull=False,
         then=F("form_24__name"),
     ),
-    When(form_99__isnull=False, then=Value("")),
+    When(
+        form_99__isnull=False,
+        then=Case(
+            *[
+                When(form_99__text_code=code, then=Value(label))
+                for code, label in text_code_mapping.items()
+            ],
+            default=Value("Miscellaneous Report to the FEC"),
+            output_field=CharField(),
+        ),
+    ),
     When(form_1m__isnull=False, then=Value("NOTIFICATION OF MULTICANDIDATE STATUS")),
     output_field=CharField(),
 )
