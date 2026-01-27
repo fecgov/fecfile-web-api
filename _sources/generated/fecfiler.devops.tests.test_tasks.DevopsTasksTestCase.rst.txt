@@ -100,7 +100,6 @@ fecfiler.devops.tests.test\_tasks.DevopsTasksTestCase
       ~DevopsTasksTestCase.tearDown
       ~DevopsTasksTestCase.tearDownClass
       ~DevopsTasksTestCase.test_delete_expired_s3_objects
-      ~DevopsTasksTestCase.test_get_database_connections
       ~DevopsTasksTestCase.test_get_db_size
       ~DevopsTasksTestCase.test_log_db_size
       ~DevopsTasksTestCase.test_log_s3_bucket_size

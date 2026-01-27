@@ -19,7 +19,6 @@ fecfiler.devops.tasks
    
       check_database_running
       check_database_size
-      get_database_connections
       log_database_size
       log_resource_size
       log_s3_bucket_size
