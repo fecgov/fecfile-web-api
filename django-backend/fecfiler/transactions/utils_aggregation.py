@@ -14,7 +14,6 @@ from typing import Optional, Dict, Any
 from uuid import UUID
 from django.db.models import Q, F, Value
 from django.db.models.fields import DecimalField
-from .models import Transaction
 from .managers import (
     Schedule,
     TransactionManager,
@@ -27,6 +26,49 @@ from .managers import (
 import structlog
 
 logger = structlog.get_logger(__name__)
+
+
+_Transaction = None
+
+
+def get_transaction_model():
+    """Get Transaction model with lazy import to avoid circular dependency.
+
+    Only used in create_old_snapshot which is imported by models.py at module load time.
+    Other functions can safely use direct Transaction import.
+    """
+    global _Transaction
+    if _Transaction is None:
+        from .models import Transaction
+        _Transaction = Transaction
+    return _Transaction
+
+
+def create_old_snapshot(transaction, effective_amount):
+    """Snapshot transaction state for aggregate updates."""
+    old_snapshot = {
+        "schedule": transaction.get_schedule_name(),
+        "contact_1_id": transaction.contact_1_id,
+        "aggregation_group": transaction.aggregation_group,
+        "committee_account_id": transaction.committee_account_id,
+        "date": transaction.get_date(),
+        "created": transaction.created,
+        "effective_amount": effective_amount,
+        "force_itemized": transaction.force_itemized,
+        "force_unaggregated": transaction.force_unaggregated,
+        "memo_code": transaction.memo_code,
+        "reatt_redes_id": transaction.reatt_redes_id,
+    }
+    if transaction.schedule_e and transaction.contact_2:
+        old_snapshot.update(
+            {
+                "election_code": transaction.schedule_e.election_code,
+                "candidate_office": transaction.contact_2.candidate_office,
+                "candidate_state": transaction.contact_2.candidate_state,
+                "candidate_district": transaction.contact_2.candidate_district,
+            }
+        )
+    return old_snapshot
 
 
 def get_query_for_earlier_in_same_year(date):
@@ -133,6 +175,8 @@ def _update_aggregate_running_sum(
     Returns:
         Number of transactions updated
     """
+    from .models import Transaction
+
     if not transactions.exists():
         logger.debug(f"No transactions found for aggregation: {log_context}")
         return 0
@@ -183,6 +227,8 @@ def calculate_entity_aggregates(
     Returns:
         Number of transactions updated
     """
+    from .models import Transaction
+
     # Get all matching transactions ordered by date and created
     # Exclude force_unaggregated transactions as they don't get aggregated
     transactions = Transaction.objects.filter(
@@ -226,6 +272,8 @@ def calculate_calendar_ytd_per_election_office(
     Returns:
         Number of transactions updated
     """
+    from .models import Transaction
+
     # Handle None/empty string values for state and district
     state_filter = Q(contact_2__candidate_state=candidate_state)
     if not candidate_state:
@@ -439,6 +487,8 @@ def apply_delta_aggregates(
         old_state: Snapshot dict of prior key fields and effective amount
         created: Whether this is a creation event
     """
+    from .models import Transaction
+
     if transaction_instance.deleted:
         return
 
@@ -751,6 +801,8 @@ def apply_delete_delta_aggregates(old_state: Dict[str, Any]) -> None:
     Uses the snapshot of the deleted row to subtract its effective amount from
     the suffix of the appropriate partition.
     """
+    from .models import Transaction
+
     if not old_state:
         return
 
@@ -842,8 +894,10 @@ def calculate_loan_payment_to_date(loan_id: UUID) -> int:
 
     # Get the loan transaction
     try:
-        loan = Transaction.objects.select_related('loan', 'loan__schedule_c').get(
-            id=loan_id, deleted__isnull=True
+        loan = (
+            Transaction
+            .objects.select_related("loan", "loan__schedule_c")
+            .get(id=loan_id, deleted__isnull=True)
         )
     except Transaction.DoesNotExist:
         logger.warning(f"Loan transaction {loan_id} not found")
@@ -1026,7 +1080,7 @@ def _update_parent_itemization_service(instance) -> None:
 
 
 def update_aggregates_for_affected_transactions(
-    instance: Transaction,
+    instance,  # Transaction instance
     action: str,
     old_snapshot: Optional[Dict[str, Any]] = None,
 ) -> None:
@@ -1057,36 +1111,17 @@ def update_aggregates_for_affected_transactions(
         # This handles edge cases where caller couldn't capture it
         if getattr(instance, "id", None):
             try:
-                old = Transaction.objects.select_related(
+                old = get_transaction_model().objects.select_related(
                     "schedule_a", "schedule_b", "schedule_c", "schedule_e",
                     "contact_2"
                 ).get(id=instance.id)
                 eff = calculate_effective_amount(old)
-
-                old_snapshot = {
-                    "schedule": old.get_schedule_name(),
-                    "contact_1_id": old.contact_1_id,
-                    "aggregation_group": old.aggregation_group,
-                    "committee_account_id": old.committee_account_id,
-                    "date": old.get_date(),
-                    "created": old.created,
-                    "effective_amount": eff,
-                    "force_unaggregated": old.force_unaggregated,
-                }
-                if old.schedule_e and old.contact_2:
-                    old_snapshot.update(
-                        {
-                            "election_code": old.schedule_e.election_code,
-                            "candidate_office": old.contact_2.candidate_office,
-                            "candidate_state": old.contact_2.candidate_state,
-                            "candidate_district": old.contact_2.candidate_district,
-                        }
-                    )
+                old_snapshot = create_old_snapshot(old, eff)
                 logger.info(
                     f"Derived old_snapshot for {action} on transaction {instance.id} - "
                     "caller should provide this for better performance"
                 )
-            except Transaction.DoesNotExist:
+            except get_transaction_model().DoesNotExist:
                 logger.error(
                     f"Cannot derive old_snapshot for {action} on transaction "
                     f"{instance.id} - transaction not found, skipping aggregation"
@@ -1143,11 +1178,12 @@ def update_aggregates_for_affected_transactions(
     if _should_cascade_unitemization_service(
         instance, old_aggregate, uses_itemization_threshold
     ):
+        from .models import Transaction
         child_ids = get_all_children_ids(instance.id)
         if child_ids:
-            Transaction.objects.filter(id__in=child_ids, deleted__isnull=True).update(
-                itemized=False
-            )
+            Transaction.objects.filter(
+                id__in=child_ids, deleted__isnull=True
+            ).update(itemized=False)
 
     # Update itemization based on current aggregate
     itemization_changed = update_itemization(instance)

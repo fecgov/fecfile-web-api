@@ -8,6 +8,11 @@ from fecfiler.transactions.managers import (
     Schedule,
     AGGREGATE_SCHEDULES,
 )
+from fecfiler.transactions.utils_aggregation import (
+    create_old_snapshot,
+    update_aggregates_for_affected_transactions,
+    calculate_effective_amount,
+)
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_c.models import ScheduleC
@@ -240,11 +245,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         return self.debt is not None and self.schedule_d is None
 
     def save(self, *args, **kwargs):
-        from .utils_aggregation import (
-            update_aggregates_for_affected_transactions,
-            calculate_effective_amount,
-        )
-
         if self.memo_text:
             if self.memo_text.text4000 is None or self.memo_text.text4000 == "":
                 self.memo_text.hard_delete()
@@ -276,29 +276,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 old = None
             if old:
                 eff = calculate_effective_amount(old)
-                old_snapshot = {
-                    "schedule": old.get_schedule_name(),
-                    "contact_1_id": old.contact_1_id,
-                    "aggregation_group": old.aggregation_group,
-                    "committee_account_id": old.committee_account_id,
-                    "date": old.get_date(),
-                    "created": old.created,
-                    "effective_amount": eff,
-                    # Itemization-affecting fields
-                    "force_itemized": old.force_itemized,
-                    "force_unaggregated": old.force_unaggregated,
-                    "memo_code": old.memo_code,
-                    "reatt_redes_id": old.reatt_redes_id,
-                }
-                if old.schedule_e and old.contact_2:
-                    old_snapshot.update(
-                        {
-                            "election_code": old.schedule_e.election_code,
-                            "candidate_office": old.contact_2.candidate_office,
-                            "candidate_state": old.contact_2.candidate_state,
-                            "candidate_district": old.contact_2.candidate_district,
-                        }
-                    )
+                old_snapshot = create_old_snapshot(old, eff)
 
         super(Transaction, self).save(*args, **kwargs)
 
@@ -311,11 +289,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     update_aggregates_for_affected_transactions(
                         self, action, old_snapshot
                     )
-            except Exception:
+            except Exception as e:
                 # Do not raise to avoid breaking save on service failure; log instead
                 logger.error(
                     "Failed to update aggregates via service on save",
                     transaction_id=self.id,
+                    error=str(e),
+                    exc_info=True,
                 )
 
     def delete(self):
@@ -333,24 +313,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 if schedule in AGGREGATE_SCHEDULES:
                     # Capture snapshot and apply delete delta before deleting
                     eff = calculate_effective_amount(self)
-                    old_snapshot = {
-                        "schedule": schedule,
-                        "contact_1_id": self.contact_1_id,
-                        "aggregation_group": self.aggregation_group,
-                        "committee_account_id": self.committee_account_id,
-                        "date": self.get_date(),
-                        "created": self.created,
-                        "effective_amount": eff,
-                    }
-                    if self.schedule_e and self.contact_2:
-                        old_snapshot.update(
-                            {
-                                "election_code": self.schedule_e.election_code,
-                                "candidate_office": self.contact_2.candidate_office,
-                                "candidate_state": self.contact_2.candidate_state,
-                                "candidate_district": self.contact_2.candidate_district,
-                            }
-                        )
+                    old_snapshot = create_old_snapshot(self, eff)
                     update_aggregates_for_affected_transactions(
                         self, "delete", old_snapshot
                     )

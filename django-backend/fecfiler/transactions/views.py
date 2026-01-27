@@ -493,25 +493,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                         Schedule.B,
                         Schedule.E,
                     ]:
-                        from .utils_aggregation import calculate_effective_amount
+                        from .utils_aggregation import (
+                            calculate_effective_amount,
+                            create_old_snapshot,
+                        )
 
                         eff = calculate_effective_amount(child_instance)
-                        old_snapshot = {
-                            "schedule": child_instance.get_schedule_name(),
-                            "contact_1_id": child_instance.contact_1_id,
-                            "aggregation_group": child_instance.aggregation_group,
-                            "committee_account_id": child_instance.committee_account_id,
-                            "date": child_instance.get_date(),
-                            "created": child_instance.created,
-                            "effective_amount": eff,
-                        }
-                        if child_instance.schedule_e and child_instance.contact_2:
-                            old_snapshot.update({
-                                "election_code": child_instance.schedule_e.election_code,  # noqa: E501
-                                "candidate_office": child_instance.contact_2.candidate_office,  # noqa: E501
-                                "candidate_state": child_instance.contact_2.candidate_state,  # noqa: E501
-                                "candidate_district": child_instance.contact_2.candidate_district,  # noqa: E501
-                            })
+                        old_snapshot = create_old_snapshot(child_instance, eff)
 
                     # Now update the parent
                     Transaction.objects.filter(id=child_transaction_data).update(
