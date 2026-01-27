@@ -480,20 +480,51 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         for child_transaction_data in children:
             if type(child_transaction_data) is str:
-                Transaction.objects.filter(id=child_transaction_data).update(
-                    parent_transaction_id=transaction_instance.id
-                )
-                # Explicitly update aggregates and itemization for the child
+                # Capture old state BEFORE updating
                 try:
-                    child_instance = Transaction.objects.get(id=child_transaction_data)
-                    # Only trigger service for schedules A, B, and E
+                    child_instance = Transaction.objects.select_related(
+                        "schedule_a", "schedule_b", "schedule_e", "contact_2"
+                    ).get(id=child_transaction_data)
+
+                    # Capture old snapshot if this is an aggregating schedule
+                    old_snapshot = None
                     if child_instance.get_schedule_name() in [
                         Schedule.A,
                         Schedule.B,
                         Schedule.E,
                     ]:
+                        from .utils_aggregation import calculate_effective_amount
+
+                        eff = calculate_effective_amount(child_instance)
+                        old_snapshot = {
+                            "schedule": child_instance.get_schedule_name(),
+                            "contact_1_id": child_instance.contact_1_id,
+                            "aggregation_group": child_instance.aggregation_group,
+                            "committee_account_id": child_instance.committee_account_id,
+                            "date": child_instance.get_date(),
+                            "created": child_instance.created,
+                            "effective_amount": eff,
+                        }
+                        if child_instance.schedule_e and child_instance.contact_2:
+                            old_snapshot.update({
+                                "election_code": child_instance.schedule_e.election_code,  # noqa: E501
+                                "candidate_office": child_instance.contact_2.candidate_office,  # noqa: E501
+                                "candidate_state": child_instance.contact_2.candidate_state,  # noqa: E501
+                                "candidate_district": child_instance.contact_2.candidate_district,  # noqa: E501
+                            })
+
+                    # Now update the parent
+                    Transaction.objects.filter(id=child_transaction_data).update(
+                        parent_transaction_id=transaction_instance.id
+                    )
+
+                    # Refresh to get new state
+                    child_instance.refresh_from_db()
+
+                    # Call aggregation with proper old_snapshot
+                    if old_snapshot:
                         update_aggregates_for_affected_transactions(
-                            child_instance, "update"
+                            child_instance, "update", old_snapshot
                         )
                 except Transaction.DoesNotExist:
                     pass

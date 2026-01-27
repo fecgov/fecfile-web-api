@@ -1031,36 +1031,38 @@ def update_aggregates_for_affected_transactions(
     old_snapshot: Optional[Dict[str, Any]] = None,
 ) -> None:
     """
-    Explicit, signals-free entry point to update aggregates and itemization.
+    Entry point to update aggregates and itemization.
 
-    Call this after creating or updating a `Transaction` instance, or prior to
-    deleting, providing `action` as one of: "create", "update", "delete".
-
-    - For create/update: applies delta-based aggregate updates, recalculates
+    - For create: applies delta-based aggregate updates, recalculates
       schedule-specific totals, then updates itemization and cascades as needed.
-    - For delete: applies a negative delta to downstream aggregates using the
-      provided or derived snapshot.
+      old_snapshot will be None.
+    - For update/delete: applies delta-based aggregate updates using the
+      provided old_snapshot. old_snapshot is expected for these actions.
 
     Args:
         instance: The Transaction instance being changed.
         action: One of "create", "update", or "delete".
-        old_snapshot: Optional prior-state snapshot used for efficient deltas.
-                      If not provided for update/delete, it will be derived.
+        old_snapshot: Prior-state snapshot expected for "update" and "delete" actions.
+                      Will be None for "create". Must include: schedule,
+                      contact_1_id, aggregation_group, committee_account_id, date,
+                      created, effective_amount, and for Schedule E: election_code,
+                      candidate_office, candidate_state, candidate_district.
     """
     if action not in {"create", "update", "delete"}:
         raise ValueError("action must be one of 'create', 'update', 'delete'")
 
-    # For delete, we operate purely on the old snapshot and return early
-    if action == "delete":
-        if not old_snapshot and getattr(instance, "id", None):
+    # Validate old_snapshot requirements - attempt fallback if missing
+    if action in {"update", "delete"} and not old_snapshot:
+        # Fallback: derive old_snapshot if possible
+        # This handles edge cases where caller couldn't capture it
+        if getattr(instance, "id", None):
             try:
                 old = Transaction.objects.select_related(
-                    "schedule_a", "schedule_b", "schedule_c", "schedule_e", "contact_2"
+                    "schedule_a", "schedule_b", "schedule_c", "schedule_e",
+                    "contact_2"
                 ).get(id=instance.id)
-            except Transaction.DoesNotExist:
-                old = None
-            if old:
                 eff = calculate_effective_amount(old)
+
                 old_snapshot = {
                     "schedule": old.get_schedule_name(),
                     "contact_1_id": old.contact_1_id,
@@ -1069,6 +1071,7 @@ def update_aggregates_for_affected_transactions(
                     "date": old.get_date(),
                     "created": old.created,
                     "effective_amount": eff,
+                    "force_unaggregated": old.force_unaggregated,
                 }
                 if old.schedule_e and old.contact_2:
                     old_snapshot.update(
@@ -1079,40 +1082,30 @@ def update_aggregates_for_affected_transactions(
                             "candidate_district": old.contact_2.candidate_district,
                         }
                     )
-        apply_delete_delta_aggregates(old_snapshot or {})
+                logger.info(
+                    f"Derived old_snapshot for {action} on transaction {instance.id} - "
+                    "caller should provide this for better performance"
+                )
+            except Transaction.DoesNotExist:
+                logger.error(
+                    f"Cannot derive old_snapshot for {action} on transaction "
+                    f"{instance.id} - transaction not found, skipping aggregation"
+                )
+                return
+        else:
+            logger.error(
+                f"Cannot derive old_snapshot for {action} - instance has no id, "
+                "skipping aggregation"
+            )
+            return
+
+    # For delete, we operate purely on the old snapshot and return early
+    if action == "delete":
+        apply_delete_delta_aggregates(old_snapshot)
         return
 
     # Create or update path
     created = action == "create"
-
-    # Derive old snapshot if not provided and this is an update
-    if not created and not old_snapshot and getattr(instance, "id", None):
-        try:
-            old = Transaction.objects.select_related(
-                "schedule_a", "schedule_b", "schedule_c", "schedule_e", "contact_2"
-            ).get(id=instance.id)
-        except Transaction.DoesNotExist:
-            old = None
-        if old:
-            eff = calculate_effective_amount(old)
-            old_snapshot = {
-                "schedule": old.get_schedule_name(),
-                "contact_1_id": old.contact_1_id,
-                "aggregation_group": old.aggregation_group,
-                "committee_account_id": old.committee_account_id,
-                "date": old.get_date(),
-                "created": old.created,
-                "effective_amount": eff,
-            }
-            if old.schedule_e and old.contact_2:
-                old_snapshot.update(
-                    {
-                        "election_code": old.schedule_e.election_code,
-                        "candidate_office": old.contact_2.candidate_office,
-                        "candidate_state": old.contact_2.candidate_state,
-                        "candidate_district": old.contact_2.candidate_district,
-                    }
-                )
 
     # Keep previous aggregate for itemization cascade checks
     old_aggregate = instance.aggregate

@@ -126,6 +126,7 @@ class DotFECScheduleFTestCase(TestCase):
         )
         transaction.itemized = True
         transaction.save()
+        transaction.refresh_from_db()
         self.run_test(transaction)
 
     def test_org_form(self):
@@ -163,6 +164,7 @@ class DotFECScheduleFTestCase(TestCase):
         )
         transaction.itemized = True
         transaction.save()
+        transaction.refresh_from_db()
         self.run_test(transaction)
 
     def run_test(self, transaction: Transaction):
