@@ -244,7 +244,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             update_aggregates_for_affected_transactions,
             calculate_effective_amount,
         )
-        from .managers import _thread_local
 
         if self.memo_text:
             if self.memo_text.text4000 is None or self.memo_text.text4000 == "":
@@ -258,9 +257,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         update_fields = kwargs.get("update_fields")
         is_internal_update = update_fields is not None
 
-        # Check if this save is being called from Manager.create()
-        from_manager_create = getattr(_thread_local, 'in_manager_create', False)
-
         # Capture old snapshot for updates
         old_snapshot = None
 
@@ -269,7 +265,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         should_capture_snapshot = (
             not is_create
             and not is_internal_update
-            and not from_manager_create
             and schedule in AGGREGATE_SCHEDULES
         )
         if should_capture_snapshot:
@@ -308,8 +303,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         super(Transaction, self).save(*args, **kwargs)
 
         # Invoke service after save for create/update
-        # Skip if this is from Manager.create() as it will handle aggregation
-        if not is_internal_update and not from_manager_create:
+        if not is_internal_update:
             try:
                 # Only schedules A, B, and E participate in aggregates.
                 if schedule in AGGREGATE_SCHEDULES:
