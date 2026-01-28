@@ -202,7 +202,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def previous_transaction_by_entity(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation"""
-        transaction_id = request.query_params.get("transaction_id", None)
         try:
             contact_1_id = request.query_params["contact_1_id"]
             date = request.query_params["date"]
@@ -214,15 +213,22 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             message = "contact_1_id, date, and aggregate_group are required params"
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+        original_transaction, errorResponse = self.get_transaction_in_params(request)
+        if errorResponse:
+            return errorResponse
+
         return self.get_previous(
-            self.get_queryset(), date, aggregation_group, transaction_id, contact_1_id
+            self.get_queryset(),
+            date,
+            aggregation_group,
+            original_transaction,
+            contact_1_id,
         )
 
     @action(detail=False, methods=["get"], url_path=r"previous/election")
     def previous_transaction_by_election(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation and the same election"""
-        id = request.query_params.get("transaction_id", None)
         try:
             date = request.query_params["date"]
             aggregation_group = request.query_params["aggregation_group"]
@@ -245,11 +251,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             candidate_district is required for HOUSE"""
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+        original_transaction, errorResponse = self.get_transaction_in_params(request)
+        if errorResponse:
+            return errorResponse
+
         return self.get_previous(
             self.get_queryset(),
             date,
             aggregation_group,
-            id,
+            original_transaction,
             None,
             None,
             election_code,
@@ -263,7 +273,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def previous_transaction_by_payee_candidate(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation"""
-        transaction_id = request.query_params.get("transaction_id", None)
         try:
             contact_2_id = request.query_params["contact_2_id"]
             date = request.query_params["date"]
@@ -281,11 +290,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+        original_transaction, errorResponse = self.get_transaction_in_params(request)
+        if errorResponse:
+            return errorResponse
+
         return self.get_previous(
             self.get_queryset(),
             date,
             aggregation_group,
-            transaction_id,
+            original_transaction,
             None,
             contact_2_id,
             None,
@@ -297,7 +310,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         queryset,
         date,
         aggregation_group,
-        transaction_id=None,
+        original_transaction=None,
         contact_1_id=None,
         contact_2_id=None,
         election_code=None,
@@ -311,7 +324,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             queryset,
             date,
             aggregation_group,
-            transaction_id,
+            original_transaction.id if original_transaction else None,
             contact_1_id,
             contact_2_id,
             election_code,
@@ -321,10 +334,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             district,
         )
         previous_transaction = previous_transactions.first()
-
-        original_transaction = None
-        if transaction_id:
-            original_transaction = queryset.get(id=transaction_id)
 
         if previous_transaction:
             if original_transaction and (
@@ -353,6 +362,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         response = {"message": "No previous transaction found."}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+    def get_transaction_in_params(self, request):
+        """Retrieves the transaction specified by transaction_id in query params
+        if it does not exist, returns an error response in the second position
+        of the tuple
+        """
+        transaction_id = request.query_params.get("transaction_id", None)
+        if transaction_id:
+            try:
+                return self.get_queryset().get(id=transaction_id), None
+            except self.get_queryset().model.DoesNotExist:
+                message = f"Transaction with id {transaction_id} not found."
+                return None, Response(message, status=status.HTTP_400_BAD_REQUEST)
+        return None, None
 
     def save_transaction(self, transaction_data, request):
         committee_id = request.session["committee_uuid"]
