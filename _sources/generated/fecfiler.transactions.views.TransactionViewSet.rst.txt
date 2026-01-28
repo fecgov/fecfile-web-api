@@ -54,6 +54,7 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.get_serializer_context
       ~TransactionViewSet.get_success_headers
       ~TransactionViewSet.get_throttles
+      ~TransactionViewSet.get_transaction_in_params
       ~TransactionViewSet.get_view_description
       ~TransactionViewSet.get_view_name
       ~TransactionViewSet.handle_broken_transaction_chain
