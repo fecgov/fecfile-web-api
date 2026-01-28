@@ -193,25 +193,44 @@ class TransactionSerializer(
         representation["form_type"] = instance.form_type
 
         # represent parent
-        if getattr(instance, "parent_transaction"):
-            representation["parent_transaction"] = (
-                TransactionSerializer().to_representation(instance.parent_transaction)
-            )
+        if instance.parent_transaction_id is not None:
+            parent_transaction = Transaction.objects.filter(
+                id=instance.parent_transaction_id
+            ).first()
+
+            if parent_transaction is not None:
+                representation["parent_transaction"] = (
+                    TransactionSerializer().to_representation(parent_transaction)
+                )
+
         # represent loan
-        if getattr(instance, "loan"):
-            representation["loan"] = TransactionSerializer().to_representation(
-                instance.loan
-            )
+        if instance.loan_id is not None:
+            loan = Transaction.objects.filter(
+                id=instance.loan_id
+            ).first()
+
+            if loan is not None:
+                representation["loan"] = TransactionSerializer().to_representation(loan)
+
         # represent debt
-        if getattr(instance, "debt"):
-            representation["debt"] = TransactionSerializer().to_representation(
-                instance.debt
-            )
+        if instance.debt_id is not None:
+            debt = Transaction.objects.filter(
+                id=instance.debt_id
+            ).first()
+
+            if debt is not None:
+                representation["debt"] = TransactionSerializer().to_representation(debt)
+
         # represent original reattribution/redesignation transaction
-        if getattr(instance, "reatt_redes"):
-            representation["reatt_redes"] = TransactionSerializer().to_representation(
-                instance.reatt_redes
-            )
+        if instance.reatt_redes_id is not None:
+            reatt_redes = Transaction.objects.filter(
+                id=instance.reatt_redes_id
+            ).first()
+
+            if reatt_redes is not None:
+                representation["reatt_redes"] = (
+                    TransactionSerializer().to_representation(reatt_redes)
+                )
 
         representation["reports"] = []
         representation["report_ids"] = []
