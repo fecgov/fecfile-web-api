@@ -34,6 +34,13 @@ def create_old_snapshot(transaction, effective_amount):
                 "candidate_district": transaction.contact_2.candidate_district,
             }
         )
+    if transaction.schedule_f and transaction.contact_2:
+        old_snapshot.update(
+            {
+                "contact_2_id": transaction.contact_2_id,
+                "election_year": transaction.schedule_f.general_election_year,
+            }
+        )
     return old_snapshot
 
 

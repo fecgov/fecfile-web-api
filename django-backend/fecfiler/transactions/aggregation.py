@@ -49,6 +49,7 @@ def process_aggregation_for_debts(transaction_instance):
         repayments = transactions.filter(
             schedule_d__isnull=True,
             debt__id=debt.id,
+            deleted__isnull=True,
         )
         for repayment in repayments:
             repayed_during += repayment.amount
@@ -76,7 +77,7 @@ def process_aggregation_for_debts(transaction_instance):
     )
 
 
-def process_aggregation_by_payee_candidate(transaction_instance):
+def process_aggregation_by_payee_candidate(transaction_instance, old_snapshot=None):
     # Get the transaction out of the queryset in order to populate annotated fields
     transaction = Transaction.objects.filter(id=transaction_instance.id).first()
 
@@ -106,25 +107,45 @@ def process_aggregation_by_payee_candidate(transaction_instance):
         transaction.schedule_f.general_election_year,
     )
 
-    to_update = shared_entity_transactions.filter(
-        Q(id=transaction.id)
-        | Q(date__gt=transaction.date)
-        | Q(Q(date=transaction.date) & Q(created__gt=transaction.created))
-    ).order_by("date", "created")
+    # Identify all transactions to recalculate
+    # When date changes, recalculate all transactions from first affected date
+    # Otherwise, recalculate current transaction and all future-dated transactions
+    old_date = old_snapshot.get("date") if old_snapshot else None
+    date_changed = old_date and old_date != transaction.date
+
+    if date_changed:
+        # Date changed: recalculate all transactions from the earliest affected date
+        earliest_affected_date = min(old_date, transaction.date)
+        to_update = shared_entity_transactions.filter(
+            date__gte=earliest_affected_date
+        ).order_by("date", "created")
+    else:
+        # No date change: recalculate current transaction and all future-dated
+        # transactions
+        to_update = shared_entity_transactions.filter(
+            Q(id=transaction.id)
+            | Q(date__gt=transaction.date)
+            | Q(Q(date=transaction.date) & Q(created__gt=transaction.created))
+        ).order_by("date", "created")
 
     previous_transaction = previous_transactions.first()
     updated_schedule_fs = []
-    for trans in to_update:
-        previous_aggregate = 0
-        if previous_transaction:
-            previous_aggregate = (
-                previous_transaction.schedule_f.aggregate_general_elec_expended
-            )
+    previous_aggregate_value = 0
 
+    # When date changes, all transactions are recalculated together,
+    # so we start from 0 instead of using previous_transaction's aggregate
+    if not date_changed and previous_transaction:
+        previous_aggregate_value = (
+            previous_transaction.schedule_f.aggregate_general_elec_expended
+        )
+
+    for trans in to_update:
         trans.schedule_f.aggregate_general_elec_expended = (
-            trans.schedule_f.expenditure_amount + previous_aggregate
+            trans.schedule_f.expenditure_amount + previous_aggregate_value
         )
         updated_schedule_fs.append(trans.schedule_f)
+        # Use the newly calculated aggregate for the next iteration, not DB value
+        previous_aggregate_value = trans.schedule_f.aggregate_general_elec_expended
         previous_transaction = trans
 
     ScheduleF.objects.bulk_update(
