@@ -28,6 +28,7 @@ from fecfiler.transactions.utils_aggregation_queries import (
 )
 from fecfiler.transactions.utils_aggregation_prep import (
     create_old_snapshot,
+    calculate_effective_amount,
 )
 from fecfiler.transactions.utils_aggregation_service import (
     update_aggregates_for_affected_transactions,
@@ -378,9 +379,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 # Capture old_snapshot IMMEDIATELY after loading, before serializer
                 # modifies it
                 if schedule in ["A", "B", "F"]:
-                    from fecfiler.transactions.utils_aggregation_prep import (
-                        calculate_effective_amount,
-                    )
                     eff = calculate_effective_amount(original_instance)
                     old_snapshot = create_old_snapshot(original_instance, eff)
 
