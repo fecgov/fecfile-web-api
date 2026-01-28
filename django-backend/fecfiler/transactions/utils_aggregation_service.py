@@ -1,164 +1,44 @@
 """
-Functions for calculating and updating transaction aggregates.
+Aggregation service logic (no Transaction import).
 
-These functions handles the calculation of aggregates for Schedule A and Schedule B
-transactions that are grouped by entity (contact, calendar year, and aggregation group),
-as well as aggregates for Schedule E transactions grouped by election office.
-
-Previously, these calculations were done in database triggers. This moves
-that logic into Django code for better maintainability and testability.
+All ORM access is performed via the provided transaction_model to avoid
+circular imports with models.py.
 """
 
 from decimal import Decimal
 from typing import Optional, Dict, Any
 from uuid import UUID
+
 from django.db.models import Q, F, Value
 from django.db.models.fields import DecimalField
+import structlog
+
 from .managers import (
     Schedule,
     TransactionManager,
     schedule_a_over_two_hundred_types,
     schedule_b_over_two_hundred_types,
-    schedule_b_refunds,
     ITEMIZATION_THRESHOLD,
     CONTACT_AGGREGATE_SCHEDULES,
 )
-import structlog
+from .utils_aggregation_prep import (
+    calculate_effective_amount,
+    create_old_snapshot,
+    _get_calendar_year_from_date,
+)
+from .itemization import (
+    has_itemized_children,
+    update_itemization,
+    cascade_itemization_to_parents,
+    cascade_unitemization_to_children,
+    get_all_children_ids,
+)
 
 logger = structlog.get_logger(__name__)
 
 
-_Transaction = None
-
-
-def get_transaction_model():
-    """Get Transaction model with lazy import to avoid circular dependency.
-
-    Only used in create_old_snapshot which is imported by models.py at module load time.
-    Other functions can safely use direct Transaction import.
-    """
-    global _Transaction
-    if _Transaction is None:
-        from .models import Transaction
-        _Transaction = Transaction
-    return _Transaction
-
-
-def create_old_snapshot(transaction, effective_amount):
-    """Snapshot transaction state for aggregate updates."""
-    old_snapshot = {
-        "schedule": transaction.get_schedule_name(),
-        "contact_1_id": transaction.contact_1_id,
-        "aggregation_group": transaction.aggregation_group,
-        "committee_account_id": transaction.committee_account_id,
-        "date": transaction.get_date(),
-        "created": transaction.created,
-        "effective_amount": effective_amount,
-        "force_itemized": transaction.force_itemized,
-        "force_unaggregated": transaction.force_unaggregated,
-        "memo_code": transaction.memo_code,
-        "reatt_redes_id": transaction.reatt_redes_id,
-    }
-    if transaction.schedule_e and transaction.contact_2:
-        old_snapshot.update(
-            {
-                "election_code": transaction.schedule_e.election_code,
-                "candidate_office": transaction.contact_2.candidate_office,
-                "candidate_state": transaction.contact_2.candidate_state,
-                "candidate_district": transaction.contact_2.candidate_district,
-            }
-        )
-    return old_snapshot
-
-
-def get_query_for_earlier_in_same_year(date):
-    return Q(
-        Q(date__year=date.year),
-        Q(date__lte=date),
-    )
-
-
-def get_query_for_earlier_in_same_day(queryset, transaction_id, date):
-    if transaction_id:
-        original_transaction = queryset.filter(id=transaction_id).first()
-        if original_transaction is not None:
-            return Q(created__lt=original_transaction.created) | ~Q(date=date)
-    return Q()
-
-
-def get_query_for_entity_aggregation(contact_id):
-    return Q(contact_1_id=contact_id)
-
-
-def get_query_for_election_aggregation(election_code, state, office, district):
-    return Q(
-        Q(schedule_e__election_code=election_code),
-        Q(contact_2__candidate_office=office),
-        Q(contact_2__candidate_state=state),
-        Q(contact_2__candidate_district=district),
-    )
-
-
-def get_query_for_payee_candidate_aggregation(election_year, contact_id):
-    return Q(
-        Q(contact_2_id=contact_id),
-        Q(schedule_f__general_election_year=election_year)
-    )
-
-
-def get_query_for_aggregation_relationship(
-    contact_1_id,
-    contact_2_id,
-    election_year,
-    election_code,
-    state,
-    office,
-    district,
-):
-    if contact_1_id:
-        return get_query_for_entity_aggregation(contact_1_id)
-    elif contact_2_id:
-        return get_query_for_payee_candidate_aggregation(election_year, contact_2_id)
-    elif election_code is not None:
-        return get_query_for_election_aggregation(election_code, state, office, district)
-    return Q()
-
-
-def filter_queryset_for_previous_transactions_in_aggregation(
-    queryset,
-    date,
-    aggregation_group,
-    transaction_id=None,
-    contact_1_id=None,
-    contact_2_id=None,
-    election_code=None,
-    election_year=None,
-    office=None,
-    state=None,
-    district=None,
-):
-    """Get transactions whose amounts factor into an aggregate for a date."""
-    previous_transactions_in_aggregation = queryset.filter(
-        ~Q(id=transaction_id or None),  # Filter out the initial transaction
-        Q(aggregation_group=aggregation_group),  # Only transactions in same group
-        get_query_for_earlier_in_same_year(date),
-        get_query_for_earlier_in_same_day(queryset, transaction_id, date),
-        get_query_for_aggregation_relationship(
-            contact_1_id,
-            contact_2_id,
-            election_year,
-            election_code,
-            state,
-            office,
-            district,
-        ),
-    )
-
-    return previous_transactions_in_aggregation.order_by("-date", "-created")
-
-
 def _update_aggregate_running_sum(
-    transactions, aggregate_field_name: str, log_context: str
+    transactions, aggregate_field_name: str, log_context: str, transaction_model
 ) -> int:
     """
     Calculate and update running sum aggregates for transactions.
@@ -171,12 +51,11 @@ def _update_aggregate_running_sum(
         aggregate_field_name: Name of field to update ('aggregate' or
             '_calendar_ytd_per_election_office')
         log_context: String with logging context info
+        transaction_model: Transaction model class
 
     Returns:
         Number of transactions updated
     """
-    from .models import Transaction
-
     if not transactions.exists():
         logger.debug(f"No transactions found for aggregation: {log_context}")
         return 0
@@ -196,11 +75,11 @@ def _update_aggregate_running_sum(
     )
 
     updates = [
-        Transaction(id=row.id, **{aggregate_field_name: row.sub_agg})
+        transaction_model(id=row.id, **{aggregate_field_name: row.sub_agg})
         for row in annotated
     ]
 
-    Transaction.objects.bulk_update(updates, [aggregate_field_name])
+    transaction_model.objects.bulk_update(updates, [aggregate_field_name])
     update_count = len(updates)
 
     logger.info(
@@ -210,7 +89,7 @@ def _update_aggregate_running_sum(
 
 
 def calculate_entity_aggregates(
-    contact_1_id: UUID, year: int, aggregation_group: str
+    transaction_model, contact_1_id: UUID, year: int, aggregation_group: str
 ) -> int:
     """
     Calculate and update aggregate values for Schedule A/B transactions.
@@ -220,6 +99,7 @@ def calculate_entity_aggregates(
     ordered by date and creation time.
 
     Args:
+        transaction_model: Transaction model class
         contact_1_id: UUID of the contact (entity)
         year: Calendar year for aggregation
         aggregation_group: Aggregation group identifier
@@ -227,11 +107,9 @@ def calculate_entity_aggregates(
     Returns:
         Number of transactions updated
     """
-    from .models import Transaction
-
     # Get all matching transactions ordered by date and created
     # Exclude force_unaggregated transactions as they don't get aggregated
-    transactions = Transaction.objects.filter(
+    transactions = transaction_model.objects.filter(
         contact_1_id=contact_1_id,
         date__year=year,
         aggregation_group=aggregation_group,
@@ -242,10 +120,13 @@ def calculate_entity_aggregates(
     ).order_by("date", "created").select_related("schedule_a", "schedule_b")
 
     log_context = f"contact_1={contact_1_id}, year={year}, group={aggregation_group}"
-    return _update_aggregate_running_sum(transactions, "aggregate", log_context)
+    return _update_aggregate_running_sum(
+        transactions, "aggregate", log_context, transaction_model
+    )
 
 
 def calculate_calendar_ytd_per_election_office(
+    transaction_model,
     election_code: str,
     candidate_office: str,
     candidate_state: Optional[str],
@@ -262,6 +143,7 @@ def calculate_calendar_ytd_per_election_office(
     ordered by date and creation time.
 
     Args:
+        transaction_model: Transaction model class
         election_code: Election code identifier
         candidate_office: Candidate office (e.g., 'P', 'S', 'H')
         candidate_state: Candidate state (may be None or empty string)
@@ -272,8 +154,6 @@ def calculate_calendar_ytd_per_election_office(
     Returns:
         Number of transactions updated
     """
-    from .models import Transaction
-
     # Handle None/empty string values for state and district
     state_filter = Q(contact_2__candidate_state=candidate_state)
     if not candidate_state:
@@ -303,7 +183,7 @@ def calculate_calendar_ytd_per_election_office(
     if committee_account_id:
         query_filters["committee_account_id"] = committee_account_id
 
-    transactions = Transaction.objects.filter(
+    transactions = transaction_model.objects.filter(
         **query_filters
     ).filter(state_filter, district_filter).order_by(
         "date", "created"
@@ -314,86 +194,8 @@ def calculate_calendar_ytd_per_election_office(
         f"state={candidate_state}, district={candidate_district}, year={year}"
     )
     return _update_aggregate_running_sum(
-        transactions, "_calendar_ytd_per_election_office", log_context
+        transactions, "_calendar_ytd_per_election_office", log_context, transaction_model
     )
-
-
-def _get_schedule_amount(transaction) -> Optional[Decimal]:
-    """
-    Extract the base amount from related schedule.
-
-    Args:
-        transaction: Transaction instance
-
-    Returns:
-        Decimal amount from the transaction's schedule, or None if not found
-    """
-    schedule_map = {
-        "schedule_a": "contribution_amount",
-        "schedule_b": "expenditure_amount",
-        "schedule_c2": "guaranteed_amount",
-        "schedule_d": "incurred_amount",
-        "schedule_e": "expenditure_amount",
-        "schedule_f": "expenditure_amount",
-    }
-
-    for schedule_name, amount_field in schedule_map.items():
-        schedule = getattr(transaction, schedule_name, None)
-        if schedule:
-            return getattr(schedule, amount_field, None)
-
-    if transaction.debt and transaction.debt.schedule_d:
-        return transaction.debt.schedule_d.incurred_amount
-
-    return None
-
-
-def calculate_effective_amount(transaction) -> Decimal:
-    """
-    Calculate the effective amount for a transaction.
-
-    The effective amount is used for aggregation calculations and differs from
-    the transaction amount for certain transaction types (e.g., refunds are
-    negated) and for certain schedules (e.g., Schedule C has no effective amount).
-
-    Args:
-        transaction: Transaction instance
-
-    Returns:
-        Decimal: The effective amount for aggregation
-    """
-    # Schedule C transactions have no effective amount for aggregation
-    if transaction.schedule_c_id is not None:
-        return Decimal(0)
-
-    # Get the base amount from related schedule
-    amount = _get_schedule_amount(transaction)
-
-    if amount is None:
-        return Decimal(0)
-
-    # Ensure Decimal type for downstream arithmetic before any operations
-    if not isinstance(amount, Decimal):
-        amount = Decimal(str(amount))
-
-    # Refunds are negated
-    if transaction.transaction_type_identifier in schedule_b_refunds:
-        amount = amount * Decimal(-1)
-
-    return amount
-
-
-def _get_calendar_year_from_date(date_obj) -> int:
-    """
-    Parse calendar year from date object or date string in YYYY-MM-DD format.
-
-    Args:
-        date_obj: Date object with .year attribute or date string
-
-    Returns:
-        Integer year value
-    """
-    return date_obj.year if hasattr(date_obj, 'year') else int(str(date_obj)[:4])
 
 
 def _update_suffix_delta(
@@ -474,7 +276,10 @@ def _get_previous_aggregate_value(
 
 
 def apply_delta_aggregates(
-    transaction_instance, old_state: Optional[Dict[str, Any]], created: bool
+    transaction_model,
+    transaction_instance,
+    old_state: Optional[Dict[str, Any]],
+    created: bool
 ) -> None:
     """
     Apply efficient delta-based updates to aggregates for a single change.
@@ -483,12 +288,11 @@ def apply_delta_aggregates(
     within affected partitions using set-based updates.
 
     Args:
+        transaction_model: Transaction model class
         transaction_instance: The saved Transaction instance
         old_state: Snapshot dict of prior key fields and effective amount
         created: Whether this is a creation event
     """
-    from .models import Transaction
-
     if transaction_instance.deleted:
         return
 
@@ -503,7 +307,7 @@ def apply_delta_aggregates(
         # Build new partition queryset
         year = _get_calendar_year_from_date(transaction_date)
         new_qs = (
-            Transaction.objects.filter(
+            transaction_model.objects.filter(
                 contact_1_id=transaction_instance.contact_1_id,
                 date__year=year,
                 aggregation_group=transaction_instance.aggregation_group,
@@ -577,7 +381,7 @@ def apply_delta_aggregates(
                     ).select_related("schedule_a", "schedule_b")
                     _update_aggregate_running_sum(
                         recompute_qs, "aggregate",
-                        "entity derive-mismatch"
+                        "entity derive-mismatch", transaction_model
                     )
             return
 
@@ -587,13 +391,13 @@ def apply_delta_aggregates(
                 "date", "created"
             ).select_related("schedule_a", "schedule_b")
             _update_aggregate_running_sum(
-                recompute_qs, "aggregate", "entity move"
+                recompute_qs, "aggregate", "entity move", transaction_model
             )
             return
 
         # Partition changed: subtract from old partition suffix, then add to new
         old_qs = (
-            Transaction.objects.filter(
+            transaction_model.objects.filter(
                 contact_1_id=old_state.get("contact_1_id"),
                 date__year=old_year,
                 aggregation_group=old_state.get("aggregation_group"),
@@ -663,7 +467,7 @@ def apply_delta_aggregates(
             base_filters["committee_account_id"] = (
                 transaction_instance.committee_account_id
             )
-        new_qs = Transaction.objects.filter(**base_filters).filter(
+        new_qs = transaction_model.objects.filter(**base_filters).filter(
             state_filter, district_filter
         )
 
@@ -760,7 +564,7 @@ def apply_delta_aggregates(
             old_base_filters["committee_account_id"] = old_state.get(
                 "committee_account_id"
             )
-        old_qs = Transaction.objects.filter(
+        old_qs = transaction_model.objects.filter(
             **old_base_filters
         ).filter(old_state_filter, old_district_filter)
 
@@ -794,15 +598,13 @@ def apply_delta_aggregates(
         return
 
 
-def apply_delete_delta_aggregates(old_state: Dict[str, Any]) -> None:
+def apply_delete_delta_aggregates(transaction_model, old_state: Dict[str, Any]) -> None:
     """
     Apply a negative delta for a deleted transaction to downstream aggregates.
 
     Uses the snapshot of the deleted row to subtract its effective amount from
     the suffix of the appropriate partition.
     """
-    from .models import Transaction
-
     if not old_state:
         return
 
@@ -815,7 +617,7 @@ def apply_delete_delta_aggregates(old_state: Dict[str, Any]) -> None:
     if schedule in CONTACT_AGGREGATE_SCHEDULES:
         old_year = _get_calendar_year_from_date(old_date)
         old_qs = (
-            Transaction.objects.filter(
+            transaction_model.objects.filter(
                 contact_1_id=old_state.get("contact_1_id"),
                 date__year=old_year,
                 aggregation_group=old_state.get("aggregation_group"),
@@ -852,7 +654,7 @@ def apply_delete_delta_aggregates(old_state: Dict[str, Any]) -> None:
             )
 
         old_qs = (
-            Transaction.objects.filter(
+            transaction_model.objects.filter(
                 schedule_e__election_code=old_state.get("election_code"),
                 contact_2__candidate_office=old_state.get("candidate_office"),
                 date__year=old_year,
@@ -876,7 +678,7 @@ def apply_delete_delta_aggregates(old_state: Dict[str, Any]) -> None:
         return
 
 
-def calculate_loan_payment_to_date(loan_id: UUID) -> int:
+def calculate_loan_payment_to_date(transaction_model, loan_id: UUID) -> int:
     """
     Calculate the cumulative loan payment to date for a given loan.
 
@@ -885,21 +687,20 @@ def calculate_loan_payment_to_date(loan_id: UUID) -> int:
     repayments from the parent loan chain.
 
     Args:
+        transaction_model: Transaction model class
         loan_id: UUID of the loan transaction
 
     Returns:
         Number of loan transactions updated (the loan itself)
     """
-    from .models import Transaction
-
     # Get the loan transaction
     try:
         loan = (
-            Transaction
+            transaction_model
             .objects.select_related("loan", "loan__schedule_c")
             .get(id=loan_id, deleted__isnull=True)
         )
-    except Transaction.DoesNotExist:
+    except transaction_model.DoesNotExist:
         logger.warning(f"Loan transaction {loan_id} not found")
         return 0
 
@@ -921,7 +722,7 @@ def calculate_loan_payment_to_date(loan_id: UUID) -> int:
             break
 
     # Get all loan repayment transactions for all loans in the chain
-    repayments = Transaction.objects.filter(
+    repayments = transaction_model.objects.filter(
         loan_id__in=loan_ids,
         transaction_type_identifier="LOAN_REPAYMENT_MADE",
         deleted__isnull=True,
@@ -942,18 +743,20 @@ def calculate_loan_payment_to_date(loan_id: UUID) -> int:
             f"Updated loan_payment_to_date for loan {loan_id}: {total_payment}"
         )
         # Propagate updated totals to any carried-forward child loans
-        child_loans = Transaction.objects.filter(
+        child_loans = transaction_model.objects.filter(
             loan_id=loan_id,
             deleted__isnull=True,
         ).exclude(id=loan_id).values_list("id", flat=True)
         for child_loan_id in child_loans:
-            calculate_loan_payment_to_date(child_loan_id)
+            calculate_loan_payment_to_date(transaction_model, child_loan_id)
         return 1
 
     return 0
 
 
-def recalculate_aggregates_for_transaction(transaction_instance) -> None:
+def recalculate_aggregates_for_transaction(
+    transaction_model, transaction_instance
+) -> None:
     """
     Recalculate aggregates for a transaction and any affected related transactions.
 
@@ -962,6 +765,7 @@ def recalculate_aggregates_for_transaction(transaction_instance) -> None:
     function.
 
     Args:
+        transaction_model: Transaction model class
         transaction_instance: Transaction model instance
     """
     if transaction_instance.deleted:
@@ -980,7 +784,9 @@ def recalculate_aggregates_for_transaction(transaction_instance) -> None:
             # If this is a loan repayment, recalculate loan_payment_to_date
             if (transaction_instance.transaction_type_identifier == "LOAN_REPAYMENT_MADE"
                     and transaction_instance.loan_id):
-                calculate_loan_payment_to_date(transaction_instance.loan_id)
+                calculate_loan_payment_to_date(
+                    transaction_model, transaction_instance.loan_id
+                )
 
         elif schedule == Schedule.E:
             schedule_e = transaction_instance.schedule_e
@@ -1007,8 +813,6 @@ def _should_cascade_unitemization_service(
     Mirrors logic used in signal handler, used when explicitly invoking
     aggregate updates without signals.
     """
-    from .itemization import has_itemized_children
-
     if not uses_itemization_threshold or instance.force_itemized is not None:
         return False
 
@@ -1033,12 +837,6 @@ def _update_parent_itemization_service(instance) -> None:
     """
     Update parent transaction itemization when child changes, for service path.
     """
-    from .itemization import (
-        update_itemization,
-        cascade_itemization_to_parents,
-        cascade_unitemization_to_children,
-    )
-
     parent = instance.parent_transaction
     if not parent:
         return
@@ -1080,7 +878,8 @@ def _update_parent_itemization_service(instance) -> None:
 
 
 def update_aggregates_for_affected_transactions(
-    instance,  # Transaction instance
+    transaction_model,
+    instance,
     action: str,
     old_snapshot: Optional[Dict[str, Any]] = None,
 ) -> None:
@@ -1094,6 +893,7 @@ def update_aggregates_for_affected_transactions(
       provided old_snapshot. old_snapshot is expected for these actions.
 
     Args:
+        transaction_model: Transaction model class
         instance: The Transaction instance being changed.
         action: One of "create", "update", or "delete".
         old_snapshot: Prior-state snapshot expected for "update" and "delete" actions.
@@ -1111,7 +911,7 @@ def update_aggregates_for_affected_transactions(
         # This handles edge cases where caller couldn't capture it
         if getattr(instance, "id", None):
             try:
-                old = get_transaction_model().objects.select_related(
+                old = transaction_model.objects.select_related(
                     "schedule_a", "schedule_b", "schedule_c", "schedule_e",
                     "contact_2"
                 ).get(id=instance.id)
@@ -1121,7 +921,7 @@ def update_aggregates_for_affected_transactions(
                     f"Derived old_snapshot for {action} on transaction {instance.id} - "
                     "caller should provide this for better performance"
                 )
-            except get_transaction_model().DoesNotExist:
+            except transaction_model.DoesNotExist:
                 logger.error(
                     f"Cannot derive old_snapshot for {action} on transaction "
                     f"{instance.id} - transaction not found, skipping aggregation"
@@ -1136,7 +936,7 @@ def update_aggregates_for_affected_transactions(
 
     # For delete, we operate purely on the old snapshot and return early
     if action == "delete":
-        apply_delete_delta_aggregates(old_snapshot)
+        apply_delete_delta_aggregates(transaction_model, old_snapshot)
         return
 
     # Create or update path
@@ -1146,21 +946,13 @@ def update_aggregates_for_affected_transactions(
     old_aggregate = instance.aggregate
 
     # Delta-based aggregate updates
-    apply_delta_aggregates(instance, old_snapshot, created)
+    apply_delta_aggregates(transaction_model, instance, old_snapshot, created)
 
     # Handle loan recalculation and other schedule specifics
-    recalculate_aggregates_for_transaction(instance)
+    recalculate_aggregates_for_transaction(transaction_model, instance)
 
     # Refresh with updated aggregate values
     instance.refresh_from_db()
-
-    # Itemization calculations and cascading
-    from .itemization import (
-        get_all_children_ids,
-        update_itemization,
-        cascade_itemization_to_parents,
-        cascade_unitemization_to_children,
-    )
 
     uses_itemization_threshold = (
         instance.transaction_type_identifier
@@ -1178,10 +970,9 @@ def update_aggregates_for_affected_transactions(
     if _should_cascade_unitemization_service(
         instance, old_aggregate, uses_itemization_threshold
     ):
-        from .models import Transaction
         child_ids = get_all_children_ids(instance.id)
         if child_ids:
-            Transaction.objects.filter(
+            transaction_model.objects.filter(
                 id__in=child_ids, deleted__isnull=True
             ).update(itemized=False)
 

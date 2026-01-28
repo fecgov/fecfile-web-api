@@ -23,8 +23,14 @@ from fecfiler.transactions.serializers import (
     TransactionListSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.transactions.utils_aggregation import (
+from fecfiler.transactions.utils_aggregation_queries import (
     filter_queryset_for_previous_transactions_in_aggregation,
+)
+from fecfiler.transactions.utils_aggregation_prep import (
+    calculate_effective_amount,
+    create_old_snapshot,
+)
+from fecfiler.transactions.utils_aggregation_service import (
     update_aggregates_for_affected_transactions,
 )
 from fecfiler.reports.models import Report
@@ -493,11 +499,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                         Schedule.B,
                         Schedule.E,
                     ]:
-                        from .utils_aggregation import (
-                            calculate_effective_amount,
-                            create_old_snapshot,
-                        )
-
                         eff = calculate_effective_amount(child_instance)
                         old_snapshot = create_old_snapshot(child_instance, eff)
 
@@ -512,7 +513,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     # Call aggregation with proper old_snapshot
                     if old_snapshot:
                         update_aggregates_for_affected_transactions(
-                            child_instance, "update", old_snapshot
+                            Transaction, child_instance, "update", old_snapshot
                         )
                 except Transaction.DoesNotExist:
                     pass

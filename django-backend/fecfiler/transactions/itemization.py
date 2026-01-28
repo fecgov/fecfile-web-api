@@ -47,9 +47,9 @@ def has_itemized_children(transaction) -> bool:
     Returns:
         Boolean indicating if any children are itemized
     """
-    from .models import Transaction
+    transaction_model = transaction.__class__
 
-    return Transaction.objects.filter(
+    return transaction_model.objects.filter(
         parent_transaction_id=transaction.id,
         deleted__isnull=True,
         itemized=True
@@ -156,10 +156,9 @@ def _cascade_itemization_generic(
     if not related_ids:
         return
 
-    from .models import Transaction
-
     # Build query for transactions that need updating
-    base_query = Transaction.objects.filter(
+    transaction_model = transaction.__class__
+    base_query = transaction_model.objects.filter(
         id__in=related_ids,
         deleted__isnull=True
     )

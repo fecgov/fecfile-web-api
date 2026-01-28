@@ -1,7 +1,7 @@
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_f.models import ScheduleF
-from fecfiler.transactions.utils_aggregation import (
+from fecfiler.transactions.utils_aggregation_queries import (
     filter_queryset_for_previous_transactions_in_aggregation,
 )  # noqa: E501
 

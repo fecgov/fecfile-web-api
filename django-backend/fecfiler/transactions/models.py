@@ -8,10 +8,12 @@ from fecfiler.transactions.managers import (
     Schedule,
     AGGREGATE_SCHEDULES,
 )
-from fecfiler.transactions.utils_aggregation import (
+from fecfiler.transactions.utils_aggregation_prep import (
     create_old_snapshot,
-    update_aggregates_for_affected_transactions,
     calculate_effective_amount,
+)
+from fecfiler.transactions.utils_aggregation_service import (
+    update_aggregates_for_affected_transactions,
 )
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
@@ -287,7 +289,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 if schedule in AGGREGATE_SCHEDULES:
                     action = "create" if is_create else "update"
                     update_aggregates_for_affected_transactions(
-                        self, action, old_snapshot
+                        Transaction, self, action, old_snapshot
                     )
             except Exception as e:
                 # Do not raise to avoid breaking save on service failure; log instead
@@ -303,11 +305,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             raise AttributeError("Transaction cannot be deleted")
         if not self.deleted:
             try:
-                from .utils_aggregation import (
-                    calculate_effective_amount,
-                    update_aggregates_for_affected_transactions,
-                )
-
                 # Only schedules A, B, and E participate in aggregates
                 schedule = self.get_schedule_name()
                 if schedule in AGGREGATE_SCHEDULES:
@@ -315,7 +312,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     eff = calculate_effective_amount(self)
                     old_snapshot = create_old_snapshot(self, eff)
                     update_aggregates_for_affected_transactions(
-                        self, "delete", old_snapshot
+                        Transaction, self, "delete", old_snapshot
                     )
             except Exception:
                 logger.error(
