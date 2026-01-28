@@ -247,10 +247,145 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     def is_debt_repayment(self):
         return self.debt is not None and self.schedule_d is None
 
+    def _get_snapshot_related_fields(self, schedule):
+        related_map = {
+            Schedule.A: ["schedule_a"],
+            "A": ["schedule_a"],
+            Schedule.B: ["schedule_b"],
+            "B": ["schedule_b"],
+            Schedule.E: ["schedule_e", "contact_2"],
+            "E": ["schedule_e", "contact_2"],
+            Schedule.F: ["schedule_f", "contact_2"],
+            "F": ["schedule_f", "contact_2"],
+        }
+        return related_map.get(schedule, [])
+
+    def _get_old_snapshot(self, schedule, is_internal_update, passed_old_snapshot):
+        # Use passed_old_snapshot if available, otherwise query DB
+        if passed_old_snapshot is not None:
+            return passed_old_snapshot
+
+        if (
+            schedule not in AGGREGATE_SCHEDULES
+            and schedule not in ["A", "B", "E"]
+            and schedule not in [Schedule.F, "F"]
+        ):
+            return None
+
+        if is_internal_update or self.pk is None:
+            return None
+
+        try:
+            related_fields = self._get_snapshot_related_fields(schedule)
+            queryset = Transaction.objects
+            if related_fields:
+                queryset = queryset.select_related(*related_fields)
+            old = queryset.get(pk=self.pk)
+        except Transaction.DoesNotExist:
+            return None
+
+        eff = calculate_effective_amount(old)
+        return create_old_snapshot(old, eff)
+
+    def _handle_service_aggregation(self, schedule, is_create, old_snapshot):
+        # Only schedules A, B, and E participate in aggregates.
+        if schedule in AGGREGATE_SCHEDULES or schedule in ["A", "B", "E"]:
+            action = "create" if is_create else "update"
+            update_aggregates_for_affected_transactions(
+                Transaction, self, action, old_snapshot
+            )
+
+    def _handle_schedule_f_aggregation(self, schedule, old_snapshot):
+        if schedule not in [Schedule.F, "F"]:
+            return
+
+        from fecfiler.transactions.aggregation import (
+            process_aggregation_by_payee_candidate,
+        )
+
+        # Handle broken chain: if election_year changed, recalculate old chain
+        if old_snapshot and old_snapshot.get("election_year"):
+            old_election_year = old_snapshot.get("election_year")
+            current_election_year = (
+                self.schedule_f.general_election_year
+                if self.schedule_f else None
+            )
+
+            if old_election_year != current_election_year:
+                # Find first transaction in old election year chain to
+                # recalculate
+                old_chain_first = Transaction.objects.filter(
+                    ~Q(id=self.id),
+                    contact_2_id=old_snapshot.get("contact_2_id"),
+                    schedule_f__isnull=False,
+                    schedule_f__general_election_year=old_election_year,
+                ).order_by("date", "created").first()
+
+                if old_chain_first:
+                    process_aggregation_by_payee_candidate(
+                        old_chain_first, None
+                    )
+
+        # Always recalculate current transaction's chain
+        # Note: This handles date leapfrogging by recalculating
+        # all transactions with date >= this transaction's date
+        process_aggregation_by_payee_candidate(self, old_snapshot)
+
+    def _handle_entity_aggregation(self, schedule, old_snapshot):
+        if schedule not in [Schedule.A, Schedule.B, "A", "B"] or not old_snapshot:
+            return
+
+        from fecfiler.transactions.aggregation import (
+            process_aggregation_for_entity_contact,
+        )
+
+        old_contact_id = old_snapshot.get("contact_1_id")
+        old_date = old_snapshot.get("date")
+        old_group = old_snapshot.get("aggregation_group")
+        new_date = self.get_date()
+
+        if (
+            old_contact_id == self.contact_1_id
+            and old_date == new_date
+            and old_group == self.aggregation_group
+        ):
+            return
+
+        # Determine if we need to recalculate old chain (contact changed)
+        if old_contact_id and old_contact_id != self.contact_1_id:
+            process_aggregation_for_entity_contact(
+                self.committee_account_id,
+                self.aggregation_group,
+                old_contact_id,
+                old_date if old_date else self.get_date(),
+            )
+
+        # Calculate earliest date for current chain
+        if old_date:
+            earliest_date = min(self.get_date(), old_date)
+        else:
+            earliest_date = self.get_date()
+
+        # Recalculate current contact's chain
+        process_aggregation_for_entity_contact(
+            self.committee_account_id,
+            self.aggregation_group,
+            self.contact_1_id,
+            earliest_date,
+        )
+
+    def _handle_debt_aggregation(self):
+        if self.is_debt_repayment() or self.schedule_d is not None:
+            from fecfiler.transactions.aggregation import (
+                process_aggregation_for_debts,
+            )
+
+            process_aggregation_for_debts(self)
+
     def save(self, *args, **kwargs):
         # Check if old_snapshot was passed from view (for Schedule A, B, F)
-        # This is needed because schedule is saved before transaction, so DB
-        # already has new values
+        # This is needed because schedule is saved before transaction,
+        # so DB already has new values
         passed_old_snapshot = getattr(self, '_passed_old_snapshot', None)
 
         # Avoid recursion when service adjusts fields via save(update_fields=...)
@@ -259,27 +394,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
         # Capture old snapshot for updates IMMEDIATELY, before any other modifications
         # Use passed_old_snapshot if available (for Schedule F), otherwise query DB
-        old_snapshot = passed_old_snapshot
         schedule = self.get_schedule_name()
         is_create = self.pk is None
-        should_capture_snapshot = (
-            not is_create
-            and not is_internal_update
-            and (schedule in AGGREGATE_SCHEDULES or schedule == Schedule.F)
-            and not passed_old_snapshot  # Only query if not already provided
+        old_snapshot = self._get_old_snapshot(
+            schedule, is_internal_update, passed_old_snapshot
         )
-
-        if should_capture_snapshot:
-            try:
-                old = Transaction.objects.select_related(
-                    "schedule_a", "schedule_b", "schedule_c", "schedule_e",
-                    "schedule_f", "contact_2"
-                ).get(pk=self.pk)
-            except Transaction.DoesNotExist:
-                old = None
-            if old:
-                eff = calculate_effective_amount(old)
-                old_snapshot = create_old_snapshot(old, eff)
 
         # Handle memo_text after snapshot is captured
         if self.memo_text:
@@ -295,12 +414,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         # Invoke service after save for create/update
         if not is_internal_update:
             try:
-                # Only schedules A, B, and E participate in aggregates.
-                if schedule in AGGREGATE_SCHEDULES:
-                    action = "create" if is_create else "update"
-                    update_aggregates_for_affected_transactions(
-                        Transaction, self, action, old_snapshot
-                    )
+                self._handle_service_aggregation(
+                    schedule, is_create, old_snapshot
+                )
             except Exception as e:
                 # Do not raise to avoid breaking save on service failure; log instead
                 logger.error(
@@ -312,38 +428,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
             # Handle Schedule F (payee-candidate) aggregation
             try:
-                if schedule == Schedule.F:
-                    from fecfiler.transactions.aggregation import (
-                        process_aggregation_by_payee_candidate,
-                    )
-
-                    # Handle broken chain: if election_year changed, recalculate old chain
-                    if old_snapshot and old_snapshot.get("election_year"):
-                        old_election_year = old_snapshot.get("election_year")
-                        current_election_year = (
-                            self.schedule_f.general_election_year
-                            if self.schedule_f else None
-                        )
-
-                        if old_election_year != current_election_year:
-                            # Find first transaction in old election year chain to
-                            # recalculate
-                            old_chain_first = Transaction.objects.filter(
-                                ~Q(id=self.id),
-                                contact_2_id=old_snapshot.get("contact_2_id"),
-                                schedule_f__isnull=False,
-                                schedule_f__general_election_year=old_election_year,
-                            ).order_by("date", "created").first()
-
-                            if old_chain_first:
-                                process_aggregation_by_payee_candidate(
-                                    old_chain_first, None
-                                )
-
-                    # Always recalculate current transaction's chain
-                    # Note: This handles date leapfrogging by recalculating
-                    # all transactions with date >= this transaction's date
-                    process_aggregation_by_payee_candidate(self, old_snapshot)
+                self._handle_schedule_f_aggregation(schedule, old_snapshot)
             except Exception as e:
                 logger.error(
                     "Failed to process Schedule F aggregation on save",
@@ -355,39 +440,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             # Handle entity aggregation for schedules with contact_1 changes
             # This covers edge cases like date changes and contact changes
             try:
-                if schedule in ["A", "B"] and old_snapshot:
-                    from fecfiler.transactions.aggregation import (
-                        process_aggregation_for_entity,
-                    )
-
-                    # Determine if we need to recalculate old chain (contact changed)
-                    if (old_snapshot.get("contact_1_id")
-                            and old_snapshot.get("contact_1_id")
-                            != self.contact_1_id):
-                        # Get first transaction in old contact's chain to trigger recalc
-                        old_contact_first = Transaction.objects.filter(
-                            contact_1_id=old_snapshot["contact_1_id"],
-                            committee_account_id=self.committee_account_id,
-                            aggregation_group=self.aggregation_group,
-                            deleted__isnull=True,
-                        ).order_by("date", "created").first()
-
-                        if old_contact_first:
-                            old_date = old_snapshot.get("date")
-                            process_aggregation_for_entity(
-                                old_contact_first,
-                                old_date if old_date else self.get_date(),
-                            )
-
-                    # Calculate earliest date for current chain
-                    old_date = old_snapshot.get("date")
-                    if old_date:
-                        earliest_date = min(self.get_date(), old_date)
-                    else:
-                        earliest_date = self.get_date()
-
-                    # Recalculate current contact's chain
-                    process_aggregation_for_entity(self, earliest_date)
+                self._handle_entity_aggregation(schedule, old_snapshot)
             except Exception as e:
                 logger.error(
                     "Failed to process entity aggregation on save",
@@ -398,12 +451,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
             # Handle debt aggregation for Schedule D and debt repayments
             try:
-                if self.is_debt_repayment() or self.schedule_d is not None:
-                    from fecfiler.transactions.aggregation import (
-                        process_aggregation_for_debts,
-                    )
-
-                    process_aggregation_for_debts(self)
+                self._handle_debt_aggregation()
             except Exception as e:
                 logger.error(
                     "Failed to process debt aggregation on save",

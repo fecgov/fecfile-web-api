@@ -121,7 +121,6 @@ def process_aggregation_by_payee_candidate(transaction_instance, old_snapshot=No
         ).order_by("date", "created")
     else:
         # No date change: recalculate current transaction and all future-dated
-        # transactions
         to_update = shared_entity_transactions.filter(
             Q(id=transaction.id)
             | Q(date__gt=transaction.date)
@@ -153,11 +152,16 @@ def process_aggregation_by_payee_candidate(transaction_instance, old_snapshot=No
     )
 
 
-def process_aggregation_for_entity(transaction_instance, earliest_date=None):
+def process_aggregation_for_entity_contact(
+    committee_account_id,
+    aggregation_group,
+    contact_1_id,
+    earliest_date=None,
+):
     query_filter = {
-        "committee_account_id": transaction_instance.committee_account_id,
-        "aggregation_group": transaction_instance.aggregation_group,
-        "contact_1": transaction_instance.contact_1,
+        "committee_account_id": committee_account_id,
+        "aggregation_group": aggregation_group,
+        "contact_1_id": contact_1_id,
         "force_unaggregated__isnull": True,
     }
 
@@ -177,3 +181,12 @@ def process_aggregation_for_entity(transaction_instance, earliest_date=None):
         transaction.aggregate = transaction.agg
 
     Transaction.objects.bulk_update(dependent_transactions, ["aggregate"])
+
+
+def process_aggregation_for_entity(transaction_instance, earliest_date=None):
+    process_aggregation_for_entity_contact(
+        transaction_instance.committee_account_id,
+        transaction_instance.aggregation_group,
+        transaction_instance.contact_1_id,
+        earliest_date,
+    )
