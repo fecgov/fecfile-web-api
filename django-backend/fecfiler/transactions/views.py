@@ -30,9 +30,6 @@ from fecfiler.transactions.utils_aggregation_prep import (
     create_old_snapshot,
     calculate_effective_amount,
 )
-from fecfiler.transactions.utils_aggregation_service import (
-    update_aggregates_for_affected_transactions,
-)
 from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
@@ -481,19 +478,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                         eff = calculate_effective_amount(child_instance)
                         old_snapshot = create_old_snapshot(child_instance, eff)
 
-                    # Now update the parent
-                    Transaction.objects.filter(id=child_transaction_data).update(
-                        parent_transaction_id=transaction_instance.id
-                    )
-
-                    # Refresh to get new state
-                    child_instance.refresh_from_db()
-
-                    # Call aggregation with proper old_snapshot
+                    # Update parent via model save to trigger aggregation
+                    child_instance.parent_transaction_id = transaction_instance.id
                     if old_snapshot:
-                        update_aggregates_for_affected_transactions(
-                            Transaction, child_instance, "update", old_snapshot
-                        )
+                        child_instance._passed_old_snapshot = old_snapshot
+                    child_instance.save()
                 except Transaction.DoesNotExist:
                     pass
             else:
