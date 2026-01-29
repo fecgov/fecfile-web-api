@@ -23,9 +23,7 @@ from fecfiler.transactions.serializers import (
     TransactionListSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.transactions.utils import (
-    filter_queryset_for_previous_transactions_in_aggregation,
-)  # noqa: E501
+
 from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
@@ -105,6 +103,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return TransactionSerializer
 
     def get_queryset(self):
+        if hasattr(self, "action") and self.action in [
+            "previous_transaction_by_entity",
+            "previous_transaction_by_election",
+            "previous_transaction_by_payee_candidate",
+        ]:
+            return Transaction.objects.get_date_amount_queryset()
+
         queryset = super().get_queryset()
         report_id = (
             (
@@ -174,6 +179,28 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         response = super().retrieve(request, *args, **kwargs)
         return response
 
+    @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
+    def save_reatt_redes_transactions(self, request):
+        with db_transaction.atomic():
+            if request.data[0].get("id", None) is not None:
+                saved_data = [
+                    self.save_transaction(data, request) for data in request.data
+                ]
+            else:
+                reatt_redes = self.save_transaction(request.data[0], request)
+                request.data[1]["reatt_redes"] = reatt_redes
+                request.data[1]["reatt_redes_id"] = reatt_redes.id
+                child = request.data[1].get("children", [])[0]
+                child[" "] = reatt_redes
+                child["reatt_redes_id"] = reatt_redes.id
+                request.data[1]["children"] = [child]
+                to = self.save_transaction(request.data[1], request)
+                saved_data = [reatt_redes, to]
+        ids = []
+        for data in saved_data:
+            ids.append(data.id)
+        return Response(ids)
+
     @action(detail=True, methods=["put"], url_path="update-itemization-aggregation")
     def update_itemization_aggregation(self, request, pk=None):
 
@@ -198,184 +225,217 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         return Response(transaction.id)
 
+    @action(detail=False, methods=["post"], url_path=r"add-to-report")
+    def add_transaction_to_report(self, request):
+        try:
+            report = Report.objects.get(id=request.data.get("report_id"))
+        except Report.DoesNotExist:
+            return Response("No report matching id provided", status=404)
+
+        try:
+            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+            transactions = transaction.get_transaction_family()
+            for t in transactions:
+                t.reports.add(report)
+        except Transaction.DoesNotExist:
+            return Response("No transaction matching id provided", status=404)
+
+        return Response(f"Transaction(s) added to report: {[x.id for x in transactions]}")
+
+    @action(detail=False, methods=["post"], url_path=r"remove-from-report")
+    def remove_transaction_from_report(self, request):
+        try:
+            report = Report.objects.get(id=request.data.get("report_id"))
+        except Report.DoesNotExist:
+            return Response("No report matching id provided", status=404)
+
+        try:
+            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+        except Transaction.DoesNotExist:
+            return Response("No transaction matching id provided", status=404)
+
+        transaction.reports.remove(report)
+        return Response("Transaction removed from report")
+
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
     def previous_transaction_by_entity(self, request):
-        """Retrieves transaction that comes before this transactions,
-        while being in the same group for aggregation"""
         try:
             contact_1_id = request.query_params["contact_1_id"]
-            date = request.query_params["date"]
-            aggregation_group = request.query_params["aggregation_group"]
             assert (
-                date and contact_1_id and aggregation_group
-            )  # Raises error if any value is not truthy (i.e, "" or None)
-        except Exception:
-            message = "contact_1_id, date, and aggregate_group are required params"
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+                contact_1_id
+                and request.query_params.get("date")
+                and request.query_params.get("aggregation_group")
+            )
+        except (KeyError, AssertionError):
+            return Response(
+                "contact_1_id, date, and aggregation_group are required.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        original_transaction, errorResponse = self.get_transaction_in_params(request)
-        if errorResponse:
-            return errorResponse
+        filters = Q(contact_1_id=contact_1_id)
 
-        return self.get_previous(
-            self.get_queryset(),
-            date,
-            aggregation_group,
-            original_transaction,
-            contact_1_id,
-        )
+        return self.find_and_process_previous(request, filters)
 
     @action(detail=False, methods=["get"], url_path=r"previous/election")
     def previous_transaction_by_election(self, request):
-        """Retrieves transaction that comes before this transactions,
-        while being in the same group for aggregation and the same election"""
         try:
-            date = request.query_params["date"]
-            aggregation_group = request.query_params["aggregation_group"]
             election_code = request.query_params["election_code"]
             office = request.query_params["candidate_office"]
-            state = request.query_params.get("candidate_state", None)
+            state = request.query_params.get("candidate_state")
+            district = request.query_params.get("candidate_district")
+
             if office != Contact.CandidateOffice.PRESIDENTIAL and not state:
-                raise Exception()
-            district = request.query_params.get("candidate_district", None)
+                raise ValueError("State required for non-presidential.")
             if office == Contact.CandidateOffice.HOUSE and not district:
-                raise Exception()
+                raise ValueError("District required for House.")
 
             assert (
-                date and aggregation_group and election_code
-            )  # Raises error if any value is not truthy (i.e, "" or None)
-        except Exception:
-            message = """date, aggregate_group, election_code, and candidate_office \
-            are required params.
-            candidate_state is required for HOUSE and SENATE.
-            candidate_district is required for HOUSE"""
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
+                election_code
+                and request.query_params.get("date")
+                and request.query_params.get("aggregation_group")
+            )
+        except (KeyError, AssertionError, ValueError) as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
-        original_transaction, errorResponse = self.get_transaction_in_params(request)
-        if errorResponse:
-            return errorResponse
-
-        return self.get_previous(
-            self.get_queryset(),
-            date,
-            aggregation_group,
-            original_transaction,
-            None,
-            None,
-            election_code,
-            None,
-            office,
-            state,
-            district,
+        filters = Q(
+            schedule_e__election_code=election_code, contact_2__candidate_office=office
         )
+        if state:
+            filters &= Q(contact_2__candidate_state=state)
+        if district:
+            filters &= Q(contact_2__candidate_district=district)
+
+        return self.find_and_process_previous(request, filters)
 
     @action(detail=False, methods=["get"], url_path=r"previous/payee-candidate")
     def previous_transaction_by_payee_candidate(self, request):
-        """Retrieves transaction that comes before this transactions,
-        while being in the same group for aggregation"""
         try:
             contact_2_id = request.query_params["contact_2_id"]
-            date = request.query_params["date"]
-            aggregation_group = request.query_params["aggregation_group"]
-            general_election_year = request.query_params["general_election_year"]
+            gen_election_year = request.query_params["general_election_year"]
 
             assert (
-                contact_2_id and date and aggregation_group and general_election_year
-            )  # Raises error if any value is not truthy (i.e, "" or None)
-        except Exception:
-            message = (
-                "contact_2_id, date, aggregation_group, and "
-                "general_election_year are required params"
+                contact_2_id
+                and gen_election_year
+                and request.query_params.get("date")
+                and request.query_params.get("aggregation_group")
+            )
+        except (KeyError, AssertionError):
+            return Response(
+                """
+                contact_2_id, general_election_year, date,
+                 and aggregation_group required.
+                """,
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-            return Response(message, status=status.HTTP_400_BAD_REQUEST)
-
-        original_transaction, errorResponse = self.get_transaction_in_params(request)
-        if errorResponse:
-            return errorResponse
-
-        return self.get_previous(
-            self.get_queryset(),
-            date,
-            aggregation_group,
-            original_transaction,
-            None,
-            contact_2_id,
-            None,
-            general_election_year,
+        filters = Q(
+            contact_2_id=contact_2_id, schedule_f__general_election_year=gen_election_year
         )
 
-    def get_previous(
-        self,
-        queryset,
-        date,
-        aggregation_group,
-        original_transaction=None,
-        contact_1_id=None,
-        contact_2_id=None,
-        election_code=None,
-        election_year=None,
-        office=None,
-        state=None,
-        district=None,
-    ):
-        date = datetime.fromisoformat(date)
-        previous_transactions = filter_queryset_for_previous_transactions_in_aggregation(
-            queryset,
-            date,
-            aggregation_group,
-            original_transaction.id if original_transaction else None,
-            contact_1_id,
-            contact_2_id,
-            election_code,
-            election_year,
-            office,
-            state,
-            district,
-        )
-        previous_transaction = previous_transactions.first()
+        return self.find_and_process_previous(request, filters)
 
-        if previous_transaction:
-            if original_transaction and (
-                original_transaction.date < previous_transaction.date
-                or (
-                    original_transaction.date == previous_transaction.date
-                    and original_transaction.created < previous_transaction.created
-                )
-            ):
-                if previous_transaction.aggregate is not None:
-                    previous_transaction.aggregate -= original_transaction.amount
-                if previous_transaction.calendar_ytd_per_election_office is not None:
-                    previous_transaction.calendar_ytd_per_election_office -= (
-                        original_transaction.amount
-                    )
-                if previous_transaction.schedule_f is not None:
-                    if (
-                        original_transaction.schedule_f.general_election_year
-                        == previous_transaction.schedule_f.general_election_year
-                    ):
-                        previous_transaction.schedule_f.aggregate_general_elec_expended -= (  # noqa
-                            original_transaction.amount
-                        )
-            serializer = self.get_serializer(previous_transaction)
-            return Response(data=serializer.data)
+    def find_and_process_previous(self, request, extra_filters):
+        transaction_id = request.query_params.get("transaction_id")
+        committee_uuid = self.get_committee_uuid()
 
-        response = {"message": "No previous transaction found."}
-        return Response(response, status=status.HTTP_404_NOT_FOUND)
+        try:
+            target_date = datetime.fromisoformat(request.query_params["date"])
+            start_of_year = target_date.replace(month=1, day=1)
+        except (ValueError, TypeError):
+            return Response("Invalid date format", status=status.HTTP_400_BAD_REQUEST)
 
-    def get_transaction_in_params(self, request):
-        """Retrieves the transaction specified by transaction_id in query params
-        if it does not exist, returns an error response in the second position
-        of the tuple
-        """
-        transaction_id = request.query_params.get("transaction_id", None)
+        aggregation_group = request.query_params["aggregation_group"]
+        target_created = datetime.max
+        original_transaction = None
+
         if transaction_id:
             try:
-                return self.get_queryset().get(id=transaction_id), None
-            except self.get_queryset().model.DoesNotExist:
-                message = f"Transaction with id {transaction_id} not found."
-                return None, Response(message, status=status.HTTP_400_BAD_REQUEST)
-        return None, None
+                original_transaction = self.get_queryset().get(
+                    id=transaction_id, committee_account_id=committee_uuid
+                )
+                target_created = original_transaction.created
+            except Transaction.DoesNotExist:
+                return Response(
+                    f"Transaction with id {transaction_id} not found.",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        qs = self.get_queryset().filter(
+            committee_account_id=committee_uuid,
+            aggregation_group=aggregation_group,
+            date__gte=start_of_year,
+        )
+
+        if transaction_id:
+            qs = qs.exclude(id=transaction_id)
+
+        time_filter = Q(date__lt=target_date) | Q(
+            date=target_date, created__lt=target_created
+        )
+
+        previous_transaction = (
+            qs.filter(extra_filters)
+            .filter(time_filter)
+            .order_by("-date", "-created")
+            .first()
+        )
+
+        if not previous_transaction:
+            return Response(
+                {
+                    "aggregate": 0,
+                    "calendar_ytd_per_election_office": 0,
+                    "aggregate_general_elec_expended": 0,
+                    "message": "No previous transaction found.",
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if original_transaction and (
+            original_transaction.date < previous_transaction.date
+            or (
+                original_transaction.date == previous_transaction.date
+                and original_transaction.created < previous_transaction.created
+            )
+        ):
+            self.adjust_running_totals(previous_transaction, original_transaction)
+
+        return Response(
+            {
+                "aggregate": (
+                    previous_transaction.aggregate
+                    if previous_transaction.aggregate is not None
+                    else 0
+                ),
+                "calendar_ytd_per_election_office": (
+                    previous_transaction.calendar_ytd_per_election_office
+                    if previous_transaction.calendar_ytd_per_election_office is not None
+                    else 0
+                ),
+                "aggregate_general_elec_expended": (
+                    previous_transaction.schedule_f.aggregate_general_elec_expended
+                    if getattr(previous_transaction, "schedule_f", None)
+                    else 0
+                ),
+            }
+        )
+
+    def adjust_running_totals(self, target: Transaction, source: Transaction):
+        amount = source.amount
+
+        if target.aggregate is not None:
+            target.aggregate -= amount
+
+        if target.calendar_ytd_per_election_office is not None:
+            target.calendar_ytd_per_election_office -= amount
+
+        if getattr(target, "schedule_f", None) and getattr(source, "schedule_f", None):
+            if (
+                target.schedule_f.aggregate_general_elec_expended is not None
+                and source.schedule_f.general_election_year
+                == target.schedule_f.general_election_year
+            ):
+                target.schedule_f.aggregate_general_elec_expended -= amount
 
     def save_transaction(self, transaction_data, request):
         committee_id = request.session["committee_uuid"]
@@ -575,28 +635,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         return self.queryset.get(id=transaction_instance.id)
 
-    @action(detail=False, methods=["put"], url_path=r"multisave/reattribution")
-    def save_reatt_redes_transactions(self, request):
-        with db_transaction.atomic():
-            if request.data[0].get("id", None) is not None:
-                saved_data = [
-                    self.save_transaction(data, request) for data in request.data
-                ]
-            else:
-                reatt_redes = self.save_transaction(request.data[0], request)
-                request.data[1]["reatt_redes"] = reatt_redes
-                request.data[1]["reatt_redes_id"] = reatt_redes.id
-                child = request.data[1].get("children", [])[0]
-                child[" "] = reatt_redes
-                child["reatt_redes_id"] = reatt_redes.id
-                request.data[1]["children"] = [child]
-                to = self.save_transaction(request.data[1], request)
-                saved_data = [reatt_redes, to]
-        ids = []
-        for data in saved_data:
-            ids.append(data.id)
-        return Response(ids)
-
     # Manually process aggregation for a given transaction,
     # and if updating an existing transaction, check for edge cases
     def process_aggregation(self, transaction_instance, original_values):
@@ -741,38 +779,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             to_recalculate = leapfrogged_sch_f_transactions.first()
             if to_recalculate is not None:
                 process_aggregation_by_payee_candidate(to_recalculate)
-
-    @action(detail=False, methods=["post"], url_path=r"add-to-report")
-    def add_transaction_to_report(self, request):
-        try:
-            report = Report.objects.get(id=request.data.get("report_id"))
-        except Report.DoesNotExist:
-            return Response("No report matching id provided", status=404)
-
-        try:
-            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
-            transactions = transaction.get_transaction_family()
-            for t in transactions:
-                t.reports.add(report)
-        except Transaction.DoesNotExist:
-            return Response("No transaction matching id provided", status=404)
-
-        return Response(f"Transaction(s) added to report: {[x.id for x in transactions]}")
-
-    @action(detail=False, methods=["post"], url_path=r"remove-from-report")
-    def remove_transaction_from_report(self, request):
-        try:
-            report = Report.objects.get(id=request.data.get("report_id"))
-        except Report.DoesNotExist:
-            return Response("No report matching id provided", status=404)
-
-        try:
-            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
-        except Transaction.DoesNotExist:
-            return Response("No transaction matching id provided", status=404)
-
-        transaction.reports.remove(report)
-        return Response("Transaction removed from report")
 
 
 def noop(transaction, is_existing):
