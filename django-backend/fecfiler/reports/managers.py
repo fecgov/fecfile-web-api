@@ -1,8 +1,20 @@
-from django.db.models import Case, When, Value, Manager, Q, CharField
+from django.db.models import Case, When, Value, Manager, Q, IntegerField
 from enum import Enum
 
 """Manager to deterimine fields that are used the same way across reports,
 but are called different names"""
+
+STATUS_CODE_FAILED = 1
+STATUS_CODE_PENDING = 2
+STATUS_CODE_IN_PROGRESS = 3
+STATUS_CODE_SUCCESS = 4
+
+REPORT_STATUS_MAP = {
+    STATUS_CODE_FAILED: "Submission failure",
+    STATUS_CODE_PENDING: "Submission pending",
+    STATUS_CODE_IN_PROGRESS: "In progress",
+    STATUS_CODE_SUCCESS: "Submission success",
+}
 
 
 def get_status_mapping():
@@ -22,15 +34,15 @@ def get_status_mapping():
 
     return Case(
         # the report was submitted and efo returned a "success"
-        When(success, then=Value("Submission success")),
+        When(success, then=Value(STATUS_CODE_SUCCESS)),
         # the submission failed either on our side or efo's side
-        When(failed, then=Value("Submission failure")),
+        When(failed, then=Value(STATUS_CODE_FAILED)),
         # the report has been sent to efo, we are waiting on a response
-        When(upload_exists, then=Value("Submission pending")),
+        When(upload_exists, then=Value(STATUS_CODE_PENDING)),
         # the report is in progress because there is no
         # upload_submission associated with it
-        default=Value("In progress"),
-        output_field=CharField(),
+        default=Value(STATUS_CODE_IN_PROGRESS),
+        output_field=IntegerField(),
     )
 
 
