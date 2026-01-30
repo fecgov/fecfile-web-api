@@ -4,6 +4,7 @@ from fecfiler.transactions.schedule_f.models import ScheduleF
 from fecfiler.transactions.utils_aggregation_queries import (
     filter_queryset_for_previous_transactions_in_aggregation,
 )  # noqa: E501
+from fecfiler.transactions.utils_aggregation_prep import _get_calendar_year_from_date
 
 from django.db.models import Q
 import structlog
@@ -165,22 +166,25 @@ def process_aggregation_for_entity_contact(
         "force_unaggregated__isnull": True,
     }
 
-    # Only add date filter if earliest_date is provided
-    if earliest_date is not None:
-        query_filter["date__gte"] = earliest_date
-
-    dependent_transactions = (
+    all_transactions = (
         Transaction.objects.filter(**query_filter)
         .order_by("date", "created")
         .annotate(agg=Transaction.objects.ENTITY_AGGREGATE_CLAUSE())
     )
-    logger.error(
-        f"Processing entity aggregation for transactions {dependent_transactions}"
-    )
-    for transaction in dependent_transactions:
+
+    # If earliest_date specified, only update transactions >= that date
+    if earliest_date is not None:
+        transactions_to_update = [
+            t for t in all_transactions if t.date >= earliest_date
+        ]
+    else:
+        transactions_to_update = list(all_transactions)
+
+    for transaction in transactions_to_update:
         transaction.aggregate = transaction.agg
 
-    Transaction.objects.bulk_update(dependent_transactions, ["aggregate"])
+    if transactions_to_update:
+        Transaction.objects.bulk_update(transactions_to_update, ["aggregate"])
 
 
 def process_aggregation_for_entity(transaction_instance, earliest_date=None):
@@ -190,3 +194,78 @@ def process_aggregation_for_entity(transaction_instance, earliest_date=None):
         transaction_instance.contact_1_id,
         earliest_date,
     )
+
+
+def process_aggregation_for_election(transaction_instance, earliest_date=None):
+    """
+    Recalculate election aggregates for Schedule E transactions.
+
+    Updates _calendar_ytd_per_election_office for all transactions in the same
+    election partition (election_code, candidate_office, state, district, year).
+
+    Args:
+        transaction_instance: The Schedule E transaction instance
+        earliest_date: If specified, only update transactions on or after this date
+    """
+    if not transaction_instance.schedule_e:
+        return
+
+    if not transaction_instance.contact_2:
+        return
+
+    schedule_e = transaction_instance.schedule_e
+    contact_2 = transaction_instance.contact_2
+
+    # Get the date - handle both date objects and date strings
+    transaction_date = transaction_instance.get_date()
+    if not transaction_date:
+        return
+
+    year = _get_calendar_year_from_date(transaction_date)
+
+    # Build query filter for the election partition
+    # Query ALL transactions (no date filter) so window function has complete history
+    query_filter = {
+        "committee_account_id": transaction_instance.committee_account_id,
+        "aggregation_group": transaction_instance.aggregation_group,
+        "schedule_e__election_code": schedule_e.election_code,
+        "contact_2__candidate_office": contact_2.candidate_office,
+        "date__year": year,
+        "force_unaggregated__isnull": True,
+        "deleted__isnull": True,
+    }
+
+    # Handle optional state/district fields
+    if contact_2.candidate_state:
+        query_filter["contact_2__candidate_state"] = contact_2.candidate_state
+    else:
+        query_filter["contact_2__candidate_state__isnull"] = True
+
+    if contact_2.candidate_district:
+        query_filter["contact_2__candidate_district"] = contact_2.candidate_district
+
+    # Get ALL transactions in this election partition and annotate with running sum
+    all_transactions = (
+        Transaction.objects.filter(**query_filter)
+        .order_by("date", "created")
+        .annotate(election_agg=Transaction.objects.ELECTION_AGGREGATE_CLAUSE())
+    )
+
+    # If earliest_date specified, only update transactions >= that date
+    if earliest_date is not None:
+        transactions_to_update = [
+            t for t in all_transactions if t.date >= earliest_date
+        ]
+    else:
+        transactions_to_update = list(all_transactions)
+
+    # Update transactions with their calculated aggregates
+    for trans in transactions_to_update:
+        trans._calendar_ytd_per_election_office = trans.election_agg
+
+    if transactions_to_update:
+        Transaction.objects.bulk_update(
+            transactions_to_update,
+            ["_calendar_ytd_per_election_office"],
+            batch_size=64
+        )
