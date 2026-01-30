@@ -105,20 +105,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return TransactionSerializer
 
     def get_queryset(self):
-        # Use the table if writing
-        if hasattr(self, "action") and self.action in [
-            "create",
-            "update",
-            "destroy",
-            "save_transactions",
-        ]:
-            queryset = super().get_queryset()
-        else:  # Otherwise, use the view for reading
-            committee_uuid = self.get_committee_uuid()
-            queryset = Transaction.objects.transaction_view().filter(
-                committee_account__id=committee_uuid
-            )
-
+        queryset = super().get_queryset()
         report_id = (
             (
                 self.request.query_params.get("report_id")
@@ -187,11 +174,34 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         response = super().retrieve(request, *args, **kwargs)
         return response
 
+    @action(detail=True, methods=["put"], url_path="update-itemization-aggregation")
+    def update_itemization_aggregation(self, request, pk=None):
+
+        transaction: Transaction = self.get_object()
+        transaction_data = self.get_serializer(transaction).data
+        transaction_data["report_ids"] = [
+            str(rep_id) for rep_id in transaction.reports.values_list("id", flat=True)
+        ]
+
+        allowed_fields = [
+            "force_itemized",
+            "force_unaggregated",
+            "schedule_id",
+            "schema_name",
+        ]
+        for field in allowed_fields:
+            if field in request.data:
+                transaction_data[field] = request.data[field]
+
+        with db_transaction.atomic():
+            self.save_transaction(transaction_data, request)
+
+        return Response(transaction.id)
+
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
     def previous_transaction_by_entity(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation"""
-        transaction_id = request.query_params.get("transaction_id", None)
         try:
             contact_1_id = request.query_params["contact_1_id"]
             date = request.query_params["date"]
@@ -203,15 +213,22 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             message = "contact_1_id, date, and aggregate_group are required params"
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+        original_transaction, errorResponse = self.get_transaction_in_params(request)
+        if errorResponse:
+            return errorResponse
+
         return self.get_previous(
-            self.get_queryset(), date, aggregation_group, transaction_id, contact_1_id
+            self.get_queryset(),
+            date,
+            aggregation_group,
+            original_transaction,
+            contact_1_id,
         )
 
     @action(detail=False, methods=["get"], url_path=r"previous/election")
     def previous_transaction_by_election(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation and the same election"""
-        id = request.query_params.get("transaction_id", None)
         try:
             date = request.query_params["date"]
             aggregation_group = request.query_params["aggregation_group"]
@@ -234,11 +251,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             candidate_district is required for HOUSE"""
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+        original_transaction, errorResponse = self.get_transaction_in_params(request)
+        if errorResponse:
+            return errorResponse
+
         return self.get_previous(
             self.get_queryset(),
             date,
             aggregation_group,
-            id,
+            original_transaction,
             None,
             None,
             election_code,
@@ -252,7 +273,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def previous_transaction_by_payee_candidate(self, request):
         """Retrieves transaction that comes before this transactions,
         while being in the same group for aggregation"""
-        transaction_id = request.query_params.get("transaction_id", None)
         try:
             contact_2_id = request.query_params["contact_2_id"]
             date = request.query_params["date"]
@@ -270,11 +290,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
             return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+        original_transaction, errorResponse = self.get_transaction_in_params(request)
+        if errorResponse:
+            return errorResponse
+
         return self.get_previous(
             self.get_queryset(),
             date,
             aggregation_group,
-            transaction_id,
+            original_transaction,
             None,
             contact_2_id,
             None,
@@ -286,7 +310,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         queryset,
         date,
         aggregation_group,
-        transaction_id=None,
+        original_transaction=None,
         contact_1_id=None,
         contact_2_id=None,
         election_code=None,
@@ -300,7 +324,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             queryset,
             date,
             aggregation_group,
-            transaction_id,
+            original_transaction.id if original_transaction else None,
             contact_1_id,
             contact_2_id,
             election_code,
@@ -310,10 +334,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             district,
         )
         previous_transaction = previous_transactions.first()
-
-        original_transaction = None
-        if transaction_id:
-            original_transaction = queryset.get(id=transaction_id)
 
         if previous_transaction:
             if original_transaction and (
@@ -342,6 +362,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         response = {"message": "No previous transaction found."}
         return Response(response, status=status.HTTP_404_NOT_FOUND)
+
+    def get_transaction_in_params(self, request):
+        """Retrieves the transaction specified by transaction_id in query params
+        if it does not exist, returns an error response in the second position
+        of the tuple
+        """
+        transaction_id = request.query_params.get("transaction_id", None)
+        if transaction_id:
+            try:
+                return self.get_queryset().get(id=transaction_id), None
+            except self.get_queryset().model.DoesNotExist:
+                message = f"Transaction with id {transaction_id} not found."
+                return None, Response(message, status=status.HTTP_400_BAD_REQUEST)
+        return None, None
 
     def save_transaction(self, transaction_data, request):
         committee_id = request.session["committee_uuid"]
@@ -774,7 +808,7 @@ def stringify_queryset(qs):
 
 def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_id):
     if transaction.is_loan_repayment() is True:
-        current_loan = Transaction.objects.transaction_view().get(pk=transaction.loan_id)
+        current_loan = Transaction.objects.get(pk=transaction.loan_id)
         current_loan_balance = current_loan.loan_balance
         original_loan_id = current_loan.loan_id or current_loan.id
         if current_loan_balance == 0:
@@ -794,7 +828,7 @@ def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_i
 
 def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_id):
     if transaction.is_debt_repayment() is True:
-        current_debt = Transaction.objects.transaction_view().get(pk=transaction.debt_id)
+        current_debt = Transaction.objects.get(pk=transaction.debt_id)
         current_debt_balance = current_debt.balance_at_close
         original_debt_id = current_debt.debt_id or current_debt.id
         if current_debt_balance == 0:
