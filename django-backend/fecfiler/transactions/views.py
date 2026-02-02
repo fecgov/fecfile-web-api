@@ -103,13 +103,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return TransactionSerializer
 
     def get_queryset(self):
-        if hasattr(self, "action") and self.action in [
-            "previous_transaction_by_entity",
-            "previous_transaction_by_election",
-            "previous_transaction_by_payee_candidate",
-        ]:
-            return Transaction.objects.get_date_amount_queryset()
-
         queryset = super().get_queryset()
         report_id = (
             (
@@ -350,7 +343,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         if transaction_id:
             try:
-                original_transaction = self.get_queryset().get(
+                original_transaction = Transaction.objects.get_previous_queryset().get(
                     id=transaction_id, committee_account_id=committee_uuid
                 )
                 target_created = original_transaction.created
@@ -360,7 +353,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-        qs = self.get_queryset().filter(
+        qs = Transaction.objects.get_previous_queryset().filter(
             committee_account_id=committee_uuid,
             aggregation_group=aggregation_group,
             date__gte=start_of_year,

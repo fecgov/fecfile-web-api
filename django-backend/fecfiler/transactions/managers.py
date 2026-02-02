@@ -80,7 +80,7 @@ class TransactionManager(SoftDeleteManager):
             .order_by("order_key")
         )
 
-    def get_date_amount_queryset(self):
+    def get_previous_queryset(self):
         return (
             super()
             .get_queryset()
