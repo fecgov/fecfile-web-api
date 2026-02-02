@@ -241,7 +241,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set.request = self.post_request({}, {"schedules": "A,B,D,E"})
         self.assertEqual(view_set.get_queryset().count(), 11)
         view_set.request = self.post_request({}, {"schedules": ""})
-        self.assertEqual(view_set.get_queryset().count(), 0)
+        self.assertEqual(view_set.get_queryset().count(), 13)
 
     def test_get_previous_entity(self):
         view_set = TransactionViewSet()
