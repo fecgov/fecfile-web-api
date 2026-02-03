@@ -228,23 +228,17 @@ def _update_suffix_delta(
 
     op_equal = "created__gte" if include_self else "created__gt"
 
-    # Update all rows strictly after the anchor date
-    updated_after = base_qs.filter(date__gt=key_date).update(
-        **{aggregate_field_name: F(aggregate_field_name) + Value(
-            delta, output_field=DecimalField()
-        )}
-    )
-
-    # Update rows on the same date and at/after the anchor creation time
-    updated_same_day = base_qs.filter(date=key_date).filter(
-        **{op_equal: key_created}
+    # Update all rows strictly after the anchor date, and rows on the same
+    # date at/after the anchor creation time
+    updated = base_qs.filter(
+        Q(date__gt=key_date) | (Q(date=key_date) & Q(**{op_equal: key_created}))
     ).update(
         **{aggregate_field_name: F(aggregate_field_name) + Value(
             delta, output_field=DecimalField()
         )}
     )
 
-    return int(updated_after) + int(updated_same_day)
+    return int(updated)
 
 
 def _get_previous_aggregate_value(
