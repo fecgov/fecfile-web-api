@@ -1188,6 +1188,69 @@ class TransactionModelTestCase(TestCase):
         self.assertFalse(tier1.itemized)
         self.assertFalse(tier2.itemized)
 
+    def test_unitemization_cascades_to_children_in_other_chain(self):
+        parent_contact = create_test_individual_contact(
+            "parent_ln", "parent_fn", self.committee.id
+        )
+        child_chain_contact = create_test_individual_contact(
+            "child_ln", "child_fn", self.committee.id
+        )
+        moved_contact = create_test_individual_contact(
+            "moved_ln", "moved_fn", self.committee.id
+        )
+
+        first_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            parent_contact,
+            "2024-01-01",
+            "190.00",
+        )
+        second_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            parent_contact,
+            "2024-01-02",
+            "20.00",
+        )
+        third_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            parent_contact,
+            "2024-01-03",
+            "5.00",
+        )
+
+        child_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            child_chain_contact,
+            "2024-01-04",
+            "250.00",
+            parent_id=second_transaction.id,
+        )
+
+        first_transaction.refresh_from_db()
+        second_transaction.refresh_from_db()
+        third_transaction.refresh_from_db()
+        child_transaction.refresh_from_db()
+
+        self.assertFalse(first_transaction.itemized)
+        self.assertTrue(second_transaction.itemized)
+        self.assertTrue(third_transaction.itemized)
+        self.assertTrue(child_transaction.itemized)
+
+        first_transaction.contact_1 = moved_contact
+        first_transaction.save()
+
+        second_transaction.refresh_from_db()
+        third_transaction.refresh_from_db()
+        child_transaction.refresh_from_db()
+
+        self.assertFalse(second_transaction.itemized)
+        self.assertFalse(third_transaction.itemized)
+        self.assertFalse(child_transaction.itemized)
+
     def test_election_aggregates_across_committees(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C99999999")
         individual = create_test_individual_contact("ind", "ividual", other_committee.id)

@@ -1,4 +1,16 @@
 from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.itemization import (
+    update_itemization,
+    cascade_itemization_to_parents,
+    cascade_unitemization_to_children,
+    has_itemized_children,
+    get_all_children_ids,
+)
+from fecfiler.transactions.managers import (
+    schedule_a_over_two_hundred_types,
+    schedule_b_over_two_hundred_types,
+    ITEMIZATION_THRESHOLD,
+)
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_f.models import ScheduleF
 from fecfiler.transactions.utils_aggregation_queries import (
@@ -180,11 +192,57 @@ def process_aggregation_for_entity_contact(
     else:
         transactions_to_update = list(all_transactions)
 
+    itemization_updates = []
+
     for transaction in transactions_to_update:
+        old_aggregate = transaction.aggregate
+        old_itemized = transaction.itemized
         transaction.aggregate = transaction.agg
+
+        uses_itemization_threshold = (
+            transaction.transaction_type_identifier
+            in (schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types)
+        )
+
+        # Cascade unitemization to children when aggregate drops below threshold
+        if (
+            uses_itemization_threshold
+            and transaction.force_itemized is None
+            and old_aggregate is not None
+            and transaction.aggregate is not None
+        ):
+            aggregate_dropped_below = (
+                old_aggregate > ITEMIZATION_THRESHOLD
+                and transaction.aggregate <= ITEMIZATION_THRESHOLD
+            )
+            aggregate_changed_at_or_below = (
+                old_aggregate != transaction.aggregate
+                and transaction.aggregate <= ITEMIZATION_THRESHOLD
+                and has_itemized_children(transaction)
+            )
+
+            if (aggregate_dropped_below or aggregate_changed_at_or_below):
+                child_ids = get_all_children_ids(transaction.id)
+                if child_ids:
+                    Transaction.objects.filter(
+                        id__in=child_ids,
+                        deleted__isnull=True,
+                    ).update(itemized=False)
+
+        itemization_changed = update_itemization(transaction)
+        if itemization_changed:
+            itemization_updates.append(transaction)
+
+            if transaction.itemized and not old_itemized:
+                cascade_itemization_to_parents(transaction)
+            elif not transaction.itemized and old_itemized:
+                cascade_unitemization_to_children(transaction)
 
     if transactions_to_update:
         Transaction.objects.bulk_update(transactions_to_update, ["aggregate"])
+
+    if itemization_updates:
+        Transaction.objects.bulk_update(itemization_updates, ["itemized"])
 
 
 def process_aggregation_for_entity(transaction_instance, earliest_date=None):
