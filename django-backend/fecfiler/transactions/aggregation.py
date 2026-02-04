@@ -327,3 +327,49 @@ def process_aggregation_for_election(transaction_instance, earliest_date=None):
             ["_calendar_ytd_per_election_office"],
             batch_size=64
         )
+
+
+def reaggregate_after_report_deletion(report):
+    """
+    Prepare and trigger re-aggregation after a report is deleted.
+    
+    This function should be called BEFORE transactions are deleted from the report.
+    It collects aggregation contexts for transactions that will be deleted, then
+    returns a callback function that should be called AFTER transactions are deleted
+    to trigger re-aggregation of remaining transactions.
+    
+    Args:
+        report: The Report instance being deleted
+        
+    Returns:
+        A callable that should be invoked after transactions are deleted
+    """
+    # Get all transactions associated with this report before they're deleted
+    transactions_to_delete = Transaction.objects.filter(reports=report)
+    
+    # Collect unique aggregation contexts for Schedule A/B transactions
+    aggregation_contexts = set()
+    for txn in transactions_to_delete:
+        if (
+            txn.transaction_type_identifier
+            in (schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types)
+            and txn.contact_1_id
+        ):
+            aggregation_contexts.add((
+                txn.committee_account_id,
+                txn.aggregation_group,
+                txn.contact_1_id,
+            ))
+        # Note: Schedule E election aggregates will be recalculated
+        # through transaction.delete() signal handlers if needed
+    
+    # Return a callback that will re-aggregate after deletion
+    def reaggregate():
+        for committee_account_id, aggregation_group, contact_1_id in aggregation_contexts:
+            process_aggregation_for_entity_contact(
+                committee_account_id,
+                aggregation_group,
+                contact_1_id,
+            )
+    
+    return reaggregate
