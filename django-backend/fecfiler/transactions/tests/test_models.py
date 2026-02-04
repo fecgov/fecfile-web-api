@@ -1376,11 +1376,11 @@ class TransactionModelTestCase(TestCase):
     def test_reaggregation_after_report_deletion(self):
         """Test that deleting a report triggers re-aggregation of transactions
         in subsequent reports."""
-        
+
         # Create two reports
         report_1 = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
         report_2 = create_form3x(self.committee, "2024-02-01", "2024-02-28", {})
-        
+
         # Create a 4-transaction chain, 2 per report
         # Report 1, Transaction 1: $100 (Aggregate: $100)
         transaction_1 = create_schedule_a(
@@ -1393,7 +1393,7 @@ class TransactionModelTestCase(TestCase):
         )
         transaction_1.refresh_from_db()
         self.assertEqual(transaction_1.aggregate, Decimal("100.00"))
-        
+
         # Report 1, Transaction 2: $100 (Aggregate: $200)
         transaction_2 = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -1405,7 +1405,7 @@ class TransactionModelTestCase(TestCase):
         )
         transaction_2.refresh_from_db()
         self.assertEqual(transaction_2.aggregate, Decimal("200.00"))
-        
+
         # Report 2, Transaction 3: $10 (Aggregate: $210)
         transaction_3 = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -1417,7 +1417,7 @@ class TransactionModelTestCase(TestCase):
         )
         transaction_3.refresh_from_db()
         self.assertEqual(transaction_3.aggregate, Decimal("210.00"))
-        
+
         # Report 2, Transaction 4: $10 (Aggregate: $220)
         transaction_4 = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -1429,19 +1429,20 @@ class TransactionModelTestCase(TestCase):
         )
         transaction_4.refresh_from_db()
         self.assertEqual(transaction_4.aggregate, Decimal("220.00"))
-        
+
         # Delete Report 1
         report_1.delete()
-        
+
         # After deletion, transactions from Report 2 should be re-aggregated
         transaction_3.refresh_from_db()
         transaction_4.refresh_from_db()
-        
+
         # Transaction 3 should now have aggregate of $10 (first in chain after deletion)
         self.assertEqual(transaction_3.aggregate, Decimal("10.00"))
-        
+
         # Transaction 4 should now have aggregate of $20 (10 + 10)
         self.assertEqual(transaction_4.aggregate, Decimal("20.00"))
+
 
 def undelete(transaction):
     transaction.deleted = None
