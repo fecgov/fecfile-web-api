@@ -339,7 +339,7 @@ def reaggregate_after_report_deletion(report):
     to trigger re-aggregation of remaining transactions.
     
     Args:
-        report: The Report instance being deleted
+        report: Report instance being deleted
         
     Returns:
         A callable that should be invoked after transactions are deleted
@@ -360,8 +360,6 @@ def reaggregate_after_report_deletion(report):
                 txn.aggregation_group,
                 txn.contact_1_id,
             ))
-        # Note: Schedule E election aggregates will be recalculated
-        # through transaction.delete() signal handlers if needed
     
     # Return a callback that will re-aggregate after deletion
     def reaggregate():
