@@ -95,14 +95,15 @@ class UploadSubmissionManager(models.Manager):
 
 
 class WebPrintSubmissionManager(models.Manager):
-    def initiate_submission(self, report_id):
+    def initiate_submission(self, report):
         submission = self.create(fecfile_task_state=FECSubmissionState.INITIALIZING.value)
         submission.save()
 
-        Report.objects.filter(id=report_id).update(webprint_submission=submission)
+        report.webprint_submission = submission
+        report.save(update_fields=["webprint_submission"])
 
         logger.info(
-            f"""Submission to WebPrint has been initialized for report :{report_id}
+            f"""Submission to WebPrint has been initialized for report :{report.id}
             (track submission with {submission.id})"""
         )
         return submission

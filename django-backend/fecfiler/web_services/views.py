@@ -211,7 +211,8 @@ class WebServicesViewSet(viewsets.ViewSet):
             )
 
         """Start tracking submission"""
-        submission_id = WebPrintSubmission.objects.initiate_submission(report_id).id
+        submission = WebPrintSubmission.objects.initiate_submission(report)
+        submission_id = submission.id
 
         """Start Celery tasks in chain
         Notice that we don't send the upload submission id to `create_dot_fec`
