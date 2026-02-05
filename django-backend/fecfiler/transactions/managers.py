@@ -11,6 +11,7 @@ from fecfiler.transactions.schedule_e.managers import line_labels as line_labels
 from fecfiler.transactions.schedule_f.managers import line_labels as line_labels_f
 from django.db.models.functions import Coalesce, Concat
 from django.db.models import (
+    UUIDField,
     OuterRef,
     Subquery,
     F,
@@ -22,7 +23,7 @@ from django.db.models import (
 from decimal import Decimal
 from enum import Enum
 from ..reports.models import Report
-from fecfiler.reports.report_code_label import report_code_label_case
+from fecfiler.reports.report_code_label import report_code_label_case, report_type_case
 
 """Manager to deterimine fields that are used the same way across transactions,
 but are called different names"""
@@ -31,7 +32,49 @@ but are called different names"""
 class TransactionManager(SoftDeleteManager):
 
     def get_queryset(self):
-        return super().get_queryset().annotate(date=self.DATE_CLAUSE)
+        return super().get_queryset().annotate(
+            schedule=self.SCHEDULE_CLAUSE(),
+            date=self.DATE_CLAUSE,
+            amount=self.AMOUNT_CLAUSE,
+            incurred_prior=F("schedule_d__incurred_prior"),
+            payment_prior=F("schedule_d__payment_prior"),
+            payment_amount=F("schedule_d__payment_amount"),
+            beginning_balance=F("schedule_d__beginning_balance"),
+            balance_at_close=F("schedule_d__balance_at_close"),
+            form_type=self.FORM_TYPE_CLAUSE,
+            name=self.DISPLAY_NAME_CLAUSE,
+            transaction_ptr_id=F("id"),
+            back_reference_tran_id_number=self.BACK_REFERENCE_CLAUSE,
+            back_reference_sched_name=self.BACK_REFERENCE_NAME_CLAUSE,
+            loan_balance=Case(
+                When(
+                    schedule_c__isnull=False,
+                    then=F("amount")
+                    - Coalesce(F("loan_payment_to_date"), Decimal(0.0)),
+                ),
+            ),
+            balance=Case(
+                When(
+                    schedule_d__isnull=False,
+                    then=Coalesce(F("balance_at_close"), Value(Decimal(0.0))),
+                ),
+                When(
+                    schedule_c__isnull=False,
+                    then=Coalesce(F("loan_balance"), Decimal(0)),
+                ),
+            ),
+            calendar_ytd_per_election_office=Coalesce(
+                "parent_transaction__parent_transaction___calendar_ytd_per_election_office",  # noqa
+                "parent_transaction___calendar_ytd_per_election_office",
+                "_calendar_ytd_per_election_office",
+            ),
+            line_label=self.LINE_LABEL_CLAUSE(),
+            loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
+            report_code_label=self.REPORT_CODE_LABEL_CLAUSE(),
+            report_type=self.REPORT_TYPE_CLAUSE(),
+        ).alias(
+            order_key=self.ORDER_KEY_CLAUSE()
+        ).order_by("order_key")
 
     def SCHEDULE_CLAUSE(self):  # noqa: N802
         return Case(
@@ -108,59 +151,28 @@ class TransactionManager(SoftDeleteManager):
         output_field=TextField(),
     )
 
-    def transaction_view(self):
-        REPORT_CODE_LABEL_CLAUSE = Subquery(  # noqa: N806
-            Report.objects.filter(transactions=OuterRef("pk"))
+    def REPORT_CODE_LABEL_CLAUSE(self):
+        return Subquery(  # noqa: N806
+            Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
             .annotate(report_code_label=report_code_label_case)
             .values("report_code_label")[:1]
         )
 
-        return (
-            super()
-            .get_queryset()
-            .annotate(
-                schedule=self.SCHEDULE_CLAUSE(),
-                date=self.DATE_CLAUSE,
-                amount=self.AMOUNT_CLAUSE,
-                incurred_prior=F("schedule_d__incurred_prior"),
-                payment_prior=F("schedule_d__payment_prior"),
-                payment_amount=F("schedule_d__payment_amount"),
-                beginning_balance=F("schedule_d__beginning_balance"),
-                balance_at_close=F("schedule_d__balance_at_close"),
-                form_type=self.FORM_TYPE_CLAUSE,
-                name=self.DISPLAY_NAME_CLAUSE,
-                transaction_ptr_id=F("id"),
-                back_reference_tran_id_number=self.BACK_REFERENCE_CLAUSE,
-                back_reference_sched_name=self.BACK_REFERENCE_NAME_CLAUSE,
-                loan_balance=Case(
-                    When(
-                        schedule_c__isnull=False,
-                        then=F("amount")
-                        - Coalesce(F("loan_payment_to_date"), Decimal(0.0)),
-                    ),
-                ),
-                balance=Case(
-                    When(
-                        schedule_d__isnull=False,
-                        then=Coalesce(
-                            F("schedule_d__balance_at_close"), Value(Decimal(0.0))
-                        ),
-                    ),
-                    When(
-                        schedule_c__isnull=False,
-                        then=Coalesce(F("loan_balance"), Decimal(0)),
-                    ),
-                ),
-                calendar_ytd_per_election_office=Coalesce(
-                    "parent_transaction__parent_transaction___calendar_ytd_per_election_office",  # noqa
-                    "parent_transaction___calendar_ytd_per_election_office",
-                    "_calendar_ytd_per_election_office",
-                ),
-                line_label=self.LINE_LABEL_CLAUSE(),
-                report_code_label=REPORT_CODE_LABEL_CLAUSE,
-            )
-            .alias(order_key=self.ORDER_KEY_CLAUSE())
-            .order_by("order_key")
+    def REPORT_TYPE_CLAUSE(self):
+        return Subquery(  # noqa: N806
+            Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
+            .annotate(report_type=report_type_case)
+            .values("report_type")[:1]
+        )
+
+    def LOAN_AGREEMENT_CLAUSE(self):
+        return Subquery(
+            self.model._base_manager.filter(
+                parent_transaction_id=OuterRef("pk"),
+                transaction_type_identifier="C1_LOAN_AGREEMENT",
+                deleted__isnull=True,
+            ).values("id")[:1],
+            output_field=UUIDField(),
         )
 
     def ORDER_KEY_CLAUSE(self):  # noqa: N802

@@ -13,11 +13,11 @@ logger = structlog.get_logger(__name__)
 
 
 def process_aggregation_for_debts(transaction_instance):
-    transaction_view = Transaction.objects.transaction_view().filter(
+    transactions = Transaction.objects.filter(
         committee_account_id=transaction_instance.committee_account_id
     )
     # Get the transaction out of the queryset in order to populate annotated fields
-    transaction = transaction_view.filter(id=transaction_instance.id).first()
+    transaction = transactions.filter(id=transaction_instance.id).first()
     if transaction is None:
         return
 
@@ -27,7 +27,7 @@ def process_aggregation_for_debts(transaction_instance):
 
     debt_transaction_id = given_debt.transaction_id
 
-    debt_chain = transaction_view.filter(
+    debt_chain = transactions.filter(
         schedule_d__isnull=False,
         committee_account_id=given_debt.committee_account_id,
         transaction_id=debt_transaction_id,
@@ -46,7 +46,7 @@ def process_aggregation_for_debts(transaction_instance):
         )
 
         repayed_during = 0
-        repayments = transaction_view.filter(
+        repayments = transactions.filter(
             schedule_d__isnull=True,
             debt__id=debt.id,
         )
@@ -78,13 +78,12 @@ def process_aggregation_for_debts(transaction_instance):
 
 def process_aggregation_by_payee_candidate(transaction_instance):
     # Get the transaction out of the queryset in order to populate annotated fields
-    transaction_view = Transaction.objects.transaction_view()
-    transaction = transaction_view.filter(id=transaction_instance.id).first()
+    transaction = Transaction.objects.filter(id=transaction_instance.id).first()
 
     if transaction is None:
         return
 
-    queryset = transaction_view.filter(
+    queryset = Transaction.objects.filter(
         committee_account_id=transaction_instance.committee_account_id
     )
 

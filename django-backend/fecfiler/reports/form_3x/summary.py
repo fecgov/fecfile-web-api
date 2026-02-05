@@ -223,11 +223,11 @@ def calculate_summary_columns(report):
     return column_a, column_b
 
 
-def calculate_summary_column_a(report):
-
-    report_transactions = Transaction.objects.transaction_view().filter(
+def calculate_summary_column_a(report: Report):
+    committee_id = report.committee_account_id
+    report_transactions = Transaction.objects.filter(
         reports__id=report.id,
-        committee_account__id=report.committee_account.id,
+        committee_account_id=committee_id,
     )
     column_a = report_transactions.aggregate(
         line_11ai=get_line("SA11AI"),
@@ -323,12 +323,12 @@ def calculate_summary_column_a(report):
 
 
 def calculate_summary_column_b(report):
-    committee = report.committee_account
+    committee_id = report.committee_account_id
     report_date = report.coverage_through_date
     report_year = report_date.year
 
-    ytd_transactions = Transaction.objects.transaction_view().filter(
-        committee_account=committee,
+    ytd_transactions = Transaction.objects.filter(
+        committee_account_id=committee_id,
         date__year=report_year,
         date__lte=report_date,
     )
@@ -416,12 +416,16 @@ def calculate_summary_column_b(report):
 
 
 def calculate_cash_on_hand_fields(report, column_a, column_b):
-
-    reports_from_prior_years = Report.objects.filter(
-        Q(form_3x__isnull=False),
-        committee_account=report.committee_account,
-        coverage_through_date__year__lt=report.coverage_from_date.year,
-    ).order_by("coverage_from_date")
+    committee_id = report.committee_account_id
+    reports_from_prior_years = (
+        Report.objects.filter(
+            form_3x__isnull=False,
+            committee_account_id=committee_id,
+            coverage_through_date__year__lt=report.coverage_from_date.year,
+        )
+        .select_related("form_3x")
+        .order_by("coverage_from_date")
+    )
     closest_report_from_prior_years = reports_from_prior_years.last()
     year_of_closest_report = (
         closest_report_from_prior_years.coverage_from_date.year
@@ -433,26 +437,24 @@ def calculate_cash_on_hand_fields(report, column_a, column_b):
         for a year after the closest report from prior years """
     cash_on_hand_override = (
         CashOnHandYearly.objects.filter(
-            committee_account=report.committee_account,
+            committee_account_id=committee_id,
             year__lte=report.coverage_from_date.year,
             year__gt=year_of_closest_report,
         )
         .order_by("-year")
+        .values_list("cash_on_hand", flat=True)
         .first()
-    )
-
-    cash_on_hand_override = (
-        cash_on_hand_override.cash_on_hand if cash_on_hand_override else None
     )
 
     previous_report_this_year = (
         Report.objects.filter(
             ~Q(id=report.id),
             Q(form_3x__isnull=False),
-            committee_account=report.committee_account,
+            committee_account_id=committee_id,
             coverage_through_date__year=report.coverage_from_date.year,
             coverage_through_date__lt=report.coverage_from_date,
         )
+        .select_related("form_3x")
         .order_by("-coverage_through_date")
         .first()
     )

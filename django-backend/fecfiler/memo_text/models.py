@@ -60,11 +60,7 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
         if self.transaction_uuid is None:
             return None
 
-        return (
-            Transaction.objects.transaction_view()
-            .filter(id=self.transaction_uuid)
-            .first()
-        )
+        return Transaction.objects.filter(id=self.transaction_uuid).first()
 
     def generate_report_id(self):
         report_memos = MemoText.objects.filter(
