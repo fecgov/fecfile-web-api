@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('transactions', '0024_drop_aggregate_triggers'),
+        ("transactions", "0025_drop_aggregate_triggers"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='transaction',
-            name='itemized',
+            model_name="transaction",
+            name="itemized",
             field=models.BooleanField(db_default=False),
         ),
     ]

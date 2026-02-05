@@ -23,9 +23,12 @@ from fecfiler.transactions.serializers import (
     TransactionListSerializer,
     SCHEDULE_SERIALIZERS,
 )
-from fecfiler.transactions.utils_aggregation import (
+from fecfiler.transactions.utils_aggregation_queries import (
     filter_queryset_for_previous_transactions_in_aggregation,
-    update_aggregates_for_affected_transactions,
+)
+from fecfiler.transactions.utils_aggregation_prep import (
+    create_old_snapshot,
+    calculate_effective_amount,
 )
 from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
@@ -33,10 +36,6 @@ from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
 from fecfiler.transactions.schedule_d.views import save_hook as schedule_d_save_hook
-from fecfiler.transactions.aggregation import (
-    process_aggregation_for_debts,
-    process_aggregation_by_payee_candidate,
-)
 import structlog
 
 import os
@@ -106,20 +105,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return TransactionSerializer
 
     def get_queryset(self):
-        # Use the table if writing
-        if hasattr(self, "action") and self.action in [
-            "create",
-            "update",
-            "destroy",
-            "save_transactions",
-        ]:
-            queryset = super().get_queryset()
-        else:  # Otherwise, use the view for reading
-            committee_uuid = self.get_committee_uuid()
-            queryset = Transaction.objects.transaction_view().filter(
-                committee_account__id=committee_uuid
-            )
-
+        queryset = super().get_queryset()
         report_id = (
             (
                 self.request.query_params.get("report_id")
@@ -174,10 +160,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             response = super().destroy(request, *args, **kwargs)
             # update parents that depend on this transaction
             update_dependent_parent(transaction)
-            if transaction.is_debt_repayment():
-                process_aggregation_for_debts(transaction.debt)
-            elif transaction.schedule_d is not None:
-                process_aggregation_for_debts(transaction)
         return response
 
     def partial_update(self, request, pk=None):
@@ -187,6 +169,30 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
         return response
+
+    @action(detail=True, methods=["put"], url_path="update-itemization-aggregation")
+    def update_itemization_aggregation(self, request, pk=None):
+
+        transaction: Transaction = self.get_object()
+        transaction_data = self.get_serializer(transaction).data
+        transaction_data["report_ids"] = [
+            str(rep_id) for rep_id in transaction.reports.values_list("id", flat=True)
+        ]
+
+        allowed_fields = [
+            "force_itemized",
+            "force_unaggregated",
+            "schedule_id",
+            "schema_name",
+        ]
+        for field in allowed_fields:
+            if field in request.data:
+                transaction_data[field] = request.data[field]
+
+        with db_transaction.atomic():
+            self.save_transaction(transaction_data, request)
+
+        return Response(transaction.id)
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
     def previous_transaction_by_entity(self, request):
@@ -358,27 +364,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         if transaction_data.get("form_type"):
             transaction_data["_form_type"] = transaction_data["form_type"]
 
-        # Original values used to manually trigger aggregate recalculation
+        # Track original instance for aggregation
         original_instance = None
-        original_date = None
-        original_contact_1 = None
-        original_contact_2 = None
-        original_election_code = None
-        original_election_year = None
 
         is_existing = "id" in transaction_data
+        old_snapshot = None  # Initialize early
+
         if is_existing:
             original_instance = Transaction.objects.get(pk=transaction_data["id"])
             if original_instance is not None:
-                original_date = original_instance.get_date()
-                original_contact_1 = original_instance.contact_1
-                original_contact_2 = original_instance.contact_2
-                original_election_code = getattr(
-                    original_instance.get_schedule(), "election_code", None
-                )
-                original_election_year = getattr(
-                    original_instance.get_schedule(), "general_election_year", None
-                )
+                # Capture old_snapshot IMMEDIATELY after loading, before serializer
+                # modifies it
+                if schedule in ["A", "B", "F"]:
+                    eff = calculate_effective_amount(original_instance)
+                    old_snapshot = create_old_snapshot(original_instance, eff)
 
             transaction_serializer = TransactionSerializer(
                 original_instance,
@@ -409,14 +408,23 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             ]
             if contact_key in transaction_data
         }
+
         transaction_serializer.is_valid(raise_exception=True)
         schedule_serializer.is_valid(raise_exception=True)
 
         schedule_instance = schedule_serializer.save()
-        transaction_instance = transaction_serializer.save(
-            **{SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance},
+
+        # Store old_snapshot on transaction instance so model.save() can access it
+        if old_snapshot and original_instance:
+            original_instance._passed_old_snapshot = old_snapshot
+
+        # Pass old_snapshot to transaction.save() via kwargs (for schedules A, B, F)
+        save_kwargs = {
+            SCHEDULE_TO_TABLE[Schedule.__dict__[schedule]]: schedule_instance,
             **contact_instances,
-        )
+        }
+
+        transaction_instance = transaction_serializer.save(**save_kwargs)
 
         # Link the transaction to all the reports it references in report_ids
         transaction_instance.reports.set(report_ids)
@@ -452,37 +460,29 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             is_existing,
         )
 
-        # Manually trigger aggregate recalculation
-        # ---- Currently Schedule F only
-        self.process_aggregation(
-            transaction_instance,
-            {
-                "instance": original_instance,
-                "date": original_date,
-                "contact_1": original_contact_1,
-                "contact_2": original_contact_2,
-                "election_code": original_election_code,
-                "election_year": original_election_year,
-            },
-        )
-
         for child_transaction_data in children:
             if type(child_transaction_data) is str:
-                Transaction.objects.filter(id=child_transaction_data).update(
-                    parent_transaction_id=transaction_instance.id
-                )
-                # Explicitly update aggregates and itemization for the child
+                # Capture old state BEFORE updating
                 try:
-                    child_instance = Transaction.objects.get(id=child_transaction_data)
-                    # Only trigger service for schedules A, B, and E
+                    child_instance = Transaction.objects.select_related(
+                        "schedule_a", "schedule_b", "schedule_e", "contact_2"
+                    ).get(id=child_transaction_data)
+
+                    # Capture old snapshot if this is an aggregating schedule
+                    old_snapshot = None
                     if child_instance.get_schedule_name() in [
                         Schedule.A,
                         Schedule.B,
                         Schedule.E,
                     ]:
-                        update_aggregates_for_affected_transactions(
-                            child_instance, "update"
-                        )
+                        eff = calculate_effective_amount(child_instance)
+                        old_snapshot = create_old_snapshot(child_instance, eff)
+
+                    # Update parent via model save to trigger aggregation
+                    child_instance.parent_transaction_id = transaction_instance.id
+                    if old_snapshot:
+                        child_instance._passed_old_snapshot = old_snapshot
+                    child_instance.save()
                 except Transaction.DoesNotExist:
                     pass
             else:
@@ -503,56 +503,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         update_dependent_children(transaction_instance)
         delete_carried_forward_loans_if_needed(transaction_instance, committee_id)
         delete_carried_forward_debts_if_needed(transaction_instance, committee_id)
-
-        # Set the earlier date in order to detect when a transaction has moved forward
-        if original_date and original_date < schedule_instance.get_date():
-            next_transactions_by_entity = (
-                Transaction.objects.get_queryset()
-                .filter(
-                    ~Q(id=original_instance.id),
-                    Q(date__year=original_date.year),
-                    Q(contact_1=original_contact_1),
-                    Q(date__gt=original_date)
-                    | Q(date=original_date, created__gt=original_instance.created),
-                )
-                .order_by("date")
-            )
-
-            # Default next_transactions_by_election the same queryset as entities
-            next_transactions_by_election = next_transactions_by_entity[:0]
-
-            if original_contact_2 is not None:
-                # Capturing these in variables to cut down on line width
-                original_district = original_contact_2.candidate_district
-                original_office = original_contact_2.candidate_office
-                original_state = original_contact_2.candidate_state
-
-                next_transactions_by_election = (
-                    self.get_queryset()
-                    .filter(
-                        ~Q(id=original_instance.id),
-                        Q(
-                            contact_2__candidate_district=original_district,
-                            contact_2__candidate_office=original_office,
-                            contact_2__candidate_state=original_state,
-                        ),
-                        Q(date__gt=original_date)
-                        | Q(date=original_date, created__gt=original_instance.created),
-                        Q(
-                            schedule_e__isnull=False,
-                            schedule_e__election_code=original_election_code,
-                        ),
-                    )
-                    .order_by("date")
-                )
-
-            next_entity = next_transactions_by_entity.first()
-            next_election = next_transactions_by_election.first()
-
-            if next_entity is not None:
-                next_entity.save()
-            if next_election is not None:
-                next_election.save()
 
         return self.queryset.get(id=transaction_instance.id)
 
@@ -577,151 +527,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         for data in saved_data:
             ids.append(data.id)
         return Response(ids)
-
-    # Manually process aggregation for a given transaction,
-    # and if updating an existing transaction, check for edge cases
-    def process_aggregation(self, transaction_instance, original_values):
-        leapfrogged = False
-        if original_values["instance"] is not None:
-            leapfrogged = self.handle_date_leapfrogging(
-                transaction_instance, original_values
-            )
-            self.handle_broken_transaction_chain(transaction_instance, original_values)
-
-        if not leapfrogged:
-            schedule = transaction_instance.get_schedule_name()
-            match schedule:
-                case (
-                    Schedule.A
-                    | Schedule.B
-                    | Schedule.C
-                    | Schedule.C1
-                    | Schedule.C2
-                    | Schedule.D
-                ):  # noqa: E501
-                    # process_aggregation_by_entity()
-                    pass
-                case Schedule.E:
-                    # process_aggregation_by_election()
-                    pass
-                case Schedule.F:
-                    process_aggregation_by_payee_candidate(transaction_instance)
-
-        if transaction_instance.is_debt_repayment() or (
-            transaction_instance.schedule_d is not None
-        ):
-            process_aggregation_for_debts(transaction_instance)
-
-    # If a transaction has been moved forward, update the aggregate values
-    # for any transactions that were "leaped over"
-    # Returns a boolean value based on whether or not a leapfrogging event occurred
-    def handle_date_leapfrogging(self, transaction_instance, original_values):
-        schedule = transaction_instance.get_schedule()
-        schedule_type = transaction_instance.get_schedule_name()
-        original_date = original_values["date"]
-        # Set the earlier date in order to detect when a transaction has moved forward
-        if original_date and original_date < schedule.get_date():
-            match schedule_type:
-                case (
-                    Schedule.A
-                    | Schedule.B
-                    | Schedule.C
-                    | Schedule.C1
-                    | Schedule.C2
-                    | Schedule.D
-                ):  # noqa: E501
-                    # handle_leapfrogging_entity
-                    pass
-                case Schedule.E:
-                    # handle_leapfrogging_election_code
-                    pass
-                case Schedule.F:
-                    self.handle_leapfrogging_election_year(original_values)
-            return True
-        return False
-
-    def handle_leapfrogging_election_year(self, original_values):
-        original_contact_2 = original_values["contact_2"]
-        original_instance = original_values["instance"]
-        original_election_year = original_values["election_year"]
-        original_date = original_values["date"]
-
-        # Handle date leap-frogging just for Schedule F transactions
-        if original_contact_2 is not None and original_election_year:
-            leapfrogged_sch_f_transactions = (
-                self.get_queryset()
-                .filter(
-                    ~Q(id=original_instance.id),
-                    Q(
-                        contact_2_id=original_contact_2.id,
-                        schedule_f__isnull=False,
-                        schedule_f__general_election_year=original_election_year,
-                    ),
-                    Q(date__gt=original_date)
-                    | Q(date=original_date, created__gt=original_instance.created),
-                )
-                .order_by("date")
-            )
-
-            to_recalculate = leapfrogged_sch_f_transactions.first()
-            if to_recalculate is not None:
-                process_aggregation_by_payee_candidate(to_recalculate)
-
-    # If a transaction has been updated in such a way that would change which transactions
-    # it would aggregate with, such as switching to a different contact or election code,
-    # then recalculate the aggregates for the prior chain of transactions
-    def handle_broken_transaction_chain(self, transaction_instance, original_values):
-        schedule = transaction_instance.get_schedule_name()
-        match schedule:
-            case (
-                Schedule.A
-                | Schedule.B
-                | Schedule.C
-                | Schedule.C1
-                | Schedule.C2
-                | Schedule.D
-            ):  # noqa: E501
-                # handle_broken_transaction_chain_entity
-                pass
-            case Schedule.E:
-                # handle_broken_transaction_chain_election_code
-                pass
-            case Schedule.F:
-                self.handle_broken_transaction_chain_election_year(
-                    transaction_instance, original_values
-                )
-
-    def handle_broken_transaction_chain_election_year(
-        self, transaction_instance, original_values
-    ):
-        original_election_year = original_values["election_year"]
-        original_instance = original_values["instance"]
-        original_contact_2 = original_values["contact_2"]
-        original_date = original_values["date"]
-
-        if (
-            original_election_year is not None
-            and original_election_year
-            != transaction_instance.schedule_f.general_election_year  # noqa: E501
-        ):
-            leapfrogged_sch_f_transactions = (
-                self.get_queryset()
-                .filter(
-                    ~Q(id=original_instance.id),
-                    Q(
-                        contact_2_id=original_contact_2.id,
-                        schedule_f__isnull=False,
-                        schedule_f__general_election_year=original_election_year,
-                    ),
-                    Q(date__gt=original_date)
-                    | Q(date=original_date, created__gt=original_instance.created),
-                )
-                .order_by("date")
-            )
-
-            to_recalculate = leapfrogged_sch_f_transactions.first()
-            if to_recalculate is not None:
-                process_aggregation_by_payee_candidate(to_recalculate)
 
     @action(detail=False, methods=["post"], url_path=r"add-to-report")
     def add_transaction_to_report(self, request):
@@ -789,7 +594,7 @@ def stringify_queryset(qs):
 
 def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_id):
     if transaction.is_loan_repayment() is True:
-        current_loan = Transaction.objects.transaction_view().get(pk=transaction.loan_id)
+        current_loan = Transaction.objects.get(pk=transaction.loan_id)
         current_loan_balance = current_loan.loan_balance
         original_loan_id = current_loan.loan_id or current_loan.id
         if current_loan_balance == 0:
@@ -809,7 +614,7 @@ def delete_carried_forward_loans_if_needed(transaction: Transaction, committee_i
 
 def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_id):
     if transaction.is_debt_repayment() is True:
-        current_debt = Transaction.objects.transaction_view().get(pk=transaction.debt_id)
+        current_debt = Transaction.objects.get(pk=transaction.debt_id)
         current_debt_balance = current_debt.balance_at_close
         original_debt_id = current_debt.debt_id or current_debt.id
         if current_debt_balance == 0:
@@ -825,4 +630,3 @@ def delete_carried_forward_debts_if_needed(transaction: Transaction, committee_i
             )
             for transaction_to_delete in transactions_to_delete:
                 transaction_to_delete.delete()
-        process_aggregation_for_debts(current_debt)

@@ -14,6 +14,7 @@ from fecfiler.transactions.schedule_c2.utils import add_schedule_c2_contact_fiel
 from fecfiler.transactions.schedule_d.utils import add_schedule_d_contact_fields
 from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
 from fecfiler.transactions.schedule_f.utils import add_schedule_f_contact_fields
+from fecfiler.transactions.itemization import calculate_itemization
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -62,10 +63,13 @@ def compose_transaction(transaction: Transaction):
     if transaction.schedule_f:
         add_schedule_f_contact_fields(transaction)
 
+    # Calculate itemization based on current aggregate and force_itemized
+    transaction.itemized = calculate_itemization(transaction)
+
 
 def compose_transactions(report_id):
     report = Report.objects.get(id=report_id)
-    transactions = Transaction.objects.transaction_view().filter(
+    transactions = Transaction.objects.filter(
         reports__id=report_id,
         committee_account__id=report.committee_account.id,
     )

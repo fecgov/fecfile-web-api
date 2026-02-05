@@ -225,7 +225,7 @@ def calculate_summary_columns(report):
 
 def calculate_summary_column_a(report):
 
-    report_transactions = Transaction.objects.transaction_view().filter(
+    report_transactions = Transaction.objects.filter(
         reports__id=report.id,
         committee_account__id=report.committee_account.id,
     )
@@ -327,7 +327,7 @@ def calculate_summary_column_b(report):
     report_date = report.coverage_through_date
     report_year = report_date.year
 
-    ytd_transactions = Transaction.objects.transaction_view().filter(
+    ytd_transactions = Transaction.objects.filter(
         committee_account=committee,
         date__year=report_year,
         date__lte=report_date,

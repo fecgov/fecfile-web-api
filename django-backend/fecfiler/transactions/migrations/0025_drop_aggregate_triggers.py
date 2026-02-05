@@ -7,7 +7,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("transactions", "0023_optimize_calculate_loan_payment_to_date"),
+        ("transactions", "0024_scheduled_balance_at_close_and_more"),
     ]
 
     operations = [
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
             FOR EACH ROW
             WHEN (pg_trigger_depth() = 0)
             EXECUTE FUNCTION after_transactions_transaction();
-            """
+            """,
         ),
         migrations.RunSQL(
             """
@@ -99,7 +99,7 @@ class Migration(migrations.Migration):
                     txn.aggregation_group;
             END;
             $$ LANGUAGE plpgsql;
-            """
+            """,
         ),
         migrations.RunSQL(
             """
@@ -217,7 +217,7 @@ class Migration(migrations.Migration):
                     txn.committee_account_id;
             END;
             $$ LANGUAGE plpgsql;
-            """
+            """,
         ),
         migrations.RunSQL(
             """
@@ -275,7 +275,7 @@ class Migration(migrations.Migration):
                 RETURN effective_amount;
             END;
             $$ LANGUAGE plpgsql;
-            """
+            """,
         ),
         migrations.RunSQL(
             """
@@ -328,7 +328,7 @@ class Migration(migrations.Migration):
                 );
             END;
             $$ LANGUAGE plpgsql;
-            """
+            """,
         ),
         migrations.RunSQL(
             """
@@ -449,7 +449,7 @@ class Migration(migrations.Migration):
                 USING txn.id, txn.loan_id;
             END;
             $$ LANGUAGE plpgsql;
-            """
+            """,
         ),
         migrations.RunSQL(
             """
@@ -499,7 +499,7 @@ class Migration(migrations.Migration):
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
-            """
+            """,
         ),
         migrations.RunSQL(
             """
@@ -560,6 +560,6 @@ class Migration(migrations.Migration):
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
-            """
+            """,
         ),
     ]

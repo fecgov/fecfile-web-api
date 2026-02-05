@@ -9,10 +9,6 @@ TRANSACTION_MANAGER_PROFILING = [
     },
     {
         "module": "fecfiler.transactions.managers",
-        "function": "TransactionManager.transaction_view",
-    },
-    {
-        "module": "fecfiler.transactions.managers",
         "function": "TransactionManager.ORDER_KEY_CLAUSE",
     },
     {
