@@ -9,7 +9,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 import uuid
 
 
-def add_schedule_a_to_transaction(transaction_list):
+def add_schedule_a_to_transaction(transaction_list, *args, **kwargs):
     for transaction in transaction_list:
         transaction.schedule_a = ScheduleA(
             **{
@@ -19,7 +19,7 @@ def add_schedule_a_to_transaction(transaction_list):
     return transaction_list
 
 
-def add_schedule_b_to_transaction(transaction_list):
+def add_schedule_b_to_transaction(transaction_list, *args, **kwargs):
     for transaction in transaction_list:
         transaction.schedule_b = ScheduleB(
             **{
@@ -27,6 +27,10 @@ def add_schedule_b_to_transaction(transaction_list):
             }
         )
     return transaction_list
+
+
+def return_only_first_argument(arg, *args, **kwargs):
+    return arg
 
 
 class LocustDataGeneratorTestCase(TestCase):
@@ -37,11 +41,11 @@ class LocustDataGeneratorTestCase(TestCase):
 
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Form3X.objects.bulk_create",
-        side_effect=lambda x: x,
+        side_effect=return_only_first_argument,
     )
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Report.objects.bulk_create",
-        side_effect=lambda x: x,
+        side_effect=return_only_first_argument,
     )
     def test_generate_form_3x(self, mock_report_bulk_create, mock_form3x_bulk_create):
         result = self.locust_data_generator.generate_form_3x(3)
@@ -56,7 +60,7 @@ class LocustDataGeneratorTestCase(TestCase):
 
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Contact.objects.bulk_create",
-        side_effect=lambda x: x,
+        side_effect=return_only_first_argument,
     )
     def test_generate_contacts(self, mock_contact_bulk_create):
         result = self.locust_data_generator.generate_contacts(3)
@@ -71,7 +75,7 @@ class LocustDataGeneratorTestCase(TestCase):
 
     @patch(
         "fecfiler.devops.utils.locust_data_generator.ScheduleA.objects.bulk_create",
-        side_effect=lambda x: x,
+        side_effect=return_only_first_argument,
     )
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Transaction.objects.bulk_create",
@@ -79,7 +83,8 @@ class LocustDataGeneratorTestCase(TestCase):
     )
     @patch(
         "fecfiler.devops.utils.locust_data_generator"
-        ".ReportTransaction.objects.bulk_create"
+        ".ReportTransaction.objects.bulk_create",
+        side_effect=return_only_first_argument,
     )
     def test_generate_single_schedule_a_transactions(
         self,
@@ -112,7 +117,7 @@ class LocustDataGeneratorTestCase(TestCase):
             3, test_reports, test_contacts
         )
         self.assertEqual(len(result), 3)
-        mock_transaction_bulk_create.assert_called_with(result)
+        mock_transaction_bulk_create.assert_called_with(result, batch_size=100)
         for transaction in result:
             self.assertIsNotNone(transaction.id)
             self.assertEqual(
@@ -160,7 +165,7 @@ class LocustDataGeneratorTestCase(TestCase):
 
     @patch(
         "fecfiler.devops.utils.locust_data_generator.ScheduleB.objects.bulk_create",
-        side_effect=lambda x: x,
+        side_effect=return_only_first_argument,
     )
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Transaction.objects.bulk_create",
@@ -168,7 +173,8 @@ class LocustDataGeneratorTestCase(TestCase):
     )
     @patch(
         "fecfiler.devops.utils.locust_data_generator"
-        ".ReportTransaction.objects.bulk_create"
+        ".ReportTransaction.objects.bulk_create",
+        side_effect=return_only_first_argument,
     )
     def test_generate_single_schedule_b_transactions(
         self,
@@ -201,7 +207,7 @@ class LocustDataGeneratorTestCase(TestCase):
             3, test_reports, test_contacts
         )
         self.assertEqual(len(result), 3)
-        mock_transaction_bulk_create.assert_called_with(result)
+        mock_transaction_bulk_create.assert_called_with(result, batch_size=100)
         for transaction in result:
             self.assertIsNotNone(transaction.id)
             self.assertEqual(
