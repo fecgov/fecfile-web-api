@@ -25,7 +25,7 @@ def add_schedule_c_contact_fields(instance, representation=None):
 
 def carry_forward_loans(report):
     if report.previous_report:
-        loans_to_carry_forward = Transaction.objects.transaction_view().filter(
+        loans_to_carry_forward = Transaction.objects.filter(
             ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
             ~Q(memo_code=True),
             reports=report.previous_report,

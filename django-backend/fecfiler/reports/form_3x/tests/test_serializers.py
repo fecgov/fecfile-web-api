@@ -2,7 +2,7 @@ from django.test import TestCase
 from ..serializers import (
     Form3XSerializer,
     COVERAGE_DATE_REPORT_CODE_COLLISION,
-    COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS
+    COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS,
 )
 from fecfiler.user.models import User
 from fecfiler.reports.models import Report
@@ -14,6 +14,13 @@ from fecfiler.web_services.models import (
     FECStatus,
     FECSubmissionState,
     UploadSubmission,
+)
+from fecfiler.reports.managers import (
+    REPORT_STATUS_MAP,
+    STATUS_CODE_IN_PROGRESS,
+    STATUS_CODE_SUCCESS,
+    STATUS_CODE_PENDING,
+    STATUS_CODE_FAILED,
 )
 
 
@@ -88,7 +95,10 @@ class F3XSerializerTestCase(TestCase):
         f3x_report = Report.objects.get(id=f3x_report.id)
         valid_serializer.is_valid()
         representation = valid_serializer.to_representation(f3x_report)
-        self.assertEqual(representation["report_status"], "In progress")
+        self.assertEqual(
+            representation["report_status"],
+            REPORT_STATUS_MAP.get(STATUS_CODE_IN_PROGRESS),
+        )
 
         # .fec has been submitted but a result is pending
         f3x_report.upload_submission = UploadSubmission.objects.initiate_submission(
@@ -97,7 +107,9 @@ class F3XSerializerTestCase(TestCase):
         # retrieve from manager to populate annotations
         f3x_report = Report.objects.get(id=f3x_report.id)
         representation = valid_serializer.to_representation(f3x_report)
-        self.assertEqual(representation["report_status"], "Submission pending")
+        self.assertEqual(
+            representation["report_status"], REPORT_STATUS_MAP.get(STATUS_CODE_PENDING)
+        )
 
         # .fec was submitted and efo came back with an 'Accepted'
         f3x_report.upload_submission.fec_status = FECStatus.ACCEPTED
@@ -105,7 +117,9 @@ class F3XSerializerTestCase(TestCase):
         # retrieve from manager to populate annotations
         f3x_report = Report.objects.get(id=f3x_report.id)
         representation = valid_serializer.to_representation(f3x_report)
-        self.assertEqual(representation["report_status"], "Submission success")
+        self.assertEqual(
+            representation["report_status"], REPORT_STATUS_MAP.get(STATUS_CODE_SUCCESS)
+        )
 
         # an error occured at some point on our side after the user submitted
         f3x_report.upload_submission.fecfile_task_state = FECSubmissionState.FAILED
@@ -114,7 +128,9 @@ class F3XSerializerTestCase(TestCase):
         # retrieve from manager to populate annotations
         f3x_report = Report.objects.get(id=f3x_report.id)
         representation = valid_serializer.to_representation(f3x_report)
-        self.assertEqual(representation["report_status"], "Submission failure")
+        self.assertEqual(
+            representation["report_status"], REPORT_STATUS_MAP.get(STATUS_CODE_FAILED)
+        )
 
         # .fec was submitted and efo came back with a 'rejected'
         f3x_report.upload_submission.fecfile_task_state = FECSubmissionState.SUBMITTING
@@ -123,7 +139,9 @@ class F3XSerializerTestCase(TestCase):
         # retrieve from manager to populate annotations
         f3x_report = Report.objects.get(id=f3x_report.id)
         representation = valid_serializer.to_representation(f3x_report)
-        self.assertEqual(representation["report_status"], "Submission failure")
+        self.assertEqual(
+            representation["report_status"], REPORT_STATUS_MAP.get(STATUS_CODE_FAILED)
+        )
 
     def test_update_coverage_to_overlapping_dates(self):
         report_a = create_form3x(self.committee, "2024-01-01", "2024-03-31")
@@ -138,17 +156,13 @@ class F3XSerializerTestCase(TestCase):
             type(COVERAGE_DATE_REPORT_CODE_COLLISION),
             serializer.update,
             report_a,
-            {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-05-31"}
+            {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-05-31"},
         )
 
     def test_update_coverage_to_exclude_transaction(self):
         report_a = create_form3x(self.committee, "2024-01-01", "2024-03-31")
         create_schedule_a(
-            "INDIVIDUAL_RECEIPT",
-            self.committee, None,
-            "2024-03-31",
-            250,
-            report=report_a
+            "INDIVIDUAL_RECEIPT", self.committee, None, "2024-03-31", 250, report=report_a
         )
 
         serializer = Form3XSerializer(
@@ -160,7 +174,7 @@ class F3XSerializerTestCase(TestCase):
             type(COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS),
             serializer.update,
             report_a,
-            {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-02-28"}
+            {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-02-28"},
         )
 
     def test_update_coverage_to_exclude_memo_transaction(self):
@@ -172,7 +186,7 @@ class F3XSerializerTestCase(TestCase):
             "2024-03-31",
             250,
             report=report_a,
-            memo_code=True
+            memo_code=True,
         )
 
         serializer = Form3XSerializer(
@@ -185,10 +199,10 @@ class F3XSerializerTestCase(TestCase):
                 report_a,
                 {
                     "coverage_from_date": "2024-01-01",
-                    "coverage_through_date": "2024-02-28"
-                }
+                    "coverage_through_date": "2024-02-28",
+                },
             ),
-            report_a
+            report_a,
         )
 
     def test_update_coverage_to_exclude_deleted_transaction(self):
@@ -200,7 +214,7 @@ class F3XSerializerTestCase(TestCase):
             "2024-03-31",
             250,
             report=report_a,
-            memo_code=False
+            memo_code=False,
         )
         transaction.delete()
 
@@ -214,8 +228,8 @@ class F3XSerializerTestCase(TestCase):
                 report_a,
                 {
                     "coverage_from_date": "2024-01-01",
-                    "coverage_through_date": "2024-02-28"
-                }
+                    "coverage_through_date": "2024-02-28",
+                },
             ),
-            report_a
+            report_a,
         )

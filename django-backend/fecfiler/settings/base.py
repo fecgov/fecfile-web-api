@@ -116,14 +116,17 @@ if INCLUDE_SILK:
         "django.contrib.staticfiles",
     ]
     MIDDLEWARE = ["silk.middleware.SilkyMiddleware"]
-    # Static files (CSS, JavaScript, Images)
-    # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
     SILKY_PYTHON_PROFILER = True
-    SILKY_PYTHON_PROFILER_BINARY = True
 
-    # the sub-directories of media and static files
-    STATICFILES_LOCATION = "static"
+    # Set SILKY_PYTHON_PROFILER_BINARY to True for cProfiling
+    SILKY_PYTHON_PROFILER_BINARY = False
+
+    # Don't profile static assets
+    def custom_silk_filter(request):
+        return STATIC_URL not in request.path
+    SILKY_INTERCEPT_FUNC = custom_silk_filter
+
     SILKY_DYNAMIC_PROFILING = WEB_SERVICES_PROFILING
 
 

@@ -29,6 +29,14 @@ report_code_label_mapping = {
     "M12": "DECEMBER 20 MONTHLY (M12)",
 }
 
+text_code_mapping = {
+    "MST": "Miscellaneous Report to the FEC",
+    "MSM": "Filing Frequency Change Notice",
+    "MSW": "Loan Agreement / Loan Forgiveness",
+    "MSI": "Disavowal Response",
+    "MSR": "Form 3L Filing Frequency Change Notice",
+}
+
 # Generate the Case object
 report_code_label_case = Case(
     *[When(report_code=k, then=Value(v)) for k, v in report_code_label_mapping.items()],
@@ -36,7 +44,17 @@ report_code_label_case = Case(
         form_24__isnull=False,
         then=F("form_24__name"),
     ),
-    When(form_99__isnull=False, then=Value("")),
+    When(
+        form_99__isnull=False,
+        then=Case(
+            *[
+                When(form_99__text_code=code, then=Value(label))
+                for code, label in text_code_mapping.items()
+            ],
+            default=Value("Miscellaneous Report to the FEC"),
+            output_field=CharField(),
+        ),
+    ),
     When(form_1m__isnull=False, then=Value("NOTIFICATION OF MULTICANDIDATE STATUS")),
     output_field=CharField(),
 )
@@ -48,3 +66,13 @@ def get_report_code_label(report: Report):
     if report.form_24:
         return f"{report.form_24.report_type_24_48} HOUR"
     return ""
+
+
+report_type_case = Case(
+    When(form_3__isnull=False, then=Value("Form 3")),
+    When(form_3x__isnull=False, then=Value("Form 3X")),
+    When(form_24__isnull=False, then=Value("Form 24")),
+    When(form_99__isnull=False, then=Value("Form 99")),
+    When(form_1m__isnull=False, then=Value("Form 1M")),
+    output_field=CharField(),
+)

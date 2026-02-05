@@ -65,7 +65,7 @@ def compose_transaction(transaction: Transaction):
 
 def compose_transactions(report_id):
     report = Report.objects.get(id=report_id)
-    transactions = Transaction.objects.transaction_view().filter(
+    transactions = Transaction.objects.filter(
         reports__id=report_id,
         committee_account__id=report.committee_account.id,
     )
