@@ -30,7 +30,6 @@ from django.db.models import (
     RowRange,
     Window,
     TextField,
-    Sum,
 )
 from decimal import Decimal
 from enum import Enum
