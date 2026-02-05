@@ -618,7 +618,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             reatt_redes.delete()
 
         # Delete any reattribution/redesignation transactions
-        # related to this transaction (copy/from/to)"
+        # related to this transaction (copy/from/to)
         reatributions_and_redesignations = Transaction.objects.filter(reatt_redes=self)
         for reatribuiton_or_redesignation in reatributions_and_redesignations:
             reatribuiton_or_redesignation.delete()
