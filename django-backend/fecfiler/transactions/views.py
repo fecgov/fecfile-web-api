@@ -251,7 +251,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return Response("Transaction removed from report")
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
-    def previous_transaction_by_entity(self, request):
+    def previous_aggregate_by_entity(self, request):
         try:
             contact_1_id = request.query_params["contact_1_id"]
             assert (
@@ -270,7 +270,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return self.find_and_process_previous(request, filters)
 
     @action(detail=False, methods=["get"], url_path=r"previous/election")
-    def previous_transaction_by_election(self, request):
+    def previous_aggregate_by_election(self, request):
         try:
             election_code = request.query_params["election_code"]
             office = request.query_params["candidate_office"]
@@ -301,7 +301,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         return self.find_and_process_previous(request, filters)
 
     @action(detail=False, methods=["get"], url_path=r"previous/payee-candidate")
-    def previous_transaction_by_payee_candidate(self, request):
+    def previous_aggregate_by_payee_candidate(self, request):
         try:
             contact_2_id = request.query_params["contact_2_id"]
             gen_election_year = request.query_params["general_election_year"]
