@@ -15,9 +15,9 @@ defaults: &defaults
     DISABLE_COLLECTSTATIC: 1
     DJANGO_SETTINGS_MODULE: fecfiler.settings.production
     FFAPI_COOKIE_DOMAIN: app.cloud.gov
-    LOGIN_REDIRECT_CLIENT_URL: https://load-dev.fecfile.fec.gov
-    LOGIN_REDIRECT_SERVER_URL: https://load-dev-api.fecfile.fec.gov/api/v1/oidc/login-redirect
-    LOGOUT_REDIRECT_URL: https://dev-api.fecfile.fec.gov/api/v1/oidc/logout-redirect
+    LOGIN_REDIRECT_CLIENT_URL: https://load-dev.cloud.fec.gov
+    LOGIN_REDIRECT_SERVER_URL: https://load-dev-api.cloud.gov/api/v1/oidc/login-redirect
+    LOGOUT_REDIRECT_URL: https://dev-api.cloud.fec.gov/api/v1/oidc/logout-redirect
     MOCK_OIDC_PROVIDER: True
     OIDC_OP_AUTODISCOVER_ENDPOINT: https://idp.int.identitysandbox.gov/.well-known/openid-configuration
     PRODUCTION_OPEN_FEC_API: https://api.open.fec.gov/v1/
