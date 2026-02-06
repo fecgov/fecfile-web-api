@@ -205,6 +205,7 @@ services:
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://load-dev-api.app.cloud.gov -r .5
+    # command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080 -r .5
     profiles: [locust]
 
   locust-follower:
