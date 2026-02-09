@@ -73,6 +73,7 @@ fecfiler.transactions.managers.TransactionManager
       ~TransactionManager.from_queryset
       ~TransactionManager.get
       ~TransactionManager.get_or_create
+      ~TransactionManager.get_previous_queryset
       ~TransactionManager.get_queryset
       ~TransactionManager.hard_delete
       ~TransactionManager.in_bulk

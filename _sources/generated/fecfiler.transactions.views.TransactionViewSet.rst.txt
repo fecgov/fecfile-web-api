@@ -21,6 +21,7 @@ fecfiler.transactions.views.TransactionViewSet
    
       ~TransactionViewSet.__init__
       ~TransactionViewSet.add_transaction_to_report
+      ~TransactionViewSet.adjust_running_totals
       ~TransactionViewSet.as_view
       ~TransactionViewSet.check_object_permissions
       ~TransactionViewSet.check_permissions
@@ -31,6 +32,7 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.dispatch
       ~TransactionViewSet.filter_queryset
       ~TransactionViewSet.finalize_response
+      ~TransactionViewSet.find_and_process_previous
       ~TransactionViewSet.get_authenticate_header
       ~TransactionViewSet.get_authenticators
       ~TransactionViewSet.get_committee_uuid
@@ -45,7 +47,6 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.get_parser_context
       ~TransactionViewSet.get_parsers
       ~TransactionViewSet.get_permissions
-      ~TransactionViewSet.get_previous
       ~TransactionViewSet.get_queryset
       ~TransactionViewSet.get_renderer_context
       ~TransactionViewSet.get_renderers
@@ -54,7 +55,6 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.get_serializer_context
       ~TransactionViewSet.get_success_headers
       ~TransactionViewSet.get_throttles
-      ~TransactionViewSet.get_transaction_in_params
       ~TransactionViewSet.get_view_description
       ~TransactionViewSet.get_view_name
       ~TransactionViewSet.handle_broken_transaction_chain
@@ -75,9 +75,9 @@ fecfiler.transactions.views.TransactionViewSet
       ~TransactionViewSet.perform_destroy
       ~TransactionViewSet.perform_update
       ~TransactionViewSet.permission_denied
-      ~TransactionViewSet.previous_transaction_by_election
-      ~TransactionViewSet.previous_transaction_by_entity
-      ~TransactionViewSet.previous_transaction_by_payee_candidate
+      ~TransactionViewSet.previous_aggregate_by_election
+      ~TransactionViewSet.previous_aggregate_by_entity
+      ~TransactionViewSet.previous_aggregate_by_payee_candidate
       ~TransactionViewSet.process_aggregation
       ~TransactionViewSet.raise_uncaught_exception
       ~TransactionViewSet.remove_transaction_from_report

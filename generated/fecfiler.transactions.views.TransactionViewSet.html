@@ -54,35 +54,41 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_transaction_to_report</span></code>(request)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.as_view" title="fecfiler.transactions.views.TransactionViewSet.as_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_view</span></code></a>([actions])</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">adjust_running_totals</span></code>(target, source)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.as_view" title="fecfiler.transactions.views.TransactionViewSet.as_view"><code class="xref py py-obj docutils literal notranslate"><span class="pre">as_view</span></code></a>([actions])</p></td>
 <td><p>Because of the way class based views create a closure around the instantiated view, we need to totally reimplement <cite>.as_view</cite>, and slightly modify the view function that is created and returned.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.check_object_permissions" title="fecfiler.transactions.views.TransactionViewSet.check_object_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_object_permissions</span></code></a>(request, obj)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.check_object_permissions" title="fecfiler.transactions.views.TransactionViewSet.check_object_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_object_permissions</span></code></a>(request, obj)</p></td>
 <td><p>Check if the request should be permitted for a given object.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.check_permissions" title="fecfiler.transactions.views.TransactionViewSet.check_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_permissions</span></code></a>(request)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.check_permissions" title="fecfiler.transactions.views.TransactionViewSet.check_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_permissions</span></code></a>(request)</p></td>
 <td><p>Check if the request should be permitted.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.check_throttles" title="fecfiler.transactions.views.TransactionViewSet.check_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_throttles</span></code></a>(request)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.check_throttles" title="fecfiler.transactions.views.TransactionViewSet.check_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_throttles</span></code></a>(request)</p></td>
 <td><p>Check if request should be throttled.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">create</span></code>(request, *args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">destroy</span></code>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">destroy</span></code>(request, *args, **kwargs)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.determine_version" title="fecfiler.transactions.views.TransactionViewSet.determine_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_version</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.determine_version" title="fecfiler.transactions.views.TransactionViewSet.determine_version"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_version</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p>If versioning is being used, then determine any API version for the incoming request.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.dispatch" title="fecfiler.transactions.views.TransactionViewSet.dispatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch</span></code></a>(request, *args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.dispatch" title="fecfiler.transactions.views.TransactionViewSet.dispatch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dispatch</span></code></a>(request, *args, **kwargs)</p></td>
 <td><p><cite>.dispatch()</cite> is pretty much the same as Django's regular dispatch, but with extra hooks for startup, finalize, and exception handling.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.filter_queryset" title="fecfiler.transactions.views.TransactionViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.filter_queryset" title="fecfiler.transactions.views.TransactionViewSet.filter_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_queryset</span></code></a>(queryset)</p></td>
 <td><p>Given a queryset, filter it with whichever filter backend is in use.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.finalize_response" title="fecfiler.transactions.views.TransactionViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.finalize_response" title="fecfiler.transactions.views.TransactionViewSet.finalize_response"><code class="xref py py-obj docutils literal notranslate"><span class="pre">finalize_response</span></code></a>(request, response, *args, ...)</p></td>
 <td><p>Returns the final response object.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_and_process_previous</span></code>(request, extra_filters)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_authenticate_header" title="fecfiler.transactions.views.TransactionViewSet.get_authenticate_header"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_authenticate_header</span></code></a>(request)</p></td>
 <td><p>If a request is unauthenticated, determine the WWW-Authenticate header to use for 401 responses, if any.</p></td>
@@ -126,35 +132,29 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_permissions" title="fecfiler.transactions.views.TransactionViewSet.get_permissions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_permissions</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of permissions that this view requires.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_previous</span></code>(queryset, date, aggregation_group)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_queryset" title="fecfiler.transactions.views.TransactionViewSet.get_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_queryset</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_queryset" title="fecfiler.transactions.views.TransactionViewSet.get_queryset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_queryset</span></code></a>()</p></td>
 <td><p>Get the list of items for this view.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_renderer_context" title="fecfiler.transactions.views.TransactionViewSet.get_renderer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderer_context</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_renderer_context" title="fecfiler.transactions.views.TransactionViewSet.get_renderer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderer_context</span></code></a>()</p></td>
 <td><p>Returns a dict that is passed through to Renderer.render(), as the <cite>renderer_context</cite> keyword argument.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_renderers" title="fecfiler.transactions.views.TransactionViewSet.get_renderers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderers</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_renderers" title="fecfiler.transactions.views.TransactionViewSet.get_renderers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_renderers</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of renderers that this view can use.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_serializer" title="fecfiler.transactions.views.TransactionViewSet.get_serializer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_serializer" title="fecfiler.transactions.views.TransactionViewSet.get_serializer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Return the serializer instance that should be used for validating and deserializing input, and for serializing output.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_serializer_class" title="fecfiler.transactions.views.TransactionViewSet.get_serializer_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_class</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_serializer_class" title="fecfiler.transactions.views.TransactionViewSet.get_serializer_class"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_class</span></code></a>()</p></td>
 <td><p>Return the class to use for the serializer.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_serializer_context" title="fecfiler.transactions.views.TransactionViewSet.get_serializer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_context</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_serializer_context" title="fecfiler.transactions.views.TransactionViewSet.get_serializer_context"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_serializer_context</span></code></a>()</p></td>
 <td><p>Extra context provided to the serializer class.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_success_headers</span></code>(data)</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_success_headers</span></code>(data)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_throttles" title="fecfiler.transactions.views.TransactionViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_throttles" title="fecfiler.transactions.views.TransactionViewSet.get_throttles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_throttles</span></code></a>()</p></td>
 <td><p>Instantiates and returns the list of throttles that this view uses.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_transaction_in_params" title="fecfiler.transactions.views.TransactionViewSet.get_transaction_in_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_transaction_in_params</span></code></a>(request)</p></td>
-<td><p>Retrieves the transaction specified by transaction_id in query params if it does not exist, returns an error response in the second position of the tuple</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_view_description" title="fecfiler.transactions.views.TransactionViewSet.get_view_description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_view_description</span></code></a>([html])</p></td>
 <td><p>Return some descriptive text for the view, as used in OPTIONS responses and in the browsable API.</p></td>
@@ -216,14 +216,14 @@ keyword arguments, and other things.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.permission_denied" title="fecfiler.transactions.views.TransactionViewSet.permission_denied"><code class="xref py py-obj docutils literal notranslate"><span class="pre">permission_denied</span></code></a>(request[, message, code])</p></td>
 <td><p>If request is not permitted, determine what kind of exception to raise.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_election" title="fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_election"><code class="xref py py-obj docutils literal notranslate"><span class="pre">previous_transaction_by_election</span></code></a>(request)</p></td>
-<td><p>Retrieves transaction that comes before this transactions, while being in the same group for aggregation and the same election</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">previous_aggregate_by_election</span></code>(request)</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_entity" title="fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_entity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">previous_transaction_by_entity</span></code></a>(request)</p></td>
-<td><p>Retrieves transaction that comes before this transactions, while being in the same group for aggregation</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">previous_aggregate_by_entity</span></code>(request)</p></td>
+<td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_payee_candidate" title="fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_payee_candidate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">previous_transaction_by_payee_candidate</span></code></a>(request)</p></td>
-<td><p>Retrieves transaction that comes before this transactions, while being in the same group for aggregation</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">previous_aggregate_by_payee_candidate</span></code>(request)</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">process_aggregation</span></code>(transaction_instance, ...)</p></td>
 <td><p></p></td>
@@ -544,14 +544,6 @@ serializations depending on the incoming request.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.transactions.views.TransactionViewSet.get_transaction_in_params">
-<span class="sig-name descname"><span class="pre">get_transaction_in_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.views.TransactionViewSet.get_transaction_in_params" title="Link to this definition">¶</a></dt>
-<dd><p>Retrieves the transaction specified by transaction_id in query params
-if it does not exist, returns an error response in the second position
-of the tuple</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.transactions.views.TransactionViewSet.get_view_description">
 <span class="sig-name descname"><span class="pre">get_view_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">html</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.views.TransactionViewSet.get_view_description" title="Link to this definition">¶</a></dt>
 <dd><p>Return some descriptive text for the view, as used in OPTIONS responses
@@ -640,27 +632,6 @@ will instead be performed lazily, the first time either
 <dt class="sig sig-object py" id="fecfiler.transactions.views.TransactionViewSet.permission_denied">
 <span class="sig-name descname"><span class="pre">permission_denied</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.views.TransactionViewSet.permission_denied" title="Link to this definition">¶</a></dt>
 <dd><p>If request is not permitted, determine what kind of exception to raise.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_election">
-<span class="sig-name descname"><span class="pre">previous_transaction_by_election</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_election" title="Link to this definition">¶</a></dt>
-<dd><p>Retrieves transaction that comes before this transactions,
-while being in the same group for aggregation and the same election</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_entity">
-<span class="sig-name descname"><span class="pre">previous_transaction_by_entity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_entity" title="Link to this definition">¶</a></dt>
-<dd><p>Retrieves transaction that comes before this transactions,
-while being in the same group for aggregation</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_payee_candidate">
-<span class="sig-name descname"><span class="pre">previous_transaction_by_payee_candidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_payee_candidate" title="Link to this definition">¶</a></dt>
-<dd><p>Retrieves transaction that comes before this transactions,
-while being in the same group for aggregation</p>
 </dd></dl>
 
 <dl class="py method">
@@ -791,7 +762,6 @@ while being in the same group for aggregation</p>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_serializer_class"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.get_serializer_class()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_serializer_context"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.get_serializer_context()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_throttles"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.get_throttles()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_transaction_in_params"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.get_transaction_in_params()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_view_description"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.get_view_description()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.get_view_name"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.get_view_name()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.handle_exception"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.handle_exception()</span></code></a></li>
@@ -806,9 +776,6 @@ while being in the same group for aggregation</p>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.perform_authentication"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.perform_authentication()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.perform_content_negotiation"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.perform_content_negotiation()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.permission_denied"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.permission_denied()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_election"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.previous_transaction_by_election()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_entity"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.previous_transaction_by_entity()</span></code></a></li>
-<li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.previous_transaction_by_payee_candidate"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.previous_transaction_by_payee_candidate()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.reverse_action"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.reverse_action()</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.serializer_class"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.serializer_class</span></code></a></li>
 <li class="toctree-l7"><a class="reference internal" href="#fecfiler.transactions.views.TransactionViewSet.setup"><code class="docutils literal notranslate"><span class="pre">TransactionViewSet.setup()</span></code></a></li>
