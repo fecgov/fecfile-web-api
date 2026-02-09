@@ -252,4 +252,4 @@ workflows:
             - test
           filters:
             branches:
-              only: /develop|feature\/2726-locust_testing-load|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|feature\/2726-locust_testing-develop|release\/sprint-[\.\d]+|release\/test|main/
