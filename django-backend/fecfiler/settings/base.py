@@ -13,7 +13,7 @@ from enum import Enum
 from .env import env
 from corsheaders.defaults import default_headers
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
-from fecfiler.web_services.profilers import WEB_SERVICES_PROFILING
+from fecfiler.transactions.profilers import TRANSACTION_MANAGER_PROFILING
 from math import floor
 from celery.schedules import crontab
 
@@ -51,7 +51,7 @@ ENABLE_PL_SQL_LOGGING = get_boolean_from_string(
 )
 
 CSRF_COOKIE_DOMAIN = env.get_credential("FFAPI_COOKIE_DOMAIN")
-CSRF_TRUSTED_ORIGINS = ["https://*.fecfile.fec.gov"]
+CSRF_TRUSTED_ORIGINS = ["https://*.app.cloud.gov"]
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY")
@@ -116,18 +116,15 @@ if INCLUDE_SILK:
         "django.contrib.staticfiles",
     ]
     MIDDLEWARE = ["silk.middleware.SilkyMiddleware"]
+    # Static files (CSS, JavaScript, Images)
+    # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
     SILKY_PYTHON_PROFILER = True
+    SILKY_PYTHON_PROFILER_BINARY = True
 
-    # Set SILKY_PYTHON_PROFILER_BINARY to True for cProfiling
-    SILKY_PYTHON_PROFILER_BINARY = False
-
-    # Don't profile static assets
-    def custom_silk_filter(request):
-        return STATIC_URL not in request.path
-    SILKY_INTERCEPT_FUNC = custom_silk_filter
-
-    SILKY_DYNAMIC_PROFILING = WEB_SERVICES_PROFILING
+    # the sub-directories of media and static files
+    STATICFILES_LOCATION = "static"
+    SILKY_DYNAMIC_PROFILING = TRANSACTION_MANAGER_PROFILING
 
 
 MIDDLEWARE += [
@@ -161,7 +158,7 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGIN_REGEXES = [r"https://(.*?)fecfile\.fec\.gov$"]
+CORS_ALLOWED_ORIGIN_REGEXES = [r"https://(.*?)\.app\.cloud\.gov$"]
 
 CORS_ALLOW_HEADERS = (
     *default_headers,
