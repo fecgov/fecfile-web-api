@@ -70,7 +70,7 @@ class UploadSubmissionTestCase(TestCase):
 
     def test_webprint_initiate_submission(self):
         self.assertIsNone(self.f3x.webprint_submission_id)
-        submission = WebPrintSubmission.objects.initiate_submission(str(self.f3x.id))
+        submission = WebPrintSubmission.objects.initiate_submission(self.f3x)
         self.assertEqual(
             submission.fecfile_task_state,
             FECSubmissionState.INITIALIZING.value,

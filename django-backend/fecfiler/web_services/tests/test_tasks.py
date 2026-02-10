@@ -235,22 +235,16 @@ class TasksTestCase(TestCase):
         )
 
     def test_submit_to_webprint(self):
-        webprint_submission = WebPrintSubmission.objects.initiate_submission(
-            str(self.f3x.id)
-        )
+        webprint_submission = WebPrintSubmission.objects.initiate_submission(self.f3x)
         self.run_webprint_submission_tests(webprint_submission)
 
     def test_webprint_submit_from_failed(self):
-        webprint_submission = WebPrintSubmission.objects.initiate_submission(
-            str(self.f3x.id)
-        )
+        webprint_submission = WebPrintSubmission.objects.initiate_submission(self.f3x)
         webprint_submission.save_state(FECSubmissionState.FAILED)
         self.run_webprint_submission_tests(webprint_submission)
 
     def test_webprint_submit_from_submitting(self):
-        webprint_submission = WebPrintSubmission.objects.initiate_submission(
-            str(self.f3x.id)
-        )
+        webprint_submission = WebPrintSubmission.objects.initiate_submission(self.f3x)
         webprint_submission.save_state(FECSubmissionState.SUBMITTING)
         self.run_webprint_submission_tests(webprint_submission)
 
@@ -363,9 +357,7 @@ class PollingTasksTestCase(TestCase):
             self.assertEqual(resolved_submission.fec_status, FECStatus.ACCEPTED)
 
     def test_submission_polling_completes(self):
-        webprint_submission = WebPrintSubmission.objects.initiate_submission(
-            str(self.f3x.id)
-        )
+        webprint_submission = WebPrintSubmission.objects.initiate_submission(self.f3x)
         self.assertNotEqual(webprint_submission.fec_status, FECStatus.COMPLETED)
         poll_for_fec_response(
             webprint_submission.id, self.mock_web_print_key, "Unit Testing Web Print"
@@ -379,9 +371,7 @@ class PollingTasksTestCase(TestCase):
             SUBMISSION_MANAGERS=self.submission_managers,
             SUBMISSION_CLASSES=self.submission_classes,
         ):
-            webprint_submission = WebPrintSubmission.objects.initiate_submission(
-                str(self.f3x.id)
-            )
+            webprint_submission = WebPrintSubmission.objects.initiate_submission(self.f3x)
             webprint_submission.fec_submission_id = webprint_submission.id
             webprint_submission.save()
             self.assertEqual(webprint_submission.fecfile_polling_attempts, 0)
@@ -398,9 +388,7 @@ class PollingTasksTestCase(TestCase):
             SUBMISSION_MANAGERS=self.submission_managers,
             SUBMISSION_CLASSES=self.submission_classes,
         ):
-            webprint_submission = WebPrintSubmission.objects.initiate_submission(
-                str(self.f3x.id)
-            )
+            webprint_submission = WebPrintSubmission.objects.initiate_submission(self.f3x)
             webprint_submission.fec_submission_id = webprint_submission.id
             webprint_submission.fecfile_polling_attempts = 6
             webprint_submission.save()
