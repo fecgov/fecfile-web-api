@@ -226,9 +226,9 @@ class UploadSubmission(BaseSubmission):
 
         self.fec_report_id = fec_response_json.get("report_id")
         report = self.report_set.first()
-        if not report.report_id:
+        if report.report_id != self.fec_report_id:
             report.report_id = self.fec_report_id
-        report.save()
+            report.save()
         super().save_fec_response(response_string)
 
     class Meta:

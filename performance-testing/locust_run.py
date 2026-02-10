@@ -5,18 +5,47 @@ import random
 from urllib.parse import urlparse
 import json
 import os
+from math import ceil
 from copy import deepcopy
+import string
 
-from locust import between, task, TaskSet, user
+from locust import between, task, TaskSet, user, events, runners
 from locust.exception import StopUser
 
 
-TIMEOUT = 30  # seconds
 SCHEDULES = ["A", "B,E,F", "C,D"]
+
+TIMEOUT = os.environ.get("LOCUST_TIMEOUT", 30)
+RETRIEVAL_WEIGHT = os.environ.get("LOCUST_RETRIEVAL_WEIGHT", 5)
+DATA_ENTRY_WEIGHT = os.environ.get("LOCUST_DATA_ENTRY_WEIGHT", 2)
+FILING_WEIGHT = os.environ.get("LOCUST_FILING_WEIGHT", 1)
+
+SCHEDULE_A_MULTIPLIER = 1
+SCHEDULE_B_MULTIPLIER = 1
+SCHEDULE_C_MULTIPLIER = 1
+SCHEDULE_D_MULTIPLIER = 1
+
+# The rate of new contacts created for transactions vs existing contacts
+TRANSACTION_NEW_CONTACT_RATE = 1 / 4
+
+UPDATE_TRANSACTION_MULTIPLIER = 0.5
+DELETE_TRANSACTION_MULTIPLIER = 0.5
+
+CONTACT_CREATION_MULTIPLIER = 1
+
+SUMMARY_CALCULATION_MULTIPLIER = 3
+AMEND_MULTIPLIER = 0.2
+
+# Tracks state of Payload Contacts between test runs
+CREATED_PAYLOAD_CONTACTS = False
+
+# Lower the interval between log reports to prevent log queue overflow
+runners.WORKER_LOG_REPORT_INTERVAL = 2
 
 
 class AtomicInteger:
-    def __init__(self, initial_value=0):
+    def __init__(self, initial_value):
+        self._initial_value = initial_value
         self._value = initial_value
         self._lock = threading.Lock()
 
@@ -26,50 +55,88 @@ class AtomicInteger:
             self._value += 1
             return retval
 
+    def reset(self):
+        with self._lock:
+            self._value = self._initial_value
+            return True
+        logging.error("Failed to reset user index")
+
 
 user_index_counter = AtomicInteger(0)
+
+
+@events.test_start.add_listener
+def on_test_start(environment, **kwargs):
+    logging.info("Test run starting")
+    logging.info("Reseting user index")
+
+    resetted = user_index_counter.reset()
+    reset_attempts = 0
+    while not resetted:
+        reset_attempts += 1
+        logging.error(f"Failed to reset user index counter {reset_attempts} times")
+        resetted = user_index_counter.reset()
+
+        if reset_attempts >= 20:
+            raise Exception("Failed to reset user index counter")
+
+    logging.info("Successfully reset user index counter")
 
 
 class Tasks(TaskSet):
     report_ids = []
     contacts = []
+    created_contacts = {
+        "IND": {},
+        "ORG": {},
+        "CAN": {},
+        "COM": {},
+    }
 
     def on_start(self):
         logging.info("Logging in")
         self.login()
 
         logging.info("Getting and activating committee")
-        self.get_and_activate_committee()
+        self.get_and_activate_commmittee()
+
+        logging.info("Checking for committee administrators")
+        self.get_committee_admins()
+
+        logging.info("Loading default page")
+        self.get_post_login_page()
 
         logging.info("Loading payloads")
         self.load_payloads()
 
+        logging.info("Creating one report")
+        self.create_one_report()
+
+        # Setup for tests
         logging.info("Creating contacts")
         self.create_payload_contacts()
+
+        logging.info("Retrieving all contacts")
+        found_contacts_count = self.retrieve_all_contacts()
+        logging.info(f"Found {found_contacts_count} contacts")
 
         logging.info("Getting report IDs")
         self.get_report_ids()
 
-        # Cache of created Schedule A txns per report for targeted updates
-        self.last_created_schedule_a_by_report = {}
-        self.last_created_schedule_b_by_report = {}
-        self.last_created_schedule_c_by_report = {}
+        time.sleep(5)
 
-    @task
-    def devops_celery_test(self):
-        self.client_get("/devops/celery-status/", name="celery-status", timeout=TIMEOUT)
-
-    @task
+    @task(ceil(RETRIEVAL_WEIGHT))
     def get_contacts(self):
         params = {
             "page": 1,
-            "ordering": "form_type",
+            "ordering": "sort_name",
+            "page_size": random.choice([5, 10, 15, 20])
         }
         self.client_get(
             "/api/v1/contacts/", name="get_contacts", timeout=TIMEOUT, params=params
         )
 
-    @task
+    @task(ceil(RETRIEVAL_WEIGHT))
     def get_reports(self):
         params = {
             "page": 1,
@@ -78,8 +145,9 @@ class Tasks(TaskSet):
         self.client_get(
             "/api/v1/reports/", name="get_reports", timeout=TIMEOUT, params=params
         )
+        self.load_report_page()
 
-    @task(100)
+    @task(ceil(RETRIEVAL_WEIGHT))
     def lookup_committees(self):
         params = {
             # Querying with only a single character avoids FEC lookups
@@ -96,7 +164,7 @@ class Tasks(TaskSet):
             params=params
         )
 
-    @task(100)
+    @task(ceil(RETRIEVAL_WEIGHT))
     def lookup_candidates(self):
         params = {
             # Querying with only a single character avoids FEC lookups
@@ -113,7 +181,7 @@ class Tasks(TaskSet):
             params=params
         )
 
-    @task
+    @task(ceil(RETRIEVAL_WEIGHT))
     def get_schedule_transactions(self):
         if len(self.report_ids) > 0:
             report_id = random.choice(self.report_ids)
@@ -132,18 +200,30 @@ class Tasks(TaskSet):
                     params=params,
                 )
 
-    @task(100)  # This task will be picked 100 times more often than the default
+    @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_A_MULTIPLIER))
     def create_schedule_a_transaction(self):
-        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_1"])
+        if len(self.report_ids) == 0:
+            return
+
+        contact_data = self.get_contact_of_type("IND")
         transaction_data = deepcopy(self.transaction_payloads["INDIVIDUAL_RECEIPT"])
-        report_id = self.report_ids[0]  # random.choice(self.report_ids)
+        report_id = random.choice(self.report_ids)
         contribution_date = self.report_ids_dict[report_id]
 
         transaction_data["contact_1"] = contact_data
-        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["contact_1_id"] = contact_data.get("id")
         transaction_data["report_ids"].append(report_id)
         transaction_data["contribution_date"] = contribution_date
         transaction_data["contribution_amount"] = random.randrange(25, 10000)
+
+        if contact_data.get("id") is not None:
+            self.get_previous_transaction_by_entity(
+                contact_data.get("id"),
+                contribution_date,
+                "GENERAL"
+            )
+
+        time.sleep(1)
 
         response = self.client.post(
             "/api/v1/transactions/",
@@ -153,26 +233,30 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule a transaction")
 
-        # Record the created transaction id for targeted update runs
-        try:
-            created = response.json()
-            if len(self.report_ids) > 0:
-                self.last_created_schedule_a_by_report[report_id] = created.get("id")
-        except Exception:
-            pass
-
-    @task(100)  # This task will be picked 100 times more often than the default
+    @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER / 2))
     def create_schedule_b_transaction(self):
-        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_2"])
+        if len(self.report_ids) == 0:
+            return
+
+        contact_data = self.get_contact_of_type("IND")
         transaction_data = deepcopy(self.transaction_payloads["OPERATING_EXPENDITURE"])
-        report_id = self.report_ids[0]  # random.choice(self.report_ids)
+        report_id = random.choice(self.report_ids)
         expenditure_date = self.report_ids_dict[report_id]
 
         transaction_data["contact_1"] = contact_data
-        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["contact_1_id"] = contact_data.get("id")
         transaction_data["report_ids"].append(report_id)
         transaction_data["expenditure_date"] = expenditure_date
         transaction_data["expenditure_amount"] = random.randrange(25, 10000)
+
+        if contact_data.get("id") is not None:
+            self.get_previous_transaction_by_entity(
+                contact_data.get("id"),
+                expenditure_date,
+                "GENERAL_DISBURSEMENT"
+            )
+
+        time.sleep(1)
 
         response = self.client.post(
             "/api/v1/transactions/",
@@ -182,24 +266,59 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule b transaction")
 
-        try:
-            created = response.json()
-            if len(self.report_ids) > 0:
-                self.last_created_schedule_b_by_report[report_id] = created.get("id")
-        except Exception:
-            pass
+    @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER / 2))
+    def create_schedule_b_election_transaction(self):
+        if len(self.report_ids) == 0:
+            return
 
-    @task
+        contact_data = self.get_contact_of_type("ORG")
+        contact_2_data = self.get_contact_of_type("CAN")
+        transaction_data = deepcopy(
+            self.transaction_payloads["CONTRIBUTION_TO_CANDIDATE"]
+        )
+        report_id = random.choice(self.report_ids)
+        expenditure_date = self.report_ids_dict[report_id]
+
+        transaction_data["contact_1"] = contact_data
+        transaction_data["contact_1_id"] = contact_data.get("id")
+        transaction_data["contact_2"] = contact_2_data
+        transaction_data["contact_2_id"] = contact_2_data.get("id")
+        transaction_data["report_ids"].append(report_id)
+        transaction_data["expenditure_date"] = expenditure_date
+        transaction_data["expenditure_amount"] = random.randrange(25, 10000)
+
+        self.get_previous_transaction_by_election(
+            transaction_data["election_code"],
+            transaction_data["beneficiary_candidate_office"],
+            transaction_data["beneficiary_candidate_state"],
+            expenditure_date,
+            transaction_data["aggregation_group"]
+        )
+
+        time.sleep(1)
+
+        response = self.client.post(
+            "/api/v1/transactions/",
+            name="create_new_schedule_b_transaction",
+            json=transaction_data,
+        )
+        if response.status_code != 200:
+            raise Exception("Failed to POST new schedule b transaction")
+
+    @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_C_MULTIPLIER))
     def create_schedule_c_transaction(self):
-        contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_3"])
+        if len(self.report_ids) == 0:
+            return
+
+        contact_data = self.get_contact_of_type("IND")
         transaction_data = deepcopy(
             self.transaction_payloads["LOAN_RECEIVED_FROM_INDIVIDUAL"]
         )
-        report_id = self.report_ids[0]  # random.choice(self.report_ids)
+        report_id = random.choice(self.report_ids)
         loan_incurred_date = self.report_ids_dict[report_id]
 
         transaction_data["contact_1"] = contact_data
-        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["contact_1_id"] = contact_data.get("id")
         transaction_data["report_ids"].append(report_id)
         transaction_data["loan_incurred_date"] = loan_incurred_date
         transaction_data["loan_due_date"] = add_year_to_date_str(loan_incurred_date)
@@ -220,21 +339,17 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule c transaction")
 
-        try:
-            created = response.json()
-            if len(self.report_ids) > 0:
-                self.last_created_schedule_c_by_report[report_id] = created.get("id")
-        except Exception:
-            pass
-
-    @task(10)  # This task will be picked 10 times more often than the default
+    @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_D_MULTIPLIER))
     def create_schedule_d_transaction(self):
-        contact_data = deepcopy(self.contact_payloads["ORGANIZATION_CONTACT_1"])
+        if len(self.report_ids) == 0:
+            return
+
+        contact_data = self.get_contact_of_type("ORG")
         transaction_data = deepcopy(self.transaction_payloads["DEBT_OWED_BY_COMMITTEE"])
-        report_id = self.report_ids[0]  # random.choice(self.report_ids)
+        report_id = random.choice(self.report_ids)
 
         transaction_data["contact_1"] = contact_data
-        transaction_data["contact_1_id"] = contact_data["id"]
+        transaction_data["contact_1_id"] = contact_data.get("id")
         transaction_data["report_ids"].append(report_id)
         transaction_data["incurred_amount"] = random.randrange(100, 10000)
         transaction_data["balance_at_close"] = transaction_data["incurred_amount"]
@@ -247,58 +362,56 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new schedule d transaction")
 
-    @task(100)  # This task will be picked 100 times more often than the default
+    @task(
+        ceil(DATA_ENTRY_WEIGHT * SCHEDULE_A_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
+    )
     def update_schedule_a_transaction(self):
         if len(self.report_ids) > 0:
-            report_id = self.report_ids[0]  # random.choice(self.report_ids)
-            txn_id = self.last_created_schedule_a_by_report.get(report_id)
-            transaction = None
-            if txn_id:
-                transaction = {"id": txn_id}
-            else:
-                transaction = self.get_first_transaction_for_report(
-                    report_id, "A", "INDIVIDUAL_RECEIPT"
-                )
+            report_id = random.choice(self.report_ids)
+            transaction = self.get_first_individual_receipt_for_report(report_id)
             if transaction:
                 response = self.client_get(
-                    f"/api/v1/transactions/{transaction['id']}/",
+                    f"/api/v1/transactions/{transaction["id"]}/",
                     name="get_schedule_a_transaction_by_id",
-                    timeout=TIMEOUT
+                    timeout=TIMEOUT,
                 )
                 if response and response.status_code == 200:
                     data = response.json()
                     data["contribution_amount"] = 1.23
                     data["schedule_id"] = "A"
-                    data["schema_name"] = data.get(
-                        "schema_name",
-                        self.transaction_payloads["INDIVIDUAL_RECEIPT"].get(
-                            "schema_name", "INDIVIDUAL_RECEIPT"
-                        ),
-                    )
+                    data["schema_name"] = "INDIVIDUAL_RECEIPT"
                     response = self.client.put(
-                        f"/api/v1/transactions/{data['id']}/",
+                        f"/api/v1/transactions/{data["id"]}/",
                         name="update_schedule_a_transaction",
                         json=data,
                     )
                 if response.status_code == 200:
-                    self.last_created_schedule_a_by_report[report_id] = data["id"]
                     return
-        else:
-            pass
         raise Exception("Failed to PUT update schedule a transaction")
 
-    @task(100)
+    @task(
+        ceil(DATA_ENTRY_WEIGHT * SCHEDULE_A_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
+    )
+    def delete_schedule_a_transaction(self):
+        if len(self.report_ids) > 0:
+            report_id = random.choice(self.report_ids)
+            transaction = self.get_first_individual_receipt_for_report(report_id)
+            if transaction:
+                response = self.client.delete(
+                    f"/api/v1/transactions/{transaction['id']}/",
+                    name="delete_schedule_a_transaction",
+                )
+                if response.status_code == 204:
+                    return
+        raise Exception("Failed to DELETE schedule a transaction")
+
+    @task(
+        ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
+    )
     def update_schedule_b_transaction(self):
         if len(self.report_ids) > 0:
-            report_id = self.report_ids[0]
-            txn_id = self.last_created_schedule_b_by_report.get(report_id)
-            transaction = (
-                {"id": txn_id}
-                if txn_id
-                else self.get_first_transaction_for_report(
-                    report_id, "B", "OPERATING_EXPENDITURE"
-                )
-            )
+            report_id = random.choice(self.report_ids)
+            transaction = self.get_first_operating_expenditure_for_report(report_id)
             if transaction:
                 response = self.client_get(
                     f"/api/v1/transactions/{transaction['id']}/",
@@ -321,22 +434,16 @@ class Tasks(TaskSet):
                         json=data,
                     )
                 if response.status_code == 200:
-                    self.last_created_schedule_b_by_report[report_id] = data["id"]
                     return
         raise Exception("Failed to PUT update schedule b transaction")
 
-    @task
+    @task(
+        ceil(DATA_ENTRY_WEIGHT * SCHEDULE_C_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
+    )
     def update_schedule_c_transaction(self):
         if len(self.report_ids) > 0:
-            report_id = self.report_ids[0]
-            txn_id = self.last_created_schedule_c_by_report.get(report_id)
-            transaction = (
-                {"id": txn_id}
-                if txn_id
-                else self.get_first_transaction_for_report(
-                    report_id, "C", "LOAN_RECEIVED_FROM_INDIVIDUAL"
-                )
-            )
+            report_id = random.choice(self.report_ids)
+            transaction = self.get_first_loan_received_from_individual_for_report(report_id)
             if transaction:
                 response = self.client_get(
                     f"/api/v1/transactions/{transaction['id']}/",
@@ -359,36 +466,24 @@ class Tasks(TaskSet):
                         json=data,
                     )
                 if response.status_code == 200:
-                    self.last_created_schedule_c_by_report[report_id] = data["id"]
                     return
         raise Exception("Failed to PUT update schedule c transaction")
 
-    @task
-    def delete_schedule_a_transaction(self):
-        if len(self.report_ids) > 0:
-            report_id = self.report_ids[0]  # random.choice(self.report_ids)
-            transaction = self.get_first_individual_receipt_for_report(report_id)
-            if transaction:
-                response = self.client.delete(
-                    f"/api/v1/transactions/{transaction['id']}/",
-                    name="delete_schedule_a_transaction",
-                )
-                if response.status_code == 204:
-                    return
-        raise Exception("Failed to DELETE schedule a transaction")
-
-    @task(100)
+    @task(ceil(FILING_WEIGHT * SUMMARY_CALCULATION_MULTIPLIER))
     def filing_calculate_summary_only(self):
+        if len(self.report_ids) == 0:
+            return
+
         self.client.request_name = "recalculate_report_summary"
-        report_id = self.report_ids[0]  # random.choice(self.report_ids)
+        report_id = random.choice(self.report_ids)
         self.calculate_summary_for_report_id(report_id, "calculate_summary_for_report_id")
 
-    @task(500)
+    @task(ceil(FILING_WEIGHT))
     def filing_prepare_and_submit_report(self):
         if len(self.report_ids_to_submit) == 0:
             logging.info("No more reports to submit")
             return
-        report_id = self.report_ids[0]  # random.choice(self.report_ids)
+        report_id = random.choice(self.report_ids_to_submit)
         report_json = self.retrieve_report(report_id)
 
         self.calculate_summary_for_report_id(
@@ -398,7 +493,7 @@ class Tasks(TaskSet):
         self.submit_report(report_id, poll_seconds=40)
         self.report_ids_to_amend.append(self.report_ids_to_submit.pop())
 
-    @task(100)
+    @task(ceil(FILING_WEIGHT * AMEND_MULTIPLIER))
     def prepare_and_amend_report(self):
         if len(self.report_ids_to_amend) == 0:
             if len(self.report_ids_to_submit) == 0:
@@ -407,7 +502,7 @@ class Tasks(TaskSet):
                 logging.info("No current reports to amend")
             return
 
-        report_id = self.report_ids[0]  # random.choice(self.report_ids)
+        report_id = random.choice(self.report_ids_to_amend)
         logging.info(f"Amending report {report_id}")
 
         self.amend_report(report_id)
@@ -429,9 +524,10 @@ class Tasks(TaskSet):
         self.client.headers["user-agent"] = "Locust testing"
         self.client.headers["Origin"] = self.client.base_url
 
-    def get_and_activate_committee(self):
+    def get_and_activate_commmittee(self):
         committee_id_list = self.retrieve_committee_id_list()
-        if len(committee_id_list) <= self.user.user_index:
+        if self.user.user_index >= len(committee_id_list):
+            logging.info(f"User index: {self.user.user_index} stopping!")
             logging.info("Not enough committees - need 1 per user!")
             raise StopUser()
         # Check if we have enough committees - 1 per user
@@ -445,6 +541,118 @@ class Tasks(TaskSet):
             raise Exception(
                 f"Failed to activate committee for user_index {self.user.user_index}"
             )
+
+    def retrieve_all_contacts(self):
+        page = 1
+        page_size = 20
+        found_contacts = []
+
+        params = {
+            "page": page,
+            "ordering": "sort_name",
+            "page_size": page_size
+        }
+        response = self.client_get(
+            "/api/v1/contacts/", name="get_contacts", timeout=TIMEOUT, params=params
+        )
+
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed to retrieve contact data for user_index {self.user.user_index}"
+            )
+
+        data = response.json()
+        if data["count"] > 0:
+            found_contacts += data["results"]
+
+        while response.status_code == 200:
+            page += 1
+            params["page"] = page
+            response = self.client_get(
+                "/api/v1/contacts/", name="get_contacts", timeout=TIMEOUT, params=params
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                found_contacts += data["results"]
+
+            if data["next"] is None:
+                break
+
+        for contact in found_contacts:
+            self.created_contacts[contact["type"]][contact["id"]] = deepcopy(contact)
+
+        return len(found_contacts)
+
+    def get_contact_of_type(self, type):
+        if random.random() < TRANSACTION_NEW_CONTACT_RATE:
+            return self.get_random_contact_data(type)
+        else:
+            return self.get_created_contact(type)
+
+    def get_random_contact_data(self, type=None):
+        if type is None:
+            type = random.choice(["IND", "ORG", "CAN", "COM"])
+
+        contact_data = {}
+        match(type):
+            case "IND":
+                contact_data = deepcopy(self.contact_payloads["INDIVIDUAL_CONTACT_1"])
+                contact_data["last_name"] = ''.join(
+                    random.choices(string.ascii_letters, k=10)
+                )
+                contact_data["first_name"] = ''.join(
+                    random.choices(string.ascii_letters, k=10)
+                )
+            case "ORG":
+                contact_data = deepcopy(self.contact_payloads["ORGANIZATION_CONTACT_1"])
+                contact_data["name"] = ''.join(random.choices(string.ascii_letters, k=20))
+            case "COM":
+                contact_data = deepcopy(self.contact_payloads["COMMITTEE_CONTACT_1"])
+                contact_data[
+                    "committee_id"
+                ] = "C" + "".join(random.choices(string.digits, k=8))
+                contact_data["name"] = ''.join(random.choices(string.ascii_letters, k=20))
+            case "CAN":
+                contact_data = deepcopy(self.contact_payloads["CANDIDATE_CONTACT_1"])
+                contact_data["last_name"] = ''.join(
+                    random.choices(string.ascii_letters, k=10)
+                )
+                contact_data["first_name"] = ''.join(
+                    random.choices(string.ascii_letters, k=10)
+                )
+                state = random.choice(["AK", "IL", "MA", "TX", "PN", "IN", "OH", "MO"])
+                contact_data[
+                    "candidate_id"
+                ] = f"S{random.randint(1, 2)}{state}{random.choices(string.digits, k=5)}"
+                contact_data["candidate_state"] = state
+
+        contact_data.pop("id")
+        return contact_data
+
+    @task(ceil(DATA_ENTRY_WEIGHT * CONTACT_CREATION_MULTIPLIER))
+    def create_new_contact(self, type=None):
+        contact_data = self.get_random_contact_data(type)
+
+        response = self.client.post(
+            "/api/v1/contacts/",
+            name="create_new_random_contact",
+            json=contact_data,
+        )
+        if response.status_code != 201:
+            raise Exception("Failed to POST new contact")
+
+        created_contact = response.json()
+        self.created_contacts[type][created_contact["id"]] = created_contact
+        return created_contact
+
+    def get_created_contact(self, type):
+        of_type = list(self.created_contacts[type].values())
+        if len(of_type) > 0:
+            return deepcopy(random.choice(of_type))
+        else:
+            logging.error(f"No contact of type {type} available!")
+            return None
 
     def load_payloads(self):
         directory = os.path.dirname(os.path.abspath(__file__))
@@ -462,10 +670,12 @@ class Tasks(TaskSet):
         )
 
     def create_payload_contacts(self):
+        global CREATED_PAYLOAD_CONTACTS
+        if CREATED_PAYLOAD_CONTACTS:
+            return
+
         for key in self.contact_payloads:
             data = deepcopy(self.contact_payloads[key])
-            # Ensure no client-specified id is sent; server assigns UUIDs
-            data.pop("id", None)
             response = self.client.post(
                 "/api/v1/contacts/",
                 name="_create_new_contact",
@@ -473,8 +683,11 @@ class Tasks(TaskSet):
             )
             if response.status_code != 201:
                 raise Exception("Failed to POST new contact")
-            self.contact_payloads[key]["id"] = response.json()["id"]
+            created_contact = response.json()
+            self.contact_payloads[key]["id"] = created_contact["id"]
             time.sleep(1)
+
+        CREATED_PAYLOAD_CONTACTS = True
 
     def get_report_ids(self):
         self.report_ids_dict = self.retrieve_report_ids_dict()
@@ -623,42 +836,229 @@ class Tasks(TaskSet):
         raise Exception("Failed to retrieve committee ids for load test setup")
 
     def get_first_individual_receipt_for_report(self, report_id):
-        return self.get_first_transaction_for_report(
-            report_id, "A", "INDIVIDUAL_RECEIPT"
-        )
-
-    def get_first_transaction_for_report(
-        self, report_id, schedule_id, transaction_type_identifier=None
-    ):
         params = {
             "page": 1,
             "ordering": "-created",
-            "schedules": schedule_id,
+            "schedules": "A",
             "report_id": report_id,
         }
         response = self.client_get(
             "/api/v1/transactions/",
-            name=f"get_schedule_{schedule_id}_transactions",
+            name="get_transactions",
             timeout=TIMEOUT,
             params=params,
         )
         if response and response.status_code == 200:
-            payload = response.json()
-            results = (
-                payload.get("results", [])
-                if isinstance(payload, dict)
-                else payload
-            )
-            if not isinstance(results, list):
-                return None
+            results = response.json().get("results", [])
             for transaction in results:
-                if (
-                    not transaction_type_identifier
-                    or transaction.get("transaction_type_identifier")
-                    == transaction_type_identifier
-                ):
+                if transaction["transaction_type_identifier"] == "INDIVIDUAL_RECEIPT":
                     return transaction
         return None
+
+    def get_first_operating_expenditure_for_report(self, report_id):
+        params = {
+            "page": 1,
+            "ordering": "-created",
+            "schedules": "B",
+            "report_id": report_id,
+        }
+        response = self.client_get(
+            "/api/v1/transactions/",
+            name="get_transactions",
+            timeout=TIMEOUT,
+            params=params,
+        )
+        if response and response.status_code == 200:
+            results = response.json().get("results", [])
+            for transaction in results:
+                if transaction["transaction_type_identifier"] == "OPERATING_EXPENDITURE":
+                    return transaction
+        return None
+
+    def get_first_loan_received_from_individual_for_report(self, report_id):
+        params = {
+            "page": 1,
+            "ordering": "-created",
+            "schedules": "C",
+            "report_id": report_id,
+        }
+        response = self.client_get(
+            "/api/v1/transactions/",
+            name="get_transactions",
+            timeout=TIMEOUT,
+            params=params,
+        )
+        if response and response.status_code == 200:
+            results = response.json().get("results", [])
+            for transaction in results:
+                if transaction["transaction_type_identifier"] == "LOAN_RECEIVED_FROM_INDIVIDUAL":
+                    return transaction
+        return None
+
+    def get_previous_transaction_by_entity(self, contact_id, date, aggregation_group):
+        params = {
+            "contact_1_id": contact_id,
+            "aggregation_group": aggregation_group,
+            "date": date,
+        }
+        self.client_get(
+            "/api/v1/transactions/previous/entity",
+            name="get_previous_transaction_by_entity",
+            timeout=TIMEOUT,
+            params=params,
+        )
+
+    def get_previous_transaction_by_election(
+        self, election_code, office, state, date, aggregation_group
+    ):
+        params = {
+            "date": date,
+            "aggregation_group": aggregation_group,
+            "election_code": election_code,
+            "office": office,
+            "state": state
+        }
+        self.client_get(
+            "/api/v1/transactions/previous/election",
+            name="get_previous_transaction_by_election",
+            timeout=TIMEOUT,
+            params=params,
+        )
+
+    def get_committee_admins(self):
+        test_name = "check_admins"
+        response = self.client.get(
+            "/api/v1/users/get_current/",
+            name=f"_{test_name}",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed {test_name} for user_index {self.user.user_index}"
+            )
+        response = self.client.get(
+            "/api/v1/committee-members/",
+            name=f"_{test_name}",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed {test_name} for user_index {self.user.user_index}"
+            )
+
+    def get_post_login_page(self):
+        self.load_report_page()
+
+    def load_report_page(self):
+        params = {
+            "page": 1,
+            "ordering": "report_code_label",
+            "page_size": 5
+        }
+        # Two calls are made to F24 under the current setup of the reports page
+        for form in ("3x", "24", "24", "1m", "99"):
+            response = self.client_get(
+                f"/api/v1/reports/form-{form}/",
+                name="_get_post_login_page",
+                timeout=TIMEOUT,
+                params=params
+            )
+            if response.status_code != 200:
+                raise Exception(
+                    f"Failed to load initial page for user_index {self.user.user_index}"
+                )
+
+    def create_one_report(self):
+        test_name = "create_one_report"
+        response = self.client.get(
+            "/api/v1/reports/form-3x/report_code_map/",
+            name=f"_{test_name}",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed {test_name} for user_index {self.user.user_index}"
+            )
+        response = self.client.get(
+            "/api/v1/reports/form-3x/coverage_dates/",
+            name=f"_{test_name}",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed {test_name} for user_index {self.user.user_index}"
+            )
+        fields_to_validate = [
+            "filing_frequency",
+            "report_type_category",
+            "report_code",
+            "coverage_from_date",
+            "coverage_through_date",
+            "date_of_election",
+            "state_of_election",
+            "form_type"
+        ]
+        # TODO: Why do we do this? list of fields_to_validate
+        params = {
+            "fields_to_validate": fields_to_validate
+        }
+        # TODO: From locust data generator - make a function?
+        reports_and_dates = [
+            ["Q1", "01-01", "03-31"],
+            ["Q2", "04-01", "06-30"],
+            ["Q3", "07-01", "09-30"],
+            ["YE", "10-01", "12-31"],
+        ]
+        _, from_date, through_date = random.choice(reports_and_dates)
+        year = random.randrange(1000, 9999)
+
+        json = {
+            "hasChangeOfAddress": "true",
+            "can_delete": "false",
+            "can_unamend": "false",
+            "report_type": "F3X",
+            "form_type": "F3XN",
+            "report_code": "Q1",
+            "date_of_election": None,
+            "state_of_election": None,
+            "coverage_from_date": f"{year}-{from_date}",
+            "coverage_through_date": f"{year}-{through_date}",
+            "filing_frequency": "Q",
+            "report_type_category": "Election Year"
+        }
+        response = self.client.post(
+            "/api/v1/reports/form-3x/",
+            name=f"_{test_name}",
+            params=params,
+            json=json
+        )
+        # TODO: Why are some of these 200s and some 201s?
+        if response.status_code != 201:
+            raise Exception(
+                f"Failed {test_name} for user_index {self.user.user_index}"
+            )
+        report_id = response.json()["id"]
+        response = self.client.get(
+            f"/api/v1/reports/{report_id}/",
+            name=f"_{test_name}",
+        )
+        if response.status_code != 200:
+            raise Exception(
+                f"Failed {test_name} for user_index {self.user.user_index}"
+            )
+        params = {
+            "page": 1,
+            "ordering": "line_label,created",
+            "report_id": report_id,
+            "page_size": 5,
+        }
+        for _ in SCHEDULES:
+            response = self.client_get(
+                "/api/v1/transactions/",
+                name=f"_{test_name}",
+                timeout=TIMEOUT,
+                params=params,
+            )
+            if response.status_code != 200:
+                raise Exception(
+                    f"Failed {test_name} for user_index {self.user.user_index}"
+                )
 
     def client_get(self, *args, **kwargs):
         kwargs["catch_response"] = True
