@@ -65,7 +65,7 @@ services:
       INCLUDE_SILK: "${INCLUDE_SILK}"
       DJANGO_APPLICATION: FECFILE_CELERY_WORKER
       E2E_TEST: "${E2E_TEST:-False}" # E2E-only endpoints disabled by default, set to True to enable
-      DB_POOL_MIN_SIZE: 4
+      DB_POOL_MIN_SIZE: 8
       DB_POOL_MAX_SIZE: 20
       DB_POOL_MAX_IDLE: 600
     deploy:
@@ -179,7 +179,7 @@ services:
       INCLUDE_SILK: "${INCLUDE_SILK}"
       DJANGO_APPLICATION: FECFILE_API
       E2E_TEST: "${E2E_TEST:-False}"
-      DB_POOL_MIN_SIZE: 4
+      DB_POOL_MIN_SIZE: 8
       DB_POOL_MAX_SIZE: 20
       DB_POOL_MAX_IDLE: 600
 
