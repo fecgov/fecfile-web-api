@@ -10,7 +10,7 @@ defaults: &defaults
     - fecfile-api-s3
     - fecfile-api-redis
     - fecfile-api-creds-test
-  env:
+  env: &default-env
     SPACE: test
     DISABLE_COLLECTSTATIC: 1
     DJANGO_SETTINGS_MODULE: fecfiler.settings.production
@@ -25,6 +25,9 @@ defaults: &defaults
     EFO_FILING_API: https://efoservices.stage.efo.fec.gov
     FEC_AGENCY_ID: FEC
     SESSION_COOKIE_AGE: 3600 # Value in seconds (1 hour)
+    DB_POOL_MIN_SIZE: 8
+    DB_POOL_MAX_SIZE: 8
+    DB_POOL_MAX_IDLE: 600
     BP_PIP_VERSION: latest
     LOG_FORMAT: KEY_VALUE
     MOCK_EFO_FILING: False
@@ -48,6 +51,11 @@ applications:
     memory: 2G
   - name: fecfile-web-services
     <<: *defaults
+    env:
+      <<: *default-env
+      DB_POOL_MIN_SIZE: 10
+      DB_POOL_MAX_SIZE: 10
+      DB_POOL_MAX_IDLE: 600
     instances: 2
     no-route: true
     health-check-type: process
