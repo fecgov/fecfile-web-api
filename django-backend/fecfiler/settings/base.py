@@ -180,9 +180,7 @@ APPLICATION_INDEX = env.get_credential("CF_INSTANCE_INDEX", "0")
 
 
 # Pull Database config from environment.  Via DATABASE_URL, by default
-database = dj_database_url.config(
-    conn_health_checks=True,
-)
+database = dj_database_url.config()
 database.setdefault("OPTIONS", {})
 database["OPTIONS"]["application_name"] = f"{APPLICATION_NAME}_{APPLICATION_INDEX}"
 # psycopg pool settings:
@@ -194,7 +192,7 @@ database["OPTIONS"]["pool"] = {
     "min_size": int(env.get_credential("DB_POOL_MIN_SIZE", "4")),
     # max_size: default to no overflow
     "max_size": int(env.get_credential("DB_POOL_MAX_SIZE", "4")),
-    # max_idle: psycopg default10 minutes
+    # max_idle: psycopg default 10 minutes
     "max_idle": int(env.get_credential("DB_POOL_MAX_IDLE", "600")),
 }
 
