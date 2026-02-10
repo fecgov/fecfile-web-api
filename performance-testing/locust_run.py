@@ -410,15 +410,8 @@ class Tasks(TaskSet):
     )
     def update_schedule_b_transaction(self):
         if len(self.report_ids) > 0:
-            report_id = self.report_ids[0]
-            txn_id = self.last_created_schedule_b_by_report.get(report_id)
-            transaction = (
-                {"id": txn_id}
-                if txn_id
-                else self.get_first_transaction_for_report(
-                    report_id, "B", "OPERATING_EXPENDITURE"
-                )
-            )
+            report_id = random.choice(self.report_ids)
+            transaction = self.get_first_operating_expenditure_for_report(report_id)
             if transaction:
                 response = self.client_get(
                     f"/api/v1/transactions/{transaction['id']}/",
@@ -441,7 +434,6 @@ class Tasks(TaskSet):
                         json=data,
                     )
                 if response.status_code == 200:
-                    self.last_created_schedule_b_by_report[report_id] = data["id"]
                     return
         raise Exception("Failed to PUT update schedule b transaction")
 
@@ -450,15 +442,8 @@ class Tasks(TaskSet):
     )
     def update_schedule_c_transaction(self):
         if len(self.report_ids) > 0:
-            report_id = self.report_ids[0]
-            txn_id = self.last_created_schedule_c_by_report.get(report_id)
-            transaction = (
-                {"id": txn_id}
-                if txn_id
-                else self.get_first_transaction_for_report(
-                    report_id, "C", "LOAN_RECEIVED_FROM_INDIVIDUAL"
-                )
-            )
+            report_id = random.choice(self.report_ids)
+            transaction = self.get_first_loan_received_from_individual_for_report(report_id)
             if transaction:
                 response = self.client_get(
                     f"/api/v1/transactions/{transaction['id']}/",
@@ -481,7 +466,6 @@ class Tasks(TaskSet):
                         json=data,
                     )
                 if response.status_code == 200:
-                    self.last_created_schedule_c_by_report[report_id] = data["id"]
                     return
         raise Exception("Failed to PUT update schedule c transaction")
 
@@ -868,6 +852,46 @@ class Tasks(TaskSet):
             results = response.json().get("results", [])
             for transaction in results:
                 if transaction["transaction_type_identifier"] == "INDIVIDUAL_RECEIPT":
+                    return transaction
+        return None
+
+    def get_first_operating_expenditure_for_report(self, report_id):
+        params = {
+            "page": 1,
+            "ordering": "-created",
+            "schedules": "B",
+            "report_id": report_id,
+        }
+        response = self.client_get(
+            "/api/v1/transactions/",
+            name="get_transactions",
+            timeout=TIMEOUT,
+            params=params,
+        )
+        if response and response.status_code == 200:
+            results = response.json().get("results", [])
+            for transaction in results:
+                if transaction["transaction_type_identifier"] == "OPERATING_EXPENDITURE":
+                    return transaction
+        return None
+
+    def get_first_loan_received_from_individual_for_report(self, report_id):
+        params = {
+            "page": 1,
+            "ordering": "-created",
+            "schedules": "C",
+            "report_id": report_id,
+        }
+        response = self.client_get(
+            "/api/v1/transactions/",
+            name="get_transactions",
+            timeout=TIMEOUT,
+            params=params,
+        )
+        if response and response.status_code == 200:
+            results = response.json().get("results", [])
+            for transaction in results:
+                if transaction["transaction_type_identifier"] == "LOAN_RECEIVED_FROM_INDIVIDUAL":
                     return transaction
         return None
 
