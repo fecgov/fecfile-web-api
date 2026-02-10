@@ -405,6 +405,86 @@ class Tasks(TaskSet):
                     return
         raise Exception("Failed to DELETE schedule a transaction")
 
+    @task(
+        ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
+    )
+    def update_schedule_b_transaction(self):
+        if len(self.report_ids) > 0:
+            report_id = self.report_ids[0]
+            txn_id = self.last_created_schedule_b_by_report.get(report_id)
+            transaction = (
+                {"id": txn_id}
+                if txn_id
+                else self.get_first_transaction_for_report(
+                    report_id, "B", "OPERATING_EXPENDITURE"
+                )
+            )
+            if transaction:
+                response = self.client_get(
+                    f"/api/v1/transactions/{transaction['id']}/",
+                    name="get_schedule_b_transaction_by_id",
+                    timeout=TIMEOUT,
+                )
+                if response and response.status_code == 200:
+                    data = response.json()
+                    data["expenditure_amount"] = 1.23
+                    data["schedule_id"] = "B"
+                    data["schema_name"] = data.get(
+                        "schema_name",
+                        self.transaction_payloads["OPERATING_EXPENDITURE"].get(
+                            "schema_name", "DISBURSEMENTS"
+                        ),
+                    )
+                    response = self.client.put(
+                        f"/api/v1/transactions/{data['id']}/",
+                        name="update_schedule_b_transaction",
+                        json=data,
+                    )
+                if response.status_code == 200:
+                    self.last_created_schedule_b_by_report[report_id] = data["id"]
+                    return
+        raise Exception("Failed to PUT update schedule b transaction")
+
+    @task(
+        ceil(DATA_ENTRY_WEIGHT * SCHEDULE_C_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
+    )
+    def update_schedule_c_transaction(self):
+        if len(self.report_ids) > 0:
+            report_id = self.report_ids[0]
+            txn_id = self.last_created_schedule_c_by_report.get(report_id)
+            transaction = (
+                {"id": txn_id}
+                if txn_id
+                else self.get_first_transaction_for_report(
+                    report_id, "C", "LOAN_RECEIVED_FROM_INDIVIDUAL"
+                )
+            )
+            if transaction:
+                response = self.client_get(
+                    f"/api/v1/transactions/{transaction['id']}/",
+                    name="get_schedule_c_transaction_by_id",
+                    timeout=TIMEOUT,
+                )
+                if response and response.status_code == 200:
+                    data = response.json()
+                    data["loan_amount"] = 123.45
+                    data["schedule_id"] = "C"
+                    data["schema_name"] = data.get(
+                        "schema_name",
+                        self.transaction_payloads["LOAN_RECEIVED_FROM_INDIVIDUAL"].get(
+                            "schema_name", "LOANS"
+                        ),
+                    )
+                    response = self.client.put(
+                        f"/api/v1/transactions/{data['id']}/",
+                        name="update_schedule_c_transaction",
+                        json=data,
+                    )
+                if response.status_code == 200:
+                    self.last_created_schedule_c_by_report[report_id] = data["id"]
+                    return
+        raise Exception("Failed to PUT update schedule c transaction")
+
     @task(ceil(FILING_WEIGHT * SUMMARY_CALCULATION_MULTIPLIER))
     def filing_calculate_summary_only(self):
         if len(self.report_ids) == 0:
