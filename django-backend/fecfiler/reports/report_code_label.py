@@ -59,6 +59,11 @@ report_code_label_case = Case(
     output_field=CharField(),
 )
 
+limited_label_case = Case(
+    *[When(report_code=k, then=Value(v)) for k, v in report_code_label_mapping.items()],
+    output_field=CharField(),
+)
+
 
 def get_report_code_label(report: Report):
     if report.form_3x or report.form_3:

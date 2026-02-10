@@ -102,7 +102,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return TransactionListSerializer
         return TransactionSerializer
 
-    def get_queryset(self):
+    def get_detail_queryset(self):
         queryset = super().get_queryset()
         report_id = (
             (
@@ -113,20 +113,41 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             else None
         )
         queryset = queryset.filter(reports__id=report_id) if report_id else queryset
+        return queryset
 
+    def get_queryset(self):
+        report_type = self.request.query_params.get("report_type")
+        report_code_label = self.request.query_params.get("report_code_label")
         schedule_filters = self.request.query_params.get("schedules")
-        if schedule_filters is not None:
-            schedules_to_include = schedule_filters.split(",") if schedule_filters else []
+        schedules_to_include = schedule_filters.split(",") if schedule_filters else []
+
+        queryset = Transaction.objects.get_list_queryset(
+            schedules_to_include, report_type, report_code_label
+        )
+
+        report_id = (
+            (
+                self.request.query_params.get("report_id")
+                or self.request.data.get("report_id")
+            )
+            if self.request
+            else None
+        )
+        queryset = queryset.filter(reports__id=report_id) if report_id else queryset
+
+        if schedules_to_include:
             queryset = queryset.filter(
                 schedule__in=[
                     Schedule[schedule].value for schedule in schedules_to_include
                 ]
             )
 
+        # Guarantors
         parent_id = self.request.query_params.get("parent")
         if parent_id:
             queryset = queryset.filter(parent_transaction_id=parent_id)
 
+        # List of transactions by contact
         contact_id = self.request.query_params.get("contact")
         if contact_id:
             queryset = queryset.filter(
@@ -137,7 +158,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 | Q(contact_5=contact_id)
             )
 
-        return queryset.prefetch_related("reports")
+        return queryset
 
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
@@ -600,7 +621,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 original_state = original_contact_2.candidate_state
 
                 next_transactions_by_election = (
-                    self.get_queryset()
+                    self.get_detail_queryset()
                     .filter(
                         ~Q(id=original_instance.id),
                         Q(
@@ -699,7 +720,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         # Handle date leap-frogging just for Schedule F transactions
         if original_contact_2 is not None and original_election_year:
             leapfrogged_sch_f_transactions = (
-                self.get_queryset()
+                self.get_detail_queryset()
                 .filter(
                     ~Q(id=original_instance.id),
                     Q(
@@ -755,7 +776,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             != transaction_instance.schedule_f.general_election_year  # noqa: E501
         ):
             leapfrogged_sch_f_transactions = (
-                self.get_queryset()
+                self.get_detail_queryset()
                 .filter(
                     ~Q(id=original_instance.id),
                     Q(
