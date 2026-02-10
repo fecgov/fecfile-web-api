@@ -181,7 +181,6 @@ APPLICATION_INDEX = env.get_credential("CF_INSTANCE_INDEX", "0")
 
 # Pull Database config from environment.  Via DATABASE_URL, by default
 database = dj_database_url.config(
-    conn_max_age=600,
     conn_health_checks=True,
 )
 database.setdefault("OPTIONS", {})
