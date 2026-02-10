@@ -443,7 +443,11 @@ class Tasks(TaskSet):
     def update_schedule_c_transaction(self):
         if len(self.report_ids) > 0:
             report_id = random.choice(self.report_ids)
-            transaction = self.get_first_loan_received_from_individual_for_report(report_id)
+            transaction = (
+                self.get_first_loan_received_from_individual_for_report(
+                    report_id
+                )
+            )
             if transaction:
                 response = self.client_get(
                     f"/api/v1/transactions/{transaction['id']}/",
@@ -891,7 +895,10 @@ class Tasks(TaskSet):
         if response and response.status_code == 200:
             results = response.json().get("results", [])
             for transaction in results:
-                if transaction["transaction_type_identifier"] == "LOAN_RECEIVED_FROM_INDIVIDUAL":
+                if (
+                    transaction["transaction_type_identifier"]
+                    == "LOAN_RECEIVED_FROM_INDIVIDUAL"
+                ):
                     return transaction
         return None
 
