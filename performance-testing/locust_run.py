@@ -394,7 +394,8 @@ class Tasks(TaskSet):
                 return
             else:
                 raise Exception(
-                    f"Failed to update Schedule A transaction with response: {response}"
+                    f"Failed to update Schedule A transaction with response: "
+                    f"{response.status_code} - {response.text}"
                 )
         else:
             raise Exception("No Schedule A transaction to update")
@@ -445,7 +446,8 @@ class Tasks(TaskSet):
                 return
             else:
                 raise Exception(
-                    f"Failed to update Schedule B transaction with response: {response}"
+                    f"Failed to update Schedule B transaction with response: "
+                    f"{response.status_code} - {response.text}"
                 )
         else:
             raise Exception("No Schedule B transaction to update")
@@ -484,7 +486,8 @@ class Tasks(TaskSet):
                 return
             else:
                 raise Exception(
-                    f"Failed to update Schedule C transaction with response: {response.status_code} - {response.text}"
+                    f"Failed to update Schedule C transaction with response: "
+                    f"{response.status_code} - {response.text}"
                 )
         else:
             raise Exception("No Schedule C transaction to update")
