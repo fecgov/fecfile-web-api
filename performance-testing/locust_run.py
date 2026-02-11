@@ -373,12 +373,10 @@ class Tasks(TaskSet):
         ceil(DATA_ENTRY_WEIGHT * SCHEDULE_A_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
     )
     def update_schedule_a_transaction(self):
-        transaction = self.last_created_schedule_a
-        if transaction:
-            if not isinstance(transaction, dict):
-                raise Exception(f"Last created Schedule A transaction is not a dict, it is: {transaction}")
+        transaction_id = self.last_created_schedule_a
+        if transaction_id:
             response = self.client_get(
-                f"/api/v1/transactions/{transaction["id"]}/",
+                f"/api/v1/transactions/{transaction_id}/",
                 name="get_schedule_a_transaction_by_id",
                 timeout=TIMEOUT,
             )
@@ -418,13 +416,10 @@ class Tasks(TaskSet):
         ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
     )
     def update_schedule_b_transaction(self):
-        transaction = self.last_created_schedule_b
-        if transaction:
-            if not isinstance(transaction, dict):
-                raise Exception(f"Last created Schedule B transaction is not a dict, it is: {transaction}")
-
+        transaction_id = self.last_created_schedule_b
+        if transaction_id:
             response = self.client_get(
-                f"/api/v1/transactions/{transaction["id"]}/",
+                f"/api/v1/transactions/{transaction_id}/",
                 name="get_schedule_b_transaction_by_id",
                 timeout=TIMEOUT,
             )
@@ -453,13 +448,10 @@ class Tasks(TaskSet):
         ceil(DATA_ENTRY_WEIGHT * SCHEDULE_C_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
     )
     def update_schedule_c_transaction(self):
-        transaction = self.last_created_schedule_c
-        if transaction:
-            if not isinstance(transaction, dict):
-                raise Exception(f"Last created Schedule C transaction is not a dict, it is: {transaction}")
-
+        transaction_id = self.last_created_schedule_c
+        if transaction_id:
             response = self.client_get(
-                f"/api/v1/transactions/{transaction["id"]}/",
+                f"/api/v1/transactions/{transaction_id}/",
                 name="get_schedule_c_transaction_by_id",
                 timeout=TIMEOUT,
             )
