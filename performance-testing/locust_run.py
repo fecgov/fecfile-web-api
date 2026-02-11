@@ -235,7 +235,7 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule A transaction")
-        self.last_created_schedule_a = response.json()
+        self.last_created_schedule_a = response
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER / 2))
     def create_schedule_b_transaction(self):
@@ -269,7 +269,7 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule B transaction")
-        self.last_created_schedule_b = response.json()
+        self.last_created_schedule_b = response
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER / 2))
     def create_schedule_b_election_transaction(self):
@@ -309,7 +309,7 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule B transaction")
-        self.last_created_schedule_b = response.json()
+        self.last_created_schedule_b = response
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_C_MULTIPLIER))
     def create_schedule_c_transaction(self):
@@ -344,7 +344,7 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule C transaction")
-        self.last_created_schedule_c = response.json()
+        self.last_created_schedule_c = response
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_D_MULTIPLIER))
     def create_schedule_d_transaction(self):
@@ -392,9 +392,12 @@ class Tasks(TaskSet):
                 )
             if response.status_code == 200:
                 return
+            else:
+                raise Exception(
+                    f"Failed to update Schedule A transaction with response: {response}"
+                )
         else:
             raise Exception("No Schedule A transaction to update")
-        raise Exception("Failed to PUT update Schedule A transaction")
 
     @task(
         ceil(DATA_ENTRY_WEIGHT * SCHEDULE_A_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
@@ -440,9 +443,12 @@ class Tasks(TaskSet):
                 )
             if response.status_code == 200:
                 return
+            else:
+                raise Exception(
+                    f"Failed to update Schedule B transaction with response: {response}"
+                )
         else:
             raise Exception("No Schedule B transaction to update")
-        raise Exception("Failed to PUT update Schedule B transaction")
 
     @task(
         ceil(DATA_ENTRY_WEIGHT * SCHEDULE_C_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
@@ -458,6 +464,8 @@ class Tasks(TaskSet):
             if response and response.status_code == 200:
                 data = response.json()
                 data["loan_amount"] = 123.45
+                data["loan_payment_to_date"] = 24.69
+                data["loan_balance"] = 98.76
                 data["schedule_id"] = "C"
                 data["schema_name"] = data.get(
                     "schema_name",
@@ -465,16 +473,21 @@ class Tasks(TaskSet):
                         "schema_name", "LOANS"
                     ),
                 )
+
                 response = self.client.put(
                     f"/api/v1/transactions/{data["id"]}/",
                     name="update_schedule_c_transaction",
                     json=data,
                 )
+
             if response.status_code == 200:
                 return
+            else:
+                raise Exception(
+                    f"Failed to update Schedule C transaction with response: {response.status_code} - {response.text}"
+                )
         else:
             raise Exception("No Schedule C transaction to update")
-        raise Exception("Failed to PUT update Schedule C transaction")
 
     @task(ceil(FILING_WEIGHT * SUMMARY_CALCULATION_MULTIPLIER))
     def filing_calculate_summary_only(self):
