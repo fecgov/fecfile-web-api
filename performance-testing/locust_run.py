@@ -375,6 +375,8 @@ class Tasks(TaskSet):
     def update_schedule_a_transaction(self):
         transaction = self.last_created_schedule_a
         if transaction:
+            if not isinstance(transaction, dict):
+                raise Exception(f"Last created Schedule A transaction is not a dict, it is: {transaction}")
             response = self.client_get(
                 f"/api/v1/transactions/{transaction["id"]}/",
                 name="get_schedule_a_transaction_by_id",
@@ -405,7 +407,7 @@ class Tasks(TaskSet):
             transaction = self.get_first_individual_receipt_for_report(report_id)
             if transaction:
                 response = self.client.delete(
-                    f"/api/v1/transactions/{transaction['id']}/",
+                    f"/api/v1/transactions/{transaction["id"]}/",
                     name="delete_schedule_a_transaction",
                 )
                 if response.status_code == 204:
@@ -418,8 +420,11 @@ class Tasks(TaskSet):
     def update_schedule_b_transaction(self):
         transaction = self.last_created_schedule_b
         if transaction:
+            if not isinstance(transaction, dict):
+                raise Exception(f"Last created Schedule B transaction is not a dict, it is: {transaction}")
+
             response = self.client_get(
-                f"/api/v1/transactions/{transaction['id']}/",
+                f"/api/v1/transactions/{transaction["id"]}/",
                 name="get_schedule_b_transaction_by_id",
                 timeout=TIMEOUT,
             )
@@ -434,7 +439,7 @@ class Tasks(TaskSet):
                     ),
                 )
                 response = self.client.put(
-                    f"/api/v1/transactions/{data['id']}/",
+                    f"/api/v1/transactions/{data["id"]}/",
                     name="update_schedule_b_transaction",
                     json=data,
                 )
@@ -450,8 +455,11 @@ class Tasks(TaskSet):
     def update_schedule_c_transaction(self):
         transaction = self.last_created_schedule_c
         if transaction:
+            if not isinstance(transaction, dict):
+                raise Exception(f"Last created Schedule C transaction is not a dict, it is: {transaction}")
+
             response = self.client_get(
-                f"/api/v1/transactions/{transaction['id']}/",
+                f"/api/v1/transactions/{transaction["id"]}/",
                 name="get_schedule_c_transaction_by_id",
                 timeout=TIMEOUT,
             )
@@ -466,7 +474,7 @@ class Tasks(TaskSet):
                     ),
                 )
                 response = self.client.put(
-                    f"/api/v1/transactions/{data['id']}/",
+                    f"/api/v1/transactions/{data["id"]}/",
                     name="update_schedule_c_transaction",
                     json=data,
                 )
