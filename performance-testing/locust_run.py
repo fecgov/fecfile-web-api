@@ -21,8 +21,8 @@ DATA_ENTRY_WEIGHT = os.environ.get("LOCUST_DATA_ENTRY_WEIGHT", 2)
 FILING_WEIGHT = os.environ.get("LOCUST_FILING_WEIGHT", 1)
 
 SCHEDULE_A_MULTIPLIER = 1
-SCHEDULE_B_MULTIPLIER = 10
-SCHEDULE_C_MULTIPLIER = 10
+SCHEDULE_B_MULTIPLIER = 1
+SCHEDULE_C_MULTIPLIER = 1
 SCHEDULE_D_MULTIPLIER = 1
 
 # The rate of new contacts created for transactions vs existing contacts
@@ -235,7 +235,7 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule A transaction")
-        self.last_created_schedule_a = response
+        self.last_created_schedule_a = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER / 2))
     def create_schedule_b_transaction(self):
@@ -269,7 +269,7 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule B transaction")
-        self.last_created_schedule_b = response
+        self.last_created_schedule_b = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER / 2))
     def create_schedule_b_election_transaction(self):
@@ -309,7 +309,7 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule B transaction")
-        self.last_created_schedule_b = response
+        self.last_created_schedule_b = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_C_MULTIPLIER))
     def create_schedule_c_transaction(self):
@@ -344,7 +344,7 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule C transaction")
-        self.last_created_schedule_c = response
+        self.last_created_schedule_c = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_D_MULTIPLIER))
     def create_schedule_d_transaction(self):
@@ -475,6 +475,9 @@ class Tasks(TaskSet):
                         "schema_name", "LOANS"
                     ),
                 )
+                data["fields_to_validate"] = self.transaction_payloads[
+                    "LOAN_RECEIVED_FROM_INDIVIDUAL"
+                ].get("fields_to_validate", [])
 
                 response = self.client.put(
                     f"/api/v1/transactions/{data["id"]}/",
