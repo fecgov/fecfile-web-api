@@ -192,8 +192,6 @@ def process_aggregation_for_entity_contact(
     else:
         transactions_to_update = list(all_transactions)
 
-    itemization_updates = []
-
     for transaction in transactions_to_update:
         old_aggregate = transaction.aggregate
         old_itemized = transaction.itemized
@@ -231,7 +229,10 @@ def process_aggregation_for_entity_contact(
 
         itemization_changed = update_itemization(transaction)
         if itemization_changed:
-            itemization_updates.append(transaction)
+            if transaction.itemized and not old_itemized:
+                cascade_itemization_to_parents(transaction)
+            elif not transaction.itemized and old_itemized:
+                cascade_unitemization_to_children(transaction)
 
             if transaction.itemized and not old_itemized:
                 cascade_itemization_to_parents(transaction)
@@ -239,10 +240,10 @@ def process_aggregation_for_entity_contact(
                 cascade_unitemization_to_children(transaction)
 
     if transactions_to_update:
-        Transaction.objects.bulk_update(transactions_to_update, ["aggregate"])
-
-    if itemization_updates:
-        Transaction.objects.bulk_update(itemization_updates, ["itemized"])
+        Transaction.objects.bulk_update(
+            transactions_to_update,
+            ["aggregate", "itemized"],
+        )
 
 
 def process_aggregation_for_entity(transaction_instance, earliest_date=None):
