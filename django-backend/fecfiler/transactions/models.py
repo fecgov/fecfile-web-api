@@ -424,6 +424,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         # so DB already has new values
         passed_old_snapshot = getattr(self, '_passed_old_snapshot', None)
 
+        # Check if aggregation should be skipped (for cascading child saves)
+        skip_aggregation = getattr(self, '_skip_aggregation', False)
+
         # Avoid recursion when service adjusts fields via save(update_fields=...)
         update_fields = kwargs.get("update_fields")
         is_internal_update = update_fields is not None
@@ -447,8 +450,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
         super(Transaction, self).save(*args, **kwargs)
 
-        # Invoke aggregation after save for create/update
-        if not is_internal_update:
+        # Invoke aggregation after save for create/update (unless skipped for child cascades)
+        if not is_internal_update and not skip_aggregation:
             # Handle Schedules A, B, E aggregation (full recalculation)
             try:
                 self._handle_service_aggregation(schedule, old_snapshot)
@@ -495,6 +498,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     error=str(e),
                     exc_info=True,
                 )
+        elif skip_aggregation:
+            # Clear the flag for next save
+            self._skip_aggregation = False
 
     def delete(self):
         if not self.can_delete:
