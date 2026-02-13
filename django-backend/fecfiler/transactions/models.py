@@ -450,7 +450,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
         super(Transaction, self).save(*args, **kwargs)
 
-        # Invoke aggregation after save for create/update (unless skipped for child cascades)
+        # Invoke aggregation after save for create/update
+        # (unless skipped for child cascades)
         if not is_internal_update and not skip_aggregation:
             # Handle Schedules A, B, E aggregation (full recalculation)
             try:

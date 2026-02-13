@@ -576,7 +576,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     child_instance.save()
 
                     # Track child for post-save aggregation
-                    if child_instance.get_schedule_name() in [Schedule.A, Schedule.B, Schedule.E]:
+                    if child_instance.get_schedule_name() in [
+                        Schedule.A,
+                        Schedule.B,
+                        Schedule.E,
+                    ]:
                         child_instances_to_aggregate.append(child_instance)
                 except Transaction.DoesNotExist:
                     pass
@@ -618,7 +622,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     )
                 elif context[0] == Schedule.E:
                     # Find a representative child for this context
-                    child = next(c for c in child_instances_to_aggregate if c.id == context[1])
+                    child = next(
+                        c
+                        for c in child_instances_to_aggregate
+                        if c.id == context[1]
+                    )
                     process_aggregation_for_election(child)
 
         # trigger updates to transactions with fields that depend on this one
