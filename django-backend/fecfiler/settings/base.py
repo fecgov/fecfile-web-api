@@ -122,9 +122,16 @@ if INCLUDE_SILK:
     SILKY_PYTHON_PROFILER = True
     SILKY_PYTHON_PROFILER_BINARY = True
 
-    # the sub-directories of media and static files
-    STATICFILES_LOCATION = "static"
-    SILKY_DYNAMIC_PROFILING = TRANSACTION_MANAGER_PROFILING
+    # Set SILKY_PYTHON_PROFILER_BINARY to True for cProfiling
+    SILKY_PYTHON_PROFILER_BINARY = False
+
+    # Don't profile static assets
+    def custom_silk_filter(request):
+        return STATIC_URL not in request.path
+
+    SILKY_INTERCEPT_FUNC = custom_silk_filter
+
+    SILKY_DYNAMIC_PROFILING = WEB_SERVICES_PROFILING
 
 
 MIDDLEWARE += [
@@ -176,12 +183,21 @@ APPLICATION_INDEX = env.get_credential("CF_INSTANCE_INDEX", "0")
 
 
 # Pull Database config from environment.  Via DATABASE_URL, by default
-database = dj_database_url.config(
-    conn_max_age=600,
-    conn_health_checks=True,
-)
+database = dj_database_url.config()
 database.setdefault("OPTIONS", {})
 database["OPTIONS"]["application_name"] = f"{APPLICATION_NAME}_{APPLICATION_INDEX}"
+# psycopg pool settings:
+# https://www.psycopg.org/psycopg3/docs/api/pool.html#psycopg_pool.ConnectionPool
+# this works for celery workers as well
+# https://docs.celeryq.dev/en/main/django/first-steps-with-django.html#django-connection-pool
+database["OPTIONS"]["pool"] = {
+    # min_size: psycopg default is 4
+    "min_size": int(env.get_credential("DB_POOL_MIN_SIZE", "4")),
+    # max_size: default to no overflow
+    "max_size": int(env.get_credential("DB_POOL_MAX_SIZE", "4")),
+    # max_idle: psycopg default 10 minutes
+    "max_idle": int(env.get_credential("DB_POOL_MAX_IDLE", "600")),
+}
 
 # Database
 DATABASES = {"default": database}

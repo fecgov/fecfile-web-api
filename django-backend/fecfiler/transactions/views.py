@@ -27,6 +27,10 @@ from fecfiler.transactions.utils_aggregation_prep import (
     create_old_snapshot,
     calculate_effective_amount,
 )
+from fecfiler.transactions.aggregation import (
+    process_aggregation_for_entity_contact,
+    process_aggregation_for_election,
+)
 from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
@@ -543,6 +547,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             is_existing,
         )
 
+        # Batch child transaction saves to trigger aggregation only once
+        child_instances_to_aggregate = []
+
         for child_transaction_data in children:
             if type(child_transaction_data) is str:
                 # Capture old state BEFORE updating
@@ -561,11 +568,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                         eff = calculate_effective_amount(child_instance)
                         old_snapshot = create_old_snapshot(child_instance, eff)
 
-                    # Update parent via model save to trigger aggregation
+                    # Update parent and skip aggregation during save
                     child_instance.parent_transaction_id = transaction_instance.id
+                    child_instance._skip_aggregation = True
                     if old_snapshot:
                         child_instance._passed_old_snapshot = old_snapshot
                     child_instance.save()
+
+                    # Track child for post-save aggregation
+                    if child_instance.get_schedule_name() in [
+                        Schedule.A,
+                        Schedule.B,
+                        Schedule.E,
+                    ]:
+                        child_instances_to_aggregate.append(child_instance)
                 except Transaction.DoesNotExist:
                     pass
             else:
@@ -579,10 +595,41 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
                 self.save_transaction(child_transaction_data, request)
 
-        """ trigger updates to transactions with fields that depend on this one
-        EXAMPLE: if this transaction is a JF transfer, update the descriptions of its
-        children and grandchildren transactions with any changes to the committee name
-        """
+        # Trigger aggregation once for all child transactions
+        if child_instances_to_aggregate:
+            # Group children by aggregation context to minimize redundant work
+            aggregation_contexts = set()
+            for child in child_instances_to_aggregate:
+                schedule = child.get_schedule_name()
+                if schedule in [Schedule.A, Schedule.B]:
+                    context = (
+                        schedule,
+                        child.committee_account_id,
+                        child.aggregation_group,
+                        child.contact_1_id,
+                    )
+                    aggregation_contexts.add(context)
+                elif schedule == Schedule.E:
+                    context = (schedule, child.id)
+                    aggregation_contexts.add(context)
+
+            # Execute aggregation once per unique context
+            for context in aggregation_contexts:
+                if context[0] in [Schedule.A, Schedule.B]:
+                    _, committee_id, agg_group, contact_id = context
+                    process_aggregation_for_entity_contact(
+                        committee_id, agg_group, contact_id
+                    )
+                elif context[0] == Schedule.E:
+                    # Find a representative child for this context
+                    child = next(
+                        c
+                        for c in child_instances_to_aggregate
+                        if c.id == context[1]
+                    )
+                    process_aggregation_for_election(child)
+
+        # trigger updates to transactions with fields that depend on this one
         update_dependent_children(transaction_instance)
         delete_carried_forward_loans_if_needed(transaction_instance, committee_id)
         delete_carried_forward_debts_if_needed(transaction_instance, committee_id)

@@ -46,6 +46,22 @@ def process_aggregation_for_debts(transaction_instance):
         transaction_id=debt_transaction_id,
     ).order_by("schedule_d__report_coverage_from_date")
 
+    # Pre-fetch all repayments for the debt chain to avoid N+1 queries
+    debt_ids = [debt.id for debt in debt_chain]
+    all_repayments = transactions.filter(
+        schedule_d__isnull=True,
+        debt__id__in=debt_ids,
+        deleted__isnull=True,
+    ).values('debt__id', 'amount')
+
+    # Group repayments by debt_id for quick lookup
+    repayments_by_debt = {}
+    for repayment in all_repayments:
+        debt_id = repayment['debt__id']
+        if debt_id not in repayments_by_debt:
+            repayments_by_debt[debt_id] = 0
+        repayments_by_debt[debt_id] += repayment['amount']
+
     incurred_prior = 0
     repayed_amount = 0
     schedule_ds = []
@@ -58,14 +74,8 @@ def process_aggregation_for_debts(transaction_instance):
             debt.schedule_d.incurred_prior - repayed_amount
         )
 
-        repayed_during = 0
-        repayments = transactions.filter(
-            schedule_d__isnull=True,
-            debt__id=debt.id,
-            deleted__isnull=True,
-        )
-        for repayment in repayments:
-            repayed_during += repayment.amount
+        # Use pre-fetched repayments instead of querying per debt
+        repayed_during = repayments_by_debt.get(debt.id, 0)
 
         debt.schedule_d.payment_amount = repayed_during
         debt.schedule_d.balance_at_close = (
@@ -192,8 +202,6 @@ def process_aggregation_for_entity_contact(
     else:
         transactions_to_update = list(all_transactions)
 
-    itemization_updates = []
-
     for transaction in transactions_to_update:
         old_aggregate = transaction.aggregate
         old_itemized = transaction.itemized
@@ -231,18 +239,17 @@ def process_aggregation_for_entity_contact(
 
         itemization_changed = update_itemization(transaction)
         if itemization_changed:
-            itemization_updates.append(transaction)
-
             if transaction.itemized and not old_itemized:
                 cascade_itemization_to_parents(transaction)
             elif not transaction.itemized and old_itemized:
                 cascade_unitemization_to_children(transaction)
 
     if transactions_to_update:
-        Transaction.objects.bulk_update(transactions_to_update, ["aggregate"])
-
-    if itemization_updates:
-        Transaction.objects.bulk_update(itemization_updates, ["itemized"])
+        Transaction.objects.bulk_update(
+            transactions_to_update,
+            ["aggregate", "itemized"],
+            batch_size=64,
+        )
 
 
 def process_aggregation_for_entity(transaction_instance, earliest_date=None):

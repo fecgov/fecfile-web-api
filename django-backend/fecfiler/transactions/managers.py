@@ -42,9 +42,7 @@ from fecfiler.reports.report_code_label import (
     report_type_case,
     limited_label_case,
 )
-import structlog
-
-logger = structlog.get_logger(__name__)
+from django.contrib.postgres.expressions import ArraySubquery
 
 # Itemization threshold defined by FEC regulations
 ITEMIZATION_THRESHOLD = Decimal(200)
@@ -156,6 +154,11 @@ class TransactionManager(SoftDeleteManager):
         report_code_label_clause = self.report_code_label_builder(report_code_label)
         report_type_clause = self.report_type_builder(report_type)
         back_ref_id_clause = self.back_reference_builder(active_schedules)
+        reports_subquery = ArraySubquery(
+            self.model.reports.through.objects.filter(
+                transaction_id=OuterRef("pk")
+            ).values("report_id")
+        )
 
         return (
             super()
@@ -174,6 +177,7 @@ class TransactionManager(SoftDeleteManager):
                 loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
                 report_type=report_type_clause,
                 back_reference_tran_id_number=back_ref_id_clause,
+                report_ids_list=reports_subquery,
             )
             .alias(order_key=self.ORDER_KEY_CLAUSE())
             .order_by("order_key")
