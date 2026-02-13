@@ -13,7 +13,7 @@ from enum import Enum
 from .env import env
 from corsheaders.defaults import default_headers
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
-from fecfiler.transactions.profilers import TRANSACTION_MANAGER_PROFILING
+from fecfiler.web_services.profilers import WEB_SERVICES_PROFILING
 from math import floor
 from celery.schedules import crontab
 
@@ -116,8 +116,6 @@ if INCLUDE_SILK:
         "django.contrib.staticfiles",
     ]
     MIDDLEWARE = ["silk.middleware.SilkyMiddleware"]
-    # Static files (CSS, JavaScript, Images)
-    # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
     SILKY_PYTHON_PROFILER = True
     SILKY_PYTHON_PROFILER_BINARY = True
@@ -131,7 +129,7 @@ if INCLUDE_SILK:
 
     SILKY_INTERCEPT_FUNC = custom_silk_filter
 
-    SILKY_DYNAMIC_PROFILING = TRANSACTION_MANAGER_PROFILING
+    SILKY_DYNAMIC_PROFILING = WEB_SERVICES_PROFILING
 
 
 MIDDLEWARE += [
