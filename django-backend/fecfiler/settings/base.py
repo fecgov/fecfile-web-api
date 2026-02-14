@@ -118,7 +118,6 @@ if INCLUDE_SILK:
     MIDDLEWARE = ["silk.middleware.SilkyMiddleware"]
 
     SILKY_PYTHON_PROFILER = True
-    SILKY_PYTHON_PROFILER_BINARY = True
 
     # Set SILKY_PYTHON_PROFILER_BINARY to True for cProfiling
     SILKY_PYTHON_PROFILER_BINARY = False
