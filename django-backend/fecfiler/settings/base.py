@@ -13,7 +13,7 @@ from enum import Enum
 from .env import env
 from corsheaders.defaults import default_headers
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
-from fecfiler.web_services.profilers import TRANSACTION_MANAGER_PROFILING
+from fecfiler.transactions.profilers import TRANSACTION_MANAGER_PROFILING
 from math import floor
 from celery.schedules import crontab
 
