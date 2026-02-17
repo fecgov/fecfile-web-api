@@ -13,7 +13,7 @@ from enum import Enum
 from .env import env
 from corsheaders.defaults import default_headers
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
-from fecfiler.web_services.profilers import WEB_SERVICES_PROFILING
+from fecfiler.web_services.profilers import TRANSACTION_MANAGER_PROFILING
 from math import floor
 from celery.schedules import crontab
 
@@ -128,7 +128,10 @@ if INCLUDE_SILK:
 
     SILKY_INTERCEPT_FUNC = custom_silk_filter
 
-    SILKY_DYNAMIC_PROFILING = WEB_SERVICES_PROFILING
+    # the sub-directories of media and static files
+    STATICFILES_LOCATION = "static"
+
+    SILKY_DYNAMIC_PROFILING = TRANSACTION_MANAGER_PROFILING
 
 
 MIDDLEWARE += [
