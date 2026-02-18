@@ -5,6 +5,7 @@ from fecfiler.settings import (
     FFAPI_TIMEOUT_COOKIE_NAME,
     FFAPI_COOKIE_DOMAIN,
 )
+import time
 
 
 class TimeoutMiddleware:
@@ -13,6 +14,7 @@ class TimeoutMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
+        time.sleep(1)
         session_cookie = response.cookies.get(settings.SESSION_COOKIE_NAME)
         if session_cookie and request.user.is_authenticated:
             response.set_cookie(
