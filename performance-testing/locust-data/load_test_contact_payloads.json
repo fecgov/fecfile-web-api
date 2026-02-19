@@ -61,5 +61,40 @@
     "name": "test_org_name1",
     "street_2": null,
     "telephone": null
+  },
+  "CANDIDATE_CONTACT_1": {
+    "type":"CAN",
+    "street_1":"beneficiary_street_1",
+    "city":"beneficiary_city",
+    "state":"AK",
+    "zip":"12345",
+    "country":"USA",
+    "has_transaction_or_report":false,
+    "candidate_id":"S1AK01001",
+    "last_name":"beneficiary_last",
+    "first_name":"beneficiary_first",
+    "middle_name":null,
+    "prefix":null,
+    "suffix":null,
+    "street_2":null,
+    "employer":"beneficiary_employer",
+    "occupation":"beneficiary_occupation",
+    "candidate_office":"S",
+    "candidate_state":"AK",
+    "candidate_district":null,
+    "telephone":null
+  },
+  "COMMITTEE_CONTACT_1": {
+    "type":"COM",
+    "street_1":"committee_street_1",
+    "city":"committee_city_1",
+    "state":"AK",
+    "zip":"12345",
+    "country":"USA",
+    "has_transaction_or_report":false,
+    "committee_id":"C12345678",
+    "name":"Test_Committee_1",
+    "street_2":null,
+    "telephone":null
   }
 }

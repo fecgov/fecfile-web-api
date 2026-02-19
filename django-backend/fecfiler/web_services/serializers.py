@@ -9,9 +9,11 @@ class ReportIdSerializer(serializers.Serializer):
     def validate(self, data):
         request = self.context["request"]
         committee_uuid = request.session["committee_uuid"]
-        report = Report.objects.filter(
-            id=data["report_id"], committee_account_id=committee_uuid
-        ).first()
+        report = (
+            Report.objects.select_related("webprint_submission")
+            .filter(id=data["report_id"], committee_account_id=committee_uuid)
+            .first()
+        )
         if not report:
             raise serializers.ValidationError(
                 f"No report found with report id: {data['report_id']}"
