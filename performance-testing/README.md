@@ -30,12 +30,12 @@ upwards:
 
 Optional additional flags can be used to override various defaults:
 
-`--base_committee_number` (Default 33333333)
-`--number_of_committees`
-`--number_of_reports`
-`--number_of_contacts`
-`--number_of_transactions`
-`--single_to_tiered_transaction_ratio`
+* `--base_committee_number` (Default 33333333)
+* `--number_of_committees`
+* `--number_of_reports`
+* `--number_of_contacts`
+* `--number_of_transactions`
+* `--single_to_tiered_transaction_ratio`
 
 
 ## Setup - Additional steps for remote testing
@@ -44,6 +44,33 @@ Optional additional flags can be used to override various defaults:
 - Set the target API service for testing in [docker-compose.yml](https://github.com/fecgov/fecfile-web-api/blob/develop/docker-compose.yml#L118):
 - As an example, this is what you would set in order to target DEV:
   - `-f /mnt/locust/locust_run.py --master -H https://dev-api.fecfile.fec.gov`
+
+2. Refresh the database:
+- As an example, here is blowing away and then recreating the RDS in the load testing mirror in DEV:
+````
+# create new db
+cf create-service aws-rds small-psql-redundant load-fecfile-api-rds-NEW
+
+# wait for create to complete before moving on
+while true; do clear; cf services; sleep 30; done
+
+# unbind old
+cf unbind-service load-fecfile-scheduler load-fecfile-api-rds
+cf unbind-service load-fecfile-web-api load-fecfile-api-rds
+cf unbind-service load-fecfile-web-services load-fecfile-api-rds
+
+# rename old and new
+cf rename-service load-fecfile-api-rds load-fecfile-api-rds-OLD
+cf rename-service load-fecfile-api-rds-NEW load-fecfile-api-rds
+
+# bind new
+cf bind-service load-fecfile-web-api load-fecfile-api-rds
+cf bind-service load-fecfile-web-services load-fecfile-api-rds
+cf bind-service load-fecfile-scheduler load-fecfile-api-rds
+
+# delete old
+cf delete-service load-fecfile-api-rds-OLD
+````
 
 ## Running Tests
 
