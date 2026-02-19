@@ -18,7 +18,8 @@ from fecfiler.transactions.utils_aggregation_queries import (
 )  # noqa: E501
 from fecfiler.transactions.utils_aggregation_prep import _get_calendar_year_from_date
 
-from django.db.models import Q
+from django.db.models import Q, Sum, Value, DecimalField, OuterRef, Subquery
+from django.db.models.functions import Coalesce
 import structlog
 
 
@@ -40,27 +41,32 @@ def process_aggregation_for_debts(transaction_instance):
 
     debt_transaction_id = given_debt.transaction_id
 
+    repayments_base = Transaction.all_objects.filter(
+        committee_account_id=transaction_instance.committee_account_id,
+        schedule_d__isnull=True,
+        deleted__isnull=True,
+        debt_id__isnull=False,
+    ).annotate(
+        amount=Transaction.objects.AMOUNT_CLAUSE,
+    )
+
+    repayments_totals = repayments_base.values("debt_id").annotate(
+        total=Sum("amount", output_field=DecimalField())
+    )
+
     debt_chain = transactions.filter(
         schedule_d__isnull=False,
         committee_account_id=given_debt.committee_account_id,
         transaction_id=debt_transaction_id,
+    ).annotate(
+        repayed_during=Coalesce(
+            Subquery(
+                repayments_totals.filter(debt_id=OuterRef("id")).values("total")[:1],
+                output_field=DecimalField(),
+            ),
+            Value(0, output_field=DecimalField()),
+        )
     ).order_by("schedule_d__report_coverage_from_date")
-
-    # Pre-fetch all repayments for the debt chain to avoid N+1 queries
-    debt_ids = [debt.id for debt in debt_chain]
-    all_repayments = transactions.filter(
-        schedule_d__isnull=True,
-        debt__id__in=debt_ids,
-        deleted__isnull=True,
-    ).values('debt__id', 'amount')
-
-    # Group repayments by debt_id for quick lookup
-    repayments_by_debt = {}
-    for repayment in all_repayments:
-        debt_id = repayment['debt__id']
-        if debt_id not in repayments_by_debt:
-            repayments_by_debt[debt_id] = 0
-        repayments_by_debt[debt_id] += repayment['amount']
 
     incurred_prior = 0
     repayed_amount = 0
@@ -74,16 +80,13 @@ def process_aggregation_for_debts(transaction_instance):
             debt.schedule_d.incurred_prior - repayed_amount
         )
 
-        # Use pre-fetched repayments instead of querying per debt
-        repayed_during = repayments_by_debt.get(debt.id, 0)
-
-        debt.schedule_d.payment_amount = repayed_during
+        debt.schedule_d.payment_amount = debt.repayed_during
         debt.schedule_d.balance_at_close = (
             debt.schedule_d.beginning_balance
             + debt.schedule_d.incurred_amount
-            - repayed_during
+            - debt.repayed_during
         )
-        repayed_amount += repayed_during
+        repayed_amount += debt.repayed_during
 
         schedule_ds.append(debt.schedule_d)
 
