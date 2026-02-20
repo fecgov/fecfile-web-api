@@ -72,32 +72,44 @@ class LoadTestUtils:
 
         # Schedule A Transactions
         schedule_a_transactions_needed = math.ceil(
-            number_of_receipts or (number_of_transactions/2)
+            number_of_receipts or (number_of_transactions / 2)
         )
         logger.info(f"Creating {schedule_a_transactions_needed} Sch A transactions")
         self.locust_data_generator.generate_single_schedule_a_transactions(
-            math.ceil(schedule_a_transactions_needed * single_to_tiered_transaction_ratio),
+            math.ceil(
+                schedule_a_transactions_needed
+                * single_to_tiered_transaction_ratio
+            ),
             reports,
             contacts,
         )
         self.locust_data_generator.generate_tiered_schedule_a_transactions(
-            math.ceil(schedule_a_transactions_needed * (1 - single_to_tiered_transaction_ratio)),
+            math.ceil(
+                schedule_a_transactions_needed
+                * (1 - single_to_tiered_transaction_ratio)
+            ),
             reports,
             contacts,
         )
 
         # Schedule B Transactions
         schedule_b_transactions_needed = math.ceil(
-            number_of_disbursements or (number_of_transactions/2)
+            number_of_disbursements or (number_of_transactions / 2)
         )
         logger.info(f"Creating {schedule_b_transactions_needed} Sch B transactions")
         self.locust_data_generator.generate_single_schedule_b_transactions(
-            math.ceil(schedule_b_transactions_needed * single_to_tiered_transaction_ratio),
+            math.ceil(
+                schedule_b_transactions_needed
+                * single_to_tiered_transaction_ratio
+            ),
             reports,
             contacts,
         )
         self.locust_data_generator.generate_tiered_schedule_b_transactions(
-            math.ceil(schedule_b_transactions_needed * (1 - single_to_tiered_transaction_ratio)),
+            math.ceil(
+                schedule_b_transactions_needed
+                * (1 - single_to_tiered_transaction_ratio)
+            ),
             reports,
             contacts,
         )
