@@ -44,7 +44,7 @@ defaults: &defaults
 applications:
   - name: fecfile-web-api
     <<: *defaults
-    instances: 4
+    instances: 2
     routes:
       - route: fecfile-web-api-test.apps.internal
     command: bin/run-api.sh
