@@ -5,6 +5,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_d.models import ScheduleD
+from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.reports.models import ReportTransaction
 from fecfiler.contacts.models import Contact
 
@@ -15,9 +16,15 @@ class LocustDataGenerator:
 
     def generate_form_3x(self, count, collision_maximum=1000):
         reports_and_dates = [
-            ["Q1", "01-01", "03-31"],
-            ["Q2", "04-01", "06-30"],
-            ["Q3", "07-01", "09-30"],
+            ["M2", "01-01", "01-31"],
+            ["M3", "02-01", "02-28"],
+            ["M4", "03-01", "03-31"],
+            ["M5", "04-01", "04-30"],
+            ["M6", "05-01", "05-31"],
+            ["M7", "06-01", "06-30"],
+            ["M8", "07-01", "07-31"],
+            ["M9", "08-01", "08-31"],
+            ["M10", "09-01", "09-30"],
             ["YE", "10-01", "12-31"],
         ]
         form_3x_list = []
@@ -239,6 +246,62 @@ class LocustDataGenerator:
         Transaction.objects.bulk_update(tier2_transactions, ["parent_transaction_id"])
 
         return tier1_transactions
+
+    def generate_loan_transactions(self, count, reports, contacts):
+        schedule_c_list = []
+        transaction_list = []
+        report_transaction_list = []
+        for _ in range(count):
+            transaction_type_identifier = "LOAN_RECEIVED_FROM_INDIVIDUAL"
+            contact = choice(contacts)
+            report = choice(reports)
+            loan_amount = randrange(10000, 40000)
+            form_type = "SC13"
+
+            schedule_c_list.append(
+                ScheduleC(
+                    **{
+                        "receipt_line_number": "13",
+                        "memo_text_description": report.id,
+                        "loan_amount": loan_amount,
+                        "loan_incurred_date": report.coverage_from_date,
+                        "loan_due_date": "Later",
+                        "loan_interest_rate": "More",
+                        "secured": choice([True, False]),
+                    }
+                )
+            )
+
+        saved_schedule_c_list = ScheduleC.objects.bulk_create(schedule_c_list)
+        for schedule_c in saved_schedule_c_list:
+            transaction_list.append(
+                Transaction(
+                    **{
+                        "transaction_type_identifier": transaction_type_identifier,
+                        "committee_account_id": self.committee.id,
+                        "contact_1_id": contact.id,
+                        "form_type": form_type,
+                        "entity_type": contact.type,
+                        "schedule_c_id": schedule_c.id,
+                    }
+                )
+            )
+
+        saved_transaction_list = Transaction.objects.bulk_create(transaction_list)
+
+        for transaction in saved_transaction_list:
+            report_transaction_list.append(
+                ReportTransaction(
+                    **{
+                        # Retrieve report ID from purpose field
+                        "report_id": transaction.schedule_c.memo_text_description,
+                        "transaction_id": transaction.id,
+                    }
+                )
+            )
+        ReportTransaction.objects.bulk_create(report_transaction_list)
+
+        return saved_transaction_list
 
     def generate_debt_transactions(self, count, repayments, reports, contacts):
         schedule_d_list = []
