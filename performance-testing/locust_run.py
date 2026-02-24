@@ -16,9 +16,9 @@ from locust.exception import StopUser
 SCHEDULES = ["A", "B,E,F", "C,D"]
 
 TIMEOUT = os.environ.get("LOCUST_TIMEOUT", 30)
-RETRIEVAL_WEIGHT = os.environ.get("LOCUST_RETRIEVAL_WEIGHT", 5)
-DATA_ENTRY_WEIGHT = os.environ.get("LOCUST_DATA_ENTRY_WEIGHT", 2)
-FILING_WEIGHT = os.environ.get("LOCUST_FILING_WEIGHT", 1)
+RETRIEVAL_WEIGHT = os.environ.get("LOCUST_RETRIEVAL_WEIGHT", 10)
+DATA_ENTRY_WEIGHT = os.environ.get("LOCUST_DATA_ENTRY_WEIGHT", 5)
+FILING_WEIGHT = os.environ.get("LOCUST_FILING_WEIGHT", 2)
 
 SCHEDULE_A_MULTIPLIER = 1
 SCHEDULE_B_MULTIPLIER = 1
@@ -28,7 +28,7 @@ SCHEDULE_D_MULTIPLIER = 1
 # The rate of new contacts created for transactions vs existing contacts
 TRANSACTION_NEW_CONTACT_RATE = 1 / 4
 
-UPDATE_TRANSACTION_MULTIPLIER = 0.5
+UPDATE_TRANSACTION_MULTIPLIER = 0.7
 DELETE_TRANSACTION_MULTIPLIER = 0.5
 
 CONTACT_CREATION_MULTIPLIER = 1
@@ -92,9 +92,9 @@ class Tasks(TaskSet):
         "CAN": {},
         "COM": {},
     }
-    last_created_schedule_a = None
-    last_created_schedule_b = None
-    last_created_schedule_c = None
+    first_created_schedule_a = None
+    first_created_schedule_b = None
+    first_created_schedule_c = None
 
     def on_start(self):
         logging.info("Logging in")
@@ -235,7 +235,8 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule A transaction")
-        self.last_created_schedule_a = response.json()
+        if self.first_created_schedule_a is None:
+            self.first_created_schedule_a = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER / 2))
     def create_schedule_b_transaction(self):
@@ -269,7 +270,8 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule B transaction")
-        self.last_created_schedule_b = response.json()
+        if self.first_created_schedule_b is None:
+            self.first_created_schedule_b = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER / 2))
     def create_schedule_b_election_transaction(self):
@@ -309,7 +311,8 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule B transaction")
-        self.last_created_schedule_b = response.json()
+        if self.first_created_schedule_b is None:
+            self.first_created_schedule_b = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_C_MULTIPLIER))
     def create_schedule_c_transaction(self):
@@ -344,7 +347,8 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule C transaction")
-        self.last_created_schedule_c = response.json()
+        if self.first_created_schedule_c is None:
+            self.first_created_schedule_c = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_D_MULTIPLIER))
     def create_schedule_d_transaction(self):
@@ -373,7 +377,7 @@ class Tasks(TaskSet):
         ceil(DATA_ENTRY_WEIGHT * SCHEDULE_A_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
     )
     def update_schedule_a_transaction(self):
-        transaction_id = self.last_created_schedule_a
+        transaction_id = self.first_created_schedule_a
         if transaction_id:
             response = self.client_get(
                 f"/api/v1/transactions/{transaction_id}/",
@@ -420,7 +424,7 @@ class Tasks(TaskSet):
         ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
     )
     def update_schedule_b_transaction(self):
-        transaction_id = self.last_created_schedule_b
+        transaction_id = self.first_created_schedule_b
         if transaction_id:
             response = self.client_get(
                 f"/api/v1/transactions/{transaction_id}/",
@@ -456,7 +460,7 @@ class Tasks(TaskSet):
         ceil(DATA_ENTRY_WEIGHT * SCHEDULE_C_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
     )
     def update_schedule_c_transaction(self):
-        transaction_id = self.last_created_schedule_c
+        transaction_id = self.first_created_schedule_c
         if transaction_id:
             response = self.client_get(
                 f"/api/v1/transactions/{transaction_id}/",
