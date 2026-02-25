@@ -291,7 +291,11 @@ class LocustDataGenerator:
                 )
             )
 
-        saved_schedule_c_list = ScheduleC.objects.bulk_create(schedule_c_list, batch_size=100)
+        saved_schedule_c_list = ScheduleC.objects.bulk_create(
+            schedule_c_list,
+            batch_size=100
+        )
+
         for schedule_c in saved_schedule_c_list:
             transaction_list.append(
                 Transaction(
@@ -306,7 +310,10 @@ class LocustDataGenerator:
                 )
             )
 
-        saved_transaction_list = Transaction.objects.bulk_create(transaction_list, batch_size=100)
+        saved_transaction_list = Transaction.objects.bulk_create(
+            transaction_list,
+            batch_size=100
+        )
 
         for transaction in saved_transaction_list:
             report_transaction_list.append(
