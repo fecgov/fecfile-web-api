@@ -37,16 +37,16 @@ class LocustDataGeneratorTestCase(TestCase):
 
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Form3X.objects.bulk_create",
-        side_effect=lambda x: x,
+        side_effect=lambda x, batch_size: x,
     )
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Report.objects.bulk_create",
-        side_effect=lambda x: x,
+        side_effect=lambda x, batch_size: x,
     )
     def test_generate_form_3x(self, mock_report_bulk_create, mock_form3x_bulk_create):
         result = self.locust_data_generator.generate_form_3x(3)
         self.assertEqual(len(result), 3)
-        mock_report_bulk_create.assert_called_with(result)
+        mock_report_bulk_create.assert_called_with(result, batch_size=100)
         for report in result:
             self.assertIsNotNone(report.id)
             self.assertEqual(report.form_type, "F3XN")
@@ -56,12 +56,12 @@ class LocustDataGeneratorTestCase(TestCase):
 
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Contact.objects.bulk_create",
-        side_effect=lambda x: x,
+        side_effect=lambda x, batch_size: x,
     )
     def test_generate_contacts(self, mock_contact_bulk_create):
         result = self.locust_data_generator.generate_contacts(3)
         self.assertEqual(len(result), 3)
-        mock_contact_bulk_create.assert_called_with(result)
+        mock_contact_bulk_create.assert_called_with(result, batch_size=100)
         for contact in result:
             self.assertIsNotNone(contact.id)
             self.assertEqual(
@@ -71,11 +71,11 @@ class LocustDataGeneratorTestCase(TestCase):
 
     @patch(
         "fecfiler.devops.utils.locust_data_generator.ScheduleA.objects.bulk_create",
-        side_effect=lambda x: x,
+        side_effect=lambda x, batch_size: x,
     )
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Transaction.objects.bulk_create",
-        side_effect=add_schedule_a_to_transaction,
+        side_effect=lambda x, batch_size: add_schedule_a_to_transaction(x),
     )
     @patch(
         "fecfiler.devops.utils.locust_data_generator"
@@ -112,7 +112,7 @@ class LocustDataGeneratorTestCase(TestCase):
             3, test_reports, test_contacts
         )
         self.assertEqual(len(result), 3)
-        mock_transaction_bulk_create.assert_called_with(result)
+        mock_transaction_bulk_create.assert_called_with(result, batch_size=100)
         for transaction in result:
             self.assertIsNotNone(transaction.id)
             self.assertEqual(
@@ -160,11 +160,11 @@ class LocustDataGeneratorTestCase(TestCase):
 
     @patch(
         "fecfiler.devops.utils.locust_data_generator.ScheduleB.objects.bulk_create",
-        side_effect=lambda x: x,
+        side_effect=lambda x, batch_size: x,
     )
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Transaction.objects.bulk_create",
-        side_effect=add_schedule_b_to_transaction,
+        side_effect=lambda x, batch_size: add_schedule_b_to_transaction(x),
     )
     @patch(
         "fecfiler.devops.utils.locust_data_generator"
@@ -201,7 +201,7 @@ class LocustDataGeneratorTestCase(TestCase):
             3, test_reports, test_contacts
         )
         self.assertEqual(len(result), 3)
-        mock_transaction_bulk_create.assert_called_with(result)
+        mock_transaction_bulk_create.assert_called_with(result, batch_size=100)
         for transaction in result:
             self.assertIsNotNone(transaction.id)
             self.assertEqual(
@@ -239,6 +239,7 @@ class LocustDataGeneratorTestCase(TestCase):
         result = self.locust_data_generator.generate_tiered_schedule_b_transactions(
             1, [], []
         )
+        print(result)
         self.assertEqual(len(result), 1)
         self.assertEqual(mock_tier2_transaction.id, 2)
         self.assertEqual(mock_tier2_transaction.parent_transaction_id, 1)
