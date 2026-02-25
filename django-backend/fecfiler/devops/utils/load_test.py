@@ -18,6 +18,9 @@ class LoadTestUtils:
         number_of_reports,
         number_of_contacts,
         number_of_transactions,
+        number_of_receipts,
+        number_of_disbursements,
+        number_of_loans,
         number_of_debts,
         single_to_tiered_transaction_ratio,
         repayments_per_debt,
@@ -34,6 +37,9 @@ class LoadTestUtils:
                 number_of_reports,
                 number_of_contacts,
                 number_of_transactions,
+                number_of_receipts,
+                number_of_disbursements,
+                number_of_loans,
                 number_of_debts,
                 single_to_tiered_transaction_ratio,
                 repayments_per_debt
@@ -45,6 +51,9 @@ class LoadTestUtils:
         number_of_reports,
         number_of_contacts,
         number_of_transactions,
+        number_of_receipts,
+        number_of_disbursements,
+        number_of_loans,
         number_of_debts,
         single_to_tiered_transaction_ratio,
         repayments_per_debt
@@ -53,44 +62,67 @@ class LoadTestUtils:
         committee = self.create_new_committee(new_committee_id)
         self.locust_data_generator = LocustDataGenerator(committee)
 
+        # Reports
         logger.info(f"Creating {number_of_reports} reports")
         reports = self.locust_data_generator.generate_form_3x(number_of_reports)
 
+        # Contacts
         logger.info(f"Creating {number_of_contacts} contacts")
         contacts = self.locust_data_generator.generate_contacts(number_of_contacts)
 
-        single_transactions_needed = math.ceil(
-            number_of_transactions * single_to_tiered_transaction_ratio
+        # Schedule A Transactions
+        schedule_a_transactions_needed = math.ceil(
+            number_of_receipts or (number_of_transactions / 2)
         )
-        logger.info(f"Creating {single_transactions_needed} Sch A single transactions")
+        logger.info(f"Creating {schedule_a_transactions_needed} Sch A transactions")
         self.locust_data_generator.generate_single_schedule_a_transactions(
-            single_transactions_needed,
+            math.ceil(
+                schedule_a_transactions_needed
+                * single_to_tiered_transaction_ratio
+            ),
             reports,
             contacts,
         )
-        logger.info(f"Creating {single_transactions_needed} Sch B single transactions")
-        self.locust_data_generator.generate_single_schedule_b_transactions(
-            single_transactions_needed,
-            reports,
-            contacts,
-        )
-
-        tiered_transactions_needed = math.ceil(
-            number_of_transactions * (1 - single_to_tiered_transaction_ratio)
-        )
-        logger.info(f"Creating {tiered_transactions_needed} Sch A tiered transactions")
         self.locust_data_generator.generate_tiered_schedule_a_transactions(
-            tiered_transactions_needed,
-            reports,
-            contacts,
-        )
-        logger.info(f"Creating {tiered_transactions_needed} Sch B tiered transactions")
-        self.locust_data_generator.generate_tiered_schedule_b_transactions(
-            tiered_transactions_needed,
+            math.ceil(
+                schedule_a_transactions_needed
+                * (1 - single_to_tiered_transaction_ratio)
+            ),
             reports,
             contacts,
         )
 
+        # Schedule B Transactions
+        schedule_b_transactions_needed = math.ceil(
+            number_of_disbursements or (number_of_transactions / 2)
+        )
+        logger.info(f"Creating {schedule_b_transactions_needed} Sch B transactions")
+        self.locust_data_generator.generate_single_schedule_b_transactions(
+            math.ceil(
+                schedule_b_transactions_needed
+                * single_to_tiered_transaction_ratio
+            ),
+            reports,
+            contacts,
+        )
+        self.locust_data_generator.generate_tiered_schedule_b_transactions(
+            math.ceil(
+                schedule_b_transactions_needed
+                * (1 - single_to_tiered_transaction_ratio)
+            ),
+            reports,
+            contacts,
+        )
+
+        # Schedule C Transactions
+        logger.info(f"Creating {number_of_loans} loans")
+        self.locust_data_generator.generate_loan_transactions(
+            number_of_loans,
+            reports,
+            contacts
+        )
+
+        # Schedule D Transactions
         logger.info(f"Creating {number_of_debts} debts with {repayments_per_debt} repayments each")  # NOQA: E501
         self.locust_data_generator.generate_debt_transactions(
             number_of_debts,
