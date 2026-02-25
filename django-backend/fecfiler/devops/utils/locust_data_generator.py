@@ -38,7 +38,7 @@ class LocustDataGenerator:
 
         for _ in range(count):
             form_3x_list.append(Form3X())
-        form_3x_list = Form3X.objects.bulk_create(form_3x_list)
+        form_3x_list = Form3X.objects.bulk_create(form_3x_list, batch_size=100)
 
         while len(report_list) < count and collision_count < collision_maximum:
             quarter, from_date, through_date = choice(reports_and_dates)
@@ -64,7 +64,7 @@ class LocustDataGenerator:
                 )
             )
 
-        return Report.objects.bulk_create(report_list)
+        return Report.objects.bulk_create(report_list, batch_size=100)
 
     def generate_contacts(self, count):
         street_names = ["Main", "Test", "Place", "Home", "Domain", "Victory", "Word"]
@@ -102,7 +102,7 @@ class LocustDataGenerator:
                 )
             )
 
-        return Contact.objects.bulk_create(contact_list)
+        return Contact.objects.bulk_create(contact_list, batch_size=100)
 
     def generate_single_schedule_a_transactions(self, count, reports, contacts, debts=[]):
         schedule_a_list = []
@@ -291,7 +291,7 @@ class LocustDataGenerator:
                 )
             )
 
-        saved_schedule_c_list = ScheduleC.objects.bulk_create(schedule_c_list)
+        saved_schedule_c_list = ScheduleC.objects.bulk_create(schedule_c_list, batch_size=100)
         for schedule_c in saved_schedule_c_list:
             transaction_list.append(
                 Transaction(
@@ -306,7 +306,7 @@ class LocustDataGenerator:
                 )
             )
 
-        saved_transaction_list = Transaction.objects.bulk_create(transaction_list)
+        saved_transaction_list = Transaction.objects.bulk_create(transaction_list, batch_size=100)
 
         for transaction in saved_transaction_list:
             report_transaction_list.append(
@@ -318,7 +318,7 @@ class LocustDataGenerator:
                     }
                 )
             )
-        ReportTransaction.objects.bulk_create(report_transaction_list)
+        ReportTransaction.objects.bulk_create(report_transaction_list, batch_size=100)
 
         return saved_transaction_list
 
