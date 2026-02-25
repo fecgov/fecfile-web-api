@@ -134,7 +134,10 @@ class LocustDataGenerator:
                 )
             )
 
-        transaction_list = Transaction.objects.bulk_create(transaction_list, batch_size=100)
+        transaction_list = Transaction.objects.bulk_create(
+            transaction_list,
+            batch_size=100
+        )
 
         for transaction in transaction_list:
             report_transaction_list.append(
@@ -211,7 +214,10 @@ class LocustDataGenerator:
                 )
             )
 
-        transaction_list = Transaction.objects.bulk_create(transaction_list, batch_size=100)
+        transaction_list = Transaction.objects.bulk_create(
+            transaction_list,
+            batch_size=100
+        )
 
         for transaction in transaction_list:
             report_transaction_list.append(
@@ -237,7 +243,11 @@ class LocustDataGenerator:
 
         for index in range(count):
             tier2_transactions[index].parent_transaction_id = tier1_transactions[index].id
-        Transaction.objects.bulk_update(tier2_transactions, ["parent_transaction_id"], batch_size=100)
+        Transaction.objects.bulk_update(
+            tier2_transactions,
+            ["parent_transaction_id"],
+            batch_size=100
+        )
 
         return tier1_transactions
 
@@ -278,7 +288,10 @@ class LocustDataGenerator:
                 )
             )
 
-        transaction_list = Transaction.objects.bulk_create(transaction_list, batch_size=100)
+        transaction_list = Transaction.objects.bulk_create(
+            transaction_list,
+            batch_size=100
+        )
 
         for transaction in transaction_list:
             report_transaction_list.append(
