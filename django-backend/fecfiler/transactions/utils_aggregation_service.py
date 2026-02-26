@@ -1,5 +1,5 @@
 """
-Aggregation service logic (no Transaction import).
+Aggregation service logic
 
 All ORM access is performed via the provided transaction_model to avoid
 circular imports with models.py.

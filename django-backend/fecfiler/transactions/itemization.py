@@ -59,7 +59,6 @@ def has_itemized_children(transaction) -> bool:
 def get_all_children_ids(transaction_id: UUID) -> List[UUID]:
     """
     Get all child and grandchild transaction IDs using recursive CTE.
-
     Uses a single SQL recursive query instead of O(depth) Python queries.
 
     Args:
@@ -93,7 +92,6 @@ def get_all_children_ids(transaction_id: UUID) -> List[UUID]:
 def get_all_parent_ids(transaction) -> List[UUID]:
     """
     Get all parent and grandparent transaction IDs using recursive CTE.
-
     Uses a single SQL recursive query for efficient tree traversal.
 
     Args:
