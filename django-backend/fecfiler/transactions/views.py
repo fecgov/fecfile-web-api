@@ -527,12 +527,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 if transaction_instance.schedule_d and report.coverage_from_date:
                     coverage_from_date = report.coverage_from_date
 
-            if coverage_through_date or coverage_from_date:
-                if coverage_through_date:
-                    schedule_instance.report_coverage_through_date = coverage_through_date
-                if coverage_from_date:
-                    schedule_instance.report_coverage_from_date = coverage_from_date
-                schedule_instance.save()
+            if coverage_through_date:
+                schedule_instance.report_coverage_through_date = coverage_through_date
+                schedule_instance.save(update_fields=["report_coverage_through_date"])
+            elif coverage_from_date:
+                schedule_instance.report_coverage_from_date = coverage_from_date
+                schedule_instance.save(update_fields=["report_coverage_from_date"])
 
         Report.objects.filter(committee_account_id=committee_id).update(
             calculation_status=None
@@ -623,9 +623,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 elif context[0] == Schedule.E:
                     # Find a representative child for this context
                     child = next(
-                        c
-                        for c in child_instances_to_aggregate
-                        if c.id == context[1]
+                        c for c in child_instances_to_aggregate if c.id == context[1]
                     )
                     process_aggregation_for_election(child)
 
