@@ -1,0 +1,6 @@
+fecfiler.transactions.itemization.get\_all\_children\_ids
+=========================================================
+
+.. currentmodule:: fecfiler.transactions.itemization
+
+.. autofunction:: get_all_children_ids

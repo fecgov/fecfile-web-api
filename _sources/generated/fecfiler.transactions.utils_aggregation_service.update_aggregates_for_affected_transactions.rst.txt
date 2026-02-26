@@ -1,0 +1,6 @@
+fecfiler.transactions.utils\_aggregation\_service.update\_aggregates\_for\_affected\_transactions
+=================================================================================================
+
+.. currentmodule:: fecfiler.transactions.utils_aggregation_service
+
+.. autofunction:: update_aggregates_for_affected_transactions

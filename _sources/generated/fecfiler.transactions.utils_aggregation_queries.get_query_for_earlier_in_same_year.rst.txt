@@ -1,0 +1,6 @@
+fecfiler.transactions.utils\_aggregation\_queries.get\_query\_for\_earlier\_in\_same\_year
+==========================================================================================
+
+.. currentmodule:: fecfiler.transactions.utils_aggregation_queries
+
+.. autofunction:: get_query_for_earlier_in_same_year

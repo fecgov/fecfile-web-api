@@ -1,0 +1,6 @@
+fecfiler.transactions.itemization.has\_itemized\_children
+=========================================================
+
+.. currentmodule:: fecfiler.transactions.itemization
+
+.. autofunction:: has_itemized_children

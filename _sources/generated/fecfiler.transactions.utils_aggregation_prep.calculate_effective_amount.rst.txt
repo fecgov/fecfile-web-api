@@ -1,0 +1,6 @@
+fecfiler.transactions.utils\_aggregation\_prep.calculate\_effective\_amount
+===========================================================================
+
+.. currentmodule:: fecfiler.transactions.utils_aggregation_prep
+
+.. autofunction:: calculate_effective_amount

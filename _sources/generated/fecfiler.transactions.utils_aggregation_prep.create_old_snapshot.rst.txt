@@ -1,0 +1,6 @@
+fecfiler.transactions.utils\_aggregation\_prep.create\_old\_snapshot
+====================================================================
+
+.. currentmodule:: fecfiler.transactions.utils_aggregation_prep
+
+.. autofunction:: create_old_snapshot

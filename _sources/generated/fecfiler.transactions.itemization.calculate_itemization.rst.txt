@@ -1,0 +1,6 @@
+fecfiler.transactions.itemization.calculate\_itemization
+========================================================
+
+.. currentmodule:: fecfiler.transactions.itemization
+
+.. autofunction:: calculate_itemization

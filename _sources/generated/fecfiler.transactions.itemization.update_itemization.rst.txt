@@ -1,0 +1,6 @@
+fecfiler.transactions.itemization.update\_itemization
+=====================================================
+
+.. currentmodule:: fecfiler.transactions.itemization
+
+.. autofunction:: update_itemization

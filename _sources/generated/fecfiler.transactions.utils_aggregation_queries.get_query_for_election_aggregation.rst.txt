@@ -1,0 +1,6 @@
+fecfiler.transactions.utils\_aggregation\_queries.get\_query\_for\_election\_aggregation
+========================================================================================
+
+.. currentmodule:: fecfiler.transactions.utils_aggregation_queries
+
+.. autofunction:: get_query_for_election_aggregation

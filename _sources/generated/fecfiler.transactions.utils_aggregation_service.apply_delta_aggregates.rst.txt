@@ -1,0 +1,6 @@
+fecfiler.transactions.utils\_aggregation\_service.apply\_delta\_aggregates
+==========================================================================
+
+.. currentmodule:: fecfiler.transactions.utils_aggregation_service
+
+.. autofunction:: apply_delta_aggregates

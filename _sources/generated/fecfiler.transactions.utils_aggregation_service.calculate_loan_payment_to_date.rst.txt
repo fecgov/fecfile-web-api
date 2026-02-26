@@ -1,0 +1,6 @@
+fecfiler.transactions.utils\_aggregation\_service.calculate\_loan\_payment\_to\_date
+====================================================================================
+
+.. currentmodule:: fecfiler.transactions.utils_aggregation_service
+
+.. autofunction:: calculate_loan_payment_to_date

@@ -19,6 +19,9 @@ fecfiler.transactions.managers.TransactionManager
 
    .. autosummary::
    
+      ~TransactionManager.ELECTION_AGGREGATE_CLAUSE
+      ~TransactionManager.ENTITY_AGGREGATE_CLAUSE
+      ~TransactionManager.ITEMIZATION_CLAUSE
       ~TransactionManager.LINE_LABEL_CLAUSE
       ~TransactionManager.LOAN_AGREEMENT_CLAUSE
       ~TransactionManager.ORDER_KEY_CLAUSE
@@ -112,6 +115,7 @@ fecfiler.transactions.managers.TransactionManager
    .. autosummary::
    
       ~TransactionManager.A
+      ~TransactionManager.AGGREGATE
       ~TransactionManager.AMOUNT_CLAUSE
       ~TransactionManager.AMOUNT_MAPPING
       ~TransactionManager.A_11
@@ -124,11 +128,14 @@ fecfiler.transactions.managers.TransactionManager
       ~TransactionManager.DATE_MAPPING
       ~TransactionManager.DISPLAY_NAME_CLAUSE
       ~TransactionManager.E
+      ~TransactionManager.EFFECTIVE_AMOUNT_CLAUSE
       ~TransactionManager.F
       ~TransactionManager.FORM_TYPE_CLAUSE
       ~TransactionManager.auto_created
       ~TransactionManager.creation_counter
       ~TransactionManager.db
+      ~TransactionManager.election_aggregate_window
+      ~TransactionManager.entity_aggregate_window
       ~TransactionManager.use_in_migrations
    
    

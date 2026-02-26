@@ -346,13 +346,22 @@ not have a method with the specified name.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_hard_delete_memo_when_empty</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_itemization_with_parent_child_disbursement</span></code>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_insert_transaction_between_existing_no_double_counting</span></code></a>()</p></td>
+<td><p>Test that inserting a transaction chronologically between two existing transactions in the same entity/aggregation chain does not result in double-counting in the aggregate for later transactions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_itemization_with_parent_child_disbursement</span></code>()</p></td>
 <td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_reaggregation_after_report_deletion" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_reaggregation_after_report_deletion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_reaggregation_after_report_deletion</span></code></a>()</p></td>
+<td><p>Test that deleting a report triggers re-aggregation of transactions in subsequent reports.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_tier3_itemization</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_transaction_and_memo_text_soft_delete</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_unitemization_cascades_to_children_in_other_chain</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -1102,6 +1111,21 @@ deleting the tier 2 deletes the tier 2 and 3
 deleting the tier 3 deletes only the tier 3</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting">
+<span class="sig-name descname"><span class="pre">test_insert_transaction_between_existing_no_double_counting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting" title="Link to this definition">¶</a></dt>
+<dd><p>Test that inserting a transaction chronologically between two existing
+transactions in the same entity/aggregation chain does not result in
+double-counting in the aggregate for later transactions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_reaggregation_after_report_deletion">
+<span class="sig-name descname"><span class="pre">test_reaggregation_after_report_deletion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_reaggregation_after_report_deletion" title="Link to this definition">¶</a></dt>
+<dd><p>Test that deleting a report triggers re-aggregation of transactions
+in subsequent reports.</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -1147,6 +1171,7 @@ deleting the tier 3 deletes only the tier 3</p>
 <li class="toctree-l3 current"><a class="reference internal" href="fecfiler.transactions.html">fecfiler.transactions</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.aggregation.html">fecfiler.transactions.aggregation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.apps.html">fecfiler.transactions.apps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.itemization.html">fecfiler.transactions.itemization</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.management.html">fecfiler.transactions.management</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.managers.html">fecfiler.transactions.managers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.migrations.html">fecfiler.transactions.migrations</a></li>
@@ -1244,6 +1269,8 @@ deleting the tier 3 deletes only the tier 3</p>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_coupled_transactions"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.test_delete_coupled_transactions()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_debt_transactions"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.test_delete_debt_transactions()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.test_delete_transaction_with_children()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_reaggregation_after_report_deletion"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.test_reaggregation_after_report_deletion()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1260,6 +1287,9 @@ deleting the tier 3 deletes only the tier 3</p>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.transaction_dependencies.html">fecfiler.transactions.transaction_dependencies</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.urls.html">fecfiler.transactions.urls</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.utils.html">fecfiler.transactions.utils</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.utils_aggregation_prep.html">fecfiler.transactions.utils_aggregation_prep</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.utils_aggregation_queries.html">fecfiler.transactions.utils_aggregation_queries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.utils_aggregation_service.html">fecfiler.transactions.utils_aggregation_service</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.transactions.views.html">fecfiler.transactions.views</a></li>
 </ul>
 </li>

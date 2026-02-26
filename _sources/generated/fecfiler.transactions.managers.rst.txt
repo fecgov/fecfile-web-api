@@ -8,6 +8,13 @@ fecfiler.transactions.managers
   
    
    
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+      :toctree:                                          
+   
+      ITEMIZATION_THRESHOLD
+   
    
 
    

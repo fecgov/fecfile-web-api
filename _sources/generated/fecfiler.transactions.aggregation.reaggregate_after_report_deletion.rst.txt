@@ -1,0 +1,6 @@
+fecfiler.transactions.aggregation.reaggregate\_after\_report\_deletion
+======================================================================
+
+.. currentmodule:: fecfiler.transactions.aggregation
+
+.. autofunction:: reaggregate_after_report_deletion

@@ -1,0 +1,6 @@
+fecfiler.transactions.utils\_aggregation\_service.calculate\_entity\_aggregates
+===============================================================================
+
+.. currentmodule:: fecfiler.transactions.utils_aggregation_service
+
+.. autofunction:: calculate_entity_aggregates

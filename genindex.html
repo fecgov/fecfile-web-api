@@ -358,6 +358,8 @@
 </li>
         <li><a href="generated/fecfiler.transactions.apps.TransactionsConfig.html#fecfiler.transactions.apps.TransactionsConfig.__init__">(fecfiler.transactions.apps.TransactionsConfig method)</a>
 </li>
+        <li><a href="generated/fecfiler.transactions.itemization.CascadeDirection.html#fecfiler.transactions.itemization.CascadeDirection.__init__">(fecfiler.transactions.itemization.CascadeDirection method)</a>
+</li>
         <li><a href="generated/fecfiler.transactions.managers.Schedule.html#fecfiler.transactions.managers.Schedule.__init__">(fecfiler.transactions.managers.Schedule method)</a>
 </li>
         <li><a href="generated/fecfiler.transactions.managers.TransactionManager.html#fecfiler.transactions.managers.TransactionManager.__init__">(fecfiler.transactions.managers.TransactionManager method)</a>
@@ -409,6 +411,10 @@
         <li><a href="generated/fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date.Migration.html#fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date.Migration.__init__">(fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date.Migration method)</a>
 </li>
         <li><a href="generated/fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration.html#fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration.__init__">(fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration method)</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration.html#fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration.__init__">(fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration method)</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration.html#fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration.__init__">(fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration method)</a>
 </li>
         <li><a href="generated/fecfiler.transactions.models.OverTwoHundredTypesScheduleA.html#fecfiler.transactions.models.OverTwoHundredTypesScheduleA.__init__">(fecfiler.transactions.models.OverTwoHundredTypesScheduleA method)</a>
 </li>
@@ -1580,6 +1586,10 @@
 </li>
         <li><a href="generated/fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration.html#fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration.apply">(fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration method)</a>
 </li>
+        <li><a href="generated/fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration.html#fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration.apply">(fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration method)</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration.html#fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration.apply">(fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration method)</a>
+</li>
         <li><a href="generated/fecfiler.user.migrations.0001_initial.Migration.html#fecfiler.user.migrations.0001_initial.Migration.apply">(fecfiler.user.migrations.0001_initial.Migration method)</a>
 </li>
         <li><a href="generated/fecfiler.user.migrations.0002_remove_user_cmtee_id.Migration.html#fecfiler.user.migrations.0002_remove_user_cmtee_id.Migration.apply">(fecfiler.user.migrations.0002_remove_user_cmtee_id.Migration method)</a>
@@ -1601,6 +1611,10 @@
         <li><a href="generated/fecfiler.web_services.migrations.0003_uploadsubmission_fecfile_polling_attempts_and_more.Migration.html#fecfiler.web_services.migrations.0003_uploadsubmission_fecfile_polling_attempts_and_more.Migration.apply">(fecfiler.web_services.migrations.0003_uploadsubmission_fecfile_polling_attempts_and_more.Migration method)</a>
 </li>
       </ul></li>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_service.apply_delete_delta_aggregates.html#fecfiler.transactions.utils_aggregation_service.apply_delete_delta_aggregates">apply_delete_delta_aggregates() (in module fecfiler.transactions.utils_aggregation_service)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_service.apply_delta_aggregates.html#fecfiler.transactions.utils_aggregation_service.apply_delta_aggregates">apply_delta_aggregates() (in module fecfiler.transactions.utils_aggregation_service)</a>
+</li>
       <li><a href="generated/fecfiler.cash_on_hand.views.CashOnHandYearlyViewSet.html#fecfiler.cash_on_hand.views.CashOnHandYearlyViewSet.as_view">as_view() (fecfiler.cash_on_hand.views.CashOnHandYearlyViewSet class method)</a>
 
       <ul>
@@ -11223,7 +11237,17 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/fecfiler.transactions.migrations.0015_merge_transaction_triggers.calculate_aggregates.html#fecfiler.transactions.migrations.0015_merge_transaction_triggers.calculate_aggregates">calculate_aggregates() (in module fecfiler.transactions.migrations.0015_merge_transaction_triggers)</a>
 </li>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_service.calculate_calendar_ytd_per_election_office.html#fecfiler.transactions.utils_aggregation_service.calculate_calendar_ytd_per_election_office">calculate_calendar_ytd_per_election_office() (in module fecfiler.transactions.utils_aggregation_service)</a>
+</li>
       <li><a href="generated/fecfiler.reports.form_3x.summary.calculate_cash_on_hand_fields.html#fecfiler.reports.form_3x.summary.calculate_cash_on_hand_fields">calculate_cash_on_hand_fields() (in module fecfiler.reports.form_3x.summary)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_prep.calculate_effective_amount.html#fecfiler.transactions.utils_aggregation_prep.calculate_effective_amount">calculate_effective_amount() (in module fecfiler.transactions.utils_aggregation_prep)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_service.calculate_entity_aggregates.html#fecfiler.transactions.utils_aggregation_service.calculate_entity_aggregates">calculate_entity_aggregates() (in module fecfiler.transactions.utils_aggregation_service)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.itemization.calculate_itemization.html#fecfiler.transactions.itemization.calculate_itemization">calculate_itemization() (in module fecfiler.transactions.itemization)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_service.calculate_loan_payment_to_date.html#fecfiler.transactions.utils_aggregation_service.calculate_loan_payment_to_date">calculate_loan_payment_to_date() (in module fecfiler.transactions.utils_aggregation_service)</a>
 </li>
       <li><a href="generated/fecfiler.web_services.tasks.calculate_polling_interval.html#fecfiler.web_services.tasks.calculate_polling_interval">calculate_polling_interval() (in module fecfiler.web_services.tasks)</a>
 </li>
@@ -11440,6 +11464,12 @@
       <li><a href="generated/fecfiler.transactions.schedule_c.utils.carry_forward_loan.html#fecfiler.transactions.schedule_c.utils.carry_forward_loan">carry_forward_loan() (in module fecfiler.transactions.schedule_c.utils)</a>
 </li>
       <li><a href="generated/fecfiler.transactions.schedule_c.utils.carry_forward_loans.html#fecfiler.transactions.schedule_c.utils.carry_forward_loans">carry_forward_loans() (in module fecfiler.transactions.schedule_c.utils)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.itemization.cascade_itemization_to_parents.html#fecfiler.transactions.itemization.cascade_itemization_to_parents">cascade_itemization_to_parents() (in module fecfiler.transactions.itemization)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.itemization.cascade_unitemization_to_children.html#fecfiler.transactions.itemization.cascade_unitemization_to_children">cascade_unitemization_to_children() (in module fecfiler.transactions.itemization)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.itemization.CascadeDirection.html#fecfiler.transactions.itemization.CascadeDirection">CascadeDirection (class in fecfiler.transactions.itemization)</a>
 </li>
       <li><a href="generated/fecfiler.committee_accounts.models.Membership.html#fecfiler.committee_accounts.models.Membership.CommitteeRole.casefold">casefold() (fecfiler.committee_accounts.models.Membership.CommitteeRole method)</a>
 
@@ -12286,6 +12316,8 @@
       <li><a href="generated/fecfiler.transactions.tests.utils.create_loan_from_bank.html#fecfiler.transactions.tests.utils.create_loan_from_bank">create_loan_from_bank() (in module fecfiler.transactions.tests.utils)</a>
 </li>
       <li><a href="generated/fecfiler.committee_accounts.migrations.0002_membership.create_memberships.html#fecfiler.committee_accounts.migrations.0002_membership.create_memberships">create_memberships() (in module fecfiler.committee_accounts.migrations.0002_membership)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_prep.create_old_snapshot.html#fecfiler.transactions.utils_aggregation_prep.create_old_snapshot">create_old_snapshot() (in module fecfiler.transactions.utils_aggregation_prep)</a>
 </li>
       <li><a href="generated/fecfiler.contacts.serializers.create_or_update_contact.html#fecfiler.contacts.serializers.create_or_update_contact">create_or_update_contact() (in module fecfiler.contacts.serializers)</a>
 </li>
@@ -15445,8 +15477,6 @@
         <li><a href="generated/fecfiler.reports.report_code_label.html#module-fecfiler.reports.report_code_label">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     fecfiler.reports.serializers
 
@@ -15468,6 +15498,8 @@
         <li><a href="generated/fecfiler.reports.tests.html#module-fecfiler.reports.tests">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     fecfiler.reports.tests.test_models
 
@@ -15641,6 +15673,13 @@
 
       <ul>
         <li><a href="generated/fecfiler.transactions.apps.html#module-fecfiler.transactions.apps">module</a>
+</li>
+      </ul></li>
+      <li>
+    fecfiler.transactions.itemization
+
+      <ul>
+        <li><a href="generated/fecfiler.transactions.itemization.html#module-fecfiler.transactions.itemization">module</a>
 </li>
       </ul></li>
       <li>
@@ -15837,6 +15876,20 @@
 
       <ul>
         <li><a href="generated/fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.html#module-fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more">module</a>
+</li>
+      </ul></li>
+      <li>
+    fecfiler.transactions.migrations.0025_drop_aggregate_triggers
+
+      <ul>
+        <li><a href="generated/fecfiler.transactions.migrations.0025_drop_aggregate_triggers.html#module-fecfiler.transactions.migrations.0025_drop_aggregate_triggers">module</a>
+</li>
+      </ul></li>
+      <li>
+    fecfiler.transactions.migrations.0026_alter_transaction_itemized
+
+      <ul>
+        <li><a href="generated/fecfiler.transactions.migrations.0026_alter_transaction_itemized.html#module-fecfiler.transactions.migrations.0026_alter_transaction_itemized">module</a>
 </li>
       </ul></li>
       <li>
@@ -16369,6 +16422,27 @@
 
       <ul>
         <li><a href="generated/fecfiler.transactions.utils.html#module-fecfiler.transactions.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    fecfiler.transactions.utils_aggregation_prep
+
+      <ul>
+        <li><a href="generated/fecfiler.transactions.utils_aggregation_prep.html#module-fecfiler.transactions.utils_aggregation_prep">module</a>
+</li>
+      </ul></li>
+      <li>
+    fecfiler.transactions.utils_aggregation_queries
+
+      <ul>
+        <li><a href="generated/fecfiler.transactions.utils_aggregation_queries.html#module-fecfiler.transactions.utils_aggregation_queries">module</a>
+</li>
+      </ul></li>
+      <li>
+    fecfiler.transactions.utils_aggregation_service
+
+      <ul>
+        <li><a href="generated/fecfiler.transactions.utils_aggregation_service.html#module-fecfiler.transactions.utils_aggregation_service">module</a>
 </li>
       </ul></li>
       <li>
@@ -17089,7 +17163,7 @@
         <li><a href="generated/fecfiler.user.views.UserViewSet.html#fecfiler.user.views.UserViewSet.filter_queryset">(fecfiler.user.views.UserViewSet method)</a>
 </li>
       </ul></li>
-      <li><a href="generated/fecfiler.transactions.utils.filter_queryset_for_previous_transactions_in_aggregation.html#fecfiler.transactions.utils.filter_queryset_for_previous_transactions_in_aggregation">filter_queryset_for_previous_transactions_in_aggregation() (in module fecfiler.transactions.utils)</a>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_queries.filter_queryset_for_previous_transactions_in_aggregation.html#fecfiler.transactions.utils_aggregation_queries.filter_queryset_for_previous_transactions_in_aggregation">filter_queryset_for_previous_transactions_in_aggregation() (in module fecfiler.transactions.utils_aggregation_queries)</a>
 </li>
       <li><a href="generated/fecfiler.oidc.backends.OIDCAuthenticationBackend.html#fecfiler.oidc.backends.OIDCAuthenticationBackend.filter_users_by_claims">filter_users_by_claims() (fecfiler.oidc.backends.OIDCAuthenticationBackend method)</a>
 </li>
@@ -17331,6 +17405,10 @@
         <li><a href="generated/fecfiler.web_services.models.WebPrintSubmissionManager.html#fecfiler.web_services.models.WebPrintSubmissionManager.get">(fecfiler.web_services.models.WebPrintSubmissionManager method)</a>
 </li>
       </ul></li>
+      <li><a href="generated/fecfiler.transactions.itemization.get_all_children_ids.html#fecfiler.transactions.itemization.get_all_children_ids">get_all_children_ids() (in module fecfiler.transactions.itemization)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.itemization.get_all_parent_ids.html#fecfiler.transactions.itemization.get_all_parent_ids">get_all_parent_ids() (in module fecfiler.transactions.itemization)</a>
+</li>
       <li><a href="generated/fecfiler.routers.get_all_routers.html#fecfiler.routers.get_all_routers">get_all_routers() (in module fecfiler.routers)</a>
 </li>
       <li><a href="generated/fecfiler.cash_on_hand.serializers.CashOnHandYearlySerializer.html#fecfiler.cash_on_hand.serializers.CashOnHandYearlySerializer.get_attribute">get_attribute() (fecfiler.cash_on_hand.serializers.CashOnHandYearlySerializer method)</a>
@@ -18353,6 +18431,8 @@
       </ul></li>
       <li><a href="generated/fecfiler.oidc.oidc_op_config.get_oidc_op_config.html#fecfiler.oidc.oidc_op_config.get_oidc_op_config">get_oidc_op_config() (in module fecfiler.oidc.oidc_op_config)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/fecfiler.reports.managers.ReportManager.html#fecfiler.reports.managers.ReportManager.get_or_create">get_or_create() (fecfiler.reports.managers.ReportManager method)</a>
 
       <ul>
@@ -18365,8 +18445,6 @@
         <li><a href="generated/fecfiler.web_services.models.WebPrintSubmissionManager.html#fecfiler.web_services.models.WebPrintSubmissionManager.get_or_create">(fecfiler.web_services.models.WebPrintSubmissionManager method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/fecfiler.mock_oidc_provider.views.get_or_create_kdat_dict.html#fecfiler.mock_oidc_provider.views.get_or_create_kdat_dict">get_or_create_kdat_dict() (in module fecfiler.mock_oidc_provider.views)</a>
 </li>
       <li><a href="generated/fecfiler.oidc.backends.OIDCAuthenticationBackend.html#fecfiler.oidc.backends.OIDCAuthenticationBackend.get_or_create_user">get_or_create_user() (fecfiler.oidc.backends.OIDCAuthenticationBackend method)</a>
@@ -18539,17 +18617,17 @@
 </li>
       <li><a href="generated/fecfiler.committee_accounts.utils.accounts.get_production_committee_emails.html#fecfiler.committee_accounts.utils.accounts.get_production_committee_emails">get_production_committee_emails() (in module fecfiler.committee_accounts.utils.accounts)</a>
 </li>
-      <li><a href="generated/fecfiler.transactions.utils.get_query_for_aggregation_relationship.html#fecfiler.transactions.utils.get_query_for_aggregation_relationship">get_query_for_aggregation_relationship() (in module fecfiler.transactions.utils)</a>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_queries.get_query_for_aggregation_relationship.html#fecfiler.transactions.utils_aggregation_queries.get_query_for_aggregation_relationship">get_query_for_aggregation_relationship() (in module fecfiler.transactions.utils_aggregation_queries)</a>
 </li>
-      <li><a href="generated/fecfiler.transactions.utils.get_query_for_earlier_in_same_day.html#fecfiler.transactions.utils.get_query_for_earlier_in_same_day">get_query_for_earlier_in_same_day() (in module fecfiler.transactions.utils)</a>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_queries.get_query_for_earlier_in_same_day.html#fecfiler.transactions.utils_aggregation_queries.get_query_for_earlier_in_same_day">get_query_for_earlier_in_same_day() (in module fecfiler.transactions.utils_aggregation_queries)</a>
 </li>
-      <li><a href="generated/fecfiler.transactions.utils.get_query_for_earlier_in_same_year.html#fecfiler.transactions.utils.get_query_for_earlier_in_same_year">get_query_for_earlier_in_same_year() (in module fecfiler.transactions.utils)</a>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_queries.get_query_for_earlier_in_same_year.html#fecfiler.transactions.utils_aggregation_queries.get_query_for_earlier_in_same_year">get_query_for_earlier_in_same_year() (in module fecfiler.transactions.utils_aggregation_queries)</a>
 </li>
-      <li><a href="generated/fecfiler.transactions.utils.get_query_for_election_aggregation.html#fecfiler.transactions.utils.get_query_for_election_aggregation">get_query_for_election_aggregation() (in module fecfiler.transactions.utils)</a>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_queries.get_query_for_election_aggregation.html#fecfiler.transactions.utils_aggregation_queries.get_query_for_election_aggregation">get_query_for_election_aggregation() (in module fecfiler.transactions.utils_aggregation_queries)</a>
 </li>
-      <li><a href="generated/fecfiler.transactions.utils.get_query_for_entity_aggregation.html#fecfiler.transactions.utils.get_query_for_entity_aggregation">get_query_for_entity_aggregation() (in module fecfiler.transactions.utils)</a>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_queries.get_query_for_entity_aggregation.html#fecfiler.transactions.utils_aggregation_queries.get_query_for_entity_aggregation">get_query_for_entity_aggregation() (in module fecfiler.transactions.utils_aggregation_queries)</a>
 </li>
-      <li><a href="generated/fecfiler.transactions.utils.get_query_for_payee_candidate_aggregation.html#fecfiler.transactions.utils.get_query_for_payee_candidate_aggregation">get_query_for_payee_candidate_aggregation() (in module fecfiler.transactions.utils)</a>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_queries.get_query_for_payee_candidate_aggregation.html#fecfiler.transactions.utils_aggregation_queries.get_query_for_payee_candidate_aggregation">get_query_for_payee_candidate_aggregation() (in module fecfiler.transactions.utils_aggregation_queries)</a>
 </li>
       <li><a href="generated/fecfiler.cash_on_hand.views.CashOnHandYearlyViewSet.html#fecfiler.cash_on_hand.views.CashOnHandYearlyViewSet.get_queryset">get_queryset() (fecfiler.cash_on_hand.views.CashOnHandYearlyViewSet method)</a>
 
@@ -19495,14 +19573,16 @@
 </li>
       <li><a href="generated/fecfiler.transactions.migrations.0015_merge_transaction_triggers.handle_parent_itemization.html#fecfiler.transactions.migrations.0015_merge_transaction_triggers.handle_parent_itemization">handle_parent_itemization() (in module fecfiler.transactions.migrations.0015_merge_transaction_triggers)</a>
 </li>
+      <li><a href="generated/fecfiler.transactions.itemization.has_itemized_children.html#fecfiler.transactions.itemization.has_itemized_children">has_itemized_children() (in module fecfiler.transactions.itemization)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/fecfiler.oidc.backends.OIDCAuthenticationBackend.html#fecfiler.oidc.backends.OIDCAuthenticationBackend.has_module_perms">has_module_perms() (fecfiler.oidc.backends.OIDCAuthenticationBackend method)</a>
 
       <ul>
         <li><a href="generated/fecfiler.user.models.User.html#fecfiler.user.models.User.has_module_perms">(fecfiler.user.models.User method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="generated/fecfiler.committee_accounts.views.IsCommitteeAdministrator.html#fecfiler.committee_accounts.views.IsCommitteeAdministrator.has_object_permission">has_object_permission() (fecfiler.committee_accounts.views.IsCommitteeAdministrator method)</a>
 </li>
       <li><a href="generated/fecfiler.user.models.User.html#fecfiler.user.models.User.has_perm">has_perm() (fecfiler.user.models.User method)</a>
@@ -19923,6 +20003,8 @@
         <li><a href="generated/fecfiler.web_services.models.FECSubmissionState.html#fecfiler.web_services.models.FECSubmissionState.isupper">(fecfiler.web_services.models.FECSubmissionState method)</a>
 </li>
       </ul></li>
+      <li><a href="generated/fecfiler.transactions.managers.ITEMIZATION_THRESHOLD.html#fecfiler.transactions.managers.ITEMIZATION_THRESHOLD">ITEMIZATION_THRESHOLD (in module fecfiler.transactions.managers)</a>
+</li>
       <li><a href="generated/fecfiler.reports.managers.ReportManager.html#fecfiler.reports.managers.ReportManager.iterator">iterator() (fecfiler.reports.managers.ReportManager method)</a>
 
       <ul>
@@ -20359,6 +20441,10 @@
         <li><a href="generated/fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date.Migration.html#fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date.Migration">(class in fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date)</a>
 </li>
         <li><a href="generated/fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration.html#fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration">(class in fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more)</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration.html#fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration">(class in fecfiler.transactions.migrations.0025_drop_aggregate_triggers)</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration.html#fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration">(class in fecfiler.transactions.migrations.0026_alter_transaction_itemized)</a>
 </li>
         <li><a href="generated/fecfiler.user.migrations.0001_initial.Migration.html#fecfiler.user.migrations.0001_initial.Migration">(class in fecfiler.user.migrations.0001_initial)</a>
 </li>
@@ -20995,6 +21081,8 @@
 </li>
         <li><a href="generated/fecfiler.transactions.apps.html#module-fecfiler.transactions.apps">fecfiler.transactions.apps</a>
 </li>
+        <li><a href="generated/fecfiler.transactions.itemization.html#module-fecfiler.transactions.itemization">fecfiler.transactions.itemization</a>
+</li>
         <li><a href="generated/fecfiler.transactions.management.html#module-fecfiler.transactions.management">fecfiler.transactions.management</a>
 </li>
         <li><a href="generated/fecfiler.transactions.management.commands.html#module-fecfiler.transactions.management.commands">fecfiler.transactions.management.commands</a>
@@ -21050,6 +21138,10 @@
         <li><a href="generated/fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date.html#module-fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date">fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date</a>
 </li>
         <li><a href="generated/fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.html#module-fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more">fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.migrations.0025_drop_aggregate_triggers.html#module-fecfiler.transactions.migrations.0025_drop_aggregate_triggers">fecfiler.transactions.migrations.0025_drop_aggregate_triggers</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.migrations.0026_alter_transaction_itemized.html#module-fecfiler.transactions.migrations.0026_alter_transaction_itemized">fecfiler.transactions.migrations.0026_alter_transaction_itemized</a>
 </li>
         <li><a href="generated/fecfiler.transactions.models.html#module-fecfiler.transactions.models">fecfiler.transactions.models</a>
 </li>
@@ -21202,6 +21294,12 @@
         <li><a href="generated/fecfiler.transactions.urls.html#module-fecfiler.transactions.urls">fecfiler.transactions.urls</a>
 </li>
         <li><a href="generated/fecfiler.transactions.utils.html#module-fecfiler.transactions.utils">fecfiler.transactions.utils</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.utils_aggregation_prep.html#module-fecfiler.transactions.utils_aggregation_prep">fecfiler.transactions.utils_aggregation_prep</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.utils_aggregation_queries.html#module-fecfiler.transactions.utils_aggregation_queries">fecfiler.transactions.utils_aggregation_queries</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.utils_aggregation_service.html#module-fecfiler.transactions.utils_aggregation_service">fecfiler.transactions.utils_aggregation_service</a>
 </li>
         <li><a href="generated/fecfiler.transactions.views.html#module-fecfiler.transactions.views">fecfiler.transactions.views</a>
 </li>
@@ -21482,6 +21580,10 @@
         <li><a href="generated/fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date.Migration.html#fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date.Migration.mutate_state">(fecfiler.transactions.migrations.0023_optimize_calculate_loan_payment_to_date.Migration method)</a>
 </li>
         <li><a href="generated/fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration.html#fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration.mutate_state">(fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration method)</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration.html#fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration.mutate_state">(fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration method)</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration.html#fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration.mutate_state">(fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration method)</a>
 </li>
         <li><a href="generated/fecfiler.user.migrations.0001_initial.Migration.html#fecfiler.user.migrations.0001_initial.Migration.mutate_state">(fecfiler.user.migrations.0001_initial.Migration method)</a>
 </li>
@@ -21920,6 +22022,12 @@
 </li>
       <li><a href="generated/fecfiler.transactions.aggregation.process_aggregation_for_debts.html#fecfiler.transactions.aggregation.process_aggregation_for_debts">process_aggregation_for_debts() (in module fecfiler.transactions.aggregation)</a>
 </li>
+      <li><a href="generated/fecfiler.transactions.aggregation.process_aggregation_for_election.html#fecfiler.transactions.aggregation.process_aggregation_for_election">process_aggregation_for_election() (in module fecfiler.transactions.aggregation)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.aggregation.process_aggregation_for_entity.html#fecfiler.transactions.aggregation.process_aggregation_for_entity">process_aggregation_for_entity() (in module fecfiler.transactions.aggregation)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.aggregation.process_aggregation_for_entity_contact.html#fecfiler.transactions.aggregation.process_aggregation_for_entity_contact">process_aggregation_for_entity_contact() (in module fecfiler.transactions.aggregation)</a>
+</li>
       <li><a href="generated/fecfiler.transactions.migrations.0015_merge_transaction_triggers.process_itemization.html#fecfiler.transactions.migrations.0015_merge_transaction_triggers.process_itemization">process_itemization() (in module fecfiler.transactions.migrations.0015_merge_transaction_triggers)</a>
 </li>
   </ul></td>
@@ -21956,6 +22064,10 @@
         <li><a href="generated/fecfiler.transactions.apps.TransactionsConfig.html#fecfiler.transactions.apps.TransactionsConfig.ready">(fecfiler.transactions.apps.TransactionsConfig method)</a>
 </li>
       </ul></li>
+      <li><a href="generated/fecfiler.transactions.aggregation.reaggregate_after_report_deletion.html#fecfiler.transactions.aggregation.reaggregate_after_report_deletion">reaggregate_after_report_deletion() (in module fecfiler.transactions.aggregation)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_service.recalculate_aggregates_for_transaction.html#fecfiler.transactions.utils_aggregation_service.recalculate_aggregates_for_transaction">recalculate_aggregates_for_transaction() (in module fecfiler.transactions.utils_aggregation_service)</a>
+</li>
       <li><a href="generated/fecfiler.celery.receiver_setup_logging.html#fecfiler.celery.receiver_setup_logging">receiver_setup_logging() (in module fecfiler.celery)</a>
 </li>
       <li><a href="generated/fecfiler.devops.utils.redis.refresh_cache.html#fecfiler.devops.utils.redis.refresh_cache">refresh_cache() (in module fecfiler.devops.utils.redis)</a>
@@ -24593,6 +24705,10 @@
 </li>
         <li><a href="generated/fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration.html#fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration.suggest_name">(fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration method)</a>
 </li>
+        <li><a href="generated/fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration.html#fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration.suggest_name">(fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration method)</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration.html#fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration.suggest_name">(fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration method)</a>
+</li>
         <li><a href="generated/fecfiler.user.migrations.0001_initial.Migration.html#fecfiler.user.migrations.0001_initial.Migration.suggest_name">(fecfiler.user.migrations.0001_initial.Migration method)</a>
 </li>
         <li><a href="generated/fecfiler.user.migrations.0002_remove_user_cmtee_id.Migration.html#fecfiler.user.migrations.0002_remove_user_cmtee_id.Migration.suggest_name">(fecfiler.user.migrations.0002_remove_user_cmtee_id.Migration method)</a>
@@ -25038,11 +25154,15 @@
 </li>
       <li><a href="generated/fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.html#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_get_jf_transfer_descriptions">test_get_jf_transfer_descriptions() (fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase method)</a>
 </li>
+      <li><a href="generated/fecfiler.transactions.tests.test_models.TransactionModelTestCase.html#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting">test_insert_transaction_between_existing_no_double_counting() (fecfiler.transactions.tests.test_models.TransactionModelTestCase method)</a>
+</li>
       <li><a href="generated/fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.html#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_memo">test_jf_memo() (fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase method)</a>
 </li>
       <li><a href="generated/fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.html#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo">test_jf_partnership_memo() (fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase method)</a>
 </li>
       <li><a href="generated/fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.html#fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase.test_jf_partnership_memo_with_attribution">test_jf_partnership_memo_with_attribution() (fecfiler.transactions.tests.test_transaction_dependencies.TransactionDependenciesTestCase method)</a>
+</li>
+      <li><a href="generated/fecfiler.transactions.tests.test_models.TransactionModelTestCase.html#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_reaggregation_after_report_deletion">test_reaggregation_after_report_deletion() (fecfiler.transactions.tests.test_models.TransactionModelTestCase method)</a>
 </li>
       <li><a href="generated/fecfiler.test_runner.CustomTestRunner.html#fecfiler.test_runner.CustomTestRunner.test_runner">test_runner (fecfiler.test_runner.CustomTestRunner attribute)</a>
 </li>
@@ -25425,6 +25545,10 @@
 </li>
         <li><a href="generated/fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration.html#fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration.unapply">(fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more.Migration method)</a>
 </li>
+        <li><a href="generated/fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration.html#fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration.unapply">(fecfiler.transactions.migrations.0025_drop_aggregate_triggers.Migration method)</a>
+</li>
+        <li><a href="generated/fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration.html#fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration.unapply">(fecfiler.transactions.migrations.0026_alter_transaction_itemized.Migration method)</a>
+</li>
         <li><a href="generated/fecfiler.user.migrations.0001_initial.Migration.html#fecfiler.user.migrations.0001_initial.Migration.unapply">(fecfiler.user.migrations.0001_initial.Migration method)</a>
 </li>
         <li><a href="generated/fecfiler.user.migrations.0002_remove_user_cmtee_id.Migration.html#fecfiler.user.migrations.0002_remove_user_cmtee_id.Migration.unapply">(fecfiler.user.migrations.0002_remove_user_cmtee_id.Migration method)</a>
@@ -25466,6 +25590,8 @@
         <li><a href="generated/fecfiler.web_services.models.WebPrintSubmissionManager.html#fecfiler.web_services.models.WebPrintSubmissionManager.update">(fecfiler.web_services.models.WebPrintSubmissionManager method)</a>
 </li>
       </ul></li>
+      <li><a href="generated/fecfiler.transactions.utils_aggregation_service.update_aggregates_for_affected_transactions.html#fecfiler.transactions.utils_aggregation_service.update_aggregates_for_affected_transactions">update_aggregates_for_affected_transactions() (in module fecfiler.transactions.utils_aggregation_service)</a>
+</li>
       <li><a href="generated/fecfiler.transactions.migrations.0012_alter_transactions_blocking_reports.update_blocking_reports_default.html#fecfiler.transactions.migrations.0012_alter_transactions_blocking_reports.update_blocking_reports_default">update_blocking_reports_default() (in module fecfiler.transactions.migrations.0012_alter_transactions_blocking_reports)</a>
 </li>
       <li><a href="generated/fecfiler.transactions.migrations.0015_merge_transaction_triggers.update_can_unamend.html#fecfiler.transactions.migrations.0015_merge_transaction_triggers.update_can_unamend">update_can_unamend() (in module fecfiler.transactions.migrations.0015_merge_transaction_triggers)</a>
@@ -25496,6 +25622,8 @@
         <li><a href="generated/fecfiler.transactions.schedule_d.views.update_in_future_reports.html#fecfiler.transactions.schedule_d.views.update_in_future_reports">(in module fecfiler.transactions.schedule_d.views)</a>
 </li>
       </ul></li>
+      <li><a href="generated/fecfiler.transactions.itemization.update_itemization.html#fecfiler.transactions.itemization.update_itemization">update_itemization() (in module fecfiler.transactions.itemization)</a>
+</li>
       <li><a href="generated/fecfiler.transactions.schedule_c.views.update_memo_text_in_future_reports.html#fecfiler.transactions.schedule_c.views.update_memo_text_in_future_reports">update_memo_text_in_future_reports() (in module fecfiler.transactions.schedule_c.views)</a>
 </li>
       <li><a href="generated/fecfiler.reports.managers.ReportManager.html#fecfiler.reports.managers.ReportManager.update_or_create">update_or_create() (fecfiler.reports.managers.ReportManager method)</a>

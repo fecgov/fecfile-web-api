@@ -1,0 +1,6 @@
+fecfiler.transactions.managers.ITEMIZATION\_THRESHOLD
+=====================================================
+
+.. currentmodule:: fecfiler.transactions.managers
+
+.. autodata:: ITEMIZATION_THRESHOLD

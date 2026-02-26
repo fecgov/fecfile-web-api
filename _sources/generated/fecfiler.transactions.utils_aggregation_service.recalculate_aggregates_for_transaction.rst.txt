@@ -1,0 +1,6 @@
+fecfiler.transactions.utils\_aggregation\_service.recalculate\_aggregates\_for\_transaction
+===========================================================================================
+
+.. currentmodule:: fecfiler.transactions.utils_aggregation_service
+
+.. autofunction:: recalculate_aggregates_for_transaction

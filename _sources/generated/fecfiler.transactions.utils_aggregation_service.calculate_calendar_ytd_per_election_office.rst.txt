@@ -1,0 +1,6 @@
+fecfiler.transactions.utils\_aggregation\_service.calculate\_calendar\_ytd\_per\_election\_office
+=================================================================================================
+
+.. currentmodule:: fecfiler.transactions.utils_aggregation_service
+
+.. autofunction:: calculate_calendar_ytd_per_election_office

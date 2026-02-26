@@ -1,0 +1,6 @@
+fecfiler.transactions.itemization.cascade\_itemization\_to\_parents
+===================================================================
+
+.. currentmodule:: fecfiler.transactions.itemization
+
+.. autofunction:: cascade_itemization_to_parents

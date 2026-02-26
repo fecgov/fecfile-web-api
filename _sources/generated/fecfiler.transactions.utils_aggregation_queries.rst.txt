@@ -1,0 +1,39 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.transactions.utils\_aggregation\_queries
+=================================================
+
+.. automodule:: fecfiler.transactions.utils_aggregation_queries
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      filter_queryset_for_previous_transactions_in_aggregation
+      get_query_for_aggregation_relationship
+      get_query_for_earlier_in_same_day
+      get_query_for_earlier_in_same_year
+      get_query_for_election_aggregation
+      get_query_for_entity_aggregation
+      get_query_for_payee_candidate_aggregation
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

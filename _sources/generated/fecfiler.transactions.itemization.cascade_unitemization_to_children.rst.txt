@@ -1,0 +1,6 @@
+fecfiler.transactions.itemization.cascade\_unitemization\_to\_children
+======================================================================
+
+.. currentmodule:: fecfiler.transactions.itemization
+
+.. autofunction:: cascade_unitemization_to_children

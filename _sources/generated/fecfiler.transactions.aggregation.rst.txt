@@ -19,6 +19,10 @@ fecfiler.transactions.aggregation
    
       process_aggregation_by_payee_candidate
       process_aggregation_for_debts
+      process_aggregation_for_election
+      process_aggregation_for_entity
+      process_aggregation_for_entity_contact
+      reaggregate_after_report_deletion
    
    
 

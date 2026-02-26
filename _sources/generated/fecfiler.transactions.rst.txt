@@ -33,6 +33,7 @@ fecfiler.transactions
 
    fecfiler.transactions.aggregation
    fecfiler.transactions.apps
+   fecfiler.transactions.itemization
    fecfiler.transactions.management
    fecfiler.transactions.managers
    fecfiler.transactions.migrations
@@ -52,5 +53,8 @@ fecfiler.transactions
    fecfiler.transactions.transaction_dependencies
    fecfiler.transactions.urls
    fecfiler.transactions.utils
+   fecfiler.transactions.utils_aggregation_prep
+   fecfiler.transactions.utils_aggregation_queries
+   fecfiler.transactions.utils_aggregation_service
    fecfiler.transactions.views
 

@@ -1,0 +1,29 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.transactions.itemization.CascadeDirection
+==================================================
+
+.. currentmodule:: fecfiler.transactions.itemization
+
+.. autoclass:: CascadeDirection
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~CascadeDirection.TO_PARENTS
+      ~CascadeDirection.TO_CHILDREN
+   
+   
