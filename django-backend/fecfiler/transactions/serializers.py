@@ -56,6 +56,8 @@ REDESIGNATED = "REDESIGNATED"
 REATTRIBUTION_TO = "REATTRIBUTION_TO"
 REDESIGNATION_TO = "REDESIGNATION_TO"
 
+DEFAULT_ZERO_FIELDS = ["beginning_balance", "payment_amount", "payment_prior"]
+
 
 class TransactionSerializer(
     LinkedMemoTextSerializerMixin,
@@ -212,6 +214,11 @@ class TransactionSerializer(
             representation["reatt_redes"] = TransactionSerializer().to_representation(
                 instance.reatt_redes
             )
+
+        # null decimals should be zeroes
+        for field in DEFAULT_ZERO_FIELDS:
+            if representation.get(field) is None:
+                representation[field] = 0.00
 
         representation["reports"] = []
         representation["report_ids"] = []
