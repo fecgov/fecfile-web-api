@@ -516,6 +516,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         # Link the transaction to all the reports it references in report_ids
         transaction_instance.reports.set(report_ids)
         if transaction_instance.schedule_c or transaction_instance.schedule_d:
+            schedule_instance.refresh_from_db()
             reports = Report.objects.filter(id__in=report_ids)
             coverage_through_date = None
             coverage_from_date = None
@@ -623,9 +624,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 elif context[0] == Schedule.E:
                     # Find a representative child for this context
                     child = next(
-                        c
-                        for c in child_instances_to_aggregate
-                        if c.id == context[1]
+                        c for c in child_instances_to_aggregate if c.id == context[1]
                     )
                     process_aggregation_for_election(child)
 
