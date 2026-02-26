@@ -247,13 +247,13 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
-        view_set.action = "previous_aggregate_by_entity"
+        view_set.action = "previous_transaction_by_entity"
 
         # leave out required params
-        response = view_set.previous_aggregate_by_entity(view_set.request)
+        response = view_set.previous_transaction_by_entity(view_set.request)
         self.assertEqual(response.status_code, 400)
 
-        response = view_set.previous_aggregate_by_entity(
+        response = view_set.previous_transaction_by_entity(
             self.post_request(
                 {},
                 {
@@ -269,7 +269,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
-        view_set.action = "previous_aggregate_by_entity"
+        view_set.action = "previous_transaction_by_entity"
 
         first_transaction = create_schedule_a(
             "IND",
@@ -289,7 +289,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         first_transaction.refresh_from_db()
         self.assertGreater(second_transaction.created, first_transaction.created)
-        response = view_set.previous_aggregate_by_entity(
+        response = view_set.previous_transaction_by_entity(
             self.post_request(
                 {},
                 {
@@ -302,7 +302,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(response.data["aggregate"], first_transaction.aggregate)
 
-        response = view_set.previous_aggregate_by_entity(
+        response = view_set.previous_transaction_by_entity(
             self.post_request(
                 {},
                 {
@@ -319,7 +319,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
-        view_set.action = "previous_aggregate_by_entity"
+        view_set.action = "previous_transaction_by_entity"
 
         first_transaction = create_schedule_a(
             "IND",
@@ -337,7 +337,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "47.00",
         )
 
-        response = view_set.previous_aggregate_by_entity(
+        response = view_set.previous_transaction_by_entity(
             self.post_request(
                 {},
                 {
@@ -427,7 +427,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
-        view_set.action = "previous_aggregate_by_entity"
+        view_set.action = "previous_transaction_by_entity"
 
         first_transaction = create_schedule_a(
             "IND",
@@ -453,7 +453,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "25.00",
         )
 
-        response = view_set.previous_aggregate_by_entity(
+        response = view_set.previous_transaction_by_entity(
             self.post_request(
                 {},
                 {
@@ -480,7 +480,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         saved_transaction = view_set.get_queryset().get(id=first_transaction.id)
         self.assertEqual(saved_transaction.aggregate, 178.00)
-        response = view_set.previous_aggregate_by_entity(
+        response = view_set.previous_transaction_by_entity(
             self.post_request(
                 {},
                 {
@@ -513,10 +513,10 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "candidate_office": "S",
             },
         )
-        view_set.action = "previous_aggregate_by_election"
+        view_set.action = "previous_transaction_by_election"
 
         # leave out required params
-        response = view_set.previous_aggregate_by_election(view_set.request)
+        response = view_set.previous_transaction_by_election(view_set.request)
         self.assertEqual(response.status_code, 400)
         view_set.request = self.post_request(
             {},
@@ -529,7 +529,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             },
         )
         # leave out required params
-        response = view_set.previous_aggregate_by_election(view_set.request)
+        response = view_set.previous_transaction_by_election(view_set.request)
         self.assertEqual(response.status_code, 400)
 
         view_set.request = self.post_request(
@@ -543,7 +543,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "candidate_district": "01",
             },
         )
-        response = view_set.previous_aggregate_by_election(view_set.request)
+        response = view_set.previous_transaction_by_election(view_set.request)
         aggregation_amounts = response.data
 
         self.assertEqual(
@@ -566,9 +566,9 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "candidate_district": "01",
             },
         )
-        view_set.action = "previous_aggregate_by_election"
+        view_set.action = "previous_transaction_by_election"
 
-        response = view_set.previous_aggregate_by_election(view_set.request)
+        response = view_set.previous_transaction_by_election(view_set.request)
         aggregation_amounts = response.data
 
         self.assertEqual(
@@ -1712,7 +1712,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 153.00)
         self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 200.00)
 
-    def test_previous_aggregate_by_payee_candidate(self):
+    def test_previous_transaction_by_payee_candidate(self):
         report = create_form3x(
             self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
         )
@@ -1797,7 +1797,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request(transaction_1_data)
-        view_set.action = "previous_aggregate_by_payee_candidate"
+        view_set.action = "previous_transaction_by_payee_candidate"
 
         # Test standard aggregation
         transaction_1 = view_set.save_transaction(transaction_1_data, view_set.request)
@@ -1832,7 +1832,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self._run_payee_candidate_test(view_set, params, 400)
 
         params["general_election_year"] = "2022"
-        response = view_set.previous_aggregate_by_payee_candidate(
+        response = view_set.previous_transaction_by_payee_candidate(
             self.post_request({}, params)
         )
         self.assertEqual(
@@ -1841,7 +1841,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         params["date"] = "2024-01-13"
-        response = view_set.previous_aggregate_by_payee_candidate(
+        response = view_set.previous_transaction_by_payee_candidate(
             self.post_request({}, params)
         )
         self.assertEqual(
@@ -1863,7 +1863,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         params["transaction_id"] = str(transaction_3.id)
         params["aggregation_group"] = "COORDINATED_PARTY_EXPENDITURES"
-        response = view_set.previous_aggregate_by_payee_candidate(
+        response = view_set.previous_transaction_by_payee_candidate(
             self.post_request({}, params)
         )
         self.assertEqual(
@@ -1872,7 +1872,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
     def _run_payee_candidate_test(self, view_set, params, expected):
-        response = view_set.previous_aggregate_by_payee_candidate(
+        response = view_set.previous_transaction_by_payee_candidate(
             self.post_request({}, params)
         )
         self.assertEqual(response.status_code, expected)

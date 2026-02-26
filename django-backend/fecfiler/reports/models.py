@@ -162,12 +162,22 @@ class Report(CommitteeOwnedModel):
     def delete(self):
         if not self.can_delete:
             raise ValidationError("Cannot delete report", status.HTTP_400_BAD_REQUEST)
-        if not self.form_24:
-            """only delete transactions if the report is the source of the
-            tranaction"""
-            from fecfiler.transactions.models import Transaction
 
+        if not self.form_24:
+            """only delete transactions if report is the source of the transaction"""
+            from fecfiler.transactions.models import Transaction
+            from fecfiler.transactions.aggregation import (
+                reaggregate_after_report_deletion,
+            )
+
+            # Prepare re-aggregation callback before transactions are deleted
+            reaggregate_callback = reaggregate_after_report_deletion(self)
+
+            # Delete the transactions
             Transaction.objects.filter(reports=self).delete()
+
+            # Trigger re-aggregation of remaining transactions
+            reaggregate_callback()
 
         """delete report-transaction links"""
         ReportTransaction.objects.filter(report=self).delete()

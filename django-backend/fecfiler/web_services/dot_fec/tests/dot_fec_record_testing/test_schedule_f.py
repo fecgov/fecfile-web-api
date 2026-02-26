@@ -126,6 +126,7 @@ class DotFECScheduleFTestCase(TestCase):
         )
         transaction.itemized = True
         transaction.save()
+        transaction.refresh_from_db()
         self.run_test(transaction)
 
     def test_org_form(self):
@@ -163,6 +164,7 @@ class DotFECScheduleFTestCase(TestCase):
         )
         transaction.itemized = True
         transaction.save()
+        transaction.refresh_from_db()
         self.run_test(transaction)
 
     def run_test(self, transaction: Transaction):
@@ -289,10 +291,10 @@ class DotFECScheduleFTestCase(TestCase):
 
         self.assertEqual(
             self.split_row[field_to_num["expenditure_date"]],
-            transaction.schedule_f.expenditure_date.replace("-", ""),
+            str(transaction.schedule_f.expenditure_date).replace("-", ""),
         )
         self.assertEqual(
-            self.split_row[field_to_num["expenditure_amount"]],
+            Decimal(self.split_row[field_to_num["expenditure_amount"]]),
             transaction.schedule_f.expenditure_amount,
         )
         self.assertEqual(
