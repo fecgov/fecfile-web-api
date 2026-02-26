@@ -172,6 +172,12 @@ class TransactionSerializer(
     def to_representation(self, instance):
         representation = super().to_representation(instance)
 
+        # Ensure debt fields are always decimal 0.00 if None
+        for field in ["beginning_balance", "payment_amount", "payment_prior"]:
+            value = representation.get(field)
+            if value is None:
+                representation[field] = 0.00
+
         self.handle_schedule_a(instance, representation)
         self.handle_schedule_b(instance, representation)
         self.handle_schedule_c(instance, representation)
