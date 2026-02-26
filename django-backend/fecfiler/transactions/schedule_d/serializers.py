@@ -1,6 +1,7 @@
 from rest_framework.serializers import (
     CharField,
     ModelSerializer,
+    DecimalField,
 )
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.shared.utilities import get_model_data
@@ -20,6 +21,8 @@ CONTACT_FIELDS = [
     'creditor_zip',
 ]
 
+DEFAULT_ZERO_FIELDS = ["beginning_balance", "payment_amount", "payment_prior"]
+
 
 class ScheduleDSerializer(ModelSerializer):
     creditor_organization_name = CharField(required=False, allow_null=True)
@@ -33,6 +36,13 @@ class ScheduleDSerializer(ModelSerializer):
     creditor_city = CharField(required=False, allow_null=True)
     creditor_state = CharField(required=False, allow_null=True)
     creditor_zip = CharField(required=False, allow_null=True)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        for field in DEFAULT_ZERO_FIELDS:
+            if representation.get(field) is None:
+                representation[field] = 0.00
+        return representation
 
     def create(self, validated_data):
         model_data = get_model_data(validated_data, ScheduleD)
