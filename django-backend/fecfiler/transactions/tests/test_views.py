@@ -220,7 +220,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(schedule_d.payment_amount, Decimal("0.00"))
         self.assertEqual(schedule_d.balance_at_close, Decimal("123.00"))
         self.assertEqual(
-            str(schedule_d.report_coverage_from_date), str(self.q1_report.coverage_from_date)
+            str(schedule_d.report_coverage_from_date),
+            str(self.q1_report.coverage_from_date),
         )
 
     def test_update_transaction_debt_ignores_null_payload_for_derived_fields(self):
@@ -229,7 +230,9 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         create_request = self.post_request(create_payload)
         debt = TransactionViewSet().save_transaction(create_request.data, create_request)
-        carried_over = Transaction.objects.get(reports__id=self.q2_report.id, debt_id=debt.id)
+        carried_over = Transaction.objects.get(
+            reports__id=self.q2_report.id, debt_id=debt.id
+        )
 
         update_payload = deepcopy(create_payload)
         update_payload["id"] = str(debt.id)
