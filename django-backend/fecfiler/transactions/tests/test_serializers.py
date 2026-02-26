@@ -12,8 +12,10 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.tests.utils import (
     create_schedule_a,
     create_schedule_b,
-    create_schedule_f
+    create_schedule_f,
+    create_debt,
 )
+from fecfiler.contacts.models import Contact
 
 
 class TransactionSerializerBaseTestCase(TestCase):
@@ -21,6 +23,7 @@ class TransactionSerializerBaseTestCase(TestCase):
     def setUp(self):
         self.missing_type_transaction = {}
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        self.contact = Contact.objects.create(committee_account=self.committee)
         self.user = User.objects.create(email="test@fec.gov", username="gov")
         self.mock_request = Request(HttpRequest())
         self.mock_request.user = self.user
@@ -114,3 +117,15 @@ class TransactionSerializerBaseTestCase(TestCase):
         representation = serializer.to_representation(transaction)
         self.assertEqual(representation["aggregate"], '62.00')
         self.assertEqual(representation["aggregate_general_elec_expended"], '62.00')
+
+    def test_debt_null_balances_serialize_as_zero(self):
+        transaction = create_debt(self.committee, self.contact, 100)
+        serializer = TransactionSerializer(
+            context={"request": self.mock_request},
+        )
+        representation = serializer.to_representation(transaction)
+
+        self.assertEqual(representation["beginning_balance"], "0.00")
+        self.assertEqual(representation["payment_amount"], "0.00")
+        self.assertEqual(representation["payment_prior"], "0.00")
+        self.assertNotIn("schedule_d", representation)
