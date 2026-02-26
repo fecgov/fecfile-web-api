@@ -516,7 +516,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         # Link the transaction to all the reports it references in report_ids
         transaction_instance.reports.set(report_ids)
         if transaction_instance.schedule_c or transaction_instance.schedule_d:
-            schedule_instance.refresh_from_db()
             reports = Report.objects.filter(id__in=report_ids)
             coverage_through_date = None
             coverage_from_date = None
@@ -533,7 +532,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     schedule_instance.report_coverage_through_date = coverage_through_date
                 if coverage_from_date:
                     schedule_instance.report_coverage_from_date = coverage_from_date
-                schedule_instance.save()
+                schedule_instance.save(
+                    update_fields=[
+                        "report_coverage_through_date",
+                        "report_coverage_from_date",
+                    ]
+                )
 
         Report.objects.filter(committee_account_id=committee_id).update(
             calculation_status=None
