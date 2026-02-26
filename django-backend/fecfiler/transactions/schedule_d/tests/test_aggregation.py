@@ -6,6 +6,7 @@ from fecfiler.transactions.aggregation import process_aggregation_for_debts
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.contacts.models import Contact
 
+
 class ScheduleDAggregationTestCase(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000001")
@@ -48,7 +49,8 @@ class ScheduleDAggregationTestCase(TestCase):
         _ = schedule_d.payment_prior
 
     def test_multiple_debts_chain(self):
-        # Create a chain of debts for the same committee and transaction_id, with sequential report periods
+        # Create a chain of debts for the same committee and transaction_id,
+        # with sequential report periods
         import uuid
         transaction_id = str(uuid.uuid4())
         txn1 = self.create_debt_transaction(incurred_amount=100)
@@ -65,4 +67,7 @@ class ScheduleDAggregationTestCase(TestCase):
         process_aggregation_for_debts(txn2)
         txn1.refresh_from_db()
         txn2.refresh_from_db()
-        self.assertNotEqual(txn1.schedule_d.balance_at_close, txn2.schedule_d.balance_at_close)
+        self.assertNotEqual(
+            txn1.schedule_d.balance_at_close,
+            txn2.schedule_d.balance_at_close
+        )
