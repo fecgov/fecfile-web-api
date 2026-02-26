@@ -56,6 +56,8 @@ REDESIGNATED = "REDESIGNATED"
 REATTRIBUTION_TO = "REATTRIBUTION_TO"
 REDESIGNATION_TO = "REDESIGNATION_TO"
 
+DEFAULT_ZERO_FIELDS = ["beginning_balance", "payment_amount", "payment_prior"]
+
 
 class TransactionSerializer(
     LinkedMemoTextSerializerMixin,
@@ -173,7 +175,7 @@ class TransactionSerializer(
         representation = super().to_representation(instance)
 
         # Ensure debt fields are always decimal 0.00 if None
-        for field in ["beginning_balance", "payment_amount", "payment_prior"]:
+        for field in DEFAULT_ZERO_FIELDS:
             value = representation.get(field)
             if value is None:
                 representation[field] = 0.00
