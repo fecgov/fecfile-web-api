@@ -203,6 +203,59 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual("John", transaction.contact_1.first_name)
         self.assertEqual("Smith", transaction.contact_1.last_name)
 
+    def test_save_transaction_debt_preserves_aggregated_zero_fields(self):
+        payload = deepcopy(self.payloads["DEBT"])
+        payload["report_ids"] = [str(self.q1_report.id)]
+        payload.pop("beginning_balance", None)
+        payload.pop("payment_amount", None)
+        payload.pop("balance_at_close", None)
+
+        request = self.post_request(payload)
+        transaction = TransactionViewSet().save_transaction(request.data, request)
+        transaction.refresh_from_db()
+        schedule_d = transaction.schedule_d
+
+        self.assertEqual(schedule_d.beginning_balance, Decimal("0.00"))
+        self.assertEqual(schedule_d.payment_prior, Decimal("0.00"))
+        self.assertEqual(schedule_d.payment_amount, Decimal("0.00"))
+        self.assertEqual(schedule_d.balance_at_close, Decimal("123.00"))
+        self.assertEqual(
+            str(schedule_d.report_coverage_from_date), str(self.q1_report.coverage_from_date)
+        )
+
+    def test_update_transaction_debt_ignores_null_payload_for_derived_fields(self):
+        create_payload = deepcopy(self.payloads["DEBT"])
+        create_payload["report_ids"] = [str(self.q1_report.id)]
+
+        create_request = self.post_request(create_payload)
+        debt = TransactionViewSet().save_transaction(create_request.data, create_request)
+        carried_over = Transaction.objects.get(reports__id=self.q2_report.id, debt_id=debt.id)
+
+        update_payload = deepcopy(create_payload)
+        update_payload["id"] = str(debt.id)
+        update_payload["beginning_balance"] = None
+        update_payload["payment_prior"] = None
+        update_payload["payment_amount"] = None
+
+        update_request = self.post_request(update_payload)
+        TransactionViewSet().save_transaction(update_request.data, update_request)
+
+        debt.refresh_from_db()
+        carried_over.refresh_from_db()
+
+        self.assertEqual(debt.schedule_d.beginning_balance, Decimal("0.00"))
+        self.assertEqual(debt.schedule_d.payment_prior, Decimal("0.00"))
+        self.assertEqual(debt.schedule_d.payment_amount, Decimal("0.00"))
+
+        self.assertEqual(carried_over.schedule_d.beginning_balance, Decimal("123.00"))
+        self.assertEqual(carried_over.schedule_d.payment_prior, Decimal("0.00"))
+        self.assertEqual(carried_over.schedule_d.payment_amount, Decimal("0.00"))
+        self.assertEqual(carried_over.schedule_d.balance_at_close, Decimal("123.00"))
+        self.assertEqual(
+            str(carried_over.schedule_d.report_coverage_from_date),
+            str(self.q2_report.coverage_from_date),
+        )
+
     def test_update(self):
         request = self.post_request(self.payloads["IN_KIND"])
         transaction = TransactionViewSet().save_transaction(request.data, request)

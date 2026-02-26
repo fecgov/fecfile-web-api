@@ -519,6 +519,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             reports = Report.objects.filter(id__in=report_ids)
             coverage_through_date = None
             coverage_from_date = None
+            coverage_update_fields = []
 
             for report in reports:
                 if transaction_instance.schedule_c and report.coverage_through_date:
@@ -530,9 +531,14 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             if coverage_through_date or coverage_from_date:
                 if coverage_through_date:
                     schedule_instance.report_coverage_through_date = coverage_through_date
+                    coverage_update_fields.append("report_coverage_through_date")
                 if coverage_from_date:
                     schedule_instance.report_coverage_from_date = coverage_from_date
-                schedule_instance.save()
+                    coverage_update_fields.append("report_coverage_from_date")
+
+                # Save only coverage fields so we don't overwrite
+                # recently aggregated schedule values with stale in-memory data.
+                schedule_instance.save(update_fields=coverage_update_fields)
 
         Report.objects.filter(committee_account_id=committee_id).update(
             calculation_status=None

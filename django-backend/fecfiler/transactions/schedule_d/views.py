@@ -8,8 +8,21 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
+SCHEDULE_D_NON_PROPAGATED_FIELDS = [
+    "incurred_amount",
+    "incurred_prior",
+    "payment_prior",
+    "payment_amount",
+    "beginning_balance",
+    "balance_at_close",
+    "report_coverage_from_date",
+]
+
 
 def save_hook(transaction: Transaction, is_existing):
+    # Re-read the transaction so schedule_d fields reflect DB values after aggregation.
+    transaction = Transaction.objects.select_related("schedule_d").get(id=transaction.id)
+
     if not is_existing:
         create_in_future_reports(transaction)
     else:
@@ -49,9 +62,10 @@ def update_in_future_reports(transaction):
     )
     transactions_to_update.update(**transaction_copy)
     schedule_d_copy = copy.deepcopy(model_to_dict(transaction.schedule_d))
-    # don't update the incurred amount because the debt already exists on
-    # this report
-    del schedule_d_copy["incurred_amount"]
+    # Keep carried-forward debt math and report coverage dates independent.
+    for field in SCHEDULE_D_NON_PROPAGATED_FIELDS:
+        schedule_d_copy.pop(field, None)
+
     schedule_ds_to_update = ScheduleD.objects.filter(
         transaction__schedule_d_id__in=Subquery(
             transactions_to_update.values("schedule_d_id")
