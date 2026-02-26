@@ -1,7 +1,6 @@
 from rest_framework.serializers import (
     CharField,
     ModelSerializer,
-    DecimalField,
 )
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.shared.utilities import get_model_data
