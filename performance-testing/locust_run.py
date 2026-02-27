@@ -40,7 +40,7 @@ AMEND_MULTIPLIER = 0.2
 CREATED_PAYLOAD_CONTACTS = False
 
 # Do we want long transaction chains?
-LONG_CHAINS = False
+LONG_CHAINS = str(os.environ.get("LONG_CHAINS", "false")).lower() in ("true", "1")
 
 # Lower the interval between log reports to prevent log queue overflow
 runners.WORKER_LOG_REPORT_INTERVAL = 2
