@@ -39,7 +39,7 @@ AMEND_MULTIPLIER = 0.2
 # Tracks state of Payload Contacts between test runs
 CREATED_PAYLOAD_CONTACTS = False
 
-# Do we want long transaction chains?
+# Do we want long transaction chains? Accepts "true"/"True"/"1", otherwise false
 LONG_CHAINS = str(os.environ.get("LONG_CHAINS", "false")).lower() in ("true", "1")
 
 # Lower the interval between log reports to prevent log queue overflow
