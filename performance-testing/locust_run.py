@@ -423,8 +423,8 @@ class Tasks(TaskSet):
                     name="delete_schedule_a_transaction",
                 )
                 if response.status_code == 204:
-                    if transaction == self.first_created_schedule_a:
-                        self.first_created_schedule_a = None
+                    if transaction == self.saved_schedule_a:
+                        self.saved_schedule_a = None
                     return
         raise Exception("Failed to DELETE Schedule A transaction")
 
