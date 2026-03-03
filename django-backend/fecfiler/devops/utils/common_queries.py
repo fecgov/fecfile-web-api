@@ -66,7 +66,10 @@ def get_num_reports_per_committee(committee_id=None):
 
         averages = get_averages(committee_report_counts)
 
-        print("\nNumber of reports per committee:\n--------------------------------")
+        print(
+            "\nNumber of reports per committee:"
+            "\n--------------------------------"
+        )
         print_keyvalues(averages)
 
 
@@ -89,7 +92,10 @@ def get_num_transactions_per_committee(committee_id=None):
 
         averages = get_averages(committee_transaction_counts)
 
-        print("\nNumber of transactions per committee:\n-------------------------------------")
+        print(
+            "\nNumber of transactions per committee:"
+            "\n-------------------------------------"
+        )
         print_keyvalues(averages)
         print(
             "The largest committee is"
@@ -107,7 +113,10 @@ def get_num_transactions_per_report(committee_id=None):
 
     averages = get_averages(report_transaction_counts)
 
-    print("\nNumber of transactions per report:\n----------------------------------")
+    print(
+        "\nNumber of transactions per report:"
+        "\n----------------------------------"
+    )
     print_keyvalues(averages)
 
 
