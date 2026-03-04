@@ -78,7 +78,9 @@ def get_num_transactions_per_committee(committee_id=None):
         transaction_count = Transaction.objects.filter(
             committee_account__committee_id=committee_id
         ).count()
-        logger.info(f"Number of transactions for committee {committee_id}: {transaction_count}")
+        logger.info(
+            f"Number of transactions for committee {committee_id}: {transaction_count}"
+        )
     else:
         committee_transaction_counts = []
         highest_count = 0
@@ -139,7 +141,10 @@ def get_num_transactions_per_contact():
 
     averages = get_averages(contact_transaction_counts)
 
-    logger.info("\nNumber of transactions per contact:\n-----------------------------------")
+    logger.info(
+        "\nNumber of transactions per contact:"
+        "\n-----------------------------------"
+    )
     print_keyvalues(averages)
 
 
@@ -149,7 +154,10 @@ def get_transaction_types_breakdown():
         tti = transaction.transaction_type_identifier
         tti_counts[tti] = tti_counts.get(tti, 0) + 1
 
-    logger.info("\nTransaction types breakdown:\n----------------------------")
+    logger.info(
+        "\nTransaction types breakdown:"
+        "\n----------------------------"
+    )
     print_keyvalues(tti_counts)
 
 
@@ -162,7 +170,10 @@ def get_transaction_tiers_breakdown():
         },
         {"parent_transaction__parent_transaction__isnull": False},
     ]
-    logger.info("\nTransaction tiers breakdown:\n----------------------------")
+    logger.info(
+        "\nTransaction tiers breakdown:"
+        "\n----------------------------"
+    )
     for i in range(3):
         logger.info(
             f"Tier {'I' * (i + 1)}: "
