@@ -31,11 +31,6 @@ class Command(FECCommand):
 
     def command(self, *args, **options):
         committee_id = options["committee_id"]
-        logger.info(
-            f"Beginning overview generation"
-            f"{f' with committee_id {committee_id}' if committee_id is not None else ''}"
-        )
-
         if not committee_id:
             get_num_committees()
             get_num_users()
@@ -50,8 +45,3 @@ class Command(FECCommand):
             get_transaction_types_breakdown()
             get_transaction_tiers_breakdown()
             get_carryover_type_transactions()
-
-        logger.info(
-            f"Successfully generated overview"
-            f"{f' with committee_id {committee_id}' if committee_id is not None else ''}"
-        )

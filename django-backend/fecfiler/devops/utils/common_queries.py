@@ -36,7 +36,7 @@ def get_averages(items):
 
 def print_keyvalues(dict):
     for key in dict.keys():
-        logger.info(f"{key}: {dict[key]}")
+        logger.info(f"   {key}: {dict[key]}")
 
 
 def get_num_committees():
@@ -66,10 +66,7 @@ def get_num_reports_per_committee(committee_id=None):
 
         averages = get_averages(committee_report_counts)
 
-        logger.info(
-            "\nNumber of reports per committee:"
-            "\n--------------------------------"
-        )
+        logger.info("Number of reports per committee:")
         print_keyvalues(averages)
 
 
@@ -94,13 +91,10 @@ def get_num_transactions_per_committee(committee_id=None):
 
         averages = get_averages(committee_transaction_counts)
 
-        logger.info(
-            "\nNumber of transactions per committee:"
-            "\n-------------------------------------"
-        )
+        logger.info("Number of transactions per committee:")
         print_keyvalues(averages)
         logger.info(
-            "The largest committee is"
+            "   The largest committee is"
             f" {biggest_committee.committee_id} with {highest_count} transactions"
         )
 
@@ -116,8 +110,8 @@ def get_num_transactions_per_report(committee_id=None):
     averages = get_averages(report_transaction_counts)
 
     logger.info(
-        "\nNumber of transactions per report:"
-        "\n----------------------------------"
+        "Number of transactions per report"
+        f"{f' for committee_id {committee_id}' if committee_id is not None else ''}"
     )
     print_keyvalues(averages)
 
@@ -141,10 +135,7 @@ def get_num_transactions_per_contact():
 
     averages = get_averages(contact_transaction_counts)
 
-    logger.info(
-        "\nNumber of transactions per contact:"
-        "\n-----------------------------------"
-    )
+    logger.info("Number of transactions per contact:")
     print_keyvalues(averages)
 
 
@@ -154,10 +145,7 @@ def get_transaction_types_breakdown():
         tti = transaction.transaction_type_identifier
         tti_counts[tti] = tti_counts.get(tti, 0) + 1
 
-    logger.info(
-        "\nTransaction types breakdown:"
-        "\n----------------------------"
-    )
+    logger.info("Transaction types breakdown:")
     print_keyvalues(tti_counts)
 
 
@@ -170,18 +158,15 @@ def get_transaction_tiers_breakdown():
         },
         {"parent_transaction__parent_transaction__isnull": False},
     ]
-    logger.info(
-        "\nTransaction tiers breakdown:"
-        "\n----------------------------"
-    )
+    logger.info("Transaction tiers breakdown:")
     for i in range(3):
         logger.info(
-            f"Tier {'I' * (i + 1)}: "
+            f"   Tier {'I' * (i + 1)}: "
             f"{Transaction.objects.filter(**filter_keys[i]).count()}"
         )
 
 
 def get_carryover_type_transactions():
-    logger.info("\nCarryover transactions:\n-----------------------")
+    logger.info("Carryover transactions:")
     for model in [ScheduleC, ScheduleC2, ScheduleD]:
-        logger.info(f"{model.__name__}: {model.objects.count()}")
+        logger.info(f"   {model.__name__}: {model.objects.count()}")
