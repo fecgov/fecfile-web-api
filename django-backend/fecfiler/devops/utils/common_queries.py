@@ -36,20 +36,20 @@ def get_averages(items):
 
 def print_keyvalues(dict):
     for key in dict.keys():
-        print(f"{key}: {dict[key]}")
+        logger.info(f"{key}: {dict[key]}")
 
 
 def get_num_committees():
-    print(f"Number of committees: {CommitteeAccount.objects.count()}")
+    logger.info(f"Number of committees: {CommitteeAccount.objects.count()}")
 
 
 def get_num_users():
     User = get_user_model()
-    print(f"Number of users: {User.objects.count()}")
+    logger.info(f"Number of users: {User.objects.count()}")
 
 
 def get_num_reports():
-    print(f"Number of reports: {Report.objects.count()}")
+    logger.info(f"Number of reports: {Report.objects.count()}")
 
 
 def get_num_reports_per_committee(committee_id=None):
@@ -57,7 +57,7 @@ def get_num_reports_per_committee(committee_id=None):
         report_count = Report.objects.filter(
             committee_account__committee_id=committee_id
         ).count()
-        print(f"Number of reports for committee {committee_id}: {report_count}")
+        logger.info(f"Number of reports for committee {committee_id}: {report_count}")
     else:
         committee_report_counts = []
         for committee in CommitteeAccount.objects.all():
@@ -66,7 +66,7 @@ def get_num_reports_per_committee(committee_id=None):
 
         averages = get_averages(committee_report_counts)
 
-        print(
+        logger.info(
             "\nNumber of reports per committee:"
             "\n--------------------------------"
         )
@@ -78,7 +78,7 @@ def get_num_transactions_per_committee(committee_id=None):
         transaction_count = Transaction.objects.filter(
             committee_account__committee_id=committee_id
         ).count()
-        print(f"Number of transactions for committee {committee_id}: {transaction_count}")
+        logger.info(f"Number of transactions for committee {committee_id}: {transaction_count}")
     else:
         committee_transaction_counts = []
         highest_count = 0
@@ -92,12 +92,12 @@ def get_num_transactions_per_committee(committee_id=None):
 
         averages = get_averages(committee_transaction_counts)
 
-        print(
+        logger.info(
             "\nNumber of transactions per committee:"
             "\n-------------------------------------"
         )
         print_keyvalues(averages)
-        print(
+        logger.info(
             "The largest committee is"
             f" {biggest_committee.committee_id} with {highest_count} transactions"
         )
@@ -113,7 +113,7 @@ def get_num_transactions_per_report(committee_id=None):
 
     averages = get_averages(report_transaction_counts)
 
-    print(
+    logger.info(
         "\nNumber of transactions per report:"
         "\n----------------------------------"
     )
@@ -139,7 +139,7 @@ def get_num_transactions_per_contact():
 
     averages = get_averages(contact_transaction_counts)
 
-    print("\nNumber of transactions per contact:\n-----------------------------------")
+    logger.info("\nNumber of transactions per contact:\n-----------------------------------")
     print_keyvalues(averages)
 
 
@@ -149,7 +149,7 @@ def get_transaction_types_breakdown():
         tti = transaction.transaction_type_identifier
         tti_counts[tti] = tti_counts.get(tti, 0) + 1
 
-    print("\nTransaction types breakdown:\n----------------------------")
+    logger.info("\nTransaction types breakdown:\n----------------------------")
     print_keyvalues(tti_counts)
 
 
@@ -162,15 +162,15 @@ def get_transaction_tiers_breakdown():
         },
         {"parent_transaction__parent_transaction__isnull": False},
     ]
-    print("\nTransaction tiers breakdown:\n----------------------------")
+    logger.info("\nTransaction tiers breakdown:\n----------------------------")
     for i in range(3):
-        print(
+        logger.info(
             f"Tier {'I' * (i + 1)}: "
             f"{Transaction.objects.filter(**filter_keys[i]).count()}"
         )
 
 
 def get_carryover_type_transactions():
-    print("\nCarryover transactions:\n-----------------------")
+    logger.info("\nCarryover transactions:\n-----------------------")
     for model in [ScheduleC, ScheduleC2, ScheduleD]:
-        print(f"{model.__name__}: {model.objects.count()}")
+        logger.info(f"{model.__name__}: {model.objects.count()}")
