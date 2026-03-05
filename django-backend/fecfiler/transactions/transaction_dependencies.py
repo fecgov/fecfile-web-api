@@ -147,7 +147,7 @@ def get_truncated_description(description: str, parenthetical: str):
     and append a parenthetical."""
     if len(description + parenthetical) > 100:
         description = description[: 96 - len(parenthetical)] + "..."
-    return f"{description} {parenthetical}"
+    return "".join(filter(None, [description, parenthetical]))
 
 
 # Dictionary of joint fundraising transfer dependencies.
@@ -214,7 +214,7 @@ PARTNERSHIP_MEMOS = [
 
 # List of transaction types that are partnership attributions.
 PARTNERSHIP_ATTRIBUTIONS = [
-    # "PARTNERSHIP_ATTRIBUTION",
+    "PARTNERSHIP_ATTRIBUTION",
     "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
     "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
     "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
