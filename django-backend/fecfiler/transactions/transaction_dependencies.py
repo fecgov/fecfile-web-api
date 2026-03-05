@@ -51,16 +51,19 @@ def update_dependent_children(transaction: Transaction):
 def update_dependent_parent(transaction: Transaction):
     """Update the contribution_purpose_descrip field for PARTNERSHIP_MEMO transactions
     when thier children are created or deleted."""
+
     if transaction.transaction_type_identifier in PARTNERSHIP_ATTRIBUTIONS:
         parent = transaction.parent_transaction
-        grandparent = parent.parent_transaction
-        dependencies = JF_TRANSFER_DEPENDENCIES[grandparent.transaction_type_identifier]
-        _, _, partnership_no_children_update, partnership_with_children_update = (
-            get_jf_transfer_descriptions(
-                dependencies["prefix"], grandparent.contact_1.name
-            )
+        grandparent = parent.parent_transaction or {"transaction_type_identifier": None}
+        grandparent_dependencies = JF_TRANSFER_DEPENDENCIES.get(
+            getattr(grandparent, "transaction_type_identifier", None), {}
         )
+        prefix = grandparent_dependencies.get("prefix", "")
+        committee_name = getattr(getattr(grandparent, "contact_1", None), "name", "")
 
+        _, _, partnership_no_children_update, partnership_with_children_update = (
+            get_jf_transfer_descriptions(prefix, committee_name)
+        )
         ScheduleA.objects.filter(transaction__id=parent.id).update(
             contribution_purpose_descrip=Subquery(
                 ScheduleA.objects.filter(id=OuterRef("id"))
@@ -120,7 +123,7 @@ def get_jf_transfer_descriptions(memo_prefix: str, commmittee_name: str):
     4. The description for partnership memos with grandchildren
         (ex: "JF Memo: Committee Name (See Partnership Attribution(s) below)")
     """
-    committee_clause = f"{memo_prefix} {commmittee_name}"
+    committee_clause = " ".join(filter(None, [memo_prefix, commmittee_name]))
     attribution_description = get_truncated_description(
         committee_clause, "(Partnership Attribution)"
     )
@@ -211,6 +214,7 @@ PARTNERSHIP_MEMOS = [
 
 # List of transaction types that are partnership attributions.
 PARTNERSHIP_ATTRIBUTIONS = [
+    # "PARTNERSHIP_ATTRIBUTION",
     "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
     "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_CONVENTION_JF_TRANSFER_MEMO",
     "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_HEADQUARTERS_JF_TRANSFER_MEMO",
