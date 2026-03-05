@@ -6,7 +6,6 @@ from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.user.models import User
-from django.contrib.auth import get_user_model
 import structlog
 
 logger = structlog.get_logger(__name__)
