@@ -147,7 +147,7 @@ def get_truncated_description(description: str, parenthetical: str):
     and append a parenthetical."""
     if len(description + parenthetical) > 100:
         description = description[: 96 - len(parenthetical)] + "..."
-    return "".join(filter(None, [description, parenthetical]))
+    return " ".join(filter(None, [description, parenthetical]))
 
 
 # Dictionary of joint fundraising transfer dependencies.
