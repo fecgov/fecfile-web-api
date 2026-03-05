@@ -5,6 +5,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
+from fecfiler.user.models import User
 from django.contrib.auth import get_user_model
 import structlog
 
@@ -44,7 +45,6 @@ def get_num_committees():
 
 
 def get_num_users():
-    User = get_user_model()
     logger.info(f"{f'Number of users: {User.objects.count()}':<60}")
 
 
