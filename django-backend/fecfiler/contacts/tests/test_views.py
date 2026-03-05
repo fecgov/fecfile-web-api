@@ -135,6 +135,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 400)
 
+    @patch("fecfiler.contacts.views.settings.E2E_TEST", False)
     @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_lookup_happy_path(self, mock_get):
         response = self.send_viewset_get_request(
@@ -168,6 +169,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 400)
 
+    @patch("fecfiler.contacts.views.settings.E2E_TEST", False)
     @patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_happy_path(self, mock_get):
         response = self.send_viewset_get_request(
