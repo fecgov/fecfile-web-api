@@ -5,8 +5,13 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
 from fecfiler.transactions.schedule_d.models import ScheduleD
+from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.reports.models import ReportTransaction
 from fecfiler.contacts.models import Contact
+
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class LocustDataGenerator:
@@ -15,9 +20,15 @@ class LocustDataGenerator:
 
     def generate_form_3x(self, count, collision_maximum=1000):
         reports_and_dates = [
-            ["Q1", "01-01", "03-31"],
-            ["Q2", "04-01", "06-30"],
-            ["Q3", "07-01", "09-30"],
+            ["M2", "01-01", "01-31"],
+            ["M3", "02-01", "02-28"],
+            ["M4", "03-01", "03-31"],
+            ["M5", "04-01", "04-30"],
+            ["M6", "05-01", "05-31"],
+            ["M7", "06-01", "06-30"],
+            ["M8", "07-01", "07-31"],
+            ["M9", "08-01", "08-31"],
+            ["M10", "09-01", "09-30"],
             ["YE", "10-01", "12-31"],
         ]
         form_3x_list = []
@@ -27,7 +38,7 @@ class LocustDataGenerator:
 
         for _ in range(count):
             form_3x_list.append(Form3X())
-        form_3x_list = Form3X.objects.bulk_create(form_3x_list)
+        form_3x_list = Form3X.objects.bulk_create(form_3x_list, batch_size=100)
 
         while len(report_list) < count and collision_count < collision_maximum:
             quarter, from_date, through_date = choice(reports_and_dates)
@@ -53,7 +64,7 @@ class LocustDataGenerator:
                 )
             )
 
-        return Report.objects.bulk_create(report_list)
+        return Report.objects.bulk_create(report_list, batch_size=100)
 
     def generate_contacts(self, count):
         street_names = ["Main", "Test", "Place", "Home", "Domain", "Victory", "Word"]
@@ -91,12 +102,14 @@ class LocustDataGenerator:
                 )
             )
 
-        return Contact.objects.bulk_create(contact_list)
+        return Contact.objects.bulk_create(contact_list, batch_size=100)
 
     def generate_single_schedule_a_transactions(self, count, reports, contacts, debts=[]):
         schedule_a_list = []
         transaction_list = []
         report_transaction_list = []
+
+        logger.info(f"Creating {count} Sch A records")
         for _ in range(count):
             transaction_type_identifier = "INDIVIDUAL_RECEIPT"
             contact = choice(contacts)
@@ -117,7 +130,10 @@ class LocustDataGenerator:
                 )
             )
 
-        schedule_a_list = ScheduleA.objects.bulk_create(schedule_a_list)
+        logger.info(f"writing {count} Sch A records")
+        schedule_a_list = ScheduleA.objects.bulk_create(schedule_a_list, batch_size=100)
+
+        logger.info(f"Creating {count} transaction records for schedule A's")
         for schedule_a in schedule_a_list:
             transaction_list.append(
                 Transaction(
@@ -129,13 +145,16 @@ class LocustDataGenerator:
                         "form_type": form_type,
                         "entity_type": contact.type,
                         "schedule_a_id": schedule_a.id,
-                        "debt_id": None if len(debts) == 0 else choice(debts).id
+                        "debt_id": None if len(debts) == 0 else choice(debts).id,
                     }
                 )
             )
+        logger.info(f"writing {count} transaction records for schedule A's")
+        transaction_list = Transaction.objects.bulk_create(
+            transaction_list, batch_size=100
+        )
 
-        transaction_list = Transaction.objects.bulk_create(transaction_list)
-
+        logger.info(f"Creating {count} report linkage records for schedule A's")
         for transaction in transaction_list:
             report_transaction_list.append(
                 ReportTransaction(
@@ -146,7 +165,8 @@ class LocustDataGenerator:
                     }
                 )
             )
-        ReportTransaction.objects.bulk_create(report_transaction_list)
+        logger.info(f"writing {count} report linkage records for schedule A's")
+        ReportTransaction.objects.bulk_create(report_transaction_list, batch_size=100)
 
         return transaction_list
 
@@ -165,7 +185,9 @@ class LocustDataGenerator:
             tier3_transactions[index].parent_transaction_id = tier2_transactions[index].id
             tier2_transactions[index].parent_transaction_id = tier1_transactions[index].id
         Transaction.objects.bulk_update(
-            tier3_transactions + tier2_transactions, ["parent_transaction_id"]
+            tier3_transactions + tier2_transactions,
+            ["parent_transaction_id"],
+            batch_size=100,
         )
 
         return tier1_transactions
@@ -194,7 +216,7 @@ class LocustDataGenerator:
                 )
             )
 
-        schedule_b_list = ScheduleB.objects.bulk_create(schedule_b_list)
+        schedule_b_list = ScheduleB.objects.bulk_create(schedule_b_list, batch_size=100)
         for schedule_b in schedule_b_list:
             transaction_list.append(
                 Transaction(
@@ -210,7 +232,9 @@ class LocustDataGenerator:
                 )
             )
 
-        transaction_list = Transaction.objects.bulk_create(transaction_list)
+        transaction_list = Transaction.objects.bulk_create(
+            transaction_list, batch_size=100
+        )
 
         for transaction in transaction_list:
             report_transaction_list.append(
@@ -222,7 +246,7 @@ class LocustDataGenerator:
                     }
                 )
             )
-        ReportTransaction.objects.bulk_create(report_transaction_list)
+        ReportTransaction.objects.bulk_create(report_transaction_list, batch_size=100)
 
         return transaction_list
 
@@ -236,9 +260,74 @@ class LocustDataGenerator:
 
         for index in range(count):
             tier2_transactions[index].parent_transaction_id = tier1_transactions[index].id
-        Transaction.objects.bulk_update(tier2_transactions, ["parent_transaction_id"])
+        Transaction.objects.bulk_update(
+            tier2_transactions, ["parent_transaction_id"], batch_size=100
+        )
 
         return tier1_transactions
+
+    def generate_loan_transactions(self, count, reports, contacts):
+        schedule_c_list = []
+        transaction_list = []
+        report_transaction_list = []
+        for _ in range(count):
+            transaction_type_identifier = "LOAN_RECEIVED_FROM_INDIVIDUAL"
+            contact = choice(contacts)
+            report = choice(reports)
+            loan_amount = randrange(10000, 40000)
+            form_type = "SC13"
+
+            schedule_c_list.append(
+                ScheduleC(
+                    **{
+                        "receipt_line_number": "13",
+                        "memo_text_description": report.id,
+                        "loan_amount": loan_amount,
+                        "loan_incurred_date": report.coverage_from_date,
+                        "loan_due_date": "Later",
+                        "loan_interest_rate": "More",
+                        "secured": choice([True, False]),
+                    }
+                )
+            )
+
+        saved_schedule_c_list = ScheduleC.objects.bulk_create(
+            schedule_c_list,
+            batch_size=100
+        )
+
+        for schedule_c in saved_schedule_c_list:
+            transaction_list.append(
+                Transaction(
+                    **{
+                        "transaction_type_identifier": transaction_type_identifier,
+                        "committee_account_id": self.committee.id,
+                        "contact_1_id": contact.id,
+                        "form_type": form_type,
+                        "entity_type": contact.type,
+                        "schedule_c_id": schedule_c.id,
+                    }
+                )
+            )
+
+        saved_transaction_list = Transaction.objects.bulk_create(
+            transaction_list,
+            batch_size=100
+        )
+
+        for transaction in saved_transaction_list:
+            report_transaction_list.append(
+                ReportTransaction(
+                    **{
+                        # Retrieve report ID from purpose field
+                        "report_id": transaction.schedule_c.memo_text_description,
+                        "transaction_id": transaction.id,
+                    }
+                )
+            )
+        ReportTransaction.objects.bulk_create(report_transaction_list, batch_size=100)
+
+        return saved_transaction_list
 
     def generate_debt_transactions(self, count, repayments, reports, contacts):
         schedule_d_list = []
@@ -262,7 +351,7 @@ class LocustDataGenerator:
                 )
             )
 
-        schedule_d_list = ScheduleD.objects.bulk_create(schedule_d_list)
+        schedule_d_list = ScheduleD.objects.bulk_create(schedule_d_list, batch_size=100)
         for schedule_d in schedule_d_list:
             transaction_list.append(
                 Transaction(
@@ -277,7 +366,9 @@ class LocustDataGenerator:
                 )
             )
 
-        transaction_list = Transaction.objects.bulk_create(transaction_list)
+        transaction_list = Transaction.objects.bulk_create(
+            transaction_list, batch_size=100
+        )
 
         for transaction in transaction_list:
             report_transaction_list.append(
@@ -289,7 +380,7 @@ class LocustDataGenerator:
                     }
                 )
             )
-        ReportTransaction.objects.bulk_create(report_transaction_list)
+        ReportTransaction.objects.bulk_create(report_transaction_list, batch_size=100)
 
         for report_transaction in report_transaction_list:
             report = report_transaction.report

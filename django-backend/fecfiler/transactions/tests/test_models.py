@@ -1188,6 +1188,69 @@ class TransactionModelTestCase(TestCase):
         self.assertFalse(tier1.itemized)
         self.assertFalse(tier2.itemized)
 
+    def test_unitemization_cascades_to_children_in_other_chain(self):
+        parent_contact = create_test_individual_contact(
+            "parent_ln", "parent_fn", self.committee.id
+        )
+        child_chain_contact = create_test_individual_contact(
+            "child_ln", "child_fn", self.committee.id
+        )
+        moved_contact = create_test_individual_contact(
+            "moved_ln", "moved_fn", self.committee.id
+        )
+
+        first_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            parent_contact,
+            "2024-01-01",
+            "190.00",
+        )
+        second_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            parent_contact,
+            "2024-01-02",
+            "20.00",
+        )
+        third_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            parent_contact,
+            "2024-01-03",
+            "5.00",
+        )
+
+        child_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            child_chain_contact,
+            "2024-01-04",
+            "250.00",
+            parent_id=second_transaction.id,
+        )
+
+        first_transaction.refresh_from_db()
+        second_transaction.refresh_from_db()
+        third_transaction.refresh_from_db()
+        child_transaction.refresh_from_db()
+
+        self.assertFalse(first_transaction.itemized)
+        self.assertTrue(second_transaction.itemized)
+        self.assertTrue(third_transaction.itemized)
+        self.assertTrue(child_transaction.itemized)
+
+        first_transaction.contact_1 = moved_contact
+        first_transaction.save()
+
+        second_transaction.refresh_from_db()
+        third_transaction.refresh_from_db()
+        child_transaction.refresh_from_db()
+
+        self.assertFalse(second_transaction.itemized)
+        self.assertFalse(third_transaction.itemized)
+        self.assertFalse(child_transaction.itemized)
+
     def test_election_aggregates_across_committees(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C99999999")
         individual = create_test_individual_contact("ind", "ividual", other_committee.id)
@@ -1240,6 +1303,145 @@ class TransactionModelTestCase(TestCase):
         self.assertEqual(
             our_later_ie._calendar_ytd_per_election_office, Decimal("2000.00")
         )
+
+    def test_insert_transaction_between_existing_no_double_counting(self):
+        """Test that inserting a transaction chronologically between two existing
+        transactions in the same entity/aggregation chain does not result in
+        double-counting in the aggregate for later transactions."""
+
+        # Create first transaction on Jan 10
+        first_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-10",
+            "100.00",
+        )
+        first_transaction.refresh_from_db()
+
+        # Verify first transaction has correct aggregate
+        self.assertEqual(first_transaction.aggregate, Decimal("100.00"))
+
+        # Create second transaction on Jan 20
+        second_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-20",
+            "150.00",
+        )
+        second_transaction.refresh_from_db()
+
+        # Verify second transaction aggregate includes first transaction
+        self.assertEqual(second_transaction.aggregate, Decimal("250.00"))
+
+        # Now create a third transaction on Jan 15 (between the first two)
+        middle_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-15",
+            "75.00",
+        )
+        middle_transaction.refresh_from_db()
+
+        # Verify middle transaction aggregate includes only first transaction
+        self.assertEqual(middle_transaction.aggregate, Decimal("175.00"))
+
+        # Refresh all transactions to get updated aggregates
+        first_transaction.refresh_from_db()
+        second_transaction.refresh_from_db()
+
+        # Verify first transaction aggregate is unchanged
+        self.assertEqual(first_transaction.aggregate, Decimal("100.00"))
+
+        # Verify second transaction now includes all three without double-counting
+        # Should be: 100 (first) + 75 (third) + 150 (second) = 325
+        self.assertEqual(second_transaction.aggregate, Decimal("325.00"))
+
+        # Create a fourth transaction on Jan 25 to verify the chain continues correctly
+        fourth_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-25",
+            "200.00",
+        )
+        fourth_transaction.refresh_from_db()
+
+        # Verify fourth transaction aggregate includes all previous transactions
+        # Should be: 100 (first) + 75 (third) + 150 (second) + 200 (fourth) = 525
+        self.assertEqual(fourth_transaction.aggregate, Decimal("525.00"))
+
+    def test_reaggregation_after_report_deletion(self):
+        """Test that deleting a report triggers re-aggregation of transactions
+        in subsequent reports."""
+
+        # Create two reports
+        report_1 = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
+        report_2 = create_form3x(self.committee, "2024-02-01", "2024-02-28", {})
+
+        # Create a 4-transaction chain, 2 per report
+        # Report 1, Transaction 1: $100 (Aggregate: $100)
+        transaction_1 = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-05",
+            "100.00",
+            report=report_1,
+        )
+        transaction_1.refresh_from_db()
+        self.assertEqual(transaction_1.aggregate, Decimal("100.00"))
+
+        # Report 1, Transaction 2: $100 (Aggregate: $200)
+        transaction_2 = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-15",
+            "100.00",
+            report=report_1,
+        )
+        transaction_2.refresh_from_db()
+        self.assertEqual(transaction_2.aggregate, Decimal("200.00"))
+
+        # Report 2, Transaction 3: $10 (Aggregate: $210)
+        transaction_3 = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-02-05",
+            "10.00",
+            report=report_2,
+        )
+        transaction_3.refresh_from_db()
+        self.assertEqual(transaction_3.aggregate, Decimal("210.00"))
+
+        # Report 2, Transaction 4: $10 (Aggregate: $220)
+        transaction_4 = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-02-15",
+            "10.00",
+            report=report_2,
+        )
+        transaction_4.refresh_from_db()
+        self.assertEqual(transaction_4.aggregate, Decimal("220.00"))
+
+        # Delete Report 1
+        report_1.delete()
+
+        # After deletion, transactions from Report 2 should be re-aggregated
+        transaction_3.refresh_from_db()
+        transaction_4.refresh_from_db()
+
+        # Transaction 3 should now have aggregate of $10 (first in chain after deletion)
+        self.assertEqual(transaction_3.aggregate, Decimal("10.00"))
+
+        # Transaction 4 should now have aggregate of $20 (10 + 10)
+        self.assertEqual(transaction_4.aggregate, Decimal("20.00"))
 
 
 def undelete(transaction):

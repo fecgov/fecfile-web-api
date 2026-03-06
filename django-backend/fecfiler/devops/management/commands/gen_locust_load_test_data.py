@@ -12,7 +12,10 @@ class Command(FECCommand):
         parser.add_argument("--number_of_reports", type=int, default=10)
         parser.add_argument("--number_of_contacts", type=int, default=100)
         parser.add_argument("--number_of_transactions", type=int, default=500)
-        parser.add_argument("--number_of_debts", type=int, default=2)
+        parser.add_argument("--number_of_receipts", type=int, default=None)
+        parser.add_argument("--number_of_disbursements", type=int, default=None)
+        parser.add_argument("--number_of_loans", type=int, default=1)
+        parser.add_argument("--number_of_debts", type=int, default=1)
         parser.add_argument(
             "--single_to_tiered_transaction_ratio", type=float, default=9 / 10
         )
@@ -28,6 +31,9 @@ class Command(FECCommand):
             options["number_of_reports"],
             options["number_of_contacts"],
             options["number_of_transactions"],
+            options["number_of_receipts"],
+            options["number_of_disbursements"],
+            options["number_of_loans"],
             options["number_of_debts"],
             options["single_to_tiered_transaction_ratio"],
             options["repayments_per_debt"],
