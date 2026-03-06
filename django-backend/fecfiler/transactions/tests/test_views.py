@@ -864,7 +864,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             parent_id=jf_transfer.id,
         )
         partnership_memo.schedule_a.contribution_purpose_descrip = (
-            "JF Memo: None (See Partnership Attribution(s) below)"
+            "JF Memo: (See Partnership Attribution(s) below)"
         )
         partnership_memo.schedule_a.save()
         partnership_attribution_memo = create_schedule_a(
@@ -883,7 +883,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(
             response.data["contribution_purpose_descrip"],
-            "JF Memo: None (See Partnership Attribution(s) below)",
+            "JF Memo: (See Partnership Attribution(s) below)",
         )
 
         # If we delete the attribution memo, the parent memo should be updated
@@ -903,7 +903,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(
             response.data["contribution_purpose_descrip"],
-            "JF Memo: None (Partnership attributions do not meet itemization threshold)",
+            "JF Memo: (Partnership attributions do not meet itemization threshold)",
         )
 
     def test_delete_carried_forward_loan_on_repayment_to_orignal_loan(self):

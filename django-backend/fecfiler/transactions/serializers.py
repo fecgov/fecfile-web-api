@@ -192,41 +192,49 @@ class TransactionSerializer(
         # because form_type is a dynamic field
         representation["form_type"] = instance.form_type
 
-        # represent parent
-        if instance.parent_transaction:
-            representation["parent_transaction"] = (
-                TransactionSerializer().to_representation(instance.parent_transaction)
-            )
-        # represent loan
-        if instance.loan:
-            representation["loan"] = TransactionSerializer().to_representation(
-                instance.loan
-            )
-        # represent debt
-        if instance.debt:
-            representation["debt"] = TransactionSerializer().to_representation(
-                instance.debt
-            )
-        # represent original reattribution/redesignation transaction
-        if instance.reatt_redes:
-            representation["reatt_redes"] = TransactionSerializer().to_representation(
-                instance.reatt_redes
-            )
+        if not self.context.get("no_depth"):
+            new_context = {"no_depth": True, "no_children": True}
+            # represent parent
+            if instance.parent_transaction:
+                representation["parent_transaction"] = TransactionSerializer(
+                    instance.parent_transaction, context=new_context
+                ).data
+            # represent loan
+            if instance.loan:
+                representation["loan"] = TransactionSerializer(
+                    context=new_context
+                ).to_representation(instance.loan)
+            # represent debt
+            if instance.debt:
+                representation["debt"] = TransactionSerializer(
+                    context=new_context
+                ).to_representation(instance.debt)
+            # represent original reattribution/redesignation transaction
+            if instance.reatt_redes:
+                representation["reatt_redes"] = TransactionSerializer(
+                    context=new_context
+                ).to_representation(instance.reatt_redes)
 
-        representation["reports"] = []
-        representation["report_ids"] = []
-        for report in instance.reports.all():
-            representation["report_ids"].append(report.id)
-            representation["reports"].append(
-                {
-                    "id": report.id,
-                    "coverage_from_date": report.coverage_from_date,
-                    "coverage_through_date": report.coverage_through_date,
-                    "report_code": report.report_code,
-                    "report_type": report.report_type,
-                    "report_code_label": get_report_code_label(report),
-                }
-            )
+            if instance.children.exists():
+                representation["children"] = [
+                    TransactionSerializer(child, context={"no_children": True}).data
+                    for child in instance.children.all()
+                ]
+
+            representation["reports"] = []
+            representation["report_ids"] = []
+            for report in instance.reports.all():
+                representation["report_ids"].append(report.id)
+                representation["reports"].append(
+                    {
+                        "id": report.id,
+                        "coverage_from_date": report.coverage_from_date,
+                        "coverage_through_date": report.coverage_through_date,
+                        "report_code": report.report_code,
+                        "report_type": report.report_type,
+                        "report_code_label": get_report_code_label(report),
+                    }
+                )
 
         representation["can_delete"] = instance.can_delete
         return representation
