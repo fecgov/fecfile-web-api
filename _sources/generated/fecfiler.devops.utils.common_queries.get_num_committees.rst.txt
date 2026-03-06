@@ -1,0 +1,6 @@
+fecfiler.devops.utils.common\_queries.get\_num\_committees
+==========================================================
+
+.. currentmodule:: fecfiler.devops.utils.common_queries
+
+.. autofunction:: get_num_committees

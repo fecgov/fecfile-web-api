@@ -1,0 +1,44 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+    
+fecfiler.devops.utils.common\_queries
+=====================================
+
+.. automodule:: fecfiler.devops.utils.common_queries
+  
+   
+   
+   
+
+   
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+      :toctree:                                          
+   
+      get_averages
+      get_carryover_type_transactions
+      get_num_committees
+      get_num_reports
+      get_num_reports_per_committee
+      get_num_transactions_per_committee
+      get_num_transactions_per_contact
+      get_num_transactions_per_report
+      get_num_users
+      get_transaction_tiers_breakdown
+      get_transaction_types_breakdown
+      print_keyvalues
+   
+   
+
+   
+   
+   
+
+   
+   
+   
+
+
+

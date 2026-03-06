@@ -32,6 +32,7 @@ fecfiler.devops.utils
    :recursive:
 
    fecfiler.devops.utils.cf_api
+   fecfiler.devops.utils.common_queries
    fecfiler.devops.utils.crypt
    fecfiler.devops.utils.django_key
    fecfiler.devops.utils.load_test

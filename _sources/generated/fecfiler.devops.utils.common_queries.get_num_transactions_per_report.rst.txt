@@ -1,0 +1,6 @@
+fecfiler.devops.utils.common\_queries.get\_num\_transactions\_per\_report
+=========================================================================
+
+.. currentmodule:: fecfiler.devops.utils.common_queries
+
+.. autofunction:: get_num_transactions_per_report
