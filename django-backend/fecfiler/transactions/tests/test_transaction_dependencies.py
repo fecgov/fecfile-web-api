@@ -185,6 +185,50 @@ class TransactionDependenciesTestCase(TestCase):
         partnership_memo.refresh_from_db()
         self.assertEqual(
             partnership_memo.schedule_a.contribution_purpose_descrip,
-            "JF Memo: Parent Contact"
-            + " (Partnership attributions do not meet itemization threshold)",
+            "JF Memo: Parent Contact "
+            + "(Partnership attributions do not meet itemization threshold)",
+        )
+
+    def test_partnership_receipt(self):
+        parent = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.parent_contact,
+            "2020-01-01",
+            100,
+            "GENERAL",
+            "SA11AI",
+            False,
+            None,
+            None,
+            None,
+            "(Partnership attributions do not meet itemization threshold)",
+        )
+        partnership_attribution = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION",
+            self.committee,
+            self.parent_contact,
+            "2020-01-01",
+            100,
+            "GENERAL",
+            "SA11AI",
+            False,
+            None,
+            None,
+            parent.id,
+        )
+        update_dependent_parent(partnership_attribution)
+        parent.refresh_from_db()
+        self.assertEqual(
+            parent.schedule_a.contribution_purpose_descrip,
+            "(See Partnership Attribution(s) below)",
+        )
+
+        partnership_attribution.delete()
+        update_dependent_parent(partnership_attribution)
+        parent.refresh_from_db()
+
+        self.assertEqual(
+            parent.schedule_a.contribution_purpose_descrip,
+            "(Partnership attributions do not meet itemization threshold)",
         )
