@@ -22,53 +22,61 @@ def remove_old_login_accounts(apps, schema_editor):
         user.membership_set.all().delete()
     users_to_delete.delete()
 
+
 class Migration(migrations.Migration):
 
-    replaces = [('user', '0002_remove_user_cmtee_id'), ('user', '0003_user_security_consent_date'), ('user', '0004_alter_user_managers'), ('user', '0005_rename_security_consent_date_user_security_consent_exp_date'), ('user', '0006_remove_old_login_accounts'), ('user', '0007_user_security_consent_version')]
+    replaces = [
+        ("user", "0002_remove_user_cmtee_id"),
+        ("user", "0003_user_security_consent_date"),
+        ("user", "0004_alter_user_managers"),
+        ("user", "0005_rename_security_consent_date_user_security_consent_exp_date"),
+        ("user", "0006_remove_old_login_accounts"),
+        ("user", "0007_user_security_consent_version"),
+    ]
 
     dependencies = [
-        ('committee_accounts', '0002_membership'),
-        ('user', '0001_initial'),
+        ("committee_accounts", "0002_membership"),
+        ("user", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='user',
-            name='cmtee_id',
+            model_name="user",
+            name="cmtee_id",
         ),
         migrations.AlterField(
-            model_name='user',
-            name='first_name',
+            model_name="user",
+            name="first_name",
             field=models.CharField(blank=True, max_length=150, null=True),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='last_name',
+            model_name="user",
+            name="last_name",
             field=models.CharField(blank=True, max_length=150, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='security_consent_date',
+            model_name="user",
+            name="security_consent_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AlterModelManagers(
-            name='user',
+            name="user",
             managers=[
-                ('objects', fecfiler.user.managers.UserManager()),
+                ("objects", fecfiler.user.managers.UserManager()),
             ],
         ),
         migrations.RenameField(
-            model_name='user',
-            old_name='security_consent_date',
-            new_name='security_consent_exp_date',
+            model_name="user",
+            old_name="security_consent_date",
+            new_name="security_consent_exp_date",
         ),
         migrations.RunPython(
             code=remove_old_login_accounts,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.AddField(
-            model_name='user',
-            name='security_consent_version',
+            model_name="user",
+            name="security_consent_version",
             field=models.CharField(blank=True, null=True),
         ),
     ]

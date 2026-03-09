@@ -18,23 +18,27 @@ def set_default_task_completed_times(apps, schema_editor):
     uploads.objects.all().update(task_completed=F("updated"))
     web_prints.objects.all().update(task_completed=F("updated"))
 
+
 class Migration(migrations.Migration):
 
-    replaces = [('web_services', '0002_uploadsubmission_task_completed_and_more'), ('web_services', '0003_uploadsubmission_fecfile_polling_attempts_and_more')]
+    replaces = [
+        ("web_services", "0002_uploadsubmission_task_completed_and_more"),
+        ("web_services", "0003_uploadsubmission_fecfile_polling_attempts_and_more"),
+    ]
 
     dependencies = [
-        ('web_services', '0001_initial'),
+        ("web_services", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='uploadsubmission',
-            name='task_completed',
+            model_name="uploadsubmission",
+            name="task_completed",
             field=models.DateTimeField(null=True),
         ),
         migrations.AddField(
-            model_name='webprintsubmission',
-            name='task_completed',
+            model_name="webprintsubmission",
+            name="task_completed",
             field=models.DateTimeField(null=True),
         ),
         migrations.RunPython(
@@ -42,13 +46,13 @@ class Migration(migrations.Migration):
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.AddField(
-            model_name='uploadsubmission',
-            name='fecfile_polling_attempts',
+            model_name="uploadsubmission",
+            name="fecfile_polling_attempts",
             field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='webprintsubmission',
-            name='fecfile_polling_attempts',
+            model_name="webprintsubmission",
+            name="fecfile_polling_attempts",
             field=models.IntegerField(default=0),
         ),
     ]

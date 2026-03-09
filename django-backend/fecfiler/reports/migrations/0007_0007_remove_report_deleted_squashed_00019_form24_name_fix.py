@@ -4,6 +4,7 @@ import django.db.migrations.operations.special
 import django.db.models.deletion
 import uuid
 from importlib import import_module
+from textwrap import dedent
 from django.db import migrations, models
 
 
@@ -12,9 +13,14 @@ from django.db import migrations, models
 # RunPython operations to refer to the local versions:
 # fecfiler.reports.migrations.00018_form24_name
 # fecfiler.reports.migrations.00019_form24_name_fix
-# fecfiler.reports.migrations.0008_remove_form1m_city_remove_form1m_committee_name_and_more
+# fecfiler.reports.migrations.
+#   0008_remove_form1m_city_remove_form1m_committee_name_and_more
 # fecfiler.reports.migrations.0009_report_can_delete
 # fecfiler.reports.migrations.0010_report_can_unammend
+
+
+def _strip_sql(sql):
+    return dedent(sql).strip()
 
 
 def _load_callable(module_name, function_name):
@@ -22,155 +28,211 @@ def _load_callable(module_name, function_name):
         try:
             fn = getattr(import_module(module_name), function_name)
         except Exception:
-            return django.db.migrations.operations.special.RunPython.noop(apps, schema_editor)
+            return django.db.migrations.operations.special.RunPython.noop(
+                apps, schema_editor
+            )
         return fn(apps, schema_editor)
 
     return _wrapper
 
+
 class Migration(migrations.Migration):
 
-    replaces = [('reports', '0007_remove_report_deleted'), ('reports', '0008_remove_form1m_city_remove_form1m_committee_name_and_more'), ('reports', '0009_report_can_delete'), ('reports', '0010_report_can_unammend'), ('reports', '0011_remove_form3x_cash_on_hand_date'), ('reports', '0012_alter_form99_text_code'), ('reports', '0013_form3_report_form_3'), ('reports', '0014_form99_swap_text_code'), ('reports', '0015_form3x_filing_frequency_form3x_report_type_category'), ('reports', '0016_determine_frequency_and_category'), ('reports', '0017_form99_filing_frequency_form99_pdf_attachment'), ('reports', '00018_form24_name'), ('reports', '00019_form24_name_fix')]
+    replaces = [
+        ("reports", "0007_remove_report_deleted"),
+        ("reports", "0008_remove_form1m_city_remove_form1m_committee_name_and_more"),
+        ("reports", "0009_report_can_delete"),
+        ("reports", "0010_report_can_unammend"),
+        ("reports", "0011_remove_form3x_cash_on_hand_date"),
+        ("reports", "0012_alter_form99_text_code"),
+        ("reports", "0013_form3_report_form_3"),
+        ("reports", "0014_form99_swap_text_code"),
+        ("reports", "0015_form3x_filing_frequency_form3x_report_type_category"),
+        ("reports", "0016_determine_frequency_and_category"),
+        ("reports", "0017_form99_filing_frequency_form99_pdf_attachment"),
+        ("reports", "00018_form24_name"),
+        ("reports", "00019_form24_name_fix"),
+    ]
 
     dependencies = [
-        ('reports', '0006_reporttransaction'),
+        ("reports", "0006_reporttransaction"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='report',
-            name='deleted',
+            model_name="report",
+            name="deleted",
         ),
         migrations.AddField(
-            model_name='report',
-            name='city',
+            model_name="report",
+            name="city",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='report',
-            name='committee_name',
+            model_name="report",
+            name="committee_name",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='report',
-            name='state',
+            model_name="report",
+            name="state",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='report',
-            name='street_1',
+            model_name="report",
+            name="street_1",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='report',
-            name='street_2',
+            model_name="report",
+            name="street_2",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='report',
-            name='zip',
+            model_name="report",
+            name="zip",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.RunPython(
             code=_load_callable(
-                "fecfiler.reports.migrations.0008_remove_form1m_city_remove_form1m_committee_name_and_more",
+                "fecfiler.reports.migrations."
+                "0008_remove_form1m_city_remove_form1m_committee_name_and_more",
                 "migrate_committee_data",
             ),
         ),
         migrations.RemoveField(
-            model_name='form1m',
-            name='city',
+            model_name="form1m",
+            name="city",
         ),
         migrations.RemoveField(
-            model_name='form1m',
-            name='committee_name',
+            model_name="form1m",
+            name="committee_name",
         ),
         migrations.RemoveField(
-            model_name='form1m',
-            name='state',
+            model_name="form1m",
+            name="state",
         ),
         migrations.RemoveField(
-            model_name='form1m',
-            name='street_1',
+            model_name="form1m",
+            name="street_1",
         ),
         migrations.RemoveField(
-            model_name='form1m',
-            name='street_2',
+            model_name="form1m",
+            name="street_2",
         ),
         migrations.RemoveField(
-            model_name='form1m',
-            name='zip',
+            model_name="form1m",
+            name="zip",
         ),
         migrations.RemoveField(
-            model_name='form24',
-            name='city',
+            model_name="form24",
+            name="city",
         ),
         migrations.RemoveField(
-            model_name='form24',
-            name='state',
+            model_name="form24",
+            name="state",
         ),
         migrations.RemoveField(
-            model_name='form24',
-            name='street_1',
+            model_name="form24",
+            name="street_1",
         ),
         migrations.RemoveField(
-            model_name='form24',
-            name='street_2',
+            model_name="form24",
+            name="street_2",
         ),
         migrations.RemoveField(
-            model_name='form24',
-            name='zip',
+            model_name="form24",
+            name="zip",
         ),
         migrations.RemoveField(
-            model_name='form3x',
-            name='city',
+            model_name="form3x",
+            name="city",
         ),
         migrations.RemoveField(
-            model_name='form3x',
-            name='state',
+            model_name="form3x",
+            name="state",
         ),
         migrations.RemoveField(
-            model_name='form3x',
-            name='street_1',
+            model_name="form3x",
+            name="street_1",
         ),
         migrations.RemoveField(
-            model_name='form3x',
-            name='street_2',
+            model_name="form3x",
+            name="street_2",
         ),
         migrations.RemoveField(
-            model_name='form3x',
-            name='zip',
+            model_name="form3x",
+            name="zip",
         ),
         migrations.RemoveField(
-            model_name='form99',
-            name='city',
+            model_name="form99",
+            name="city",
         ),
         migrations.RemoveField(
-            model_name='form99',
-            name='committee_name',
+            model_name="form99",
+            name="committee_name",
         ),
         migrations.RemoveField(
-            model_name='form99',
-            name='state',
+            model_name="form99",
+            name="state",
         ),
         migrations.RemoveField(
-            model_name='form99',
-            name='street_1',
+            model_name="form99",
+            name="street_1",
         ),
         migrations.RemoveField(
-            model_name='form99',
-            name='street_2',
+            model_name="form99",
+            name="street_2",
         ),
         migrations.RemoveField(
-            model_name='form99',
-            name='zip',
+            model_name="form99",
+            name="zip",
         ),
         migrations.AddField(
-            model_name='report',
-            name='can_delete',
+            model_name="report",
+            name="can_delete",
             field=models.BooleanField(default=True),
         ),
         migrations.RunSQL(
-            sql='\n        CREATE OR REPLACE FUNCTION update_report_can_delete(report RECORD)\n        RETURNS VOID AS $$\n        DECLARE\n            r_can_delete boolean;\n        BEGIN\n             r_can_delete = report.upload_submission_id IS NULL\n                AND (report.report_version IS NULL OR report.report_version = \'0\')\n                AND (\n                    report.form_3x_id IS NULL OR\n                    (\n                        report.form_24_id IS NULL\n                        AND NOT EXISTS(\n                            SELECT DISTINCT rrt1.id\n                            FROM "reports_reporttransaction" rrt1\n                                JOIN "transactions_transaction" tt ON (\n                                rrt1."transaction_id" = tt."id"\n                                OR tt."reatt_redes_id" = rrt1."transaction_id"\n                                OR tt."parent_transaction_id" = rrt1."transaction_id"\n                                OR tt."debt_id" = rrt1."transaction_id"\n                                OR tt."loan_id" = rrt1."transaction_id"\n                            )\n                                INNER JOIN "reports_reporttransaction" rrt2 ON (\n                                rrt2."transaction_id" = tt."id"\n                                AND rrt2."report_id" <> report.id\n                            )\n                            WHERE rrt1."report_id" = report.id\n                        )\n                    )\n                );\n            UPDATE reports_report SET can_delete = r_can_delete\n            WHERE id = report.id\n            AND can_delete <> r_can_delete;\n        END;\n        $$ LANGUAGE plpgsql;\n        ',
+            sql=_strip_sql(
+                """
+                CREATE OR REPLACE FUNCTION update_report_can_delete(report RECORD)
+                RETURNS VOID AS $$
+                DECLARE
+                    r_can_delete boolean;
+                BEGIN
+                     r_can_delete = report.upload_submission_id IS NULL
+                        AND (report.report_version IS NULL OR report.report_version = '0')
+                        AND (
+                            report.form_3x_id IS NULL OR
+                            (
+                                report.form_24_id IS NULL
+                                AND NOT EXISTS(
+                                    SELECT DISTINCT rrt1.id
+                                    FROM "reports_reporttransaction" rrt1
+                                        JOIN "transactions_transaction" tt ON (
+                                        rrt1."transaction_id" = tt."id"
+                                        OR tt."reatt_redes_id" = rrt1."transaction_id"
+                                        OR tt."parent_transaction_id" =
+                                            rrt1."transaction_id"
+                                        OR tt."debt_id" = rrt1."transaction_id"
+                                        OR tt."loan_id" = rrt1."transaction_id"
+                                    )
+                                        INNER JOIN "reports_reporttransaction" rrt2 ON (
+                                        rrt2."transaction_id" = tt."id"
+                                        AND rrt2."report_id" <> report.id
+                                    )
+                                    WHERE rrt1."report_id" = report.id
+                                )
+                            )
+                        );
+                    UPDATE reports_report SET can_delete = r_can_delete
+                    WHERE id = report.id
+                    AND can_delete <> r_can_delete;
+                END;
+                $$ LANGUAGE plpgsql;
+                """
+            ),
         ),
         migrations.RunPython(
             code=_load_callable(
@@ -189,8 +251,8 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AddField(
-            model_name='report',
-            name='can_unamend',
+            model_name="report",
+            name="can_unamend",
             field=models.BooleanField(default=False),
         ),
         migrations.RunPython(
@@ -200,146 +262,558 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RemoveField(
-            model_name='form3x',
-            name='cash_on_hand_date',
+            model_name="form3x",
+            name="cash_on_hand_date",
         ),
         migrations.AddField(
-            model_name='form99',
-            name='text_code_2',
-            field=models.TextField(db_default=''),
+            model_name="form99",
+            name="text_code_2",
+            field=models.TextField(db_default=""),
         ),
         migrations.RunSQL(
-            sql="\n                UPDATE reports_form99 SET text_code_2 = COALESCE(text_code, '');\n                ALTER TABLE reports_form99 ALTER COLUMN text_code SET DEFAULT '';\n                ALTER TABLE reports_form99 ALTER COLUMN text_code_2 SET NOT NULL;\n            ",
-            reverse_sql='\n                ALTER TABLE reports_form99 ALTER COLUMN text_code_2 DROP DEFAULT;\n                ALTER TABLE reports_form99 ALTER COLUMN text_code_2 DROP NOT NULL;\n            ',
-            state_operations=[migrations.AlterField(
-                model_name='form99',
-                name='text_code_2',
-                field=models.TextField(db_default='', default=''),
-            )],
+            sql=_strip_sql(
+                """
+                UPDATE reports_form99 SET text_code_2 = COALESCE(text_code, '');
+                ALTER TABLE reports_form99 ALTER COLUMN text_code SET DEFAULT '';
+                ALTER TABLE reports_form99 ALTER COLUMN text_code_2 SET NOT NULL;
+                """
+            ),
+            reverse_sql=_strip_sql(
+                """
+                ALTER TABLE reports_form99 ALTER COLUMN text_code_2 DROP DEFAULT;
+                ALTER TABLE reports_form99 ALTER COLUMN text_code_2 DROP NOT NULL;
+                """
+            ),
+            state_operations=[
+                migrations.AlterField(
+                    model_name="form99",
+                    name="text_code_2",
+                    field=models.TextField(db_default="", default=""),
+                )
+            ],
         ),
         migrations.CreateModel(
-            name='Form3',
+            name="Form3",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('change_of_address', models.BooleanField(blank=True, default=False, null=True)),
-                ('election_state', models.TextField(blank=True, null=True)),
-                ('election_district', models.TextField(blank=True, null=True)),
-                ('election_code', models.TextField(blank=True, null=True)),
-                ('date_of_election', models.DateField(blank=True, null=True)),
-                ('state_of_election', models.TextField(blank=True, null=True)),
-                ('L6a_total_contributions_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L6b_total_contribution_refunds_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L6c_net_contributions_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L7a_total_operating_expenditures_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L7b_total_offsets_to_operating_expenditures_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L7c_net_operating_expenditures_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L8_cash_on_hand_at_close_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L9_debts_owed_to_committee_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L10_debts_owed_by_committee_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11ai_individuals_itemized_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11aii_individuals_unitemized_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11aiii_total_individual_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11b_political_party_committees_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11c_other_political_committees_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11d_the_candidate_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11e_total_contributions_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L12_transfers_from_other_authorized_committees_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L13a_loans_made_or_guaranteed_by_the_candidate_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L13b_all_other_loans_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L13c_total_loans_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L14_offsets_to_operating_expenditures_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L15_other_receipts_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L16_total_receipts_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L17_operating_expenditures_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L18_transfers_to_other_authorized_committees_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L19a_loan_repayments_of_loans_made_or_guaranteed_by_candidate_period', models.DecimalField(blank=True, db_column='l19a_period', decimal_places=2, max_digits=11, null=True)),
-                ('L19b_loan_repayments_of_all_other_loans_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L19c_total_loan_repayments_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L20a_refunds_to_individuals_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L20b_refunds_to_political_party_committees_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L20c_refunds_to_other_political_committees_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L20d_total_contribution_refunds_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L21_other_disbursements_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L22_total_disbursements_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L23_cash_on_hand_beginning_reporting_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L24_total_receipts_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L25_subtotals_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L26_total_disbursements_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L27_cash_on_hand_at_close_period', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L6a_total_contributions_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L6b_total_contribution_refunds_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L6c_net_contributions_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L7a_total_operating_expenditures_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L7b_total_offsets_to_operating_expenditures_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L7c_net_operating_expenditures_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11ai_individuals_itemized_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11aii_individuals_unitemized_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11aiii_total_individual_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11b_political_party_committees_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11c_other_political_committees_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11d_the_candidate_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L11e_total_contributions_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L12_transfers_from_other_authorized_committees_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L13a_loans_made_or_guaranteed_by_the_candidate_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L13b_all_other_loans_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L13c_total_loans_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L14_offsets_to_operating_expenditures_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L15_other_receipts_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L16_total_receipts_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L17_operating_expenditures_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L18_transfers_to_other_authorized_committees_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L19a_loan_repayments_of_loans_made_or_guaranteed_by_candidate_ytd', models.DecimalField(blank=True, db_column='l19a_ytd', decimal_places=2, max_digits=11, null=True)),
-                ('L19b_loan_repayments_of_all_other_loans_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L19c_total_loan_repayments_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L20a_refunds_to_individuals_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L20b_refunds_to_political_party_committees_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L20c_refunds_to_other_political_committees_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L20d_total_contribution_refunds_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L21_other_disbursements_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
-                ('L22_total_disbursements_ytd', models.DecimalField(blank=True, decimal_places=2, max_digits=11, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                (
+                    "change_of_address",
+                    models.BooleanField(blank=True, default=False, null=True),
+                ),
+                ("election_state", models.TextField(blank=True, null=True)),
+                ("election_district", models.TextField(blank=True, null=True)),
+                ("election_code", models.TextField(blank=True, null=True)),
+                ("date_of_election", models.DateField(blank=True, null=True)),
+                ("state_of_election", models.TextField(blank=True, null=True)),
+                (
+                    "L6a_total_contributions_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L6b_total_contribution_refunds_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L6c_net_contributions_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L7a_total_operating_expenditures_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L7b_total_offsets_to_operating_expenditures_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L7c_net_operating_expenditures_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L8_cash_on_hand_at_close_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L9_debts_owed_to_committee_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L10_debts_owed_by_committee_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11ai_individuals_itemized_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11aii_individuals_unitemized_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11aiii_total_individual_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11b_political_party_committees_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11c_other_political_committees_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11d_the_candidate_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11e_total_contributions_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L12_transfers_from_other_authorized_committees_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L13a_loans_made_or_guaranteed_by_the_candidate_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L13b_all_other_loans_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L13c_total_loans_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L14_offsets_to_operating_expenditures_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L15_other_receipts_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L16_total_receipts_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L17_operating_expenditures_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L18_transfers_to_other_authorized_committees_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L19a_loan_repayments_of_loans_made_or_"
+                    "guaranteed_by_candidate_period",
+                    models.DecimalField(
+                        blank=True,
+                        db_column="l19a_period",
+                        decimal_places=2,
+                        max_digits=11,
+                        null=True,
+                    ),
+                ),
+                (
+                    "L19b_loan_repayments_of_all_other_loans_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L19c_total_loan_repayments_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L20a_refunds_to_individuals_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L20b_refunds_to_political_party_committees_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L20c_refunds_to_other_political_committees_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L20d_total_contribution_refunds_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L21_other_disbursements_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L22_total_disbursements_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L23_cash_on_hand_beginning_reporting_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L24_total_receipts_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L25_subtotals_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L26_total_disbursements_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L27_cash_on_hand_at_close_period",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L6a_total_contributions_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L6b_total_contribution_refunds_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L6c_net_contributions_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L7a_total_operating_expenditures_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L7b_total_offsets_to_operating_expenditures_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L7c_net_operating_expenditures_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11ai_individuals_itemized_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11aii_individuals_unitemized_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11aiii_total_individual_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11b_political_party_committees_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11c_other_political_committees_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11d_the_candidate_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L11e_total_contributions_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L12_transfers_from_other_authorized_committees_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L13a_loans_made_or_guaranteed_by_the_candidate_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L13b_all_other_loans_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L13c_total_loans_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L14_offsets_to_operating_expenditures_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L15_other_receipts_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L16_total_receipts_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L17_operating_expenditures_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L18_transfers_to_other_authorized_committees_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L19a_loan_repayments_of_loans_made_or_guaranteed_by_candidate_ytd",
+                    models.DecimalField(
+                        blank=True,
+                        db_column="l19a_ytd",
+                        decimal_places=2,
+                        max_digits=11,
+                        null=True,
+                    ),
+                ),
+                (
+                    "L19b_loan_repayments_of_all_other_loans_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L19c_total_loan_repayments_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L20a_refunds_to_individuals_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L20b_refunds_to_political_party_committees_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L20c_refunds_to_other_political_committees_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L20d_total_contribution_refunds_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L21_other_disbursements_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
+                (
+                    "L22_total_disbursements_ytd",
+                    models.DecimalField(
+                        blank=True, decimal_places=2, max_digits=11, null=True
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='report',
-            name='form_3',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reports.form3'),
+            model_name="report",
+            name="form_3",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="reports.form3",
+            ),
         ),
         migrations.RemoveField(
-            model_name='form99',
-            name='text_code',
+            model_name="form99",
+            name="text_code",
         ),
         migrations.RenameField(
-            model_name='form99',
-            old_name='text_code_2',
-            new_name='text_code',
+            model_name="form99",
+            old_name="text_code_2",
+            new_name="text_code",
         ),
         migrations.AddField(
-            model_name='form3x',
-            name='filing_frequency',
+            model_name="form3x",
+            name="filing_frequency",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='form3x',
-            name='report_type_category',
+            model_name="form3x",
+            name="report_type_category",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.RunSQL(
-            sql="\n        UPDATE reports_form3x f\n        SET filing_frequency = CASE\n            WHEN r.report_code IN (\n                'M2', 'M3', 'M4', 'M5', 'M6', 'M7',\n                'M8', 'M9', 'M10', 'M11', 'M12'\n            ) THEN 'M'\n            ELSE 'Q'\n        END,\n        report_type_category = CASE\n            WHEN r.report_code IN (\n                'M11', 'M12', 'MY'\n            ) THEN 'Non-Election Year'\n            ELSE 'Election Year'\n        END\n        FROM reports_report as r\n        WHERE r.form_3x_id = f.id\n        AND filing_frequency IS NULL AND report_type_category IS NULL;\n    ",
-            reverse_sql='',
+            sql=_strip_sql(
+                """
+                UPDATE reports_form3x f
+                SET filing_frequency = CASE
+                    WHEN r.report_code IN (
+                        'M2', 'M3', 'M4', 'M5', 'M6', 'M7',
+                        'M8', 'M9', 'M10', 'M11', 'M12'
+                    ) THEN 'M'
+                    ELSE 'Q'
+                END,
+                report_type_category = CASE
+                    WHEN r.report_code IN (
+                        'M11', 'M12', 'MY'
+                    ) THEN 'Non-Election Year'
+                    ELSE 'Election Year'
+                END
+                FROM reports_report as r
+                WHERE r.form_3x_id = f.id
+                AND filing_frequency IS NULL AND report_type_category IS NULL;
+                """
+            ),
+            reverse_sql=_strip_sql(
+                """
+                """
+            ),
         ),
         migrations.AddField(
-            model_name='form99',
-            name='pdf_attachment',
+            model_name="form99",
+            name="pdf_attachment",
             field=models.BooleanField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='form99',
-            name='filing_frequency',
+            model_name="form99",
+            name="filing_frequency",
             field=models.TextField(blank=True, max_length=1, null=True),
         ),
         migrations.AddField(
-            model_name='form24',
-            name='name',
+            model_name="form24",
+            name="name",
             field=models.TextField(null=True),
         ),
         migrations.RunPython(
@@ -349,8 +823,8 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterField(
-            model_name='form24',
-            name='name',
+            model_name="form24",
+            name="name",
             field=models.TextField(),
         ),
         migrations.RunPython(

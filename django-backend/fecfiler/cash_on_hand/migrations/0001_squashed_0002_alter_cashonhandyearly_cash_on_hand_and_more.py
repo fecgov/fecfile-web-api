@@ -7,27 +7,46 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('cash_on_hand', '0001_initial'), ('cash_on_hand', '0002_alter_cashonhandyearly_cash_on_hand_and_more')]
+    replaces = [
+        ("cash_on_hand", "0001_initial"),
+        ("cash_on_hand", "0002_alter_cashonhandyearly_cash_on_hand_and_more"),
+    ]
 
     initial = True
 
     dependencies = [
-        ('committee_accounts', '0001_squashed_0007_alter_committeeaccount_members'),
+        ("committee_accounts", "0001_squashed_0007_alter_committeeaccount_members"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CashOnHandYearly',
+            name="CashOnHandYearly",
             fields=[
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('cash_on_hand', models.DecimalField(decimal_places=2, max_digits=11)),
-                ('year', models.TextField()),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
-                ('committee_account', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='committee_accounts.committeeaccount')),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                ("cash_on_hand", models.DecimalField(decimal_places=2, max_digits=11)),
+                ("year", models.TextField()),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
+                    "committee_account",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="committee_accounts.committeeaccount",
+                    ),
+                ),
             ],
             options={
-                'db_table': 'cash_on_hand_yearly',
+                "db_table": "cash_on_hand_yearly",
             },
         ),
     ]

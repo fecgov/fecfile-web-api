@@ -80,56 +80,119 @@ def remove_pending_emails(apps, schema_editor):
         pending_email=None
     )
 
+
 class Migration(migrations.Migration):
 
-    replaces = [('committee_accounts', '0001_initial'), ('committee_accounts', '0002_membership'), ('committee_accounts', '0003_membership_pending_email_alter_membership_id_and_more'), ('committee_accounts', '0004_remove_duplicate_memberships'), ('committee_accounts', '0005_remove_pending_emails'), ('committee_accounts', '0006_alter_membership_committee_account_and_more'), ('committee_accounts', '0007_alter_committeeaccount_members')]
+    replaces = [
+        ("committee_accounts", "0001_initial"),
+        ("committee_accounts", "0002_membership"),
+        (
+            "committee_accounts",
+            "0003_membership_pending_email_alter_membership_id_and_more",
+        ),
+        ("committee_accounts", "0004_remove_duplicate_memberships"),
+        ("committee_accounts", "0005_remove_pending_emails"),
+        ("committee_accounts", "0006_alter_membership_committee_account_and_more"),
+        ("committee_accounts", "0007_alter_committeeaccount_members"),
+    ]
 
     initial = True
 
     dependencies = [
-        ('user', '0001_initial'),
+        ("user", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CommitteeAccount',
+            name="CommitteeAccount",
             fields=[
-                ('deleted', models.DateTimeField(blank=True, null=True)),
-                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True)),
-                ('committee_id', models.CharField(max_length=9, unique=True, validators=[django.core.validators.RegexValidator('^C[0-9]{8}$', 'invalid committee id format')])),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('updated', models.DateTimeField(auto_now=True)),
+                ("deleted", models.DateTimeField(blank=True, null=True)),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        unique=True,
+                    ),
+                ),
+                (
+                    "committee_id",
+                    models.CharField(
+                        max_length=9,
+                        unique=True,
+                        validators=[
+                            django.core.validators.RegexValidator(
+                                "^C[0-9]{8}$", "invalid committee id format"
+                            )
+                        ],
+                    ),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
             ],
             options={
-                'db_table': 'committee_accounts',
+                "db_table": "committee_accounts",
             },
         ),
         migrations.CreateModel(
-            name='Membership',
+            name="Membership",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('role', models.CharField(choices=[('COMMITTEE_ADMINISTRATOR', 'Committee Administrator'), ('REVIEWER', 'Reviewer')], max_length=25)),
-                ('committee_account', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='committee_accounts.committeeaccount')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[
+                            ("COMMITTEE_ADMINISTRATOR", "Committee Administrator"),
+                            ("REVIEWER", "Reviewer"),
+                        ],
+                        max_length=25,
+                    ),
+                ),
+                (
+                    "committee_account",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="committee_accounts.committeeaccount",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='committeeaccount',
-            name='members',
-            field=models.ManyToManyField(through='committee_accounts.Membership', to=settings.AUTH_USER_MODEL),
+            model_name="committeeaccount",
+            name="members",
+            field=models.ManyToManyField(
+                through="committee_accounts.Membership", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.RunPython(
             code=create_memberships,
         ),
         migrations.AddField(
-            model_name='membership',
-            name='pending_email',
+            model_name="membership",
+            name="pending_email",
             field=models.EmailField(blank=True, max_length=254, null=True),
         ),
         migrations.AddField(
-            model_name='membership',
-            name='uuid',
+            model_name="membership",
+            name="uuid",
             field=models.UUIDField(default=uuid.uuid4, editable=False, serialize=False),
         ),
         migrations.RunPython(
@@ -137,33 +200,45 @@ class Migration(migrations.Migration):
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.RemoveField(
-            model_name='membership',
-            name='id',
+            model_name="membership",
+            name="id",
         ),
         migrations.RenameField(
-            model_name='membership',
-            old_name='uuid',
-            new_name='id',
+            model_name="membership",
+            old_name="uuid",
+            new_name="id",
         ),
         migrations.AlterField(
-            model_name='membership',
-            name='id',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, unique=True),
+            model_name="membership",
+            name="id",
+            field=models.UUIDField(
+                default=uuid.uuid4,
+                editable=False,
+                primary_key=True,
+                serialize=False,
+                unique=True,
+            ),
         ),
         migrations.AlterField(
-            model_name='membership',
-            name='user',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="membership",
+            name="user",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='membership',
-            name='created',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="membership",
+            name="created",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='membership',
-            name='updated',
+            model_name="membership",
+            name="updated",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.RunPython(
@@ -179,18 +254,32 @@ class Migration(migrations.Migration):
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.AlterField(
-            model_name='membership',
-            name='committee_account',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='committee_accounts.committeeaccount'),
+            model_name="membership",
+            name="committee_account",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="committee_accounts.committeeaccount",
+            ),
         ),
         migrations.AlterField(
-            model_name='membership',
-            name='role',
-            field=models.CharField(choices=[('COMMITTEE_ADMINISTRATOR', 'Committee Administrator'), ('MANAGER', 'Manager')], max_length=25),
+            model_name="membership",
+            name="role",
+            field=models.CharField(
+                choices=[
+                    ("COMMITTEE_ADMINISTRATOR", "Committee Administrator"),
+                    ("MANAGER", "Manager"),
+                ],
+                max_length=25,
+            ),
         ),
         migrations.AlterField(
-            model_name='committeeaccount',
-            name='members',
-            field=models.ManyToManyField(through='committee_accounts.Membership', through_fields=('committee_account', 'user'), to=settings.AUTH_USER_MODEL),
+            model_name="committeeaccount",
+            name="members",
+            field=models.ManyToManyField(
+                through="committee_accounts.Membership",
+                through_fields=("committee_account", "user"),
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

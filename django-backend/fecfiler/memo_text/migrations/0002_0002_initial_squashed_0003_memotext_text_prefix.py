@@ -6,22 +6,27 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('memo_text', '0002_initial'), ('memo_text', '0003_memotext_text_prefix')]
+    replaces = [("memo_text", "0002_initial"), ("memo_text", "0003_memotext_text_prefix")]
 
     dependencies = [
-        ('memo_text', '0001_initial'),
-        ('reports', '0001_initial'),
+        ("memo_text", "0001_initial"),
+        ("reports", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='memotext',
-            name='report',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reports.report'),
+            model_name="memotext",
+            name="report",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="reports.report",
+            ),
         ),
         migrations.AddField(
-            model_name='memotext',
-            name='text_prefix',
+            model_name="memotext",
+            name="text_prefix",
             field=models.TextField(blank=True, null=True),
         ),
     ]
