@@ -3,33 +3,252 @@
 import django.db.migrations.operations.special
 import django.db.models.deletion
 import uuid
-from importlib import import_module
-from textwrap import dedent
-from django.db import migrations, models
+import structlog
+from django.db import connection, migrations, models
+
+logger = structlog.get_logger(__name__)
 
 
-# Functions from the following migrations need manual copying.
-# Move them and any dependencies into this file, then update the
-# RunPython operations to refer to the local versions:
-# fecfiler.reports.migrations.00018_form24_name
-# fecfiler.reports.migrations.00019_form24_name_fix
-# fecfiler.reports.migrations.
-#   0008_remove_form1m_city_remove_form1m_committee_name_and_more
-# fecfiler.reports.migrations.0009_report_can_delete
-# fecfiler.reports.migrations.0010_report_can_unammend
+def _migrate_committee_data(apps, schema_editor):
+    Report = apps.get_model("reports", "Report")  # noqa
+    Form24 = apps.get_model("reports", "Form24")  # noqa
+    Form3x = apps.get_model("reports", "Form3X")  # noqa
+    Form99 = apps.get_model("reports", "Form99")  # noqa
+    Form1m = apps.get_model("reports", "Form1M")  # noqa
+
+    for form in Form24.objects.all():
+        report = Report.objects.filter(form_24=form).first()
+        if report is not None:
+            report.street_1 = form.street_1
+            report.street_2 = form.street_2
+            report.city = form.city
+            report.state = form.state
+            report.zip = form.zip
+            report.save()
+        else:
+            logger.error(f"F24 Form has no corresponding report! {form}")
+
+    for form in Form3x.objects.all():
+        report = Report.objects.filter(form_3x=form).first()
+        if report is not None:
+            report.street_1 = form.street_1
+            report.street_2 = form.street_2
+            report.city = form.city
+            report.state = form.state
+            report.zip = form.zip
+            report.save()
+        else:
+            logger.error(f"F3X Form has no corresponding report! {form}")
+
+    for form in Form99.objects.all():
+        report = Report.objects.filter(form_99=form).first()
+        if report is not None:
+            report.committee_name = form.committee_name
+            report.street_1 = form.street_1
+            report.street_2 = form.street_2
+            report.city = form.city
+            report.state = form.state
+            report.zip = form.zip
+            report.save()
+        else:
+            logger.error(f"F99 Form has no corresponding report! {form}")
+
+    for form in Form1m.objects.all():
+        report = Report.objects.filter(form_1m=form).first()
+        if report is not None:
+            report.committee_name = form.committee_name
+            report.street_1 = form.street_1
+            report.street_2 = form.street_2
+            report.city = form.city
+            report.state = form.state
+            report.zip = form.zip
+            report.save()
+        else:
+            logger.error(f"F1M Form has no corresponding report! {form}")
 
 
-def _load_callable(module_name, function_name):
-    def _wrapper(apps, schema_editor):
-        try:
-            fn = getattr(import_module(module_name), function_name)
-        except Exception:
-            return django.db.migrations.operations.special.RunPython.noop(
-                apps, schema_editor
+def _create_can_delete_trigger(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+        CREATE OR REPLACE FUNCTION check_can_delete()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            PERFORM update_report_can_delete(NEW);
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION check_can_delete_previous()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            associated_report RECORD;
+        BEGIN
+            FOR associated_report IN (
+                SELECT * FROM reports_report
+                WHERE committee_account_id = OLD.committee_account_id
+                AND can_delete = false
             )
-        return fn(apps, schema_editor)
+            LOOP
+                PERFORM update_report_can_delete(associated_report);
+            END LOOP;
 
-    return _wrapper
+            RETURN OLD;
+        END;
+        $$ LANGUAGE plpgsql;
+
+
+        CREATE OR REPLACE FUNCTION check_can_delete_transaction_update()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            associated_report RECORD;
+        BEGIN
+            SELECT * INTO associated_report FROM reports_report WHERE id IN (
+                    SELECT report_id FROM reports_reporttransaction
+                    WHERE transaction_id = NEW.id LIMIT 1
+                );
+                PERFORM update_report_can_delete(associated_report);
+
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION check_can_delete_transaction_insert()
+        RETURNS TRIGGER AS $$
+        DECLARE
+             associated_report RECORD;
+        BEGIN
+            FOR associated_report IN (
+                SELECT r1.*
+                FROM reports_report r1
+                JOIN reports_report r2
+                    ON r1.committee_account_id = r2.committee_account_id
+                    AND EXTRACT(YEAR FROM r1.coverage_from_date) = (
+                        EXTRACT(YEAR FROM r2.coverage_from_date))
+                WHERE r1.can_delete = true
+                AND r2.id = NEW.report_id
+            )
+        LOOP
+            PERFORM update_report_can_delete(associated_report);
+        END LOOP;
+
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE TRIGGER check_can_delete_report
+        AFTER INSERT OR UPDATE ON reports_report
+        FOR EACH ROW
+        WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
+        EXECUTE FUNCTION check_can_delete();
+
+        CREATE TRIGGER check_can_delete_previous
+        AFTER DELETE ON reports_report
+        FOR EACH ROW
+        WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
+        EXECUTE FUNCTION check_can_delete_previous();
+
+        CREATE TRIGGER check_can_delete_transaction_insert
+        AFTER INSERT ON reports_reporttransaction
+        FOR EACH ROW
+        WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
+        EXECUTE FUNCTION check_can_delete_transaction_insert();
+        """
+        )
+
+
+def _reverse_can_delete_trigger(apps, schema_editor):
+    report_model = apps.get_model("reports", "Report")
+    transaction_model = apps.get_model("transactions", "Transaction")
+
+    triggers = [
+        "check_can_delete_report",
+        "check_can_delete_previous",
+        "check_can_delete_transaction_update",
+        "check_can_delete_transaction_insert",
+    ]
+
+    with schema_editor.atomic():
+        for trigger in triggers:
+            schema_editor.execute(
+                "DROP TRIGGER IF EXISTS %s ON %s",
+                (trigger, report_model._meta.db_table),
+            )
+            schema_editor.execute(
+                "DROP TRIGGER IF EXISTS %s ON %s",
+                (trigger, transaction_model._meta.db_table),
+            )
+
+
+def _populate_can_delete(apps, schema_editor):
+    report_model = apps.get_model("reports", "Report")
+    for row in report_model.objects.all():
+        row.can_delete = True
+        row.save()
+
+
+def _create_can_unamend_trigger(apps, schema_editor):
+    schema_editor.execute(
+        """
+    CREATE OR REPLACE FUNCTION update_can_unamend()
+    RETURNS TRIGGER AS $$
+    BEGIN
+        UPDATE reports_report
+        SET can_unamend = FALSE
+        WHERE id IN (
+            SELECT report_id
+            FROM reports_reporttransaction
+            WHERE transaction_id = NEW.id
+        );
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TRIGGER transaction_updated
+    AFTER UPDATE ON transactions_transaction
+    FOR EACH ROW
+    WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
+    EXECUTE FUNCTION update_can_unamend();
+
+    CREATE OR REPLACE FUNCTION update_can_unamend_new_transaction()
+    RETURNS TRIGGER AS $$
+    BEGIN
+        UPDATE reports_report
+        SET can_unamend = FALSE
+        WHERE id IN (
+            SELECT report_id
+            FROM reports_reporttransaction
+            WHERE id = NEW.id
+        );
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TRIGGER transaction_created
+    AFTER INSERT ON reports_reporttransaction
+    FOR EACH ROW
+    WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
+    EXECUTE FUNCTION update_can_unamend_new_transaction();
+    """
+    )
+
+
+def _update_form24_names_v1(apps, schema_editor):
+    form24 = apps.get_model("reports", "Form24")
+    form24_objects = list(form24.objects.all())
+    for index, form in enumerate(form24_objects, start=1):
+        report_type = form.report_type_24_48
+        form.name = f"{report_type}-HOUR Report: {index}"
+        form.save()
+
+
+def _update_form24_names_v2(apps, schema_editor):
+    form24 = apps.get_model("reports", "Form24")
+    form24_objects = list(form24.objects.all())
+    for form in form24_objects:
+        report_type = form.report_type_24_48
+        form.name = f"{report_type}-HOUR: Report of Independent Expenditure"
+        form.save()
 
 
 class Migration(migrations.Migration):
@@ -90,11 +309,7 @@ class Migration(migrations.Migration):
             field=models.TextField(blank=True, null=True),
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.reports.migrations."
-                "0008_remove_form1m_city_remove_form1m_committee_name_and_more",
-                "migrate_committee_data",
-            ),
+            code=_migrate_committee_data,
         ),
         migrations.RemoveField(
             model_name="form1m",
@@ -229,20 +444,11 @@ class Migration(migrations.Migration):
             """
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.reports.migrations.0009_report_can_delete",
-                "create_trigger",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.reports.migrations.0009_report_can_delete",
-                "reverse_code",
-            ),
+            code=_create_can_delete_trigger,
+            reverse_code=_reverse_can_delete_trigger,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.reports.migrations.0009_report_can_delete",
-                "populate_existing_rows",
-            ),
+            code=_populate_can_delete,
         ),
         migrations.AddField(
             model_name="report",
@@ -250,10 +456,7 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=False),
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.reports.migrations.0010_report_can_unammend",
-                "create_trigger",
-            ),
+            code=_create_can_unamend_trigger,
         ),
         migrations.RemoveField(
             model_name="form3x",
@@ -802,10 +1005,7 @@ class Migration(migrations.Migration):
             field=models.TextField(null=True),
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.reports.migrations.00018_form24_name",
-                "update_form24_names",
-            ),
+            code=_update_form24_names_v1,
         ),
         migrations.AlterField(
             model_name="form24",
@@ -813,10 +1013,7 @@ class Migration(migrations.Migration):
             field=models.TextField(),
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.reports.migrations.00019_form24_name_fix",
-                "update_form24_names",
-            ),
+            code=_update_form24_names_v2,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
     ]

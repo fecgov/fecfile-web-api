@@ -184,6 +184,7 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(
             code=create_memberships,
+            reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.AddField(
             model_name="membership",

@@ -3,42 +3,959 @@
 import django.contrib.postgres.fields
 import django.db.migrations.operations.special
 import django.db.models.deletion
+import structlog
 import uuid
-from django.db import migrations, models
-from importlib import import_module
-from textwrap import dedent
+from django.db import connection, migrations, models
+from django.db.models import F, Q
+from fecfiler.transactions.aggregation import process_aggregation_for_debts
+from fecfiler.transactions.schedule_a.managers import (
+    over_two_hundred_types as schedule_a_over_two_hundred_types,
+)
+from fecfiler.transactions.schedule_b.managers import (
+    over_two_hundred_types as schedule_b_over_two_hundred_types,
+)
+from fecfiler.transactions.utils_aggregation_queries import (
+    filter_queryset_for_previous_transactions_in_aggregation,
+)
 
 
-# Functions from the following migrations need manual copying.
-# Move them and any dependencies into this file, then update the
-# RunPython operations to refer to the local versions:
-# fecfiler.transactions.migrations.0004_report_transactions_link_table
-# fecfiler.transactions.migrations.0005_schedulec_report_coverage_from_date_and_more
-# fecfiler.transactions.migrations.
-#   0006_independent_expenditure_memos_no_aggregation_group
-# fecfiler.transactions.migrations.
-#   0008_transaction__calendar_ytd_per_election_office_and_more
-# fecfiler.transactions.migrations.0009_update_calculate_loan_payment_to_date
-# fecfiler.transactions.migrations.0011_transaction_can_delete
-# fecfiler.transactions.migrations.0012_alter_transactions_blocking_reports
-# fecfiler.transactions.migrations.0013_transaction_itemized_and_associated_triggers
-# fecfiler.transactions.migrations.0015_merge_transaction_triggers
-# fecfiler.transactions.migrations.0020_trigger_save_on_transactions
-# fecfiler.transactions.migrations.0022_schedule_f_aggregation
-# fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more
+logger = structlog.get_logger(__name__)
 
 
-def _load_callable(module_name, function_name):
-    def _wrapper(apps, schema_editor):
-        try:
-            fn = getattr(import_module(module_name), function_name)
-        except Exception:
-            return django.db.migrations.operations.special.RunPython.noop(
-                apps, schema_editor
+# Inlined from 0004_report_transactions_link_table
+def add_link_table(apps, schema_editor):
+    transaction = apps.get_model("transactions", "Transaction")
+
+    for t in transaction.objects.all():
+        t.reports.add(t.report)
+        t.save()
+
+
+# Inlined from 0005_schedulec_report_coverage_from_date_and_more
+def set_coverage_date(apps, schema_editor):
+    transaction_model = apps.get_model("transactions", "Transaction")
+
+    for transaction in transaction_model.objects.filter(
+        Q(schedule_c__isnull=False) | Q(schedule_d__isnull=False)
+    ):
+        for report in transaction.reports.all():
+            if report.coverage_from_date and transaction.schedule_d:
+                transaction.schedule_d.report_coverage_from_date = (
+                    report.coverage_from_date
+                )
+                transaction.schedule_d.save()
+            if report.coverage_through_date and transaction.schedule_c:
+                transaction.schedule_c.report_coverage_through_date = (
+                    report.coverage_through_date
+                )
+                transaction.schedule_c.save()
+        transaction.save()
+
+
+# Inlined from 0006_independent_expenditure_memos_no_aggregation_group
+def set_aggregation_group_to_none_for_ie_memos(apps, schema_editor):
+    transaction_model = apps.get_model("transactions", "Transaction")
+
+    for transaction in transaction_model.objects.filter(
+        Q(
+            transaction_type_identifier__in=[
+                "INDEPENDENT_EXPENDITURE_CREDIT_CARD_PAYMENT_MEMO",
+                "INDEPENDENT_EXPENDITURE_STAFF_REIMBURSEMENT_MEMO",
+                "INDEPENDENT_EXPENDITURE_PAYMENT_TO_PAYROLL_MEMO",
+            ]
+        )
+    ):
+        transaction.aggregation_group = None
+        transaction.save()
+
+
+def reverse_removing_aggregation_group_for_ie_memos(apps, schema_editor):
+    transaction_model = apps.get_model("transactions", "Transaction")
+
+    for transaction in transaction_model.objects.filter(
+        Q(
+            transaction_type_identifier__in=[
+                "INDEPENDENT_EXPENDITURE_CREDIT_CARD_PAYMENT_MEMO",
+                "INDEPENDENT_EXPENDITURE_STAFF_REIMBURSEMENT_MEMO",
+                "INDEPENDENT_EXPENDITURE_PAYMENT_TO_PAYROLL_MEMO",
+            ]
+        )
+    ):
+        transaction.aggregation_group = "INDEPENDENT_EXPENDITURE"
+        transaction.save()
+
+
+# Inlined from 0008_transaction__calendar_ytd_per_election_office_and_more
+def populate_existing_rows(apps, schema_editor):
+    transaction = apps.get_model("transactions", "Transaction")
+    for row in transaction.objects.all():
+        row.aggregate = 0.0
+        row.save()
+
+
+# Inlined from 0009_update_calculate_loan_payment_to_date
+def update_existing_rows(apps, schema_editor):
+    transaction = apps.get_model("transactions", "Transaction")
+    types = [
+        "LOAN_RECEIVED_FROM_INDIVIDUAL",
+        "LOAN_RECEIVED_FROM BANK",
+        "LOAN_BY_COMMITTEE",
+    ]
+    for row in transaction.objects.filter(transaction_type_identifier__in=types):
+        row.save()
+
+
+# Inlined from 0011_transaction_can_delete
+def create_trigger_function(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+        CREATE OR REPLACE FUNCTION update_transactions_can_delete() RETURNS TRIGGER AS $$
+        BEGIN
+            UPDATE transactions_transaction
+            SET blocking_reports = CASE
+                WHEN NEW.upload_submission_id IS NOT NULL
+                THEN array_append(blocking_reports, NEW.id)
+                ELSE array_remove(blocking_reports, NEW.id)
+            END
+            -- all transactions in the submitted report
+            WHERE id IN (
+                SELECT transaction_id
+                FROM reports_reporttransaction
+                WHERE report_id = NEW.id
             )
-        return fn(apps, schema_editor)
+            -- all transactions that are reattributed in the submtited report
+            OR id IN (
+                SELECT reatt_redes_id
+                FROM reports_reporttransaction
+                JOIN transactions_transaction tt
+                ON reports_reporttransaction.transaction_id = tt.id
+                WHERE report_id = NEW.id
+            )
+            -- all loans that are carried forward in the submitted report
+            OR id IN (
+                SELECT loan_id
+                FROM reports_reporttransaction
+                JOIN transactions_transaction tt
+                ON reports_reporttransaction.transaction_id = tt.id
+                WHERE report_id = NEW.id
+            )
+            -- all repayments to loans that are carried forward in the submitted report
+            OR loan_id IN (
+                SELECT loan_id
+                FROM reports_reporttransaction
+                JOIN transactions_transaction tt
+                ON reports_reporttransaction.transaction_id = tt.id
+                WHERE report_id = NEW.id AND tt.schedule_c_id IS NOT NULL
+            )
+            -- all debts that are carried forward in the submitted report
+            OR id IN (
+                SELECT debt_id
+                FROM reports_reporttransaction
+                JOIN transactions_transaction tt
+                ON reports_reporttransaction.transaction_id = tt.id
+                WHERE report_id = NEW.id
+            )
+            -- all repayments to debts that are carried forward in the submitted report
+            OR debt_id IN (
+                SELECT debt_id
+                FROM reports_reporttransaction
+                JOIN transactions_transaction tt
+                ON reports_reporttransaction.transaction_id = tt.id
+                WHERE report_id = NEW.id AND tt.schedule_d_id IS NOT NULL
+            );
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+        """
+        )
 
-    return _wrapper
+
+def drop_trigger_function(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute("DROP FUNCTION IF EXISTS update_transactions_can_delete();")
+
+
+def create_trigger(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            CREATE TRIGGER report_status_update
+            AFTER UPDATE OF upload_submission_id ON reports_report
+            FOR EACH ROW
+            EXECUTE FUNCTION update_transactions_can_delete();
+            """
+        )
+
+
+def drop_trigger(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute("DROP TRIGGER IF EXISTS report_status_update ON reports_report;")
+
+
+# Inlined from 0012_alter_transactions_blocking_reports
+def update_blocking_reports_default(apps, schema_editor):
+    transaction = apps.get_model("transactions", "Transaction")
+    transaction._meta.get_field("blocking_reports").default = list
+
+
+# Inlined from 0013_transaction_itemized_and_associated_triggers
+def populate_over_two_hundred_types(apps, schema_editor):
+    OverTwoHundredTypesScheduleA = apps.get_model(  # noqa: N806
+        "transactions", "OverTwoHundredTypesScheduleA"
+    )
+    OverTwoHundredTypesScheduleB = apps.get_model(  # noqa: N806
+        "transactions", "OverTwoHundredTypesScheduleB"
+    )
+    scha_types_to_create = [
+        OverTwoHundredTypesScheduleA(type=type_to_create)
+        for type_to_create in schedule_a_over_two_hundred_types
+    ]
+    OverTwoHundredTypesScheduleA.objects.bulk_create(scha_types_to_create)
+    schb_types_to_create = [
+        OverTwoHundredTypesScheduleB(type=type_to_create)
+        for type_to_create in schedule_b_over_two_hundred_types
+    ]
+    OverTwoHundredTypesScheduleB.objects.bulk_create(schb_types_to_create)
+
+
+def drop_over_two_hundred_types(apps, schema_editor):
+    print("this reverses migration automatically.")
+
+
+def create_itemized_triggers_and_functions(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+        CREATE OR REPLACE FUNCTION before_transactions_transaction_insert_or_update()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            needs_itemized_set boolean;
+            itemization boolean;
+        BEGIN
+            needs_itemized_set := needs_itemized_set(OLD, NEW);
+            IF needs_itemized_set THEN
+                NEW.itemized := calculate_itemization(NEW);
+            END IF;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION calculate_itemization(
+            txn RECORD
+        )
+        RETURNS BOOLEAN AS $$
+        DECLARE
+            itemized boolean;
+        BEGIN
+            itemized := TRUE;
+            IF txn.force_itemized IS NOT NULL THEN
+                itemized := txn.force_itemized;
+            ELSIF txn.aggregate < 0 THEN
+                itemized := TRUE;
+            ELSIF EXISTS (
+                SELECT type from (
+                    SELECT type
+                    FROM over_two_hundred_types_schedulea
+                    UNION
+                    SELECT type
+                    FROM over_two_hundred_types_scheduleb
+                ) as scha_schb_types
+                WHERE type = txn.transaction_type_identifier
+            ) THEN
+                IF txn.aggregate > 200 THEN
+                    itemized := TRUE;
+                ELSE
+                    itemized := FALSE;
+                END IF;
+            END IF;
+            return itemized;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION after_transactions_transaction_insert_or_update()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            parent_and_grandparent_ids uuid[];
+            children_and_grandchildren_ids uuid[];
+        BEGIN
+            IF OLD IS NULL OR OLD.itemized <> NEW.itemized THEN
+                IF NEW.itemized is TRUE THEN
+                    parent_and_grandparent_ids :=
+                        get_parent_grandparent_transaction_ids(NEW);
+                    PERFORM set_itemization_for_ids(TRUE, parent_and_grandparent_ids);
+                ELSE
+                    children_and_grandchildren_ids :=
+                        get_children_and_grandchildren_transaction_ids(NEW);
+                    PERFORM set_itemization_for_ids(
+                        FALSE,children_and_grandchildren_ids
+                    );
+                END IF;
+            END IF;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION needs_itemized_set(
+            OLD RECORD,
+            NEW RECORD
+        )
+        RETURNS BOOLEAN AS $$
+        BEGIN
+            return OLD IS NULL OR (
+                OLD.force_itemized IS DISTINCT FROM NEW.force_itemized
+                OR OLD.aggregate IS DISTINCT FROM NEW.aggregate
+            );
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION set_itemization_for_ids(
+            itemization boolean,
+            ids uuid[]
+        )
+        RETURNS VOID AS $$
+        BEGIN
+            IF cardinality(ids) > 0 THEN
+                UPDATE transactions_transaction
+                SET
+                    itemized = itemization
+                WHERE id = ANY (ids);
+            END IF;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION get_parent_grandparent_transaction_ids(
+            txn RECORD
+        )
+        RETURNS uuid[] AS $$
+        DECLARE
+            ids uuid[];
+        BEGIN
+            SELECT array(
+                SELECT id
+                FROM transactions_transaction
+                WHERE id IN (
+                    txn.parent_transaction_id,
+                    (
+                        SELECT parent_transaction_id
+                        FROM transactions_transaction
+                        WHERE id = txn.parent_transaction_id
+                    )
+                )
+            ) into ids;
+            RETURN ids;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION get_children_and_grandchildren_transaction_ids(
+            txn RECORD
+        )
+        RETURNS uuid[] AS $$
+        DECLARE
+            ids uuid[];
+        BEGIN
+            SELECT array(
+                SELECT id
+                FROM transactions_transaction
+                WHERE parent_transaction_id = ANY (
+                    array_prepend(txn.id,
+                        array(
+                            SELECT id
+                            FROM transactions_transaction
+                            WHERE parent_transaction_id = txn.id
+                        )
+                    )
+                )
+            ) into ids;
+            RETURN ids;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE TRIGGER before_transactions_transaction_insert_or_update_trigger
+        BEFORE INSERT OR UPDATE ON transactions_transaction
+        FOR EACH ROW
+        EXECUTE FUNCTION before_transactions_transaction_insert_or_update();
+
+        CREATE TRIGGER zafter_transactions_transaction_insert_or_update_trigger
+        AFTER INSERT OR UPDATE ON transactions_transaction
+        FOR EACH ROW
+        EXECUTE FUNCTION after_transactions_transaction_insert_or_update();
+        """
+        )
+
+
+def drop_itemized_triggers_and_functions(apps, schema_editor):
+    schema_editor.execute(
+        """
+        DROP TRIGGER
+        IF EXISTS zafter_transactions_transaction_insert_or_update_trigger
+        ON transactions_transaction;
+
+        DROP TRIGGER
+        IF EXISTS before_transactions_transaction_insert_or_update_trigger
+        ON transactions_transaction;
+
+        DROP FUNCTION IF EXISTS before_transactions_transaction_insert_or_update;
+        DROP FUNCTION IF EXISTS calculate_itemization;
+        DROP FUNCTION IF EXISTS after_transactions_transaction_insert_or_update;
+        DROP FUNCTION IF EXISTS needs_itemized_set;
+        DROP FUNCTION IF EXISTS set_itemization_for_ids;
+        DROP FUNCTION IF EXISTS get_parent_grandparent_transaction_ids;
+        DROP FUNCTION IF EXISTS get_children_and_grandchildren_transaction_ids;
+        """
+    )
+
+
+# Inlined from 0015_merge_transaction_triggers
+def create_triggers(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+        CREATE TRIGGER before_transactions_transaction_trigger
+        BEFORE INSERT OR UPDATE ON transactions_transaction
+        FOR EACH ROW
+        EXECUTE FUNCTION before_transactions_transaction();
+
+        CREATE TRIGGER after_transactions_transaction_infinite_trigger
+        AFTER INSERT OR UPDATE ON transactions_transaction
+        FOR EACH ROW
+        EXECUTE FUNCTION after_transactions_transaction_infinite();
+
+        CREATE TRIGGER after_transactions_transaction_trigger
+        AFTER INSERT OR UPDATE ON transactions_transaction
+        FOR EACH ROW
+        WHEN (pg_trigger_depth() = 0)
+        EXECUTE FUNCTION after_transactions_transaction();
+        """
+        )
+
+
+def reverse_create_triggers(apps, schema):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            DROP TRIGGER
+            IF EXISTS before_transactions_transaction_trigger
+            ON transactions_transaction;
+
+            DROP TRIGGER
+            IF EXISTS after_transactions_transaction_infinite_trigger
+            ON transactions_transaction;
+
+            DROP TRIGGER
+            IF EXISTS after_transactions_transaction_trigger
+            ON transactions_transaction;
+            """
+        )
+
+
+def before_transactions_transaction(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+        CREATE OR REPLACE FUNCTION before_transactions_transaction()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            NEW := process_itemization(OLD, NEW);
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+            """
+        )
+
+
+def after_transactions_transaction(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+        CREATE OR REPLACE FUNCTION after_transactions_transaction()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            IF TG_OP = 'UPDATE'
+            THEN
+                NEW := calculate_aggregates(OLD, NEW, TG_OP);
+                NEW := update_can_unamend(NEW);
+            ELSE
+                NEW := calculate_aggregates(OLD, NEW, TG_OP);
+            END IF;
+
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION after_transactions_transaction_infinite()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            NEW := handle_parent_itemization(OLD, NEW);
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+            """
+        )
+
+
+def reverse_after_transactions_transaction(apps, schema):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            DROP FUNCTION IF EXISTS after_transactions_transaction
+            DROP FUNCTION IF EXISTS after_transactions_transaction_infinite
+            """
+        )
+
+
+def drop_old_triggers(apps, schema_editor):
+    schema_editor.execute(
+        """
+        DROP TRIGGER
+        IF EXISTS zafter_transactions_transaction_insert_or_update_trigger
+        ON transactions_transaction;
+
+        DROP TRIGGER
+        IF EXISTS before_transactions_transaction_insert_or_update_trigger
+        ON transactions_transaction;
+
+        DROP TRIGGER
+        IF EXISTS transaction_updated
+        ON transactions_transaction;
+
+        DROP TRIGGER
+        IF EXISTS calculate_aggregates_trigger
+        ON transactions_transaction;
+        """
+    )
+
+
+def reverse_drop_old_triggers(apps, schema_editor):
+    schema_editor.execute(
+        """
+        CREATE TRIGGER zafter_transactions_transaction_insert_or_update_trigger
+        AFTER INSERT OR UPDATE ON transactions_transaction
+        FOR EACH ROW
+        EXECUTE FUNCTION after_transactions_transaction_insert_or_update();
+
+        CREATE TRIGGER before_transactions_transaction_insert_or_update_trigger
+        BEFORE INSERT OR UPDATE ON transactions_transaction
+        FOR EACH ROW
+        EXECUTE FUNCTION before_transactions_transaction_insert_or_update();
+
+        CREATE TRIGGER transaction_updated
+        AFTER UPDATE ON transactions_transaction
+        FOR EACH ROW
+        WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
+        EXECUTE FUNCTION update_can_unamend();
+
+        CREATE TRIGGER calculate_aggregates_trigger
+        AFTER INSERT OR UPDATE ON transactions_transaction
+        FOR EACH ROW
+        WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
+        EXECUTE FUNCTION calculate_aggregates();
+        """
+    )
+
+
+def drop_old_functions(apps, schema_editor):
+    schema_editor.execute(
+        """
+        DROP FUNCTION IF EXISTS before_transactions_transaction_insert_or_update;
+        DROP FUNCTION IF EXISTS after_transactions_transaction_insert_or_update;
+        DROP FUNCTION IF EXISTS calculate_aggregates;
+        DROP FUNCTION IF EXISTS update_can_unamend;
+        """
+    )
+
+
+def reverse_drop_old_functions(apps, schema_editor):
+    schema_editor.execute(
+        """
+        CREATE OR REPLACE FUNCTION before_transactions_transaction_insert_or_update()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            needs_itemized_set boolean;
+            itemization boolean;
+        BEGIN
+            needs_itemized_set := needs_itemized_set(OLD, NEW);
+            IF needs_itemized_set THEN
+                NEW.itemized := calculate_itemization(NEW);
+            END IF;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+
+        CREATE OR REPLACE FUNCTION after_transactions_transaction_insert_or_update()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            parent_and_grandparent_ids uuid[];
+            children_and_grandchildren_ids uuid[];
+        BEGIN
+            IF OLD IS NULL OR OLD.itemized <> NEW.itemized THEN
+                IF NEW.itemized is TRUE THEN
+                    parent_and_grandparent_ids :=
+                        get_parent_grandparent_transaction_ids(NEW);
+                    PERFORM set_itemization_for_ids(TRUE, parent_and_grandparent_ids);
+                ELSE
+                    children_and_grandchildren_ids :=
+                        get_children_and_grandchildren_transaction_ids(NEW);
+                    PERFORM set_itemization_for_ids(
+                        FALSE,children_and_grandchildren_ids
+                    );
+                END IF;
+            END IF;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+        CREATE OR REPLACE FUNCTION calculate_aggregates()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            sql_committee_id TEXT;
+        BEGIN
+            sql_committee_id := REPLACE(NEW.committee_account_id::TEXT, '-', '_');
+
+            -- If schedule_c2_id or schedule_d_id is not null, stop processing
+            IF NEW.schedule_c2_id IS NOT NULL OR NEW.schedule_d_id IS NOT NULL
+            THEN
+                RETURN NEW;
+            END IF;
+
+            IF NEW.schedule_a_id IS NOT NULL OR NEW.schedule_b_id IS NOT NULL
+            THEN
+                PERFORM calculate_entity_aggregates(NEW, sql_committee_id);
+                IF TG_OP = 'UPDATE'
+                    AND NEW.contact_1_id <> OLD.contact_1_id
+                THEN
+                    PERFORM calculate_entity_aggregates(OLD, sql_committee_id);
+                END IF;
+            END IF;
+
+            IF NEW.schedule_c_id IS NOT NULL
+                OR NEW.schedule_c1_id IS NOT NULL
+                OR NEW.transaction_type_identifier = 'LOAN_REPAYMENT_MADE'
+            THEN
+                PERFORM calculate_loan_payment_to_date(NEW, sql_committee_id);
+            END IF;
+
+            IF NEW.schedule_e_id IS NOT NULL
+            THEN
+                PERFORM calculate_calendar_ytd_per_election_office(
+                    NEW, sql_committee_id);
+                IF TG_OP = 'UPDATE'
+                THEN
+                    PERFORM calculate_calendar_ytd_per_election_office(
+                        OLD, sql_committee_id);
+                END IF;
+            END IF;
+
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+
+
+        CREATE OR REPLACE FUNCTION update_can_unamend()
+        RETURNS TRIGGER AS $$
+        BEGIN
+            UPDATE reports_report
+            SET can_unamend = FALSE
+            WHERE id IN (
+                SELECT report_id
+                FROM reports_reporttransaction
+                WHERE transaction_id = NEW.id
+            );
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+        """
+    )
+
+
+def process_itemization(apps, schema):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+    CREATE OR REPLACE FUNCTION process_itemization(
+        OLD RECORD,
+        NEW RECORD
+    )
+        RETURNS RECORD AS $$
+        DECLARE
+            needs_itemized_set boolean;
+            itemization boolean;
+        BEGIN
+            needs_itemized_set := needs_itemized_set(OLD, NEW);
+            IF needs_itemized_set THEN
+                NEW.itemized := calculate_itemization(NEW);
+            END IF;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+        """
+        )
+
+
+def reverse_process_itemization(apps, schema):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            DROP FUNCTION IF EXISTS process_itemization
+            """
+        )
+
+
+def handle_parent_itemization(apps, schema):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+    CREATE OR REPLACE FUNCTION handle_parent_itemization(
+        OLD RECORD,
+        NEW RECORD
+    )
+        RETURNS RECORD AS $$
+        DECLARE
+            parent_and_grandparent_ids uuid[];
+            children_and_grandchildren_ids uuid[];
+        BEGIN
+            IF OLD IS NULL OR OLD.itemized <> NEW.itemized THEN
+                IF NEW.itemized is TRUE THEN
+                    parent_and_grandparent_ids :=
+                        get_parent_grandparent_transaction_ids(NEW);
+                    PERFORM set_itemization_for_ids(TRUE, parent_and_grandparent_ids);
+                ELSE
+                    children_and_grandchildren_ids :=
+                        get_children_and_grandchildren_transaction_ids(NEW);
+                    PERFORM set_itemization_for_ids(
+                        FALSE,children_and_grandchildren_ids
+                    );
+                END IF;
+            END IF;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+        """
+        )
+
+
+def reverse_handle_parent_itemization(apps, schema):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            DROP FUNCTION IF EXISTS handle_parent_itemization
+            """
+        )
+
+
+def calculate_aggregates(apps, schema):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+        CREATE OR REPLACE FUNCTION calculate_aggregates(
+            OLD RECORD,
+            NEW RECORD,
+            TG_OP TEXT
+        )
+        RETURNS RECORD AS $$
+        DECLARE
+            sql_committee_id TEXT;
+        BEGIN
+            sql_committee_id := REPLACE(NEW.committee_account_id::TEXT, '-', '_');
+
+            -- If schedule_c2_id or schedule_d_id is not null, stop processing
+            IF NEW.schedule_c2_id IS NOT NULL OR NEW.schedule_d_id IS NOT NULL
+            THEN
+                RETURN NEW;
+            END IF;
+
+            IF NEW.schedule_a_id IS NOT NULL OR NEW.schedule_b_id IS NOT NULL
+            THEN
+                PERFORM calculate_entity_aggregates(NEW, sql_committee_id);
+                IF TG_OP = 'UPDATE'
+                    AND NEW.contact_1_id <> OLD.contact_1_id
+                THEN
+                    PERFORM calculate_entity_aggregates(OLD, sql_committee_id);
+                END IF;
+            END IF;
+
+            IF NEW.schedule_c_id IS NOT NULL
+                OR NEW.schedule_c1_id IS NOT NULL
+                OR NEW.transaction_type_identifier = 'LOAN_REPAYMENT_MADE'
+            THEN
+                PERFORM calculate_loan_payment_to_date(NEW, sql_committee_id);
+            END IF;
+
+            IF NEW.schedule_e_id IS NOT NULL
+            THEN
+                PERFORM calculate_calendar_ytd_per_election_office(
+                    NEW, sql_committee_id);
+                IF TG_OP = 'UPDATE'
+                THEN
+                    PERFORM calculate_calendar_ytd_per_election_office(
+                        OLD, sql_committee_id);
+                END IF;
+            END IF;
+
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+        """
+        )
+
+
+def reverse_calculate_aggregates(apps, schema):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            DROP FUNCTION IF EXISTS calculate_aggregates
+            """
+        )
+
+
+def update_can_unamend(apps, schema):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            CREATE OR REPLACE FUNCTION update_can_unamend(
+                NEW RECORD
+            )
+            RETURNS RECORD AS $$
+            BEGIN
+                UPDATE reports_report
+                SET can_unamend = FALSE
+                WHERE id IN (
+                    SELECT report_id
+                    FROM reports_reporttransaction
+                    WHERE transaction_id = NEW.id
+                );
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+            """
+        )
+
+
+def reverse_update_can_unamend(apps, schema):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """
+            DROP FUNCTION IF EXISTS update_can_unamend
+            """
+        )
+
+
+# Inlined from 0020_trigger_save_on_transactions
+def trigger_save_on_transactions(apps, schema_editor):
+    transactions = apps.get_model("transactions", "transaction")
+    committees = apps.get_model("committee_accounts", "committeeaccount")
+    contacts = apps.get_model("contacts", "contact")
+
+    # Update transactions for each committee
+    for committee in committees.objects.all():
+        logger.info(f"Committee:{committee.committee_id}")
+
+        # For each contact, update the first schedule A transaction
+        for contact in contacts.objects.filter(committee_account=committee):
+            logger.info(f"Contact: {contact.id}")
+            first_schedule_a = (
+                transactions.objects.filter(
+                    schedule_a__isnull=False,
+                    contact_1=contact,
+                    committee_account=committee,
+                )
+                .order_by("schedule_a__contribution_date", "created")
+                .first()
+            )
+            if first_schedule_a:
+                logger.info(f"Saving first Schedule A: {first_schedule_a.id}")
+                first_schedule_a.save()
+
+        # Election Aggregates
+        elections = transactions.objects.filter(
+            schedule_e__isnull=False,
+            committee_account=committee,
+        ).values(
+            "contact_2__candidate_office",
+            "contact_2__candidate_state",
+            "contact_2__candidate_district",
+            "schedule_e__election_code",
+        )
+        for election in elections:
+            logger.info("Finding first schedule E for election")
+            first_schedule_e = (
+                transactions.objects.filter(
+                    schedule_e__isnull=False,
+                    contact_2__candidate_office=election["contact_2__candidate_office"],
+                    contact_2__candidate_state=election["contact_2__candidate_state"],
+                    contact_2__candidate_district=election[
+                        "contact_2__candidate_district"
+                    ],
+                    schedule_e__election_code=election["schedule_e__election_code"],
+                    committee_account=committee,
+                )
+                .order_by(
+                    "schedule_e__disbursement_date",
+                    "created",
+                )
+                .first()
+            )
+            if first_schedule_e:
+                logger.info(f"Saving first Schedule E: {first_schedule_e.id}")
+                first_schedule_e.save()
+
+
+# Inlined from 0022_schedule_f_aggregation
+def calculate_schedule_f_aggregates(apps, schema_editor):
+    CommitteeAccount = apps.get_model("committee_accounts", "CommitteeAccount")  # noqa
+    Transaction = apps.get_model("transactions", "Transaction")  # noqa
+
+    for committee in CommitteeAccount.objects.all():
+        schedule_f_transactions = (
+            Transaction.objects.all()
+            .filter(
+                committee_account=committee,
+                schedule_f__isnull=False,
+            )
+            .annotate(
+                date=F("schedule_f__expenditure_date"),
+                amount=F("schedule_f__expenditure_amount"),
+            )
+            .order_by("date")
+        )
+
+        for trans in schedule_f_transactions:
+            previous_transactions = (
+                filter_queryset_for_previous_transactions_in_aggregation(  # noqa: E501
+                    schedule_f_transactions,
+                    trans.date,
+                    trans.aggregation_group,
+                    trans.id,
+                    None,
+                    trans.contact_2.id,
+                    None,
+                    trans.schedule_f.general_election_year,
+                )
+            )
+
+            previous_transaction = previous_transactions.first()
+            previous_aggregate = 0
+            if previous_transaction:
+                previous_aggregate = (
+                    previous_transaction.schedule_f.aggregate_general_elec_expended
+                )
+
+            trans.schedule_f.aggregate_general_elec_expended = (
+                trans.amount + previous_aggregate
+            )
+            trans.schedule_f.save()
+
+
+# Inlined from 0024_scheduled_balance_at_close_and_more
+def run_aggregations_for_all_debts(apps, schema_editor):
+    transaction = apps.get_model("transactions", "Transaction")
+    all_root_debts = transaction.objects.filter(
+        schedule_d__isnull=False, debt__isnull=True
+    )
+    for debt in all_root_debts:
+        process_aggregation_for_debts(debt)
 
 
 class Migration(migrations.Migration):
@@ -97,10 +1014,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0004_report_transactions_link_table",
-                "add_link_table",
-            ),
+            code=add_link_table,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.RemoveField(
@@ -137,24 +1051,12 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0005_schedulec_report_coverage_from_date_and_more",
-                "set_coverage_date",
-            ),
+            code=set_coverage_date,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0006_independent_expenditure_memos_no_aggregation_group",
-                "set_aggregation_group_to_none_for_ie_memos",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0006_independent_expenditure_memos_no_aggregation_group",
-                "reverse_removing_aggregation_group_for_ie_memos",
-            ),
+            code=set_aggregation_group_to_none_for_ie_memos,
+            reverse_code=reverse_removing_aggregation_group_for_ie_memos,
         ),
         migrations.AddField(
             model_name="schedulee",
@@ -403,11 +1305,7 @@ class Migration(migrations.Migration):
             """
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0008_transaction__calendar_ytd_per_election_office_and_more",
-                "populate_existing_rows",
-            ),
+            code=populate_existing_rows,
         ),
         migrations.RunSQL(
             """
@@ -649,11 +1547,7 @@ class Migration(migrations.Migration):
             """
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0009_update_calculate_loan_payment_to_date",
-                "update_existing_rows",
-            ),
+            code=update_existing_rows,
         ),
         migrations.RunSQL(
             """
@@ -856,24 +1750,12 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0011_transaction_can_delete",
-                "create_trigger_function",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations.0011_transaction_can_delete",
-                "drop_trigger_function",
-            ),
+            code=create_trigger_function,
+            reverse_code=drop_trigger_function,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0011_transaction_can_delete",
-                "create_trigger",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations.0011_transaction_can_delete",
-                "drop_trigger",
-            ),
+            code=create_trigger,
+            reverse_code=drop_trigger,
         ),
         migrations.AlterField(
             model_name="transaction",
@@ -883,11 +1765,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0012_alter_transactions_blocking_reports",
-                "update_blocking_reports_default",
-            ),
+            code=update_blocking_reports_default,
         ),
         migrations.AddField(
             model_name="transaction",
@@ -939,28 +1817,12 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0013_transaction_itemized_and_associated_triggers",
-                "populate_over_two_hundred_types",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0013_transaction_itemized_and_associated_triggers",
-                "drop_over_two_hundred_types",
-            ),
+            code=populate_over_two_hundred_types,
+            reverse_code=drop_over_two_hundred_types,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0013_transaction_itemized_and_associated_triggers",
-                "create_itemized_triggers_and_functions",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0013_transaction_itemized_and_associated_triggers",
-                "drop_itemized_triggers_and_functions",
-            ),
+            code=create_itemized_triggers_and_functions,
+            reverse_code=drop_itemized_triggers_and_functions,
         ),
         migrations.RunSQL(
             """
@@ -1577,94 +2439,40 @@ class Migration(migrations.Migration):
             """
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "drop_old_triggers",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "reverse_drop_old_triggers",
-            ),
+            code=drop_old_triggers,
+            reverse_code=reverse_drop_old_triggers,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "drop_old_functions",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "reverse_drop_old_functions",
-            ),
+            code=drop_old_functions,
+            reverse_code=reverse_drop_old_functions,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "process_itemization",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "reverse_process_itemization",
-            ),
+            code=process_itemization,
+            reverse_code=reverse_process_itemization,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "handle_parent_itemization",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "reverse_handle_parent_itemization",
-            ),
+            code=handle_parent_itemization,
+            reverse_code=reverse_handle_parent_itemization,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "calculate_aggregates",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "reverse_calculate_aggregates",
-            ),
+            code=calculate_aggregates,
+            reverse_code=reverse_calculate_aggregates,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "update_can_unamend",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "reverse_update_can_unamend",
-            ),
+            code=update_can_unamend,
+            reverse_code=reverse_update_can_unamend,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "before_transactions_transaction",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "before_transactions_transaction",
-            ),
+            code=before_transactions_transaction,
+            reverse_code=before_transactions_transaction,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "after_transactions_transaction",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "reverse_after_transactions_transaction",
-            ),
+            code=after_transactions_transaction,
+            reverse_code=reverse_after_transactions_transaction,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "create_triggers",
-            ),
-            reverse_code=_load_callable(
-                "fecfiler.transactions.migrations.0015_merge_transaction_triggers",
-                "reverse_create_triggers",
-            ),
+            code=create_triggers,
+            reverse_code=reverse_create_triggers,
         ),
         migrations.CreateModel(
             name="ScheduleF",
@@ -1957,10 +2765,7 @@ class Migration(migrations.Migration):
             """,
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0020_trigger_save_on_transactions",
-                "trigger_save_on_transactions",
-            ),
+            code=trigger_save_on_transactions,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.AlterField(
@@ -1974,10 +2779,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations.0022_schedule_f_aggregation",
-                "calculate_schedule_f_aggregates",
-            ),
+            code=calculate_schedule_f_aggregates,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.RunSQL(
@@ -2135,11 +2937,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0024_scheduled_balance_at_close_and_more",
-                "run_aggregations_for_all_debts",
-            ),
+            code=run_aggregations_for_all_debts,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.RunSQL(
