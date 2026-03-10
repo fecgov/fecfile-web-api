@@ -9,8 +9,9 @@ from decimal import Decimal
 from typing import Optional, Dict, Any
 from uuid import UUID
 
-from django.db.models import Q, F, Value
+from django.db.models import Q, F, Value, Subquery, OuterRef, Sum, Func
 from django.db.models.fields import DecimalField
+from django.db.models.functions import Coalesce
 import structlog
 
 from .managers import (
@@ -81,9 +82,7 @@ def _update_aggregate_running_sum(
     transaction_model.objects.bulk_update(updates, [aggregate_field_name])
     update_count = len(updates)
 
-    logger.info(
-        f"Updated {update_count} transactions for aggregation: {log_context}"
-    )
+    logger.info(f"Updated {update_count} transactions for aggregation: {log_context}")
     return update_count
 
 
@@ -108,15 +107,18 @@ def calculate_entity_aggregates(
     """
     # Get all matching transactions ordered by date and created
     # Exclude force_unaggregated transactions as they don't get aggregated
-    transactions = transaction_model.objects.filter(
-        contact_1_id=contact_1_id,
-        date__year=year,
-        aggregation_group=aggregation_group,
-        deleted__isnull=True,
-        force_unaggregated__isnull=True,
-    ).filter(
-        Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False)
-    ).order_by("date", "created").select_related("schedule_a", "schedule_b")
+    transactions = (
+        transaction_model.objects.filter(
+            contact_1_id=contact_1_id,
+            date__year=year,
+            aggregation_group=aggregation_group,
+            deleted__isnull=True,
+            force_unaggregated__isnull=True,
+        )
+        .filter(Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False))
+        .order_by("date", "created")
+        .select_related("schedule_a", "schedule_b")
+    )
 
     log_context = f"contact_1={contact_1_id}, year={year}, group={aggregation_group}"
     return _update_aggregate_running_sum(
@@ -132,7 +134,7 @@ def calculate_calendar_ytd_per_election_office(
     candidate_district: Optional[str],
     year: int,
     aggregation_group: str,
-    committee_account_id: Optional[UUID] = None
+    committee_account_id: Optional[UUID] = None,
 ) -> int:
     """
     Calculate and update calendar YTD aggregates for Schedule E transactions.
@@ -182,11 +184,12 @@ def calculate_calendar_ytd_per_election_office(
     if committee_account_id:
         query_filters["committee_account_id"] = committee_account_id
 
-    transactions = transaction_model.objects.filter(
-        **query_filters
-    ).filter(state_filter, district_filter).order_by(
-        "date", "created"
-    ).select_related("schedule_e", "contact_2")
+    transactions = (
+        transaction_model.objects.filter(**query_filters)
+        .filter(state_filter, district_filter)
+        .order_by("date", "created")
+        .select_related("schedule_e", "contact_2")
+    )
 
     log_context = (
         f"election_code={election_code}, office={candidate_office}, "
@@ -233,9 +236,10 @@ def _update_suffix_delta(
     updated = base_qs.filter(
         Q(date__gt=key_date) | (Q(date=key_date) & Q(**{op_equal: key_created}))
     ).update(
-        **{aggregate_field_name: F(aggregate_field_name) + Value(
-            delta, output_field=DecimalField()
-        )}
+        **{
+            aggregate_field_name: F(aggregate_field_name)
+            + Value(delta, output_field=DecimalField())
+        }
     )
 
     return int(updated)
@@ -272,7 +276,7 @@ def apply_delta_aggregates(
     transaction_model,
     transaction_instance,
     old_state: Optional[Dict[str, Any]],
-    created: bool
+    created: bool,
 ) -> None:
     """
     Apply efficient delta-based updates to aggregates for a single change.
@@ -299,16 +303,13 @@ def apply_delta_aggregates(
     if schedule in CONTACT_AGGREGATE_SCHEDULES:
         # Build new partition queryset
         year = _get_calendar_year_from_date(transaction_date)
-        new_qs = (
-            transaction_model.objects.filter(
-                contact_1_id=transaction_instance.contact_1_id,
-                date__year=year,
-                aggregation_group=transaction_instance.aggregation_group,
-                deleted__isnull=True,
-                force_unaggregated__isnull=True,
-            )
-            .filter(Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False))
-        )
+        new_qs = transaction_model.objects.filter(
+            contact_1_id=transaction_instance.contact_1_id,
+            date__year=year,
+            aggregation_group=transaction_instance.aggregation_group,
+            deleted__isnull=True,
+            force_unaggregated__isnull=True,
+        ).filter(Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False))
 
         new_eff = calculate_effective_amount(transaction_instance)
         new_force_unagg = transaction_instance.force_unaggregated is not None
@@ -325,15 +326,21 @@ def apply_delta_aggregates(
                     transaction_instance.aggregate = new_value
                     transaction_instance.save(update_fields=["aggregate"])
             _update_suffix_delta(
-                new_qs, "aggregate", transaction_date, new_created,
-                new_eff_contrib, include_self=False
+                new_qs,
+                "aggregate",
+                transaction_date,
+                new_created,
+                new_eff_contrib,
+                include_self=False,
             )
             return
 
         # Update with delta or handle partition move
-        old_year = _get_calendar_year_from_date(
-            old_state["date"]
-        ) if old_state.get("date") else year
+        old_year = (
+            _get_calendar_year_from_date(old_state["date"])
+            if old_state.get("date")
+            else year
+        )
 
         same_partition = (
             old_state.get("contact_1_id") == transaction_instance.contact_1_id
@@ -344,9 +351,7 @@ def apply_delta_aggregates(
 
         old_eff = old_state.get("effective_amount", Decimal(0))
         old_force_unagg = old_state.get("force_unaggregated") is not None
-        old_eff_contrib = Decimal(0) if old_force_unagg else (
-            old_eff or Decimal(0)
-        )
+        old_eff_contrib = Decimal(0) if old_force_unagg else (old_eff or Decimal(0))
         delta = new_eff_contrib - old_eff_contrib
 
         moved = (
@@ -362,43 +367,46 @@ def apply_delta_aggregates(
         if same_partition and not moved:
             if delta != 0:
                 _update_suffix_delta(
-                    new_qs, "aggregate", transaction_date, new_created,
-                    delta, include_self=True
+                    new_qs,
+                    "aggregate",
+                    transaction_date,
+                    new_created,
+                    delta,
+                    include_self=True,
                 )
             else:
                 # If aggregate does not match expected, recompute partition
                 expected = derived_base + new_eff_contrib
                 if transaction_instance.aggregate != expected:
-                    recompute_qs = new_qs.order_by(
-                        "date", "created"
-                    ).select_related("schedule_a", "schedule_b")
+                    recompute_qs = new_qs.order_by("date", "created").select_related(
+                        "schedule_a", "schedule_b"
+                    )
                     _update_aggregate_running_sum(
-                        recompute_qs, "aggregate",
-                        "entity derive-mismatch", transaction_model
+                        recompute_qs,
+                        "aggregate",
+                        "entity derive-mismatch",
+                        transaction_model,
                     )
             return
 
         if same_partition and moved:
             # Fallback: recompute entire partition when ordering changes
-            recompute_qs = new_qs.order_by(
-                "date", "created"
-            ).select_related("schedule_a", "schedule_b")
+            recompute_qs = new_qs.order_by("date", "created").select_related(
+                "schedule_a", "schedule_b"
+            )
             _update_aggregate_running_sum(
                 recompute_qs, "aggregate", "entity move", transaction_model
             )
             return
 
         # Partition changed: subtract from old partition suffix, then add to new
-        old_qs = (
-            transaction_model.objects.filter(
-                contact_1_id=old_state.get("contact_1_id"),
-                date__year=old_year,
-                aggregation_group=old_state.get("aggregation_group"),
-                deleted__isnull=True,
-                force_unaggregated__isnull=True,
-            )
-            .filter(Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False))
-        )
+        old_qs = transaction_model.objects.filter(
+            contact_1_id=old_state.get("contact_1_id"),
+            date__year=old_year,
+            aggregation_group=old_state.get("aggregation_group"),
+            deleted__isnull=True,
+            force_unaggregated__isnull=True,
+        ).filter(Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False))
         _update_suffix_delta(
             old_qs,
             "aggregate",
@@ -418,8 +426,12 @@ def apply_delta_aggregates(
                 transaction_instance.aggregate = new_value
                 transaction_instance.save(update_fields=["aggregate"])
         _update_suffix_delta(
-            new_qs, "aggregate", transaction_date, new_created,
-            new_eff_contrib, include_self=False
+            new_qs,
+            "aggregate",
+            transaction_date,
+            new_created,
+            new_eff_contrib,
+            include_self=False,
         )
         return
 
@@ -433,18 +445,14 @@ def apply_delta_aggregates(
 
         state_filter = Q(contact_2__candidate_state=contact_2.candidate_state)
         if not contact_2.candidate_state:
-            state_filter = (
-                Q(contact_2__candidate_state__isnull=True)
-                | Q(contact_2__candidate_state="")
+            state_filter = Q(contact_2__candidate_state__isnull=True) | Q(
+                contact_2__candidate_state=""
             )
 
-        district_filter = Q(
-            contact_2__candidate_district=contact_2.candidate_district
-        )
+        district_filter = Q(contact_2__candidate_district=contact_2.candidate_district)
         if not contact_2.candidate_district:
-            district_filter = (
-                Q(contact_2__candidate_district__isnull=True)
-                | Q(contact_2__candidate_district="")
+            district_filter = Q(contact_2__candidate_district__isnull=True) | Q(
+                contact_2__candidate_district=""
             )
 
         base_filters = dict(
@@ -489,9 +497,11 @@ def apply_delta_aggregates(
             )
             return
 
-        old_year = _get_calendar_year_from_date(
-            old_state["date"]
-        ) if old_state.get("date") else year
+        old_year = (
+            _get_calendar_year_from_date(old_state["date"])
+            if old_state.get("date")
+            else year
+        )
 
         same_partition = (
             old_state.get("election_code") == schedule_e.election_code
@@ -531,17 +541,15 @@ def apply_delta_aggregates(
         old_state_state = old_state.get("candidate_state")
         old_state_filter = Q(contact_2__candidate_state=old_state_state)
         if not old_state_state:
-            old_state_filter = (
-                Q(contact_2__candidate_state__isnull=True)
-                | Q(contact_2__candidate_state="")
+            old_state_filter = Q(contact_2__candidate_state__isnull=True) | Q(
+                contact_2__candidate_state=""
             )
 
         old_district = old_state.get("candidate_district")
         old_district_filter = Q(contact_2__candidate_district=old_district)
         if not old_district:
-            old_district_filter = (
-                Q(contact_2__candidate_district__isnull=True)
-                | Q(contact_2__candidate_district="")
+            old_district_filter = Q(contact_2__candidate_district__isnull=True) | Q(
+                contact_2__candidate_district=""
             )
 
         old_base_filters = dict(
@@ -557,9 +565,9 @@ def apply_delta_aggregates(
             old_base_filters["committee_account_id"] = old_state.get(
                 "committee_account_id"
             )
-        old_qs = transaction_model.objects.filter(
-            **old_base_filters
-        ).filter(old_state_filter, old_district_filter)
+        old_qs = transaction_model.objects.filter(**old_base_filters).filter(
+            old_state_filter, old_district_filter
+        )
 
         _update_suffix_delta(
             old_qs,
@@ -609,21 +617,21 @@ def apply_delete_delta_aggregates(transaction_model, old_state: Dict[str, Any]) 
 
     if schedule in CONTACT_AGGREGATE_SCHEDULES:
         old_year = _get_calendar_year_from_date(old_date)
-        old_qs = (
-            transaction_model.objects.filter(
-                contact_1_id=old_state.get("contact_1_id"),
-                date__year=old_year,
-                aggregation_group=old_state.get("aggregation_group"),
-                deleted__isnull=True,
-                force_unaggregated__isnull=True,
-            )
-            .filter(Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False))
-        )
+        old_qs = transaction_model.objects.filter(
+            contact_1_id=old_state.get("contact_1_id"),
+            date__year=old_year,
+            aggregation_group=old_state.get("aggregation_group"),
+            deleted__isnull=True,
+            force_unaggregated__isnull=True,
+        ).filter(Q(schedule_a__isnull=False) | Q(schedule_b__isnull=False))
         old_eff = old_state.get("effective_amount", Decimal(0))
         _update_suffix_delta(
-            old_qs, "aggregate", old_date, old_created,
+            old_qs,
+            "aggregate",
+            old_date,
+            old_created,
             -(old_eff or Decimal(0)),
-            include_self=False
+            include_self=False,
         )
         return
 
@@ -633,32 +641,27 @@ def apply_delete_delta_aggregates(transaction_model, old_state: Dict[str, Any]) 
         old_state_state = old_state.get("candidate_state")
         old_state_filter = Q(contact_2__candidate_state=old_state_state)
         if not old_state_state:
-            old_state_filter = (
-                Q(contact_2__candidate_state__isnull=True)
-                | Q(contact_2__candidate_state="")
+            old_state_filter = Q(contact_2__candidate_state__isnull=True) | Q(
+                contact_2__candidate_state=""
             )
 
         old_district = old_state.get("candidate_district")
         old_district_filter = Q(contact_2__candidate_district=old_district)
         if not old_district:
-            old_district_filter = (
-                Q(contact_2__candidate_district__isnull=True)
-                | Q(contact_2__candidate_district="")
+            old_district_filter = Q(contact_2__candidate_district__isnull=True) | Q(
+                contact_2__candidate_district=""
             )
 
-        old_qs = (
-            transaction_model.objects.filter(
-                schedule_e__election_code=old_state.get("election_code"),
-                contact_2__candidate_office=old_state.get("candidate_office"),
-                date__year=old_year,
-                aggregation_group=old_state.get("aggregation_group"),
-                deleted__isnull=True,
-                schedule_e__isnull=False,
-                force_unaggregated__isnull=True,
-                committee_account_id=old_state.get("committee_account_id"),
-            )
-            .filter(old_state_filter, old_district_filter)
-        )
+        old_qs = transaction_model.objects.filter(
+            schedule_e__election_code=old_state.get("election_code"),
+            contact_2__candidate_office=old_state.get("candidate_office"),
+            date__year=old_year,
+            aggregation_group=old_state.get("aggregation_group"),
+            deleted__isnull=True,
+            schedule_e__isnull=False,
+            force_unaggregated__isnull=True,
+            committee_account_id=old_state.get("committee_account_id"),
+        ).filter(old_state_filter, old_district_filter)
         old_eff = old_state.get("effective_amount", Decimal(0))
         _update_suffix_delta(
             old_qs,
@@ -688,71 +691,45 @@ def calculate_loan_payment_to_date(transaction_model, loan_id: UUID) -> int:
     """
     # Get the loan transaction
     try:
-        loan = (
-            transaction_model
-            .objects.select_related("loan", "loan__schedule_c")
-            .get(id=loan_id, deleted__isnull=True)
-        )
+        loan = transaction_model.objects.select_related("schedule_c").get(id=loan_id)
     except transaction_model.DoesNotExist:
         logger.warning(f"Loan transaction {loan_id} not found")
         return 0
 
-    # Collect all loan IDs in the parent chain (for carried forward loans)
-    # Carried forward loans reference their parent via the 'loan' field
-    original_loan = loan
-    if loan.loan_id:
-        original_loan = loan.loan
-
-    loan_ids = [original_loan.id]
-
-    child_loan_ids = transaction_model.objects.filter(
-        loan_id=original_loan.id,
-        schedule_c__isnull=False,
-        deleted__isnull=True
-    ).order_by("schedule_c__report_coverage_through_date").values("id")
-
-    for loan_id_dict in child_loan_ids:
-        loan_ids.append(loan_id_dict["id"])
-
-    repayments_to_date = 0
-    loans_to_save = []
-    for loan_id in loan_ids:
-        current_loan = transaction_model.objects.get(id=loan_id)
-        loan_report = current_loan.reports.first()
-        repayments = transaction_model.objects.filter(
-            Q(
-                schedule_b__isnull=False,
-                transaction_type_identifier="LOAN_REPAYMENT_MADE",
-                schedule_b__expenditure_date__lte=loan_report.coverage_through_date,
-            ) | Q(
-                schedule_a__isnull=False,
-                transaction_type_identifier="LOAN_REPAYMENT_RECEIVED",
-                schedule_a__contribution_date__lte=loan_report.coverage_through_date,
-            ),
-            loan_id__in=loan_ids,
-            deleted__isnull=True,
-        ).order_by("date", "created").select_related("schedule_a", "schedule_b")
-
-        # Calculate the cumulative payment amount
-        total_payment = Decimal(0)
-        for repayment in repayments:
-            if repayment.schedule_b and repayment.schedule_b.expenditure_amount:
-                total_payment += repayment.schedule_b.expenditure_amount
-            elif repayment.schedule_a and repayment.schedule_a.contribution_amount:
-                total_payment += repayment.schedule_a.contribution_amount
-
-        repayments_to_date = total_payment
-        print(total_payment)
-        current_loan.loan_payment_to_date = repayments_to_date
-        loans_to_save.append(current_loan)
-        logger.info(
-            f"Updating loan_payment_to_date for loan {loan_id}: {repayments_to_date}"
+    loan_payment_to_date_subquery = Coalesce(
+        Subquery(
+            transaction_model.objects.filter(
+                Q(
+                    schedule_b__isnull=False,
+                    transaction_type_identifier="LOAN_REPAYMENT_MADE",
+                    schedule_b__expenditure_date__lte=OuterRef("report_through_date"),
+                )
+                | Q(
+                    schedule_a__isnull=False,
+                    transaction_type_identifier="LOAN_REPAYMENT_RECEIVED",
+                    schedule_a__contribution_date__lte=OuterRef("report_through_date"),
+                ),
+                loan__transaction_id=OuterRef("transaction_id"),
+            )
+            .order_by()
+            .annotate(payment_to_date=Func(F("amount"), function="SUM"))
+            .values("payment_to_date")[:1]
+        ),
+        Decimal(0),
+    )
+    return (
+        transaction_model.objects.filter(
+            Q(transaction_id=loan.transaction_id),
+            schedule_c__isnull=False,
         )
-
-    transaction_model.objects.bulk_update(
-        loans_to_save,
-        ["loan_payment_to_date"],
-        batch_size=64
+        .annotate(
+            report_through_date=Subquery(
+                transaction_model.objects.filter(id=OuterRef("id")).values(
+                    "schedule_c__report_coverage_through_date"
+                )[:1]
+            )
+        )
+        .update(loan_payment_to_date=loan_payment_to_date_subquery)
     )
 
 
@@ -785,9 +762,9 @@ def recalculate_aggregates_for_transaction(
         if schedule in CONTACT_AGGREGATE_SCHEDULES:
             # If this is a loan repayment, recalculate loan_payment_to_date
             if (
-                transaction_instance.transaction_type_identifier in [
-                    "LOAN_REPAYMENT_MADE", "LOAN_REPAYMENT_RECEIVED"
-                ] and transaction_instance.loan_id
+                transaction_instance.transaction_type_identifier
+                in ["LOAN_REPAYMENT_MADE", "LOAN_REPAYMENT_RECEIVED"]
+                and transaction_instance.loan_id
             ):
                 calculate_loan_payment_to_date(
                     transaction_model, transaction_instance.loan_id
@@ -917,9 +894,8 @@ def update_aggregates_for_affected_transactions(
     # Refresh with updated aggregate values
     instance.refresh_from_db()
 
-    uses_itemization_threshold = (
-        instance.transaction_type_identifier
-        in (schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types)
+    uses_itemization_threshold = instance.transaction_type_identifier in (
+        schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
     )
 
     # Track previous itemization state; on create, treat as False to enable cascade
