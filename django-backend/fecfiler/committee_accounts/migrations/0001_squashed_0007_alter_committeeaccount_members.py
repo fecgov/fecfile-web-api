@@ -10,15 +10,6 @@ from django.db import migrations, models
 from django_migration_linter import IgnoreMigration
 
 
-# Functions from the following migrations need manual copying.
-# Move them and any dependencies into this file, then update the
-# RunPython operations to refer to the local versions:
-# fecfiler.committee_accounts.migrations.0002_membership
-# fecfiler.committee_accounts.migrations.0003_membership_pending_email_alter_membership_id_and_more
-# fecfiler.committee_accounts.migrations.0004_remove_duplicate_memberships
-# fecfiler.committee_accounts.migrations.0005_remove_pending_emails
-
-
 def create_memberships(apps, schema_editor):
     CommitteeAccount = apps.get_model("committee_accounts", "CommitteeAccount")
     User = apps.get_model("user", "User")
