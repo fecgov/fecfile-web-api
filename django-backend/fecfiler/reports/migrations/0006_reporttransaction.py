@@ -8,8 +8,10 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('committee_accounts',
-            '0003_membership_pending_email_alter_membership_id_and_more'),
+        (
+            "committee_accounts",
+            "0001_squashed_0007_alter_committeeaccount_members",
+        ),
         ('transactions', '0002_remove_schedulea_contributor_city_and_more'),
         ('reports', '0005_remove_form1m_iii_candidate_district_and_more'),
     ]

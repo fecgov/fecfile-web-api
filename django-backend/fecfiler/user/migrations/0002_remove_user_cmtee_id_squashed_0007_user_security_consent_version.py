@@ -35,7 +35,10 @@ class Migration(migrations.Migration):
     ]
 
     dependencies = [
-        ("committee_accounts", "0002_membership"),
+        (
+            "committee_accounts",
+            "0001_squashed_0007_alter_committeeaccount_members",
+        ),
         ("user", "0001_initial"),
     ]
 
