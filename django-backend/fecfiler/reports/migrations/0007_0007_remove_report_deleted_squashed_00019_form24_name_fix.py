@@ -19,10 +19,6 @@ from django.db import migrations, models
 # fecfiler.reports.migrations.0010_report_can_unammend
 
 
-def _strip_sql(sql):
-    return dedent(sql).strip()
-
-
 def _load_callable(module_name, function_name):
     def _wrapper(apps, schema_editor):
         try:
@@ -194,8 +190,7 @@ class Migration(migrations.Migration):
             field=models.BooleanField(default=True),
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 CREATE OR REPLACE FUNCTION update_report_can_delete(report RECORD)
                 RETURNS VOID AS $$
                 DECLARE
@@ -231,8 +226,7 @@ class Migration(migrations.Migration):
                     AND can_delete <> r_can_delete;
                 END;
                 $$ LANGUAGE plpgsql;
-                """
-            ),
+            """
         ),
         migrations.RunPython(
             code=_load_callable(
@@ -271,19 +265,15 @@ class Migration(migrations.Migration):
             field=models.TextField(db_default=""),
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 UPDATE reports_form99 SET text_code_2 = COALESCE(text_code, '');
                 ALTER TABLE reports_form99 ALTER COLUMN text_code SET DEFAULT '';
                 ALTER TABLE reports_form99 ALTER COLUMN text_code_2 SET NOT NULL;
-                """
-            ),
-            reverse_sql=_strip_sql(
-                """
+            """,
+            reverse_sql="""
                 ALTER TABLE reports_form99 ALTER COLUMN text_code_2 DROP DEFAULT;
                 ALTER TABLE reports_form99 ALTER COLUMN text_code_2 DROP NOT NULL;
-                """
-            ),
+            """,
             state_operations=[
                 migrations.AlterField(
                     model_name="form99",
@@ -775,8 +765,7 @@ class Migration(migrations.Migration):
             field=models.TextField(blank=True, null=True),
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 UPDATE reports_form3x f
                 SET filing_frequency = CASE
                     WHEN r.report_code IN (
@@ -794,12 +783,8 @@ class Migration(migrations.Migration):
                 FROM reports_report as r
                 WHERE r.form_3x_id = f.id
                 AND filing_frequency IS NULL AND report_type_category IS NULL;
-                """
-            ),
-            reverse_sql=_strip_sql(
-                """
-                """
-            ),
+            """,
+            reverse_sql="",
         ),
         migrations.AddField(
             model_name="form99",

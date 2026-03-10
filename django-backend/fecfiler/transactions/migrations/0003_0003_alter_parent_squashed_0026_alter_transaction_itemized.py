@@ -28,10 +28,6 @@ from textwrap import dedent
 # fecfiler.transactions.migrations.0024_scheduled_balance_at_close_and_more
 
 
-def _strip_sql(sql):
-    return dedent(sql).strip()
-
-
 def _load_callable(module_name, function_name):
     def _wrapper(apps, schema_editor):
         try:
@@ -187,234 +183,224 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-                """
-            ),
+            """
+            CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+            """
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
-                    txn RECORD,
-                    sql_committee_id TEXT,
-                    temp_table_name TEXT
-                )
-                RETURNS VOID AS $$
-                DECLARE
-                    schedule_date DATE;
-                BEGIN
-                    IF txn.schedule_a_id IS NOT NULL THEN
-                        SELECT contribution_date
-                        INTO schedule_date
-                        FROM transactions_schedulea
-                        WHERE id = txn.schedule_a_id;
-                    ELSIF txn.schedule_b_id IS NOT NULL THEN
-                        SELECT expenditure_date
-                        INTO schedule_date
-                        FROM transactions_scheduleb
-                        WHERE id = txn.schedule_b_id;
-                    END IF;
+            """
+            CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
+                txn RECORD,
+                sql_committee_id TEXT,
+                temp_table_name TEXT
+            )
+            RETURNS VOID AS $$
+            DECLARE
+                schedule_date DATE;
+            BEGIN
+                IF txn.schedule_a_id IS NOT NULL THEN
+                    SELECT contribution_date
+                    INTO schedule_date
+                    FROM transactions_schedulea
+                    WHERE id = txn.schedule_a_id;
+                ELSIF txn.schedule_b_id IS NOT NULL THEN
+                    SELECT expenditure_date
+                    INTO schedule_date
+                    FROM transactions_scheduleb
+                    WHERE id = txn.schedule_b_id;
+                END IF;
 
-                    EXECUTE '
-                        CREATE TEMPORARY TABLE ' || temp_table_name || '
-                        ON COMMIT DROP AS
-                        SELECT
-                            id,
-                            SUM(effective_amount) OVER (ORDER BY date, created)
-                            AS new_sum
-                        FROM transaction_view__' || sql_committee_id || '
-                        WHERE
-                            contact_1_id = $1
-                            AND EXTRACT(YEAR FROM date) = $2
-                            AND aggregation_group = $3
-                            AND force_unaggregated IS NOT TRUE;
+                EXECUTE '
+                    CREATE TEMPORARY TABLE ' || temp_table_name || '
+                    ON COMMIT DROP AS
+                    SELECT
+                        id,
+                        SUM(effective_amount) OVER (ORDER BY date, created)
+                        AS new_sum
+                    FROM transaction_view__' || sql_committee_id || '
+                    WHERE
+                        contact_1_id = $1
+                        AND EXTRACT(YEAR FROM date) = $2
+                        AND aggregation_group = $3
+                        AND force_unaggregated IS NOT TRUE;
 
-                        UPDATE transactions_transaction AS t
-                        SET aggregate = tt.new_sum
-                        FROM ' || temp_table_name || ' AS tt
-                        WHERE t.id = tt.id;
-                    '
-                    USING
-                        txn.contact_1_id,
-                        EXTRACT(YEAR FROM schedule_date),
-                        txn.aggregation_group;
-                END;
-                $$ LANGUAGE plpgsql;
-                """
-            ),
+                    UPDATE transactions_transaction AS t
+                    SET aggregate = tt.new_sum
+                    FROM ' || temp_table_name || ' AS tt
+                    WHERE t.id = tt.id;
+                '
+                USING
+                    txn.contact_1_id,
+                    EXTRACT(YEAR FROM schedule_date),
+                    txn.aggregation_group;
+            END;
+            $$ LANGUAGE plpgsql;
+            """
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
-                    txn RECORD,
-                    sql_committee_id TEXT,
-                    temp_table_name TEXT
-                )
-                RETURNS VOID AS $$
-                DECLARE
-                    schedule_date DATE;
-                    v_election_code TEXT;
-                    v_candidate_office TEXT;
-                    v_candidate_state TEXT;
-                    v_candidate_district TEXT;
-                BEGIN
-                    SELECT COALESCE(disbursement_date, dissemination_date)
-                        INTO schedule_date FROM transactions_schedulee
-                        WHERE id = txn.schedule_e_id;
-                    SELECT election_code
-                        INTO v_election_code
-                        FROM transactions_schedulee
-                        WHERE id = txn.schedule_e_id;
-                    SELECT candidate_office, candidate_state, candidate_district
-                        INTO v_candidate_office, v_candidate_state, v_candidate_district
-                        FROM contacts WHERE id = txn.contact_2_id;
+            """
+            CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
+                txn RECORD,
+                sql_committee_id TEXT,
+                temp_table_name TEXT
+            )
+            RETURNS VOID AS $$
+            DECLARE
+                schedule_date DATE;
+                v_election_code TEXT;
+                v_candidate_office TEXT;
+                v_candidate_state TEXT;
+                v_candidate_district TEXT;
+            BEGIN
+                SELECT COALESCE(disbursement_date, dissemination_date)
+                    INTO schedule_date FROM transactions_schedulee
+                    WHERE id = txn.schedule_e_id;
+                SELECT election_code
+                    INTO v_election_code
+                    FROM transactions_schedulee
+                    WHERE id = txn.schedule_e_id;
+                SELECT candidate_office, candidate_state, candidate_district
+                    INTO v_candidate_office, v_candidate_state, v_candidate_district
+                    FROM contacts WHERE id = txn.contact_2_id;
 
-                    EXECUTE '
-                        CREATE TEMPORARY TABLE ' || temp_table_name || '
-                        ON COMMIT DROP AS
-                        SELECT
-                            t.id,
-                            SUM(t.effective_amount) OVER
-                            (ORDER BY t.date, t.created) AS new_sum
-                        FROM transactions_schedulee e
-                            JOIN transaction_view__' || sql_committee_id || ' t
-                                ON e.id = t.schedule_e_id
-                            JOIN contacts c
-                                ON t.contact_2_id = c.id
-                        WHERE
-                            e.election_code  = $1
-                            AND c.candidate_office = $2
-                            AND (
-                                c.candidate_state = $3
-                                OR (
-                                    c.candidate_state IS NULL
-                                    AND $3 = ''''
-                                )
+                EXECUTE '
+                    CREATE TEMPORARY TABLE ' || temp_table_name || '
+                    ON COMMIT DROP AS
+                    SELECT
+                        t.id,
+                        SUM(t.effective_amount) OVER
+                        (ORDER BY t.date, t.created) AS new_sum
+                    FROM transactions_schedulee e
+                        JOIN transaction_view__' || sql_committee_id || ' t
+                            ON e.id = t.schedule_e_id
+                        JOIN contacts c
+                            ON t.contact_2_id = c.id
+                    WHERE
+                        e.election_code  = $1
+                        AND c.candidate_office = $2
+                        AND (
+                            c.candidate_state = $3
+                            OR (
+                                c.candidate_state IS NULL
+                                AND $3 = ''''
                             )
-                            AND (
-                                c.candidate_district = $4
-                                OR (
-                                    c.candidate_district IS NULL
-                                    AND $4 = ''''
-                                )
+                        )
+                        AND (
+                            c.candidate_district = $4
+                            OR (
+                                c.candidate_district IS NULL
+                                AND $4 = ''''
                             )
-                            AND EXTRACT(YEAR FROM t.date) = $5
-                            AND aggregation_group = $6
-                            AND force_unaggregated IS NOT TRUE;
+                        )
+                        AND EXTRACT(YEAR FROM t.date) = $5
+                        AND aggregation_group = $6
+                        AND force_unaggregated IS NOT TRUE;
 
-                        UPDATE transactions_transaction AS t
-                        SET _calendar_ytd_per_election_office = tt.new_sum
-                        FROM ' || temp_table_name || ' AS tt
-                        WHERE t.id = tt.id;
-                    '
-                    USING
-                        v_election_code,
-                        v_candidate_office,
-                        COALESCE(v_candidate_state, ''),
-                        COALESCE(v_candidate_district, ''),
-                        EXTRACT(YEAR FROM schedule_date),
-                        txn.aggregation_group;
-                END;
-                $$ LANGUAGE plpgsql;
-                """
-            ),
+                    UPDATE transactions_transaction AS t
+                    SET _calendar_ytd_per_election_office = tt.new_sum
+                    FROM ' || temp_table_name || ' AS tt
+                    WHERE t.id = tt.id;
+                '
+                USING
+                    v_election_code,
+                    v_candidate_office,
+                    COALESCE(v_candidate_state, ''),
+                    COALESCE(v_candidate_district, ''),
+                    EXTRACT(YEAR FROM schedule_date),
+                    txn.aggregation_group;
+            END;
+            $$ LANGUAGE plpgsql;
+            """
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_loan_payment_to_date(
-                    txn RECORD,
-                    sql_committee_id TEXT,
-                    temp_table_name TEXT
-                )
-                RETURNS VOID AS $$
-                BEGIN
-                    EXECUTE '
-                        CREATE TEMPORARY TABLE ' || temp_table_name || '
-                        ON COMMIT DROP AS
-                        SELECT
-                            id,
-                            loan_key,
-                            SUM(effective_amount) OVER (ORDER BY loan_key) AS new_sum
-                        FROM transaction_view__' || sql_committee_id || '
-                        WHERE loan_key LIKE (
-                            SELECT transaction_id FROM transactions_transaction
-                            WHERE id = $1
-                        ) || ''%%''; -- Match the loan_key with a transaction_id prefix
+            """
+            CREATE OR REPLACE FUNCTION calculate_loan_payment_to_date(
+                txn RECORD,
+                sql_committee_id TEXT,
+                temp_table_name TEXT
+            )
+            RETURNS VOID AS $$
+            BEGIN
+                EXECUTE '
+                    CREATE TEMPORARY TABLE ' || temp_table_name || '
+                    ON COMMIT DROP AS
+                    SELECT
+                        id,
+                        loan_key,
+                        SUM(effective_amount) OVER (ORDER BY loan_key) AS new_sum
+                    FROM transaction_view__' || sql_committee_id || '
+                    WHERE loan_key LIKE (
+                        SELECT transaction_id FROM transactions_transaction
+                        WHERE id = $1
+                    ) || ''%%''; -- Match the loan_key with a transaction_id prefix
 
-                        UPDATE transactions_transaction AS t
-                        SET loan_payment_to_date = tt.new_sum
-                        FROM ' || temp_table_name || ' AS tt
-                        WHERE t.id = tt.id
-                        AND tt.loan_key LIKE ''%%LOAN'';
-                    '
-                    USING txn.id;
-                END;
-                $$ LANGUAGE plpgsql;
-                """
-            ),
+                    UPDATE transactions_transaction AS t
+                    SET loan_payment_to_date = tt.new_sum
+                    FROM ' || temp_table_name || ' AS tt
+                    WHERE t.id = tt.id
+                    AND tt.loan_key LIKE ''%%LOAN'';
+                '
+                USING txn.id;
+            END;
+            $$ LANGUAGE plpgsql;
+            """
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_aggregates()
-                RETURNS TRIGGER AS $$
-                DECLARE
-                    sql_committee_id TEXT;
-                    temp_table_name TEXT;
-                BEGIN
-                    sql_committee_id := REPLACE(NEW.committee_account_id::TEXT, '-', '_');
-                    temp_table_name := 'temp_' ||
-                        REPLACE(uuid_generate_v4()::TEXT, '-', '_');
-                    RAISE NOTICE 'TESTING TRIGGER';
+            """
+            CREATE OR REPLACE FUNCTION calculate_aggregates()
+            RETURNS TRIGGER AS $$
+            DECLARE
+                sql_committee_id TEXT;
+                temp_table_name TEXT;
+            BEGIN
+                sql_committee_id := REPLACE(NEW.committee_account_id::TEXT, '-', '_');
+                temp_table_name := 'temp_' ||
+                    REPLACE(uuid_generate_v4()::TEXT, '-', '_');
+                RAISE NOTICE 'TESTING TRIGGER';
 
-                    -- If schedule_c2_id or schedule_d_id is not null, stop processing
-                    IF NEW.schedule_c2_id IS NOT NULL OR NEW.schedule_d_id IS NOT NULL
-                    THEN
-                        RETURN NEW;
-                    END IF;
+                -- If schedule_c2_id or schedule_d_id is not null, stop processing
+                IF NEW.schedule_c2_id IS NOT NULL OR NEW.schedule_d_id IS NOT NULL
+                THEN
+                    RETURN NEW;
+                END IF;
 
-                    IF NEW.schedule_a_id IS NOT NULL OR NEW.schedule_b_id IS NOT NULL
+                IF NEW.schedule_a_id IS NOT NULL OR NEW.schedule_b_id IS NOT NULL
+                THEN
+                    PERFORM calculate_entity_aggregates(
+                        NEW, sql_committee_id, temp_table_name || 'NEW');
+                    IF TG_OP = 'UPDATE'
+                        AND NEW.contact_1_id <> OLD.contact_1_id
                     THEN
                         PERFORM calculate_entity_aggregates(
-                            NEW, sql_committee_id, temp_table_name || 'NEW');
-                        IF TG_OP = 'UPDATE'
-                            AND NEW.contact_1_id <> OLD.contact_1_id
-                        THEN
-                            PERFORM calculate_entity_aggregates(
-                                OLD, sql_committee_id, temp_table_name || 'OLD');
-                        END IF;
-
-                    ELSIF NEW.schedule_c_id IS NOT NULL OR NEW.schedule_c1_id IS NOT NULL
-                    THEN
-                        PERFORM calculate_loan_payment_to_date(
-                            NEW, sql_committee_id, temp_table_name || 'NEW');
-
-                    ELSIF NEW.schedule_e_id IS NOT NULL
-                    THEN
-                        PERFORM calculate_calendar_ytd_per_election_office(
-                            NEW, sql_committee_id, temp_table_name || 'NEW');
-                        IF TG_OP = 'UPDATE'
-                        THEN
-                            PERFORM calculate_calendar_ytd_per_election_office(
-                                OLD, sql_committee_id, temp_table_name || 'OLD');
-                        END IF;
+                            OLD, sql_committee_id, temp_table_name || 'OLD');
                     END IF;
 
-                    RETURN NEW;
-                END;
-                $$ LANGUAGE plpgsql;
+                ELSIF NEW.schedule_c_id IS NOT NULL OR NEW.schedule_c1_id IS NOT NULL
+                THEN
+                    PERFORM calculate_loan_payment_to_date(
+                        NEW, sql_committee_id, temp_table_name || 'NEW');
 
-                CREATE TRIGGER calculate_aggregates_trigger
-                AFTER INSERT OR UPDATE ON transactions_transaction
-                FOR EACH ROW
-                WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
-                EXECUTE FUNCTION calculate_aggregates();
-                """
-            ),
+                ELSIF NEW.schedule_e_id IS NOT NULL
+                THEN
+                    PERFORM calculate_calendar_ytd_per_election_office(
+                        NEW, sql_committee_id, temp_table_name || 'NEW');
+                    IF TG_OP = 'UPDATE'
+                    THEN
+                        PERFORM calculate_calendar_ytd_per_election_office(
+                            OLD, sql_committee_id, temp_table_name || 'OLD');
+                    END IF;
+                END IF;
+
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+
+            CREATE TRIGGER calculate_aggregates_trigger
+            AFTER INSERT OR UPDATE ON transactions_transaction
+            FOR EACH ROW
+            WHEN (pg_trigger_depth() = 0) -- Prevent infinite trigger loop
+            EXECUTE FUNCTION calculate_aggregates();
+            """
         ),
         migrations.RunPython(
             code=_load_callable(
@@ -424,135 +410,388 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION get_temp_tablename()
-                RETURNS TEXT AS $$
-                BEGIN
-                    RETURN 'temp_' || REPLACE(uuid_generate_v4()::TEXT, '-', '_');
-                END;
-                $$ LANGUAGE plpgsql;
-                """
+            """
+            CREATE OR REPLACE FUNCTION get_temp_tablename()
+            RETURNS TEXT AS $$
+            BEGIN
+                RETURN 'temp_' || REPLACE(uuid_generate_v4()::TEXT, '-', '_');
+            END;
+            $$ LANGUAGE plpgsql;
+            """
+        ),
+        migrations.RunSQL(
+            """
+            CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
+                txn RECORD,
+                sql_committee_id TEXT
+            )
+            RETURNS VOID AS $$
+            DECLARE
+                schedule_date DATE;
+                temp_table_name TEXT;
+            BEGIN
+                temp_table_name := get_temp_tablename();
+                IF txn.schedule_a_id IS NOT NULL THEN
+                    SELECT contribution_date
+                    INTO schedule_date
+                    FROM transactions_schedulea
+                    WHERE id = txn.schedule_a_id;
+                ELSIF txn.schedule_b_id IS NOT NULL THEN
+                    SELECT expenditure_date
+                    INTO schedule_date
+                    FROM transactions_scheduleb
+                    WHERE id = txn.schedule_b_id;
+                END IF;
+
+                EXECUTE '
+                    CREATE TEMPORARY TABLE ' || temp_table_name || '
+                    ON COMMIT DROP AS
+                    SELECT
+                        id,
+                        SUM(effective_amount) OVER (ORDER BY date, created)
+                        AS new_sum
+                    FROM transaction_view__' || sql_committee_id || '
+                    WHERE
+                        contact_1_id = $1
+                        AND EXTRACT(YEAR FROM date) = $2
+                        AND aggregation_group = $3
+                        AND force_unaggregated IS NOT TRUE;
+
+                    UPDATE transactions_transaction AS t
+                    SET aggregate = tt.new_sum
+                    FROM ' || temp_table_name || ' AS tt
+                    WHERE t.id = tt.id;
+                '
+                USING
+                    txn.contact_1_id,
+                    EXTRACT(YEAR FROM schedule_date),
+                    txn.aggregation_group;
+            END;
+            $$ LANGUAGE plpgsql;
+            """
+        ),
+        migrations.RunSQL(
+            """
+            CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
+                txn RECORD,
+                sql_committee_id TEXT
+            )
+            RETURNS VOID AS $$
+            DECLARE
+                schedule_date DATE;
+                v_election_code TEXT;
+                v_candidate_office TEXT;
+                v_candidate_state TEXT;
+                v_candidate_district TEXT;
+                temp_table_name TEXT;
+            BEGIN
+                temp_table_name := get_temp_tablename();
+                SELECT COALESCE(disbursement_date, dissemination_date)
+                    INTO schedule_date FROM transactions_schedulee
+                    WHERE id = txn.schedule_e_id;
+                SELECT election_code
+                    INTO v_election_code
+                    FROM transactions_schedulee
+                    WHERE id = txn.schedule_e_id;
+                SELECT candidate_office, candidate_state, candidate_district
+                    INTO v_candidate_office, v_candidate_state, v_candidate_district
+                    FROM contacts WHERE id = txn.contact_2_id;
+
+                EXECUTE '
+                    CREATE TEMPORARY TABLE ' || temp_table_name || '
+                    ON COMMIT DROP AS
+                    SELECT
+                        t.id,
+                        SUM(t.effective_amount) OVER
+                        (ORDER BY t.date, t.created) AS new_sum
+                    FROM transactions_schedulee e
+                        JOIN transaction_view__' || sql_committee_id || ' t
+                            ON e.id = t.schedule_e_id
+                        JOIN contacts c
+                            ON t.contact_2_id = c.id
+                    WHERE
+                        e.election_code  = $1
+                        AND c.candidate_office = $2
+                        AND (
+                            c.candidate_state = $3
+                            OR (
+                                c.candidate_state IS NULL
+                                AND $3 = ''''
+                            )
+                        )
+                        AND (
+                            c.candidate_district = $4
+                            OR (
+                                c.candidate_district IS NULL
+                                AND $4 = ''''
+                            )
+                        )
+                        AND EXTRACT(YEAR FROM t.date) = $5
+                        AND aggregation_group = $6
+                        AND force_unaggregated IS NOT TRUE;
+
+                    UPDATE transactions_transaction AS t
+                    SET _calendar_ytd_per_election_office = tt.new_sum
+                    FROM ' || temp_table_name || ' AS tt
+                    WHERE t.id = tt.id;
+                '
+                USING
+                    v_election_code,
+                    v_candidate_office,
+                    COALESCE(v_candidate_state, ''),
+                    COALESCE(v_candidate_district, ''),
+                    EXTRACT(YEAR FROM schedule_date),
+                    txn.aggregation_group;
+            END;
+            $$ LANGUAGE plpgsql;
+            """
+        ),
+        migrations.RunSQL(
+            """
+            CREATE OR REPLACE FUNCTION calculate_loan_payment_to_date(
+                txn RECORD,
+                sql_committee_id TEXT
+            )
+            RETURNS VOID AS $$
+            DECLARE
+                temp_table_name TEXT;
+            BEGIN
+                temp_table_name := get_temp_tablename();
+                EXECUTE '
+                    CREATE TEMPORARY TABLE ' || temp_table_name || '
+                    ON COMMIT DROP AS
+                    SELECT
+                        id,
+                        loan_key,
+                        SUM(effective_amount) OVER (ORDER BY loan_key) AS new_sum
+                    FROM transaction_view__' || sql_committee_id || '
+                    WHERE loan_key LIKE (
+                        SELECT
+                            CASE
+                                WHEN loan_id IS NULL THEN transaction_id
+                                ELSE (
+                                    SELECT transaction_id
+                                    FROM transactions_transaction
+                                    WHERE id = t.loan_id
+                                )
+                            END
+                        FROM transactions_transaction t
+                        WHERE id = $1
+                    ) || ''%%''; -- Match the loan_key with a transaction_id prefix
+
+                    UPDATE transactions_transaction AS t
+                    SET loan_payment_to_date = tt.new_sum
+                    FROM ' || temp_table_name || ' AS tt
+                    WHERE t.id = tt.id
+                    AND tt.loan_key LIKE ''%%LOAN'';
+                '
+                USING txn.id;
+            END;
+            $$ LANGUAGE plpgsql;
+            """
+        ),
+        migrations.RunSQL(
+            """
+            CREATE OR REPLACE FUNCTION calculate_aggregates()
+            RETURNS TRIGGER AS $$
+            DECLARE
+                sql_committee_id TEXT;
+            BEGIN
+                sql_committee_id := REPLACE(NEW.committee_account_id::TEXT, '-', '_');
+
+                -- If schedule_c2_id or schedule_d_id is not null, stop processing
+                IF NEW.schedule_c2_id IS NOT NULL OR NEW.schedule_d_id IS NOT NULL
+                THEN
+                    RETURN NEW;
+                END IF;
+
+                IF NEW.schedule_a_id IS NOT NULL OR NEW.schedule_b_id IS NOT NULL
+                THEN
+                    PERFORM calculate_entity_aggregates(NEW, sql_committee_id);
+                    IF TG_OP = 'UPDATE'
+                        AND NEW.contact_1_id <> OLD.contact_1_id
+                    THEN
+                        PERFORM calculate_entity_aggregates(OLD, sql_committee_id);
+                    END IF;
+                END IF;
+
+                IF NEW.schedule_c_id IS NOT NULL
+                    OR NEW.schedule_c1_id IS NOT NULL
+                    OR NEW.transaction_type_identifier = 'LOAN_REPAYMENT_MADE'
+                THEN
+                    PERFORM calculate_loan_payment_to_date(NEW, sql_committee_id);
+                END IF;
+
+                IF NEW.schedule_e_id IS NOT NULL
+                THEN
+                    PERFORM calculate_calendar_ytd_per_election_office(
+                        NEW, sql_committee_id);
+                    IF TG_OP = 'UPDATE'
+                    THEN
+                        PERFORM calculate_calendar_ytd_per_election_office(
+                            OLD, sql_committee_id);
+                    END IF;
+                END IF;
+
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+            """
+        ),
+        migrations.RunSQL(
+            """
+            -- Drop  prior versions of these functions
+            DROP FUNCTION calculate_entity_aggregates(RECORD, TEXT, TEXT);
+            DROP FUNCTION calculate_calendar_ytd_per_election_office(
+                RECORD, TEXT, TEXT
+            );
+            DROP FUNCTION calculate_loan_payment_to_date(RECORD, TEXT, TEXT);
+            """
+        ),
+        migrations.RunPython(
+            code=_load_callable(
+                "fecfiler.transactions.migrations."
+                "0009_update_calculate_loan_payment_to_date",
+                "update_existing_rows",
             ),
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
-                    txn RECORD,
-                    sql_committee_id TEXT
-                )
-                RETURNS VOID AS $$
-                DECLARE
-                    schedule_date DATE;
-                    temp_table_name TEXT;
-                BEGIN
-                    temp_table_name := get_temp_tablename();
-                    IF txn.schedule_a_id IS NOT NULL THEN
-                        SELECT contribution_date
-                        INTO schedule_date
-                        FROM transactions_schedulea
-                        WHERE id = txn.schedule_a_id;
-                    ELSIF txn.schedule_b_id IS NOT NULL THEN
-                        SELECT expenditure_date
-                        INTO schedule_date
-                        FROM transactions_scheduleb
-                        WHERE id = txn.schedule_b_id;
-                    END IF;
+            """
+            CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
+                txn RECORD, sql_committee_id text
+            )
+            RETURNS VOID AS $$
+            DECLARE
+                schedule_date date;
+            BEGIN
+                IF txn.schedule_a_id IS NOT NULL THEN
+                    SELECT
+                        contribution_date INTO schedule_date
+                    FROM
+                        transactions_schedulea
+                    WHERE
+                        id = txn.schedule_a_id;
+                ELSIF txn.schedule_b_id IS NOT NULL THEN
+                    SELECT
+                        expenditure_date INTO schedule_date
+                    FROM
+                        transactions_scheduleb
+                    WHERE
+                        id = txn.schedule_b_id;
+                END IF;
 
-                    EXECUTE '
-                        CREATE TEMPORARY TABLE ' || temp_table_name || '
-                        ON COMMIT DROP AS
+                EXECUTE '
+                    UPDATE transactions_transaction AS t
+                    SET aggregate = tc.new_sum
+                    FROM (
                         SELECT
                             id,
+                            aggregate,
+                            date,
                             SUM(effective_amount) OVER (ORDER BY date, created)
-                            AS new_sum
+                                AS new_sum
                         FROM transaction_view__' || sql_committee_id || '
                         WHERE
                             contact_1_id = $1
                             AND EXTRACT(YEAR FROM date) = $2
                             AND aggregation_group = $3
-                            AND force_unaggregated IS NOT TRUE;
-
-                        UPDATE transactions_transaction AS t
-                        SET aggregate = tt.new_sum
-                        FROM ' || temp_table_name || ' AS tt
-                        WHERE t.id = tt.id;
+                            AND force_unaggregated IS NOT TRUE
+                    ) AS tc
+                    WHERE t.id = tc.id
+                        AND (
+                            tc.date > $4
+                            OR (
+                                tc.date = $4
+                                AND t.created >= $5
+                            )
+                        );
                     '
-                    USING
-                        txn.contact_1_id,
-                        EXTRACT(YEAR FROM schedule_date),
-                        txn.aggregation_group;
-                END;
-                $$ LANGUAGE plpgsql;
-                """
-            ),
+                USING
+                    txn.contact_1_id,
+                    EXTRACT(YEAR FROM schedule_date),
+                    txn.aggregation_group,
+                    schedule_date,
+                    txn.created;
+            END;
+            $$
+            LANGUAGE plpgsql;
+            """
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
-                    txn RECORD,
-                    sql_committee_id TEXT
-                )
-                RETURNS VOID AS $$
+            """
+            CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
+                    txn RECORD, sql_committee_id text
+                    )
+                    RETURNS VOID
+                    AS $$
                 DECLARE
-                    schedule_date DATE;
-                    v_election_code TEXT;
-                    v_candidate_office TEXT;
-                    v_candidate_state TEXT;
-                    v_candidate_district TEXT;
-                    temp_table_name TEXT;
+                    schedule_date date;
+                    v_election_code text;
+                    v_candidate_office text;
+                    v_candidate_state text;
+                    v_candidate_district text;
                 BEGIN
-                    temp_table_name := get_temp_tablename();
-                    SELECT COALESCE(disbursement_date, dissemination_date)
-                        INTO schedule_date FROM transactions_schedulee
-                        WHERE id = txn.schedule_e_id;
-                    SELECT election_code
-                        INTO v_election_code
-                        FROM transactions_schedulee
-                        WHERE id = txn.schedule_e_id;
-                    SELECT candidate_office, candidate_state, candidate_district
-                        INTO v_candidate_office, v_candidate_state, v_candidate_district
-                        FROM contacts WHERE id = txn.contact_2_id;
+                    SELECT
+                        COALESCE(disbursement_date, dissemination_date)
+                            INTO schedule_date
+                    FROM transactions_schedulee
+                    WHERE id = txn.schedule_e_id;
 
+                    SELECT election_code INTO v_election_code
+                    FROM transactions_schedulee
+                    WHERE id = txn.schedule_e_id;
+
+                    SELECT
+                        candidate_office,
+                        candidate_state,
+                        candidate_district INTO v_candidate_office,
+                        v_candidate_state,
+                        v_candidate_district
+                    FROM contacts
+                    WHERE id = txn.contact_2_id;
                     EXECUTE '
-                        CREATE TEMPORARY TABLE ' || temp_table_name || '
-                        ON COMMIT DROP AS
-                        SELECT
-                            t.id,
-                            SUM(t.effective_amount) OVER
-                            (ORDER BY t.date, t.created) AS new_sum
-                        FROM transactions_schedulee e
-                            JOIN transaction_view__' || sql_committee_id || ' t
-                                ON e.id = t.schedule_e_id
-                            JOIN contacts c
-                                ON t.contact_2_id = c.id
-                        WHERE
-                            e.election_code  = $1
-                            AND c.candidate_office = $2
-                            AND (
-                                c.candidate_state = $3
-                                OR (
-                                    c.candidate_state IS NULL
-                                    AND $3 = ''''
-                                )
-                            )
-                            AND (
-                                c.candidate_district = $4
-                                OR (
-                                    c.candidate_district IS NULL
-                                    AND $4 = ''''
-                                )
-                            )
-                            AND EXTRACT(YEAR FROM t.date) = $5
-                            AND aggregation_group = $6
-                            AND force_unaggregated IS NOT TRUE;
-
                         UPDATE transactions_transaction AS t
-                        SET _calendar_ytd_per_election_office = tt.new_sum
-                        FROM ' || temp_table_name || ' AS tt
-                        WHERE t.id = tt.id;
+                        SET _calendar_ytd_per_election_office = tc.new_sum
+                        FROM (
+                            SELECT
+                                t.id,
+                                t.date,
+                                SUM(t.effective_amount) OVER
+                                (ORDER BY t.date, t.created) AS new_sum
+                            FROM transactions_schedulee e
+                                JOIN transaction_view__' || sql_committee_id || ' t
+                                    ON e.id = t.schedule_e_id
+                                JOIN contacts c
+                                    ON t.contact_2_id = c.id
+                            WHERE
+                                e.election_code  = $1
+                                AND c.candidate_office = $2
+                                AND (
+                                    c.candidate_state = $3
+                                    OR (
+                                        c.candidate_state IS NULL
+                                        AND $3 = ''''
+                                    )
+                                )
+                                AND (
+                                    c.candidate_district = $4
+                                    OR (
+                                        c.candidate_district IS NULL
+                                        AND $4 = ''''
+                                    )
+                                )
+                                AND EXTRACT(YEAR FROM t.date) = $5
+                                AND aggregation_group = $6
+                                AND force_unaggregated IS NOT TRUE
+                        ) AS tc
+                        WHERE t.id = tc.id
+                        AND (
+                            tc.date > $7
+                            OR (
+                                tc.date = $7
+                                AND t.created >= $8
+                            )
+                        );
                     '
                     USING
                         v_election_code,
@@ -560,27 +799,26 @@ class Migration(migrations.Migration):
                         COALESCE(v_candidate_state, ''),
                         COALESCE(v_candidate_district, ''),
                         EXTRACT(YEAR FROM schedule_date),
-                        txn.aggregation_group;
-                END;
-                $$ LANGUAGE plpgsql;
-                """
-            ),
+                        txn.aggregation_group,
+                        schedule_date,
+                        txn.created;
+            END;
+            $$
+            LANGUAGE plpgsql;
+            """
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_loan_payment_to_date(
-                    txn RECORD,
-                    sql_committee_id TEXT
-                )
-                RETURNS VOID AS $$
-                DECLARE
-                    temp_table_name TEXT;
-                BEGIN
-                    temp_table_name := get_temp_tablename();
-                    EXECUTE '
-                        CREATE TEMPORARY TABLE ' || temp_table_name || '
-                        ON COMMIT DROP AS
+            """
+            CREATE OR REPLACE FUNCTION calculate_loan_payment_to_date(
+                txn RECORD, sql_committee_id text
+            )
+                RETURNS VOID
+                AS $$
+            BEGIN
+                EXECUTE '
+                    UPDATE transactions_transaction AS t
+                    SET loan_payment_to_date = tc.new_sum
+                    FROM (
                         SELECT
                             id,
                             loan_key,
@@ -598,287 +836,17 @@ class Migration(migrations.Migration):
                                 END
                             FROM transactions_transaction t
                             WHERE id = $1
-                        ) || ''%%''; -- Match the loan_key with a transaction_id prefix
-
-                        UPDATE transactions_transaction AS t
-                        SET loan_payment_to_date = tt.new_sum
-                        FROM ' || temp_table_name || ' AS tt
-                        WHERE t.id = tt.id
-                        AND tt.loan_key LIKE ''%%LOAN'';
-                    '
-                    USING txn.id;
-                END;
-                $$ LANGUAGE plpgsql;
-                """
-            ),
-        ),
-        migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_aggregates()
-                RETURNS TRIGGER AS $$
-                DECLARE
-                    sql_committee_id TEXT;
-                BEGIN
-                    sql_committee_id := REPLACE(NEW.committee_account_id::TEXT, '-', '_');
-
-                    -- If schedule_c2_id or schedule_d_id is not null, stop processing
-                    IF NEW.schedule_c2_id IS NOT NULL OR NEW.schedule_d_id IS NOT NULL
-                    THEN
-                        RETURN NEW;
-                    END IF;
-
-                    IF NEW.schedule_a_id IS NOT NULL OR NEW.schedule_b_id IS NOT NULL
-                    THEN
-                        PERFORM calculate_entity_aggregates(NEW, sql_committee_id);
-                        IF TG_OP = 'UPDATE'
-                            AND NEW.contact_1_id <> OLD.contact_1_id
-                        THEN
-                            PERFORM calculate_entity_aggregates(OLD, sql_committee_id);
-                        END IF;
-                    END IF;
-
-                    IF NEW.schedule_c_id IS NOT NULL
-                        OR NEW.schedule_c1_id IS NOT NULL
-                        OR NEW.transaction_type_identifier = 'LOAN_REPAYMENT_MADE'
-                    THEN
-                        PERFORM calculate_loan_payment_to_date(NEW, sql_committee_id);
-                    END IF;
-
-                    IF NEW.schedule_e_id IS NOT NULL
-                    THEN
-                        PERFORM calculate_calendar_ytd_per_election_office(
-                            NEW, sql_committee_id);
-                        IF TG_OP = 'UPDATE'
-                        THEN
-                            PERFORM calculate_calendar_ytd_per_election_office(
-                                OLD, sql_committee_id);
-                        END IF;
-                    END IF;
-
-                    RETURN NEW;
-                END;
-                $$ LANGUAGE plpgsql;
-                """
-            ),
-        ),
-        migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                -- Drop  prior versions of these functions
-                DROP FUNCTION calculate_entity_aggregates(RECORD, TEXT, TEXT);
-                DROP FUNCTION calculate_calendar_ytd_per_election_office(
-                    RECORD, TEXT, TEXT
-                );
-                DROP FUNCTION calculate_loan_payment_to_date(RECORD, TEXT, TEXT);
-                """
-            ),
-        ),
-        migrations.RunPython(
-            code=_load_callable(
-                "fecfiler.transactions.migrations."
-                "0009_update_calculate_loan_payment_to_date",
-                "update_existing_rows",
-            ),
-        ),
-        migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
-                    txn RECORD, sql_committee_id text
-                )
-                RETURNS VOID AS $$
-                DECLARE
-                    schedule_date date;
-                BEGIN
-                    IF txn.schedule_a_id IS NOT NULL THEN
-                        SELECT
-                            contribution_date INTO schedule_date
-                        FROM
-                            transactions_schedulea
-                        WHERE
-                            id = txn.schedule_a_id;
-                    ELSIF txn.schedule_b_id IS NOT NULL THEN
-                        SELECT
-                            expenditure_date INTO schedule_date
-                        FROM
-                            transactions_scheduleb
-                        WHERE
-                            id = txn.schedule_b_id;
-                    END IF;
-
-                    EXECUTE '
-                        UPDATE transactions_transaction AS t
-                        SET aggregate = tc.new_sum
-                        FROM (
-                            SELECT
-                                id,
-                                aggregate,
-                                date,
-                                SUM(effective_amount) OVER (ORDER BY date, created)
-                                    AS new_sum
-                            FROM transaction_view__' || sql_committee_id || '
-                            WHERE
-                                contact_1_id = $1
-                                AND EXTRACT(YEAR FROM date) = $2
-                                AND aggregation_group = $3
-                                AND force_unaggregated IS NOT TRUE
-                        ) AS tc
-                        WHERE t.id = tc.id
-                            AND (
-                                tc.date > $4
-                                OR (
-                                    tc.date = $4
-                                    AND t.created >= $5
-                                )
-                            );
-                        '
-                    USING
-                        txn.contact_1_id,
-                        EXTRACT(YEAR FROM schedule_date),
-                        txn.aggregation_group,
-                        schedule_date,
-                        txn.created;
-                END;
-                $$
-                LANGUAGE plpgsql;
-                """
-            ),
-        ),
-        migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
-                        txn RECORD, sql_committee_id text
-                        )
-                        RETURNS VOID
-                        AS $$
-                    DECLARE
-                        schedule_date date;
-                        v_election_code text;
-                        v_candidate_office text;
-                        v_candidate_state text;
-                        v_candidate_district text;
-                    BEGIN
-                        SELECT
-                            COALESCE(disbursement_date, dissemination_date)
-                                INTO schedule_date
-                        FROM transactions_schedulee
-                        WHERE id = txn.schedule_e_id;
-
-                        SELECT election_code INTO v_election_code
-                        FROM transactions_schedulee
-                        WHERE id = txn.schedule_e_id;
-
-                        SELECT
-                            candidate_office,
-                            candidate_state,
-                            candidate_district INTO v_candidate_office,
-                            v_candidate_state,
-                            v_candidate_district
-                        FROM contacts
-                        WHERE id = txn.contact_2_id;
-                        EXECUTE '
-                            UPDATE transactions_transaction AS t
-                            SET _calendar_ytd_per_election_office = tc.new_sum
-                            FROM (
-                                SELECT
-                                    t.id,
-                                    t.date,
-                                    SUM(t.effective_amount) OVER
-                                    (ORDER BY t.date, t.created) AS new_sum
-                                FROM transactions_schedulee e
-                                    JOIN transaction_view__' || sql_committee_id || ' t
-                                        ON e.id = t.schedule_e_id
-                                    JOIN contacts c
-                                        ON t.contact_2_id = c.id
-                                WHERE
-                                    e.election_code  = $1
-                                    AND c.candidate_office = $2
-                                    AND (
-                                        c.candidate_state = $3
-                                        OR (
-                                            c.candidate_state IS NULL
-                                            AND $3 = ''''
-                                        )
-                                    )
-                                    AND (
-                                        c.candidate_district = $4
-                                        OR (
-                                            c.candidate_district IS NULL
-                                            AND $4 = ''''
-                                        )
-                                    )
-                                    AND EXTRACT(YEAR FROM t.date) = $5
-                                    AND aggregation_group = $6
-                                    AND force_unaggregated IS NOT TRUE
-                            ) AS tc
-                            WHERE t.id = tc.id
-                            AND (
-                                tc.date > $7
-                                OR (
-                                    tc.date = $7
-                                    AND t.created >= $8
-                                )
-                            );
-                        '
-                        USING
-                            v_election_code,
-                            v_candidate_office,
-                            COALESCE(v_candidate_state, ''),
-                            COALESCE(v_candidate_district, ''),
-                            EXTRACT(YEAR FROM schedule_date),
-                            txn.aggregation_group,
-                            schedule_date,
-                            txn.created;
-                END;
-                $$
-                LANGUAGE plpgsql;
-                """
-            ),
-        ),
-        migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_loan_payment_to_date(
-                    txn RECORD, sql_committee_id text
-                )
-                    RETURNS VOID
-                    AS $$
-                BEGIN
-                    EXECUTE '
-                        UPDATE transactions_transaction AS t
-                        SET loan_payment_to_date = tc.new_sum
-                        FROM (
-                            SELECT
-                                id,
-                                loan_key,
-                                SUM(effective_amount) OVER (ORDER BY loan_key) AS new_sum
-                            FROM transaction_view__' || sql_committee_id || '
-                            WHERE loan_key LIKE (
-                                SELECT
-                                    CASE
-                                        WHEN loan_id IS NULL THEN transaction_id
-                                        ELSE (
-                                            SELECT transaction_id
-                                            FROM transactions_transaction
-                                            WHERE id = t.loan_id
-                                        )
-                                    END
-                                FROM transactions_transaction t
-                                WHERE id = $1
-                            ) || ''%%'' -- Match the loan_key with a transaction_id prefix
-                        ) AS tc
-                        WHERE t.id = tc.id
-                        AND tc.loan_key LIKE ''%%LOAN''
-                        ;
-                    '
-                    USING txn.id;
-                END;
-                $$
-                LANGUAGE plpgsql;
-                """
-            ),
+                        ) || ''%%'' -- Match the loan_key with a transaction_id prefix
+                    ) AS tc
+                    WHERE t.id = tc.id
+                    AND tc.loan_key LIKE ''%%LOAN''
+                    ;
+                '
+                USING txn.id;
+            END;
+            $$
+            LANGUAGE plpgsql;
+            """
         ),
         migrations.AddField(
             model_name="transaction",
@@ -995,452 +963,547 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
-                    txn RECORD, sql_committee_id text
-                )
-                RETURNS VOID AS $$
-                DECLARE
-                    schedule_date date;
-                BEGIN
-                    IF txn.schedule_a_id IS NOT NULL THEN
-                        SELECT
-                            contribution_date INTO schedule_date
-                        FROM
-                            transactions_schedulea
-                        WHERE
-                            id = txn.schedule_a_id;
-                    ELSIF txn.schedule_b_id IS NOT NULL THEN
-                        SELECT
-                            expenditure_date INTO schedule_date
-                        FROM
-                            transactions_scheduleb
-                        WHERE
-                            id = txn.schedule_b_id;
-                    END IF;
-
-                    EXECUTE '
-                        UPDATE transactions_transaction AS t
-                        SET aggregate = tc.new_sum
-                        FROM (
-                            SELECT
-                                t.id,
-                                COALESCE(
-                                    sa.contribution_date,
-                                    sb.expenditure_date,
-                                    sc.loan_incurred_date,
-                                    se.disbursement_date,
-                                    se.dissemination_date
-                                ) AS date,
-                                SUM(
-                                    calculate_effective_amount(
-                                        t.transaction_type_identifier,
-                                        calculate_amount(
-                                            sa.contribution_amount,
-                                            sb.expenditure_amount,
-                                            sc.loan_amount,
-                                            sc2.guaranteed_amount,
-                                            se.expenditure_amount,
-                                            t.debt_id,
-                                            t.schedule_d_id
-                                        ),
-                                        t.schedule_c_id)
-                                    ) OVER (
-                                    ORDER BY
-                                        COALESCE(
-                                            sa.contribution_date,
-                                            sb.expenditure_date,
-                                            sc.loan_incurred_date,
-                                            se.disbursement_date,
-                                            se.dissemination_date
-                                        ),
-                                        t.created
-                                ) AS new_sum
-                            FROM transactions_transaction t
-                            LEFT JOIN transactions_schedulea AS sa
-                                ON t.schedule_a_id = sa.id
-                            LEFT JOIN transactions_scheduleb AS sb
-                                ON t.schedule_b_id = sb.id
-                            LEFT JOIN transactions_schedulec AS sc
-                                ON t.schedule_c_id = sc.id
-                            LEFT JOIN transactions_schedulec2 AS sc2
-                                ON t.schedule_c2_id = sc2.id
-                            LEFT JOIN transactions_schedulee AS se
-                                ON t.schedule_e_id = se.id
-                            LEFT JOIN transactions_scheduled AS sd
-                                ON t.schedule_d_id = sd.id
-                            WHERE
-                                contact_1_id = $1
-                                AND EXTRACT(YEAR FROM COALESCE(
-                                    sa.contribution_date,
-                                    sb.expenditure_date,
-                                    sc.loan_incurred_date,
-                                    se.disbursement_date,
-                                    se.dissemination_date
-                                )) = $2
-                                AND aggregation_group = $3
-                                AND force_unaggregated IS NOT TRUE
-                                AND deleted IS NULL
-                        ) AS tc
-                        WHERE t.id = tc.id
-                            AND (
-                                tc.date > $4
-                                OR (
-                                    tc.date = $4
-                                    AND t.created >= $5
-                                )
-                            );
-                        '
-                    USING
-                        txn.contact_1_id,
-                        EXTRACT(YEAR FROM schedule_date),
-                        txn.aggregation_group,
-                        schedule_date,
-                        txn.created;
-                END;
-                $$
-                LANGUAGE plpgsql;
-                """
-            ),
-        ),
-        migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
-                    txn RECORD, sql_committee_id text
-                )
-                RETURNS VOID
-                AS $$
-                DECLARE
-                    schedule_date date;
-                    v_election_code text;
-                    v_candidate_office text;
-                    v_candidate_state text;
-                    v_candidate_district text;
-                BEGIN
+            """
+            CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
+                txn RECORD, sql_committee_id text
+            )
+            RETURNS VOID AS $$
+            DECLARE
+                schedule_date date;
+            BEGIN
+                IF txn.schedule_a_id IS NOT NULL THEN
                     SELECT
-                        COALESCE(disbursement_date, dissemination_date)
-                            INTO schedule_date
-                    FROM transactions_schedulee
-                    WHERE id = txn.schedule_e_id;
-
-                    SELECT election_code INTO v_election_code
-                    FROM transactions_schedulee
-                    WHERE id = txn.schedule_e_id;
-
+                        contribution_date INTO schedule_date
+                    FROM
+                        transactions_schedulea
+                    WHERE
+                        id = txn.schedule_a_id;
+                ELSIF txn.schedule_b_id IS NOT NULL THEN
                     SELECT
-                        candidate_office,
-                        candidate_state,
-                        candidate_district INTO v_candidate_office,
-                        v_candidate_state,
-                        v_candidate_district
-                    FROM contacts
-                    WHERE id = txn.contact_2_id;
-                    EXECUTE '
-                        UPDATE transactions_transaction AS t
-                        SET _calendar_ytd_per_election_office = tc.new_sum
-                        FROM (
-                            SELECT
-                                t.id,
-                                Coalesce(
-                                    e.disbursement_date,
-                                    e.dissemination_date
-                                ) as date,
-                                SUM(
-                                    calculate_effective_amount(
-                                        t.transaction_type_identifier,
-                                        calculate_amount(
-                                            NULL,
-                                            NULL,
-                                            NULL,
-                                            NULL,
-                                            e.expenditure_amount,
-                                            t.debt_id,
-                                            t.schedule_d_id
-                                        ),
-                                    t.schedule_c_id
-                                    )
-                                ) OVER (ORDER BY Coalesce(
-                                    e.disbursement_date,
-                                    e.dissemination_date
-                                ), t.created) AS new_sum
-                            FROM transactions_schedulee e
-                                JOIN transactions_transaction t
-                                    ON e.id = t.schedule_e_id
-                                JOIN contacts c
-                                    ON t.contact_2_id = c.id
-                            WHERE
-                                e.election_code  = $1
-                                AND c.candidate_office = $2
-                                AND (
-                                    c.candidate_state = $3
-                                    OR (
-                                        c.candidate_state IS NULL
-                                        AND $3 = ''''
-                                    )
-                                )
-                                AND (
-                                    c.candidate_district = $4
-                                    OR (
-                                        c.candidate_district IS NULL
-                                        AND $4 = ''''
-                                    )
-                                )
-                                AND EXTRACT(YEAR FROM Coalesce(
-                                    e.disbursement_date,
-                                    e.dissemination_date
-                                )) = $5
-                                AND aggregation_group = $6
-                                AND force_unaggregated IS NOT TRUE
-                        ) AS tc
-                        WHERE t.id = tc.id
+                        expenditure_date INTO schedule_date
+                    FROM
+                        transactions_scheduleb
+                    WHERE
+                        id = txn.schedule_b_id;
+                END IF;
+
+                EXECUTE '
+                    UPDATE transactions_transaction AS t
+                    SET aggregate = tc.new_sum
+                    FROM (
+                        SELECT
+                            t.id,
+                            COALESCE(
+                                sa.contribution_date,
+                                sb.expenditure_date,
+                                sc.loan_incurred_date,
+                                se.disbursement_date,
+                                se.dissemination_date
+                            ) AS date,
+                            SUM(
+                                calculate_effective_amount(
+                                    t.transaction_type_identifier,
+                                    calculate_amount(
+                                        sa.contribution_amount,
+                                        sb.expenditure_amount,
+                                        sc.loan_amount,
+                                        sc2.guaranteed_amount,
+                                        se.expenditure_amount,
+                                        t.debt_id,
+                                        t.schedule_d_id
+                                    ),
+                                    t.schedule_c_id)
+                                ) OVER (
+                                ORDER BY
+                                    COALESCE(
+                                        sa.contribution_date,
+                                        sb.expenditure_date,
+                                        sc.loan_incurred_date,
+                                        se.disbursement_date,
+                                        se.dissemination_date
+                                    ),
+                                    t.created
+                            ) AS new_sum
+                        FROM transactions_transaction t
+                        LEFT JOIN transactions_schedulea AS sa
+                            ON t.schedule_a_id = sa.id
+                        LEFT JOIN transactions_scheduleb AS sb
+                            ON t.schedule_b_id = sb.id
+                        LEFT JOIN transactions_schedulec AS sc
+                            ON t.schedule_c_id = sc.id
+                        LEFT JOIN transactions_schedulec2 AS sc2
+                            ON t.schedule_c2_id = sc2.id
+                        LEFT JOIN transactions_schedulee AS se
+                            ON t.schedule_e_id = se.id
+                        LEFT JOIN transactions_scheduled AS sd
+                            ON t.schedule_d_id = sd.id
+                        WHERE
+                            contact_1_id = $1
+                            AND EXTRACT(YEAR FROM COALESCE(
+                                sa.contribution_date,
+                                sb.expenditure_date,
+                                sc.loan_incurred_date,
+                                se.disbursement_date,
+                                se.dissemination_date
+                            )) = $2
+                            AND aggregation_group = $3
+                            AND force_unaggregated IS NOT TRUE
+                            AND deleted IS NULL
+                    ) AS tc
+                    WHERE t.id = tc.id
                         AND (
-                            tc.date > $7
+                            tc.date > $4
                             OR (
-                                tc.date = $7
-                                AND t.created >= $8
+                                tc.date = $4
+                                AND t.created >= $5
                             )
                         );
                     '
-                    USING
-                        v_election_code,
-                        v_candidate_office,
-                        COALESCE(v_candidate_state, ''),
-                        COALESCE(v_candidate_district, ''),
-                        EXTRACT(YEAR FROM schedule_date),
-                        txn.aggregation_group,
-                        schedule_date,
-                        txn.created;
-                END;
-                $$
-                LANGUAGE plpgsql;
-                """
-            ),
+                USING
+                    txn.contact_1_id,
+                    EXTRACT(YEAR FROM schedule_date),
+                    txn.aggregation_group,
+                    schedule_date,
+                    txn.created;
+            END;
+            $$
+            LANGUAGE plpgsql;
+            """
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_effective_amount(
-                    transaction_type_identifier TEXT,
-                    amount NUMERIC,
-                    schedule_c_id UUID
-                )
-                RETURNS NUMERIC
-                AS $$
-                DECLARE
-                    effective_amount NUMERIC;
-                BEGIN
-                    -- Case 1: transaction type is a refund
-                    IF transaction_type_identifier IN (
-                        'TRIBAL_REFUND_NP_HEADQUARTERS_ACCOUNT',
-                        'TRIBAL_REFUND_NP_CONVENTION_ACCOUNT',
-                        'TRIBAL_REFUND_NP_RECOUNT_ACCOUNT',
-                        'INDIVIDUAL_REFUND_NP_HEADQUARTERS_ACCOUNT',
-                        'INDIVIDUAL_REFUND_NP_CONVENTION_ACCOUNT',
-                        'INDIVIDUAL_REFUND_NP_RECOUNT_ACCOUNT',
-                        'REFUND_PARTY_CONTRIBUTION',
-                        'REFUND_PARTY_CONTRIBUTION_VOID',
-                        'REFUND_PAC_CONTRIBUTION',
-                        'REFUND_PAC_CONTRIBUTION_VOID',
-                        'INDIVIDUAL_REFUND_NON_CONTRIBUTION_ACCOUNT',
-                        'BUSINESS_LABOR_REFUND_NON_CONTRIBUTION_ACCOUNT',
-                        'OTHER_COMMITTEE_REFUND_NON_CONTRIBUTION_ACCOUNT',
-                        'REFUND_UNREGISTERED_CONTRIBUTION',
-                        'REFUND_UNREGISTERED_CONTRIBUTION_VOID',
-                        'REFUND_INDIVIDUAL_CONTRIBUTION',
-                        'REFUND_INDIVIDUAL_CONTRIBUTION_VOID',
-                        'OTHER_COMMITTEE_REFUND_REFUND_NP_HEADQUARTERS_ACCOUNT',
-                        'OTHER_COMMITTEE_REFUND_REFUND_NP_CONVENTION_ACCOUNT',
-                        'OTHER_COMMITTEE_REFUND_REFUND_NP_RECOUNT_ACCOUNT'
-                    ) THEN
-                        effective_amount := amount * -1;
+            """
+            CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
+                txn RECORD, sql_committee_id text
+            )
+            RETURNS VOID
+            AS $$
+            DECLARE
+                schedule_date date;
+                v_election_code text;
+                v_candidate_office text;
+                v_candidate_state text;
+                v_candidate_district text;
+            BEGIN
+                SELECT
+                    COALESCE(disbursement_date, dissemination_date)
+                        INTO schedule_date
+                FROM transactions_schedulee
+                WHERE id = txn.schedule_e_id;
 
-                    -- Case 2: schedule_c exists (return NULL)
-                    ELSIF schedule_c_id IS NOT NULL THEN
-                        effective_amount := NULL;
+                SELECT election_code INTO v_election_code
+                FROM transactions_schedulee
+                WHERE id = txn.schedule_e_id;
 
-                    -- Default case: return the original amount
-                    ELSE
-                        effective_amount := amount;
-                    END IF;
-
-                    RETURN effective_amount;
-                END;
-                $$
-                LANGUAGE plpgsql;
-                """
-            ),
-        ),
-        migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_is_loan(
-                    loan UUID,
-                    transaction_type_identifier TEXT,
-                    schedule_c_id UUID
-                )
-                RETURNS TEXT
-                AS $$
-                DECLARE
-                    loan_key TEXT;
-                BEGIN
-                    IF loan IS NOT NULL AND transaction_type_identifier
-                        IN ('LOAN_REPAYMENT_RECEIVED', 'LOAN_REPAYMENT_MADE')
-                    THEN
-                        loan_key := 'F';
-
-                    ELSIF schedule_c_id IS NOT NULL THEN
-                        loan_key := 'T';
-
-                    ELSE
-                        loan_key := 'F';
-                    END IF;
-
-                    RETURN loan_key;
-                END;
-                $$
-                LANGUAGE plpgsql;
-                """
-            ),
-        ),
-        migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_original_loan_id(
-                    transaction_id text,
-                    loan UUID,
-                    transaction_type_identifier TEXT,
-                    schedule_c_id UUID,
-                    schedule_b_id UUID
-                )
-                RETURNS TEXT
-                AS $$
-                DECLARE
-                    loan_transaction_id text;
-                BEGIN
-                    IF loan IS NOT NULL AND transaction_type_identifier
-                        IN ('LOAN_REPAYMENT_RECEIVED', 'LOAN_REPAYMENT_MADE')
-                    THEN
-                        SELECT t.transaction_id
-                        INTO loan_transaction_id
-                        FROM transactions_transaction t
-                        LEFT JOIN transactions_scheduleb sb
-                            ON t.schedule_b_id = sb.id
-                        WHERE t.id = loan;
-
-                    ELSIF schedule_c_id IS NOT NULL THEN
-                        loan_transaction_id := transaction_id;
-
-                    ELSE
-                        loan_transaction_id := NULL;
-                    END IF;
-
-                    RETURN loan_transaction_id;
-                END;
-                $$
-                LANGUAGE plpgsql;
-                """
-            ),
-        ),
-        migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_loan_date(
-                    trans_id TEXT,
-                    loan UUID,
-                    transaction_type_identifier TEXT,
-                    schedule_c_id UUID,
-                    schedule_b_id UUID
-                )
-                RETURNS DATE
-                AS $$
-                DECLARE
-                    date DATE;
-                BEGIN
-                    IF loan IS NOT NULL AND transaction_type_identifier
-                        IN ('LOAN_REPAYMENT_RECEIVED', 'LOAN_REPAYMENT_MADE')
-                    THEN
-                        SELECT sb.expenditure_date
-                        INTO date
-                        FROM transactions_transaction t
-                        LEFT JOIN transactions_scheduleb sb
-                            ON t.schedule_b_id = sb.id
-                        WHERE t.transaction_id = trans_id;
-
-                    ELSIF schedule_c_id IS NOT NULL THEN
-                        SELECT s.report_coverage_through_date INTO date
-                        FROM transactions_schedulec s
-                        WHERE s.id = schedule_c_id;
-
-                    ELSE
-                        date := NULL;
-                    END IF;
-
-                    RETURN date;
-                END;
-                $$
-                LANGUAGE plpgsql;
-                """
-            ),
-        ),
-        migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_amount(
-                    schedule_a_contribution_amount NUMERIC,
-                    schedule_b_expenditure_amount NUMERIC,
-                    schedule_c_loan_amount NUMERIC,
-                    schedule_c2_guaranteed_amount NUMERIC,
-                    schedule_e_expenditure_amount NUMERIC,
-                    debt UUID, -- Reference to another transaction
-                    schedule_d_id UUID
-                )
-                RETURNS NUMERIC
-                AS $$
-                DECLARE
-                    debt_incurred_amount NUMERIC;
-                BEGIN
-                    IF debt IS NOT NULL THEN
-                        SELECT sd.incurred_amount
-                        INTO debt_incurred_amount
-                        FROM transactions_transaction t
-                        LEFT JOIN transactions_scheduled sd ON t.schedule_d_id = sd.id
-                        WHERE t.id = debt;
-                    ELSE
-                        debt_incurred_amount := NULL;
-                    END IF;
-
-                    RETURN COALESCE(
-                        schedule_a_contribution_amount,
-                        schedule_b_expenditure_amount,
-                        schedule_c_loan_amount,
-                        schedule_c2_guaranteed_amount,
-                        schedule_e_expenditure_amount,
-                        debt_incurred_amount,
-                        (
-                            SELECT incurred_amount
-                            FROM transactions_scheduled
-                            WHERE id = schedule_d_id
+                SELECT
+                    candidate_office,
+                    candidate_state,
+                    candidate_district INTO v_candidate_office,
+                    v_candidate_state,
+                    v_candidate_district
+                FROM contacts
+                WHERE id = txn.contact_2_id;
+                EXECUTE '
+                    UPDATE transactions_transaction AS t
+                    SET _calendar_ytd_per_election_office = tc.new_sum
+                    FROM (
+                        SELECT
+                            t.id,
+                            Coalesce(
+                                e.disbursement_date,
+                                e.dissemination_date
+                            ) as date,
+                            SUM(
+                                calculate_effective_amount(
+                                    t.transaction_type_identifier,
+                                    calculate_amount(
+                                        NULL,
+                                        NULL,
+                                        NULL,
+                                        NULL,
+                                        e.expenditure_amount,
+                                        t.debt_id,
+                                        t.schedule_d_id
+                                    ),
+                                t.schedule_c_id
+                                )
+                            ) OVER (ORDER BY Coalesce(
+                                e.disbursement_date,
+                                e.dissemination_date
+                            ), t.created) AS new_sum
+                        FROM transactions_schedulee e
+                            JOIN transactions_transaction t
+                                ON e.id = t.schedule_e_id
+                            JOIN contacts c
+                                ON t.contact_2_id = c.id
+                        WHERE
+                            e.election_code  = $1
+                            AND c.candidate_office = $2
+                            AND (
+                                c.candidate_state = $3
+                                OR (
+                                    c.candidate_state IS NULL
+                                    AND $3 = ''''
+                                )
+                            )
+                            AND (
+                                c.candidate_district = $4
+                                OR (
+                                    c.candidate_district IS NULL
+                                    AND $4 = ''''
+                                )
+                            )
+                            AND EXTRACT(YEAR FROM Coalesce(
+                                e.disbursement_date,
+                                e.dissemination_date
+                            )) = $5
+                            AND aggregation_group = $6
+                            AND force_unaggregated IS NOT TRUE
+                    ) AS tc
+                    WHERE t.id = tc.id
+                    AND (
+                        tc.date > $7
+                        OR (
+                            tc.date = $7
+                            AND t.created >= $8
                         )
                     );
-                END;
-                $$
-                LANGUAGE plpgsql;
-                """
-            ),
+                '
+                USING
+                    v_election_code,
+                    v_candidate_office,
+                    COALESCE(v_candidate_state, ''),
+                    COALESCE(v_candidate_district, ''),
+                    EXTRACT(YEAR FROM schedule_date),
+                    txn.aggregation_group,
+                    schedule_date,
+                    txn.created;
+            END;
+            $$
+            LANGUAGE plpgsql;
+            """
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
-                CREATE OR REPLACE FUNCTION calculate_loan_payment_to_date(
-                    txn RECORD, sql_committee_id TEXT
-                )
-                RETURNS VOID
-                AS $$
-                DECLARE
-                    pulled_forward_loans RECORD;
-                BEGIN
+            """
+            CREATE OR REPLACE FUNCTION calculate_effective_amount(
+                transaction_type_identifier TEXT,
+                amount NUMERIC,
+                schedule_c_id UUID
+            )
+            RETURNS NUMERIC
+            AS $$
+            DECLARE
+                effective_amount NUMERIC;
+            BEGIN
+                -- Case 1: transaction type is a refund
+                IF transaction_type_identifier IN (
+                    'TRIBAL_REFUND_NP_HEADQUARTERS_ACCOUNT',
+                    'TRIBAL_REFUND_NP_CONVENTION_ACCOUNT',
+                    'TRIBAL_REFUND_NP_RECOUNT_ACCOUNT',
+                    'INDIVIDUAL_REFUND_NP_HEADQUARTERS_ACCOUNT',
+                    'INDIVIDUAL_REFUND_NP_CONVENTION_ACCOUNT',
+                    'INDIVIDUAL_REFUND_NP_RECOUNT_ACCOUNT',
+                    'REFUND_PARTY_CONTRIBUTION',
+                    'REFUND_PARTY_CONTRIBUTION_VOID',
+                    'REFUND_PAC_CONTRIBUTION',
+                    'REFUND_PAC_CONTRIBUTION_VOID',
+                    'INDIVIDUAL_REFUND_NON_CONTRIBUTION_ACCOUNT',
+                    'BUSINESS_LABOR_REFUND_NON_CONTRIBUTION_ACCOUNT',
+                    'OTHER_COMMITTEE_REFUND_NON_CONTRIBUTION_ACCOUNT',
+                    'REFUND_UNREGISTERED_CONTRIBUTION',
+                    'REFUND_UNREGISTERED_CONTRIBUTION_VOID',
+                    'REFUND_INDIVIDUAL_CONTRIBUTION',
+                    'REFUND_INDIVIDUAL_CONTRIBUTION_VOID',
+                    'OTHER_COMMITTEE_REFUND_REFUND_NP_HEADQUARTERS_ACCOUNT',
+                    'OTHER_COMMITTEE_REFUND_REFUND_NP_CONVENTION_ACCOUNT',
+                    'OTHER_COMMITTEE_REFUND_REFUND_NP_RECOUNT_ACCOUNT'
+                ) THEN
+                    effective_amount := amount * -1;
+
+                -- Case 2: schedule_c exists (return NULL)
+                ELSIF schedule_c_id IS NOT NULL THEN
+                    effective_amount := NULL;
+
+                -- Default case: return the original amount
+                ELSE
+                    effective_amount := amount;
+                END IF;
+
+                RETURN effective_amount;
+            END;
+            $$
+            LANGUAGE plpgsql;
+            """
+        ),
+        migrations.RunSQL(
+            """
+            CREATE OR REPLACE FUNCTION calculate_is_loan(
+                loan UUID,
+                transaction_type_identifier TEXT,
+                schedule_c_id UUID
+            )
+            RETURNS TEXT
+            AS $$
+            DECLARE
+                loan_key TEXT;
+            BEGIN
+                IF loan IS NOT NULL AND transaction_type_identifier
+                    IN ('LOAN_REPAYMENT_RECEIVED', 'LOAN_REPAYMENT_MADE')
+                THEN
+                    loan_key := 'F';
+
+                ELSIF schedule_c_id IS NOT NULL THEN
+                    loan_key := 'T';
+
+                ELSE
+                    loan_key := 'F';
+                END IF;
+
+                RETURN loan_key;
+            END;
+            $$
+            LANGUAGE plpgsql;
+            """
+        ),
+        migrations.RunSQL(
+            """
+            CREATE OR REPLACE FUNCTION calculate_original_loan_id(
+                transaction_id text,
+                loan UUID,
+                transaction_type_identifier TEXT,
+                schedule_c_id UUID,
+                schedule_b_id UUID
+            )
+            RETURNS TEXT
+            AS $$
+            DECLARE
+                loan_transaction_id text;
+            BEGIN
+                IF loan IS NOT NULL AND transaction_type_identifier
+                    IN ('LOAN_REPAYMENT_RECEIVED', 'LOAN_REPAYMENT_MADE')
+                THEN
+                    SELECT t.transaction_id
+                    INTO loan_transaction_id
+                    FROM transactions_transaction t
+                    LEFT JOIN transactions_scheduleb sb
+                        ON t.schedule_b_id = sb.id
+                    WHERE t.id = loan;
+
+                ELSIF schedule_c_id IS NOT NULL THEN
+                    loan_transaction_id := transaction_id;
+
+                ELSE
+                    loan_transaction_id := NULL;
+                END IF;
+
+                RETURN loan_transaction_id;
+            END;
+            $$
+            LANGUAGE plpgsql;
+            """
+        ),
+        migrations.RunSQL(
+            """
+            CREATE OR REPLACE FUNCTION calculate_loan_date(
+                trans_id TEXT,
+                loan UUID,
+                transaction_type_identifier TEXT,
+                schedule_c_id UUID,
+                schedule_b_id UUID
+            )
+            RETURNS DATE
+            AS $$
+            DECLARE
+                date DATE;
+            BEGIN
+                IF loan IS NOT NULL AND transaction_type_identifier
+                    IN ('LOAN_REPAYMENT_RECEIVED', 'LOAN_REPAYMENT_MADE')
+                THEN
+                    SELECT sb.expenditure_date
+                    INTO date
+                    FROM transactions_transaction t
+                    LEFT JOIN transactions_scheduleb sb
+                        ON t.schedule_b_id = sb.id
+                    WHERE t.transaction_id = trans_id;
+
+                ELSIF schedule_c_id IS NOT NULL THEN
+                    SELECT s.report_coverage_through_date INTO date
+                    FROM transactions_schedulec s
+                    WHERE s.id = schedule_c_id;
+
+                ELSE
+                    date := NULL;
+                END IF;
+
+                RETURN date;
+            END;
+            $$
+            LANGUAGE plpgsql;
+            """
+        ),
+        migrations.RunSQL(
+            """
+            CREATE OR REPLACE FUNCTION calculate_amount(
+                schedule_a_contribution_amount NUMERIC,
+                schedule_b_expenditure_amount NUMERIC,
+                schedule_c_loan_amount NUMERIC,
+                schedule_c2_guaranteed_amount NUMERIC,
+                schedule_e_expenditure_amount NUMERIC,
+                debt UUID, -- Reference to another transaction
+                schedule_d_id UUID
+            )
+            RETURNS NUMERIC
+            AS $$
+            DECLARE
+                debt_incurred_amount NUMERIC;
+            BEGIN
+                IF debt IS NOT NULL THEN
+                    SELECT sd.incurred_amount
+                    INTO debt_incurred_amount
+                    FROM transactions_transaction t
+                    LEFT JOIN transactions_scheduled sd ON t.schedule_d_id = sd.id
+                    WHERE t.id = debt;
+                ELSE
+                    debt_incurred_amount := NULL;
+                END IF;
+
+                RETURN COALESCE(
+                    schedule_a_contribution_amount,
+                    schedule_b_expenditure_amount,
+                    schedule_c_loan_amount,
+                    schedule_c2_guaranteed_amount,
+                    schedule_e_expenditure_amount,
+                    debt_incurred_amount,
+                    (
+                        SELECT incurred_amount
+                        FROM transactions_scheduled
+                        WHERE id = schedule_d_id
+                    )
+                );
+            END;
+            $$
+            LANGUAGE plpgsql;
+            """
+        ),
+        migrations.RunSQL(
+            """
+            CREATE OR REPLACE FUNCTION calculate_loan_payment_to_date(
+                txn RECORD, sql_committee_id TEXT
+            )
+            RETURNS VOID
+            AS $$
+            DECLARE
+                pulled_forward_loans RECORD;
+            BEGIN
+                EXECUTE '
+                    UPDATE transactions_transaction AS t
+                    SET loan_payment_to_date = tc.new_sum
+                    FROM (
+                        SELECT
+                            data.id,
+                            data.original_loan_id,
+                            data.is_loan,
+                            SUM(data.effective_amount) OVER (
+                                PARTITION BY data.original_loan_id
+                                ORDER BY data.date
+                            ) AS new_sum
+                        FROM (
+                            SELECT
+                                t.id,
+                                calculate_loan_date(
+                                    t.transaction_id,
+                                    t.loan_id,
+                                    t.transaction_type_identifier,
+                                    t.schedule_c_id,
+                                    t.schedule_b_id
+                                ) AS date,
+                                calculate_original_loan_id(
+                                    t.transaction_id,
+                                    t.loan_id,
+                                    t.transaction_type_identifier,
+                                    t.schedule_c_id,
+                                    t.schedule_b_id
+                                ) AS original_loan_id,
+                                calculate_is_loan(
+                                    t.loan_id,
+                                    t.transaction_type_identifier,
+                                    t.schedule_c_id
+                                ) AS is_loan,
+                                calculate_effective_amount(
+                                    t.transaction_type_identifier,
+                                    calculate_amount(
+                                        sa.contribution_amount,
+                                        sb.expenditure_amount,
+                                        sc.loan_amount,
+                                        sc2.guaranteed_amount,
+                                        se.expenditure_amount,
+                                        t.debt_id,
+                                        t.schedule_d_id
+                                    ),
+                                    t.schedule_c_id
+                                ) AS effective_amount
+                            FROM transactions_transaction t
+                            LEFT JOIN transactions_schedulea sa
+                                ON t.schedule_a_id = sa.id
+                            LEFT JOIN transactions_scheduleb sb
+                                ON t.schedule_b_id = sb.id
+                            LEFT JOIN transactions_schedulec sc
+                                ON t.schedule_c_id = sc.id
+                            LEFT JOIN transactions_schedulec2 sc2
+                                ON t.schedule_c2_id = sc2.id
+                            LEFT JOIN transactions_schedulee se
+                                ON t.schedule_e_id = se.id
+                            WHERE t.deleted IS NULL
+                        ) AS data
+                        WHERE data.original_loan_id = (
+                            SELECT calculate_original_loan_id(
+                                t.transaction_id,
+                                t.loan_id,
+                                t.transaction_type_identifier,
+                                t.schedule_c_id,
+                                t.schedule_b_id
+                            )
+                            FROM transactions_transaction t
+                            WHERE t.id = COALESCE(
+                                (
+                                    SELECT loan_id
+                                    FROM transactions_transaction
+                                    WHERE id = $1
+                                ),
+                                $1
+                            )
+                        )
+                        AND data.date <= (
+                            SELECT calculate_loan_date(
+                                t.transaction_id,
+                                t.loan_id,
+                                t.transaction_type_identifier,
+                                t.schedule_c_id,
+                                t.schedule_b_id
+                            )
+                            FROM transactions_transaction t
+                            WHERE t.id = COALESCE(
+                                (
+                                    SELECT loan_id
+                                    FROM transactions_transaction
+                                    WHERE id = $1
+                                ),
+                                $1
+                            )
+                        )
+                    ) AS tc
+                    WHERE t.id = tc.id
+                    AND tc.is_loan = ''T'';
+                '
+                USING txn.id;
+
+                -- Handle pulled-forward loans
+                FOR pulled_forward_loans IN
+                    SELECT t.transaction_id
+                    FROM transactions_transaction t
+                    WHERE t.schedule_c_id IS NOT NULL
+                        AND t.loan_id =  txn.loan_id
+                LOOP
+                    -- Recalculate loan_payment_to_date for each pulled-forward loan
                     EXECUTE '
                         UPDATE transactions_transaction AS t
                         SET loan_payment_to_date = tc.new_sum
@@ -1501,128 +1564,17 @@ class Migration(migrations.Migration):
                                     ON t.schedule_e_id = se.id
                                 WHERE t.deleted IS NULL
                             ) AS data
-                            WHERE data.original_loan_id = (
-                                SELECT calculate_original_loan_id(
-                                    t.transaction_id,
-                                    t.loan_id,
-                                    t.transaction_type_identifier,
-                                    t.schedule_c_id,
-                                    t.schedule_b_id
-                                )
-                                FROM transactions_transaction t
-                                WHERE t.id = COALESCE(
-                                    (
-                                        SELECT loan_id
-                                        FROM transactions_transaction
-                                        WHERE id = $1
-                                    ),
-                                    $1
-                                )
-                            )
-                            AND data.date <= (
-                                SELECT calculate_loan_date(
-                                    t.transaction_id,
-                                    t.loan_id,
-                                    t.transaction_type_identifier,
-                                    t.schedule_c_id,
-                                    t.schedule_b_id
-                                )
-                                FROM transactions_transaction t
-                                WHERE t.id = COALESCE(
-                                    (
-                                        SELECT loan_id
-                                        FROM transactions_transaction
-                                        WHERE id = $1
-                                    ),
-                                    $1
-                                )
-                            )
+                            WHERE data.original_loan_id = $1
                         ) AS tc
                         WHERE t.id = tc.id
                         AND tc.is_loan = ''T'';
                     '
-                    USING txn.id;
-
-                    -- Handle pulled-forward loans
-                    FOR pulled_forward_loans IN
-                        SELECT t.transaction_id
-                        FROM transactions_transaction t
-                        WHERE t.schedule_c_id IS NOT NULL
-                          AND t.loan_id =  txn.loan_id
-                    LOOP
-                        -- Recalculate loan_payment_to_date for each pulled-forward loan
-                        EXECUTE '
-                            UPDATE transactions_transaction AS t
-                            SET loan_payment_to_date = tc.new_sum
-                            FROM (
-                                SELECT
-                                    data.id,
-                                    data.original_loan_id,
-                                    data.is_loan,
-                                    SUM(data.effective_amount) OVER (
-                                        PARTITION BY data.original_loan_id
-                                        ORDER BY data.date
-                                    ) AS new_sum
-                                FROM (
-                                    SELECT
-                                        t.id,
-                                        calculate_loan_date(
-                                            t.transaction_id,
-                                            t.loan_id,
-                                            t.transaction_type_identifier,
-                                            t.schedule_c_id,
-                                            t.schedule_b_id
-                                        ) AS date,
-                                        calculate_original_loan_id(
-                                            t.transaction_id,
-                                            t.loan_id,
-                                            t.transaction_type_identifier,
-                                            t.schedule_c_id,
-                                            t.schedule_b_id
-                                        ) AS original_loan_id,
-                                        calculate_is_loan(
-                                            t.loan_id,
-                                            t.transaction_type_identifier,
-                                            t.schedule_c_id
-                                        ) AS is_loan,
-                                        calculate_effective_amount(
-                                            t.transaction_type_identifier,
-                                            calculate_amount(
-                                                sa.contribution_amount,
-                                                sb.expenditure_amount,
-                                                sc.loan_amount,
-                                                sc2.guaranteed_amount,
-                                                se.expenditure_amount,
-                                                t.debt_id,
-                                                t.schedule_d_id
-                                            ),
-                                            t.schedule_c_id
-                                        ) AS effective_amount
-                                    FROM transactions_transaction t
-                                    LEFT JOIN transactions_schedulea sa
-                                        ON t.schedule_a_id = sa.id
-                                    LEFT JOIN transactions_scheduleb sb
-                                        ON t.schedule_b_id = sb.id
-                                    LEFT JOIN transactions_schedulec sc
-                                        ON t.schedule_c_id = sc.id
-                                    LEFT JOIN transactions_schedulec2 sc2
-                                        ON t.schedule_c2_id = sc2.id
-                                    LEFT JOIN transactions_schedulee se
-                                        ON t.schedule_e_id = se.id
-                                    WHERE t.deleted IS NULL
-                                ) AS data
-                                WHERE data.original_loan_id = $1
-                            ) AS tc
-                            WHERE t.id = tc.id
-                            AND tc.is_loan = ''T'';
-                        '
-                        USING pulled_forward_loans.transaction_id;
-                    END LOOP;
-                END;
-                $$
-                LANGUAGE plpgsql;
-                """
-            ),
+                    USING pulled_forward_loans.transaction_id;
+                END LOOP;
+            END;
+            $$
+            LANGUAGE plpgsql;
+            """
         ),
         migrations.RunPython(
             code=_load_callable(
@@ -1781,8 +1733,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
                     txn RECORD, sql_committee_id text
                 )
@@ -1893,10 +1844,8 @@ class Migration(migrations.Migration):
                 END;
                 $$
                 LANGUAGE plpgsql;
-                """
-            ),
-            reverse_sql=_strip_sql(
-                """
+            """,
+            reverse_sql="""
                 CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
                     txn RECORD, sql_committee_id text
                 )
@@ -2005,8 +1954,7 @@ class Migration(migrations.Migration):
                 END;
                 $$
                 LANGUAGE plpgsql;
-                """
-            ),
+            """,
         ),
         migrations.RunPython(
             code=_load_callable(
@@ -2033,8 +1981,7 @@ class Migration(migrations.Migration):
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 CREATE OR REPLACE FUNCTION public.calculate_loan_payment_to_date(
                     txn record, sql_committee_id text
                 )
@@ -2150,8 +2097,7 @@ class Migration(migrations.Migration):
                 END;
                 $$
                 LANGUAGE plpgsql;
-                """
-            ),
+            """,
         ),
         migrations.AddField(
             model_name="scheduled",
@@ -2197,8 +2143,7 @@ class Migration(migrations.Migration):
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 -- Drop all aggregate-related triggers from
                 -- transactions_transaction table
                 DROP TRIGGER IF EXISTS calculate_aggregates_trigger
@@ -2210,10 +2155,8 @@ class Migration(migrations.Migration):
                     ON transactions_transaction;
                 DROP TRIGGER IF EXISTS before_transactions_transaction_trigger
                     ON transactions_transaction;
-                """
-            ),
-            reverse_sql=_strip_sql(
-                """
+            """,
+            reverse_sql="""
                 -- Recreate triggers for aggregate calculation
                 CREATE TRIGGER before_transactions_transaction_trigger
                 BEFORE INSERT OR UPDATE ON transactions_transaction
@@ -2230,20 +2173,16 @@ class Migration(migrations.Migration):
                 FOR EACH ROW
                 WHEN (pg_trigger_depth() = 0)
                 EXECUTE FUNCTION after_transactions_transaction();
-                """
-            ),
+            """,
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 -- Drop the calculate_entity_aggregates function
                 DROP FUNCTION IF EXISTS calculate_entity_aggregates(
                     txn RECORD, sql_committee_id TEXT, temp_table_name TEXT
                 ) CASCADE;
-                """
-            ),
-            reverse_sql=_strip_sql(
-                """
+            """,
+            reverse_sql="""
                 -- Recreate calculate_entity_aggregates function
                 CREATE OR REPLACE FUNCTION calculate_entity_aggregates(
                     txn RECORD,
@@ -2291,20 +2230,16 @@ class Migration(migrations.Migration):
                         txn.aggregation_group;
                 END;
                 $$ LANGUAGE plpgsql;
-                """
-            ),
+            """,
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 -- Drop the calculate_calendar_ytd_per_election_office function
                 DROP FUNCTION IF EXISTS calculate_calendar_ytd_per_election_office(
                     txn RECORD, sql_committee_id TEXT, temp_table_name TEXT
                 ) CASCADE;
-                """
-            ),
-            reverse_sql=_strip_sql(
-                """
+            """,
+            reverse_sql="""
                 -- Recreate calculate_calendar_ytd_per_election_office function
                 CREATE OR REPLACE FUNCTION calculate_calendar_ytd_per_election_office(
                     txn RECORD, sql_committee_id text
@@ -2414,21 +2349,17 @@ class Migration(migrations.Migration):
                         txn.committee_account_id;
                 END;
                 $$ LANGUAGE plpgsql;
-                """
-            ),
+            """,
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 -- Drop the calculate_effective_amount function
                 DROP FUNCTION IF EXISTS calculate_effective_amount(
                     transaction_type_identifier TEXT, amount NUMERIC,
                     schedule_c_id UUID
                 ) CASCADE;
-                """
-            ),
-            reverse_sql=_strip_sql(
-                """
+            """,
+            reverse_sql="""
                 -- Recreate calculate_effective_amount function
                 CREATE OR REPLACE FUNCTION calculate_effective_amount(
                     transaction_type_identifier TEXT,
@@ -2476,12 +2407,10 @@ class Migration(migrations.Migration):
                     RETURN effective_amount;
                 END;
                 $$ LANGUAGE plpgsql;
-                """
-            ),
+            """,
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 -- Drop the calculate_amount function if it exists
                 DROP FUNCTION IF EXISTS calculate_amount(
                     contribution_amount NUMERIC,
@@ -2492,10 +2421,8 @@ class Migration(migrations.Migration):
                     debt_id UUID,
                     schedule_d_id UUID
                 ) CASCADE;
-                """
-            ),
-            reverse_sql=_strip_sql(
-                """
+            """,
+            reverse_sql="""
                 -- Recreate calculate_amount function
                 CREATE OR REPLACE FUNCTION calculate_amount(
                     schedule_a_contribution_amount NUMERIC,
@@ -2533,20 +2460,16 @@ class Migration(migrations.Migration):
                     );
                 END;
                 $$ LANGUAGE plpgsql;
-                """
-            ),
+            """,
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 -- Drop the calculate_loan_payment_to_date function if it exists
                 DROP FUNCTION IF EXISTS calculate_loan_payment_to_date(
                     txn RECORD, sql_committee_id TEXT, temp_table_name TEXT
                 ) CASCADE;
-                """
-            ),
-            reverse_sql=_strip_sql(
-                """
+            """,
+            reverse_sql="""
                 -- Recreate calculate_loan_payment_to_date function
                 CREATE OR REPLACE FUNCTION public.calculate_loan_payment_to_date(
                     txn record, sql_committee_id text
@@ -2658,12 +2581,10 @@ class Migration(migrations.Migration):
                     USING txn.id, txn.loan_id;
                 END;
                 $$ LANGUAGE plpgsql;
-                """
-            ),
+            """,
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 -- Drop the trigger handler functions
                 DROP FUNCTION IF EXISTS after_transactions_transaction()
                     CASCADE;
@@ -2677,10 +2598,8 @@ class Migration(migrations.Migration):
                 DROP FUNCTION IF EXISTS
                     after_transactions_transaction_insert_or_update()
                     CASCADE;
-                """
-            ),
-            reverse_sql=_strip_sql(
-                """
+            """,
+            reverse_sql="""
                 -- Recreate trigger handler functions
                 CREATE OR REPLACE FUNCTION before_transactions_transaction()
                 RETURNS TRIGGER AS $$
@@ -2712,22 +2631,18 @@ class Migration(migrations.Migration):
                     RETURN NEW;
                 END;
                 $$ LANGUAGE plpgsql;
-                """
-            ),
+            """,
         ),
         migrations.RunSQL(
-            sql=_strip_sql(
-                """
+            sql="""
                 -- Drop the main calculate_aggregates function that was
                 -- called by triggers
                 DROP FUNCTION IF EXISTS calculate_aggregates(
                     old RECORD, new RECORD, tg_op TEXT
                 ) CASCADE;
                 DROP FUNCTION IF EXISTS calculate_aggregates() CASCADE;
-                """
-            ),
-            reverse_sql=_strip_sql(
-                """
+            """,
+            reverse_sql="""
                 -- Recreate calculate_aggregates function
                 CREATE OR REPLACE FUNCTION calculate_aggregates(
                     OLD RECORD,
@@ -2777,8 +2692,7 @@ class Migration(migrations.Migration):
                     RETURN NEW;
                 END;
                 $$ LANGUAGE plpgsql;
-                """
-            ),
+            """,
         ),
         migrations.AlterField(
             model_name="transaction",
