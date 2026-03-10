@@ -64,6 +64,8 @@ class Migration(migrations.Migration):
                 ("fec_image_url", models.CharField(max_length=255, null=True)),
                 ("fec_batch_id", models.CharField(max_length=255, null=True)),
                 ("fec_email", models.CharField(max_length=255, null=True)),
+                ("task_completed", models.DateTimeField(null=True)),
+                ("fecfile_polling_attempts", models.IntegerField(default=0)),
                 (
                     "dot_fec",
                     models.ForeignKey(
@@ -98,6 +100,8 @@ class Migration(migrations.Migration):
                 ("created", models.DateTimeField(auto_now_add=True)),
                 ("updated", models.DateTimeField(auto_now=True)),
                 ("fec_report_id", models.CharField(max_length=255, null=True)),
+                ("task_completed", models.DateTimeField(null=True)),
+                ("fecfile_polling_attempts", models.IntegerField(default=0)),
                 (
                     "dot_fec",
                     models.ForeignKey(

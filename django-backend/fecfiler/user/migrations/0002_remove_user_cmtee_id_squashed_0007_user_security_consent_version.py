@@ -4,7 +4,6 @@ import django.db.migrations.operations.special
 import fecfiler.user.managers
 from django.db import migrations, models
 from django.db.models import Q
-from django_migration_linter import IgnoreMigration
 
 
 def remove_old_login_accounts(apps, schema_editor):
@@ -38,11 +37,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        IgnoreMigration(),
-        migrations.RemoveField(
-            model_name="user",
-            name="cmtee_id",
-        ),
         migrations.AlterField(
             model_name="user",
             name="first_name",
@@ -55,7 +49,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="user",
-            name="security_consent_date",
+            name="security_consent_exp_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AlterModelManagers(
@@ -63,11 +57,6 @@ class Migration(migrations.Migration):
             managers=[
                 ("objects", fecfiler.user.managers.UserManager()),
             ],
-        ),
-        migrations.RenameField(
-            model_name="user",
-            old_name="security_consent_date",
-            new_name="security_consent_exp_date",
         ),
         migrations.RunPython(
             code=remove_old_login_accounts,

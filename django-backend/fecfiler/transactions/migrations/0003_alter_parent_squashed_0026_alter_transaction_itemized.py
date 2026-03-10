@@ -17,19 +17,9 @@ from fecfiler.transactions.schedule_b.managers import (
 from fecfiler.transactions.utils_aggregation_queries import (
     filter_queryset_for_previous_transactions_in_aggregation,
 )
-from django_migration_linter import IgnoreMigration
 
 
 logger = structlog.get_logger(__name__)
-
-
-# Inlined from 0004_report_transactions_link_table
-def add_link_table(apps, schema_editor):
-    transaction = apps.get_model("transactions", "Transaction")
-
-    for t in transaction.objects.all():
-        t.reports.add(t.report)
-        t.save()
 
 
 # Inlined from 0005_schedulec_report_coverage_from_date_and_more
@@ -996,7 +986,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        IgnoreMigration(),
         migrations.AlterField(
             model_name="transaction",
             name="parent_transaction",
@@ -1014,14 +1003,6 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(
                 through="reports.ReportTransaction", to="reports.report"
             ),
-        ),
-        migrations.RunPython(
-            code=add_link_table,
-            reverse_code=django.db.migrations.operations.special.RunPython.noop,
-        ),
-        migrations.RemoveField(
-            model_name="transaction",
-            name="report",
         ),
         migrations.AddField(
             model_name="schedulec",

@@ -3,11 +3,9 @@
 import django.core.validators
 import django.db.migrations.operations.special
 import django.db.models.deletion
-import django.utils.timezone
 import uuid
 from django.conf import settings
 from django.db import migrations, models
-from django_migration_linter import IgnoreMigration
 
 
 def create_memberships(apps, schema_editor):
@@ -96,7 +94,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        IgnoreMigration(),
         migrations.CreateModel(
             name="CommitteeAccount",
             fields=[
@@ -135,11 +132,12 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.AutoField(
-                        auto_created=True,
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
                         primary_key=True,
                         serialize=False,
-                        verbose_name="ID",
+                        unique=True,
                     ),
                 ),
                 (
@@ -147,14 +145,21 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[
                             ("COMMITTEE_ADMINISTRATOR", "Committee Administrator"),
-                            ("REVIEWER", "Reviewer"),
+                            ("MANAGER", "Manager"),
                         ],
                         max_length=25,
                     ),
                 ),
                 (
+                    "pending_email",
+                    models.EmailField(blank=True, max_length=254, null=True),
+                ),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                ("updated", models.DateTimeField(auto_now=True)),
+                (
                     "committee_account",
                     models.ForeignKey(
+                        null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         to="committee_accounts.committeeaccount",
                     ),
@@ -162,6 +167,7 @@ class Migration(migrations.Migration):
                 (
                     "user",
                     models.ForeignKey(
+                        null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         to=settings.AUTH_USER_MODEL,
                     ),
@@ -172,72 +178,14 @@ class Migration(migrations.Migration):
             model_name="committeeaccount",
             name="members",
             field=models.ManyToManyField(
-                through="committee_accounts.Membership", to=settings.AUTH_USER_MODEL
+                through="committee_accounts.Membership",
+                through_fields=("committee_account", "user"),
+                to=settings.AUTH_USER_MODEL,
             ),
         ),
         migrations.RunPython(
             code=create_memberships,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
-        ),
-        migrations.AddField(
-            model_name="membership",
-            name="pending_email",
-            field=models.EmailField(blank=True, max_length=254, null=True),
-        ),
-        migrations.AddField(
-            model_name="membership",
-            name="uuid",
-            field=models.UUIDField(default=uuid.uuid4, editable=False, serialize=False),
-        ),
-        migrations.RunPython(
-            code=generate_new_uuid,
-            reverse_code=django.db.migrations.operations.special.RunPython.noop,
-        ),
-        migrations.RemoveField(
-            model_name="membership",
-            name="id",
-        ),
-        migrations.RenameField(
-            model_name="membership",
-            old_name="uuid",
-            new_name="id",
-        ),
-        migrations.AlterField(
-            model_name="membership",
-            name="id",
-            field=models.UUIDField(
-                default=uuid.uuid4,
-                editable=False,
-                primary_key=True,
-                serialize=False,
-                unique=True,
-            ),
-        ),
-        migrations.AlterField(
-            model_name="membership",
-            name="user",
-            field=models.ForeignKey(
-                null=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                to=settings.AUTH_USER_MODEL,
-            ),
-        ),
-        migrations.AddField(
-            model_name="membership",
-            name="created",
-            field=models.DateTimeField(
-                auto_now_add=True, default=django.utils.timezone.now
-            ),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name="membership",
-            name="updated",
-            field=models.DateTimeField(auto_now=True),
-        ),
-        migrations.RunPython(
-            code=django.db.migrations.operations.special.RunPython.noop,
-            reverse_code=delete_pending_memberships,
         ),
         migrations.RunPython(
             code=delete_memberships_with_overlapping_emails,
@@ -246,34 +194,5 @@ class Migration(migrations.Migration):
         migrations.RunPython(
             code=remove_pending_emails,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
-        ),
-        migrations.AlterField(
-            model_name="membership",
-            name="committee_account",
-            field=models.ForeignKey(
-                null=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                to="committee_accounts.committeeaccount",
-            ),
-        ),
-        migrations.AlterField(
-            model_name="membership",
-            name="role",
-            field=models.CharField(
-                choices=[
-                    ("COMMITTEE_ADMINISTRATOR", "Committee Administrator"),
-                    ("MANAGER", "Manager"),
-                ],
-                max_length=25,
-            ),
-        ),
-        migrations.AlterField(
-            model_name="committeeaccount",
-            name="members",
-            field=models.ManyToManyField(
-                through="committee_accounts.Membership",
-                through_fields=("committee_account", "user"),
-                to=settings.AUTH_USER_MODEL,
-            ),
         ),
     ]
