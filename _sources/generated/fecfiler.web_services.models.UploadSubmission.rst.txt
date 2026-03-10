@@ -59,6 +59,7 @@ fecfiler.web\_services.models.UploadSubmission
    .. autosummary::
    
       ~UploadSubmission.created
+      ~UploadSubmission.date_filed
       ~UploadSubmission.dot_fec
       ~UploadSubmission.dot_fec_id
       ~UploadSubmission.fec_message
