@@ -9,7 +9,8 @@ from decimal import Decimal
 from typing import Optional, Dict, Any
 from uuid import UUID
 
-from django.db.models import Q, F, Value
+from django.db.models import Q, F, Value, OuterRef, Subquery, Func
+from django.db.models.functions import Coalesce
 from django.db.models.fields import DecimalField
 import structlog
 
@@ -688,71 +689,45 @@ def calculate_loan_payment_to_date(transaction_model, loan_id: UUID) -> int:
     """
     # Get the loan transaction
     try:
-        loan = (
-            transaction_model
-            .objects.select_related("loan", "loan__schedule_c")
-            .get(id=loan_id, deleted__isnull=True)
-        )
+        loan = transaction_model.objects.select_related("schedule_c").get(id=loan_id)
     except transaction_model.DoesNotExist:
         logger.warning(f"Loan transaction {loan_id} not found")
         return 0
 
-    # Collect all loan IDs in the parent chain (for carried forward loans)
-    # Carried forward loans reference their parent via the 'loan' field
-    original_loan = loan
-    if loan.loan_id:
-        original_loan = loan.loan
-
-    loan_ids = [original_loan.id]
-
-    child_loan_ids = transaction_model.objects.filter(
-        loan_id=original_loan.id,
-        schedule_c__isnull=False,
-        deleted__isnull=True
-    ).order_by("schedule_c__report_coverage_through_date").values("id")
-
-    for loan_id_dict in child_loan_ids:
-        loan_ids.append(loan_id_dict["id"])
-
-    repayments_to_date = 0
-    loans_to_save = []
-    for loan_id in loan_ids:
-        current_loan = transaction_model.objects.get(id=loan_id)
-        loan_report = current_loan.reports.first()
-        repayments = transaction_model.objects.filter(
-            Q(
-                schedule_b__isnull=False,
-                transaction_type_identifier="LOAN_REPAYMENT_MADE",
-                schedule_b__expenditure_date__lte=loan_report.coverage_through_date,
-            ) | Q(
-                schedule_a__isnull=False,
-                transaction_type_identifier="LOAN_REPAYMENT_RECEIVED",
-                schedule_a__contribution_date__lte=loan_report.coverage_through_date,
-            ),
-            loan_id__in=loan_ids,
-            deleted__isnull=True,
-        ).order_by("date", "created").select_related("schedule_a", "schedule_b")
-
-        # Calculate the cumulative payment amount
-        total_payment = Decimal(0)
-        for repayment in repayments:
-            if repayment.schedule_b and repayment.schedule_b.expenditure_amount:
-                total_payment += repayment.schedule_b.expenditure_amount
-            elif repayment.schedule_a and repayment.schedule_a.contribution_amount:
-                total_payment += repayment.schedule_a.contribution_amount
-
-        repayments_to_date = total_payment
-        print(total_payment)
-        current_loan.loan_payment_to_date = repayments_to_date
-        loans_to_save.append(current_loan)
-        logger.info(
-            f"Updating loan_payment_to_date for loan {loan_id}: {repayments_to_date}"
+    loan_payment_to_date_subquery = Coalesce(
+        Subquery(
+            transaction_model.objects.filter(
+                Q(
+                    schedule_b__isnull=False,
+                    transaction_type_identifier="LOAN_REPAYMENT_MADE",
+                    schedule_b__expenditure_date__lte=OuterRef("report_through_date"),
+                )
+                | Q(
+                    schedule_a__isnull=False,
+                    transaction_type_identifier="LOAN_REPAYMENT_RECEIVED",
+                    schedule_a__contribution_date__lte=OuterRef("report_through_date"),
+                ),
+                loan__transaction_id=OuterRef("transaction_id"),
+            )
+            .order_by()
+            .annotate(payment_to_date=Func(F("amount"), function="SUM"))
+            .values("payment_to_date")[:1]
+        ),
+        Decimal(0),
+    )
+    return (
+        transaction_model.objects.filter(
+            Q(transaction_id=loan.transaction_id),
+            schedule_c__isnull=False,
         )
-
-    transaction_model.objects.bulk_update(
-        loans_to_save,
-        ["loan_payment_to_date"],
-        batch_size=64
+        .annotate(
+            report_through_date=Subquery(
+                transaction_model.objects.filter(id=OuterRef("id")).values(
+                    "schedule_c__report_coverage_through_date"
+                )[:1]
+            )
+        )
+        .update(loan_payment_to_date=loan_payment_to_date_subquery)
     )
 
 

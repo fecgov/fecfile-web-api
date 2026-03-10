@@ -10,6 +10,7 @@ from fecfiler.transactions.views import TransactionViewSet, TransactionOrderingF
 from fecfiler.transactions.models import Transaction
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.transactions.utils_aggregation_service import calculate_loan_payment_to_date
 from fecfiler.contacts.tests.utils import (
     create_test_committee_contact,
     create_test_individual_contact,
@@ -922,8 +923,12 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             form_type="SC/10",
             loan_incurred_date="2025-01-01",
             report=q1_report,
-            type="LOAN_BY_COMMITTEE"
+            type="LOAN_BY_COMMITTEE",
         )
+
+        # test calculate_loan_payment_to_date does not fail with
+        # no repayments
+        calculate_loan_payment_to_date(Transaction, original_loan.id)
 
         # carry forward to additional reports
         create_form3x(self.committee, "2025-04-01", "2025-06-30", {})
@@ -964,8 +969,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         # ensure that the balance is updated appropriately on carried forward loans
         child_loans = Transaction.objects.filter(
-            loan_id=original_loan.id,
-            schedule_c__isnull=False
+            loan_id=original_loan.id, schedule_c__isnull=False
         )
 
         self.assertEqual(child_loans.count(), 4)
