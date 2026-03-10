@@ -7,13 +7,18 @@ import uuid
 
 class Migration(migrations.Migration):
 
+    replaces = [
+        ('reports', '0005_remove_form1m_iii_candidate_district_and_more'),
+        ('reports', '0006_reporttransaction'),
+    ]
+
     dependencies = [
         (
             "committee_accounts",
             "0001_squashed_0007_alter_committeeaccount_members",
         ),
-        ('transactions', '0002_remove_schedulea_contributor_city_and_more'),
-        ('reports', '0005_remove_form1m_iii_candidate_district_and_more'),
+        ('transactions', '0001_initial'),
+        ('reports', '0004_form1m_date_committee_met_requirements_and_more'),
     ]
 
     operations = [

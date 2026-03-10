@@ -193,7 +193,7 @@ class Migration(migrations.Migration):
     ]
 
     dependencies = [
-        ("reports", "0006_reporttransaction"),
+        ("reports", "0005_remove_form1m_squashed_0006_reporttransaction"),
     ]
 
     operations = [

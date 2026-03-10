@@ -952,6 +952,7 @@ def run_aggregations_for_all_debts(apps, schema_editor):
 class Migration(migrations.Migration):
 
     replaces = [
+        ("transactions", "0002_remove_schedulea_contributor_city_and_more"),
         ("transactions", "0003_alter_transaction_parent_transaction"),
         ("transactions", "0004_report_transactions_link_table"),
         ("transactions", "0005_schedulec_report_coverage_from_date_and_more"),
@@ -980,9 +981,9 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("contacts", "0001_initial"),
-        ("reports", "0006_reporttransaction"),
+        ("reports", "0005_remove_form1m_squashed_0006_reporttransaction"),
         ("reports", "0007_remove_report_deleted_squashed_00019_form24_name_fix"),
-        ("transactions", "0002_remove_schedulea_contributor_city_and_more"),
+        ("transactions", "0001_initial"),
     ]
 
     operations = [
