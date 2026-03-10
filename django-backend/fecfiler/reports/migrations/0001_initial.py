@@ -9,7 +9,10 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("committee_accounts", "0001_initial"),
+        (
+            "committee_accounts",
+            "0001_squashed_0007_alter_committeeaccount_members",
+        ),
     ]
 
     operations = [
