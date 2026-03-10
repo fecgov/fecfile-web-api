@@ -9,7 +9,7 @@ from decimal import Decimal
 from typing import Optional, Dict, Any
 from uuid import UUID
 
-from django.db.models import Q, F, Value, Subquery, OuterRef, Sum, Func
+from django.db.models import Q, F, Value, Subquery, OuterRef, Func
 from django.db.models.fields import DecimalField
 from django.db.models.functions import Coalesce
 import structlog
