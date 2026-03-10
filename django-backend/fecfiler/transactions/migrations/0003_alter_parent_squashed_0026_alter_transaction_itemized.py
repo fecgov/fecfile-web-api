@@ -991,7 +991,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ("contacts", "0001_initial"),
         ("reports", "0006_reporttransaction"),
-        ("reports", "0007_0007_remove_report_deleted_squashed_00019_form24_name_fix"),
+        ("reports", "0007_remove_report_deleted_squashed_00019_form24_name_fix"),
         ("transactions", "0002_remove_schedulea_contributor_city_and_more"),
     ]
 
