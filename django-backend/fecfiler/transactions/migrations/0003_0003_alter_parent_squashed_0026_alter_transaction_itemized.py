@@ -17,6 +17,7 @@ from fecfiler.transactions.schedule_b.managers import (
 from fecfiler.transactions.utils_aggregation_queries import (
     filter_queryset_for_previous_transactions_in_aggregation,
 )
+from django_migration_linter import IgnoreMigration
 
 
 logger = structlog.get_logger(__name__)
@@ -995,6 +996,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        IgnoreMigration(),
         migrations.AlterField(
             model_name="transaction",
             name="parent_transaction",

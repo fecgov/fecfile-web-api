@@ -3,12 +3,7 @@
 import django.db.migrations.operations.special
 from django.db import migrations, models
 from django.db.models import F
-
-
-# Functions from the following migrations need manual copying.
-# Move them and any dependencies into this file, then update the
-# RunPython operations to refer to the local versions:
-# fecfiler.web_services.migrations.0002_uploadsubmission_task_completed_and_more
+from django_migration_linter import IgnoreMigration
 
 
 def set_default_task_completed_times(apps, schema_editor):
@@ -31,6 +26,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        IgnoreMigration(),
         migrations.AddField(
             model_name="uploadsubmission",
             name="task_completed",

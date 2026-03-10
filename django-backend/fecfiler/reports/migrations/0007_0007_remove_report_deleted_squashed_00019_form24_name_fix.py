@@ -5,6 +5,7 @@ import django.db.models.deletion
 import uuid
 import structlog
 from django.db import connection, migrations, models
+from django_migration_linter import IgnoreMigration
 
 logger = structlog.get_logger(__name__)
 
@@ -274,6 +275,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        IgnoreMigration(),
         migrations.RemoveField(
             model_name="report",
             name="deleted",

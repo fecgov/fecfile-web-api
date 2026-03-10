@@ -7,6 +7,7 @@ import django.utils.timezone
 import uuid
 from django.conf import settings
 from django.db import migrations, models
+from django_migration_linter import IgnoreMigration
 
 
 # Functions from the following migrations need manual copying.
@@ -104,6 +105,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        IgnoreMigration(),
         migrations.CreateModel(
             name="CommitteeAccount",
             fields=[

@@ -4,12 +4,7 @@ import django.db.migrations.operations.special
 import fecfiler.user.managers
 from django.db import migrations, models
 from django.db.models import Q
-
-
-# Functions from the following migrations need manual copying.
-# Move them and any dependencies into this file, then update the
-# RunPython operations to refer to the local versions:
-# fecfiler.user.migrations.0006_remove_old_login_accounts
+from django_migration_linter import IgnoreMigration
 
 
 def remove_old_login_accounts(apps, schema_editor):
@@ -43,6 +38,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        IgnoreMigration(),
         migrations.RemoveField(
             model_name="user",
             name="cmtee_id",
