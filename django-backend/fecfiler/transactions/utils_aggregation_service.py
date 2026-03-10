@@ -675,9 +675,9 @@ def calculate_loan_payment_to_date(transaction_model, loan_id: UUID) -> int:
     """
     Calculate the cumulative loan payment to date for a given loan.
 
-    Sums all LOAN_REPAYMENT_MADE transactions associated with the loan,
-    ordered by date and creation time. For carried forward loans, also includes
-    repayments from the parent loan chain.
+    Sums all LOAN_REPAYMENT_MADE and LOAN_REPAYMENT_RECEIVED transactions
+    associated with the loan, ordered by date and creation time.
+    For carried forward loans, also includes repayments from the parent loan chain.
 
     Args:
         transaction_model: Transaction model class
@@ -699,34 +699,39 @@ def calculate_loan_payment_to_date(transaction_model, loan_id: UUID) -> int:
 
     # Collect all loan IDs in the parent chain (for carried forward loans)
     # Carried forward loans reference their parent via the 'loan' field
-    loan_ids = [loan_id]
-    current_loan = loan
+    original_loan = loan
+    if loan.loan_id:
+        original_loan = loan.loan
 
-    # Walk up the loan chain to find the original loan
-    max_depth = 10  # Prevent infinite loops
-    depth = 0
-    while current_loan.loan_id and depth < max_depth:
-        parent_loan = current_loan.loan
-        if parent_loan and parent_loan.schedule_c:
-            loan_ids.append(parent_loan.id)
-            current_loan = parent_loan
-            depth += 1
-        else:
-            break
+    loan_ids = [original_loan.id]
+
+    child_loan_ids = transaction_model.objects.filter(
+        loan_id=original_loan.id
+    ).order_by("schedule_c__report_coverage_through_date").values("id")
+
+    for loan_id_dict in child_loan_ids:
+        loan_ids.append(loan_id_dict["id"])
 
     # Get all loan repayment transactions for all loans in the chain
     repayments = transaction_model.objects.filter(
+        Q(
+            schedule_b__isnull=False,
+            transaction_type_identifier="LOAN_REPAYMENT_MADE",
+        ) | Q(
+            schedule_a__isnull=False,
+            transaction_type_identifier="LOAN_REPAYMENT_RECEIVED",
+        ),
         loan_id__in=loan_ids,
-        transaction_type_identifier="LOAN_REPAYMENT_MADE",
         deleted__isnull=True,
-        schedule_b__isnull=False,
-    ).order_by("date", "created").select_related("schedule_b")
+    ).order_by("date", "created").select_related("schedule_a", "schedule_b")
 
     # Calculate the cumulative payment amount
     total_payment = Decimal(0)
     for repayment in repayments:
         if repayment.schedule_b and repayment.schedule_b.expenditure_amount:
             total_payment += repayment.schedule_b.expenditure_amount
+        if repayment.schedule_a and repayment.schedule_a.contribution_amount:
+            total_payment += repayment.schedule_a.contribution_amount
 
     # Update the loan transaction's loan_payment_to_date field
     if loan.loan_payment_to_date != total_payment:
@@ -775,8 +780,11 @@ def recalculate_aggregates_for_transaction(
     try:
         if schedule in CONTACT_AGGREGATE_SCHEDULES:
             # If this is a loan repayment, recalculate loan_payment_to_date
-            if (transaction_instance.transaction_type_identifier == "LOAN_REPAYMENT_MADE"
-                    and transaction_instance.loan_id):
+            if (
+                transaction_instance.transaction_type_identifier in [
+                    "LOAN_REPAYMENT_MADE", "LOAN_REPAYMENT_RECEIVED"
+                ] and transaction_instance.loan_id
+            ):
                 calculate_loan_payment_to_date(
                     transaction_model, transaction_instance.loan_id
                 )
