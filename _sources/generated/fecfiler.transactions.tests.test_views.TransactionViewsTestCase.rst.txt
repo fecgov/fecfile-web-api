@@ -85,6 +85,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.countTestCases
       ~TransactionViewsTestCase.create_debt_repayment_payload
       ~TransactionViewsTestCase.create_loan_repayment_payload
+      ~TransactionViewsTestCase.create_loan_repayment_received_payload
       ~TransactionViewsTestCase.create_schedule_f_debt_repayment_payload
       ~TransactionViewsTestCase.create_trans_from_data
       ~TransactionViewsTestCase.debug
@@ -139,6 +140,7 @@ fecfiler.transactions.tests.test\_views.TransactionViewsTestCase
       ~TransactionViewsTestCase.test_get_previous_entity_same_day
       ~TransactionViewsTestCase.test_get_queryset
       ~TransactionViewsTestCase.test_inherited_election_aggregate
+      ~TransactionViewsTestCase.test_loan_repayment_on_loan_by_committee
       ~TransactionViewsTestCase.test_multi_sorting
       ~TransactionViewsTestCase.test_previous_transaction_by_payee_candidate
       ~TransactionViewsTestCase.test_reatt_redes_multisave_transactions
