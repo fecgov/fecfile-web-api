@@ -2,8 +2,8 @@
 
 import django.db.models.deletion
 import uuid
-import structlog
 from django.db import connection, migrations, models
+import structlog
 
 logger = structlog.get_logger(__name__)
 
