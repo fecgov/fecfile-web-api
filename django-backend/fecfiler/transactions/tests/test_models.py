@@ -81,8 +81,7 @@ class TransactionModelTestCase(TestCase):
 
         carry_forward_loans(self.m2_report)
         self.carried_forward_loan = (
-            Transaction.objects
-            .filter(committee_account_id=self.committee.id)
+            Transaction.objects.filter(committee_account_id=self.committee.id)
             .order_by("created")
             .last()
         )
@@ -277,6 +276,28 @@ class TransactionModelTestCase(TestCase):
         undelete(carried_forward_debt)
         undelete(first_repayment)
         undelete(second_repayment)
+
+    def test_delete_loan_repayment(self):
+        """Deleting a loan repayment should update the loan_payment_to_date
+        of current loan and carried forward"""
+        self.loan.refresh_from_db()
+        self.payment_1.refresh_from_db()
+        self.assertIsNone(self.payment_1.deleted)
+        self.assertEqual(self.loan.loan_payment_to_date, Decimal("1000.00"))
+
+        self.payment_1.delete()
+        self.loan.refresh_from_db()
+        self.carried_forward_loan.refresh_from_db()
+        self.assertEqual(
+            self.loan.loan_payment_to_date,
+            Decimal("0.00"),
+            "Loan payment to date should be 0 after deleting loan repayment",
+        )
+        self.assertEqual(
+            self.carried_forward_loan.loan_payment_to_date,
+            Decimal("600.00"),
+            "Carried forward loan payment to date should be 600 after deleting loan repayment",
+        )
 
     def test_delete_loan_by_committee(self):
         self.assertIsNone(self.loan.deleted)
