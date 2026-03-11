@@ -316,52 +316,55 @@ not have a method with the specified name.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_loan_received_from_bank</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution</span></code>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_loan_repayment" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_loan_repayment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_loan_repayment</span></code></a>()</p></td>
+<td><p>Deleting a loan repayment should update the loan_payment_to_date of current loan and carried forward</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_earmark</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_earmark</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_jf_transfer</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_jf_transfer</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_with_copy</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_with_copy</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_transaction</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_transaction</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_transaction_with_children</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_transaction_with_children</span></code></a>()</p></td>
 <td><p>Test the deletion of transactions within a 3 tier hierarchy deleting the parent deletes all 3 deleting the tier 2 deletes the tier 2 and 3 deleting the tier 3 deletes only the tier 3</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_election_aggregates_across_committees</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_election_aggregates_across_committees</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_children</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_children</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_transaction_family</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_get_transaction_family</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_hard_delete_memo_when_empty</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_hard_delete_memo_when_empty</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_insert_transaction_between_existing_no_double_counting</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_insert_transaction_between_existing_no_double_counting</span></code></a>()</p></td>
 <td><p>Test that inserting a transaction chronologically between two existing transactions in the same entity/aggregation chain does not result in double-counting in the aggregate for later transactions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_itemization_with_parent_child_disbursement</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_itemization_with_parent_child_disbursement</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_reaggregation_after_report_deletion" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_reaggregation_after_report_deletion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_reaggregation_after_report_deletion</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_reaggregation_after_report_deletion" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_reaggregation_after_report_deletion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_reaggregation_after_report_deletion</span></code></a>()</p></td>
 <td><p>Test that deleting a report triggers re-aggregation of transactions in subsequent reports.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_tier3_itemization</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_tier3_itemization</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_transaction_and_memo_text_soft_delete</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_transaction_and_memo_text_soft_delete</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_unitemization_cascades_to_children_in_other_chain</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_unitemization_cascades_to_children_in_other_chain</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -1103,6 +1106,13 @@ carried forward copies of it (along with repayments to them)</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_loan_repayment">
+<span class="sig-name descname"><span class="pre">test_delete_loan_repayment</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_loan_repayment" title="Link to this definition">¶</a></dt>
+<dd><p>Deleting a loan repayment should update the loan_payment_to_date
+of current loan and carried forward</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children">
 <span class="sig-name descname"><span class="pre">test_delete_transaction_with_children</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children" title="Link to this definition">¶</a></dt>
 <dd><p>Test the deletion of transactions within a 3 tier hierarchy
@@ -1268,6 +1278,7 @@ in subsequent reports.</p>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.tearDownClass"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.tearDownClass()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_coupled_transactions"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.test_delete_coupled_transactions()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_debt_transactions"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.test_delete_debt_transactions()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_loan_repayment"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.test_delete_loan_repayment()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.test_delete_transaction_with_children()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.test_insert_transaction_between_existing_no_double_counting()</span></code></a></li>
 <li class="toctree-l8"><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_reaggregation_after_report_deletion"><code class="docutils literal notranslate"><span class="pre">TransactionModelTestCase.test_reaggregation_after_report_deletion()</span></code></a></li>

@@ -108,6 +108,7 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.test_delete_debt_transactions
       ~TransactionModelTestCase.test_delete_loan_by_committee
       ~TransactionModelTestCase.test_delete_loan_received_from_bank
+      ~TransactionModelTestCase.test_delete_loan_repayment
       ~TransactionModelTestCase.test_delete_reattribution
       ~TransactionModelTestCase.test_delete_reattribution_earmark
       ~TransactionModelTestCase.test_delete_reattribution_jf_transfer
