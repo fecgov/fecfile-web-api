@@ -296,7 +296,8 @@ class TransactionModelTestCase(TestCase):
         self.assertEqual(
             self.carried_forward_loan.loan_payment_to_date,
             Decimal("600.00"),
-            "Carried forward loan payment to date should be 600 after deleting loan repayment",
+            "Carried forward loan payment to date should "
+            "be 600 after deleting loan repayment",
         )
 
     def test_delete_loan_by_committee(self):
