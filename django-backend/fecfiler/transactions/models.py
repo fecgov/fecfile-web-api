@@ -15,6 +15,7 @@ from fecfiler.transactions.utils_aggregation_prep import (
 )
 from fecfiler.transactions.utils_aggregation_service import (
     update_aggregates_for_affected_transactions,
+    calculate_loan_payment_to_date
 )
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
@@ -562,6 +563,19 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     error=str(e),
                     exc_info=True,
                 )
+
+            # Handle loan payment to date after marking deleted
+            try:
+                if self.is_loan_repayment():
+                    calculate_loan_payment_to_date(Transaction, self.loan_id)
+            except Exception as e:
+                logger.error(
+                    "Failed to recalculate loan payment to date on delete",
+                    transaction_id=self.id,
+                    error=str(e),
+                    exc_info=True,
+                )
+
             self.delete_children()
             self.delete_debts()
             self.delete_loans()
