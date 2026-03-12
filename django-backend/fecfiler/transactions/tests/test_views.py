@@ -10,6 +10,7 @@ from fecfiler.transactions.views import TransactionViewSet, TransactionOrderingF
 from fecfiler.transactions.models import Transaction
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.transactions.utils_aggregation_service import calculate_loan_payment_to_date
 from fecfiler.contacts.tests.utils import (
     create_test_committee_contact,
     create_test_individual_contact,
@@ -864,7 +865,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             parent_id=jf_transfer.id,
         )
         partnership_memo.schedule_a.contribution_purpose_descrip = (
-            "JF Memo: None (See Partnership Attribution(s) below)"
+            "JF Memo: (See Partnership Attribution(s) below)"
         )
         partnership_memo.schedule_a.save()
         partnership_attribution_memo = create_schedule_a(
@@ -883,7 +884,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(
             response.data["contribution_purpose_descrip"],
-            "JF Memo: None (See Partnership Attribution(s) below)",
+            "JF Memo: (See Partnership Attribution(s) below)",
         )
 
         # If we delete the attribution memo, the parent memo should be updated
@@ -903,8 +904,77 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(
             response.data["contribution_purpose_descrip"],
-            "JF Memo: None (Partnership attributions do not meet itemization threshold)",
+            "JF Memo: (Partnership attributions do not meet itemization threshold)",
         )
+
+    def test_loan_repayment_on_loan_by_committee(self):
+        """Loan repayments should update loan balances on the original loan
+        and on carried forward copies"""
+        # create original report
+        q1_report = create_form3x(self.committee, "2025-01-01", "2025-03-31", {})
+
+        # create loan
+        original_loan = create_loan(
+            self.committee,
+            self.test_com_contact,
+            "1000.00",
+            "2025-12-31",
+            "6%",
+            form_type="SC/10",
+            loan_incurred_date="2025-01-01",
+            report=q1_report,
+            type="LOAN_BY_COMMITTEE",
+        )
+
+        # test calculate_loan_payment_to_date does not fail with
+        # no repayments
+        calculate_loan_payment_to_date(Transaction, original_loan.id)
+
+        # carry forward to additional reports
+        create_form3x(self.committee, "2025-04-01", "2025-06-30", {})
+        create_form3x(self.committee, "2025-07-01", "2025-09-30", {})
+        create_form3x(self.committee, "2025-10-01", "2025-12-31", {})
+        create_form3x(self.committee, "2026-01-01", "2026-03-31", {})
+
+        # create repayment
+        create_schedule_a(
+            "LOAN_REPAYMENT_RECEIVED",
+            self.committee,
+            self.test_com_contact,
+            "2025-01-02",
+            "100.00",
+            loan_id=original_loan.id,
+            report=q1_report,
+        )
+
+        # assert that loan repayments are being calculated
+        annotated_copy_of_loan = Transaction.objects.get(id=original_loan.id)
+        self.assertEqual(annotated_copy_of_loan.loan_payment_to_date, 100.00)
+        self.assertEqual(annotated_copy_of_loan.loan_balance, 900.00)
+
+        # make another repayment in q1
+        q1_loan_repayment = self.create_loan_repayment_received_payload(
+            original_loan,
+            q1_report,
+            "2025-01-03",
+            150.00,
+        )
+        response = TransactionViewSet().create(self.post_request(q1_loan_repayment))
+        self.assertEqual(response.status_code, 200)
+
+        # refresh annotations
+        annotated_copy_of_loan = Transaction.objects.get(id=original_loan.id)
+        self.assertEqual(annotated_copy_of_loan.loan_payment_to_date, 250.00)
+        self.assertEqual(annotated_copy_of_loan.loan_balance, 750.00)
+
+        # ensure that the balance is updated appropriately on carried forward loans
+        child_loans = Transaction.objects.filter(
+            loan_id=original_loan.id, schedule_c__isnull=False
+        )
+
+        self.assertEqual(child_loans.count(), 4)
+        for child_loan in child_loans:
+            self.assertEqual(child_loan.loan_balance, 750.00)
 
     def test_delete_carried_forward_loan_on_repayment_to_orignal_loan(self):
         """Paying off a loan in the original report should delete any carried forward
@@ -1378,6 +1448,24 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         loan_repayment_payload["report_ids"] = [str(report.id)]
         loan_repayment_payload["expenditure_date"] = repayment_date
         loan_repayment_payload["expenditure_amount"] = repayment_amount
+        return loan_repayment_payload
+
+    def create_loan_repayment_received_payload(
+        self,
+        loan: Transaction,
+        report: Report,
+        repayment_date: str,
+        repayment_amount: int,
+    ):
+        loan_representation = self.transaction_serializer.to_representation(loan)
+        loan_repayment_payload = deepcopy(self.payloads["LOAN_REPAYMENT_RECEIVED"])
+        loan_repayment_payload["contact_1"] = loan_representation["contact_1"]
+        loan_repayment_payload["contact_1_id"] = loan_representation["contact_1_id"]
+        loan_repayment_payload["loan"] = loan_representation
+        loan_repayment_payload["loan_id"] = loan_representation["id"]
+        loan_repayment_payload["report_ids"] = [str(report.id)]
+        loan_repayment_payload["contribution_date"] = repayment_date
+        loan_repayment_payload["contribution_amount"] = repayment_amount
         return loan_repayment_payload
 
     def create_debt_repayment_payload(

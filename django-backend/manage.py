@@ -25,6 +25,7 @@ allowed_commands = [
     "reset_submitting_report",
     "fail_open_submissions",
     "dump_committee_data",
+    "get_overview",
 ]
 restricted_commands = [
     "loaddata",

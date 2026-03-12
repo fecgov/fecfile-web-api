@@ -202,6 +202,7 @@ class UploadSubmission(BaseSubmission):
 
     # different from internal report id
     fec_report_id = models.CharField(max_length=255, null=True)
+    date_filed = models.DateTimeField(null=True)
 
     objects = UploadSubmissionManager()
 
@@ -221,6 +222,7 @@ class UploadSubmission(BaseSubmission):
             FECStatus.COMPLETED.value,
         ):
             logger.info(f"FEC upload successful: {response_string}")
+            self.date_filed = datetime.now()
         else:
             logger.error(f"FEC upload failed: {response_string}")
 
