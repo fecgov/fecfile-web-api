@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ("contacts", "0001_initial"),
         ("reports", "0001_initial"),
-        ("web_services", "0001_initial"),
+        ("web_services", "0001_initial_squashed_0003_polling_attempts"),
     ]
 
     operations = [

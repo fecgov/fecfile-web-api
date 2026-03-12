@@ -3,9 +3,6 @@
 import django.db.models.deletion
 import uuid
 from django.db import migrations, models, connection
-import structlog
-
-logger = structlog.get_logger(__name__)
 
 
 def _create_can_delete_trigger(apps, schema_editor):
@@ -121,13 +118,6 @@ def _reverse_can_delete_trigger(apps, schema_editor):
             )
 
 
-def _populate_can_delete(apps, schema_editor):
-    report_model = apps.get_model("reports", "Report")
-    for row in report_model.objects.all():
-        row.can_delete = True
-        row.save()
-
-
 def _create_can_unamend_trigger(apps, schema_editor):
     schema_editor.execute(
         """
@@ -239,9 +229,6 @@ class Migration(migrations.Migration):
         migrations.RunPython(
             code=_create_can_delete_trigger,
             reverse_code=_reverse_can_delete_trigger,
-        ),
-        migrations.RunPython(
-            code=_populate_can_delete,
         ),
         migrations.RunPython(
             code=_create_can_unamend_trigger,
@@ -718,28 +705,6 @@ class Migration(migrations.Migration):
             model_name="form3x",
             name="report_type_category",
             field=models.TextField(blank=True, null=True),
-        ),
-        migrations.RunSQL(
-            sql="""
-                UPDATE reports_form3x f
-                SET filing_frequency = CASE
-                    WHEN r.report_code IN (
-                        'M2', 'M3', 'M4', 'M5', 'M6', 'M7',
-                        'M8', 'M9', 'M10', 'M11', 'M12'
-                    ) THEN 'M'
-                    ELSE 'Q'
-                END,
-                report_type_category = CASE
-                    WHEN r.report_code IN (
-                        'M11', 'M12', 'MY'
-                    ) THEN 'Non-Election Year'
-                    ELSE 'Election Year'
-                END
-                FROM reports_report as r
-                WHERE r.form_3x_id = f.id
-                AND filing_frequency IS NULL AND report_type_category IS NULL;
-            """,
-            reverse_sql="",
         ),
         migrations.AddField(
             model_name="form99",

@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         ),
         ("contacts", "0001_initial"),
         ("reports", "0001_initial"),
-        ("memo_text", "0001_initial"),
+        ("memo_text", "0001_initial_squashed_0003_memotext_text_prefix"),
     ]
 
     operations = [
