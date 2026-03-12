@@ -10,6 +10,5 @@ DEP001 = ["locust"]
 DEP002 = [
     "gunicorn",
     "django-deprecate-fields",
-    "django-migration-linter",
-    "psycopg-pool"
+    "django-migration-linter"
 ]
