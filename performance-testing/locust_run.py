@@ -423,7 +423,7 @@ class Tasks(TaskSet):
                     name="delete_schedule_a_transaction",
                 )
                 if response.status_code == 204:
-                    # if we happened to delete our saved pointer, clear it so it gets reset
+                    # if we happened to delete our saved pointer, clear it so it'll reset
                     if transaction == self.saved_schedule_a:
                         self.saved_schedule_a = None
                     return
