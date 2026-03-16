@@ -239,7 +239,7 @@ class Tasks(TaskSet):
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule A transaction")
 
-        # if LONG_CHAINS is true then we only want to save the first transaction,
+        # if LONG_CHAINS is true then we only want to save a "first" transaction,
         # otherwise we always save the current one so we have the last transaction
         if not self.saved_schedule_a or not LONG_CHAINS:
             self.saved_schedule_a = response.json()
@@ -423,6 +423,7 @@ class Tasks(TaskSet):
                     name="delete_schedule_a_transaction",
                 )
                 if response.status_code == 204:
+                    # if we happened to delete our saved pointer, clear it so it gets reset
                     if transaction == self.saved_schedule_a:
                         self.saved_schedule_a = None
                     return
