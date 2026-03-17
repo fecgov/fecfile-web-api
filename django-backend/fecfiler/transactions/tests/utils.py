@@ -31,12 +31,14 @@ def create_schedule_a(
     itemized: bool | None = None,
     report: Report | None = None,
     parent_id: UUID | None = None,
+    loan_id: UUID | None = None,
     purpose_description: str | None = None,
 ):
     transaction_data = {
         "_form_type": form_type,
         "memo_code": memo_code,
         "force_itemized": itemized,
+        "loan_id": loan_id,
     }
     if parent_id is not None:
         transaction_data["parent_transaction_id"] = parent_id
