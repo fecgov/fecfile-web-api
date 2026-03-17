@@ -6,6 +6,8 @@ import redis
 import json
 import structlog
 from fecfiler.shared.utilities import query_fec_api_single
+from django.contrib.sessions.models import Session
+from django.utils import timezone
 
 logger = structlog.getLogger(__name__)
 
@@ -91,6 +93,40 @@ def delete_committee_account(committee_id):
         logger.info(f"Committee account with ID {committee_id} has been deleted.")
     except Exception as e:
         logger.error(f"An error occurred while deleting the committee account: {e}")
+
+
+def disable_committee_account(committee_id):
+    committee_account = CommitteeAccount.objects.get(committee_id=committee_id)
+    committee_account.delete()
+    logger.info(f"Committee account with ID {committee_id} has been disabled.")
+
+
+def logout_committee_sessions(committee_id):
+    active_sessions = Session.objects.filter(expire_date__gte=timezone.now())
+    sessions_to_delete = []
+
+    for session in active_sessions:
+        data = session.get_decoded()
+        if data.get("committee_id") == committee_id:
+            sessions_to_delete.append(session.pk)
+
+    Session.objects.filter(pk__in=sessions_to_delete).delete()
+    logger.info(
+        f"""
+        Successfully logged out {len(sessions_to_delete)} users from {committee_id}
+        """
+    )
+
+
+def enable_committee_account(committee_id):
+    try:
+        committee_account = CommitteeAccount.all_objects.get(committee_id=committee_id)
+        committee_account.undelete()
+        logger.info(f"Committee account with ID {committee_id} has been enabled.")
+    except CommitteeAccount.DoesNotExist:
+        logger.error(f"Committee account with ID {committee_id} does not exist.")
+    except Exception as e:
+        logger.error(f"An error occurred while enabling the committee account: {e}")
 
 
 def get_committee_emails(committee_id):

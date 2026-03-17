@@ -54,7 +54,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     @action(detail=True, methods=["post"])
     def activate(self, request, pk):
         committee = self.get_object()
-        if not committee:
+        if not committee or committee.deleted is not None:
             return Response("Committee could not be activated", status=403)
         request.session["committee_id"] = str(committee.committee_id)
         request.session["committee_uuid"] = str(committee.id)
