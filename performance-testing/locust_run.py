@@ -39,6 +39,9 @@ AMEND_MULTIPLIER = 0.2
 # Tracks state of Payload Contacts between test runs
 CREATED_PAYLOAD_CONTACTS = False
 
+# Do we want long transaction chains? Accepts "true"/"True"/"1", otherwise false
+LONG_CHAINS = str(os.environ.get("LONG_CHAINS", "false")).lower() in ("true", "1")
+
 # Lower the interval between log reports to prevent log queue overflow
 runners.WORKER_LOG_REPORT_INTERVAL = 2
 
@@ -92,9 +95,9 @@ class Tasks(TaskSet):
         "CAN": {},
         "COM": {},
     }
-    last_created_schedule_a = None
-    last_created_schedule_b = None
-    last_created_schedule_c = None
+    saved_schedule_a = None
+    saved_schedule_b = None
+    saved_schedule_c = None
 
     def on_start(self):
         logging.info("Logging in")
@@ -235,7 +238,11 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule A transaction")
-        self.last_created_schedule_a = response.json()
+
+        # if LONG_CHAINS is true then we only want to save a "first" transaction,
+        # otherwise we always save the current one so we have the last transaction
+        if not self.saved_schedule_a or not LONG_CHAINS:
+            self.saved_schedule_a = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER / 2))
     def create_schedule_b_transaction(self):
@@ -269,7 +276,8 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule B transaction")
-        self.last_created_schedule_b = response.json()
+        if not self.saved_schedule_b or not LONG_CHAINS:
+            self.saved_schedule_b = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER / 2))
     def create_schedule_b_election_transaction(self):
@@ -309,7 +317,8 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule B transaction")
-        self.last_created_schedule_b = response.json()
+        if not self.saved_schedule_b or not LONG_CHAINS:
+            self.saved_schedule_b = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_C_MULTIPLIER))
     def create_schedule_c_transaction(self):
@@ -344,7 +353,8 @@ class Tasks(TaskSet):
         )
         if response.status_code != 200:
             raise Exception("Failed to POST new Schedule C transaction")
-        self.last_created_schedule_c = response.json()
+        if not self.saved_schedule_c or not LONG_CHAINS:
+            self.saved_schedule_c = response.json()
 
     @task(ceil(DATA_ENTRY_WEIGHT * SCHEDULE_D_MULTIPLIER))
     def create_schedule_d_transaction(self):
@@ -373,7 +383,7 @@ class Tasks(TaskSet):
         ceil(DATA_ENTRY_WEIGHT * SCHEDULE_A_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
     )
     def update_schedule_a_transaction(self):
-        transaction_id = self.last_created_schedule_a
+        transaction_id = self.saved_schedule_a
         if transaction_id:
             response = self.client_get(
                 f"/api/v1/transactions/{transaction_id}/",
@@ -413,6 +423,9 @@ class Tasks(TaskSet):
                     name="delete_schedule_a_transaction",
                 )
                 if response.status_code == 204:
+                    # if we happened to delete our saved pointer, clear it so it'll reset
+                    if transaction == self.saved_schedule_a:
+                        self.saved_schedule_a = None
                     return
         raise Exception("Failed to DELETE Schedule A transaction")
 
@@ -420,7 +433,7 @@ class Tasks(TaskSet):
         ceil(DATA_ENTRY_WEIGHT * SCHEDULE_B_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
     )
     def update_schedule_b_transaction(self):
-        transaction_id = self.last_created_schedule_b
+        transaction_id = self.saved_schedule_b
         if transaction_id:
             response = self.client_get(
                 f"/api/v1/transactions/{transaction_id}/",
@@ -456,7 +469,7 @@ class Tasks(TaskSet):
         ceil(DATA_ENTRY_WEIGHT * SCHEDULE_C_MULTIPLIER * UPDATE_TRANSACTION_MULTIPLIER)
     )
     def update_schedule_c_transaction(self):
-        transaction_id = self.last_created_schedule_c
+        transaction_id = self.saved_schedule_c
         if transaction_id:
             response = self.client_get(
                 f"/api/v1/transactions/{transaction_id}/",
