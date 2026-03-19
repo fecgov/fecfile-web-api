@@ -44,7 +44,6 @@ class Migration(migrations.Migration):
                         verbose_name="superuser status",
                     ),
                 ),
-                ("cmtee_id", models.CharField(max_length=9)),
                 (
                     "username",
                     models.CharField(
