@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0002\_remove\_schedulea\_squashed\_0026\_alter\_transaction\_itemized.create\_trigger
+======================================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0002_remove_schedulea_squashed_0026_alter_transaction_itemized
+
+.. autofunction:: create_trigger

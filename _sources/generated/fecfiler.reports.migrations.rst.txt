@@ -31,23 +31,9 @@ fecfiler.reports.migrations
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.reports.migrations.00018_form24_name
-   fecfiler.reports.migrations.00019_form24_name_fix
    fecfiler.reports.migrations.0001_initial
    fecfiler.reports.migrations.0002_initial
-   fecfiler.reports.migrations.0003_update_f24_amendment_date
    fecfiler.reports.migrations.0004_form1m_date_committee_met_requirements_and_more
-   fecfiler.reports.migrations.0005_remove_form1m_iii_candidate_district_and_more
-   fecfiler.reports.migrations.0006_reporttransaction
-   fecfiler.reports.migrations.0007_remove_report_deleted
-   fecfiler.reports.migrations.0008_remove_form1m_city_remove_form1m_committee_name_and_more
-   fecfiler.reports.migrations.0009_report_can_delete
-   fecfiler.reports.migrations.0010_report_can_unammend
-   fecfiler.reports.migrations.0011_remove_form3x_cash_on_hand_date
-   fecfiler.reports.migrations.0012_alter_form99_text_code
-   fecfiler.reports.migrations.0013_form3_report_form_3
-   fecfiler.reports.migrations.0014_form99_swap_text_code
-   fecfiler.reports.migrations.0015_form3x_filing_frequency_form3x_report_type_category
-   fecfiler.reports.migrations.0016_determine_frequency_and_category
-   fecfiler.reports.migrations.0017_form99_filing_frequency_form99_pdf_attachment
+   fecfiler.reports.migrations.0005_remove_form1m_squashed_0006_reporttransaction
+   fecfiler.reports.migrations.0007_remove_report_deleted_squashed_00019_form24_name_fix
 

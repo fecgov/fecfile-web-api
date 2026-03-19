@@ -1,0 +1,6 @@
+fecfiler.transactions.migrations.0002\_remove\_schedulea\_squashed\_0026\_alter\_transaction\_itemized.populate\_over\_two\_hundred\_types
+==========================================================================================================================================
+
+.. currentmodule:: fecfiler.transactions.migrations.0002_remove_schedulea_squashed_0026_alter_transaction_itemized
+
+.. autofunction:: populate_over_two_hundred_types

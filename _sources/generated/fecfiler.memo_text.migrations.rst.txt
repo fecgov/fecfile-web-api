@@ -31,7 +31,5 @@ fecfiler.memo\_text.migrations
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.memo_text.migrations.0001_initial
-   fecfiler.memo_text.migrations.0002_initial
-   fecfiler.memo_text.migrations.0003_memotext_text_prefix
+   fecfiler.memo_text.migrations.0001_initial_squashed_0003_memotext_text_prefix
 

@@ -31,6 +31,5 @@ fecfiler.cash\_on\_hand.migrations
    :template: custom-module-template.rst                 
    :recursive:
 
-   fecfiler.cash_on_hand.migrations.0001_initial
-   fecfiler.cash_on_hand.migrations.0002_alter_cashonhandyearly_cash_on_hand_and_more
+   fecfiler.cash_on_hand.migrations.0001_squashed_0002_alter_cashonhandyearly_cash_on_hand_and_more
 
