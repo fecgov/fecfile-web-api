@@ -1465,6 +1465,107 @@ class TransactionModelTestCase(TestCase):
         # Transaction 4 should now have aggregate of $20 (10 + 10)
         self.assertEqual(transaction_4.aggregate, Decimal("20.00"))
 
+    def test_creating_a_transaction_resets_can_unamend(self):
+        # Create a report that can be unamended
+        report_1 = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
+        report_1.can_unamend = True
+        report_1.save()
+
+        # Create a new transaction
+        transaction_1 = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-05",
+            "100.00",
+            report=report_1,
+        )
+        transaction_1.refresh_from_db()
+
+        # The report should no longer be able to be unamended
+        report_1.refresh_from_db()
+        self.assertFalse(report_1.can_unamend)
+
+    def test_updating_a_transaction_resets_can_unamend(self):
+        # Create a report that can be unamended
+        report_1 = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
+
+        # Create a new transaction
+        transaction_1 = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-05",
+            "100.00",
+            report=report_1,
+        )
+        transaction_1.refresh_from_db()
+
+        # Set can_unamend to True
+        report_1.can_unamend = True
+        report_1.save()
+
+        # Saving the transaction should reset can_unamend
+        transaction_1.save()
+        report_1.refresh_from_db()
+        self.assertFalse(report_1.can_unamend)
+
+    def test_deleting_a_transaction_resets_can_unamend(self):
+        # Create a report that can be unamended
+        report_1 = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
+
+        # Create a new transaction
+        transaction_1 = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-05",
+            "100.00",
+            report=report_1,
+        )
+        transaction_1.refresh_from_db()
+
+        # Set can_unamend to True
+        report_1.can_unamend = True
+        report_1.save()
+
+        # Deleting the transaction should reset can_unamend
+        transaction_1.delete()
+        report_1.refresh_from_db()
+        self.assertFalse(report_1.can_unamend)
+
+    def test_updating_a_transaction_resets_can_unamend_in_all_affiliated_reports(self):
+        # Create a report that can be unamended
+        report_1 = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
+
+        # Create a new transaction
+        transaction_1 = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-05",
+            "100.00",
+            report=report_1,
+        )
+        transaction_1.refresh_from_db()
+
+        # Set can_unamend to True
+        report_1.can_unamend = True
+        report_1.save()
+
+        # Updating a transaction should reset can_unamend in all affiliated reports
+        report_2 = create_form3x(self.committee, "2024-02-01", "2024-02-28", {})
+        report_2.can_unamend = True
+        report_2.save()
+
+        transaction_1.reports.add(report_2)
+
+        transaction_1.save()
+        report_1.refresh_from_db()
+        report_2.refresh_from_db()
+        self.assertFalse(report_1.can_unamend)
+        self.assertFalse(report_2.can_unamend)
+
 
 def undelete(transaction):
     transaction.deleted = None

@@ -500,6 +500,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     error=str(e),
                     exc_info=True,
                 )
+
+            # Handle report unamending
+            self.reports.update(can_unamend=False)
         elif skip_aggregation:
             # Clear the flag for next save
             self._skip_aggregation = False
@@ -534,6 +537,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     current_date = self.get_date()
                     if current_date:
                         process_aggregation_for_election(self, current_date)
+
+                self.reports.update(can_unamend=False)
             except Exception as e:
                 logger.error(
                     "Failed to update aggregates via service on delete",

@@ -155,6 +155,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             saved_transaction = self.save_transaction(request.data, request)
             logger.info(f"Created new transaction: {saved_transaction.id}")
             update_dependent_parent(saved_transaction)
+            saved_transaction.reports.update(can_unamend=False)
         return Response(saved_transaction.id)
 
     def update(self, request, *args, **kwargs):
