@@ -97,7 +97,7 @@ def delete_committee_account(committee_id):
 
 def disable_committee_account(committee_id):
     committee_account = CommitteeAccount.objects.get(committee_id=committee_id)
-    committee_account.delete()
+    committee_account.disable()
     logger.info(f"Committee account with ID {committee_id} has been disabled.")
 
 
@@ -120,8 +120,8 @@ def logout_committee_sessions(committee_id):
 
 def enable_committee_account(committee_id):
     try:
-        committee_account = CommitteeAccount.all_objects.get(committee_id=committee_id)
-        committee_account.undelete()
+        committee_account = CommitteeAccount.objects.get(committee_id=committee_id)
+        committee_account.enable()
         logger.info(f"Committee account with ID {committee_id} has been enabled.")
     except CommitteeAccount.DoesNotExist:
         logger.error(f"Committee account with ID {committee_id} does not exist.")

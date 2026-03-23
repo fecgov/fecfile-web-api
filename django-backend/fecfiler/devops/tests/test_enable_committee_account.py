@@ -8,21 +8,15 @@ COMMITTEE_ID = "C12345678"
 class EnableCommitteeAccountCommandTest(TestCase):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id=COMMITTEE_ID)
-        self.committee.delete()
-
+        self.committee.disable()
         self.assertFalse(
-            CommitteeAccount.objects.filter(committee_id=COMMITTEE_ID).exists()
+            CommitteeAccount.objects.get(committee_id=COMMITTEE_ID).disabled is None
         )
 
     def test_enable_committee_command(self):
         call_command("enable_committee_account", COMMITTEE_ID)
-
-        self.assertTrue(
-            CommitteeAccount.objects.filter(committee_id=COMMITTEE_ID).exists()
-        )
-
         re_enabled_committee = CommitteeAccount.objects.get(committee_id=COMMITTEE_ID)
-        self.assertIsNone(re_enabled_committee.deleted)
+        self.assertIsNone(re_enabled_committee.disabled)
 
     def test_enable_non_existent_committee(self):
         try:

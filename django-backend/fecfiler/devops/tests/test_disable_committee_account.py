@@ -34,20 +34,14 @@ class DisableCommitteeAccountCommandTest(TestCase):
         s2.session_data = Session.objects.encode({"committee_id": OTHER_COMMITTEE_ID})
         s2.save()
 
-        self.assertTrue(
-            CommitteeAccount.objects.filter(committee_id=COMMITTEE_ID_TO_DISABLE).exists()
-        )
         self.assertEqual(Session.objects.count(), 2)
 
         call_command("disable_committee_account", COMMITTEE_ID_TO_DISABLE)
-
-        self.assertFalse(
-            CommitteeAccount.objects.filter(committee_id=COMMITTEE_ID_TO_DISABLE).exists()
-        )
+        self.committee.refresh_from_db()
+        self.other_committee.refresh_from_db()
+        self.assertIsNotNone(self.committee.disabled)
         self.assertFalse(Session.objects.filter(session_key="target_session").exists())
-        self.assertTrue(
-            CommitteeAccount.objects.filter(committee_id=OTHER_COMMITTEE_ID).exists()
-        )
+        self.assertIsNone(self.other_committee.disabled)
         self.assertTrue(Session.objects.filter(session_key="safe_session").exists())
 
     def test_disable_non_existent_committee(self):
