@@ -66,15 +66,6 @@ class ReportManager(Manager):
         return queryset
 
 
-class ReportTransactionManager(Manager):
-    def create(self, **kwargs):
-        created = super(Manager, self).create(**kwargs)
-        created.report.can_unamend = False
-        created.report.save()
-
-        return created
-
-
 class ReportType(Enum):
     F3 = Value("F3")
     F3X = Value("F3X")
