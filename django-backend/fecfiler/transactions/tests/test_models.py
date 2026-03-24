@@ -1558,7 +1558,7 @@ class TransactionModelTestCase(TestCase):
         report_2.can_unamend = True
         report_2.save()
 
-        transaction_1.reports.add(report_2)
+        transaction_1.reports.set([report_1, report_2])
 
         transaction_1.save()
         report_1.refresh_from_db()
