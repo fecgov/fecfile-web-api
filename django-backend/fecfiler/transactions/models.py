@@ -540,7 +540,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     if current_date:
                         process_aggregation_for_election(self, current_date)
 
-                self.reports.update(can_unamend=False)
             except Exception as e:
                 logger.error(
                     "Failed to update aggregates via service on delete",
