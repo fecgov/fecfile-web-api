@@ -8,6 +8,18 @@ orbs:
   python: circleci/python@4.0.0
   node: circleci/node@7.2.1
 
+commands:
+  unified-requirements-cache:
+    steps:
+      - run:
+          name: Create unified requirements so CircleCI can cache them
+          command: |
+            cd ~/project/
+            ls -l
+            cat requirements.txt > requirements-all.txt
+            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
+            cat requirements-test.txt >> requirements-all.txt
+
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
   test:
@@ -33,15 +45,7 @@ jobs:
       - checkout:
           method: full
 
-      - run:
-          name: Create unified requirements so CircleCI can cache them
-          command: |
-            cd ~/project/
-            ls -l
-            cat requirements.txt > requirements-all.txt
-            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
-            cat requirements-test.txt >> requirements-all.txt
-
+      - unified-requirements-cache
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/
@@ -130,15 +134,7 @@ jobs:
       - checkout:
           method: full
 
-      - run:
-          name: Create unified requirements so CircleCI can cache them
-          command: |
-            cd ~/project/
-            ls -l
-            cat requirements.txt > requirements-all.txt
-            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
-            cat requirements-test.txt >> requirements-all.txt
-
+      - unified-requirements-cache
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/
@@ -169,16 +165,7 @@ jobs:
 
     steps:
       - checkout
-
-      - run:
-          name: Create unified requirements so CircleCI can cache them
-          command: |
-            cd ~/project/
-            ls -l
-            cat requirements.txt > requirements-all.txt
-            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
-            cat requirements-test.txt >> requirements-all.txt
-
+      - unified-requirements-cache
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/
@@ -195,16 +182,7 @@ jobs:
 
     steps:
       - checkout
-
-      - run:
-          name: Create unified requirements so CircleCI can cache them
-          command: |
-            cd ~/project/
-            ls -l
-            cat requirements.txt > requirements-all.txt
-            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
-            cat requirements-test.txt >> requirements-all.txt
-
+      - unified-requirements-cache
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/
@@ -244,16 +222,7 @@ jobs:
 
     steps:
       - checkout
-
-      - run:
-          name: Create unified requirements so CircleCI can cache them
-          command: |
-            cd ~/project/
-            ls -l
-            cat requirements.txt > requirements-all.txt
-            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
-            cat requirements-test.txt >> requirements-all.txt
-
+      - unified-requirements-cache
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/
