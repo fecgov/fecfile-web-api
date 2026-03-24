@@ -5,9 +5,8 @@ version: 2.1
 # See: https://circleci.com/docs/2.0/orb-intro/
 orbs:
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
-  python: circleci/python@3.2.0
-  browser-tools: circleci/browser-tools@2.2.1
-  node: circleci/node@7.1.1
+  python: circleci/python@4.0.0
+  node: circleci/node@7.2.1
 
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
@@ -15,9 +14,10 @@ jobs:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
-      - image: cimg/python:3.13-node
+      - image: &python313_image cimg/python:3.13-node
       - image: cimg/postgres:14.13
       - image: cimg/redis:6.2.6
+    resource_class: large
 
     steps:
       - run:
@@ -48,43 +48,14 @@ jobs:
           pip-dependency-file: requirements-all.txt
 
       - run:
-          name: Load test database fixure
-          command: |
-            psql ${DATABASE_URL} < e2e-test-db.sql
-          working_directory: ~/project/db
-
-      - run:
-          name: Check for missing migrations
-          command: |
-            python manage.py makemigrations --check
-          working_directory: ~/project/django-backend/
-
-      - run:
-          name: Check for breaking change migrations
-          # After December 2024
-          command: |
-            python manage.py lintmigrations --git-commit-id d73068e23fc5b035af2b224b16d4726b7b20d67c --project-root-path '.'
-          working_directory: ~/project/django-backend/
-
-      - run:
-          name: Run migrations
-          command: |
-            python manage.py migrate --no-input --traceback --verbosity 3
-          working_directory: ~/project/django-backend/
-
-      - run:
-          name: Run lint
-          command: |
-            flake8 --config django-backend/.flake8
-
-      - run:
-          name: Run deptry
-          command: deptry ~/project/
-
-      - run:
           name: Run tests
           # Use built-in Django test module
-          command: coverage run --source='.' --rcfile=.coveragerc manage.py test
+          command: coverage run --rcfile=.coveragerc manage.py test --parallel 4 --timing
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: Combine coverage data
+          command: coverage combine --rcfile=.coveragerc
           working_directory: ~/project/django-backend/
 
       - run:
@@ -133,14 +104,119 @@ jobs:
             SONARQUBE_SCANNER_PARAMS: '{"sonar.host.url":"https://sonarcloud.io"}'
       - save_cache:
           key: v1-sonarcloud-scanner-7.1.0.4889
-          paths: /tmp/cache/scanner
+          paths:
+            - /tmp/cache/scanner
       - store_artifacts:
           path: /tmp/sonar_report
           destination: sonar_report
 
+  schema-checks:
+    docker:
+      - image: *python313_image
+      - image: cimg/postgres:14.13
+      - image: cimg/redis:6.2.6
+
+    steps:
+      - run:
+          name: Check for necessary environment variables
+          command: |
+            while read var; do
+              [ -z "${!var}" ] && { echo "Environment variable $var is needed for a successful test run, there is no default."; exit 1; }
+            done \<< EOF
+            FECFILE_FEC_WEBSITE_API_KEY
+            EOF
+            exit 0
+
+      - checkout:
+          method: full
+
+      - run:
+          name: Create unified requirements so CircleCI can cache them
+          command: |
+            cd ~/project/
+            ls -l
+            cat requirements.txt > requirements-all.txt
+            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
+            cat requirements-test.txt >> requirements-all.txt
+
+      - python/install-packages:
+          pkg-manager: pip
+          app-dir: ~/project/
+          pip-dependency-file: requirements-all.txt
+
+      - run:
+          name: Check for missing migrations
+          command: |
+            python manage.py makemigrations --check
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: Check for breaking change migrations
+          # After December 2024
+          command: |
+            python manage.py lintmigrations --git-commit-id d73068e23fc5b035af2b224b16d4726b7b20d67c --project-root-path '.'
+          working_directory: ~/project/django-backend/
+
+      - run:
+          name: Run migrations
+          command: |
+            python manage.py migrate --no-input --traceback --verbosity 3
+          working_directory: ~/project/django-backend/
+
+  lint:
+    docker:
+      - image: *python313_image
+
+    steps:
+      - checkout
+
+      - run:
+          name: Create unified requirements so CircleCI can cache them
+          command: |
+            cd ~/project/
+            ls -l
+            cat requirements.txt > requirements-all.txt
+            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
+            cat requirements-test.txt >> requirements-all.txt
+
+      - python/install-packages:
+          pkg-manager: pip
+          app-dir: ~/project/
+          pip-dependency-file: requirements-all.txt
+
+      - run:
+          name: Run lint
+          command: |
+            flake8 --config django-backend/.flake8
+
+  dependency-check:
+    docker:
+      - image: *python313_image
+
+    steps:
+      - checkout
+
+      - run:
+          name: Create unified requirements so CircleCI can cache them
+          command: |
+            cd ~/project/
+            ls -l
+            cat requirements.txt > requirements-all.txt
+            echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
+            cat requirements-test.txt >> requirements-all.txt
+
+      - python/install-packages:
+          pkg-manager: pip
+          app-dir: ~/project/
+          pip-dependency-file: requirements-all.txt
+
+      - run:
+          name: Run deptry
+          command: deptry ~/project/
+
   deploy-job:
     docker:
-      - image: cimg/python:3.13
+      - image: *python313_image
 
     steps:
       - checkout
@@ -164,7 +240,7 @@ jobs:
 
   docs-build:
     docker:
-      - image: cimg/python:3.13
+      - image: *python313_image
 
     steps:
       - checkout
@@ -190,7 +266,8 @@ jobs:
 
       - persist_to_workspace:
           root: ~/project/docs/_build
-          paths: html
+          paths:
+            - html
 
   docs-deploy:
     docker:
@@ -244,6 +321,9 @@ jobs:
 workflows:
   primary: # This is the name of the workflow, feel free to change it to better match your workflow.
     jobs:
+      - lint
+      - dependency-check
+      - schema-checks
       - test
       # This job is triggered whenever a commit is made to the dev/stage/test/prod branches.
       # It kicks off the e2e-test pipeline in the fecfile-web-app project.
@@ -253,6 +333,9 @@ workflows:
               only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - deploy-job:
           requires:
+            - lint
+            - dependency-check
+            - schema-checks
             - test
           filters:
             branches:
