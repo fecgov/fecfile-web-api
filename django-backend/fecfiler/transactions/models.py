@@ -1,5 +1,7 @@
 from django.db import models
 from django.db.models import Q
+from django.db.models.signals import m2m_changed
+from django.dispatch import receiver
 from django.contrib.postgres.fields import ArrayField
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
@@ -738,3 +740,16 @@ class OverTwoHundredTypesScheduleB(models.Model):
     class Meta:
         db_table = "over_two_hundred_types_scheduleb"
         indexes = [models.Index(fields=["type"])]
+
+
+@receiver(m2m_changed, sender=Transaction.reports.through)
+def report_transaction_changed(sender, **kwargs):
+    instance = kwargs.pop('instance', None)
+    pk_set = kwargs.pop('pk_set', None)
+    action = kwargs.pop('action', None)
+    if action == "post_add":
+        instance.reports.update(can_unamend=False)
+    if action == "post_remove" or action == "post_clear":
+        from fecfiler.reports.models import Report
+        removed_reports = Report.objects.filter(id__in=pk_set)
+        removed_reports.update(can_unamend=False)
