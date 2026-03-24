@@ -20,6 +20,17 @@ commands:
             echo >> requirements-all.txt  # blank in case new newline at end of requirements.txt
             cat requirements-test.txt >> requirements-all.txt
 
+  check-env-vars:
+    steps:
+      - run:
+          name: Check for necessary environment variables
+          command: |
+            while read var; do
+              [ -z "${!var}" ] && { echo "Environment variable $var is needed for a successful test run, there is no default."; exit 1; }
+            done \<< EOF
+            FECFILE_FEC_WEBSITE_API_KEY
+            EOF
+            exit 0
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
   test:
@@ -32,16 +43,7 @@ jobs:
     resource_class: large
 
     steps:
-      - run:
-          name: Check for necessary environment variables
-          command: |
-            while read var; do
-              [ -z "${!var}" ] && { echo "Environment variable $var is needed for a successful test run, there is no default."; exit 1; }
-            done \<< EOF
-            FECFILE_FEC_WEBSITE_API_KEY
-            EOF
-            exit 0
-
+      - check-env-vars
       - checkout:
           method: full
 
@@ -121,16 +123,7 @@ jobs:
       - image: cimg/redis:6.2.6
 
     steps:
-      - run:
-          name: Check for necessary environment variables
-          command: |
-            while read var; do
-              [ -z "${!var}" ] && { echo "Environment variable $var is needed for a successful test run, there is no default."; exit 1; }
-            done \<< EOF
-            FECFILE_FEC_WEBSITE_API_KEY
-            EOF
-            exit 0
-
+      - check-env-vars
       - checkout:
           method: full
 
