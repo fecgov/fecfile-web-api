@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.test import TestCase
 from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.reports.models import ReportTransaction
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
@@ -1558,7 +1559,10 @@ class TransactionModelTestCase(TestCase):
         report_2.can_unamend = True
         report_2.save()
 
-        transaction_1.reports.add(report_2)
+        ReportTransaction.objects.create(
+            transaction=transaction_1,
+            report=report_2
+        )
 
         transaction_1.save()
         report_1.refresh_from_db()
