@@ -689,15 +689,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             current_report_ids.add(str(report_id_dict["id"]))
 
         updated_report_ids = set(report_ids)
+        report_ids_to_reset_can_unamend = current_report_ids ^ updated_report_ids
 
-        new_report_ids = updated_report_ids - current_report_ids
-        removed_report_ids = current_report_ids - updated_report_ids
+        Transaction.objects.filter(
+            id__in=report_ids_to_reset_can_unamend
+        ).update(can_unamend = False)
 
-        for report_id in new_report_ids:
-            self.add_to_report(report_id)
-
-        for report_id in removed_report_ids:
-            self.remove_from_report(report_id)
+        self.reports.set(report_ids)
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
