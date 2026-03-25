@@ -691,7 +691,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         updated_report_ids = set(report_ids)
         report_ids_to_reset_can_unamend = current_report_ids ^ updated_report_ids
 
-        Transaction.objects.filter(
+        Report = apps.get_model("reports.Report")
+        Report.objects.filter(
             id__in=report_ids_to_reset_can_unamend
         ).update(can_unamend = False)
 
