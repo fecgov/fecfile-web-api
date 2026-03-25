@@ -83,8 +83,7 @@ class ReportModelTestCase(TestCase):
             "H2024",
             candidate_a,
         )
-        ie.reports.set([f24_report_id, f3x_report_id])
-        ie.save()
+        ie.set_reports([f24_report_id, f3x_report_id])
         ie_id = ie.id
 
         f24_report.delete()

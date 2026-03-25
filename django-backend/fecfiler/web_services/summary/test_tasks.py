@@ -193,7 +193,7 @@ class F3XSerializerTestCase(TestCase):
                 data["memo"],
                 data["itemized"],
             )
-            scha.reports.add(data["report"])
+            scha.add_to_report(data["report"].id)
             scha.save()
 
         calculate_summary(next_year_report.id)
@@ -325,7 +325,7 @@ class F3XSerializerTestCase(TestCase):
                 data["memo"],
                 data["itemized"],
             )
-            scha.reports.add(data["report"])
+            scha.add_to_report(data["report"].id)
             scha.save()
 
         years_later_report = create_form3x(
@@ -369,7 +369,7 @@ class F3XSerializerTestCase(TestCase):
             False,
             True,
         )
-        schedule_a.reports.add(first_report)
+        schedule_a.add_to_report(first_report.id)
         schedule_a.save()
 
         next_year_report = create_form3x(

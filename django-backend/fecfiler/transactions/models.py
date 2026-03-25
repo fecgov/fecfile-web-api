@@ -1,7 +1,6 @@
 from django.db import models
 from django.db.models import Q
-from django.db.models.signals import m2m_changed
-from django.dispatch import receiver
+from django.apps import apps
 from django.contrib.postgres.fields import ArrayField
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
@@ -660,6 +659,46 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             parent.refresh_from_db(fields=["deleted"])
             parent.delete()
 
+    def add_to_report(self, report_id):
+        ReportTransaction = apps.get_model("reports.ReportTransaction")
+        report_transaction = ReportTransaction.objects.filter(
+            transaction=self,
+            report_id=report_id
+        ).first()
+
+        if report_transaction is None:
+            ReportTransaction.objects.create(
+                transaction=self,
+                report_id=report_id
+            )
+
+    def remove_from_report(self, report_id):
+        ReportTransaction = apps.get_model("reports.ReportTransaction")
+        report_transaction = ReportTransaction.objects.filter(
+            transaction=self,
+            report_id=report_id
+        ).first()
+
+        if report_transaction is not None:
+            report_transaction.delete()
+
+    def set_reports(self, report_ids):
+        current_report_ids = set()
+        current_report_id_dicts = list(self.reports.values("id"))
+        for report_id_dict in current_report_id_dicts:
+            current_report_ids.add(str(report_id_dict["id"]))
+
+        updated_report_ids = set(report_ids)
+
+        new_report_ids = updated_report_ids - current_report_ids
+        removed_report_ids = current_report_ids - updated_report_ids
+
+        for report_id in new_report_ids:
+            self.add_to_report(report_id)
+
+        for report_id in removed_report_ids:
+            self.remove_from_report(report_id)
+
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
 
@@ -738,16 +777,3 @@ class OverTwoHundredTypesScheduleB(models.Model):
     class Meta:
         db_table = "over_two_hundred_types_scheduleb"
         indexes = [models.Index(fields=["type"])]
-
-
-@receiver(m2m_changed, sender=Transaction.reports.through)
-def report_transaction_changed(sender, **kwargs):
-    instance = kwargs.pop('instance', None)
-    pk_set = kwargs.pop('pk_set', None)
-    action = kwargs.pop('action', None)
-    if action == "post_add":
-        instance.reports.update(can_unamend=False)
-    if action == "post_remove" or action == "post_clear":
-        from fecfiler.reports.models import Report
-        removed_reports = Report.objects.filter(id__in=pk_set)
-        removed_reports.update(can_unamend=False)

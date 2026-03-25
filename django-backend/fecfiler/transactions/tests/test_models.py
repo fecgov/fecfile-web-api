@@ -240,7 +240,7 @@ class TransactionModelTestCase(TestCase):
         carried forward copies of it (along with repayments to them)"""
         original_debt = create_debt(self.committee, self.contact_1, Decimal("123.00"))
         original_debt.save()
-        original_debt.reports.add(self.q1_report)
+        original_debt.add_to_report(self.q1_report.id)
         carried_forward_debt = carry_forward_debt(original_debt, self.m1_report)
         first_repayment = create_schedule_b(
             "OPERATING_EXPENDITURE",

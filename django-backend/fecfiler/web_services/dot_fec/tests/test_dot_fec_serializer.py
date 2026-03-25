@@ -51,7 +51,7 @@ class DotFECSerializerTestCase(TestCase):
             "GENERAL",
             "SA11AI",
         )
-        self.transaction.reports.add(self.f3x)
+        self.transaction.add_to_report(self.f3x.id)
         self.transaction.save()
 
         self.schc_transaction1 = create_loan(

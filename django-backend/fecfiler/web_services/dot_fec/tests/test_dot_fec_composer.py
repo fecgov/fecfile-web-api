@@ -84,7 +84,7 @@ class DotFECSerializerTestCase(TestCase):
             "GENERAL",
             "SA11AI",
         )
-        self.transaction.reports.add(self.f3x)
+        self.transaction.add_to_report(self.f3x.id)
         self.transaction.save()
         self.report_level_memo = create_report_memo(
             self.committee,
@@ -137,7 +137,7 @@ class DotFECSerializerTestCase(TestCase):
             "SA11AI",
         )
         for transaction in [earlier_transaction, later_transaction]:
-            transaction.reports.add(self.f3x)
+            transaction.add_to_report(self.f3x.id)
             transaction.save()
 
         later_transaction.refresh_from_db()

@@ -40,7 +40,7 @@ class ScheduleC2ViewsTestCase(TestCase):
         self.schedule_c.save()
         self.loan.schedule_c = self.schedule_c
         self.loan.save()
-        self.loan.reports.add(self.report_1)
+        self.loan.add_to_report(self.report_1.id)
 
         self.report_2 = Report(
             form_type="F3XN",
@@ -63,7 +63,7 @@ class ScheduleC2ViewsTestCase(TestCase):
         self.schedule_c2.save()
         self.guarantor.schedule_c2 = self.schedule_c2
         self.guarantor.save()
-        self.guarantor.reports.add(self.report_1)
+        self.guarantor.add_to_report(self.report_1.id)
 
     def test_create_guarantor_in_future_report(self):
         c2_hook(self.guarantor, False)

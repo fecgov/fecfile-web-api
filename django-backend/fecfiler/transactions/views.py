@@ -31,7 +31,7 @@ from fecfiler.transactions.aggregation import (
     process_aggregation_for_entity_contact,
     process_aggregation_for_election,
 )
-from fecfiler.reports.models import Report, ReportTransaction
+from fecfiler.reports.models import Report
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
@@ -236,7 +236,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
             transactions = transaction.get_transaction_family()
             for t in transactions:
-                t.reports.add(report)
+                t.add_to_report(report.id)
         except Transaction.DoesNotExist:
             return Response("No transaction matching id provided", status=404)
 
@@ -254,7 +254,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         except Transaction.DoesNotExist:
             return Response("No transaction matching id provided", status=404)
 
-        transaction.reports.remove(report)
+        transaction.remove_from_report(report.id)
+
         return Response("Transaction removed from report")
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
@@ -514,29 +515,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction_instance = transaction_serializer.save(**save_kwargs)
 
         # Link the transaction to all the reports it references in report_ids
-        current_report_ids = set()
-        current_report_id_dicts = list(transaction_instance.reports.values("id"))
-        for report_id_dict in current_report_id_dicts:
-            current_report_ids.add(str(report_id_dict["id"]))
-
-        updated_report_ids = set(report_ids)
-
-        new_report_ids = updated_report_ids - current_report_ids
-        removed_report_ids = current_report_ids - updated_report_ids
-
-        for report_id in new_report_ids:
-            ReportTransaction.objects.create(
-                transaction=transaction_instance,
-                report_id=report_id
-            )
-
-        for report_id in removed_report_ids:
-            report_transaction = ReportTransaction.objects.filter(
-                transaction=transaction_instance,
-                report_id=report_id
-            ).first()
-            if report_transaction is not None:
-                report_transaction.delete()
+        transaction_instance.set_reports(report_ids)
 
         # handle loans and debts
         if transaction_instance.schedule_c or transaction_instance.schedule_d:

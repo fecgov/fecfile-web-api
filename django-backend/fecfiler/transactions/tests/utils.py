@@ -298,7 +298,7 @@ def create_test_transaction(
         **(transaction_data or {})
     )
     if report:
-        transaction.reports.set([report])
+        transaction.set_reports([report.id])
     return transaction
 
 
