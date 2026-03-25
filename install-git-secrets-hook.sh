@@ -29,19 +29,19 @@
 GLOBAL_TOKEN=
 if [ "$1" == "--local" ] || [ "$1" == "-l" ]; then
     # Install only to the fecfile-web-api repo.
-    git secrets --install
+    git secrets --install -f
 else
     # Install globally by modifying the ~/.gitconfig file and creating
     # the ~/.git-support/hooks directory.
-    git secrets --install ${HOME}/.git-support
+    git secrets --install -f ${HOME}/.git-support
     git config --global core.hooksPath ${HOME}/.git-support/hooks
     GLOBAL_TOKEN="--global"
 fi
 git secrets --register-aws $GLOBAL_TOKEN
 
 # Add general custom rules
-git secrets --add $GLOBAL_TOKEN '(dbpasswd|dbuser|dbname|dbhost|api_key|apikey|password|guid|hostname|pw).*[=:][^(?=|>|.*=>|.*>$)]'
-git secrets --add $GLOBAL_TOKEN '(DBPASSWD|DBUSER|DBNAME|DBHOST|API_KEY|APIKEY|PASSWORD|GUID|HOSTNAME|PW).*[=:][^(?=|>|.*=>|.*>$)]'
+git secrets --add $GLOBAL_TOKEN '(dbpasswd|dbuser|dbname|dbhost|_key|api_key|apikey|password|guid|hostname|pw).*[=:][^(?=|>|.*=>|.*>$)]'
+git secrets --add $GLOBAL_TOKEN '(DBPASSWD|DBUSER|DBNAME|DBHOST|_KEY|API_KEY|APIKEY|PASSWORD|GUID|HOSTNAME|PW).*[=:][^(?=|>|.*=>|.*>$)]'
 git secrets --add $GLOBAL_TOKEN '(user|auth|USER|AUTH)\s*[=:][^(?=|>|.*=>|.*>$)]'
 git secrets --add $GLOBAL_TOKEN '(aws_access_key_id|aws_secret_access_key)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
 git secrets --add $GLOBAL_TOKEN '(AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
