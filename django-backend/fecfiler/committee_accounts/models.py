@@ -1,3 +1,4 @@
+from django.utils import timezone
 import uuid
 from django.db import models
 from django.core.validators import RegexValidator
@@ -27,6 +28,15 @@ class CommitteeAccount(SoftDeleteModel):
     )
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    disabled = models.DateTimeField(blank=True, null=True, default=None)
+
+    def disable(self):
+        self.disabled = timezone.now()
+        self.save()
+
+    def enable(self):
+        self.disabled = None
+        self.save()
 
     class Meta:
         db_table = "committee_accounts"

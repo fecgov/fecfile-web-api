@@ -26,6 +26,8 @@ allowed_commands = [
     "fail_open_submissions",
     "dump_committee_data",
     "get_overview",
+    "disable_committee_account",
+    "enable_committee_account",
 ]
 restricted_commands = [
     "loaddata",
