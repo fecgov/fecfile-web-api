@@ -4,7 +4,7 @@ from rest_framework import status
 from django.db import models, transaction as db_transaction
 from django.db.models import Q
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
-from .managers import ReportManager, ReportTransactionManager
+from .managers import ReportManager
 from .form_3.models import Form3
 from .form_3x.models import Form3X
 from .form_24.models import Form24
@@ -236,4 +236,9 @@ class ReportTransaction(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    objects = ReportTransactionManager()
+    def save(self, *args, **kwargs):
+        with db_transaction.atomic():
+            super(ReportTransaction, self).save(*args, **kwargs)
+            if self.report.can_unamend:
+                self.report.can_unamend = False
+                self.report.save()
