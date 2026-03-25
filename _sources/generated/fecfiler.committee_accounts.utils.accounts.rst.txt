@@ -21,6 +21,8 @@ fecfiler.committee\_accounts.utils.accounts
       convert_raw_to_processed
       create_committee_account
       delete_committee_account
+      disable_committee_account
+      enable_committee_account
       get_committee_account_data
       get_committee_emails
       get_committee_from_test_fec
@@ -35,6 +37,7 @@ fecfiler.committee\_accounts.utils.accounts
       is_production_efo_pac
       is_production_efo_pty
       is_test_efo_pty
+      logout_committee_sessions
       raise_if_cannot_create_committee_account
    
    

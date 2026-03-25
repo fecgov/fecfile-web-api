@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.accounts.logout\_committee\_sessions
+=======================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.accounts
+
+.. autofunction:: logout_committee_sessions

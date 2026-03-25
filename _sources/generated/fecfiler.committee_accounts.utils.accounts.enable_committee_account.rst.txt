@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.accounts.enable\_committee\_account
+======================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.accounts
+
+.. autofunction:: enable_committee_account

@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>fecfiler.committee_accounts.migrations &#8212; FECFile Web API  documentation</title>
+    <title>fecfiler.devops.tests.test_enable_committee_account &#8212; FECFile Web API  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
@@ -13,8 +13,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.committee_accounts.migrations.0001_squashed_0007_alter_committeeaccount_members" href="fecfiler.committee_accounts.migrations.0001_squashed_0007_alter_committeeaccount_members.html" />
-    <link rel="prev" title="fecfiler.committee_accounts.management" href="fecfiler.committee_accounts.management.html" />
+    <link rel="next" title="fecfiler.devops.tests.test_enable_committee_account.EnableCommitteeAccountCommandTest" href="fecfiler.devops.tests.test_enable_committee_account.EnableCommitteeAccountCommandTest.html" />
+    <link rel="prev" title="fecfiler.devops.tests.test_django_key_utils.DjangoKeyUtilsTestCase" href="fecfiler.devops.tests.test_django_key_utils.DjangoKeyUtilsTestCase.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -32,15 +32,12 @@
 
           <div class="body" role="main">
             
-  <section id="module-fecfiler.committee_accounts.migrations">
-<span id="fecfiler-committee-accounts-migrations"></span><h1>fecfiler.committee_accounts.migrations<a class="headerlink" href="#module-fecfiler.committee_accounts.migrations" title="Link to this heading">¶</a></h1>
-<p class="rubric">Modules</p>
+  <section id="module-fecfiler.devops.tests.test_enable_committee_account">
+<span id="fecfiler-devops-tests-test-enable-committee-account"></span><h1>fecfiler.devops.tests.test_enable_committee_account<a class="headerlink" href="#module-fecfiler.devops.tests.test_enable_committee_account" title="Link to this heading">¶</a></h1>
+<p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.committee_accounts.migrations.0001_squashed_0007_alter_committeeaccount_members.html#module-fecfiler.committee_accounts.migrations.0001_squashed_0007_alter_committeeaccount_members" title="fecfiler.committee_accounts.migrations.0001_squashed_0007_alter_committeeaccount_members"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.migrations.0001_squashed_0007_alter_committeeaccount_members</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.committee_accounts.migrations.0008_committeeaccount_disabled.html#module-fecfiler.committee_accounts.migrations.0008_committeeaccount_disabled" title="fecfiler.committee_accounts.migrations.0008_committeeaccount_disabled"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fecfiler.committee_accounts.migrations.0008_committeeaccount_disabled</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.devops.tests.test_enable_committee_account.EnableCommitteeAccountCommandTest.html#fecfiler.devops.tests.test_enable_committee_account.EnableCommitteeAccountCommandTest" title="fecfiler.devops.tests.test_enable_committee_account.EnableCommitteeAccountCommandTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnableCommitteeAccountCommandTest</span></code></a>([methodName])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -69,26 +66,33 @@
 <li class="toctree-l2 current"><a class="reference internal" href="fecfiler.html">fecfiler</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.cash_on_hand.html">fecfiler.cash_on_hand</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.celery.html">fecfiler.celery</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.apps.html">fecfiler.committee_accounts.apps</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.management.html">fecfiler.committee_accounts.management</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.committee_accounts.migrations</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.migrations.0001_squashed_0007_alter_committeeaccount_members.html">fecfiler.committee_accounts.migrations.0001_squashed_0007_alter_committeeaccount_members</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.committee_accounts.migrations.0008_committeeaccount_disabled.html">fecfiler.committee_accounts.migrations.0008_committeeaccount_disabled</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.models.html">fecfiler.committee_accounts.models</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.serializers.html">fecfiler.committee_accounts.serializers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.signals.html">fecfiler.committee_accounts.signals</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.tests.html">fecfiler.committee_accounts.tests</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.urls.html">fecfiler.committee_accounts.urls</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.utils.html">fecfiler.committee_accounts.utils</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.committee_accounts.views.html">fecfiler.committee_accounts.views</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.contacts.html">fecfiler.contacts</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.dcf_importer.html">fecfiler.dcf_importer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fecfiler.devops.html">fecfiler.devops</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="fecfiler.devops.html">fecfiler.devops</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.management.html">fecfiler.devops.management</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.tasks.html">fecfiler.devops.tasks</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="fecfiler.devops.tests.html">fecfiler.devops.tests</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tests.test_cf_api_utils.html">fecfiler.devops.tests.test_cf_api_utils</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tests.test_crypt_utils.html">fecfiler.devops.tests.test_crypt_utils</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tests.test_disable_committee_account.html">fecfiler.devops.tests.test_disable_committee_account</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tests.test_django_key_utils.html">fecfiler.devops.tests.test_django_key_utils</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.devops.tests.test_enable_committee_account</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.devops.tests.test_enable_committee_account.EnableCommitteeAccountCommandTest.html">fecfiler.devops.tests.test_enable_committee_account.EnableCommitteeAccountCommandTest</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tests.test_load_test_utils.html">fecfiler.devops.tests.test_load_test_utils</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tests.test_locust_data_generator.html">fecfiler.devops.tests.test_locust_data_generator</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tests.test_login_dot_gov_cert_utils.html">fecfiler.devops.tests.test_login_dot_gov_cert_utils</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tests.test_status_views.html">fecfiler.devops.tests.test_status_views</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.devops.tests.test_tasks.html">fecfiler.devops.tests.test_tasks</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.urls.html">fecfiler.devops.urls</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.utils.html">fecfiler.devops.utils</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.devops.views.html">fecfiler.devops.views</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.feedback.html">fecfiler.feedback</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.memo_text.html">fecfiler.memo_text</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fecfiler.middleware.html">fecfiler.middleware</a></li>
@@ -120,9 +124,11 @@
   <li><a href="../index.html">Documentation overview</a><ul>
   <li><a href="../api.html">API</a><ul>
   <li><a href="fecfiler.html">fecfiler</a><ul>
-  <li><a href="fecfiler.committee_accounts.html">fecfiler.committee_accounts</a><ul>
-      <li>Previous: <a href="fecfiler.committee_accounts.management.html" title="previous chapter">fecfiler.committee_accounts.management</a></li>
-      <li>Next: <a href="fecfiler.committee_accounts.migrations.0001_squashed_0007_alter_committeeaccount_members.html" title="next chapter">fecfiler.committee_accounts.migrations.0001_squashed_0007_alter_committeeaccount_members</a></li>
+  <li><a href="fecfiler.devops.html">fecfiler.devops</a><ul>
+  <li><a href="fecfiler.devops.tests.html">fecfiler.devops.tests</a><ul>
+      <li>Previous: <a href="fecfiler.devops.tests.test_django_key_utils.DjangoKeyUtilsTestCase.html" title="previous chapter">fecfiler.devops.tests.test_django_key_utils.DjangoKeyUtilsTestCase</a></li>
+      <li>Next: <a href="fecfiler.devops.tests.test_enable_committee_account.EnableCommitteeAccountCommandTest.html" title="next chapter">fecfiler.devops.tests.test_enable_committee_account.EnableCommitteeAccountCommandTest</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -159,7 +165,7 @@
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
-      <a href="../_sources/generated/fecfiler.committee_accounts.migrations.rst.txt"
+      <a href="../_sources/generated/fecfiler.devops.tests.test_enable_committee_account.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

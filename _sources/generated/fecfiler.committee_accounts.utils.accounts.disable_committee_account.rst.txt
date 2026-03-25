@@ -1,0 +1,6 @@
+fecfiler.committee\_accounts.utils.accounts.disable\_committee\_account
+=======================================================================
+
+.. currentmodule:: fecfiler.committee_accounts.utils.accounts
+
+.. autofunction:: disable_committee_account

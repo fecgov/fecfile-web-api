@@ -1,0 +1,121 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.devops.tests.test\_enable\_committee\_account.EnableCommitteeAccountCommandTest
+========================================================================================
+
+.. currentmodule:: fecfiler.devops.tests.test_enable_committee_account
+
+.. autoclass:: EnableCommitteeAccountCommandTest
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~EnableCommitteeAccountCommandTest.__init__
+      ~EnableCommitteeAccountCommandTest.addClassCleanup
+      ~EnableCommitteeAccountCommandTest.addCleanup
+      ~EnableCommitteeAccountCommandTest.addTypeEqualityFunc
+      ~EnableCommitteeAccountCommandTest.assertAlmostEqual
+      ~EnableCommitteeAccountCommandTest.assertContains
+      ~EnableCommitteeAccountCommandTest.assertCountEqual
+      ~EnableCommitteeAccountCommandTest.assertDictEqual
+      ~EnableCommitteeAccountCommandTest.assertEqual
+      ~EnableCommitteeAccountCommandTest.assertFalse
+      ~EnableCommitteeAccountCommandTest.assertFieldOutput
+      ~EnableCommitteeAccountCommandTest.assertFormError
+      ~EnableCommitteeAccountCommandTest.assertFormSetError
+      ~EnableCommitteeAccountCommandTest.assertGreater
+      ~EnableCommitteeAccountCommandTest.assertGreaterEqual
+      ~EnableCommitteeAccountCommandTest.assertHTMLEqual
+      ~EnableCommitteeAccountCommandTest.assertHTMLNotEqual
+      ~EnableCommitteeAccountCommandTest.assertIn
+      ~EnableCommitteeAccountCommandTest.assertInHTML
+      ~EnableCommitteeAccountCommandTest.assertIs
+      ~EnableCommitteeAccountCommandTest.assertIsInstance
+      ~EnableCommitteeAccountCommandTest.assertIsNone
+      ~EnableCommitteeAccountCommandTest.assertIsNot
+      ~EnableCommitteeAccountCommandTest.assertIsNotNone
+      ~EnableCommitteeAccountCommandTest.assertJSONEqual
+      ~EnableCommitteeAccountCommandTest.assertJSONNotEqual
+      ~EnableCommitteeAccountCommandTest.assertLess
+      ~EnableCommitteeAccountCommandTest.assertLessEqual
+      ~EnableCommitteeAccountCommandTest.assertListEqual
+      ~EnableCommitteeAccountCommandTest.assertLogs
+      ~EnableCommitteeAccountCommandTest.assertMultiLineEqual
+      ~EnableCommitteeAccountCommandTest.assertNoLogs
+      ~EnableCommitteeAccountCommandTest.assertNotAlmostEqual
+      ~EnableCommitteeAccountCommandTest.assertNotContains
+      ~EnableCommitteeAccountCommandTest.assertNotEqual
+      ~EnableCommitteeAccountCommandTest.assertNotIn
+      ~EnableCommitteeAccountCommandTest.assertNotInHTML
+      ~EnableCommitteeAccountCommandTest.assertNotIsInstance
+      ~EnableCommitteeAccountCommandTest.assertNotRegex
+      ~EnableCommitteeAccountCommandTest.assertNumQueries
+      ~EnableCommitteeAccountCommandTest.assertQuerySetEqual
+      ~EnableCommitteeAccountCommandTest.assertRaises
+      ~EnableCommitteeAccountCommandTest.assertRaisesMessage
+      ~EnableCommitteeAccountCommandTest.assertRaisesRegex
+      ~EnableCommitteeAccountCommandTest.assertRedirects
+      ~EnableCommitteeAccountCommandTest.assertRegex
+      ~EnableCommitteeAccountCommandTest.assertSequenceEqual
+      ~EnableCommitteeAccountCommandTest.assertSetEqual
+      ~EnableCommitteeAccountCommandTest.assertTemplateNotUsed
+      ~EnableCommitteeAccountCommandTest.assertTemplateUsed
+      ~EnableCommitteeAccountCommandTest.assertTrue
+      ~EnableCommitteeAccountCommandTest.assertTupleEqual
+      ~EnableCommitteeAccountCommandTest.assertURLEqual
+      ~EnableCommitteeAccountCommandTest.assertWarns
+      ~EnableCommitteeAccountCommandTest.assertWarnsMessage
+      ~EnableCommitteeAccountCommandTest.assertWarnsRegex
+      ~EnableCommitteeAccountCommandTest.assertXMLEqual
+      ~EnableCommitteeAccountCommandTest.assertXMLNotEqual
+      ~EnableCommitteeAccountCommandTest.captureOnCommitCallbacks
+      ~EnableCommitteeAccountCommandTest.countTestCases
+      ~EnableCommitteeAccountCommandTest.debug
+      ~EnableCommitteeAccountCommandTest.defaultTestResult
+      ~EnableCommitteeAccountCommandTest.doClassCleanups
+      ~EnableCommitteeAccountCommandTest.doCleanups
+      ~EnableCommitteeAccountCommandTest.ensure_connection_patch_method
+      ~EnableCommitteeAccountCommandTest.enterClassContext
+      ~EnableCommitteeAccountCommandTest.enterContext
+      ~EnableCommitteeAccountCommandTest.fail
+      ~EnableCommitteeAccountCommandTest.id
+      ~EnableCommitteeAccountCommandTest.modify_settings
+      ~EnableCommitteeAccountCommandTest.run
+      ~EnableCommitteeAccountCommandTest.setUp
+      ~EnableCommitteeAccountCommandTest.setUpClass
+      ~EnableCommitteeAccountCommandTest.setUpTestData
+      ~EnableCommitteeAccountCommandTest.settings
+      ~EnableCommitteeAccountCommandTest.shortDescription
+      ~EnableCommitteeAccountCommandTest.skipTest
+      ~EnableCommitteeAccountCommandTest.subTest
+      ~EnableCommitteeAccountCommandTest.tearDown
+      ~EnableCommitteeAccountCommandTest.tearDownClass
+      ~EnableCommitteeAccountCommandTest.test_enable_committee_command
+      ~EnableCommitteeAccountCommandTest.test_enable_non_existent_committee
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~EnableCommitteeAccountCommandTest.available_apps
+      ~EnableCommitteeAccountCommandTest.databases
+      ~EnableCommitteeAccountCommandTest.fixtures
+      ~EnableCommitteeAccountCommandTest.longMessage
+      ~EnableCommitteeAccountCommandTest.maxDiff
+      ~EnableCommitteeAccountCommandTest.reset_sequences
+      ~EnableCommitteeAccountCommandTest.serialized_rollback
+   
+   

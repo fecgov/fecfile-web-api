@@ -32,4 +32,5 @@ fecfiler.committee\_accounts.migrations
    :recursive:
 
    fecfiler.committee_accounts.migrations.0001_squashed_0007_alter_committeeaccount_members
+   fecfiler.committee_accounts.migrations.0008_committeeaccount_disabled
 
