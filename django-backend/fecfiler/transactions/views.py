@@ -514,11 +514,31 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction_instance = transaction_serializer.save(**save_kwargs)
 
         # Link the transaction to all the reports it references in report_ids
-        for report_id in report_ids:
+        current_report_ids = set()
+        current_report_id_dicts = list(transaction_instance.reports.values("id"))
+        for report_id_dict in current_report_id_dicts:
+            current_report_ids.add(str(report_id_dict["id"]))
+
+        updated_report_ids = set(report_ids)
+
+        new_report_ids = updated_report_ids - current_report_ids
+        removed_report_ids = current_report_ids - updated_report_ids
+
+        for report_id in new_report_ids:
             ReportTransaction.objects.create(
                 transaction=transaction_instance,
                 report_id=report_id
             )
+
+        for report_id in removed_report_ids:
+            report_transaction = ReportTransaction.objects.filter(
+                transaction=transaction_instance,
+                report_id=report_id
+            ).first()
+            if report_transaction is not None:
+                report_transaction.delete()
+
+        # handle loans and debts
         if transaction_instance.schedule_c or transaction_instance.schedule_d:
             reports = Report.objects.filter(id__in=report_ids)
             coverage_through_date = None
