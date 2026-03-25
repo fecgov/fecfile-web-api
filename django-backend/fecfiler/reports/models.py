@@ -235,3 +235,17 @@ class ReportTransaction(models.Model):
     report = models.ForeignKey(Report, on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        with db_transaction.atomic():
+            super(ReportTransaction, self).save(*args, **kwargs)
+            if self.report.can_unamend:
+                self.report.can_unamend = False
+                self.report.save()
+
+    def delete(self, *args, **kwargs):
+        with db_transaction.atomic():
+            super(ReportTransaction, self).delete(*args, **kwargs)
+            if self.report.can_unamend:
+                self.report.can_unamend = False
+                self.report.save()

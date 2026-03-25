@@ -31,7 +31,7 @@ from fecfiler.transactions.aggregation import (
     process_aggregation_for_entity_contact,
     process_aggregation_for_election,
 )
-from fecfiler.reports.models import Report
+from fecfiler.reports.models import Report, ReportTransaction
 from fecfiler.contacts.models import Contact
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
@@ -514,7 +514,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction_instance = transaction_serializer.save(**save_kwargs)
 
         # Link the transaction to all the reports it references in report_ids
-        transaction_instance.reports.set(report_ids)
+        for report_id in report_ids:
+            ReportTransaction.objects.create(
+                transaction=transaction_instance,
+                report_id=report_id
+            )
         if transaction_instance.schedule_c or transaction_instance.schedule_d:
             reports = Report.objects.filter(id__in=report_ids)
             coverage_through_date = None
