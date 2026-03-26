@@ -36,4 +36,5 @@ fecfiler.reports.migrations
    fecfiler.reports.migrations.0004_form1m_date_committee_met_requirements_and_more
    fecfiler.reports.migrations.0005_remove_form1m_squashed_0006_reporttransaction
    fecfiler.reports.migrations.0007_remove_report_deleted_squashed_00019_form24_name_fix
+   fecfiler.reports.migrations.0008_remove_can_unamend_trigger
 

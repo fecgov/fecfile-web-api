@@ -20,6 +20,7 @@ fecfiler.transactions.models.Transaction
    .. autosummary::
    
       ~Transaction.__init__
+      ~Transaction.add_to_report
       ~Transaction.adelete
       ~Transaction.arefresh_from_db
       ~Transaction.asave
@@ -52,9 +53,11 @@ fecfiler.transactions.models.Transaction
       ~Transaction.is_loan_repayment
       ~Transaction.prepare_database_save
       ~Transaction.refresh_from_db
+      ~Transaction.remove_from_report
       ~Transaction.save
       ~Transaction.save_base
       ~Transaction.serializable_value
+      ~Transaction.set_reports
       ~Transaction.unique_error_message
       ~Transaction.validate_constraints
       ~Transaction.validate_unique

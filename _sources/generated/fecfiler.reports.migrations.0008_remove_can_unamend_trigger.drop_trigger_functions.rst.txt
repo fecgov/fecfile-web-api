@@ -1,0 +1,6 @@
+fecfiler.reports.migrations.0008\_remove\_can\_unamend\_trigger.drop\_trigger\_functions
+========================================================================================
+
+.. currentmodule:: fecfiler.reports.migrations.0008_remove_can_unamend_trigger
+
+.. autofunction:: drop_trigger_functions

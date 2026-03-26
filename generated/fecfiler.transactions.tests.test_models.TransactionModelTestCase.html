@@ -304,38 +304,44 @@ not have a method with the specified name.</p>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_can_delete_reattributed_transaction</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_coupled_transactions" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_coupled_transactions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_coupled_transactions</span></code></a>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_creating_a_transaction_resets_can_unamend</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_coupled_transactions" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_coupled_transactions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_coupled_transactions</span></code></a>()</p></td>
 <td><p>Transactions where 2 or 3 transactions are filled out on the same form need to be deleted together even if the child the one deleted.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_debt_transactions" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_debt_transactions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_debt_transactions</span></code></a>()</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_debt_transactions" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_debt_transactions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_debt_transactions</span></code></a>()</p></td>
 <td><p>Deleting a debt must delete any payments made towards the debt and carried forward copies of it (along with repayments to them)</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_loan_by_committee</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_loan_by_committee</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_loan_received_from_bank</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_loan_received_from_bank</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_loan_repayment" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_loan_repayment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_loan_repayment</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_loan_repayment" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_loan_repayment"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_loan_repayment</span></code></a>()</p></td>
 <td><p>Deleting a loan repayment should update the loan_payment_to_date of current loan and carried forward</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_earmark</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_earmark</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_jf_transfer</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_jf_transfer</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_with_copy</span></code>()</p></td>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_reattribution_with_copy</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_transaction</span></code>()</p></td>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_transaction</span></code>()</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_transaction_with_children</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children" title="fecfiler.transactions.tests.test_models.TransactionModelTestCase.test_delete_transaction_with_children"><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_delete_transaction_with_children</span></code></a>()</p></td>
 <td><p>Test the deletion of transactions within a 3 tier hierarchy deleting the parent deletes all 3 deleting the tier 2 deletes the tier 2 and 3 deleting the tier 3 deletes only the tier 3</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_deleting_a_transaction_resets_can_unamend</span></code>()</p></td>
+<td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_election_aggregates_across_committees</span></code>()</p></td>
 <td><p></p></td>
@@ -365,6 +371,12 @@ not have a method with the specified name.</p>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_unitemization_cascades_to_children_in_other_chain</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_updating_a_transaction_resets_can_unamend</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_updating_a_transaction_resets_can_unamend_in_all_affiliated_reports</span></code>()</p></td>
 <td><p></p></td>
 </tr>
 </tbody>

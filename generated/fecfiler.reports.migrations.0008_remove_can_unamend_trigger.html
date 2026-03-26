@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>fecfiler.reports.models &#8212; FECFile Web API  documentation</title>
+    <title>fecfiler.reports.migrations.0008_remove_can_unamend_trigger &#8212; FECFile Web API  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
@@ -13,8 +13,8 @@
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="fecfiler.reports.models.Report" href="fecfiler.reports.models.Report.html" />
-    <link rel="prev" title="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.Migration" href="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.Migration.html" />
+    <link rel="next" title="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_db_functions" href="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_db_functions.html" />
+    <link rel="prev" title="fecfiler.reports.migrations.0007_remove_report_deleted_squashed_00019_form24_name_fix.Migration" href="fecfiler.reports.migrations.0007_remove_report_deleted_squashed_00019_form24_name_fix.Migration.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -32,18 +32,23 @@
 
           <div class="body" role="main">
             
-  <section id="module-fecfiler.reports.models">
-<span id="fecfiler-reports-models"></span><h1>fecfiler.reports.models<a class="headerlink" href="#module-fecfiler.reports.models" title="Link to this heading">¶</a></h1>
+  <section id="module-fecfiler.reports.migrations.0008_remove_can_unamend_trigger">
+<span id="fecfiler-reports-migrations-0008-remove-can-unamend-trigger"></span><h1>fecfiler.reports.migrations.0008_remove_can_unamend_trigger<a class="headerlink" href="#module-fecfiler.reports.migrations.0008_remove_can_unamend_trigger" title="Link to this heading">¶</a></h1>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_db_functions.html#fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_db_functions" title="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_db_functions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_db_functions</span></code></a>(_apps, _schema_editor)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_trigger_functions.html#fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_trigger_functions" title="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_trigger_functions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">drop_trigger_functions</span></code></a>(_apps, _schema_editor)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
 <p class="rubric">Classes</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.reports.models.Report.html#fecfiler.reports.models.Report" title="fecfiler.reports.models.Report"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Report</span></code></a>(*args, **kwargs)</p></td>
-<td><p>Generated model from json schema</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="fecfiler.reports.models.ReportMixin.html#fecfiler.reports.models.ReportMixin" title="fecfiler.reports.models.ReportMixin"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReportMixin</span></code></a>(*args, **kwargs)</p></td>
-<td><p>Abstract model for tracking reports</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.reports.models.ReportTransaction.html#fecfiler.reports.models.ReportTransaction" title="fecfiler.reports.models.ReportTransaction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ReportTransaction</span></code></a>(id, transaction, report, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.Migration.html#fecfiler.reports.migrations.0008_remove_can_unamend_trigger.Migration" title="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.Migration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Migration</span></code></a>(name, app_label)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -90,13 +95,21 @@
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.form_99.html">fecfiler.reports.form_99</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.management.html">fecfiler.reports.management</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.managers.html">fecfiler.reports.managers</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.migrations.html">fecfiler.reports.migrations</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">fecfiler.reports.models</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.reports.models.Report.html">fecfiler.reports.models.Report</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.reports.models.ReportMixin.html">fecfiler.reports.models.ReportMixin</a></li>
-<li class="toctree-l5"><a class="reference internal" href="fecfiler.reports.models.ReportTransaction.html">fecfiler.reports.models.ReportTransaction</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="fecfiler.reports.migrations.html">fecfiler.reports.migrations</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.reports.migrations.0001_initial.html">fecfiler.reports.migrations.0001_initial</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.reports.migrations.0002_initial.html">fecfiler.reports.migrations.0002_initial</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.reports.migrations.0004_form1m_date_committee_met_requirements_and_more.html">fecfiler.reports.migrations.0004_form1m_date_committee_met_requirements_and_more</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.reports.migrations.0005_remove_form1m_squashed_0006_reporttransaction.html">fecfiler.reports.migrations.0005_remove_form1m_squashed_0006_reporttransaction</a></li>
+<li class="toctree-l5"><a class="reference internal" href="fecfiler.reports.migrations.0007_remove_report_deleted_squashed_00019_form24_name_fix.html">fecfiler.reports.migrations.0007_remove_report_deleted_squashed_00019_form24_name_fix</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">fecfiler.reports.migrations.0008_remove_can_unamend_trigger</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_db_functions.html">fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_db_functions</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_trigger_functions.html">fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_trigger_functions</a></li>
+<li class="toctree-l6"><a class="reference internal" href="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.Migration.html">fecfiler.reports.migrations.0008_remove_can_unamend_trigger.Migration</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.models.html">fecfiler.reports.models</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.report_code_label.html">fecfiler.reports.report_code_label</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.serializers.html">fecfiler.reports.serializers</a></li>
 <li class="toctree-l4"><a class="reference internal" href="fecfiler.reports.signals.html">fecfiler.reports.signals</a></li>
@@ -131,8 +144,10 @@
   <li><a href="../api.html">API</a><ul>
   <li><a href="fecfiler.html">fecfiler</a><ul>
   <li><a href="fecfiler.reports.html">fecfiler.reports</a><ul>
-      <li>Previous: <a href="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.Migration.html" title="previous chapter">fecfiler.reports.migrations.0008_remove_can_unamend_trigger.Migration</a></li>
-      <li>Next: <a href="fecfiler.reports.models.Report.html" title="next chapter">fecfiler.reports.models.Report</a></li>
+  <li><a href="fecfiler.reports.migrations.html">fecfiler.reports.migrations</a><ul>
+      <li>Previous: <a href="fecfiler.reports.migrations.0007_remove_report_deleted_squashed_00019_form24_name_fix.Migration.html" title="previous chapter">fecfiler.reports.migrations.0007_remove_report_deleted_squashed_00019_form24_name_fix.Migration</a></li>
+      <li>Next: <a href="fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_db_functions.html" title="next chapter">fecfiler.reports.migrations.0008_remove_can_unamend_trigger.drop_db_functions</a></li>
+  </ul></li>
   </ul></li>
   </ul></li>
   </ul></li>
@@ -169,7 +184,7 @@
       &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
       |
-      <a href="../_sources/generated/fecfiler.reports.models.rst.txt"
+      <a href="../_sources/generated/fecfiler.reports.migrations.0008_remove_can_unamend_trigger.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

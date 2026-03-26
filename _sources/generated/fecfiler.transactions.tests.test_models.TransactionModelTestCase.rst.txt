@@ -104,6 +104,7 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.test_can_delete_debt
       ~TransactionModelTestCase.test_can_delete_loan
       ~TransactionModelTestCase.test_can_delete_reattributed_transaction
+      ~TransactionModelTestCase.test_creating_a_transaction_resets_can_unamend
       ~TransactionModelTestCase.test_delete_coupled_transactions
       ~TransactionModelTestCase.test_delete_debt_transactions
       ~TransactionModelTestCase.test_delete_loan_by_committee
@@ -115,6 +116,7 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.test_delete_reattribution_with_copy
       ~TransactionModelTestCase.test_delete_transaction
       ~TransactionModelTestCase.test_delete_transaction_with_children
+      ~TransactionModelTestCase.test_deleting_a_transaction_resets_can_unamend
       ~TransactionModelTestCase.test_election_aggregates_across_committees
       ~TransactionModelTestCase.test_get_children
       ~TransactionModelTestCase.test_get_transaction_family
@@ -125,6 +127,8 @@ fecfiler.transactions.tests.test\_models.TransactionModelTestCase
       ~TransactionModelTestCase.test_tier3_itemization
       ~TransactionModelTestCase.test_transaction_and_memo_text_soft_delete
       ~TransactionModelTestCase.test_unitemization_cascades_to_children_in_other_chain
+      ~TransactionModelTestCase.test_updating_a_transaction_resets_can_unamend
+      ~TransactionModelTestCase.test_updating_a_transaction_resets_can_unamend_in_all_affiliated_reports
    
    
 
