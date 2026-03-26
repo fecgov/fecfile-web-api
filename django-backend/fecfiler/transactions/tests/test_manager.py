@@ -289,7 +289,7 @@ class TransactionViewTestCase(TestCase):
         q1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         original_debt = create_debt(self.committee, self.contact_1, Decimal("123.00"))
         original_debt.save()
-        original_debt.reports.add(q1_report)
+        original_debt.add_to_report(q1_report.id)
         first_repayment = create_schedule_b(
             "OPERATING_EXPENDITURE",
             self.committee,

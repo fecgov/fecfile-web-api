@@ -58,7 +58,7 @@ class ScheduleCViewsTestCase(TestCase):
         self.loan.save()
         self.loan.memo_text.transaction_uuid = self.loan.id
         self.loan.memo_text.save()
-        self.loan.reports.add(self.report_1)
+        self.loan.add_to_report(self.report_1.id)
 
     def test_create_loan_in_future_report(self):
         save_hook(self.loan, False)

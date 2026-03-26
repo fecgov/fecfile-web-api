@@ -236,7 +236,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
             transactions = transaction.get_transaction_family()
             for t in transactions:
-                t.reports.add(report)
+                t.add_to_report(report.id)
         except Transaction.DoesNotExist:
             return Response("No transaction matching id provided", status=404)
 
@@ -254,7 +254,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         except Transaction.DoesNotExist:
             return Response("No transaction matching id provided", status=404)
 
-        transaction.reports.remove(report)
+        transaction.remove_from_report(report.id)
+
         return Response("Transaction removed from report")
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
@@ -514,7 +515,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction_instance = transaction_serializer.save(**save_kwargs)
 
         # Link the transaction to all the reports it references in report_ids
-        transaction_instance.reports.set(report_ids)
+        transaction_instance.set_reports(report_ids)
+
+        # handle loans and debts
         if transaction_instance.schedule_c or transaction_instance.schedule_d:
             reports = Report.objects.filter(id__in=report_ids)
             coverage_through_date = None
