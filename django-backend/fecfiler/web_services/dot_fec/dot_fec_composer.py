@@ -120,7 +120,7 @@ def compose_header(report_id):
             "HDR",
             "FEC",
             FEC_FORMAT_VERSION,
-            "FECFile Online",
+            "FECfile+",
             "0.0.1",
             report.report_id,
             report.report_version,
