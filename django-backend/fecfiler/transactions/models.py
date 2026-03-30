@@ -34,6 +34,13 @@ logger = structlog.get_logger(__name__)
 CONTACT = "contacts.Contact"
 
 
+TEST_KEY="BOO"
+TEST_KEY = "BOO"
+TEST_KEY = {
+    "test_key": "Boo"
+}
+export CYPRESS_RECORD_KEY="aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"
+
 class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
     def __str__(self):
