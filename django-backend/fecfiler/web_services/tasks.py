@@ -13,6 +13,7 @@ from fecfiler.web_services.dot_fec.dot_fec_composer import compose_dot_fec
 from fecfiler.web_services.dot_fec.dot_fec_submitter import (
     EFODotFECSubmitter,
     MockDotFECSubmitter,
+    MockDotFECSubmitterFailure,
 )
 from fecfiler.web_services.dot_fec.web_print_submitter import (
     EFOWebPrintSubmitter,
@@ -37,17 +38,20 @@ WEB_PRINT_KEY = "WebPrint"
 MOCK_WEB_PRINT_KEY = "MockWebPrint"
 EFO_SUBMITTER_KEY = "DotFEC"
 MOCK_SUBMITTER_KEY = "MockDotFEC"
+MOCK_SUBMIT_FAILURE_KEY = "MockDotFECFailure"
 SUBMISSION_MANAGERS = {
     WEB_PRINT_KEY: EFOWebPrintSubmitter,
     MOCK_WEB_PRINT_KEY: MockWebPrintSubmitter,
     EFO_SUBMITTER_KEY: EFODotFECSubmitter,
     MOCK_SUBMITTER_KEY: MockDotFECSubmitter,
+    MOCK_SUBMIT_FAILURE_KEY: MockDotFECSubmitterFailure,
 }
 SUBMISSION_CLASSES = {
     WEB_PRINT_KEY: WebPrintSubmission,
     MOCK_WEB_PRINT_KEY: WebPrintSubmission,
     EFO_SUBMITTER_KEY: UploadSubmission,
     MOCK_SUBMITTER_KEY: UploadSubmission,
+    MOCK_SUBMIT_FAILURE_KEY: UploadSubmission,
 }
 
 MAX_ATTEMPTS = INITIAL_POLLING_MAX_ATTEMPTS + SECONDARY_POLLING_MAX_ATTEMPTS
@@ -132,6 +136,7 @@ def submit_to_fec(
     force_read_from_disk=False,
     backdoor_code=None,
     mock=False,
+    mock_reject=False,
 ):
     submission = UploadSubmission.objects.get(id=submission_record_id)
     submission.save_state(FECSubmissionState.SUBMITTING)
@@ -152,7 +157,12 @@ def submit_to_fec(
 
     """Submit to FEC"""
     try:
-        submission_type_key = EFO_SUBMITTER_KEY if not mock else MOCK_SUBMITTER_KEY
+        if mock_reject:
+            submission_type_key = MOCK_SUBMIT_FAILURE_KEY
+        elif mock:
+            submission_type_key = MOCK_SUBMITTER_KEY
+        else:
+            submission_type_key = EFO_SUBMITTER_KEY
         submitter = SUBMISSION_MANAGERS[submission_type_key]()
         logger.info(f"Uploading {file_name} to FEC")
         submission_json = submitter.get_submission_json(
