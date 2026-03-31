@@ -3,7 +3,7 @@ from django.test import TestCase
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from datetime import datetime
-from fecfiler.reports.form_3x.summary import calculate_summary_columns
+from fecfiler.reports.form_3x.summary import calculate_summary, calculate_summary_columns
 from fecfiler.contacts.tests.utils import create_test_individual_contact
 from fecfiler.web_services.summary.tests.utils import generate_data
 from fecfiler.cash_on_hand.tests.utils import create_cash_on_hand_yearly
@@ -237,3 +237,24 @@ class F3XReportTestCase(TestCase):
         )
         summary_a, _ = calculate_summary_columns(f3x)
         self.assertTrue("line_8" in summary_a)
+
+    def test_calculate_summary_sets_l6a_year_from_coverage_from_date(self):
+        report = create_form3x(
+            self.committee,
+            datetime.strptime("2026-01-01", "%Y-%m-%d").date(),
+            datetime.strptime("2026-01-31", "%Y-%m-%d").date(),
+        )
+
+        calculate_summary(report)
+        report.refresh_from_db()
+        self.assertEqual(str(report.form_3x.L6a_year_for_above_ytd), "2026")
+
+        report.coverage_from_date = datetime.strptime("2025-01-01", "%Y-%m-%d").date()
+        report.coverage_through_date = datetime.strptime(
+            "2025-01-31", "%Y-%m-%d"
+        ).date()
+        report.save(update_fields=["coverage_from_date", "coverage_through_date"])
+
+        calculate_summary(report)
+        report.refresh_from_db()
+        self.assertEqual(str(report.form_3x.L6a_year_for_above_ytd), "2025")
