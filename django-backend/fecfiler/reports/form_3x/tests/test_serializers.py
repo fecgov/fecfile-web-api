@@ -22,6 +22,8 @@ from fecfiler.reports.managers import (
     STATUS_CODE_PENDING,
     STATUS_CODE_FAILED,
 )
+from fecfiler.web_services.summary.tasks import CalculationState
+from uuid import uuid4
 
 
 class F3XSerializerTestCase(TestCase):
@@ -233,3 +235,45 @@ class F3XSerializerTestCase(TestCase):
             ),
             report_a,
         )
+
+    def test_update_coverage_from_date_updates_l6a_year(self):
+        report = create_form3x(self.committee, "2026-01-01", "2026-01-31")
+
+        serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
+        )
+        serializer.is_valid()
+        serializer.update(
+            report,
+            {
+                "coverage_from_date": "2025-01-01",
+                "coverage_through_date": "2025-01-31",
+            },
+        )
+
+        report.refresh_from_db()
+        self.assertEqual(str(report.form_3x.L6a_year_for_above_ytd), "2025")
+
+    def test_update_coverage_dates_clears_calculation_status(self):
+        report = create_form3x(self.committee, "2026-01-01", "2026-01-31")
+        report.calculation_status = CalculationState.SUCCEEDED.value
+        report.calculation_token = uuid4()
+        report.save()
+
+        serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
+        )
+        serializer.is_valid()
+        serializer.update(
+            report,
+            {
+                "coverage_from_date": "2025-01-01",
+                "coverage_through_date": "2025-01-31",
+            },
+        )
+
+        report.refresh_from_db()
+        self.assertIsNone(report.calculation_status)
+        self.assertIsNone(report.calculation_token)

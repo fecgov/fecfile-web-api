@@ -384,6 +384,30 @@ class Form3XSerializer(ReportSerializer):
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
+            def normalize_coverage_date(value):
+                if isinstance(value, str):
+                    return date.fromisoformat(value)
+                return value
+
+            updated_coverage_from_date = validated_data.get(
+                "coverage_from_date", instance.coverage_from_date
+            )
+            updated_coverage_through_date = validated_data.get(
+                "coverage_through_date", instance.coverage_through_date
+            )
+            normalized_coverage_from_date = normalize_coverage_date(
+                updated_coverage_from_date
+            )
+            normalized_coverage_through_date = normalize_coverage_date(
+                updated_coverage_through_date
+            )
+            coverage_from_changed = (
+                normalized_coverage_from_date != instance.coverage_from_date
+            )
+            coverage_through_changed = (
+                normalized_coverage_through_date != instance.coverage_through_date
+            )
+
             # Check if there are any transactions that fall outside the coverage dates
             transactions_outside_coverage_dates = ReportTransaction.objects.filter(
                 ~Q(transaction__memo_code=True),
@@ -404,6 +428,18 @@ class Form3XSerializer(ReportSerializer):
             for attr, value in validated_data.items():
                 if attr != "id":
                     setattr(instance.form_3x, attr, value)
+
+            if coverage_from_changed:
+                coverage_from_year = (
+                    normalized_coverage_from_date.year
+                    if hasattr(normalized_coverage_from_date, "year")
+                    else str(normalized_coverage_from_date)[:4]
+                )
+                instance.form_3x.L6a_year_for_above_ytd = coverage_from_year
+
+            if coverage_from_changed or coverage_through_changed:
+                validated_data["calculation_status"] = None
+                validated_data["calculation_token"] = None
 
             instance.form_3x.save()
             updated = super().update(instance, validated_data)
