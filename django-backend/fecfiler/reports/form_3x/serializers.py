@@ -6,6 +6,7 @@ from fecfiler.reports.serializers import (
     COVERAGE_DATE_REPORT_CODE_COLLISION,
 )
 from fecfiler.shared.utilities import get_model_data
+from fecfiler.web_services.summary.tasks import calculate_summary
 from django.db.models import Q
 from rest_framework.serializers import (
     CharField,
@@ -414,8 +415,6 @@ class Form3XSerializer(ReportSerializer):
                 prior_coverage_through_date != updated.coverage_through_date
             )
             if coverage_from_changed or coverage_through_changed:
-                from fecfiler.web_services.summary.tasks import calculate_summary
-
                 calculate_summary(updated.id)
 
             return updated
