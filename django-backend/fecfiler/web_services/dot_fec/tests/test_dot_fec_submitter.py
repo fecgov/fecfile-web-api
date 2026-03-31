@@ -1,6 +1,7 @@
 import json
 from uuid import uuid4 as uuid
 from django.test import TestCase
+from django.utils import timezone
 from fecfiler.web_services.dot_fec.dot_fec_submitter import MockDotFECSubmitter
 from fecfiler.web_services.dot_fec.web_print_submitter import MockWebPrintSubmitter
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
@@ -44,7 +45,13 @@ class DotFECSubmitterTestCase(TestCase):
 
     def test_poll(self):
         submitter = MockDotFECSubmitter()
-        response = submitter.poll_status(UploadSubmission())
+        response = submitter.poll_status(UploadSubmission(created=timezone.now()))
+        response_obj = json.loads(response)
+        self.assertEqual(response_obj["status"], "PROCESSING")
+
+        response = submitter.poll_status(
+            UploadSubmission(created=timezone.now() - timezone.timedelta(seconds=30))
+        )
         response_obj = json.loads(response)
         self.assertEqual(response_obj["status"], "ACCEPTED")
 
