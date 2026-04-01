@@ -288,4 +288,4 @@ workflows:
       - deploy-job:
           filters:
             branches:
-              only: /feature\/2864-deploy-to-mirror/
+              only: /feature/2427-deploy-to-mirror/
