@@ -25,6 +25,7 @@ fecfiler.web\_services.dot\_fec.dot\_fec\_submitter
       DotFECSubmitter
       EFODotFECSubmitter
       MockDotFECSubmitter
+      MockDotFECSubmitterFailure
    
    
 

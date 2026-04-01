@@ -1,0 +1,32 @@
+..
+    This is a template from a stackoverflow answer https://stackoverflow.com/a/62613202
+
+fecfiler.web\_services.dot\_fec.dot\_fec\_submitter.MockDotFECSubmitterFailure
+==============================================================================
+
+.. currentmodule:: fecfiler.web_services.dot_fec.dot_fec_submitter
+
+.. autoclass:: MockDotFECSubmitterFailure
+   :members:                                    
+   :show-inheritance:                           
+   :inherited-members:                          
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MockDotFECSubmitterFailure.__init__
+      ~MockDotFECSubmitterFailure.get_submission_json
+      ~MockDotFECSubmitterFailure.log_submission_json
+      ~MockDotFECSubmitterFailure.poll_status
+      ~MockDotFECSubmitterFailure.submit
+   
+   
+
+   
+   
+   
