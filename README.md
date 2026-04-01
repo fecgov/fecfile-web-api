@@ -17,7 +17,7 @@ finance information. The project code is distributed across these repositories:
 
 ## Set up
 
-Set up instructions are found in the [wiki](https://github.com/fecgov/fecfile-web-api/wiki/Local-Setup), including [instructions specific to the API](https://github.com/fecgov/fecfile-web-api/wiki/Local-setup#running-the-backend-locally) and an [overview of Docker usage](https://github.com/fecgov/fecfile-web-api/wiki/Local-setup#docker-basic-usage). 
+Set up instructions are found in the [wiki](https://github.com/fecgov/fecfile-web-api/wiki/Local-initial-setup), including [instructions specific to the API](https://github.com/fecgov/fecfile-web-api/wiki/Local-initial-setup#running-the-backend-locally) and an [overview of Docker usage](https://github.com/fecgov/fecfile-web-api/wiki/Local-initial-setup#docker-basic-usage). 
 
 ## Local testing
 
