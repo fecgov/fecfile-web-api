@@ -42,7 +42,7 @@ class ScheduleDViewsTestCase(TestCase):
         self.schedule_d.save()
         self.debt.schedule_d = self.schedule_d
         self.debt.save()
-        self.debt.reports.add(self.report_1)
+        self.debt.add_to_report(self.report_1.id)
 
     def test_create_debt_in_future_report(self):
         save_hook(self.debt, False)
