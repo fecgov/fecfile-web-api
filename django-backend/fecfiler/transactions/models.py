@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Q
+from django.apps import apps
 from django.contrib.postgres.fields import ArrayField
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
@@ -500,6 +501,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     error=str(e),
                     exc_info=True,
                 )
+
+            # Handle report unamending
+            self.reports.update(can_unamend=False)
         elif skip_aggregation:
             # Clear the flag for next save
             self._skip_aggregation = False
@@ -654,6 +658,45 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             parent = self.parent_transaction
             parent.refresh_from_db(fields=["deleted"])
             parent.delete()
+
+    def add_to_report(self, report_id):
+        ReportTransaction = apps.get_model("reports.ReportTransaction")
+        report_transaction = ReportTransaction.objects.filter(
+            transaction=self,
+            report_id=report_id
+        ).first()
+
+        if report_transaction is None:
+            ReportTransaction.objects.create(
+                transaction=self,
+                report_id=report_id
+            )
+
+    def remove_from_report(self, report_id):
+        ReportTransaction = apps.get_model("reports.ReportTransaction")
+        report_transaction = ReportTransaction.objects.filter(
+            transaction=self,
+            report_id=report_id
+        ).first()
+
+        if report_transaction is not None:
+            report_transaction.delete()
+
+    def set_reports(self, report_ids):
+        current_report_ids = set()
+        current_report_id_dicts = list(self.reports.values("id"))
+        for report_id_dict in current_report_id_dicts:
+            current_report_ids.add(str(report_id_dict["id"]))
+
+        updated_report_ids = set(report_ids)
+        report_ids_to_reset_can_unamend = current_report_ids ^ updated_report_ids
+
+        Report = apps.get_model("reports.Report")
+        Report.objects.filter(
+            id__in=report_ids_to_reset_can_unamend
+        ).update(can_unamend=False)
+
+        self.reports.set(report_ids)
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]

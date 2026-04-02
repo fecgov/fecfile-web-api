@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('web_services', '0003_uploadsubmission_fecfile_polling_attempts_and_more'),
+        ('web_services', '0001_initial_squashed_0003_polling_attempts'),
     ]
 
     operations = [

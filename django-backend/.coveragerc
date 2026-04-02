@@ -1,6 +1,9 @@
 # .coveragerc to control coverage.py
 # https://coverage.readthedocs.io/en/coverage-4.3.3/source.html#execution
 [run]
+source = .
+parallel = True
+concurrency = multiprocessing
 omit =
     # Excluding dev scripts from code coverage
     ./scripts/json_schema_to_django_model.py

@@ -860,7 +860,7 @@ def gen_schedule_a(transaction_data, f3x, committee, contact):
             data["memo"],
             data["itemized"],
         )
-        scha.reports.add(f3x)
+        scha.add_to_report(f3x.id)
         scha.save()
         if data["form_type"] == "SA11AII":
             debt = scha
@@ -879,7 +879,7 @@ def gen_schedule_b(transaction_data, f3x, committee, contact):
             data["form_type"],
         )
 
-        schb.reports.add(f3x)
+        schb.add_to_report(f3x.id)
         schb.save()
 
 
@@ -895,7 +895,7 @@ def gen_schedule_c(transaction_data, f3x, committee, contact):
             "LOAN_RECEIVED_FROM_INDIVIDUAL",
             data["form_type"],
         )
-        schc.reports.add(f3x)
+        schc.add_to_report(f3x.id)
 
 
 def gen_schedule_d(transaction_data, f3x, committee, contact):
@@ -924,7 +924,7 @@ def gen_schedule_e(transaction_data, f3x, committee, contact, candidate):
             candidate,
             data["memo_code"],
         )
-        sche.reports.add(f3x)
+        sche.add_to_report(f3x.id)
 
 
 def gen_schedule_f(
@@ -958,5 +958,5 @@ def gen_schedule_f(
             },
         )
 
-        schf.reports.add(f3x)
+        schf.add_to_report(f3x.id)
         schf.save()
