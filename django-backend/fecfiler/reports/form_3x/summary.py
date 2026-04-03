@@ -15,6 +15,7 @@ def calculate_summary(report):
 
     a, b = calculate_summary_columns(report)
     # line 6a
+    form_3x.L6a_year_for_above_ytd = str(report.coverage_from_date.year)
     form_3x.L6a_cash_on_hand_jan_1_ytd = b.get("line_6a", None)
     # line 6b
     form_3x.L6b_cash_on_hand_beginning_period = a.get("line_6b", None)

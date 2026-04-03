@@ -22,6 +22,10 @@ from fecfiler.reports.managers import (
     STATUS_CODE_PENDING,
     STATUS_CODE_FAILED,
 )
+from fecfiler.web_services.summary.tasks import CalculationState
+from uuid import uuid4
+from datetime import datetime
+from fecfiler.web_services.summary.tasks import calculate_summary
 
 
 class F3XSerializerTestCase(TestCase):
@@ -156,7 +160,14 @@ class F3XSerializerTestCase(TestCase):
             type(COVERAGE_DATE_REPORT_CODE_COLLISION),
             serializer.update,
             report_a,
-            {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-05-31"},
+            {
+                "coverage_from_date": datetime.strptime(
+                    "2024-01-01", "%Y-%m-%d"
+                ).date(),
+                "coverage_through_date": datetime.strptime(
+                    "2024-05-31", "%Y-%m-%d"
+                ).date(),
+            },
         )
 
     def test_update_coverage_to_exclude_transaction(self):
@@ -174,7 +185,14 @@ class F3XSerializerTestCase(TestCase):
             type(COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS),
             serializer.update,
             report_a,
-            {"coverage_from_date": "2024-01-01", "coverage_through_date": "2024-02-28"},
+            {
+                "coverage_from_date": datetime.strptime(
+                    "2024-01-01", "%Y-%m-%d"
+                ).date(),
+                "coverage_through_date": datetime.strptime(
+                    "2024-02-28", "%Y-%m-%d"
+                ).date(),
+            },
         )
 
     def test_update_coverage_to_exclude_memo_transaction(self):
@@ -198,8 +216,12 @@ class F3XSerializerTestCase(TestCase):
             serializer.update(
                 report_a,
                 {
-                    "coverage_from_date": "2024-01-01",
-                    "coverage_through_date": "2024-02-28",
+                    "coverage_from_date": datetime.strptime(
+                        "2024-01-01", "%Y-%m-%d"
+                    ).date(),
+                    "coverage_through_date": datetime.strptime(
+                        "2024-02-28", "%Y-%m-%d"
+                    ).date(),
                 },
             ),
             report_a,
@@ -227,9 +249,97 @@ class F3XSerializerTestCase(TestCase):
             serializer.update(
                 report_a,
                 {
-                    "coverage_from_date": "2024-01-01",
-                    "coverage_through_date": "2024-02-28",
+                    "coverage_from_date": datetime.strptime(
+                        "2024-01-01", "%Y-%m-%d"
+                    ).date(),
+                    "coverage_through_date": datetime.strptime(
+                        "2024-02-28", "%Y-%m-%d"
+                    ).date(),
                 },
             ),
             report_a,
         )
+
+    def test_update_coverage_dates_marks_report_dirty(self):
+        report = create_form3x(self.committee, "2026-01-01", "2026-01-31")
+        report.calculation_status = CalculationState.FAILED.value
+        report.calculation_token = uuid4()
+        report.save()
+
+        serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
+        )
+        serializer.is_valid()
+        serializer.update(
+            report,
+            {
+                "coverage_from_date": datetime.strptime(
+                    "2025-01-01", "%Y-%m-%d"
+                ).date(),
+                "coverage_through_date": datetime.strptime(
+                    "2025-01-31", "%Y-%m-%d"
+                ).date(),
+            },
+        )
+
+        report.refresh_from_db()
+        self.assertIsNone(report.calculation_status)
+        self.assertIsNone(report.calculation_token)
+
+    def test_update_coverage_from_date_does_not_recalculate_l6a_year_immediately(self):
+        report = create_form3x(self.committee, "2026-01-01", "2026-01-31")
+        report.form_3x.L6a_year_for_above_ytd = "2026"
+        report.form_3x.save()
+
+        serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
+        )
+        serializer.is_valid()
+        serializer.update(
+            report,
+            {
+                "coverage_from_date": datetime.strptime(
+                    "2025-01-01", "%Y-%m-%d"
+                ).date(),
+                "coverage_through_date": datetime.strptime(
+                    "2025-01-31", "%Y-%m-%d"
+                ).date(),
+            },
+        )
+
+        report.refresh_from_db()
+        self.assertEqual(str(report.form_3x.L6a_year_for_above_ytd), "2026")
+
+    def test_update_coverage_then_request_summary_updates_l6a_year_label(self):
+        report = create_form3x(self.committee, "2026-01-01", "2026-01-31")
+        calculate_summary(report.id)
+        report.refresh_from_db()
+        self.assertEqual(str(report.form_3x.L6a_year_for_above_ytd), "2026")
+
+        serializer = Form3XSerializer(
+            data=self.valid_f3x_report,
+            context={"request": self.mock_request},
+        )
+        serializer.is_valid()
+        serializer.update(
+            report,
+            {
+                "coverage_from_date": datetime.strptime(
+                    "2025-01-01", "%Y-%m-%d"
+                ).date(),
+                "coverage_through_date": datetime.strptime(
+                    "2025-01-31", "%Y-%m-%d"
+                ).date(),
+            },
+        )
+
+        report.refresh_from_db()
+        self.assertIsNone(report.calculation_status)
+        self.assertEqual(str(report.form_3x.L6a_year_for_above_ytd), "2026")
+
+        calculate_summary(report.id)
+        report.refresh_from_db()
+        self.assertEqual(str(report.form_3x.L6a_year_for_above_ytd), "2025")
+        self.assertEqual(report.calculation_status, CalculationState.SUCCEEDED.value)
