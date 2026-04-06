@@ -85,6 +85,10 @@ class Report(CommitteeOwnedModel):
     can_delete = models.BooleanField(default=True)
     can_unamend = models.BooleanField(default=False)
 
+    @classmethod
+    def mark_calculations_dirty(cls, queryset):
+        return queryset.update(calculation_status=None, calculation_token=None)
+
     @property
     def previous_report(self):
         return (
