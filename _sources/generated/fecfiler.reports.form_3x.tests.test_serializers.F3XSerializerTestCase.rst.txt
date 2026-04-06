@@ -101,6 +101,8 @@ fecfiler.reports.form\_3x.tests.test\_serializers.F3XSerializerTestCase
       ~F3XSerializerTestCase.tearDownClass
       ~F3XSerializerTestCase.test_get_status_mapping
       ~F3XSerializerTestCase.test_serializer_validate
+      ~F3XSerializerTestCase.test_update_coverage_dates_marks_report_dirty
+      ~F3XSerializerTestCase.test_update_coverage_then_request_summary_updates_l6a_year_label
       ~F3XSerializerTestCase.test_update_coverage_to_exclude_deleted_transaction
       ~F3XSerializerTestCase.test_update_coverage_to_exclude_memo_transaction
       ~F3XSerializerTestCase.test_update_coverage_to_exclude_transaction

@@ -101,6 +101,7 @@ fecfiler.reports.form\_3x.tests.test\_summary.F3XReportTestCase
       ~F3XReportTestCase.tearDownClass
       ~F3XReportTestCase.test_calculate_summary_column_a
       ~F3XReportTestCase.test_calculate_summary_column_b
+      ~F3XReportTestCase.test_calculate_summary_sets_l6a_year_from_coverage_from_date
       ~F3XReportTestCase.test_report_with_no_transactions
       ~F3XReportTestCase.test_report_with_zero_cash_on_hand
    
