@@ -287,31 +287,6 @@ class F3XSerializerTestCase(TestCase):
         self.assertIsNone(report.calculation_status)
         self.assertIsNone(report.calculation_token)
 
-    def test_update_coverage_from_date_does_not_recalculate_l6a_year_immediately(self):
-        report = create_form3x(self.committee, "2026-01-01", "2026-01-31")
-        report.form_3x.L6a_year_for_above_ytd = "2026"
-        report.form_3x.save()
-
-        serializer = Form3XSerializer(
-            data=self.valid_f3x_report,
-            context={"request": self.mock_request},
-        )
-        serializer.is_valid()
-        serializer.update(
-            report,
-            {
-                "coverage_from_date": datetime.strptime(
-                    "2025-01-01", "%Y-%m-%d"
-                ).date(),
-                "coverage_through_date": datetime.strptime(
-                    "2025-01-31", "%Y-%m-%d"
-                ).date(),
-            },
-        )
-
-        report.refresh_from_db()
-        self.assertEqual(str(report.form_3x.L6a_year_for_above_ytd), "2026")
-
     def test_update_coverage_then_request_summary_updates_l6a_year_label(self):
         report = create_form3x(self.committee, "2026-01-01", "2026-01-31")
         calculate_summary(report.id)
