@@ -27,7 +27,4 @@ class TimeoutMiddleware:
                 samesite=settings.SESSION_COOKIE_SAMESITE,
             )
 
-        if request.method == "PUT" and "transaction" in request.path:
-            time.sleep(4)
-
         return response
