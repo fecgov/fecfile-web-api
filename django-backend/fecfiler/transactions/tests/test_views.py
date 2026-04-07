@@ -1422,20 +1422,20 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         process_aggregation_for_debts(test_debt)
 
         update_payload = {
-            "children":[],
-            "committee_account":self.committee.id,
-            "id":test_debt.id,
-            "transaction_type_identifier":test_debt.transaction_type_identifier,
-            "aggregation_group":test_debt.aggregation_group,
-            "transaction_id":test_debt.transaction_id,
-            "entity_type":test_debt.entity_type,
-            "memo_code":test_debt.memo_code,
+            "children": [],
+            "committee_account": self.committee.id,
+            "id": test_debt.id,
+            "transaction_type_identifier": test_debt.transaction_type_identifier,
+            "aggregation_group": test_debt.aggregation_group,
+            "transaction_id": test_debt.transaction_id,
+            "entity_type": test_debt.entity_type,
+            "memo_code": test_debt.memo_code,
             "contact_1_id": test_debt.contact_1.id,
-            "form_type":test_debt.form_type,
-            "name":test_debt.contact_1.name,
-            "date":test_debt.get_date(),
+            "form_type": test_debt.form_type,
+            "name": test_debt.contact_1.name,
+            "date": test_debt.get_date(),
             "loan_balance": test_debt.schedule_d.balance_at_close,
-            "creditor_organization_name":test_debt.contact_1.name,
+            "creditor_organization_name": test_debt.contact_1.name,
             "creditor_street_1": test_debt.contact_1.street_1,
             "creditor_city": test_debt.contact_1.city,
             "creditor_state": test_debt.contact_1.state,
@@ -1443,14 +1443,14 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "purpose_of_debt_or_obligation": "TESTING TESTING",
             "incurred_amount": test_debt.schedule_d.incurred_amount,
             "incurred_prior": test_debt.schedule_d.incurred_prior,
-            "payment_prior":test_debt.schedule_d.payment_prior,
-            "balance_at_close":test_debt.schedule_d.balance_at_close,
+            "payment_prior": test_debt.schedule_d.payment_prior,
+            "balance_at_close": test_debt.schedule_d.balance_at_close,
             "report_coverage_from_date": test_debt.reports.first().coverage_from_date,
-            "report_ids":[str(test_debt.reports.first().id)],
+            "report_ids": [str(test_debt.reports.first().id)],
             "can_delete": True,
-            "schema_name":"DEBTS",
-            "schedule_id":"D",
-            "fields_to_validate":[
+            "schema_name": "DEBTS",
+            "schedule_id": "D",
+            "fields_to_validate": [
                 "incurred_amount"
             ]
         }
