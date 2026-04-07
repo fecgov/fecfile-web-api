@@ -118,6 +118,7 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         """Retrieve parameters"""
         mock = request.query_params.get("mock", "false").lower() == "true"
+        mock_reject = request.query_params.get("mock_reject", "false").lower() == "true"
         if MOCK_EFO_FILING:
             """If the server is set to mock, all submissions will be mocked"""
             mock = True
@@ -160,11 +161,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         task = (
             task
             | submit_to_fec.s(
-                submission_id,
-                e_filing_password,
-                False,
-                backdoor_code,
-                mock,
+                submission_id, e_filing_password, False, backdoor_code, mock, mock_reject
             )
         ).apply_async(retry=False)
 
