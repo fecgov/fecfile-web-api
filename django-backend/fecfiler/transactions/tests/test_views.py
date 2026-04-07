@@ -186,6 +186,14 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         request.query_params = params
         return request
 
+    def put_request(self, payload, params={}):
+        request = self.build_viewset_put_request(
+            "/api/v1/transactions", json.dumps(payload, default=str)
+        )
+        request.data = deepcopy(payload)
+        request.query_params = params
+        return request
+
     def delete_request(self, path="api/v1/transactions", params={}):
         request = self.build_viewset_delete_request(path)
         request.query_params = params
@@ -1346,6 +1354,112 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         q2_debt.schedule_d.save()
 
         process_aggregation_for_debts(test_debt)
+
+        # Test assertions
+        test_debt.refresh_from_db()
+        q2_debt.refresh_from_db()
+        q3_debt.refresh_from_db()
+
+        # Check to make sure that schedule d id's are still unique
+        self.assertEqual(test_debt.schedule_d.incurred_prior, 0.00)
+        self.assertEqual(test_debt.schedule_d.incurred_amount, 1000.00)
+        self.assertEqual(test_debt.schedule_d.balance_at_close, 1000.00)
+
+        self.assertEqual(q2_debt.schedule_d.incurred_prior, 1000.00)
+        self.assertEqual(q2_debt.schedule_d.incurred_amount, 500.00)
+        self.assertEqual(q2_debt.schedule_d.balance_at_close, 1500.00)
+
+        self.assertEqual(q3_debt.schedule_d.incurred_prior, 1500.00)
+        self.assertEqual(q3_debt.schedule_d.incurred_amount, 0.00)
+        self.assertEqual(q3_debt.schedule_d.balance_at_close, 1500.00)
+
+    def test_updating_debt(self):
+        # create three reports
+        test_q1_report_2026 = create_form3x(
+            self.committee, "2026-01-01", "2026-03-31", {}
+        )
+        test_q2_report_2026 = create_form3x(
+            self.committee, "2026-04-01", "2026-06-30", {}
+        )
+        test_q3_report_2026 = create_form3x(
+            self.committee, "2026-07-01", "2026-08-31", {}
+        )
+
+        # create debt on first report
+        self.assertEqual(Transaction.objects.all().count(), 3)
+        test_debt = create_debt(
+            self.committee,
+            self.test_org_contact,
+            "1000.00",
+            report=test_q1_report_2026,
+        )
+        self.assertEqual(Transaction.objects.all().count(), 4)
+
+        # carry forward
+        create_in_future_reports(test_debt)
+        self.assertEqual(Transaction.objects.all().count(), 6)
+
+        # get child debts
+        q2_debt = Transaction.objects.filter(
+            schedule_d__isnull=False,
+            committee_account_id=test_debt.committee_account_id,
+            reports__id=test_q2_report_2026.id,
+        ).first()
+
+        q3_debt = Transaction.objects.filter(
+            schedule_d__isnull=False,
+            committee_account_id=test_debt.committee_account_id,
+            reports__id=test_q3_report_2026.id,
+        ).first()
+
+        self.assertIsNotNone(q2_debt)
+        self.assertIsNotNone(q3_debt)
+
+        # Set debt 2's incurred amount
+        q2_debt.schedule_d.incurred_amount = 500.00
+        q2_debt.schedule_d.save()
+
+        process_aggregation_for_debts(test_debt)
+
+        update_payload = {
+            "children":[],
+            "committee_account":self.committee.id,
+            "id":test_debt.id,
+            "transaction_type_identifier":test_debt.transaction_type_identifier,
+            "aggregation_group":test_debt.aggregation_group,
+            "transaction_id":test_debt.transaction_id,
+            "entity_type":test_debt.entity_type,
+            "memo_code":test_debt.memo_code,
+            "contact_1_id": test_debt.contact_1.id,
+            "form_type":test_debt.form_type,
+            "name":test_debt.contact_1.name,
+            "date":test_debt.get_date(),
+            "loan_balance": test_debt.schedule_d.balance_at_close,
+            "creditor_organization_name":test_debt.contact_1.name,
+            "creditor_street_1": test_debt.contact_1.street_1,
+            "creditor_city": test_debt.contact_1.city,
+            "creditor_state": test_debt.contact_1.state,
+            "creditor_zip": test_debt.contact_1.zip,
+            "purpose_of_debt_or_obligation": "TESTING TESTING",
+            "incurred_amount": test_debt.schedule_d.incurred_amount,
+            "incurred_prior": test_debt.schedule_d.incurred_prior,
+            "payment_prior":test_debt.schedule_d.payment_prior,
+            "balance_at_close":test_debt.schedule_d.balance_at_close,
+            "report_coverage_from_date": test_debt.reports.first().coverage_from_date,
+            "report_ids":[str(test_debt.reports.first().id)],
+            "can_delete": True,
+            "schema_name":"DEBTS",
+            "schedule_id":"D",
+            "fields_to_validate":[
+                "incurred_amount"
+            ]
+        }
+
+        view_set = TransactionViewSet()
+        view_set.format_kwarg = {}
+        view_set.request = self.put_request(update_payload)
+
+        self.view.save_transaction(update_payload, view_set.request)
 
         # Test assertions
         test_debt.refresh_from_db()
