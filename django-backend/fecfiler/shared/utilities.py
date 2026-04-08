@@ -67,10 +67,10 @@ def query_fec_api(endpoint, params, raise_for_404=True):
     response = requests.get(endpoint, headers=headers, params=params)
     if response.status_code != HTTP_404_NOT_FOUND or raise_for_404:
         try:
-            original_url = str(response.url)
-            response.url = censor_api_key(response.url)
+            # original_url = str(response.url)
+            # response.url = censor_api_key(response.url)
             response.raise_for_status()
-            response.url = original_url
+            # response.url = original_url
         except requests.HTTPError as Error:
             error_message = str(Error)
             safe_message = censor_api_key(error_message)
