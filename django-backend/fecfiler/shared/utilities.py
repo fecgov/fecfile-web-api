@@ -71,8 +71,8 @@ def query_fec_api(endpoint, params, raise_for_404=True):
             response.url = censor_api_key(response.url)
             response.raise_for_status()
             response.url = original_url
-        except requests.HTTPError as Error:
-            error_message = str(Error)
+        except requests.HTTPError as error:
+            error_message = str(error)
             safe_message = censor_api_key(error_message)
             raise requests.HTTPError(safe_message)
 
