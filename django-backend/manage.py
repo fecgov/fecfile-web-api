@@ -13,6 +13,8 @@ allowed_commands = [
     "lintmigrations",
     "makemigrations",
     "showmigrations",
+    # COMMITTEE ACCOUNT COMMANDS #
+    "add_user_to_committee",
     # DEVOPS COMMANDS #
     "backout_login_dot_gov_cert",
     "cleanup_login_dot_gov_certs",
@@ -35,7 +37,6 @@ restricted_commands = [
     "load_mocked_committee_data",
     "gen_locust_load_test_data",
     "delete_committee_account",
-    "add_user_to_committee",
     "load_committee_data",
     # REPORT COMMANDS #
     "delete_committee_reports",
