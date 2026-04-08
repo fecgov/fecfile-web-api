@@ -1,3 +1,3 @@
 cd django-backend
 
-celery -A fecfiler worker --loglevel=info --pool=gevent --concurrency=100
+celery -A fecfiler worker --loglevel=info --pool=threads --concurrency=10

@@ -44,7 +44,7 @@ defaults: &defaults
 applications:
   - name: load-fecfile-web-api
     <<: *defaults
-    instances: 2
+    instances: 4
     routes:
       - route: load-fecfile-web-api-dev.apps.internal
     command: bin/run-api.sh
@@ -53,8 +53,8 @@ applications:
     <<: *defaults
     env:
       <<: *default-env
-      DB_POOL_MIN_SIZE: 100
-      DB_POOL_MAX_SIZE: 100
+      DB_POOL_MIN_SIZE: 10
+      DB_POOL_MAX_SIZE: 10
       DB_POOL_MAX_IDLE: 600
     instances: 2
     no-route: true
