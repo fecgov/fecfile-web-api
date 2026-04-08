@@ -35,7 +35,7 @@ def censor_api_key(input_string):
         )
         safe_string = safe_string.replace(
             settings.PRODUCTION_OPEN_FEC_API_KEY,
-            settings.STAGE_OPEN_FEC_API_KEY[:4]+"*"*8
+            settings.PRODUCTION_OPEN_FEC_API_KEY[:4]+"*"*8
         )
         return str(safe_string)
     except Exception:
