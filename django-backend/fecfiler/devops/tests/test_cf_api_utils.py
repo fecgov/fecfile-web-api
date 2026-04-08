@@ -20,7 +20,9 @@ class CfApiUtilsTestCase(TestCase):
 
     def test_check_api_status_error_response(self):
         with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
-            mock_requests.get.return_value = mock_response = Mock()
+            mock_response = Mock()
+            mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
+            mock_requests.get.return_value = mock_response
             mock_response.raise_for_status.side_effect = Exception("FAIL")
             with self.assertRaisesMessage(
                 Exception,
@@ -31,6 +33,7 @@ class CfApiUtilsTestCase(TestCase):
     def test_check_api_status_happy_path(self):
         with patch("fecfiler.devops.utils.cf_api.requests") as mock_requests:
             mock_requests.get.return_value = mock_response = Mock()
+            mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
             mock_response.status_code = 200
             response = check_api_status()
             self.assertEqual(response.status_code, 200)
@@ -182,6 +185,7 @@ class CfApiUtilsTestCase(TestCase):
             test_organization_name = "test_organization_name"
             test_guid = ""
             mock_requests.get.return_value = mock_response = Mock()
+            mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "resources": [{"name": test_organization_name, "guid": test_guid}]
@@ -198,6 +202,7 @@ class CfApiUtilsTestCase(TestCase):
             test_organization_name = "test_organization_name"
             test_guid = "fd1ab0ac-691e-4755-9703-f6e0401e7b7a"
             mock_requests.get.return_value = mock_response = Mock()
+            mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "resources": [{"name": test_organization_name, "guid": test_guid}]
@@ -225,6 +230,7 @@ class CfApiUtilsTestCase(TestCase):
             test_organization_guid = "4baa2f2b-a5db-49fb-bbc3-330a7a5fada8"
             test_guid = ""
             mock_requests.get.return_value = mock_response = Mock()
+            mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "resources": [{"name": test_space_name, "guid": test_guid}]
@@ -241,6 +247,7 @@ class CfApiUtilsTestCase(TestCase):
             test_organization_guid = "4baa2f2b-a5db-49fb-bbc3-330a7a5fada8"
             test_guid = "fd1ab0ac-691e-4755-9703-f6e0401e7b7a"
             mock_requests.get.return_value = mock_response = Mock()
+            mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "resources": [{"name": test_space_name, "guid": test_guid}]
@@ -282,6 +289,7 @@ class CfApiUtilsTestCase(TestCase):
             test_service_instance_guid = "4430868a-a2b8-44a8-ae74-dea2e02d0225"
 
             get_organization_guid_mock_response = Mock()
+            get_organization_guid_mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"  # noqa
             get_organization_guid_mock_response.status_code = 200
             get_organization_guid_mock_response.json.return_value = {
                 "resources": [
@@ -294,12 +302,14 @@ class CfApiUtilsTestCase(TestCase):
 
             get_space_guid_mock_response = Mock()
             get_space_guid_mock_response.status_code = 200
+            get_space_guid_mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"  # noqa
             get_space_guid_mock_response.json.return_value = {
                 "resources": [{"name": test_space_name, "guid": test_space_guid}]
             }
 
             get_service_instance_guid_mock_response = Mock()
             get_service_instance_guid_mock_response.status_code = 200
+            get_service_instance_guid_mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"  # noqa
             get_service_instance_guid_mock_response.json.return_value = {
                 "resources": [
                     {
@@ -353,6 +363,7 @@ class CfApiUtilsTestCase(TestCase):
             test_service_instance_name = "test_service_instance_name"
             test_guid = ""
             mock_requests.get.return_value = mock_response = Mock()
+            mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "resources": [{"name": test_service_instance_name, "guid": test_guid}]
@@ -379,6 +390,7 @@ class CfApiUtilsTestCase(TestCase):
             test_service_instance_name = "test_service_instance_name"
             test_guid = "4430868a-a2b8-44a8-ae74-dea2e02d0225"
             mock_requests.get.return_value = mock_response = Mock()
+            mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "resources": [{"name": test_service_instance_name, "guid": test_guid}]
@@ -411,6 +423,7 @@ class CfApiUtilsTestCase(TestCase):
             test_service_instance_guid = "1c694e15-9ba9-4b5c-8c52-8c4fc391c126"
             test_creds = {"test_key1": "test_val1"}
             mock_requests.get.return_value = mock_response = Mock()
+            mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
             mock_response.status_code = 200
             mock_response.json.return_value = test_creds
             response = get_credentials_by_guid(test_token, test_service_instance_guid)
@@ -449,6 +462,7 @@ class CfApiUtilsTestCase(TestCase):
             test_service_instance_guid = "1c694e15-9ba9-4b5c-8c52-8c4fc391c126"
             test_creds = {"test_key1": "test_val1"}
             mock_requests.patch.return_value = mock_response = Mock()
+            mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
             mock_response.status_code = 200
             update_credentials_for_service(
                 test_token, test_service_instance_guid, test_creds
