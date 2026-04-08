@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from .tasks import calculate_summary, CalculationState
 from ..serializers import ReportIdSerializer
+from django.http import HttpResponseBadRequest, HttpResponse
 
 import structlog
 
@@ -36,3 +37,10 @@ class SummaryViewSet(viewsets.ViewSet):
         task = calculate_summary.apply_async((report_id,), retry=False)
         logger.debug(f"Status from calculate_summary report {report_id}: {task.status}")
         return Response({"status": "summary task created"})
+
+    @action(detail=False, methods=["get"], url_path="calculate-summary-get")
+    def calculate_summary_get(self, request):
+        report_id = request.GET.get("report_id")
+        if report_id is None:
+            return HttpResponseBadRequest()
+        return HttpResponse(calculate_summary(report_id))
