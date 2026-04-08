@@ -11,7 +11,7 @@ Django==5.2.12
 djangorestframework==3.16.0
 drf-spectacular==0.28.0
 Faker==37.6.0
-git+https://github.com/fecgov/fecfile-validate@e74397b1dd82e7198154ecb7477758950b9883ae#egg=fecfile_validate&subdirectory=fecfile_validate_python
+git+https://github.com/fecgov/fecfile-validate@462657b1b9f55b47d39f3e26b92a0aaea1e7fba8#egg=fecfile_validate&subdirectory=fecfile_validate_python
 github3.py==4.0.1
 GitPython==3.1.43
 gunicorn==23.0.0
