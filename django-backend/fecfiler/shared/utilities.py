@@ -3,6 +3,7 @@ import requests
 from rest_framework.status import HTTP_404_NOT_FOUND
 from fecfiler import settings
 
+
 def generate_fec_uid():
     unique_id = uuid.uuid4()
     hex_id = unique_id.hex.upper()
@@ -31,11 +32,11 @@ def censor_api_key(input_string):
     try:
         safe_string = input_string.replace(
             settings.STAGE_OPEN_FEC_API_KEY,
-            settings.STAGE_OPEN_FEC_API_KEY[:4]+"*"*8
+            settings.STAGE_OPEN_FEC_API_KEY[:4] + "*" * 8
         )
         safe_string = safe_string.replace(
             settings.PRODUCTION_OPEN_FEC_API_KEY,
-            settings.PRODUCTION_OPEN_FEC_API_KEY[:4]+"*"*8
+            settings.PRODUCTION_OPEN_FEC_API_KEY[:4] + "*" * 8
         )
         return str(safe_string)
     except Exception:
