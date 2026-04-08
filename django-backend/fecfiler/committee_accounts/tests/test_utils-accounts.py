@@ -36,6 +36,7 @@ class CommitteeAccountsUtilsTest(TestCase):
     def mock_response(self, status_code, committee_data):
         mock_response = Mock()
         mock_response.status_code = status_code
+        mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
         mock_response.json.return_value = {
             "results": [committee_data] if committee_data else []
         }
