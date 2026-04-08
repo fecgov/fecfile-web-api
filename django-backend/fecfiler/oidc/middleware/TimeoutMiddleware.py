@@ -1,3 +1,5 @@
+import time
+
 from django.conf import settings
 from django.utils.http import parse_http_date_safe
 
@@ -24,5 +26,8 @@ class TimeoutMiddleware:
                 secure=True,
                 samesite=settings.SESSION_COOKIE_SAMESITE,
             )
+
+        if "previous" in request.path:
+            time.sleep(2)
 
         return response
