@@ -71,10 +71,10 @@ def query_fec_api(endpoint, params, raise_for_404=True):
             response.url = censor_api_key(response.url)
             response.raise_for_status()
             response.url = original_url
-        except requests.exceptions.HTTPError as Error:
+        except requests.HTTPError as Error:
             error_message = str(Error)
             safe_message = censor_api_key(error_message)
-            raise requests.exceptions.HTTPError(safe_message)
+            raise requests.HTTPError(safe_message)
 
     response_data = response.json()
     return response_data.get("results", [])
