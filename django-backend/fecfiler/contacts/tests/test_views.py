@@ -28,6 +28,7 @@ MOCK_COMMITTEE_RESULTS = {"results": COMMITTEE_RESULTS}
 class MockResponse:
     def __init__(self, json_data, status_code):
         self.json_data = deepcopy(json_data)
+        self.url = "https://testurl.fake.gov/api/v1/valuesgohere"
         self.status_code = status_code
 
     def json(self):
@@ -294,6 +295,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
                 mock_requests.get = Mock()
                 mock_response = Mock()
                 mock_response.json = Mock()
+                mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
                 mock_response.json.return_value = {"results": [{"name": "TEST"}]}
                 mock_requests.get.return_value = mock_response
                 response = self.send_viewset_get_request(
