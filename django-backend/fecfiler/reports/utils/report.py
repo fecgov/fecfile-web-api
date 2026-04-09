@@ -48,9 +48,9 @@ def reset_submitting_report(id):
             logger.info(f"Deleted dotfec file {file_name} from S3.")
         dot_fec_record.delete()
 
-    Report.objects.filter(id=report_uuid).update(
-        calculation_status=None,
-        calculation_token=None,
+    report_queryset = Report.objects.filter(id=report_uuid)
+    Report.mark_calculations_dirty(report_queryset)
+    report_queryset.update(
         upload_submission_id=None,
         webprint_submission_id=None,
     )

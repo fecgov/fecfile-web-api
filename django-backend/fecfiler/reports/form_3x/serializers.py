@@ -350,9 +350,6 @@ class Form3XSerializer(ReportSerializer):
         with transaction.atomic():
             form_3x_data = get_model_data(validated_data, Form3X)
             report_data = get_model_data(validated_data, Report)
-            form_3x_data["L6a_year_for_above_ytd"] = report_data[
-                "coverage_from_date"
-            ].year  # noqa: E501
             form_3x = Form3X.objects.create(**form_3x_data)
             report_data["form_3x_id"] = form_3x.id
             report = super().create(report_data)
@@ -384,6 +381,9 @@ class Form3XSerializer(ReportSerializer):
 
     def update(self, instance, validated_data: dict):
         with transaction.atomic():
+            prior_coverage_through_date = instance.coverage_through_date
+            prior_coverage_from_date = instance.coverage_from_date
+
             # Check if there are any transactions that fall outside the coverage dates
             transactions_outside_coverage_dates = ReportTransaction.objects.filter(
                 ~Q(transaction__memo_code=True),
@@ -407,6 +407,15 @@ class Form3XSerializer(ReportSerializer):
 
             instance.form_3x.save()
             updated = super().update(instance, validated_data)
+
+            # recalculate summary if coverage dates have changed
+            coverage_from_changed = prior_coverage_from_date != updated.coverage_from_date
+            coverage_through_changed = (
+                prior_coverage_through_date != updated.coverage_through_date
+            )
+            if coverage_from_changed or coverage_through_changed:
+                Report.mark_calculations_dirty(Report.objects.filter(id=updated.id))
+
             return updated
 
     def save(self, **kwargs):
