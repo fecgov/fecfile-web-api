@@ -28,6 +28,21 @@ def get_float_from_string(string, fallback=None):
         raise ValueError("String to float conversion failed with no provided fallback")
 
 
+def censor_api_key(input_string):
+    try:
+        safe_string = input_string.replace(
+            settings.STAGE_OPEN_FEC_API_KEY,
+            settings.STAGE_OPEN_FEC_API_KEY[:4] + "*" * 8
+        )
+        safe_string = safe_string.replace(
+            settings.PRODUCTION_OPEN_FEC_API_KEY,
+            settings.PRODUCTION_OPEN_FEC_API_KEY[:4] + "*" * 8
+        )
+        return safe_string
+    except Exception:
+        raise Exception("Encountered exception when attempting to stub out API key")
+
+
 def get_boolean_from_string(string):
     return string.lower() == "true"
 
@@ -51,6 +66,15 @@ def query_fec_api(endpoint, params, raise_for_404=True):
     }
     response = requests.get(endpoint, headers=headers, params=params)
     if response.status_code != HTTP_404_NOT_FOUND or raise_for_404:
-        response.raise_for_status()
+        try:
+            original_url = str(response.url)
+            response.url = censor_api_key(response.url)
+            response.raise_for_status()
+            response.url = original_url
+        except requests.HTTPError as error:
+            error_message = str(error)
+            safe_message = censor_api_key(error_message)
+            raise requests.HTTPError(safe_message)
+
     response_data = response.json()
     return response_data.get("results", [])

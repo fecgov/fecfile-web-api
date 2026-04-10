@@ -243,6 +243,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
             with patch("fecfiler.shared.utilities.requests") as mock_requests:
                 mock_response = Mock()
                 mock_response.status_code = 200
+                mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
                 mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
                 mock_requests.get = Mock()
                 mock_requests.get.return_value = mock_response
@@ -261,6 +262,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
             with patch("fecfiler.shared.utilities.requests") as mock_requests:
                 mock_response = Mock()
                 mock_response.status_code = 200
+                mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
                 mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
                 mock_requests.get = Mock()
                 mock_requests.get.return_value = mock_response
