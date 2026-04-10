@@ -296,6 +296,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
                 mock_response = Mock()
                 mock_response.json = Mock()
                 mock_response.url = "https://testurl.fake.gov/api/v1/valuesgohere"
+                mock_response.status_code = 200
                 mock_response.json.return_value = {"results": [{"name": "TEST"}]}
                 mock_requests.get.return_value = mock_response
                 response = self.send_viewset_get_request(
