@@ -12,8 +12,10 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.tests.utils import (
     create_schedule_a,
     create_schedule_b,
-    create_schedule_f
+    create_schedule_f,
+    create_loan_from_bank,
 )
+from fecfiler.reports.tests.utils import create_form3x
 
 
 class TransactionSerializerBaseTestCase(TestCase):
@@ -93,6 +95,20 @@ class TransactionSerializerBaseTestCase(TestCase):
         self.assertEqual(representation.get("reatt_redes_total"), "1.00")
 
     def test_schedule_f_serialization(self):
+        create_schedule_f(
+            "COORDINATED_PARTY_EXPENDITURE",
+            self.committee,
+            None,
+            None,
+            None,
+            None,
+            None,
+            schedule_data={
+                "expenditure_date": "2024-01-09",
+                "expenditure_amount": 22,
+            }
+        )
+
         transaction = create_schedule_f(
             "COORDINATED_PARTY_EXPENDITURE",
             self.committee,
@@ -102,6 +118,7 @@ class TransactionSerializerBaseTestCase(TestCase):
             None,
             None,
             schedule_data={
+                "expenditure_date": "2024-01-10",
                 "expenditure_amount": 40,
                 "aggregate_general_elec_expended": 62
             }
@@ -114,3 +131,44 @@ class TransactionSerializerBaseTestCase(TestCase):
         representation = serializer.to_representation(transaction)
         self.assertEqual(representation["aggregate"], '62.00')
         self.assertEqual(representation["aggregate_general_elec_expended"], '62.00')
+
+    def test_to_representation_no_depth_skips_children_and_reports(self):
+        report = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
+        parent = create_schedule_a(
+            "INDIVIDUAL_RECEIPT", self.committee, None, "2024-01-10", 100
+        )
+        child = create_schedule_a(
+            "PARTNERSHIP_ATTRIBUTION", self.committee, None, "2024-01-11", 10
+        )
+        child.parent_transaction = parent
+        child.save()
+        parent.set_reports([report.id])
+
+        serializer = TransactionSerializer(
+            context={"request": self.mock_request, "no_depth": True},
+        )
+        representation = serializer.to_representation(parent)
+
+        self.assertNotIn("children", representation)
+        self.assertNotIn("report_ids", representation)
+        self.assertEqual(len(representation["reports"]), 1)
+
+    def test_schedule_c_serialization_includes_loan_agreement_id(self):
+        report = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
+        loan, _, loan_agreement, _ = create_loan_from_bank(
+            self.committee,
+            None,
+            "5000.00",
+            "2024-07-01",
+            "7%",
+            False,
+            "2024-01-01",
+            report=report,
+        )
+
+        serializer = TransactionSerializer(
+            context={"request": self.mock_request},
+        )
+        representation = serializer.to_representation(loan)
+
+        self.assertEqual(representation["loan_agreement_id"], loan_agreement.id)
