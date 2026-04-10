@@ -1466,6 +1466,45 @@ class TransactionModelTestCase(TestCase):
         # Transaction 4 should now have aggregate of $20 (10 + 10)
         self.assertEqual(transaction_4.aggregate, Decimal("20.00"))
 
+    def test_repayment_helper_methods(self):
+        self.assertTrue(self.payment_1.is_loan_repayment())
+        self.assertFalse(self.loan.is_loan_repayment())
+
+        debt = create_debt(self.committee, self.contact_1, Decimal("40.00"))
+        repayment = create_schedule_b(
+            "OPERATING_EXPENDITURE",
+            self.committee,
+            self.contact_1,
+            "2024-01-10",
+            "5.00",
+            "GENERAL_DISBURSEMENT",
+        )
+        repayment.debt = debt
+        repayment.save()
+
+        self.assertTrue(repayment.is_debt_repayment())
+        self.assertFalse(debt.is_debt_repayment())
+
+    def test_get_old_snapshot_short_circuits(self):
+        transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-05",
+            "100.00",
+        )
+
+        snapshot = {
+            "date": transaction.get_date(),
+            "effective_amount": Decimal("100.00"),
+        }
+        self.assertEqual(
+            transaction._get_old_snapshot("A", False, snapshot),
+            snapshot,
+        )
+        self.assertIsNone(transaction._get_old_snapshot("A", True, None))
+        self.assertIsNone(transaction._get_old_snapshot("C", False, None))
+
     def test_creating_a_transaction_resets_can_unamend(self):
         # Create a report that can be unamended
         report_1 = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
