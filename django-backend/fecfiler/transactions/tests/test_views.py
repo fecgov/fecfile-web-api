@@ -2073,101 +2073,63 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             transaction_2.schedule_f.aggregate_general_elec_expended,
         )
 
-    def test_adjust_running_totals_subtracts_matching_schedule_f_year(self):
+    def test_adjust_running_totals_schedule_f_year_behavior(self):
         view_set = TransactionViewSet()
-        target_transaction = create_schedule_f(
-            type="COORDINATED_PARTY_EXPENDITURE",
-            committee=self.committee,
-            contact_1=self.test_org_contact,
-            contact_2=self.contact_2,
-            contact_3=self.test_com_contact,
-            schedule_data={
-                "expenditure_amount": "10.00",
-                "expenditure_date": "2024-01-10",
-                "general_election_year": "2024",
-            },
-        )
+        cases = [
+            ("2024", Decimal("25.00")),
+            ("2022", Decimal("50.00")),
+        ]
 
-        source_transaction = create_schedule_f(
-            type="COORDINATED_PARTY_EXPENDITURE",
-            committee=self.committee,
-            contact_1=self.test_org_contact,
-            contact_2=self.contact_2,
-            contact_3=self.test_com_contact,
-            schedule_data={
-                "expenditure_amount": "25.00",
-                "expenditure_date": "2024-01-11",
-                "general_election_year": "2024",
-            },
-        )
+        for source_election_year, expected_schedule_f_aggregate in cases:
+            with self.subTest(source_election_year=source_election_year):
+                target_transaction = create_schedule_f(
+                    type="COORDINATED_PARTY_EXPENDITURE",
+                    committee=self.committee,
+                    contact_1=self.test_org_contact,
+                    contact_2=self.contact_2,
+                    contact_3=self.test_com_contact,
+                    schedule_data={
+                        "expenditure_amount": "10.00",
+                        "expenditure_date": "2024-01-10",
+                        "general_election_year": "2024",
+                    },
+                )
 
-        target = Transaction.objects.get_previous_queryset().select_related(
-            "schedule_f"
-        ).get(id=target_transaction.id)
-        source = Transaction.objects.get_previous_queryset().select_related(
-            "schedule_f"
-        ).get(id=source_transaction.id)
+                source_transaction = create_schedule_f(
+                    type="COORDINATED_PARTY_EXPENDITURE",
+                    committee=self.committee,
+                    contact_1=self.test_org_contact,
+                    contact_2=self.contact_2,
+                    contact_3=self.test_com_contact,
+                    schedule_data={
+                        "expenditure_amount": "25.00",
+                        "expenditure_date": "2024-01-11",
+                        "general_election_year": source_election_year,
+                    },
+                )
 
-        target.aggregate = Decimal("200.00")
-        target.calendar_ytd_per_election_office = Decimal("300.00")
-        target.schedule_f.aggregate_general_elec_expended = Decimal("50.00")
+                target = Transaction.objects.get_previous_queryset().select_related(
+                    "schedule_f"
+                ).get(id=target_transaction.id)
+                source = Transaction.objects.get_previous_queryset().select_related(
+                    "schedule_f"
+                ).get(id=source_transaction.id)
 
-        view_set.adjust_running_totals(target, source)
+                target.aggregate = Decimal("200.00")
+                target.calendar_ytd_per_election_office = Decimal("300.00")
+                target.schedule_f.aggregate_general_elec_expended = Decimal("50.00")
 
-        self.assertEqual(target.aggregate, Decimal("175.00"))
-        self.assertEqual(target.calendar_ytd_per_election_office, Decimal("275.00"))
-        self.assertEqual(
-            target.schedule_f.aggregate_general_elec_expended,
-            Decimal("25.00"),
-        )
+                view_set.adjust_running_totals(target, source)
 
-    def test_adjust_running_totals_keeps_schedule_f_aggregate_when_year_differs(self):
-        view_set = TransactionViewSet()
-        target_transaction = create_schedule_f(
-            type="COORDINATED_PARTY_EXPENDITURE",
-            committee=self.committee,
-            contact_1=self.test_org_contact,
-            contact_2=self.contact_2,
-            contact_3=self.test_com_contact,
-            schedule_data={
-                "expenditure_amount": "10.00",
-                "expenditure_date": "2024-01-10",
-                "general_election_year": "2024",
-            },
-        )
-
-        source_transaction = create_schedule_f(
-            type="COORDINATED_PARTY_EXPENDITURE",
-            committee=self.committee,
-            contact_1=self.test_org_contact,
-            contact_2=self.contact_2,
-            contact_3=self.test_com_contact,
-            schedule_data={
-                "expenditure_amount": "25.00",
-                "expenditure_date": "2024-01-11",
-                "general_election_year": "2022",
-            },
-        )
-
-        target = Transaction.objects.get_previous_queryset().select_related(
-            "schedule_f"
-        ).get(id=target_transaction.id)
-        source = Transaction.objects.get_previous_queryset().select_related(
-            "schedule_f"
-        ).get(id=source_transaction.id)
-
-        target.aggregate = Decimal("200.00")
-        target.calendar_ytd_per_election_office = Decimal("300.00")
-        target.schedule_f.aggregate_general_elec_expended = Decimal("50.00")
-
-        view_set.adjust_running_totals(target, source)
-
-        self.assertEqual(target.aggregate, Decimal("175.00"))
-        self.assertEqual(target.calendar_ytd_per_election_office, Decimal("275.00"))
-        self.assertEqual(
-            target.schedule_f.aggregate_general_elec_expended,
-            Decimal("50.00"),
-        )
+                self.assertEqual(target.aggregate, Decimal("175.00"))
+                self.assertEqual(
+                    target.calendar_ytd_per_election_office,
+                    Decimal("275.00"),
+                )
+                self.assertEqual(
+                    target.schedule_f.aggregate_general_elec_expended,
+                    expected_schedule_f_aggregate,
+                )
 
     def _run_payee_candidate_test(self, view_set, params, expected):
         response = view_set.previous_transaction_by_payee_candidate(
