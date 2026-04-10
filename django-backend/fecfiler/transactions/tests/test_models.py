@@ -1476,7 +1476,7 @@ class TransactionModelTestCase(TestCase):
             self.committee,
             self.contact_1,
             "2024-01-10",
-            Decimal("5.00"),
+            "5.00",
             "GENERAL_DISBURSEMENT",
         )
         repayment.debt = debt

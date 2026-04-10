@@ -16,6 +16,7 @@ from fecfiler.transactions.tests.utils import (
     create_loan_from_bank,
 )
 from fecfiler.reports.tests.utils import create_form3x
+from fecfiler.contacts.tests.utils import create_test_individual_contact
 
 
 class TransactionSerializerBaseTestCase(TestCase):
@@ -155,9 +156,12 @@ class TransactionSerializerBaseTestCase(TestCase):
 
     def test_schedule_c_serialization_includes_loan_agreement_id(self):
         report = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
+        contact = create_test_individual_contact(
+            "last", "first", self.committee.id
+        )
         loan, _, loan_agreement, _ = create_loan_from_bank(
             self.committee,
-            None,
+            contact,
             "5000.00",
             "2024-07-01",
             "7%",
