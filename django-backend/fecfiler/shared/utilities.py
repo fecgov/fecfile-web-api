@@ -64,14 +64,16 @@ def raise_for_status(response):
     else:
         reason = response.reason
 
+    sanitized_url = censor_api_key(response.url)
+
     if 400 <= response.status_code < 500:
         http_error_msg = (
-            f"{response.status_code} Client Error: {reason}"
+            f"{response.status_code} Client Error: {reason} for url: {sanitized_url}"
         )
 
     elif 500 <= response.status_code < 600:
         http_error_msg = (
-            f"{response.status_code} Server Error: {reason}"
+            f"{response.status_code} Server Error: {reason} for url: {sanitized_url}"
         )
 
     if http_error_msg:
