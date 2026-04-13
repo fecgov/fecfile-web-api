@@ -52,6 +52,32 @@ FEC API methods
 """
 
 
+# A modified version of the python request library's raise_for_status method
+# that does not include the url when logging an error
+def raise_for_status(response):
+    http_error_msg = ""
+    if isinstance(response.reason, bytes):
+        try:
+            reason = response.reason.decode("utf-8")
+        except UnicodeDecodeError:
+            reason = response.reason.decode("iso-8859-1")
+    else:
+        reason = response.reason
+
+    if 400 <= response.status_code < 500:
+        http_error_msg = (
+            f"{response.status_code} Client Error: {reason}"
+        )
+
+    elif 500 <= response.status_code < 600:
+        http_error_msg = (
+            f"{response.status_code} Server Error: {reason}"
+        )
+
+    if http_error_msg:
+        raise requests.HTTPError(http_error_msg, response=response)
+
+
 def query_fec_api_single(endpoint, params):
     results = query_fec_api(endpoint, params)
     return results[0] if results else None
@@ -67,10 +93,7 @@ def query_fec_api(endpoint, params, raise_for_404=True):
     response = requests.get(endpoint, headers=headers, params=params)
     if response.status_code != HTTP_404_NOT_FOUND or raise_for_404:
         try:
-            original_url = str(response.url)
-            response.url = censor_api_key(response.url)
-            response.raise_for_status()
-            response.url = original_url
+            raise_for_status(response)
         except requests.HTTPError as error:
             error_message = str(error)
             safe_message = censor_api_key(error_message)
