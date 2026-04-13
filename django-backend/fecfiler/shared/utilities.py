@@ -93,7 +93,6 @@ def query_fec_api(endpoint, params, raise_for_404=True):
         "User-Agent": f"FECfile+ {settings.SPACE}",
     }
     response = requests.get(endpoint, headers=headers, params=params)
-    print("\n\n\n", response.status_code, "\n\n\n")
     if response.status_code != HTTP_404_NOT_FOUND or raise_for_404:
         raise_for_status(response)
 
