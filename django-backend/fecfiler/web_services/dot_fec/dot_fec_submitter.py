@@ -12,6 +12,7 @@ from fecfiler.settings import (
     MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS,
 )
 import structlog
+import time
 
 logger = structlog.get_logger(__name__)
 
@@ -79,6 +80,7 @@ class MockDotFECSubmitter(DotFECSubmitter):
     """Submitter class for mocking a response from a webload service"""
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
+        time.sleep(60)
         return json.dumps(
             {
                 "submission_id": "fake_submission_id",
