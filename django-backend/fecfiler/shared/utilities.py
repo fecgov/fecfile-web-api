@@ -28,6 +28,21 @@ def get_float_from_string(string, fallback=None):
         raise ValueError("String to float conversion failed with no provided fallback")
 
 
+def censor_api_key(input_string):
+    try:
+        safe_string = input_string.replace(
+            settings.STAGE_OPEN_FEC_API_KEY,
+            settings.STAGE_OPEN_FEC_API_KEY[:4] + "*" * 8
+        )
+        safe_string = safe_string.replace(
+            settings.PRODUCTION_OPEN_FEC_API_KEY,
+            settings.PRODUCTION_OPEN_FEC_API_KEY[:4] + "*" * 8
+        )
+        return safe_string
+    except Exception:
+        raise Exception("Encountered exception when attempting to stub out API key")
+
+
 def get_boolean_from_string(string):
     return string.lower() == "true"
 
@@ -35,6 +50,34 @@ def get_boolean_from_string(string):
 """
 FEC API methods
 """
+
+
+# A modified version of the python request library's raise_for_status method
+# that does not include the url when logging an error
+def raise_for_status(response):
+    http_error_msg = ""
+    if isinstance(response.reason, bytes):
+        try:
+            reason = response.reason.decode("utf-8")
+        except UnicodeDecodeError:
+            reason = response.reason.decode("iso-8859-1")
+    else:
+        reason = response.reason
+
+    sanitized_url = censor_api_key(response.url)
+
+    if 400 <= response.status_code < 500:
+        http_error_msg = (
+            f"{response.status_code} Client Error: {reason} for url: {sanitized_url}"
+        )
+
+    elif 500 <= response.status_code < 600:
+        http_error_msg = (
+            f"{response.status_code} Server Error: {reason} for url: {sanitized_url}"
+        )
+
+    if http_error_msg:
+        raise Exception(http_error_msg)
 
 
 def query_fec_api_single(endpoint, params):
@@ -50,7 +93,9 @@ def query_fec_api(endpoint, params, raise_for_404=True):
         "User-Agent": f"FECfile+ {settings.SPACE}",
     }
     response = requests.get(endpoint, headers=headers, params=params)
+    print("\n\n\n", response.status_code, "\n\n\n")
     if response.status_code != HTTP_404_NOT_FOUND or raise_for_404:
-        response.raise_for_status()
+        raise_for_status(response)
+
     response_data = response.json()
     return response_data.get("results", [])
