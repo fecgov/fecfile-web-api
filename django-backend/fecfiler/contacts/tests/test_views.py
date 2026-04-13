@@ -28,6 +28,8 @@ MOCK_COMMITTEE_RESULTS = {"results": COMMITTEE_RESULTS}
 class MockResponse:
     def __init__(self, json_data, status_code):
         self.json_data = deepcopy(json_data)
+        self.reason = "this is a unit test"
+        self.url = "https://fake.unit.tests"
         self.status_code = status_code
 
     def json(self):
@@ -293,8 +295,11 @@ class ContactViewSetTest(FecfilerViewSetTest):
             with patch("fecfiler.shared.utilities.requests") as mock_requests:
                 mock_requests.get = Mock()
                 mock_response = Mock()
+                mock_response.status_code = 200
                 mock_response.json = Mock()
-                mock_response.json.return_value = {"results": [{"name": "TEST"}]}
+                mock_response.json.return_value = {
+                    "results": [{"name": "TEST"}],
+                }
                 mock_requests.get.return_value = mock_response
                 response = self.send_viewset_get_request(
                     "/api/v1/contacts/committee/?committee_id=C12345678",
