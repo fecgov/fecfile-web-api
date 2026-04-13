@@ -1,5 +1,6 @@
 import re
 from rest_framework.exceptions import ValidationError
+from .shared import is_valid_committee_id
 from ..models import CommitteeAccount, Membership
 from fecfiler import settings
 import redis
@@ -130,6 +131,9 @@ def enable_committee_account(committee_id):
 
 
 def get_committee_emails(committee_id):
+    if not is_valid_committee_id(committee_id):
+        raise ValueError(f"Invalid committee id: {committee_id}")
+
     match settings.FLAG__COMMITTEE_DATA_SOURCE:
         case "PRODUCTION":
             emails = get_production_committee_emails(committee_id)
@@ -141,6 +145,9 @@ def get_committee_emails(committee_id):
 
 
 def get_committee_account_data(committee_id):
+    if not is_valid_committee_id(committee_id):
+        raise ValueError(f"Invalid committee id: {committee_id}")
+
     match settings.FLAG__COMMITTEE_DATA_SOURCE:
         case "PRODUCTION":
             committee = get_production_committee_data(committee_id)
