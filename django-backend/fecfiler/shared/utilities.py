@@ -53,7 +53,7 @@ FEC API methods
 
 
 # A modified version of the python request library's raise_for_status method
-# that does not include the url when logging an error
+# that sanitizes the url when logging an error
 def raise_for_status(response):
     http_error_msg = ""
     if isinstance(response.reason, bytes):
