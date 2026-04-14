@@ -80,7 +80,7 @@ class MockDotFECSubmitter(DotFECSubmitter):
     """Submitter class for mocking a response from a webload service"""
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
-        time.sleep(60)
+        # time.sleep(60)
         return json.dumps(
             {
                 "submission_id": "fake_submission_id",
