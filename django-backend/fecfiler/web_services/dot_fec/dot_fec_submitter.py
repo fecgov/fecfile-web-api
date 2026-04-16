@@ -95,3 +95,27 @@ class MockDotFECSubmitter(DotFECSubmitter):
                 "report_id": str(uuid()),
             }
         )
+
+
+class MockDotFECSubmitterFailure(DotFECSubmitter):
+    """Submitter class for mocking a response from a webload service"""
+
+    def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
+        return json.dumps(
+            {
+                "submission_id": "fake_submission_id",
+                "status": FECStatus.PROCESSING.value,
+                "message": "We didn't really send anything to FEC",
+                "report_id": fec_report_id or str(uuid()),
+            }
+        )
+
+    def poll_status(self, submission: BaseSubmission):
+        return json.dumps(
+            {
+                "submission_id": "fake_submission_id",
+                "status": FECStatus.REJECTED.value,
+                "message": "We didn't really send anything to FEC",
+                "report_id": str(uuid()),
+            }
+        )
