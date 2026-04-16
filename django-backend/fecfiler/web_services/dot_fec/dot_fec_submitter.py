@@ -2,12 +2,14 @@ import copy
 import json
 from uuid import uuid4 as uuid
 from zeep import Client
+from django.utils import timezone
 from abc import ABC, abstractmethod
 from fecfiler.web_services.models import FECStatus, BaseSubmission
 from fecfiler.settings import (
     EFO_FILING_API,
     EFO_FILING_API_KEY,
     FEC_AGENCY_ID,
+    MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS,
 )
 import structlog
 
@@ -90,10 +92,20 @@ class MockDotFECSubmitter(DotFECSubmitter):
         return json.dumps(
             {
                 "submission_id": "fake_submission_id",
-                "status": FECStatus.ACCEPTED.value,
+                "status": self.get_fec_status_for_poll(submission),
                 "message": "We didn't really send anything to FEC",
                 "report_id": str(uuid()),
             }
+        )
+
+    def get_fec_status_for_poll(self, submission: BaseSubmission):
+        submission_complete = timezone.now() >= submission.created + timezone.timedelta(
+            seconds=MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS
+        )
+        return (
+            FECStatus.ACCEPTED.value
+            if submission_complete
+            else FECStatus.PROCESSING.value
         )
 
 

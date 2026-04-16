@@ -497,6 +497,9 @@ if not MOCK_EFO_FILING:
         raise Exception("EFO_FILING_API_KEY must be set if MOCK_EFO_FILING is False")
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 FEC_FORMAT_VERSION = env.get_credential("FEC_FORMAT_VERSION")
+MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS = get_float_from_string(
+    env.get_credential("MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS", 10)
+)  # Duration of mock dot fec submission in seconds, default to 10 seconds
 
 """EFO POLLING SETTINGS
 """
