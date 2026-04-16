@@ -2,13 +2,10 @@ import copy
 import json
 from uuid import uuid4 as uuid
 from zeep import Client
+from django.utils import timezone
 from abc import ABC, abstractmethod
 from fecfiler.web_services.models import FECStatus, BaseSubmission
-from fecfiler.settings import (
-    EFO_FILING_API,
-    EFO_FILING_API_KEY,
-    FEC_AGENCY_ID,
-)
+import fecfiler.settings as settings
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -30,10 +27,10 @@ class DotFECSubmitter(ABC):
         json_obj = {
             "committee_id": dot_fec_record.report.committee_account.committee_id,
             "password": e_filing_password,
-            "api_key": EFO_FILING_API_KEY,
+            "api_key": settings.EFO_FILING_API_KEY,
             "email_1": dot_fec_record.report.confirmation_email_1,
             "email_2": dot_fec_record.report.confirmation_email_2,
-            "agency_id": FEC_AGENCY_ID,
+            "agency_id": settings.FEC_AGENCY_ID,
             "wait": False,
         }
         if dot_fec_record.report.report_id:
@@ -56,7 +53,9 @@ class EFODotFECSubmitter(DotFECSubmitter):
     """Submitter class for submitting .FEC files to EFO's webload service"""
 
     def __init__(self) -> None:
-        self.fec_soap_client = Client(f"{EFO_FILING_API}/webload/services/upload?wsdl")
+        self.fec_soap_client = Client(
+            f"{settings.EFO_FILING_API}/webload/services/upload?wsdl"
+        )
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
@@ -90,10 +89,20 @@ class MockDotFECSubmitter(DotFECSubmitter):
         return json.dumps(
             {
                 "submission_id": "fake_submission_id",
-                "status": FECStatus.ACCEPTED.value,
+                "status": self.get_fec_status_for_poll(submission),
                 "message": "We didn't really send anything to FEC",
                 "report_id": str(uuid()),
             }
+        )
+
+    def get_fec_status_for_poll(self, submission: BaseSubmission):
+        submission_complete = timezone.now() >= submission.created + timezone.timedelta(
+            seconds=settings.MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS
+        )
+        return (
+            FECStatus.ACCEPTED.value
+            if submission_complete
+            else FECStatus.PROCESSING.value
         )
 
 
