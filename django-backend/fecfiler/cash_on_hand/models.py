@@ -24,9 +24,11 @@ class CashOnHandYearly(CommitteeOwnedModel):
     def save(self, *args, **kwargs):
         with db_transaction.atomic():
             super(CashOnHandYearly, self).save(*args, **kwargs)
-            Report.objects.filter(
-                committee_account=self.committee_account,
-            ).update(calculation_status=None)
+            Report.mark_calculations_dirty(
+                Report.objects.filter(
+                    committee_account=self.committee_account,
+                )
+            )
 
     class Meta:
         db_table = "cash_on_hand_yearly"

@@ -6,7 +6,6 @@ version: 2.1
 orbs:
   # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/python
   python: circleci/python@4.0.0
-  node: circleci/node@7.2.1
 
 commands:
   unified-requirements-cache:
@@ -37,7 +36,7 @@ jobs:
     # These next lines defines a Docker executors: https://circleci.com/docs/2.0/executor-types/
     # A list of available CircleCI Docker convenience images are available here: https://circleci.com/developer/images/image/cimg/python
     docker:
-      - image: &python313_image cimg/python:3.13-node
+      - image: &python313_image cimg/python:3.13
       - image: cimg/postgres:14.13
       - image: cimg/redis:6.2.6
     resource_class: large
@@ -209,52 +208,6 @@ jobs:
             export PATH=$HOME/bin:$PATH
             invoke deploy --branch $CIRCLE_BRANCH --login
 
-  docs-build:
-    docker:
-      - image: *python313_image
-
-    steps:
-      - checkout
-      - unified-requirements-cache
-      - python/install-packages:
-          pkg-manager: pip
-          app-dir: ~/project/
-          pip-dependency-file: requirements-all.txt
-
-      - run:
-          name: Run Sphinx
-          command: make html
-          working_directory: ~/project/docs
-
-      - persist_to_workspace:
-          root: ~/project/docs/_build
-          paths:
-            - html
-
-  docs-deploy:
-    docker:
-      - image: cimg/node:lts
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/project/docs/_build
-      - run:
-          name: Disable jekyll builds
-          command: touch ~/project/docs/_build/html/.nojekyll
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          name: Configure git
-          command: |
-            git config user.email "apiinfo@fec.gov"
-            git config user.name "apiinfo"
-      - add_ssh_keys:
-          fingerprints:
-            - "68:57:8f:bd:0a:29:0c:91:9d:dc:0d:d7:aa:76:aa:46"
-      - run:
-          name: Deploy docs to gh-pages branch
-          command: npx gh-pages --dotfiles --dist ~/project/docs/_build/html
-
   # This job kicks off the e2e-test pipeline in the fecfile-web-app project.
   # It is used to run the e2e tests when the api is deployed to dev/stage/test/prod.
   # It uses the is-triggered-e2e-test parameter which is used in the fecfile-web-app
@@ -302,15 +255,3 @@ workflows:
           filters:
             branches:
               only: /develop|release\/sprint-[\.\d]+|release\/test|main/
-      - docs-build:
-          requires:
-            - test
-          filters:
-            branches:
-              only: develop
-      - docs-deploy:
-          requires:
-            - docs-build
-          filters:
-            branches:
-              only: develop

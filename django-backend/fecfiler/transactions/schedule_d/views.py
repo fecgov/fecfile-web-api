@@ -49,9 +49,14 @@ def update_in_future_reports(transaction):
     )
     transactions_to_update.update(**transaction_copy)
     schedule_d_copy = copy.deepcopy(model_to_dict(transaction.schedule_d))
-    # don't update the incurred amount because the debt already exists on
-    # this report
+    # don't update the aggregated fields because the debt already exists on this report
     del schedule_d_copy["incurred_amount"]
+    del schedule_d_copy["incurred_prior"]
+    del schedule_d_copy["beginning_balance"]
+    del schedule_d_copy["payment_amount"]
+    del schedule_d_copy["payment_prior"]
+    del schedule_d_copy["balance_at_close"]
+
     schedule_ds_to_update = ScheduleD.objects.filter(
         transaction__schedule_d_id__in=Subquery(
             transactions_to_update.values("schedule_d_id")

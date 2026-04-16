@@ -537,8 +537,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 schedule_instance.report_coverage_from_date = coverage_from_date
                 schedule_instance.save(update_fields=["report_coverage_from_date"])
 
-        Report.objects.filter(committee_account_id=committee_id).update(
-            calculation_status=None
+        Report.mark_calculations_dirty(
+            Report.objects.filter(committee_account_id=committee_id)
         )
         logger.info(
             f"Transaction {transaction_instance.id} "
