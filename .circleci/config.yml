@@ -254,4 +254,4 @@ workflows:
             - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+              only: /feature\/2899-celery-concurrency-env-var-test-in-dev|release\/sprint-[\.\d]+|release\/test|main/
