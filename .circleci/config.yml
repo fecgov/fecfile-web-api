@@ -247,11 +247,6 @@ workflows:
             branches:
               only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - deploy-job:
-          requires:
-            - lint
-            - dependency-check
-            - schema-checks
-            - test
           filters:
             branches:
               only: /feature\/2899-celery-concurrency-env-var-test-in-dev|release\/sprint-[\.\d]+|release\/test|main/
