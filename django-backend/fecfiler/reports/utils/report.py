@@ -12,7 +12,6 @@ from fecfiler.memo_text.models import MemoText
 from fecfiler.committee_accounts.utils.shared import is_valid_committee_id
 from fecfiler.s3 import S3_SESSION
 from fecfiler.settings import AWS_STORAGE_BUCKET_NAME
-import re
 import structlog
 
 logger = structlog.get_logger(__name__)
