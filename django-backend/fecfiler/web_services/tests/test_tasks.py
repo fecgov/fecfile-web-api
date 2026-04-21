@@ -338,7 +338,30 @@ class PollingTasksTestCase(TestCase):
             self.test_dot_fec_key: UploadSubmission,
         }
 
-    def test_dotfec_submission_polling_completes(self):
+    @patch("fecfiler.web_services.dot_fec.dot_fec_submitter.settings")
+    def test_dotfec_submission_slow_response(self, mock_settings):
+        mock_settings.MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS = 50
+        with patch.multiple(
+            "fecfiler.web_services.tasks",
+            SUBMISSION_MANAGERS=self.test_dot_fec_submission_managers,
+            SUBMISSION_CLASSES=self.test_dot_fec_submission_classes,
+        ):
+            upload_submission = UploadSubmission.objects.initiate_submission(
+                str(self.f3x.id)
+            )
+            self.assertNotEqual(upload_submission.fec_status, FECStatus.COMPLETED)
+            poll_for_fec_response(
+                upload_submission.id,
+                self.mock_submitter_key,
+                "Unit Testing Upload Submission",
+            )
+
+            resolved_submission = UploadSubmission.objects.get(id=upload_submission.id)
+            self.assertEqual(resolved_submission.fec_status, FECStatus.PROCESSING)
+
+    @patch("fecfiler.web_services.dot_fec.dot_fec_submitter.settings")
+    def test_dotfec_submission_polling_completes(self, mock_settings):
+        mock_settings.MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS = 0
         with patch.multiple(
             "fecfiler.web_services.tasks",
             SUBMISSION_MANAGERS=self.test_dot_fec_submission_managers,

@@ -53,8 +53,8 @@ applications:
     <<: *defaults
     env:
       <<: *default-env
-      DB_POOL_MIN_SIZE: 10
-      DB_POOL_MAX_SIZE: 10
+      DB_POOL_MIN_SIZE: 50
+      DB_POOL_MAX_SIZE: 50
       DB_POOL_MAX_IDLE: 600
     no-route: true
     health-check-type: process
