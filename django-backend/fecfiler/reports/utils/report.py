@@ -9,6 +9,7 @@ from fecfiler.contacts.models import Contact
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
+from fecfiler.committee_accounts.utils.shared import is_valid_committee_id
 from fecfiler.s3 import S3_SESSION
 from fecfiler.settings import AWS_STORAGE_BUCKET_NAME
 import re
@@ -62,8 +63,7 @@ def delete_committee_reports(committee_ids, delete_contacts=False):
         return
     committee_id = committee_ids[0]
 
-    cid_regex = re.compile("^C[0-9]{8}$")
-    if not cid_regex.match(str(committee_id)):
+    if not is_valid_committee_id(str(committee_id)):
         logger.error(f'Invalid committee ID "{committee_id}"')
         return
 
