@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,8 +9,7 @@
       nonce="{{ nonce }}"
       rel="stylesheet"
       type="text/css"
-      href="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui.css"
-      integrity="sha384-rcbEi6xgdPk0iWkAQzT2F3FeBJXdG+ydrawGlfHAFIZG7wU6aKbQaRewysYpmrlW"
+      href="{% static "css/swagger-ui.css" %}"
       crossorigin="anonymous"
     />
   </head>
@@ -18,7 +18,7 @@
     <div id="swagger-ui"></div>
     <script
       nonce="{{ nonce }}"
-      src="https://unpkg.com/swagger-ui-dist@5.18.2/swagger-ui-bundle.js"
+      src="{% static "js/swagger-ui-bundle.js" %}"
       integrity="sha384-NXtFPpN61oWCuN4D42K6Zd5Rt2+uxeIT36R7kpXBuY9tLnZorzrJ4ykpqwJfgjpZ"
       crossorigin="anonymous">
     </script>

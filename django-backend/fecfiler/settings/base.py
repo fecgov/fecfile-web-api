@@ -105,12 +105,11 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = []
 
+STATIC_URL = "/static/"
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
+STATIC_ROOT = "static"
 
 if INCLUDE_SILK:
-    STATIC_URL = "/static/"
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
-    STATIC_ROOT = "static"
-
     INSTALLED_APPS += [
         "silk",
         "django.contrib.staticfiles",
@@ -130,10 +129,10 @@ if INCLUDE_SILK:
 
     SILKY_DYNAMIC_PROFILING = WEB_SERVICES_PROFILING
 
-
 MIDDLEWARE += [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
     "fecfiler.oidc.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -161,6 +160,12 @@ TEMPLATES = [
         },
     },
 ]
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 CORS_ALLOWED_ORIGIN_REGEXES = [r"https://(.*?)fecfile\.fec\.gov$"]
 
