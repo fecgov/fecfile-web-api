@@ -11,5 +11,6 @@ DEP002 = [
     "gunicorn",
     "django-deprecate-fields",
     "django-migration-linter",
-    "psycopg-pool"
+    "psycopg-pool",
+    "whitenoise",
 ]
