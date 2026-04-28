@@ -13,4 +13,7 @@ DEP002 = [
     "django-migration-linter",
     "psycopg-pool",
     "whitenoise",
+    "sqlparse",
+    "urllib3",
+    "lxml"
 ]
