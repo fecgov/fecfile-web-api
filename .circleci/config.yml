@@ -247,6 +247,11 @@ workflows:
             branches:
               only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - deploy-job:
+          requires:
+            - lint
+            - dependency-check
+            - schema-checks
+            - test
           filters:
             branches:
               only: /develop|release\/sprint-[\.\d]+|release\/test|main/
