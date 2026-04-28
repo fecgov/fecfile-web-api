@@ -81,8 +81,10 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
+    "drf_spectacular_sidecar",
     "corsheaders",
     "django_structlog",
     "django_migration_linter",
@@ -104,15 +106,13 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = []
 
+STATIC_URL = "/static/"
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
+STATIC_ROOT = "static"
 
 if INCLUDE_SILK:
-    STATIC_URL = "/static/"
-    STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
-    STATIC_ROOT = "static"
-
     INSTALLED_APPS += [
         "silk",
-        "django.contrib.staticfiles",
     ]
     MIDDLEWARE = ["silk.middleware.SilkyMiddleware"]
 
@@ -129,10 +129,16 @@ if INCLUDE_SILK:
 
     SILKY_DYNAMIC_PROFILING = WEB_SERVICES_PROFILING
 
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 MIDDLEWARE += [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
     "fecfiler.oidc.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -281,7 +287,13 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
+    "TITLE": "",
+    "DESCRIPTION": "",
+    "VERSION": "0.0.0 (v1)",
     "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
 }
 
 

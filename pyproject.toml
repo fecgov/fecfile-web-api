@@ -14,5 +14,6 @@ DEP002 = [
     "psycopg-pool",
     "sqlparse",
     "urllib3",
-    "lxml"
+    "lxml",
+    "whitenoise"
 ]
