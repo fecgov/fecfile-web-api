@@ -208,12 +208,6 @@ jobs:
             export PATH=$HOME/bin:$PATH
             invoke deploy --branch $CIRCLE_BRANCH --login
 
-      - run:
-          name: Run collectstatic
-          command: |
-            python manage.py collectstatic --no-input --traceback --verbosity 3
-          working_directory: ~/project/django-backend/
-
   # This job kicks off the e2e-test pipeline in the fecfile-web-app project.
   # It is used to run the e2e tests when the api is deployed to dev/stage/test/prod.
   # It uses the is-triggered-e2e-test parameter which is used in the fecfile-web-app
