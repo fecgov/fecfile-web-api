@@ -107,10 +107,10 @@ INSTALLED_APPS = [
 MIDDLEWARE = []
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
 STATIC_ROOT = "static"
 
 if INCLUDE_SILK:
+    STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
     INSTALLED_APPS += [
         "silk",
     ]

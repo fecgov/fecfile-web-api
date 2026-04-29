@@ -15,5 +15,6 @@ DEP002 = [
     "sqlparse",
     "urllib3",
     "lxml",
-    "whitenoise"
+    "whitenoise",
+    "drf-spectacular-sidecar",
 ]
