@@ -101,7 +101,6 @@ INSTALLED_APPS = [
     "fecfiler.devops",
     "fecfiler.mock_oidc_provider",
     "fecfiler.cash_on_hand",
-    "fecfiler.openapi",
 ]
 
 MIDDLEWARE = []
@@ -154,7 +153,7 @@ MIDDLEWARE += [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["fecfiler/openapi/templates", "static/templates"],
+        "DIRS": ["static/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -287,7 +286,7 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "",
+    "TITLE": "FECfile+ API",
     "DESCRIPTION": "",
     "VERSION": "0.0.0 (v1)",
     "SERVE_INCLUDE_SCHEMA": False,
