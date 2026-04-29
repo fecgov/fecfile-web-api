@@ -390,13 +390,5 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
         # Fail the build because the api will be down until the proxy can connect
         return sys.exit(1)
 
-    # run collectstatic for swagger docs (and maybe others)
-    task = "django-backend/manage.py collectstatic --no-input --traceback --verbosity 3"
-    task_name = "Collect static files"
-    ctx.run(
-        f"cf rt {APP_NAME} --command '{task}' --name '{task_name}'",
-        echo=True,
-    )
-
     # Needed for CircleCI
     return sys.exit(0)
