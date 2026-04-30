@@ -65,9 +65,11 @@ services:
       INCLUDE_SILK: "${INCLUDE_SILK}"
       DJANGO_APPLICATION: FECFILE_CELERY_WORKER
       E2E_TEST: "${E2E_TEST:-False}" # E2E-only endpoints disabled by default, set to True to enable
-      DB_POOL_MIN_SIZE: 8
-      DB_POOL_MAX_SIZE: 20
+      DB_POOL_MIN_SIZE: 10
+      DB_POOL_MAX_SIZE: 10
       DB_POOL_MAX_IDLE: 600
+      CELERY_WORKER_CONCURRENCY: 10
+      MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS: 0
     deploy:
       resources:
         limits:
@@ -182,6 +184,7 @@ services:
       DB_POOL_MIN_SIZE: 8
       DB_POOL_MAX_SIZE: 20
       DB_POOL_MAX_IDLE: 600
+      MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS: 0
 
       # ---- FEATURE FLAGS ----
       FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
