@@ -3,6 +3,7 @@ from django.urls import re_path, path
 from django.views.generic.base import RedirectView
 from fecfiler.settings import MOCK_OIDC_PROVIDER, INCLUDE_SILK
 from django.conf.urls.static import static
+from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView
 
 BASE_V1_URL = r"^api/v1/"
 
@@ -18,7 +19,11 @@ if INCLUDE_SILK:
     )
 
 urlpatterns += [
-    re_path(r"^api/", include("fecfiler.openapi.urls")),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "api/docs/swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+    ),
     re_path(BASE_V1_URL, include("fecfiler.committee_accounts.urls")),
     re_path(BASE_V1_URL, include("fecfiler.contacts.urls")),
     re_path(BASE_V1_URL, include("fecfiler.reports.urls")),
@@ -29,7 +34,7 @@ urlpatterns += [
     re_path(BASE_V1_URL, include("fecfiler.feedback.urls")),
     re_path(BASE_V1_URL, include("fecfiler.oidc.urls")),
     re_path(BASE_V1_URL, include("fecfiler.cash_on_hand.urls")),
-    path("", RedirectView.as_view(url="/api/docs/")),
+    path("", RedirectView.as_view(url="/api/docs/swagger-ui/")),
     re_path(r"", include("fecfiler.devops.urls")),
 ]
 
