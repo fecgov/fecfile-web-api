@@ -247,6 +247,11 @@ workflows:
             branches:
               only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - deploy-job:
+          requires:
+            - lint
+            - dependency-check
+            - schema-checks
+            - test
           filters:
             branches:
-              only: /feature\/338-drf-spectacular-sidecar|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
