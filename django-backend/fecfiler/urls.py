@@ -21,9 +21,8 @@ if INCLUDE_SILK:
 urlpatterns += [
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(
-        "api/schema/swagger-ui/",
+        "api/docs/swagger-ui/",
         SpectacularSwaggerView.as_view(url_name="schema"),
-        name="swagger-ui",
     ),
     re_path(BASE_V1_URL, include("fecfiler.committee_accounts.urls")),
     re_path(BASE_V1_URL, include("fecfiler.contacts.urls")),
@@ -35,7 +34,7 @@ urlpatterns += [
     re_path(BASE_V1_URL, include("fecfiler.feedback.urls")),
     re_path(BASE_V1_URL, include("fecfiler.oidc.urls")),
     re_path(BASE_V1_URL, include("fecfiler.cash_on_hand.urls")),
-    path("", RedirectView.as_view(url="/api/schema/swagger-ui/")),
+    path("", RedirectView.as_view(url="/api/docs/swagger-ui/")),
     re_path(r"", include("fecfiler.devops.urls")),
 ]
 
