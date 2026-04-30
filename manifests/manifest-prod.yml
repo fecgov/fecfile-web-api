@@ -48,7 +48,7 @@ applications:
       - route: fecfile-web-api-prod.apps.internal
     command: bin/run-api.sh
     memory: 2G
-    instances: 4
+    instances: 6
   - name: fecfile-web-services
     <<: *defaults
     env:
