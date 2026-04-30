@@ -48,14 +48,15 @@ applications:
       - route: fecfile-web-api-prod.apps.internal
     command: bin/run-api.sh
     memory: 2G
-    instances: 4
+    instances: 6
   - name: fecfile-web-services
     <<: *defaults
     env:
       <<: *default-env
-      DB_POOL_MIN_SIZE: 10
-      DB_POOL_MAX_SIZE: 10
+      DB_POOL_MIN_SIZE: 50
+      DB_POOL_MAX_SIZE: 50
       DB_POOL_MAX_IDLE: 600
+      CELERY_WORKER_CONCURRENCY: 50
     no-route: true
     health-check-type: process
     command: bin/run-celery-worker.sh

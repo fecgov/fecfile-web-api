@@ -30,6 +30,7 @@ defaults: &defaults
     BP_PIP_VERSION: latest
     LOG_FORMAT: KEY_VALUE
     MOCK_EFO_FILING: True
+    MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS: 0
     SYSTEM_STATUS_CACHE_AGE: 60
     INITIAL_POLLING_INTERVAL: 10
     INITIAL_POLLING_DURATION: 900
@@ -55,6 +56,7 @@ applications:
       DB_POOL_MIN_SIZE: 10
       DB_POOL_MAX_SIZE: 10
       DB_POOL_MAX_IDLE: 600
+      CELERY_WORKER_CONCURRENCY: 10
     instances: 2
     no-route: true
     health-check-type: process
