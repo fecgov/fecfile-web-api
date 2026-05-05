@@ -163,15 +163,6 @@ TEMPLATES = [
 
 CORS_ALLOWED_ORIGIN_REGEXES = [r"https://(.*?)fecfile\.fec\.gov$"]
 
-CORS_ALLOW_HEADERS = (
-    *default_headers,
-    "enctype",
-    "token",
-    "cache-control",
-)
-
-CORS_ALLOW_CREDENTIALS = True
-
 # In cloud environemnt, name will be from VCAP_APPLICATION
 # - otherwise from DJANGO_APPLICATION which we set in docker-compose.yml
 APPLICATION_NAME = env.name or env.get_credential("DJANGO_APPLICATION", "FECFILE")
