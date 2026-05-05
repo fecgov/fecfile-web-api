@@ -10,7 +10,6 @@ import sys
 
 from enum import Enum
 from .env import env
-from corsheaders.defaults import default_headers
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
 from fecfiler.web_services.profilers import WEB_SERVICES_PROFILING
 from math import floor
@@ -85,7 +84,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_spectacular",
     "drf_spectacular_sidecar",
-    "corsheaders",
     "django_structlog",
     "django_migration_linter",
     "fecfiler.committee_accounts",
@@ -135,7 +133,6 @@ STORAGES = {
 }
 
 MIDDLEWARE += [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
@@ -165,17 +162,6 @@ TEMPLATES = [
         },
     },
 ]
-
-CORS_ALLOWED_ORIGIN_REGEXES = [r"https://(.*?)fecfile\.fec\.gov$"]
-
-CORS_ALLOW_HEADERS = (
-    *default_headers,
-    "enctype",
-    "token",
-    "cache-control",
-)
-
-CORS_ALLOW_CREDENTIALS = True
 
 # In cloud environemnt, name will be from VCAP_APPLICATION
 # - otherwise from DJANGO_APPLICATION which we set in docker-compose.yml
