@@ -6,7 +6,11 @@ requirements_files_dev  = ["requirements-test.txt"]
 known_first_party = ["fecfiler", "locust_data_generator"]
 
 [tool.deptry.per_rule_ignores]
+
+# Project should not contain missing dependencies
 DEP001 = ["locust"]
+
+# Project should not contain unused dependencies
 DEP002 = [
     "gunicorn",
     "django-deprecate-fields",
@@ -14,5 +18,7 @@ DEP002 = [
     "psycopg-pool",
     "sqlparse",
     "urllib3",
-    "lxml"
+    "lxml",
+    "whitenoise",
+    "drf-spectacular-sidecar",
 ]
