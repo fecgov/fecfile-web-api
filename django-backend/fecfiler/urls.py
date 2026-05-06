@@ -19,9 +19,9 @@ if INCLUDE_SILK:
     )
 
 urlpatterns += [
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path(
-        "api/docs/",
+    re_path("api/schema", SpectacularAPIView.as_view(), name="schema"),
+    re_path(
+        "api/docs",
         SpectacularSwaggerView.as_view(url_name="schema"),
     ),
     re_path(BASE_V1_URL, include("fecfiler.committee_accounts.urls")),
@@ -34,7 +34,7 @@ urlpatterns += [
     re_path(BASE_V1_URL, include("fecfiler.feedback.urls")),
     re_path(BASE_V1_URL, include("fecfiler.oidc.urls")),
     re_path(BASE_V1_URL, include("fecfiler.cash_on_hand.urls")),
-    path("", RedirectView.as_view(url="/api/docs/")),
+    path("", RedirectView.as_view(url="/api/docs")),
     re_path(r"", include("fecfiler.devops.urls")),
 ]
 
