@@ -6,6 +6,7 @@ from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.transactions.schedule_c2.models import ScheduleC2
 from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.user.models import User
+from statistics import quantiles, mean
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -13,30 +14,39 @@ logger = structlog.get_logger(__name__)
 
 def get_averages(items):
     length = len(items)
-    if length == 0:
+    if not items or length == 0:
         raise ValueError("Cannot get averages for an empty list")
 
-    mean = sum(items) / length
-    if len(items) < 4:
-        return {"Mean": mean}
+    data = sorted(items)
+    avg = mean(data)
 
-    items.sort()
-    first_q = items[:length // 4]
-    second_q = items[length // 4:length // 2]
-    third_q = items[length // 2:length // 4 * 3]
-    fourth_q = items[length // 4 * 3:]
+    if length < 4:
+        return {"Mean": avg}
+
+    q1, q2, q3 = quantiles(data)
+
     return {
-        "1st quartile": first_q[-1],
-        "2nd quartile": second_q[-1],
-        "3rd quartile": third_q[-1],
-        "Max": fourth_q[-1],
-        "Mean": mean,
+        "1st quartile": q1,
+        "2nd quartile": q2,
+        "3rd quartile": q3,
+        "Max": data[-1],
+        "Mean": avg,
     }
-
 
 def print_keyvalues(dict):
     for key in dict.keys():
-        logger.info(f"{f'   {key}: {dict[key]}':<60}")
+        # when outputting, label the 2nd quartile as median
+        suffix = " (median)" if key == "2nd quartile" else ""
+
+        # limit floats to 3 decimal places and strip trailing zeros
+        value = dict[key]
+        value_str = (
+            f"{value:.3f}".rstrip("0").rstrip(".")
+            if isinstance(value, float)
+            else str(value)
+        )
+
+        logger.info(f"{f'   {key}: {value_str}{suffix}':<60}")
 
 
 def get_num_committees():
