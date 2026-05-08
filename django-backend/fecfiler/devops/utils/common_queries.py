@@ -33,6 +33,7 @@ def get_averages(items):
         "Mean": avg,
     }
 
+
 def print_keyvalues(dict):
     for key in dict.keys():
         # when outputting, label the 2nd quartile as median
