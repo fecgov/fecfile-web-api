@@ -223,7 +223,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         return self.transaction_set.all()
 
     @property
-    def can_delete(self):
+    def can_delete(self) -> bool:
         return len(self.blocking_reports) == 0
 
     @property
