@@ -79,6 +79,10 @@ def get_num_reports_per_committee(committee_id=None):
             r_count = Report.objects.filter(committee_account=committee).count()
             committee_report_counts.append(r_count)
 
+        if not committee_report_counts:
+            logger.info(f"{'Number of reports per committee: no committees':<60}")
+            return
+
         averages = get_averages(committee_report_counts)
 
         logger.info(f"{f'Number of reports per committee:':<60}")
@@ -98,7 +102,7 @@ def get_num_transactions_per_committee(committee_id=None):
         )
     else:
         committee_transaction_counts = []
-        highest_count = 0
+        highest_count = -1
         biggest_committee = None
         for committee in CommitteeAccount.objects.all():
             t_count = Transaction.objects.filter(committee_account=committee).count()
@@ -106,6 +110,10 @@ def get_num_transactions_per_committee(committee_id=None):
             if t_count > highest_count:
                 highest_count = t_count
                 biggest_committee = committee
+
+        if not committee_transaction_counts:
+            logger.info(f"{'Number of transactions per committee: no committees':<60}")
+            return
 
         averages = get_averages(committee_transaction_counts)
 
@@ -126,6 +134,20 @@ def get_num_transactions_per_report(committee_id=None):
             continue
         t_count = Transaction.objects.filter(reports=report).count()
         report_transaction_counts.append(t_count)
+
+    if not report_transaction_counts:
+        logger.info(
+            f"{(
+                'Number of transactions per report'
+                + (
+                    f' for committee_id {committee_id}'
+                    if committee_id is not None
+                    else ''
+                )
+                + ': no reports'
+            ):<60}"
+        )
+        return
 
     averages = get_averages(report_transaction_counts)
 
@@ -154,6 +176,10 @@ def get_num_transactions_per_contact():
             transaction_count += getattr(c, key).count()
 
         contact_transaction_counts.append(transaction_count)
+
+    if not contact_transaction_counts:
+        logger.info(f"{'Number of transactions per contact: no contacts':<60}")
+        return
 
     averages = get_averages(contact_transaction_counts)
 
