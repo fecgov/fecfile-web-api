@@ -30,9 +30,11 @@ report_code_label_mapping = {
 }
 
 text_code_mapping = {
-    "MST": "Miscellaneous Report to the FEC",
+    "MST": "Miscellaneous Electronic Submission to the FEC",
     "MSM": "Filing Frequency Change Notice",
-    "MSW": "Loan Agreement / Loan Forgiveness",
+    "MSX": "Loan Forgiveness",
+    "MSW": "C-1/Loan Agreement",
+    "MSA": "Debt Settlement Plan",
     "MSI": "Disavowal Response",
     "MSR": "Form 3L Filing Frequency Change Notice",
 }
@@ -51,7 +53,7 @@ report_code_label_case = Case(
                 When(form_99__text_code=code, then=Value(label))
                 for code, label in text_code_mapping.items()
             ],
-            default=Value("Miscellaneous Report to the FEC"),
+            default=Value("Miscellaneous Electronic Submission to the FEC"),
             output_field=CharField(),
         ),
     ),
