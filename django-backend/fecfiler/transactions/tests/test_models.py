@@ -1,4 +1,5 @@
 from decimal import Decimal
+import json
 from django.test import TestCase
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.reports.models import ReportTransaction
@@ -25,6 +26,7 @@ from fecfiler.web_services.models import (
     FECStatus,
     UploadSubmission,
 )
+from fecfiler.web_services.tasks import create_dot_fec
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -734,7 +736,6 @@ class TransactionModelTestCase(TestCase):
         self.payment_2.refresh_from_db()
         self.assertTrue(self.loan.can_delete)
         self.assertTrue(self.loan_made.can_delete)
-        # Can delete carried forward debt, but the UI won't let you
         self.assertTrue(self.carried_forward_loan.can_delete)
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
@@ -743,8 +744,19 @@ class TransactionModelTestCase(TestCase):
             self.m1_report.id
         )
         self.m1_report.refresh_from_db()
-        self.m1_report.upload_submission.fec_status = FECStatus.ACCEPTED
+        dot_fec_id = create_dot_fec(
+            self.m1_report.id,
+            self.m1_report.upload_submission.id
+        )
+        self.m1_report.upload_submission.dot_fec_id = dot_fec_id
         self.m1_report.upload_submission.save()
+        self.m1_report.refresh_from_db()
+        self.m1_report.upload_submission.save_fec_response(
+            json.dumps({
+                "status": str(FECStatus.ACCEPTED.value),
+                "report_id": "test_report_id"
+            })
+        )
         self.m1_report.refresh_from_db()
         self.loan.refresh_from_db()
         self.loan_made.refresh_from_db()
@@ -754,8 +766,7 @@ class TransactionModelTestCase(TestCase):
         self.assertFalse(self.loan.can_delete)
         self.assertFalse(self.loan_made.can_delete)
         self.assertFalse(self.payment_1.can_delete)
-        # Can delete carried forward loan, but the UI won't let you
-        self.assertTrue(self.carried_forward_loan.can_delete)
+        self.assertFalse(self.carried_forward_loan.can_delete)
         # Payment 2 can still be deleted because
         # it is a repayment on the loan in an active report
         self.assertTrue(self.payment_2.can_delete)
@@ -769,7 +780,6 @@ class TransactionModelTestCase(TestCase):
         self.payment_2.refresh_from_db()
         self.assertTrue(self.loan.can_delete)
         self.assertTrue(self.loan_made.can_delete)
-        # Can delete carried forward loan, but the UI won't let you
         self.assertTrue(self.carried_forward_loan.can_delete)
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
@@ -842,6 +852,24 @@ class TransactionModelTestCase(TestCase):
             self.m2_report.id
         )
         m2_report.save()
+        self.m2_report.refresh_from_db()
+        dot_fec_id = create_dot_fec(
+            self.m2_report.id,
+            self.m2_report.upload_submission.id
+        )
+        self.m2_report.upload_submission.dot_fec_id = dot_fec_id
+        self.m2_report.upload_submission.save()
+        self.m2_report.refresh_from_db()
+        self.m2_report.upload_submission.save_fec_response(
+            json.dumps({
+                "status": str(FECStatus.ACCEPTED.value),
+                "report_id": "test_report_id"
+            })
+        )
+        print("Done")
+        print(copy_of_transaction_for_reattribution.reatt_redes)
+        print(transaction)
+        self.m2_report.refresh_from_db()
         transaction.refresh_from_db()
         copy_of_transaction_for_reattribution.refresh_from_db()
         reattribution_to.refresh_from_db()
@@ -884,15 +912,26 @@ class TransactionModelTestCase(TestCase):
 
         self.assertTrue(original_debt.can_delete)
         self.assertTrue(m1_repayment.can_delete)
-        # Can delete carried forward debt, but the UI won't let you
         self.assertTrue(carried_forward_debt.can_delete)
         self.assertTrue(m2_repayment.can_delete)
 
-        m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
+        UploadSubmission.objects.initiate_submission(
             m2_report.id
         )
+        m2_report.refresh_from_db()
+        dot_fec_id = create_dot_fec(
+            m2_report.id,
+            m2_report.upload_submission.id
+        )
+        m2_report.upload_submission.dot_fec_id = dot_fec_id
         m2_report.upload_submission.save()
-        m2_report.save()
+        m2_report.refresh_from_db()
+        m2_report.upload_submission.save_fec_response(
+            json.dumps({
+                "status": str(FECStatus.ACCEPTED.value),
+                "report_id": "test_report_id"
+            })
+        )
         original_debt.refresh_from_db()
         m1_repayment.refresh_from_db()
         carried_forward_debt.refresh_from_db()
@@ -904,40 +943,61 @@ class TransactionModelTestCase(TestCase):
 
         m2_report.upload_submission = None
         m2_report.save()
-        m1_report.upload_submission = UploadSubmission.objects.initiate_submission(
+        UploadSubmission.objects.initiate_submission(
             m1_report.id
         )
-        m1_report.save()
+        m1_report.refresh_from_db()
+        dot_fec_id = create_dot_fec(
+            m1_report.id,
+            m1_report.upload_submission.id
+        )
+        m1_report.upload_submission.dot_fec_id = dot_fec_id
+        m1_report.upload_submission.save()
+        m1_report.refresh_from_db()
+        m1_report.upload_submission.save_fec_response(
+            json.dumps({
+                "status": str(FECStatus.ACCEPTED.value),
+                "report_id": "test_report_id"
+            })
+        )
+        m1_report.refresh_from_db()
         original_debt.refresh_from_db()
         m1_repayment.refresh_from_db()
         carried_forward_debt.refresh_from_db()
         m2_repayment.refresh_from_db()
         self.assertFalse(original_debt.can_delete)
         self.assertFalse(m1_repayment.can_delete)
-        # Can delete carried forward debt, but the UI won't let you
-        self.assertTrue(carried_forward_debt.can_delete)
+        self.assertFalse(carried_forward_debt.can_delete)
         self.assertTrue(m2_repayment.can_delete)
 
-        m1_report.upload_submission = None
-        m1_report.save()
+        m1_report.amend()
 
         m3_report = create_form3x(self.committee, "2024-03-01", "2024-04-01", {})
         carry_forward_debt(original_debt, m3_report)
-        # m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
-        #     m2_report.id
-        # )
-        # m2_report.save()
-        m3_report.upload_submission = UploadSubmission.objects.initiate_submission(
+        UploadSubmission.objects.initiate_submission(
             m3_report.id
         )
-        m3_report.save()
+        m3_report.refresh_from_db()
+        dot_fec_id = create_dot_fec(
+            m3_report.id,
+            m3_report.upload_submission.id
+        )
+        m3_report.upload_submission.dot_fec_id = dot_fec_id
+        m3_report.upload_submission.save()
+        m3_report.refresh_from_db()
+        m3_report.upload_submission.save_fec_response(
+            json.dumps({
+                "status": str(FECStatus.ACCEPTED.value),
+                "report_id": "test_report_id"
+            })
+        )
+        m3_report.refresh_from_db()
         original_debt.refresh_from_db()
         # self.assertFalse(original_debt.can_delete)
-        m2_report.upload_submission = None
-        m2_report.save()
+        m2_report.amend()
         original_debt.refresh_from_db()
         self.assertFalse(original_debt.can_delete)
-        m3_report.upload_submission = None
+        m3_report.amend()
         m3_report.save()
         original_debt.refresh_from_db()
         self.assertTrue(original_debt.can_delete)

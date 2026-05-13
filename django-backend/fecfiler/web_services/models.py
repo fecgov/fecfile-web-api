@@ -140,6 +140,7 @@ class BaseSubmission(models.Model):
         self.fec_submission_id = fec_response_json.get("submission_id")
         self.fec_status = fec_response_json.get("status")
         self.fec_message = fec_response_json.get("message")
+
         self.save()
 
     def save_error(self, error):
@@ -207,6 +208,7 @@ class UploadSubmission(BaseSubmission):
     objects = UploadSubmissionManager()
 
     def save_fec_response(self, response_string):
+        print("Saving FEC Response")
         try:
             fec_response_json = json.loads(response_string)
         except Exception as error:
@@ -232,6 +234,13 @@ class UploadSubmission(BaseSubmission):
             report.report_id = self.fec_report_id
             report.save()
         super().save_fec_response(response_string)
+
+        print("saved")
+        if str(self.fec_status) == str(FECStatus.ACCEPTED.value):
+            print("accepted")
+            if self.dot_fec is not None:
+                print("dot fec found")
+                self.dot_fec.report.block_transactions_from_deletion()
 
     class Meta:
         db_table = "upload_submissions"

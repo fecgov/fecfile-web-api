@@ -2,7 +2,7 @@ import uuid
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from django.db import models, transaction as db_transaction
-from django.db.models import Q
+from django.db.models import Q, F
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
 from .form_3.models import Form3
@@ -149,6 +149,8 @@ class Report(CommitteeOwnedModel):
         self.can_unamend = True
         self.save()
 
+        self.unblock_transactions_from_deletion()
+
     def unamend(self, latest_submission):
         self.report_version = int(self.report_version or "1") - 1
         if self.report_version == 0:
@@ -193,6 +195,62 @@ class Report(CommitteeOwnedModel):
 
         super(CommitteeOwnedModel, self).delete()
 
+    def block_transactions_from_deletion(self):
+        from fecfiler.transactions.models import Transaction
+
+        report_transactions = Transaction.objects.filter(
+            reports=self.id
+        ).all()
+
+        transactions_to_modify = []
+        for transaction in report_transactions:
+            related_transactions = transaction.get_related_transactions()
+            transactions_to_modify += related_transactions
+            transactions_to_modify.append(transaction)
+
+        # prune out duplicates
+        transactions_to_modify = set(transactions_to_modify)
+
+        for transaction in transactions_to_modify:
+            transaction.blocking_reports = list(
+                set(transaction.blocking_reports + [self.id])
+            )
+
+        blocked = Transaction.objects.bulk_update(
+            transactions_to_modify,
+            ["blocking_reports"],
+            batch_size=64
+        )
+        logger.info(f"Blocked {blocked} transactions from deletion")
+        for t in transactions_to_modify:
+            print(t.id)
+
+    def unblock_transactions_from_deletion(self):
+        from fecfiler.transactions.models import Transaction
+
+        report_transactions = Transaction.objects.filter(
+            reports=self.id
+        ).all()
+
+        transactions_to_modify = []
+        for transaction in report_transactions:
+            related_transactions = transaction.get_related_transactions()
+            transactions_to_modify += related_transactions
+            transactions_to_modify.append(transaction)
+
+        # prune out duplicates
+        transactions_to_modify = set(transactions_to_modify)
+
+        for transaction in transactions_to_modify:
+            transaction.blocking_reports.remove(self.id)
+
+        unblocked = Transaction.objects.bulk_update(
+            transactions_to_modify,
+            ["blocking_reports"],
+            batch_size=64
+        )
+
+        logger.info(f"Unblocked {unblocked} transactions from deletion")
 
 TABLE_TO_FORM = {
     "form_3": "F3",
