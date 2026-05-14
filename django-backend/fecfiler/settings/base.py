@@ -5,13 +5,11 @@ Django settings for the FECFile project.
 import os
 import dj_database_url
 import structlog
-from structlog.processors import CallsiteParameter
 import logging
 import sys
 
 from enum import Enum
 from .env import env
-from corsheaders.defaults import default_headers
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
 from fecfiler.web_services.profilers import WEB_SERVICES_PROFILING
 from math import floor
@@ -82,9 +80,10 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
-    "corsheaders",
+    "drf_spectacular_sidecar",
     "django_structlog",
     "django_migration_linter",
     "fecfiler.committee_accounts",
@@ -100,20 +99,17 @@ INSTALLED_APPS = [
     "fecfiler.devops",
     "fecfiler.mock_oidc_provider",
     "fecfiler.cash_on_hand",
-    "fecfiler.openapi",
 ]
 
 MIDDLEWARE = []
 
+STATIC_URL = "/static/"
+STATIC_ROOT = "static"
 
 if INCLUDE_SILK:
-    STATIC_URL = "/static/"
     STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
-    STATIC_ROOT = "static"
-
     INSTALLED_APPS += [
         "silk",
-        "django.contrib.staticfiles",
     ]
     MIDDLEWARE = ["silk.middleware.SilkyMiddleware"]
 
@@ -130,10 +126,15 @@ if INCLUDE_SILK:
 
     SILKY_DYNAMIC_PROFILING = WEB_SERVICES_PROFILING
 
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 MIDDLEWARE += [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
     "fecfiler.oidc.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -149,7 +150,7 @@ MIDDLEWARE += [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["fecfiler/openapi/templates", "static/templates"],
+        "DIRS": ["static/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -161,17 +162,6 @@ TEMPLATES = [
         },
     },
 ]
-
-CORS_ALLOWED_ORIGIN_REGEXES = [r"https://(.*?)fecfile\.fec\.gov$"]
-
-CORS_ALLOW_HEADERS = (
-    *default_headers,
-    "enctype",
-    "token",
-    "cache-control",
-)
-
-CORS_ALLOW_CREDENTIALS = True
 
 # In cloud environemnt, name will be from VCAP_APPLICATION
 # - otherwise from DJANGO_APPLICATION which we set in docker-compose.yml
@@ -282,7 +272,13 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
+    "TITLE": "FECfile+ API",
+    "DESCRIPTION": "",
+    "VERSION": "0.0.0 (v1)",
     "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
 }
 
 
@@ -410,12 +406,6 @@ def get_logging_processors():
     We will need to set these explicitly for Celery too
     """
     return [
-        structlog.processors.CallsiteParameterAdder(
-            [
-                CallsiteParameter.PATHNAME,
-                CallsiteParameter.LINENO,
-            ]
-        ),
         add_migration_logs,
         structlog.contextvars.merge_contextvars,
         structlog.stdlib.filter_by_level,
