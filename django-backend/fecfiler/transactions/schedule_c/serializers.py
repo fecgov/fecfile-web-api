@@ -1,6 +1,7 @@
 from rest_framework.serializers import (
     CharField,
     ModelSerializer,
+    BooleanField,
 )
 from fecfiler.transactions.schedule_c.models import ScheduleC
 from fecfiler.shared.utilities import get_model_data
@@ -53,6 +54,8 @@ class ScheduleCSerializer(ModelSerializer):
     lender_candidate_office = CharField(required=False, allow_null=True)
     lender_candidate_state = CharField(required=False, allow_null=True)
     lender_candidate_district = CharField(required=False, allow_null=True)
+    loan_interest_rate_is_percent = BooleanField(required=False, allow_null=True)
+    loan_due_date_is_date = BooleanField(required=False, allow_null=True)
 
     def create(self, validated_data):
         model_data = get_model_data(validated_data, ScheduleC)
