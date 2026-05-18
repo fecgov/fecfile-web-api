@@ -108,9 +108,7 @@ class AggregationDirectFunctionTestCase(SimpleTestCase):
             old_snapshot={"date": date(2024, 1, 15)},
         )
 
-        shared_entity_qs.filter.assert_called_once_with(
-            date__gte=date(2024, 1, 15)
-        )
+        shared_entity_qs.filter.assert_called_once_with(date__gte=date(2024, 1, 15))
         self.assertEqual(
             older_trans.schedule_f.aggregate_general_elec_expended,
             Decimal("10.00"),
@@ -208,3 +206,60 @@ class AggregationDirectFunctionTestCase(SimpleTestCase):
             "GENERAL",
             "contact-1",
         )
+
+    @patch("fecfiler.transactions.aggregation.ScheduleF.objects.bulk_update")
+    @patch("fecfiler.transactions.aggregation.Transaction.objects.filter")
+    def test_process_aggregation_by_payee_candidate_returns_when_no_aggregation_group(
+        self, filter_mock, bulk_update_mock
+    ):
+        transaction = MagicMock()
+        transaction.aggregation_group = None
+
+        id_qs = MagicMock()
+        id_qs.first.return_value = transaction
+        filter_mock.return_value = id_qs
+
+        instance = MagicMock(id="txn-null-group", committee_account_id="committee-1")
+        process_aggregation_by_payee_candidate(instance)
+
+        bulk_update_mock.assert_not_called()
+
+    @patch("fecfiler.transactions.aggregation.Transaction.objects.filter")
+    def test_process_aggregation_for_entity_contact_returns_when_no_aggregation_group(
+        self, filter_mock
+    ):
+        from fecfiler.transactions.aggregation import (
+            process_aggregation_for_entity_contact,
+        )
+
+        process_aggregation_for_entity_contact(
+            committee_account_id="committee-1",
+            aggregation_group=None,
+            contact_1_id="contact-1",
+        )
+        filter_mock.assert_not_called()
+
+    @patch("fecfiler.transactions.aggregation.process_aggregation_for_entity_contact")
+    def test_process_aggregation_for_entity_returns_when_no_aggregation_group(
+        self, delegate_mock
+    ):
+        transaction = MagicMock(
+            committee_account_id="committee-1",
+            aggregation_group=None,
+            contact_1_id="contact-1",
+        )
+
+        process_aggregation_for_entity(transaction)
+        delegate_mock.assert_not_called()
+
+    @patch("fecfiler.transactions.aggregation.Transaction.objects.filter")
+    def test_process_aggregation_for_election_returns_when_aggregation_group_missing(
+        self, filter_mock
+    ):
+        trans = MagicMock()
+        trans.aggregation_group = None
+        trans.schedule_e = MagicMock(election_code="H2024")
+        trans.contact_2 = MagicMock(candidate_office="H")
+
+        process_aggregation_for_election(trans)
+        filter_mock.assert_not_called()
