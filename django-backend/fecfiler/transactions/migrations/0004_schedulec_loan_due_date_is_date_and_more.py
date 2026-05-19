@@ -3,6 +3,27 @@
 from django.db import migrations, models
 
 
+def set_interest_rate_is_percent(apps, schema_editor):
+    ScheduleC = apps.get_model(  # noqa: N806
+        "transactions.ScheduleC"
+    )
+    ScheduleC1 = apps.get_model(  # noqa: N806
+        "transactions.ScheduleC1"
+    )
+
+    for Schedule in [ScheduleC, ScheduleC1]:
+        instances = list(Schedule.objects.all())
+        for instance in instances:
+            interest_rate = instance.loan_interest_rate
+            try:
+                float(str(interest_rate).strip('%'))
+                instance.loan_interest_rate_is_percent = True
+            except ValueError:
+                instance.loan_interest_rate_is_percent = False
+                continue
+
+        Schedule.objects.bulk_update(instances, ["loan_interest_rate_is_percent"])
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -20,4 +41,18 @@ class Migration(migrations.Migration):
             name='loan_interest_rate_is_percent',
             field=models.BooleanField(blank=True, default=False, null=True),
         ),
+        migrations.AddField(
+            model_name='schedulec1',
+            name='loan_due_date_is_date',
+            field=models.BooleanField(blank=True, default=False, null=True),
+        ),
+        migrations.AddField(
+            model_name='schedulec1',
+            name='loan_interest_rate_is_percent',
+            field=models.BooleanField(blank=True, default=False, null=True),
+        ),
+        migrations.RunPython(
+            set_interest_rate_is_percent,
+            migrations.RunPython.noop
+        )
     ]
