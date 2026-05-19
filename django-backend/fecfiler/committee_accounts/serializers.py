@@ -52,6 +52,8 @@ class CommitteeMembershipSerializer(CommitteeOwnedSerializer):
                 "email": self.get_email(instance),
                 "username": instance.user.username if instance.user else "",
                 "name": self.get_name(instance),
+                "first_name": instance.user.first_name if instance.user else "",
+                "last_name": instance.user.last_name if instance.user else "",
                 "is_active": instance.user is not None,
             }
         )

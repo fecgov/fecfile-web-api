@@ -230,6 +230,33 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.data["is_active"], True)
         self.assertEqual(response.data["role"], Membership.CommitteeRole.MANAGER)
 
+    def test_update_name(self):
+        response = self.send_viewset_put_request(
+            "/api/v1/committee-members/5e4ae4ff-60da-4522-a588-ccd97e124b01/",
+            {
+                "id": "5e4ae4ff-60da-4522-a588-ccd97e124b01",
+                "email": "test2@fec.gov",
+                "username": "",
+                "first_name": "abc",
+                "last_name": "def",
+                "role": "MANAGER",
+                "is_active": "true",
+                "committee_account": "11111111-2222-3333-4444-555555555555",
+                "created": "2025-03-06T15:27:17.313246-05:00",
+                "updated": "2025-03-06T15:27:17.313259-05:00",
+                "name": "",
+            },
+            CommitteeMembershipViewSet,
+            "update",
+            pk="5e4ae4ff-60da-4522-a588-ccd97e124b01",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["email"], "test2@fec.gov")
+        self.assertEqual(response.data["is_active"], True)
+        self.assertEqual(response.data["first_name"], "abc")
+        self.assertEqual(response.data["last_name"], "def")
+
 
 class CommitteeViewSetTest(FecfilerViewSetTest):
     fixtures = ["C01234567_user_and_committee"]

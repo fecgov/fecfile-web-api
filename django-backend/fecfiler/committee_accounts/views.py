@@ -221,20 +221,16 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 raise ValidationError("Invalid role")
 
             new_member = add_user_to_committee(email, committee_id, role)
-            logger.info(
-                f"""
+            logger.info(f"""
                 User {request.user.id} added {email} to committee
                 {committee_id} as {role}
-                """
-            )
+                """)
             return Response(CommitteeMembershipSerializer(new_member).data, status=200)
         except Exception as e:
-            logger.error(
-                f"""
+            logger.error(f"""
                 Failed to add email {email} to committtee {type(e)}
                 {committee_id} as {role} {str(e)}
-                """
-            )
+                """)
             return (
                 HttpResponseBadRequest()
                 if isinstance(e, ValidationError)
@@ -284,23 +280,37 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         existing_member = self.get_object()
         committee = existing_member.committee_account
         # member updates
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(existing_member, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        new_role = request.data.get("role")
 
         member_string = ""
         if existing_member.user is not None:
             user_id = existing_member.user.id
             member_string = f"user {user_id}"
+
+            first_name = request.data.get("first_name")
+            last_name = request.data.get("last_name")
+            if first_name or last_name:
+                if first_name:
+                    existing_member.user.first_name = first_name
+                if last_name:
+                    existing_member.user.last_name = last_name
+                existing_member.user.save()
+                serializer.save()
+                logger.info(f"""Updating name for {member_string}
+                    in committee {committee} to {last_name}, {first_name}""")
+                return Response(serializer.data)
         else:
             membership_id = existing_member.id
             member_string = f"pending membership {membership_id}"
 
+        new_role = request.data.get("role")
         logger.info(
             f"Updating role for {member_string} in committee {committee} to {new_role}"
         )
 
-        return super().update(request, *args, **kwargs)
+        serializer.save()
+        return Response(serializer.data)
 
     def list(self, request, *args, **kwargs):
         you_first = request.query_params.get("you_first")
