@@ -71,6 +71,23 @@ def text_to_date_serializer(model_instance, field_name, mapping):
     return date_string
 
 
+def loan_interest_rate_serializer(model_instance, field_name, mapping):
+    schedule = model_instance.schedule_c or model_instance.schedule_c1
+    if schedule:
+        interest_rate = schedule.loan_interest_rate
+        is_percent = schedule.loan_interest_rate_is_percent
+
+        if not is_percent:
+            return interest_rate
+        else:
+            try:
+                no_percent_symbol = str(interest_rate).strip('%')
+                return str(float(no_percent_symbol)/100)
+            except:
+                raise ValueError("Interest rate is not a valid number")
+
+
+
 def default_serializer(model_instance, field_name, mapping):
     """For most field types, just stringifying the value will work.
     In the case where the field is None, we want empty string rather than
@@ -89,6 +106,7 @@ FIELD_SERIALIZERS = {
     "BOOLEAN_YN": boolean_yn_serializer,
     "DATE": date_serializer,
     "TEXT_TO_DATE": text_to_date_serializer,
+    "LOAN_INTEREST_RATE": loan_interest_rate_serializer,
     None: default_serializer,
 }
 
