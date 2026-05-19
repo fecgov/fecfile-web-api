@@ -24,6 +24,7 @@ def set_interest_rate_is_percent(apps, schema_editor):
 
         Schedule.objects.bulk_update(instances, ["loan_interest_rate_is_percent"])
 
+
 class Migration(migrations.Migration):
 
     dependencies = [

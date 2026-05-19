@@ -82,10 +82,9 @@ def loan_interest_rate_serializer(model_instance, field_name, mapping):
         else:
             try:
                 no_percent_symbol = str(interest_rate).strip('%')
-                return str(float(no_percent_symbol)/100)
-            except:
+                return str(float(no_percent_symbol) / 100)
+            except ValueError:
                 raise ValueError("Interest rate is not a valid number")
-
 
 
 def default_serializer(model_instance, field_name, mapping):
