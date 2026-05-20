@@ -3,18 +3,6 @@
 from django.db import migrations, models
 
 
-def set_interest_rate_is_percent(apps, schema_editor):
-    ScheduleC = apps.get_model(  # noqa: N806
-        "transactions.ScheduleC"
-    )
-    ScheduleC1 = apps.get_model(  # noqa: N806
-        "transactions.ScheduleC1"
-    )
-
-    ScheduleC.objects.all().update(loan_interest_rate_is_percent=False)
-    ScheduleC1.objects.all().update(loan_interest_rate_is_percent=False)
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -25,25 +13,21 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='schedulec',
             name='loan_due_date_is_date',
-            field=models.BooleanField(blank=True, default=False, null=True),
+            field=models.BooleanField(default=False),
         ),
         migrations.AddField(
             model_name='schedulec',
             name='loan_interest_rate_is_percent',
-            field=models.BooleanField(blank=True, default=False, null=True),
+            field=models.BooleanField(default=False),
         ),
         migrations.AddField(
             model_name='schedulec1',
             name='loan_due_date_is_date',
-            field=models.BooleanField(blank=True, default=False, null=True),
+            field=models.BooleanField(default=False),
         ),
         migrations.AddField(
             model_name='schedulec1',
             name='loan_interest_rate_is_percent',
-            field=models.BooleanField(blank=True, default=False, null=True),
+            field=models.BooleanField(default=False),
         ),
-        migrations.RunPython(
-            set_interest_rate_is_percent,
-            migrations.RunPython.noop
-        )
     ]

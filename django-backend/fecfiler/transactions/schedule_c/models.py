@@ -17,11 +17,9 @@ class ScheduleC(models.Model):
         null=True, blank=True, max_digits=11, decimal_places=2
     )
     loan_incurred_date = models.DateField(null=True, blank=True)
-    loan_due_date_is_date = models.BooleanField(null=True, blank=True, default=False)
+    loan_due_date_is_date = models.BooleanField(default=False)
     loan_due_date = models.TextField(null=True, blank=True)
-    loan_interest_rate_is_percent = models.BooleanField(
-        null=True, blank=True, default=False
-    )
+    loan_interest_rate_is_percent = models.BooleanField(default=False)
     loan_interest_rate = models.TextField(null=True, blank=True)
     secured = models.BooleanField(null=True, blank=True, default=False)
     personal_funds = models.BooleanField(null=True, blank=True, default=False)
