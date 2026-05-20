@@ -85,13 +85,13 @@ def loan_interest_rate_serializer(model_instance, field_name, mapping):
                 return str(Decimal(interest_rate) / 100)
             except ValueError:
                 raise ValueError(
-                    "Interest rate, {interest_rate}, " \
-                    "on transaction, {model_instance.id}" \
+                    "Interest rate, {interest_rate}, "
+                    "on transaction, {model_instance.id}"
                     "is not a valid number"
                 )
     else:
         raise ValueError(
-            "Attempted to serialize loan interest rate on " \
+            "Attempted to serialize loan interest rate on "
             f"a transaction, {model_instance.id}, without a schedule c/c1"
         )
 
