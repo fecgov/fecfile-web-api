@@ -86,7 +86,7 @@ def loan_interest_rate_serializer(model_instance, field_name, mapping):
             except ValueError:
                 raise ValueError(
                     "Interest rate, {interest_rate}, "
-                    "on transaction, {model_instance.id}"
+                    "on transaction, {model_instance.id}, "
                     "is not a valid number"
                 )
     else:
