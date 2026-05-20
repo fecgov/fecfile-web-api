@@ -1,6 +1,7 @@
 from datetime import datetime
 from fecfile_validate import validate
 from fecfiler.settings import BASE_DIR
+from decimal import Decimal
 from curses import ascii
 import os
 import json
@@ -81,10 +82,18 @@ def loan_interest_rate_serializer(model_instance, field_name, mapping):
             return interest_rate
         else:
             try:
-                no_percent_symbol = str(interest_rate).strip('%')
-                return str(float(no_percent_symbol) / 100)
+                return str(Decimal(interest_rate) / 100)
             except ValueError:
-                raise ValueError("Interest rate is not a valid number")
+                raise ValueError(
+                    "Interest rate, {interest_rate}, " \
+                    "on transaction, {model_instance.id}" \
+                    "is not a valid number"
+                )
+    else:
+        raise ValueError(
+            "Attempted to serialize loan interest rate on " \
+            f"a transaction, {model_instance.id}, without a schedule c/c1"
+        )
 
 
 def default_serializer(model_instance, field_name, mapping):

@@ -11,18 +11,8 @@ def set_interest_rate_is_percent(apps, schema_editor):
         "transactions.ScheduleC1"
     )
 
-    for Schedule in [ScheduleC, ScheduleC1]:
-        instances = list(Schedule.objects.all())
-        for instance in instances:
-            interest_rate = instance.loan_interest_rate
-            try:
-                float(str(interest_rate).strip('%'))
-                instance.loan_interest_rate_is_percent = True
-            except ValueError:
-                instance.loan_interest_rate_is_percent = False
-                continue
-
-        Schedule.objects.bulk_update(instances, ["loan_interest_rate_is_percent"])
+    ScheduleC.objects.all().update(loan_interest_rate_is_percent=False)
+    ScheduleC1.objects.all().update(loan_interest_rate_is_percent=False)
 
 
 class Migration(migrations.Migration):
