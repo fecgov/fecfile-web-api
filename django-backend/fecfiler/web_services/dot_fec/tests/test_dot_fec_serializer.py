@@ -215,7 +215,7 @@ class DotFECSerializerTestCase(TestCase):
         loan = create_loan(
             self.committee,
             contact_org,
-            24000,
+            Decimal(24000.00),
             "Tomorrow",
             "twelve percent",
             False,
@@ -232,7 +232,7 @@ class DotFECSerializerTestCase(TestCase):
         loan = create_loan(
             self.committee,
             contact_org,
-            24000,
+            Decimal(24000.00),
             "Tomorrow",
             "twelve percent",
             False,
@@ -250,7 +250,7 @@ class DotFECSerializerTestCase(TestCase):
         loan = create_loan(
             self.committee,
             contact_org,
-            24000,
+            Decimal(24000.00),
             "Tomorrow",
             "12.5%",
             False,
@@ -269,7 +269,7 @@ class DotFECSerializerTestCase(TestCase):
         loan = create_loan(
             self.committee,
             contact_org,
-            24000,
+            Decimal(24000.00),
             "Tomorrow",
             "12.5",
             False,
@@ -288,7 +288,7 @@ class DotFECSerializerTestCase(TestCase):
         loan = create_loan(
             self.committee,
             contact_org,
-            24000,
+            Decimal(24000.00),
             "Tomorrow",
             "125.5",
             False,
@@ -307,7 +307,7 @@ class DotFECSerializerTestCase(TestCase):
         loan = create_loan(
             self.committee,
             contact_org,
-            24000,
+            Decimal(24000.00),
             "Tomorrow",
             "2",
             False,
@@ -326,7 +326,7 @@ class DotFECSerializerTestCase(TestCase):
         loan, _, agreement, _ = create_loan_from_bank(
             self.committee,
             contact_org,
-            24000,
+            Decimal(24000.00),
             "Tomorrow",
             "2",
             False,
