@@ -262,6 +262,7 @@ class TransactionSerializer(
                 "aggregate_amount",
                 "beginning_balance",
                 "donor_candidate_fec_id",
+                "beneficiary_committee_fec_id",
                 "beneficiary_candidate_fec_id",
                 "beneficiary_candidate_last_name",
                 "beneficiary_candidate_first_name",
