@@ -242,7 +242,7 @@ class DotFECSerializerTestCase(TestCase):
 
         self.assertRaises(ValueError, loan_interest_rate_serializer, loan, None, None)
 
-    def test_serialize_loan_interest_rate_percent_sign(self):
+    def test_serialize_loan_interest_rate_invalid_percent_sign(self):
         contact_org = create_test_organization_contact(
             "Organization",
             self.committee.id
@@ -258,8 +258,7 @@ class DotFECSerializerTestCase(TestCase):
         loan.schedule_c.loan_interest_rate_is_percent = True
         loan.schedule_c.save()
 
-        rate = loan_interest_rate_serializer(loan, None, None)
-        self.assertEqual(rate, "0.125")
+        self.assertRaises(ValueError, loan_interest_rate_serializer, loan, None, None)
 
     def test_serialize_loan_interest_rate_no_percent_sign(self):
         contact_org = create_test_organization_contact(

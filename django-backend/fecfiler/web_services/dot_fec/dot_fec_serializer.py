@@ -1,7 +1,7 @@
 from datetime import datetime
 from fecfile_validate import validate
 from fecfiler.settings import BASE_DIR
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from curses import ascii
 import os
 import json
@@ -83,7 +83,7 @@ def loan_interest_rate_serializer(model_instance, field_name, mapping):
         else:
             try:
                 return str(Decimal(interest_rate) / 100)
-            except ValueError:
+            except InvalidOperation:
                 raise ValueError(
                     f"Interest rate, {interest_rate}, "
                     f"on transaction, {model_instance.id}, "
