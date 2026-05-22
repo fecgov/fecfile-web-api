@@ -2,7 +2,6 @@ import json
 from copy import deepcopy
 from unittest.mock import patch, Mock
 import uuid
-
 from ..models import Contact
 from fecfiler.committee_accounts.models import CommitteeAccount
 from ..views import ContactViewSet, DeletedContactsViewSet
@@ -357,20 +356,21 @@ class ContactViewSetTest(FecfilerViewSetTest):
             self.default_committee.id, active_contact.id, deleted_contact.id
         )
 
-    @patch("fecfiler.contacts.views.settings")
-    def test_e2e_delete_all_contacts_requires_e2e_flag(self, mock_settings):
-        mock_settings.E2E_TEST = False
-
+    @patch("fecfiler.contacts.views.settings.E2E_TEST", False)
+    @patch("fecfiler.settings.permissions.settings.E2E_TEST", False)
+    def test_e2e_delete_all_contacts_requires_e2e_flag(self):
         active_contact, deleted_contact = self._create_active_and_deleted_contacts(
             self.default_committee.id
         )
-        response = self._post_e2e_delete_all_contacts()
+        response = self.client.post(
+            "/api/v1/contacts/e2e-delete-all-contacts/", data={}, format="json"
+        )
 
         self.assertEqual(response.status_code, 404)
         self.assertTrue(Contact.objects.filter(id=active_contact.id).exists())
         self.assertTrue(Contact.all_objects.filter(id=deleted_contact.id).exists())
 
-    @patch("fecfiler.contacts.views.settings")
+    @patch("fecfiler.settings.permissions")
     def test_e2e_delete_all_contacts_scoped_to_committee(self, mock_settings):
         mock_settings.E2E_TEST = True
 
@@ -398,9 +398,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertTrue(Contact.objects.filter(id=other_active_contact.id).exists())
         self.assertTrue(Contact.all_objects.filter(id=other_deleted_contact.id).exists())
         self.assertEqual(
-            Contact.objects.filter(
-                committee_account_id=other_committee.id
-            ).count(),
+            Contact.objects.filter(committee_account_id=other_committee.id).count(),
             1,
         )
         self.assertEqual(

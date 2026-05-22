@@ -16,6 +16,7 @@ from .models import Contact
 from .serializers import ContactSerializer
 import fecfiler.settings as settings
 from fecfiler.shared.utilities import query_fec_api, query_fec_api_single
+from fecfiler.settings.permissions import IsE2EEnabled
 
 logger = structlog.get_logger(__name__)
 
@@ -340,10 +341,13 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         )
         return max_fecfile_results, max_fec_results
 
-    @action(detail=False, methods=["post"], url_path="e2e-delete-all-contacts")
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="e2e-delete-all-contacts",
+        permission_classes=[IsE2EEnabled],
+    )
     def e2e_delete_all_contacts(self, request):
-        if not settings.E2E_TEST:
-            return Response(status=status.HTTP_404_NOT_FOUND)
         committee_uuid = str(self.get_committee_uuid())
         contacts_count = delete_all_contacts(
             committee_uuid=committee_uuid,

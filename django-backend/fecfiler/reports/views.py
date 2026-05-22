@@ -12,6 +12,7 @@ from fecfiler.transactions.aggregation import process_aggregation_for_debts
 from django.db.models import Case, Value, When, CharField, IntegerField, F
 from django.db.models.functions import Concat, Trim
 from django.db import transaction as db_transaction
+from fecfiler.settings.permissions import IsE2EEnabled
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -158,6 +159,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         detail=False,
         methods=["post"],
         url_path="e2e-delete-all-reports",
+        permission_classes=[IsE2EEnabled],
     )
     def e2e_delete_all_reports(self, request):
         reports = Report.objects.filter(committee_account__committee_id="C99999999")
