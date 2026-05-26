@@ -736,7 +736,7 @@ class TransactionModelTestCase(TestCase):
         self.payment_2.refresh_from_db()
         self.assertTrue(self.loan.can_delete)
         self.assertTrue(self.loan_made.can_delete)
-        self.assertTrue(self.carried_forward_loan.can_delete)
+        self.assertTrue(self.carried_forward_loan.can_delete)  # UI blocks from deletion
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
 
@@ -780,7 +780,7 @@ class TransactionModelTestCase(TestCase):
         self.payment_2.refresh_from_db()
         self.assertTrue(self.loan.can_delete)
         self.assertTrue(self.loan_made.can_delete)
-        self.assertTrue(self.carried_forward_loan.can_delete)
+        self.assertTrue(self.carried_forward_loan.can_delete)  # UI blocks from deletion
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
 
@@ -910,7 +910,7 @@ class TransactionModelTestCase(TestCase):
 
         self.assertTrue(original_debt.can_delete)
         self.assertTrue(m1_repayment.can_delete)
-        self.assertTrue(carried_forward_debt.can_delete)
+        self.assertTrue(carried_forward_debt.can_delete)  # UI blocks from deletion
         self.assertTrue(m2_repayment.can_delete)
 
         UploadSubmission.objects.initiate_submission(
