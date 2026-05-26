@@ -2,7 +2,7 @@ import uuid
 from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from django.db import models, transaction as db_transaction
-from django.db.models import Q, F
+from django.db.models import Q
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
 from .managers import ReportManager
 from .form_3.models import Form3
@@ -249,6 +249,7 @@ class Report(CommitteeOwnedModel):
         )
 
         logger.info(f"Unblocked {unblocked} transactions from deletion")
+
 
 TABLE_TO_FORM = {
     "form_3": "F3",
