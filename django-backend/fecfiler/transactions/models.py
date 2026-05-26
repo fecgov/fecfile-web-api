@@ -743,15 +743,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             )
             related_transactions += list(loan_children.all())
 
-        """
-        parent_transactions = list(related_transactions)
-        while(len(parent_transactions) > 0):
-            t = parent_transactions.pop(0)
-            if len(t.children) > 0:
-                related_transactions += list(t.children)
-                parent_transactions += list(t.children)
-        """
-
         return related_transactions
 
     class Meta:
