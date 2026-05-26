@@ -208,7 +208,6 @@ class UploadSubmission(BaseSubmission):
     objects = UploadSubmissionManager()
 
     def save_fec_response(self, response_string):
-        print("Saving FEC Response")
         try:
             fec_response_json = json.loads(response_string)
         except Exception as error:
@@ -235,11 +234,8 @@ class UploadSubmission(BaseSubmission):
             report.save()
         super().save_fec_response(response_string)
 
-        print("saved")
         if str(self.fec_status) == str(FECStatus.ACCEPTED.value):
-            print("accepted")
             if self.dot_fec is not None:
-                print("dot fec found")
                 self.dot_fec.report.block_transactions_from_deletion()
 
     class Meta:

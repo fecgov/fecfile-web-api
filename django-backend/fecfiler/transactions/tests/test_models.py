@@ -852,24 +852,21 @@ class TransactionModelTestCase(TestCase):
             self.m2_report.id
         )
         m2_report.save()
-        self.m2_report.refresh_from_db()
+        m2_report.refresh_from_db()
         dot_fec_id = create_dot_fec(
-            self.m2_report.id,
-            self.m2_report.upload_submission.id
+            m2_report.id,
+            m2_report.upload_submission.id
         )
-        self.m2_report.upload_submission.dot_fec_id = dot_fec_id
-        self.m2_report.upload_submission.save()
-        self.m2_report.refresh_from_db()
-        self.m2_report.upload_submission.save_fec_response(
+        m2_report.upload_submission.dot_fec_id = dot_fec_id
+        m2_report.upload_submission.save()
+        m2_report.refresh_from_db()
+        m2_report.upload_submission.save_fec_response(
             json.dumps({
                 "status": str(FECStatus.ACCEPTED.value),
                 "report_id": "test_report_id"
             })
         )
-        print("Done")
-        print(copy_of_transaction_for_reattribution.reatt_redes)
-        print(transaction)
-        self.m2_report.refresh_from_db()
+        m2_report.refresh_from_db()
         transaction.refresh_from_db()
         copy_of_transaction_for_reattribution.refresh_from_db()
         reattribution_to.refresh_from_db()
@@ -883,6 +880,7 @@ class TransactionModelTestCase(TestCase):
     def test_can_delete_debt(self):
         m1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         m2_report = create_form3x(self.committee, "2024-02-01", "2024-03-01", {})
+        m3_report = create_form3x(self.committee, "2024-03-01", "2024-04-01", {})
         original_debt = create_debt(
             self.committee, self.contact_1, Decimal("123.00"), report=m1_report
         )
@@ -937,7 +935,7 @@ class TransactionModelTestCase(TestCase):
         carried_forward_debt.refresh_from_db()
         m2_repayment.refresh_from_db()
         self.assertFalse(original_debt.can_delete)
-        self.assertFalse(m1_repayment.can_delete)
+        self.assertTrue(m1_repayment.can_delete)
         self.assertFalse(carried_forward_debt.can_delete)
         self.assertFalse(m2_repayment.can_delete)
 
@@ -968,7 +966,7 @@ class TransactionModelTestCase(TestCase):
         self.assertFalse(original_debt.can_delete)
         self.assertFalse(m1_repayment.can_delete)
         self.assertFalse(carried_forward_debt.can_delete)
-        self.assertTrue(m2_repayment.can_delete)
+        self.assertFalse(m2_repayment.can_delete)
 
         m1_report.amend()
 
@@ -992,7 +990,6 @@ class TransactionModelTestCase(TestCase):
             })
         )
         m3_report.refresh_from_db()
-        original_debt.refresh_from_db()
         # self.assertFalse(original_debt.can_delete)
         m2_report.amend()
         original_debt.refresh_from_db()
@@ -1000,7 +997,13 @@ class TransactionModelTestCase(TestCase):
         m3_report.amend()
         m3_report.save()
         original_debt.refresh_from_db()
+        m1_repayment.refresh_from_db()
+        carried_forward_debt.refresh_from_db()
+        m2_repayment.refresh_from_db()
         self.assertTrue(original_debt.can_delete)
+        self.assertTrue(m1_repayment.can_delete)
+        self.assertTrue(carried_forward_debt.can_delete)
+        self.assertTrue(m2_repayment.can_delete)
 
     def set_up_jf_transfer(self):
         jf_transfer = create_schedule_a(

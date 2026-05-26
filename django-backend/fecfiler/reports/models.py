@@ -222,8 +222,6 @@ class Report(CommitteeOwnedModel):
             batch_size=64
         )
         logger.info(f"Blocked {blocked} transactions from deletion")
-        for t in transactions_to_modify:
-            print(t.id)
 
     def unblock_transactions_from_deletion(self):
         from fecfiler.transactions.models import Transaction

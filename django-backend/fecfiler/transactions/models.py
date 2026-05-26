@@ -710,7 +710,14 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             related_transactions.append(self.loan)
 
             loan_chain = Transaction.objects.filter(
-                loan_id=self.loan_id
+                Q(
+                    schedule_c__isnull=False,
+                ) | Q(
+                    schedule_c1__isnull=False,
+                ) | Q(
+                    schedule_c2__isnull=False
+                ),
+                loan_id=self.loan_id,
             ).exclude(id=self.id)
             related_transactions += list(loan_chain.all())
 
@@ -725,6 +732,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
             debt_chain = Transaction.objects.filter(
                 debt_id=self.debt_id,
+                schedule_d__isnull=False,
             ).exclude(id=self.id)
             related_transactions += list(debt_chain.all())
 
