@@ -64,6 +64,36 @@ class UploadSubmissionTestCase(TestCase):
         self.assertEqual(from_db.fecfile_task_state, FECSubmissionState.FAILED.value)
         self.assertIsNotNone(from_db.task_completed)
 
+    def test_amendment_save_fec_response_does_not_overwrite_report_id(self):
+        self.assertIsNone(self.upload_submission.fec_report_id)
+        self.upload_submission.save_fec_response(
+            json.dumps(
+                {
+                    "submission_id": "fake_submission_id",
+                    "status": FECStatus.ACCEPTED.value,
+                    "message": "Test Save Response",
+                    "report_id": "1234",
+                }
+            )
+        )
+        from_db = UploadSubmission.objects.get(id=self.upload_submission.id)
+        self.assertEqual(from_db.fec_report_id, "1234")
+
+        # Simulate an amendment with a different report id coming back from FEC
+        self.upload_submission.save_fec_response(
+            json.dumps(
+                {
+                    "submission_id": "fake_submission_id_2",
+                    "status": FECStatus.ACCEPTED.value,
+                    "message": "Test Save Response 2",
+                    "report_id": "5678",
+                }
+            )
+        )
+        from_db.refresh_from_db()
+        # The report id should not be overwritten by the amendment response
+        self.assertEqual(from_db.fec_report_id, "1234")
+
     """
     WEBPRINT
     """
