@@ -7,12 +7,13 @@ from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
+from unittest.mock import patch
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
-class CommitteeMemberViewSetTest(FecfilerViewSetTest):
+class ReportViewSetTest(FecfilerViewSetTest):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         user = User.objects.create(email="test@fec.gov", username="gov")
@@ -74,6 +75,38 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             ordering = form_type_ordering.get(form_type, 0)
             self.assertGreaterEqual(ordering, last_ordering)
             last_ordering = ordering
+
+    @patch("fecfiler.reports.views.settings.E2E_TEST", False)
+    def test_e2e_delete_all_reports_not_allowed(self):
+        e2e_committee = CommitteeAccount(committee_id="C99999999")
+        e2e_committee.save()
+
+        new_report = Report(committee_account=e2e_committee)
+        new_report.save()
+
+        new_transaction = Transaction(committee_account=e2e_committee)
+        new_transaction.save()
+        report_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
+        transaction_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
+        self.assertGreater(report_count, 0)
+        self.assertGreater(transaction_count, 0)
+
+        response = self.client.post(
+            "/api/v1/reports/e2e-delete-all-reports/", data={}, format="json"
+        )
+        self.assertEqual(response.status_code, 403)
+        report_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
+        transaction_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
+        self.assertGreater(report_count, 0)
+        self.assertGreater(transaction_count, 0)
 
     def test_e2e_delete_all_reports(self):
         view = ReportViewSet()

@@ -357,7 +357,6 @@ class ContactViewSetTest(FecfilerViewSetTest):
         )
 
     @patch("fecfiler.contacts.views.settings.E2E_TEST", False)
-    @patch("fecfiler.settings.permissions.settings.E2E_TEST", False)
     def test_e2e_delete_all_contacts_requires_e2e_flag(self):
         active_contact, deleted_contact = self._create_active_and_deleted_contacts(
             self.default_committee.id
@@ -366,14 +365,12 @@ class ContactViewSetTest(FecfilerViewSetTest):
             "/api/v1/contacts/e2e-delete-all-contacts/", data={}, format="json"
         )
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 403)
         self.assertTrue(Contact.objects.filter(id=active_contact.id).exists())
         self.assertTrue(Contact.all_objects.filter(id=deleted_contact.id).exists())
 
-    @patch("fecfiler.settings.permissions")
-    def test_e2e_delete_all_contacts_scoped_to_committee(self, mock_settings):
-        mock_settings.E2E_TEST = True
-
+    @patch("fecfiler.contacts.views.settings.E2E_TEST", True)
+    def test_e2e_delete_all_contacts_scoped_to_committee(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000002")
         other_active_contact, other_deleted_contact = (
             self._create_active_and_deleted_contacts(
