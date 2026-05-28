@@ -228,8 +228,8 @@ class UploadSubmission(BaseSubmission):
         report = self.report_set.first()
         """ If this is the first filing, set the fec_file_report_id
         if it is an amendment, keep the original report id"""
-        if not report.report_id:
-            report.report_id = self.fec_report_id
+        if not report.fec_report_id:
+            report.fec_report_id = self.fec_report_id
             report.save()
         super().save_fec_response(response_string)
 
