@@ -28,7 +28,8 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(
                 blank=True,
                 null=True,
-                on_delete=models.SET_NULL,
+                on_delete=models.deletion.SET_NULL,
+                related_name="reports_previous_upload_submission",
                 to="web_services.uploadsubmission",
             ),
         ),
