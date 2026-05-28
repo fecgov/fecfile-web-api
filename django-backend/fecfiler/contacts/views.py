@@ -14,7 +14,7 @@ from rest_framework.viewsets import mixins, GenericViewSet
 from rest_framework import viewsets, pagination, filters, status
 from .models import Contact
 from .serializers import ContactSerializer
-import fecfiler.settings as settings
+from django.conf import settings
 from fecfiler.shared.utilities import query_fec_api, query_fec_api_single
 
 logger = structlog.get_logger(__name__)

@@ -55,7 +55,7 @@ jobs:
       - run:
           name: Run tests
           # Use built-in Django test module
-          command: coverage run --rcfile=.coveragerc manage.py test --parallel 4 --timing
+          command: coverage run --rcfile=.coveragerc manage.py test --parallel 4 --timing --settings=fecfiler.settings.test
           working_directory: ~/project/django-backend/
 
       - run:
