@@ -13,8 +13,7 @@ def drop_trigger_function(apps, schema_editor):
 
 def _reverse_create_trigger_function(apps, schema_editor):
     with connection.cursor() as cursor:
-        cursor.execute(
-            """
+        cursor.execute("""
         CREATE OR REPLACE FUNCTION update_transactions_can_delete() RETURNS TRIGGER AS $$
         BEGIN
             UPDATE transactions_transaction
@@ -72,32 +71,23 @@ def _reverse_create_trigger_function(apps, schema_editor):
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
-        """
-        )
+        """)
 
 
 def _reverse_create_trigger(apps, schema_editor):
     with connection.cursor() as cursor:
-        cursor.execute(
-            """
+        cursor.execute("""
             CREATE TRIGGER report_status_update
             AFTER UPDATE OF upload_submission_id ON reports_report
             FOR EACH ROW
             EXECUTE FUNCTION update_transactions_can_delete();
-            """
-        )
+            """)
 
 
 class Migration(migrations.Migration):
     dependencies = [
-        (
-            "transactions",
-            "0003_remove_unused_functions"
-        ),
-        (
-            "reports",
-            "0008_remove_can_unamend_trigger"
-        ),
+        ("transactions", "0004_clear_aggregates_for_null_groups"),
+        ("reports", "0008_remove_can_unamend_trigger"),
     ]
 
     operations = [
