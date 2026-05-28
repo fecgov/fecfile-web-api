@@ -5,7 +5,6 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .models import Report
 from .report_code_label import report_code_label_case
-from fecfiler.web_services.models import UploadSubmission
 from fecfiler.reports.utils.report import delete_all_reports
 from .serializers import ReportSerializer
 from fecfiler.transactions.aggregation import process_aggregation_for_debts

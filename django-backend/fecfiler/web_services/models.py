@@ -79,7 +79,7 @@ class FECStatus(str, Enum):
 
 
 class UploadSubmissionManager(models.Manager):
-    def initiate_submission(self, report_id):
+    def initiate_submission(self, report_id) -> "UploadSubmission":
         submission = self.create(fecfile_task_state=FECSubmissionState.INITIALIZING.value)
         submission.save()
 

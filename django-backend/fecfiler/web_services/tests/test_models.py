@@ -7,6 +7,7 @@ from fecfiler.web_services.models import (
     WebPrintSubmission,
 )
 from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.reports.models import Report
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.user.models import User
 
@@ -65,8 +66,12 @@ class UploadSubmissionTestCase(TestCase):
         self.assertIsNotNone(from_db.task_completed)
 
     def test_amendment_save_fec_response_does_not_overwrite_report_id(self):
-        self.assertIsNone(self.upload_submission.fec_report_id)
-        self.upload_submission.save_fec_response(
+
+        submission: UploadSubmission = UploadSubmission.objects.initiate_submission(
+            str(self.f3x.id)
+        )
+        self.assertIsNotNone(submission.report_set)
+        submission.save_fec_response(
             json.dumps(
                 {
                     "submission_id": "fake_submission_id",
@@ -76,11 +81,17 @@ class UploadSubmissionTestCase(TestCase):
                 }
             )
         )
-        from_db = UploadSubmission.objects.get(id=self.upload_submission.id)
+        from_db = UploadSubmission.objects.get(id=submission.id)
         self.assertEqual(from_db.fec_report_id, "1234")
+        report: Report = from_db.report_set.first()
+        self.assertEqual(report.fec_report_id, "1234")
 
-        # Simulate an amendment with a different report id coming back from FEC
-        self.upload_submission.save_fec_response(
+        report.amend()
+        amendment_submission: UploadSubmission = (
+            UploadSubmission.objects.initiate_submission(str(report.id))
+        )
+
+        amendment_submission.save_fec_response(
             json.dumps(
                 {
                     "submission_id": "fake_submission_id_2",
