@@ -94,7 +94,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             return Response(committee)
         except Exception as e:
             logger.error(
-                f"User {request.user.email} failed to retrieve committee account "
+                f"User {request.user.email} failed to retrieve committee for account creation "
                 f"{committee_id}: {str(e)}"
             )
             response = {"message": "No available committee found."}
@@ -228,20 +228,16 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 raise ValidationError("Invalid role")
 
             new_member = add_user_to_committee(email, committee_id, role)
-            logger.info(
-                f"""
+            logger.info(f"""
                 User {request.user.id} added {email} to committee
                 {committee_id} as {role}
-                """
-            )
+                """)
             return Response(CommitteeMembershipSerializer(new_member).data, status=200)
         except Exception as e:
-            logger.error(
-                f"""
+            logger.error(f"""
                 Failed to add email {email} to committtee {type(e)}
                 {committee_id} as {role} {str(e)}
-                """
-            )
+                """)
             return (
                 HttpResponseBadRequest()
                 if isinstance(e, ValidationError)
