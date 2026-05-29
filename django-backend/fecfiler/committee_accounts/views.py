@@ -94,7 +94,8 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             return Response(committee)
         except Exception as e:
             logger.error(
-                f"User {request.user.email} failed to retrieve committee for account creation "
+                f"User {request.user.email} failed to retrieve "
+                f"committee for account creation "
                 f"{committee_id}: {str(e)}"
             )
             response = {"message": "No available committee found."}
