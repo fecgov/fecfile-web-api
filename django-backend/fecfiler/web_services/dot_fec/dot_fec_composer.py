@@ -122,7 +122,7 @@ def compose_header(report_id):
             FEC_FORMAT_VERSION,
             "FECfile+",
             "0.0.1",
-            report.report_id,
+            report.fec_report_id,
             report.report_version,
         )
     else:

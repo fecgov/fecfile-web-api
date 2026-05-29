@@ -5,7 +5,6 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .models import Report
 from .report_code_label import report_code_label_case
-from fecfiler.web_services.models import UploadSubmission
 from fecfiler.reports.utils.report import delete_all_reports
 from .serializers import ReportSerializer
 from fecfiler.transactions.aggregation import process_aggregation_for_debts
@@ -146,12 +145,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     @action(detail=True, methods=["post"], url_name="unamend")
     def unamend(self, request, pk):
         report: Report = self.get_object()
-        latest_submission = (
-            UploadSubmission.objects.filter(fec_report_id=report.report_id)
-            .order_by("-created")
-            .first()
-        )
-        report.unamend(latest_submission)
+        report.unamend()
         return Response(f"unamended {report}")
 
     @action(

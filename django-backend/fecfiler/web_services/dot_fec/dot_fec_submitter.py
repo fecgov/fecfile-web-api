@@ -33,8 +33,8 @@ class DotFECSubmitter(ABC):
             "agency_id": settings.FEC_AGENCY_ID,
             "wait": False,
         }
-        if dot_fec_record.report.report_id:
-            json_obj["amendment_id"] = dot_fec_record.report.report_id
+        if dot_fec_record.report.fec_report_id:
+            json_obj["amendment_id"] = dot_fec_record.report.fec_report_id
             if backdoor_code:
                 json_obj["amendment_id"] += backdoor_code
         self.log_submission_json(json_obj, dot_fec_record, backdoor_code)
@@ -45,7 +45,7 @@ class DotFECSubmitter(ABC):
         copy_json_obj.pop("password", None)
         copy_json_obj.pop("api_key", None)
         if "amendment_id" in copy_json_obj and backdoor_code:
-            copy_json_obj["amendment_id"] = dot_fec_record.report.report_id + "xxxxx"
+            copy_json_obj["amendment_id"] = dot_fec_record.report.fec_report_id + "xxxxx"
         logger.info(f"submission json: {json.dumps(copy_json_obj)}")
 
 
@@ -91,7 +91,7 @@ class MockDotFECSubmitter(DotFECSubmitter):
                 "submission_id": "fake_submission_id",
                 "status": self.get_fec_status_for_poll(submission),
                 "message": "We didn't really send anything to FEC",
-                "report_id": str(uuid()),
+                "report_id": submission.fec_report_id or str(uuid()),
             }
         )
 
@@ -125,6 +125,6 @@ class MockDotFECSubmitterFailure(DotFECSubmitter):
                 "submission_id": "fake_submission_id",
                 "status": FECStatus.REJECTED.value,
                 "message": "We didn't really send anything to FEC",
-                "report_id": str(uuid()),
+                "report_id": submission.fec_report_id or str(uuid()),
             }
         )

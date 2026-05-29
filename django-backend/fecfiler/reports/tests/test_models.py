@@ -29,6 +29,7 @@ class ReportModelTestCase(TestCase):
 
     def test_amending_f24(self):
         new_upload_submission = UploadSubmission()
+        new_upload_submission.save()
         self.f24_report.upload_submission = new_upload_submission
 
         self.f24_report.amend()
@@ -45,7 +46,7 @@ class ReportModelTestCase(TestCase):
         self.f3x_report.save()
 
         self.f3x_report.amend()
-        self.f3x_report.unamend(upload_submission)
+        self.f3x_report.unamend()
         self.assertEqual(self.f3x_report.form_type, "F3XN")
         self.assertEqual(self.f3x_report.report_version, None)
         self.assertEqual(self.f3x_report.upload_submission, upload_submission)
@@ -55,7 +56,7 @@ class ReportModelTestCase(TestCase):
         new_upload_submission.save()
         self.f3x_report.upload_submission = new_upload_submission
         self.f3x_report.amend()
-        self.f3x_report.unamend(new_upload_submission)
+        self.f3x_report.unamend()
         self.assertEqual(self.f3x_report.form_type, "F3XA")
         self.assertEqual(self.f3x_report.report_version, 1)
         self.assertEqual(self.f3x_report.upload_submission, new_upload_submission)

@@ -79,7 +79,7 @@ class FECStatus(str, Enum):
 
 
 class UploadSubmissionManager(models.Manager):
-    def initiate_submission(self, report_id):
+    def initiate_submission(self, report_id) -> "UploadSubmission":
         submission = self.create(fecfile_task_state=FECSubmissionState.INITIALIZING.value)
         submission.save()
 
@@ -87,10 +87,8 @@ class UploadSubmissionManager(models.Manager):
             upload_submission=submission, date_signed=submission.created
         )
 
-        logger.info(
-            f"""Submission to Webload has been initialized for report :{report_id}
-            (track submission with {submission.id})"""
-        )
+        logger.info(f"""Submission to Webload has been initialized for report :{report_id}
+            (track submission with {submission.id})""")
         return submission
 
 
@@ -229,8 +227,10 @@ class UploadSubmission(BaseSubmission):
 
         self.fec_report_id = fec_response_json.get("report_id")
         report = self.report_set.first()
-        if report.report_id != self.fec_report_id:
-            report.report_id = self.fec_report_id
+        """ If this is the first filing, set the fec_file_report_id
+        if it is an amendment, keep the original report id"""
+        if not report.fec_report_id:
+            report.fec_report_id = self.fec_report_id
             report.save()
         super().save_fec_response(response_string)
 
