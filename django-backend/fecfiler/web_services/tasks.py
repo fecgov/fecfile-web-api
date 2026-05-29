@@ -169,7 +169,7 @@ def submit_to_fec(
             dot_fec_record, e_filing_password, backdoor_code
         )
         submission_response_string = submitter.submit(
-            dot_fec_bytes, submission_json, dot_fec_record.report.report_id or None
+            dot_fec_bytes, submission_json, dot_fec_record.report.fec_report_id or None
         )
         submission.save_fec_response(submission_response_string)
 
