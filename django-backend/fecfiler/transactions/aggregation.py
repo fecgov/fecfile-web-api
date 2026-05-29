@@ -54,19 +54,23 @@ def process_aggregation_for_debts(transaction_instance):
         total=Sum("amount", output_field=DecimalField())
     )
 
-    debt_chain = transactions.filter(
-        schedule_d__isnull=False,
-        committee_account_id=given_debt.committee_account_id,
-        transaction_id=debt_transaction_id,
-    ).annotate(
-        repayed_during=Coalesce(
-            Subquery(
-                repayments_totals.filter(debt_id=OuterRef("id")).values("total")[:1],
-                output_field=DecimalField(),
-            ),
-            Value(0, output_field=DecimalField()),
+    debt_chain = (
+        transactions.filter(
+            schedule_d__isnull=False,
+            committee_account_id=given_debt.committee_account_id,
+            transaction_id=debt_transaction_id,
         )
-    ).order_by("schedule_d__report_coverage_from_date")
+        .annotate(
+            repayed_during=Coalesce(
+                Subquery(
+                    repayments_totals.filter(debt_id=OuterRef("id")).values("total")[:1],
+                    output_field=DecimalField(),
+                ),
+                Value(0, output_field=DecimalField()),
+            )
+        )
+        .order_by("schedule_d__report_coverage_from_date")
+    )
 
     incurred_prior = 0
     repayed_amount = 0
@@ -107,7 +111,7 @@ def process_aggregation_by_payee_candidate(transaction_instance, old_snapshot=No
     # Get the transaction out of the queryset in order to populate annotated fields
     transaction = Transaction.objects.filter(id=transaction_instance.id).first()
 
-    if transaction is None:
+    if transaction is None or transaction.aggregation_group is None:
         return
 
     queryset = Transaction.objects.filter(
@@ -184,6 +188,8 @@ def process_aggregation_for_entity_contact(
     contact_1_id,
     earliest_date=None,
 ):
+    if aggregation_group is None:
+        return
     query_filter = {
         "committee_account_id": committee_account_id,
         "aggregation_group": aggregation_group,
@@ -199,9 +205,7 @@ def process_aggregation_for_entity_contact(
 
     # If earliest_date specified, only update transactions >= that date
     if earliest_date is not None:
-        transactions_to_update = [
-            t for t in all_transactions if t.date >= earliest_date
-        ]
+        transactions_to_update = [t for t in all_transactions if t.date >= earliest_date]
     else:
         transactions_to_update = list(all_transactions)
 
@@ -210,9 +214,8 @@ def process_aggregation_for_entity_contact(
         old_itemized = transaction.itemized
         transaction.aggregate = transaction.agg
 
-        uses_itemization_threshold = (
-            transaction.transaction_type_identifier
-            in (schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types)
+        uses_itemization_threshold = transaction.transaction_type_identifier in (
+            schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types
         )
 
         # Cascade unitemization to children when aggregate drops below threshold
@@ -232,7 +235,7 @@ def process_aggregation_for_entity_contact(
                 and has_itemized_children(transaction)
             )
 
-            if (aggregate_dropped_below or aggregate_changed_at_or_below):
+            if aggregate_dropped_below or aggregate_changed_at_or_below:
                 child_ids = get_all_children_ids(transaction.id)
                 if child_ids:
                     Transaction.objects.filter(
@@ -256,6 +259,8 @@ def process_aggregation_for_entity_contact(
 
 
 def process_aggregation_for_entity(transaction_instance, earliest_date=None):
+    if transaction_instance.aggregation_group is None:
+        return
     process_aggregation_for_entity_contact(
         transaction_instance.committee_account_id,
         transaction_instance.aggregation_group,
@@ -275,10 +280,11 @@ def process_aggregation_for_election(transaction_instance, earliest_date=None):
         transaction_instance: The Schedule E transaction instance
         earliest_date: If specified, only update transactions on or after this date
     """
-    if not transaction_instance.schedule_e:
-        return
-
-    if not transaction_instance.contact_2:
+    if (
+        transaction_instance.aggregation_group is None
+        or not transaction_instance.schedule_e
+        or not transaction_instance.contact_2
+    ):
         return
 
     schedule_e = transaction_instance.schedule_e
@@ -321,9 +327,7 @@ def process_aggregation_for_election(transaction_instance, earliest_date=None):
 
     # If earliest_date specified, only update transactions >= that date
     if earliest_date is not None:
-        transactions_to_update = [
-            t for t in all_transactions if t.date >= earliest_date
-        ]
+        transactions_to_update = [t for t in all_transactions if t.date >= earliest_date]
     else:
         transactions_to_update = list(all_transactions)
 
@@ -333,9 +337,7 @@ def process_aggregation_for_election(transaction_instance, earliest_date=None):
 
     if transactions_to_update:
         Transaction.objects.bulk_update(
-            transactions_to_update,
-            ["_calendar_ytd_per_election_office"],
-            batch_size=64
+            transactions_to_update, ["_calendar_ytd_per_election_office"], batch_size=64
         )
 
 
@@ -362,17 +364,16 @@ def reaggregate_after_report_deletion(report):
     for txn in transactions_to_delete:
         if (
             txn.transaction_type_identifier
-            in (
-                schedule_a_over_two_hundred_types
-                + schedule_b_over_two_hundred_types
-            )
+            in (schedule_a_over_two_hundred_types + schedule_b_over_two_hundred_types)
             and txn.contact_1_id
         ):
-            aggregation_contexts.add((
-                txn.committee_account_id,
-                txn.aggregation_group,
-                txn.contact_1_id,
-            ))
+            aggregation_contexts.add(
+                (
+                    txn.committee_account_id,
+                    txn.aggregation_group,
+                    txn.contact_1_id,
+                )
+            )
 
     # Return a callback that will re-aggregate after deletion
     def reaggregate():

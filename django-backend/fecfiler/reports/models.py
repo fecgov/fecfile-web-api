@@ -37,7 +37,8 @@ class Report(CommitteeOwnedModel):
     report_version = models.TextField(
         null=True, blank=True
     )  # fec 1-up version of amendment
-    report_id = models.TextField(null=True, blank=True)  # fec id for report
+    report_id = models.TextField(null=True, blank=True)  # DEPRECATED fec id for report
+    fec_report_id = models.TextField(null=True, blank=True)  # fec id for report
     report_code = models.TextField(null=True, blank=True)
     coverage_from_date = models.DateField(null=True, blank=True)
     coverage_through_date = models.DateField(null=True, blank=True)
@@ -62,6 +63,13 @@ class Report(CommitteeOwnedModel):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    previous_upload_submission = models.ForeignKey(
+        "web_services.UploadSubmission",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reports_previous_upload_submission",
+    )
     upload_submission = models.ForeignKey(
         "web_services.UploadSubmission",
         on_delete=models.SET_NULL,
@@ -145,11 +153,12 @@ class Report(CommitteeOwnedModel):
             self.form_24.original_amendment_date = self.upload_submission.created
             self.form_24.save()
 
+        self.previous_upload_submission = self.upload_submission
         self.upload_submission = None
         self.can_unamend = True
         self.save()
 
-    def unamend(self, latest_submission):
+    def unamend(self):
         self.report_version = int(self.report_version or "1") - 1
         if self.report_version == 0:
             self.report_version = None
@@ -159,7 +168,7 @@ class Report(CommitteeOwnedModel):
             self.form_24.original_amendment_date = None
             self.form_24.save()
 
-        self.upload_submission = latest_submission
+        self.upload_submission = self.previous_upload_submission
         self.can_unamend = False
         self.save()
 
