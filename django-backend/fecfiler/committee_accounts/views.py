@@ -69,14 +69,21 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
 
     @action(detail=False, methods=["post"])
     def create_account(self, request):
-        committee_id = request.data.get("committee_id")
-        if not committee_id:
-            raise Exception("no committee_id provided")
-        account = create_committee_account(committee_id, request.user)
+        try:
+            committee_id = request.data.get("committee_id")
+            if not committee_id:
+                raise Exception("no committee_id provided")
+            account = create_committee_account(committee_id, request.user)
 
-        return Response(
-            self.add_committee_account_data(CommitteeAccountSerializer(account).data)
-        )
+            return Response(
+                self.add_committee_account_data(CommitteeAccountSerializer(account).data)
+            )
+        except Exception as e:
+            logger.error(
+                f"User {request.user.email} failed to create committee account "
+                f"{committee_id}: {str(e)}"
+            )
+            raise
 
     @action(detail=False, methods=["get"], url_path="get-available-committee")
     def get_available_committee(self, request):
@@ -87,7 +94,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             return Response(committee)
         except Exception as e:
             logger.error(
-                f"User {request.user.email} failed to create committee account "
+                f"User {request.user.email} failed to retrieve committee for account creation "
                 f"{committee_id}: {str(e)}"
             )
             response = {"message": "No available committee found."}
@@ -221,20 +228,16 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 raise ValidationError("Invalid role")
 
             new_member = add_user_to_committee(email, committee_id, role)
-            logger.info(
-                f"""
+            logger.info(f"""
                 User {request.user.id} added {email} to committee
                 {committee_id} as {role}
-                """
-            )
+                """)
             return Response(CommitteeMembershipSerializer(new_member).data, status=200)
         except Exception as e:
-            logger.error(
-                f"""
+            logger.error(f"""
                 Failed to add email {email} to committtee {type(e)}
                 {committee_id} as {role} {str(e)}
-                """
-            )
+                """)
             return (
                 HttpResponseBadRequest()
                 if isinstance(e, ValidationError)
