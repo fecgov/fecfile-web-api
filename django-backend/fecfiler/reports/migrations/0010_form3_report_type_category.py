@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('reports', '0008_remove_can_unamend_trigger'),
+        ("reports", "0009_rename_report_id_report_fec_report_id"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='form3',
-            name='report_type_category',
+            model_name="form3",
+            name="report_type_category",
             field=models.TextField(blank=True, null=True),
         ),
     ]
