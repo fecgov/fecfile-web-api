@@ -4,7 +4,7 @@ from rest_framework import status
 from django.db import models, transaction as db_transaction
 from django.db.models import Q
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
-from .managers import ReportManager
+from .managers import ReportManager, STATUS_CODE_SUCCESS
 from .form_3.models import Form3
 from .form_3x.models import Form3X
 from .form_24.models import Form24
@@ -146,6 +146,11 @@ class Report(CommitteeOwnedModel):
         return None
 
     def amend(self):
+        if self.report_status != STATUS_CODE_SUCCESS:
+            raise ValidationError(
+                "Report cannot be amended.",
+            )
+
         self.form_type = self.get_form_name() + "A"
         self.report_version = int(self.report_version or "0") + 1
 
@@ -161,6 +166,10 @@ class Report(CommitteeOwnedModel):
         self.unblock_transactions_from_deletion()
 
     def unamend(self):
+        if not self.can_unamend_new:
+            raise ValidationError(
+                "Report cannot be unamended.",
+            )
         self.report_version = int(self.report_version or "1") - 1
         if self.report_version == 0:
             self.report_version = None
