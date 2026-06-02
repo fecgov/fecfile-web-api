@@ -176,7 +176,8 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         self.assertEqual(transaction_count, new_transaction_count)
 
     def test_amend(self):
-        """Test that an in progress report cannot be amended, but a successfully submitted report can be amended."""
+        """Test that an in progress report cannot be amended,
+        but a successfully submitted report can be amended."""
         report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         response = self.send_viewset_post_request(
             f"/api/v1/reports/{report.id}/amend",
@@ -186,7 +187,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             committee=self.committee,
             pk=report.id,
         )
-        # cannot be amended because report_status is not STATUS_CODE_SUCCESS, so response should be 400
+        # cannot be amended because report_status is not STATUS_CODE_SUCCESS
         self.assertEqual(response.status_code, 400)
 
         submission = UploadSubmission.objects.initiate_submission(
@@ -224,7 +225,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             committee=self.committee,
             pk=report.id,
         )
-        # cannot be unamended because report has not been amended, so response should be 400
+        # cannot be unamended because report has not been amended
         self.assertEqual(response.status_code, 400)
 
         submission = UploadSubmission.objects.initiate_submission(

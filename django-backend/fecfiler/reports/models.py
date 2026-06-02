@@ -1,4 +1,5 @@
 import uuid
+from rest_framework.exceptions import ValidationError
 from rest_framework import status
 from django.db import models, transaction as db_transaction
 from django.db.models import Q
