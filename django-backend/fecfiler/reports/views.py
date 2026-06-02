@@ -1,9 +1,11 @@
 from rest_framework import filters, status, pagination
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .models import Report
+from .managers import STATUS_CODE_SUCCESS
 from .report_code_label import report_code_label_case
 from fecfiler.reports.utils.report import delete_all_reports
 from .serializers import ReportSerializer
@@ -139,12 +141,20 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     @action(detail=True, methods=["post"], url_name="amend")
     def amend(self, request, pk):
         report = self.get_object()
+        if report.report_status != STATUS_CODE_SUCCESS:
+            raise ValidationError(
+                "Report cannot be amended.",
+            )
         report.amend()
         return Response(f"amended {report}")
 
     @action(detail=True, methods=["post"], url_name="unamend")
     def unamend(self, request, pk):
         report: Report = self.get_object()
+        if not report.can_unamend:
+            raise ValidationError(
+                "Report cannot be unamended.",
+            )
         report.unamend()
         return Response(f"unamended {report}")
 
