@@ -212,4 +212,4 @@ def filter_by_report(queryset, viewset):
         if viewset.request
         else None
     )
-    return queryset.filter(report_id=report_id) if report_id else queryset
+    return queryset.filter(fec_report_id=report_id) if report_id else queryset
