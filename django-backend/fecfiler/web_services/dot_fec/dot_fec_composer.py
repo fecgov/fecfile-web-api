@@ -68,22 +68,59 @@ def compose_transaction(transaction: Transaction):
 
 
 def compose_transactions(report_id):
-    report = Report.objects.get(id=report_id)
-    transactions = Transaction.objects.filter(
-        reports__id=report_id,
-        committee_account__id=report.committee_account.id,
+    report = Report.objects.select_related("committee_account").get(id=report_id)
+
+    transactions_queryset = (
+        Transaction.objects.filter(
+            reports__id=report_id,
+            committee_account__id=report.committee_account.id,
+        )
+        .select_related("contact_1")
+        .prefetch_related(
+            "schedule_a",
+            "schedule_b",
+            "schedule_c",
+            "schedule_c1",
+            "schedule_c2",
+            "schedule_d",
+            "schedule_e",
+            "schedule_f",
+            "contact_2",
+            "contact_3",
+            "contact_4",
+            "contact_5",
+        )
     )
-    if transactions.exists():
+    transactions = list(transactions_queryset)
+    if transactions:
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
+
+        transactions = prefetch_itemization(transactions)
+
         for transaction in transactions:
             compose_transaction(transaction)
 
         logger.info(f"Composed for {transactions[0].itemized}")
-        return [t for t in transactions if (t.itemized or report.form_24 is not None)]
+        return [t for t in transactions if (t.itemized or report.form_24_id is not None)]
     else:
         logger.info(f"no transactions found for report: {report_id}")
         return []
+
+
+def prefetch_itemization(transactions):
+    parent_ids = [t.id for t in transactions]
+    child_records = Transaction.objects.filter(
+        parent_transaction_id__in=parent_ids, deleted__isnull=True, itemized=True
+    ).values("id", "parent_transaction_id")
+    parents_with_itemized_children = {
+        row["parent_transaction_id"] for row in child_records
+    }
+    for transaction in transactions:
+        transaction.has_cached_itemized_children = (
+            transaction.id in parents_with_itemized_children
+        )
+    return transactions
 
 
 class Header:
