@@ -18,8 +18,6 @@ from .models import DotFEC, UploadSubmission, WebPrintSubmission, FECSubmissionS
 from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
 from drf_spectacular.utils import extend_schema
 from celery.result import AsyncResult
-from .dot_fec.dot_fec_composer import compose_transactions
-from fecfiler.transactions.serializers import TransactionListSerializer
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -226,17 +224,6 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         logger.debug(f"submit_to_webprint report {report_id}: {task.status}")
         return Response({"status": "Submit .FEC task created"})
-
-    @action(
-        detail=False,
-        methods=["get"],
-        url_path="dot-fec/compose_transactions/(?P<report_id>[a-z0-9-]+)",
-    )
-    def silky_compose_transactions(self, request, report_id):
-        transactions = compose_transactions(report_id)
-        # serializer = TransactionListSerializer(transactions, many=True)
-        # return Response({"transactions": serializer.data})
-        return Response({"number": f"{len(transactions)}"})
 
     def get_calculation_task(self, request, report_id):
         committee_uuid = request.session["committee_uuid"]
