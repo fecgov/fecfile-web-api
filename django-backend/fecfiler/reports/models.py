@@ -37,7 +37,6 @@ class Report(CommitteeOwnedModel):
     report_version = models.TextField(
         null=True, blank=True
     )  # fec 1-up version of amendment
-    report_id = models.TextField(null=True, blank=True)  # DEPRECATED fec id for report
     fec_report_id = models.TextField(null=True, blank=True)  # fec id for report
     report_code = models.TextField(null=True, blank=True)
     coverage_from_date = models.DateField(null=True, blank=True)
