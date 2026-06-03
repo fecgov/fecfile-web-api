@@ -1,5 +1,5 @@
 from django.http import QueryDict
-from fecfiler.reports.views import ReportViewSet
+from fecfiler.reports.views import ReportViewSet, e2e_delete_all_reports
 from fecfiler.reports.utils.report import delete_all_reports
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
@@ -76,7 +76,7 @@ class ReportViewSetTest(FecfilerViewSetTest):
             self.assertGreaterEqual(ordering, last_ordering)
             last_ordering = ordering
 
-    @patch("fecfiler.reports.views.settings.E2E_TEST", False)
+    @patch("fecfiler.reports.urls.settings.E2E_TEST", False)
     def test_e2e_delete_all_reports_not_allowed(self):
         e2e_committee = CommitteeAccount(committee_id="C99999999")
         e2e_committee.save()
@@ -135,7 +135,7 @@ class ReportViewSetTest(FecfilerViewSetTest):
         )
         request.query_params = QueryDict({})
         view.request = request
-        view.e2e_delete_all_reports(request)
+        e2e_delete_all_reports(request)
 
         report_count = Report.objects.filter(
             committee_account__committee_id="C99999999"

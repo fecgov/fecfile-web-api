@@ -1,6 +1,6 @@
 from rest_framework import filters, status, pagination
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .models import Report
@@ -12,7 +12,6 @@ from fecfiler.transactions.aggregation import process_aggregation_for_debts
 from django.db.models import Case, Value, When, CharField, IntegerField, F
 from django.db.models.functions import Concat, Trim
 from django.db import transaction as db_transaction
-from django.conf import settings
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -155,21 +154,6 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         report.unamend(latest_submission)
         return Response(f"unamended {report}")
 
-    if settings.E2E_TEST:
-
-        @action(
-            detail=False,
-            methods=["post"],
-            url_path="e2e-delete-all-repo",
-        )
-        def e2e_delete_all_reports(self, request):
-            reports = Report.objects.filter(committee_account__committee_id="C99999999")
-            report_count = reports.count()
-
-            delete_all_reports()
-            delete_all_reports("C99999998")
-            return Response(f"Deleted {report_count} Reports")
-
     def create(self, request):
         response = {"message": "Create function is not offered in this path."}
         return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
@@ -210,6 +194,16 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 class ReportViewMixin(CommitteeOwnedViewMixin, GenericViewSet):
     def get_queryset(self):
         return filter_by_report(super().get_queryset(), self)
+
+
+@api_view(["POST"])
+def e2e_delete_all_reports(request):
+    reports = Report.objects.filter(committee_account__committee_id="C99999999")
+    report_count = reports.count()
+
+    delete_all_reports()
+    delete_all_reports("C99999998")
+    return Response(f"Deleted {report_count} Reports")
 
 
 def filter_by_report(queryset, viewset):

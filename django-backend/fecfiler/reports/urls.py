@@ -5,7 +5,8 @@ from .form_3.views import Form3ViewSet
 from .form_3x.views import Form3XViewSet
 from .form_24.views import Form24ViewSet
 from .form_1m.views import Form1MViewSet
-from .views import ReportViewSet
+from .views import ReportViewSet, e2e_delete_all_reports
+from django.conf import settings
 
 router = register_router()
 router.register(r"form-3", Form3ViewSet, basename="form-3")
@@ -17,3 +18,12 @@ router.register(r"", ReportViewSet, basename="reports")
 
 # The API URLs are now determined automatically by the router.
 urlpatterns = [path("reports/", include(router.urls))]
+
+if settings.E2E_TEST:
+    urlpatterns.append(
+        path(
+            "reports/e2e-delete-all-reports",
+            e2e_delete_all_reports,
+            name="e2e-delete-all-reports"
+        )
+    )
