@@ -1,4 +1,4 @@
-from django.db.models import Case, When, Value, Manager, Q, IntegerField
+from django.db.models import BooleanField, Case, When, Value, Manager, Q, IntegerField
 from enum import Enum
 
 """Manager to deterimine fields that are used the same way across reports,
@@ -46,6 +46,16 @@ def get_status_mapping():
     )
 
 
+def get_can_unmamend_mapping():
+    return Case(
+        When(
+            Q(report_status=STATUS_CODE_IN_PROGRESS, can_unamend=True), then=Value(True)
+        ),
+        default=Value(False),
+        output_field=BooleanField(),
+    )
+
+
 class ReportManager(Manager):
     def get_queryset(self):
         queryset = (
@@ -61,7 +71,9 @@ class ReportManager(Manager):
                 ),
                 # report status must be in queryset because it is sorted on
                 report_status=get_status_mapping(),
+                can_unamend_new=get_can_unmamend_mapping(),
             )
+            .annotate()
         )
         return queryset
 
