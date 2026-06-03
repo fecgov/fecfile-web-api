@@ -5,7 +5,7 @@ from fecfiler.reports.views import ReportViewSet
 from fecfiler.reports.utils.report import delete_all_reports
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
-from fecfiler.reports.managers import STATUS_CODE_SUCCESS, STATUS_CODE_FAILED
+from fecfiler.reports.managers import STATUS_CODE_SUCCESS
 from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
