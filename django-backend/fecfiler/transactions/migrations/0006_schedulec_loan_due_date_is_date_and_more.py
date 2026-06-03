@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("transactions", "0003_remove_unused_functions"),
+        ("transactions", "0005_remove_can_delete_trigger"),
     ]
 
     operations = [
