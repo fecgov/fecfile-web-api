@@ -5,6 +5,7 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import (
     serialize_instance,
     get_field_mappings,
     get_value_from_path,
+    loan_interest_rate_serializer,
 )
 from fecfiler.web_services.dot_fec.dot_fec_composer import Header
 from fecfiler.reports.models import Report
@@ -13,8 +14,15 @@ from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.web_services.dot_fec.dot_fec_serializer import FS_STR
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x, create_report_memo
-from fecfiler.transactions.tests.utils import create_schedule_a, create_loan
-from fecfiler.contacts.tests.utils import create_test_individual_contact
+from fecfiler.transactions.tests.utils import (
+    create_schedule_a,
+    create_loan,
+    create_loan_from_bank
+)
+from fecfiler.contacts.tests.utils import (
+    create_test_individual_contact,
+    create_test_organization_contact
+)
 from datetime import datetime, date
 
 
@@ -198,3 +206,137 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(contribution_date, date(2020, 4, 19))
         bogus_value = get_value_from_path(self.transaction, "not.real.path")
         self.assertIsNone(bogus_value)
+
+    def test_serialize_loan_interest_rate_user_defined(self):
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id
+        )
+        loan = create_loan(
+            self.committee,
+            contact_org,
+            Decimal(24000.00),
+            "Tomorrow",
+            "twelve percent",
+            False,
+        )
+
+        rate = loan_interest_rate_serializer(loan, None, None)
+        self.assertEqual(rate, "twelve percent")
+
+    def test_serialize_loan_interest_rate_bad_value(self):
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id
+        )
+        loan = create_loan(
+            self.committee,
+            contact_org,
+            Decimal(24000.00),
+            "Tomorrow",
+            "twelve percent",
+            False,
+        )
+        loan.schedule_c.loan_interest_rate_is_percent = True
+        loan.schedule_c.save()
+
+        self.assertRaises(ValueError, loan_interest_rate_serializer, loan, None, None)
+
+    def test_serialize_loan_interest_rate_invalid_percent_sign(self):
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id
+        )
+        loan = create_loan(
+            self.committee,
+            contact_org,
+            Decimal(24000.00),
+            "Tomorrow",
+            "12.5%",
+            False,
+        )
+        loan.schedule_c.loan_interest_rate_is_percent = True
+        loan.schedule_c.save()
+
+        self.assertRaises(ValueError, loan_interest_rate_serializer, loan, None, None)
+
+    def test_serialize_loan_interest_rate_no_percent_sign(self):
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id
+        )
+        loan = create_loan(
+            self.committee,
+            contact_org,
+            Decimal(24000.00),
+            "Tomorrow",
+            "12.5",
+            False,
+        )
+        loan.schedule_c.loan_interest_rate_is_percent = True
+        loan.schedule_c.save()
+
+        rate = loan_interest_rate_serializer(loan, None, None)
+        self.assertEqual(rate, "0.125")
+
+    def test_serialize_loan_interest_rate_large_percent(self):
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id
+        )
+        loan = create_loan(
+            self.committee,
+            contact_org,
+            Decimal(24000.00),
+            "Tomorrow",
+            "125.5",
+            False,
+        )
+        loan.schedule_c.loan_interest_rate_is_percent = True
+        loan.schedule_c.save()
+
+        rate = loan_interest_rate_serializer(loan, None, None)
+        self.assertEqual(rate, "1.255")
+
+    def test_serialize_loan_interest_rate_whole_number(self):
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id
+        )
+        loan = create_loan(
+            self.committee,
+            contact_org,
+            Decimal(24000.00),
+            "Tomorrow",
+            "2",
+            False,
+        )
+        loan.schedule_c.loan_interest_rate_is_percent = True
+        loan.schedule_c.save()
+
+        rate = loan_interest_rate_serializer(loan, None, None)
+        self.assertEqual(rate, "0.02")
+
+    def test_serialize_loan_interest_rate_c1(self):
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id
+        )
+        loan, _, agreement, _ = create_loan_from_bank(
+            self.committee,
+            contact_org,
+            Decimal(24000.00),
+            "Tomorrow",
+            "2",
+            False,
+        )
+        loan.schedule_c.loan_interest_rate_is_percent = True
+        loan.schedule_c.save()
+        agreement.schedule_c1.loan_interest_rate_is_percent = True
+        agreement.schedule_c1.save()
+
+        loan_rate = loan_interest_rate_serializer(loan, None, None)
+        self.assertEqual(loan_rate, "0.02")
+
+        agreement_rate = loan_interest_rate_serializer(loan, None, None)
+        self.assertEqual(agreement_rate, "0.02")
