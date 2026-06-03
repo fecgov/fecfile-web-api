@@ -6,28 +6,28 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('transactions', '0003_remove_unused_functions'),
+        ("transactions", "0003_remove_unused_functions"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='schedulec',
-            name='loan_due_date_is_date',
-            field=models.BooleanField(default=False),
+            model_name="schedulec",
+            name="loan_due_date_is_date",
+            field=models.BooleanField(null=True, default=False),
         ),
         migrations.AddField(
-            model_name='schedulec',
-            name='loan_interest_rate_is_percent',
-            field=models.BooleanField(default=False),
+            model_name="schedulec",
+            name="loan_interest_rate_is_percent",
+            field=models.BooleanField(null=True, default=False),
         ),
         migrations.AddField(
-            model_name='schedulec1',
-            name='loan_due_date_is_date',
-            field=models.BooleanField(default=False),
+            model_name="schedulec1",
+            name="loan_due_date_is_date",
+            field=models.BooleanField(null=True, default=False),
         ),
         migrations.AddField(
-            model_name='schedulec1',
-            name='loan_interest_rate_is_percent',
-            field=models.BooleanField(default=False),
+            model_name="schedulec1",
+            name="loan_interest_rate_is_percent",
+            field=models.BooleanField(null=True, default=False),
         ),
     ]
