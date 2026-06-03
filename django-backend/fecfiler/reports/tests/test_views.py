@@ -178,8 +178,8 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
 
     def test_amend(self):
         """Test that a successfully submitted report can be amended."""
-
-        report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        committee = CommitteeAccount.objects.get(committee_id="C00000001")
+        report = create_form3x(committee, "2026-01-01", "2026-02-01", {})
         submission = UploadSubmission.objects.initiate_submission(
             str(report.id),
         )
@@ -202,7 +202,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             f"/api/v1/reports/{report.id}",
             ReportViewSet,
             "retrieve",
-            committee=self.committee,
+            committee=committee,
             pk=report.id,
         )
         self.assertEqual(response.status_code, 200)
@@ -213,13 +213,15 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             {},
             ReportViewSet,
             "amend",
-            committee=self.committee,
+            committee=committee,
             pk=report.id,
         )
-        report = ReportViewSet.as_view({"post": "amend"})(
+        report_from_view = ReportViewSet.as_view({"post": "amend"})(
             request, pk=report.id
         ).get_object()
-        logger.warning(f"test report id {report.id} status {report.report_status}")
+        logger.error(
+            f"test report_from_view id {report_from_view.id} status {report_from_view.report_status}"
+        )
         logger.error(f"test report id {report.id} status {report.report_status}")
         self.assertEqual(report.report_status, STATUS_CODE_SUCCESS)
 
@@ -228,7 +230,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             {},
             ReportViewSet,
             "amend",
-            committee=self.committee,
+            committee=committee,
             pk=report.id,
         )
         self.assertEqual(response.status_code, 200)
