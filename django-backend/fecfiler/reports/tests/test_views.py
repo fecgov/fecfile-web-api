@@ -12,7 +12,6 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
 from fecfiler.web_services.models import FECStatus, UploadSubmission
-from django.db import transaction
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -180,47 +179,59 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
     def test_amend(self):
         """Test that a successfully submitted report can be amended."""
 
-        with transaction.atomic():
-            report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
-            submission = UploadSubmission.objects.initiate_submission(
-                str(report.id),
+        report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        submission = UploadSubmission.objects.initiate_submission(
+            str(report.id),
+        )
+        submission.save_fec_response(
+            json.dumps(
+                {
+                    "submission_id": "fake_submission_id",
+                    "status": FECStatus.ACCEPTED.value,
+                    "message": "Test Save Response",
+                    "report_id": "1234",
+                }
             )
-            submission.save_fec_response(
-                json.dumps(
-                    {
-                        "submission_id": "fake_submission_id",
-                        "status": FECStatus.ACCEPTED.value,
-                        "message": "Test Save Response",
-                        "report_id": "1234",
-                    }
-                )
-            )
-            self.assertEqual(
-                Report.objects.get(id=report.id).report_status,
-                STATUS_CODE_SUCCESS,
-            )
+        )
+        self.assertEqual(
+            Report.objects.get(id=report.id).report_status,
+            STATUS_CODE_SUCCESS,
+        )
 
-            response = self.send_viewset_get_request(
-                f"/api/v1/reports/{report.id}",
-                ReportViewSet,
-                "retrieve",
-                committee=self.committee,
-                pk=report.id,
-            )
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(response.data["report_status"], "Submission success")
-            logger.warning(
-                f"how many reports {Report.objects.filter(id=report.id).count()}"
-            )
-            response = self.send_viewset_post_request(
-                f"/api/v1/reports/{report.id}/amend",
-                {},
-                ReportViewSet,
-                "amend",
-                committee=self.committee,
-                pk=report.id,
-            )
-            self.assertEqual(response.status_code, 200)
+        response = self.send_viewset_get_request(
+            f"/api/v1/reports/{report.id}",
+            ReportViewSet,
+            "retrieve",
+            committee=self.committee,
+            pk=report.id,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["report_status"], "Submission success")
+        logger.warning(f"how many reports {Report.objects.filter(id=report.id).count()}")
+        request = self.build_viewset_post_request(
+            f"/api/v1/reports/{report.id}/amend",
+            {},
+            ReportViewSet,
+            "amend",
+            committee=self.committee,
+            pk=report.id,
+        )
+        report = ReportViewSet.as_view({"post": "amend"})(
+            request, pk=report.id
+        ).get_object()
+        logger.warning(f"test report id {report.id} status {report.report_status}")
+        logger.error(f"test report id {report.id} status {report.report_status}")
+        self.assertEqual(report.report_status, STATUS_CODE_SUCCESS)
+
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{report.id}/amend",
+            {},
+            ReportViewSet,
+            "amend",
+            committee=self.committee,
+            pk=report.id,
+        )
+        self.assertEqual(response.status_code, 200)
 
     def test_unable_to_amend(self):
         """Test that an in progress report cannot be amended,
