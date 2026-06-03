@@ -198,15 +198,15 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             STATUS_CODE_SUCCESS,
         )
 
-        response = self.send_viewset_get_request(
+        retrieve_response = self.send_viewset_get_request(
             f"/api/v1/reports/{report.id}",
             ReportViewSet,
             "retrieve",
             committee=committee,
             pk=report.id,
         )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["report_status"], "Submission success")
+        self.assertEqual(retrieve_response.status_code, 200)
+        self.assertEqual(retrieve_response.data["report_status"], "Submission success")
         logger.warning(f"how many reports {Report.objects.filter(id=report.id).count()}")
         request = self.build_viewset_post_request(
             f"/api/v1/reports/{report.id}/amend",

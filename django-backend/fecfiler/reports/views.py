@@ -143,7 +143,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         report = self.get_object()
         if report.report_status != STATUS_CODE_SUCCESS:
             raise ValidationError(
-                "Report cannot be amended.",
+                f"Report {report.id} cannot be amended.",
             )
         report.amend()
         return Response(f"amended {report}")
@@ -153,7 +153,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         report: Report = self.get_object()
         if not report.can_unamend:
             raise ValidationError(
-                "Report cannot be unamended.",
+                f"Report {report.id} cannot be unamended.",
             )
         report.unamend()
         return Response(f"unamended {report}")
