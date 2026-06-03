@@ -1,4 +1,3 @@
-from fecfiler.reports.models import Report
 from ..views import Form3XViewSet
 from ..models import Form3X
 from fecfiler.user.models import User

@@ -224,7 +224,8 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         report_from_view = view.get_object()
 
         logger.error(
-            f"test report_from_view id {report_from_view.id} status {report_from_view.report_status}"
+            f"test report_from_view id {report_from_view.id} "
+            f"status {report_from_view.report_status}"
         )
         report = Report.objects.get(id=report.id)
         logger.error(f"test report id {report.id} status {report.report_status}")
