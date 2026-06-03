@@ -4,7 +4,7 @@ from unittest.mock import patch, Mock
 import uuid
 from ..models import Contact
 from fecfiler.committee_accounts.models import CommitteeAccount
-from ..views import ContactViewSet, DeletedContactsViewSet
+from ..views import ContactViewSet, DeletedContactsViewSet, E2eContactViewSet
 from .utils import create_test_individual_contact
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
 
@@ -80,7 +80,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         return self.send_viewset_post_request(
             "/api/v1/contacts/e2e-delete-all-contacts",
             {},
-            ContactViewSet,
+            E2eContactViewSet,
             "e2e_delete_all_contacts",
             committee=committee,
         )
@@ -340,7 +340,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, ["a5061946-0000-0000-82f6-f1782c333d70"])
 
-    @patch("fecfiler.contacts.views.settings")
+    @patch("fecfiler.contacts.urls.settings")
     def test_e2e_delete_all_contacts(self, mock_settings):
         mock_settings.E2E_TEST = True
 
@@ -356,7 +356,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             self.default_committee.id, active_contact.id, deleted_contact.id
         )
 
-    @patch("fecfiler.contacts.views.settings.E2E_TEST", False)
+    @patch("fecfiler.contacts.urls.settings.E2E_TEST", False)
     def test_e2e_delete_all_contacts_requires_e2e_flag(self):
         active_contact, deleted_contact = self._create_active_and_deleted_contacts(
             self.default_committee.id
@@ -369,7 +369,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertTrue(Contact.objects.filter(id=active_contact.id).exists())
         self.assertTrue(Contact.all_objects.filter(id=deleted_contact.id).exists())
 
-    @patch("fecfiler.contacts.views.settings.E2E_TEST", True)
+    @patch("fecfiler.contacts.urls.settings.E2E_TEST", True)
     def test_e2e_delete_all_contacts_scoped_to_committee(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000002")
         other_active_contact, other_deleted_contact = (
@@ -405,7 +405,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             0,
         )
 
-    @patch("fecfiler.contacts.views.settings")
+    @patch("fecfiler.contacts.urls.settings")
     def test_e2e_delete_all_contacts_no_contacts(self, mock_settings):
         mock_settings.E2E_TEST = True
 

@@ -340,22 +340,6 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         )
         return max_fecfile_results, max_fec_results
 
-    if settings.E2E_TEST:
-
-        @action(detail=False, methods=["post"], url_path="e2e-delete-all-contacts")
-        def e2e_delete_all_contacts(self, request):
-            committee_uuid = str(self.get_committee_uuid())
-            contacts_count = delete_all_contacts(
-                committee_uuid=committee_uuid,
-                log_method=None,
-            )
-            logger.info(
-                "E2E delete all contacts",
-                committee_id=committee_uuid,
-                purged=contacts_count,
-            )
-            return Response({"purged": contacts_count})
-
 
 class DeletedContactsViewSet(
     CommitteeOwnedViewMixin,
@@ -397,6 +381,23 @@ class DeletedContactsViewSet(
             )
         contacts.update(deleted=None)
         return Response(ids_to_restore)
+
+
+class E2eContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
+
+    @action(detail=False, methods=["post"], url_path="e2e-delete-all-contacts")
+    def e2e_delete_all_contacts(self, request):
+        committee_uuid = str(self.get_committee_uuid())
+        contacts_count = delete_all_contacts(
+            committee_uuid=committee_uuid,
+            log_method=None,
+        )
+        logger.info(
+            "E2E delete all contacts",
+            committee_id=committee_uuid,
+            purged=contacts_count,
+        )
+        return Response({"purged": contacts_count})
 
 
 def delete_all_contacts(committee_uuid, log_method=None) -> int:
