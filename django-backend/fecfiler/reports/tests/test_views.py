@@ -178,7 +178,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
 
     def test_amend(self):
         """Test that a successfully submitted report can be amended."""
-        committee = CommitteeAccount.objects.get(committee_id="C00000001")
+        committee = CommitteeAccount.objects.create(committee_id="C00000001")
         report = create_form3x(committee, "2026-01-01", "2026-02-01", {})
         submission = UploadSubmission.objects.initiate_submission(
             str(report.id),
@@ -211,17 +211,22 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         request = self.build_viewset_post_request(
             f"/api/v1/reports/{report.id}/amend",
             {},
-            ReportViewSet,
-            "amend",
+            {},
+            True,
+            None,
             committee=committee,
-            pk=report.id,
         )
-        report_from_view = ReportViewSet.as_view({"post": "amend"})(
-            request, pk=report.id
-        ).get_object()
+        request.query_params = {}
+        view = ReportViewSet()
+        view.request = request
+        view.action = "amend"
+        view.kwargs = {"pk": report.id}
+        report_from_view = view.get_object()
+
         logger.error(
             f"test report_from_view id {report_from_view.id} status {report_from_view.report_status}"
         )
+        report = Report.objects.get(id=report.id)
         logger.error(f"test report id {report.id} status {report.report_status}")
         self.assertEqual(report.report_status, STATUS_CODE_SUCCESS)
 
