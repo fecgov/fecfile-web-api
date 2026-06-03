@@ -142,6 +142,9 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def amend(self, request, pk):
         report = self.get_object()
         if report.report_status != STATUS_CODE_SUCCESS:
+            logger.error(
+                f"Report can't be amended: {report.upload_submission.fec_status}"
+            )
             raise ValidationError(
                 "Report cannot be amended.",
             )
