@@ -9,7 +9,7 @@ from fecfiler.committee_accounts.views import (
     CommitteeOwnedViewMixin,
 )
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.viewsets import mixins, GenericViewSet
 from rest_framework import viewsets, pagination, filters, status
 from .models import Contact
@@ -383,21 +383,19 @@ class DeletedContactsViewSet(
         return Response(ids_to_restore)
 
 
-class E2eContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
-
-    @action(detail=False, methods=["post"], url_path="e2e-delete-all-contacts")
-    def e2e_delete_all_contacts(self, request):
-        committee_uuid = str(self.get_committee_uuid())
-        contacts_count = delete_all_contacts(
-            committee_uuid=committee_uuid,
-            log_method=None,
-        )
-        logger.info(
-            "E2E delete all contacts",
-            committee_id=committee_uuid,
-            purged=contacts_count,
-        )
-        return Response({"purged": contacts_count})
+@api_view(["POST"])
+def e2e_delete_all_contacts(request):
+    committee_uuid = str(request.session["committee_uuid"])
+    contacts_count = delete_all_contacts(
+        committee_uuid=committee_uuid,
+        log_method=None,
+    )
+    logger.info(
+        "E2E delete all contacts",
+        committee_id=committee_uuid,
+        purged=contacts_count,
+    )
+    return Response({"purged": contacts_count})
 
 
 def delete_all_contacts(committee_uuid, log_method=None) -> int:
