@@ -34,14 +34,14 @@ class DotFECSubmitterTestCase(TestCase):
 
     def test_get_submission_json_for_amendment(self):
         submitter = MockDotFECSubmitter()
-        self.dot_fec_record.report.report_id = str(uuid())
+        self.dot_fec_record.report.fec_report_id = str(uuid())
         json_str = submitter.get_submission_json(
             self.dot_fec_record, "test_json_password", "test_backdoor_code"
         )
         json_obj = json.loads(json_str)
         self.assertEqual(
             json_obj["amendment_id"],
-            self.dot_fec_record.report.report_id + "test_backdoor_code",
+            self.dot_fec_record.report.fec_report_id + "test_backdoor_code",
         )
 
     @patch("fecfiler.web_services.dot_fec.dot_fec_submitter.settings")

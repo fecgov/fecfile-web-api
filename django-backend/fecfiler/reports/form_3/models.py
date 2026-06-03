@@ -15,7 +15,7 @@ class Form3(models.Model):
         unique=True,
     )
     change_of_address = models.BooleanField(default=False, null=True, blank=True)
-
+    report_type_category = models.TextField(null=True, blank=True)
     """ not to be confused with state_of_election below...
     There are two distinct fields according to the FEC Spec"""
     election_state = models.TextField(null=True, blank=True)

@@ -63,6 +63,7 @@
     "path": "schedule_c.loan_due_date"
   },
   "loan_interest_rate": {
+    "serializer": "LOAN_INTEREST_RATE",
     "path": "schedule_c.loan_interest_rate"
   },
   "secured": {

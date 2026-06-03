@@ -1,5 +1,6 @@
 from .models import Report
 from rest_framework.serializers import (
+    BooleanField,
     SerializerMethodField,
     ModelSerializer,
     CharField,
@@ -101,6 +102,8 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     city = CharField(required=False, allow_null=True)
     state = CharField(required=False, allow_null=True)
     zip = CharField(required=False, allow_null=True)
+
+    can_unamend = BooleanField(read_only=True, source="can_unamend_new")
 
     upload_submission = UploadSubmissionSerializer(
         read_only=True,
