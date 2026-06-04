@@ -11,8 +11,8 @@ from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
-from unittest.mock import patch
 from fecfiler.web_services.models import FECStatus, UploadSubmission
+from fecfiler.shared.test_utilities import login_testcase_client
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -81,7 +81,6 @@ class ReportViewSetTest(FecfilerViewSetTest):
             self.assertGreaterEqual(ordering, last_ordering)
             last_ordering = ordering
 
-    @patch("fecfiler.reports.urls.settings.E2E_TEST", False)
     def test_e2e_delete_all_reports_not_allowed(self):
         e2e_committee = CommitteeAccount(committee_id="C99999999")
         e2e_committee.save()
@@ -100,10 +99,11 @@ class ReportViewSetTest(FecfilerViewSetTest):
         self.assertGreater(report_count, 0)
         self.assertGreater(transaction_count, 0)
 
+        login_testcase_client(self.client)
         response = self.client.post(
-            "/api/v1/reports/e2e-delete-all-reports/", data={}, format="json"
+            "/api/v1/reports/e2e-delete-all-reports", data={}, format="json"
         )
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
         report_count = Report.objects.filter(
             committee_account__committee_id="C99999999"
         ).count()
