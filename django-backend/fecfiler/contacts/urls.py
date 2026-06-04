@@ -15,7 +15,7 @@ urlpatterns = [
 if settings.E2E_TEST:
     urlpatterns.append(
         path(
-            "contact/e2e-delete-all-contacts",
+            "contacts/e2e-delete-all-contacts",
             e2e_delete_all_contacts,
             name="e2e_delete_all_contacts"
         )

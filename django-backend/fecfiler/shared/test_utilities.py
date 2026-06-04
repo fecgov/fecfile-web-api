@@ -1,5 +1,6 @@
 from django.test import TestCase
 from .utilities import generate_fec_uid, get_float_from_string, get_boolean_from_string
+from urllib.parse import urlparse
 
 
 class SharedUtilitiesTestCase(TestCase):
@@ -37,3 +38,28 @@ class SharedUtilitiesTestCase(TestCase):
         self.assertFalse(value)
         value = get_boolean_from_string("")
         self.assertFalse(value)
+
+
+def login_testcase_client(client):
+    client.request_name = "_log_in"
+    authenticate_response = client.get(
+        "/api/v1/oidc/authenticate", allow_redirects=False
+    )
+    authenticate_redirect_uri = get_redirect_uri_from_redirect_response(
+        authenticate_response)
+    authorize_response = client.get(
+        authenticate_redirect_uri,
+        allow_redirects=False,
+    )
+    authorize_redirect_uri = get_redirect_uri_from_redirect_response(authorize_response)
+    client.get(authorize_redirect_uri, allow_redirects=False)
+    if not client.headers:
+        client.headers = {}
+    client.headers["x-csrftoken"] = client.cookies["csrftoken"]
+
+
+def get_redirect_uri_from_redirect_response(response):
+    if response.status_code == 302:
+        parsed_url = urlparse(response.headers["Location"])
+        return f"{parsed_url.path}?{parsed_url.query}"
+    return None
