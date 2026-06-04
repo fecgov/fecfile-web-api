@@ -53,9 +53,6 @@ def login_testcase_client(client):
     )
     authorize_redirect_uri = get_redirect_uri_from_redirect_response(authorize_response)
     client.get(authorize_redirect_uri, allow_redirects=False)
-    if not client.headers:
-        client.headers = {}
-    client.headers["x-csrftoken"] = client.cookies["csrftoken"]
 
 
 def get_redirect_uri_from_redirect_response(response):
