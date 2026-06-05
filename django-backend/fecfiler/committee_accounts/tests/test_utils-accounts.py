@@ -255,7 +255,10 @@ class CommitteeAccountsUtilsTest(TestCase):
                 committee_account_data.get("treasurer_name_1"), "Treasurer First"
             )
             self.assertEqual(committee_account_data.get("street_1"), "Committee Street 1")
-            self.assertEqual(committee_account_data.get("eligible_report_types"), ["F3", "F99"])
+            self.assertEqual(
+                committee_account_data.get("eligible_report_types"),
+                ["F3", "F99"]
+            )
 
     def test_get_committee_account_data_from_test_PTY(self):  # noqa N802
         with (
