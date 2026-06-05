@@ -122,8 +122,8 @@ def log_polling_notice(attempts):
         duration_string = f"{duration_in_minutes} minutes(s)"
 
     logger.info(f"""Submission queued for processing.  Polling every {
-            interval} seconds for {
-            MAX_ATTEMPTS} attempts over {duration_string}""")
+        interval} seconds for {
+        MAX_ATTEMPTS} attempts over {duration_string}""")
 
 
 @shared_task
@@ -259,8 +259,8 @@ def poll_for_fec_response(submission_id, submission_type_key, submission_name):
         logger.info(f"Polling status for {submission.fec_submission_id}.")
         logger.info(f"Status: {submission.fec_status}, Message: {submission.fec_message}")
         logger.info(f"""Submission Polling - Attempt {
-                submission.fecfile_polling_attempts
-            } / {MAX_ATTEMPTS}""")
+            submission.fecfile_polling_attempts
+        } / {MAX_ATTEMPTS}""")
         status_response_string = submitter.poll_status(submission)
         submission.save_fec_response(status_response_string)
         if (
