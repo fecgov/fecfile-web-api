@@ -229,7 +229,6 @@ def get_eligible_report_types_raw(committee_data: dict):
     committee_type = committee_data.get("committee_type")
     if committee_type is None:
         logger.error("committee_type not found in raw committee data")
-        raise ValueError()
 
     match (committee_type):
         case "C" | "D" | "E" | "F" | "G" | "H":

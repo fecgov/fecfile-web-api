@@ -7,6 +7,7 @@ from fecfiler.committee_accounts.utils.accounts import (
     get_committee_emails,
     get_production_committee_emails,
     get_test_committee_emails,
+    get_eligible_report_types_raw
 )
 
 from fecfiler.user.models import User
@@ -371,3 +372,52 @@ class CommitteeAccountsUtilsTest(TestCase):
             self.assertEqual(committee_account_data.get("isPAC"), True)
             self.assertEqual(committee_account_data.get("isPTY"), True)
             self.assertEqual(committee_account_data.get("qualified"), False)
+
+    def test_get_eligible_report_types_raw(self):
+        test_committee_data_A_H = {
+            "committee_type": "A",
+            "candidate_office": "H",
+        }
+        eligible_types_A_H = get_eligible_report_types_raw(test_committee_data_A_H)
+        self.assertEqual(eligible_types_A_H, ["F3", "F99"])
+
+        test_committee_data_B_S = {
+            "committee_type": "B",
+            "candidate_office": "S",
+        }
+        eligible_types_B_S = get_eligible_report_types_raw(test_committee_data_B_S)
+        self.assertEqual(eligible_types_B_S, ["F3", "F99"])
+
+        test_committee_data_A_P = {
+            "committee_type": "A",
+            "candidate_office": "P",
+        }
+        eligible_types_A_P = get_eligible_report_types_raw(test_committee_data_A_P)
+        self.assertEqual(eligible_types_A_P, ["F99"])
+
+        test_committee_data_C = {
+            "committee_type": "C",
+        }
+        eligible_types_C = get_eligible_report_types_raw(test_committee_data_C)
+        self.assertEqual(eligible_types_C, ["F3X", "F24", "F1M", "F99"])
+
+        test_committee_data_FOO = {
+            "committee_type": "FOO",
+        }
+        eligible_types_FOO = get_eligible_report_types_raw(test_committee_data_FOO)
+        self.assertEqual(eligible_types_FOO, ["F99"])
+
+        test_committee_data_None = {
+            "committee_type": None,
+        }
+        eligible_types_None = get_eligible_report_types_raw(test_committee_data_None)
+        self.assertEqual(eligible_types_None, ["F99"])
+
+        test_committee_data_invalid = None
+
+        self.assertRaises(
+            ValueError,
+            get_eligible_report_types_raw,
+            test_committee_data_invalid
+        )
+
