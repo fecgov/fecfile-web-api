@@ -420,4 +420,3 @@ class CommitteeAccountsUtilsTest(TestCase):
             get_eligible_report_types_raw,
             test_committee_data_invalid
         )
-
