@@ -170,6 +170,7 @@ class CommitteeAccountsUtilsTest(TestCase):
         with patch("fecfiler.shared.utilities.requests") as mock_requests:
             production_committee_data = {
                 "email": "list_of_emails",
+                "committee_type": "D",
             }
             # test when the raw endpoint has nothing and the processed endpoint has data
             self.mock_requests_get(
@@ -231,6 +232,7 @@ class CommitteeAccountsUtilsTest(TestCase):
                 "committee_id": "C12345678",
                 "email": "test@test.com",
                 "committee_type": "A",
+                "candidate_office": "H",
                 "treasurer_first_name": "Treasurer First",
                 "committee_str1": "Committee Street 1",
                 "committee_name": "Committee Name",
@@ -253,6 +255,7 @@ class CommitteeAccountsUtilsTest(TestCase):
                 committee_account_data.get("treasurer_name_1"), "Treasurer First"
             )
             self.assertEqual(committee_account_data.get("street_1"), "Committee Street 1")
+            self.assertEqual(committee_account_data.get("eligible_report_types"), ["F3", "F99"])
 
     def test_get_committee_account_data_from_test_PTY(self):  # noqa N802
         with (
