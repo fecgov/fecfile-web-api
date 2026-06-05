@@ -121,16 +121,13 @@ def log_polling_notice(attempts):
     elif duration_in_minutes >= 1:
         duration_string = f"{duration_in_minutes} minutes(s)"
 
-    logger.info(
-        f"""Submission queued for processing.  Polling every {
+    logger.info(f"""Submission queued for processing.  Polling every {
             interval} seconds for {
-            MAX_ATTEMPTS} attempts over {duration_string}"""
-    )
+            MAX_ATTEMPTS} attempts over {duration_string}""")
 
 
 @shared_task
 def submit_to_fec(
-    dot_fec_id,
     submission_record_id,
     e_filing_password,
     force_read_from_disk=False,
@@ -138,7 +135,9 @@ def submit_to_fec(
     mock=False,
     mock_reject=False,
 ):
-    submission = UploadSubmission.objects.get(id=submission_record_id)
+    submission = UploadSubmission.objects.select_related(
+        "dot_fec__report__committee_account"
+    ).get(id=submission_record_id)
     submission.save_state(FECSubmissionState.SUBMITTING)
 
     """Get Password"""
@@ -148,7 +147,7 @@ def submit_to_fec(
 
     """Get .FEC file bytes"""
     try:
-        dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
+        dot_fec_record = submission.dot_fec
         file_name = dot_fec_record.file_name
         dot_fec_bytes = get_file_bytes(file_name, force_read_from_disk)
     except Exception:
@@ -194,14 +193,14 @@ def submit_to_fec(
 
 
 @shared_task
-def submit_to_webprint(
-    dot_fec_id, submission_record_id, force_read_from_disk=False, mock=False
-):
-    submission = WebPrintSubmission.objects.get(id=submission_record_id)
+def submit_to_webprint(submission_record_id, force_read_from_disk=False, mock=False):
+    submission = WebPrintSubmission.objects.select_related(
+        "dot_fec__report__committee_account"
+    ).get(id=submission_record_id)
     submission.save_state(FECSubmissionState.SUBMITTING)
 
     """Get .FEC file bytes"""
-    dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
+    dot_fec_record = submission.dot_fec
     file_name = dot_fec_record.file_name
     try:
         dot_fec_bytes = get_file_bytes(file_name, force_read_from_disk)
@@ -241,18 +240,27 @@ def submit_to_webprint(
 @shared_task
 def poll_for_fec_response(submission_id, submission_type_key, submission_name):
     try:
-        submission = SUBMISSION_CLASSES[submission_type_key].objects.get(id=submission_id)
+        submission = (
+            SUBMISSION_CLASSES[submission_type_key]
+            .objects.only(
+                "id",
+                "fecfile_polling_attempts",
+                "fec_submission_id",
+                "fec_status",
+                "fec_message",
+                "fecfile_task_state",
+            )
+            .get(id=submission_id)
+        )
         submitter = SUBMISSION_MANAGERS[submission_type_key]()
         submission.save_state(FECSubmissionState.POLLING)
 
         submission.fecfile_polling_attempts += 1
         logger.info(f"Polling status for {submission.fec_submission_id}.")
         logger.info(f"Status: {submission.fec_status}, Message: {submission.fec_message}")
-        logger.info(
-            f"""Submission Polling - Attempt {
+        logger.info(f"""Submission Polling - Attempt {
                 submission.fecfile_polling_attempts
-            } / {MAX_ATTEMPTS}"""
-        )
+            } / {MAX_ATTEMPTS}""")
         status_response_string = submitter.poll_status(submission)
         submission.save_fec_response(status_response_string)
         if (

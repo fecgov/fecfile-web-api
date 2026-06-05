@@ -8,6 +8,19 @@ from .tasks import (
     create_dot_fec,
     submit_to_fec,
     submit_to_webprint,
+    compose_dot_fec,
+    store_file,
+    DotFEC,
+    get_file_bytes,
+    WEB_PRINT_KEY,
+    MOCK_WEB_PRINT_KEY,
+    SUBMISSION_MANAGERS,
+    SUBMISSION_CLASSES,
+    FECStatus,
+    calculate_polling_interval,
+    resolve_final_submission_state,
+    MAX_ATTEMPTS,
+    logger,
 )
 from .summary.tasks import CalculationState, calculate_summary
 from fecfiler.settings import MOCK_EFO_FILING
@@ -19,6 +32,9 @@ from fecfiler.reports.models import Report, FORMS_TO_CALCULATE
 from drf_spectacular.utils import extend_schema
 from celery.result import AsyncResult
 import structlog
+
+import time
+from silk.profiling.profiler import silk_profile
 
 logger = structlog.get_logger(__name__)
 
@@ -130,15 +146,11 @@ class WebServicesViewSet(viewsets.ViewSet):
             and report.upload_submission.fecfile_task_state
             not in [FECSubmissionState.SUCCEEDED, FECSubmissionState.FAILED]
         ):
-            logger.debug(
-                f"""There is already an active upload being generated for report
-                {report_id}: {report.upload_submission.fecfile_task_state}"""
-            )
+            logger.debug(f"""There is already an active upload being generated for report
+                {report_id}: {report.upload_submission.fecfile_task_state}""")
             return Response(
-                {
-                    "status": f"""There is already an active upload
-                     being generated for report {report_id}"""
-                },
+                {"status": f"""There is already an active upload
+                     being generated for report {report_id}"""},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -160,7 +172,7 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         task = (
             task
-            | submit_to_fec.s(
+            | submit_to_fec.si(
                 submission_id, e_filing_password, False, backdoor_code, mock, mock_reject
             )
         ).apply_async(retry=False)
@@ -200,10 +212,8 @@ class WebServicesViewSet(viewsets.ViewSet):
                 {report_id}: {report.webprint_submission.fecfile_task_state}"""
             )
             return Response(
-                {
-                    "status": f"""There is already an active webprint being generated
-                    for report {report_id}"""
-                },
+                {"status": f"""There is already an active webprint being generated
+                    for report {report_id}"""},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -224,7 +234,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         else:
             task = create_dot_fec.s(report_id, webprint_submission_id=submission_id)
 
-        task = (task | submit_to_webprint.s(submission_id, False, mock)).apply_async(
+        task = (task | submit_to_webprint.si(submission_id, False, mock)).apply_async(
             retry=False
         )
 
@@ -242,3 +252,136 @@ class WebServicesViewSet(viewsets.ViewSet):
         ):
             return calculate_summary.s(report_id)
         return None
+
+    # @action(
+    #     detail=False,
+    #     methods=["post"],
+    #     url_path="submit-to-webprint",
+    # )
+    # def submit_to_webprint(self, request):
+    #     """
+    #     A purely synchronous copy of the submission pipeline.
+    #     Runs completely within the HTTP request lifecycle so Silk captures it easily.
+    #     """
+    #     serializer = self.get_serializer_class()(
+    #         data=request.data, context={"request": request}
+    #     )
+    #     if not serializer.is_valid():
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    #     mock = request.query_params.get("mock", "false").lower() == "true"
+    #     if MOCK_EFO_FILING:
+    #         mock = True
+
+    #     report_id = serializer.validated_data["report_id"]
+    #     report = serializer.validated_data["report_instance"]
+
+    #     # 1. Initialize submission state record
+    #     submission = WebPrintSubmission.objects.initiate_submission(report)
+    #     submission_id = submission.id
+
+    #     # Add a global silk profile tag for the whole view execution script
+    #     with silk_profile(name="Webprint create_dot_fec"):
+
+    #         # ==========================================
+    #         # STEP A: Inline Version of create_dot_fec
+    #         # ==========================================
+    #         submission.save_state(FECSubmissionState.CREATING_FILE)
+    #         try:
+    #             file_content = compose_dot_fec(report_id)
+    #             file_name = f"{report_id}_{math.floor(datetime.now().timestamp())}.fec"
+
+    #             if not file_content:
+    #                 raise Exception("No file created")
+
+    #             store_file(file_content, file_name, False)
+    #             dot_fec_record = DotFEC(report_id=report_id, file_name=file_name)
+    #             dot_fec_record.save()
+
+    #             WebPrintSubmission.objects.filter(id=submission_id).update(
+    #                 dot_fec=dot_fec_record
+    #             )
+    #         except Exception as e:
+    #             submission.save_error("Creating .FEC failed")
+    #             return Response({"error": f"Failed dot_fec step: {str(e)}"}, status=500)
+
+    #     with silk_profile(name="Webprint submit_to_webprint"):
+    #         # ==========================================
+    #         # STEP B: Inline Version of submit_to_webprint
+    #         # ==========================================
+    #         # Fresh fetch with your optimizations included to capture query metrics
+    #         submission = WebPrintSubmission.objects.select_related(
+    #             "dot_fec__report__committee_account"
+    #         ).get(id=submission_id)
+    #         submission.save_state(FECSubmissionState.SUBMITTING)
+
+    #         dot_fec_record = submission.dot_fec
+    #         file_name = dot_fec_record.file_name
+    #         try:
+    #             dot_fec_bytes = get_file_bytes(file_name, False)
+    #         except Exception:
+    #             submission.save_error("Could not retrieve .FEC bytes")
+    #             return Response({"error": "Failed retrieving bytes"}, status=500)
+
+    #         submission_type_key = WEB_PRINT_KEY if not mock else MOCK_WEB_PRINT_KEY
+    #         submitter = SUBMISSION_MANAGERS[submission_type_key]()
+
+    #         try:
+    #             submission_response_string = submitter.submit(None, dot_fec_bytes)
+    #             submission.save_fec_response(submission_response_string)
+    #         except Exception as e:
+    #             submission.save_error("Failed submitting to WebPrint")
+    #             resolve_final_submission_state(submission)
+    #             return Response({"error": f"Submission error: {str(e)}"}, status=500)
+
+    #     with silk_profile(name="Webprint polling"):
+    #         # ==========================================
+    #         # STEP C: Synchronous polling loop replacement
+    #         # ==========================================
+    #         while submission.fec_status not in FECStatus.get_terminal_statuses_strings():
+    #             if submission.fecfile_polling_attempts >= MAX_ATTEMPTS:
+    #                 logger.warning("POLLING ATTEMPTS EXCEEDED")
+    #                 submission.fecfile_task_state = FECSubmissionState.FAILED.value
+    #                 resolve_final_submission_state(submission)
+    #                 break
+
+    #             # Simulate the countdown sleep interval cleanly
+    #             countdown = calculate_polling_interval(
+    #                 submission.fecfile_polling_attempts
+    #             )
+    #             logger.info(f"Sync Polling: Sleeping for {countdown} seconds...")
+    #             time.sleep(countdown)  # Keeps execution inside this single HTTP thread
+
+    #             # Re-fetch utilizing your optimization parameters
+    #             submission = (
+    #                 SUBMISSION_CLASSES[submission_type_key]
+    #                 .objects.only(
+    #                     "id",
+    #                     "fecfile_polling_attempts",
+    #                     "fec_submission_id",
+    #                     "fec_status",
+    #                     "fec_message",
+    #                     "fecfile_task_state",
+    #                 )
+    #                 .get(id=submission_id)
+    #             )
+    #             submission.save_state(FECSubmissionState.POLLING)
+    #             submission.fecfile_polling_attempts += 1
+
+    #             try:
+    #                 status_response_string = submitter.poll_status(submission)
+    #                 submission.save_fec_response(status_response_string)
+    #             except Exception as e:
+    #                 submission.save_error(f"Failed submitting during polling context")
+    #                 resolve_final_submission_state(submission)
+    #                 return Response({"error": f"Polling breakdown: {str(e)}"}, status=500)
+
+    #         # Handle final state resolution
+    #         final_id = resolve_final_submission_state(submission)
+
+    #     return Response(
+    #         {
+    #             "status": "Synchronous submission testing pipeline completed successfully!",
+    #             "submission_id": final_id,
+    #         }
+    #     )
