@@ -1,6 +1,7 @@
 import json
 
 from django.http import QueryDict
+from django.test import tag
 from fecfiler.reports.views import ReportViewSet
 from fecfiler.reports.utils.report import delete_all_reports
 from fecfiler.reports.models import Report
@@ -11,7 +12,6 @@ from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
-from unittest.mock import patch
 from fecfiler.web_services.models import FECStatus, UploadSubmission
 import structlog
 
@@ -81,7 +81,6 @@ class ReportViewSetTest(FecfilerViewSetTest):
             self.assertGreaterEqual(ordering, last_ordering)
             last_ordering = ordering
 
-    @patch("fecfiler.reports.views.settings.E2E_TEST", False)
     def test_e2e_delete_all_reports_not_allowed(self):
         e2e_committee = CommitteeAccount(committee_id="C99999999")
         e2e_committee.save()
@@ -99,11 +98,9 @@ class ReportViewSetTest(FecfilerViewSetTest):
         ).count()
         self.assertGreater(report_count, 0)
         self.assertGreater(transaction_count, 0)
-
-        response = self.client.post(
-            "/api/v1/reports/e2e-delete-all-reports/", data={}, format="json"
-        )
-        self.assertEqual(response.status_code, 403)
+        uri = "/api/v1/reports/e2e-delete-all-reports/"
+        response = self.send_nonviewset_post_request(uri, {}, committee=e2e_committee)
+        self.assertEqual(response.status_code, 405)
         report_count = Report.objects.filter(
             committee_account__committee_id="C99999999"
         ).count()
@@ -113,6 +110,7 @@ class ReportViewSetTest(FecfilerViewSetTest):
         self.assertGreater(report_count, 0)
         self.assertGreater(transaction_count, 0)
 
+    @tag("e2e")
     def test_e2e_delete_all_reports(self):
         view = ReportViewSet()
 
@@ -135,12 +133,14 @@ class ReportViewSetTest(FecfilerViewSetTest):
         self.assertGreater(transaction_count, 0)
 
         view.format_kwarg = "format"
-        request = self.build_viewset_post_request(
-            "/api/v1/reports/e2e-delete-all-reports", {}
+        response = self.send_viewset_post_request(
+            "/api/v1/reports/e2e-delete-all-reports/",
+            {},
+            ReportViewSet,
+            "e2e_delete_all_reports",
+            committee=e2e_committee,
         )
-        request.query_params = QueryDict({})
-        view.request = request
-        view.e2e_delete_all_reports(request)
+        self.assertEqual(response.status_code, 200)
 
         report_count = Report.objects.filter(
             committee_account__committee_id="C99999999"
@@ -151,6 +151,7 @@ class ReportViewSetTest(FecfilerViewSetTest):
         self.assertEqual(report_count, 0)
         self.assertEqual(transaction_count, 0)
 
+    @tag("e2e")
     def test_delete_all_reports_for_a_committee(self):
         committee = CommitteeAccount.objects.get(committee_id="C00000000")
 
@@ -180,6 +181,7 @@ class ReportViewSetTest(FecfilerViewSetTest):
         self.assertEqual(report_count, 0)
         self.assertEqual(transaction_count, 0)
 
+    @tag("e2e")
     def test_delete_all_reports_for_a_different_committee(self):
         committee = CommitteeAccount.objects.get(committee_id="C00000000")
 
