@@ -15,6 +15,7 @@ from fecfiler.transactions.schedule_d.utils import add_schedule_d_contact_fields
 from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
 from fecfiler.transactions.schedule_f.utils import add_schedule_f_contact_fields
 from fecfiler.transactions.itemization import calculate_itemization
+from django.db.models import Exists, OuterRef
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -70,11 +71,16 @@ def compose_transaction(transaction: Transaction):
 def compose_transactions(report_id):
     report = Report.objects.select_related("committee_account").get(id=report_id)
 
+    itemized_children_subquery = Transaction.objects.filter(
+        parent_transaction_id=OuterRef("id"), deleted__isnull=True, itemized=True
+    )
+
     transactions_queryset = (
         Transaction.objects.filter(
             reports__id=report_id,
             committee_account__id=report.committee_account.id,
         )
+        .annotate(has_cached_itemized_children=Exists(itemized_children_subquery))
         .select_related("contact_1")
         .prefetch_related(
             "schedule_a",
@@ -96,8 +102,6 @@ def compose_transactions(report_id):
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
 
-        transactions = prefetch_itemization(transactions)
-
         for transaction in transactions:
             compose_transaction(transaction)
 
@@ -106,21 +110,6 @@ def compose_transactions(report_id):
     else:
         logger.info(f"no transactions found for report: {report_id}")
         return []
-
-
-def prefetch_itemization(transactions):
-    parent_ids = [t.id for t in transactions]
-    child_records = Transaction.objects.filter(
-        parent_transaction_id__in=parent_ids, deleted__isnull=True, itemized=True
-    ).values("id", "parent_transaction_id")
-    parents_with_itemized_children = {
-        row["parent_transaction_id"] for row in child_records
-    }
-    for transaction in transactions:
-        transaction.has_cached_itemized_children = (
-            transaction.id in parents_with_itemized_children
-        )
-    return transactions
 
 
 class Header:
