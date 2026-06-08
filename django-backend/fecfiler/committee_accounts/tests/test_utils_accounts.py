@@ -7,7 +7,8 @@ from fecfiler.committee_accounts.utils.accounts import (
     get_committee_emails,
     get_production_committee_emails,
     get_test_committee_emails,
-    get_eligible_report_types_raw
+    get_eligible_report_types_raw,
+    get_eligible_report_types_processed,
 )
 
 from fecfiler.user.models import User
@@ -418,5 +419,19 @@ class CommitteeAccountsUtilsTest(TestCase):
         self.assertRaises(
             ValueError,
             get_eligible_report_types_raw,
+            test_committee_data_invalid
+        )
+
+    def test_get_eligible_report_types_processed(self):
+        test_committee_data = {
+            "committee_type": "A",
+        }
+        eligible_types = get_eligible_report_types_processed(test_committee_data)
+        self.assertEqual(eligible_types, ["F3X", "F24", "F1M", "F99", "F3"])
+        test_committee_data_invalid = None
+
+        self.assertRaises(
+            ValueError,
+            get_eligible_report_types_processed,
             test_committee_data_invalid
         )

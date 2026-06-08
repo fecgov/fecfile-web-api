@@ -191,6 +191,16 @@ def get_production_committee_data(committee_id):
     return committee_data
 
 
+def get_eligible_report_types_processed(committee_data: dict):
+    if committee_data is None:
+        logger.error(
+            "tried to retrieve eligible report types from invalid committee data"
+        )
+        raise ValueError()
+
+    return ["F3X", "F24", "F1M", "F99", "F3"]
+
+
 def get_processed_committee_data(committee_id):
 
     params = {
@@ -215,6 +225,10 @@ def get_processed_committee_data(committee_id):
         committee_data["qualified"] = (
             committee_data.get("committee_type") in PRODUCTION_QUALIFIED_COMMITTEES
         )
+
+        committee_data[
+            "eligible_report_types"
+        ] = get_eligible_report_types_processed(committee_data)
 
     return committee_data
 
