@@ -388,9 +388,14 @@ def get_mocked_committee_data(committee_id):
         )
 
         if committee is not None:
-            committee[
-                "eligible_report_types"
-            ] = get_eligible_report_types_raw(committee)
+            if committee.get("counts_as_processed"):
+                committee[
+                    "eligible_report_types"
+                ] = get_eligible_report_types_processed(committee)
+            else:
+                committee[
+                    "eligible_report_types"
+                ] = get_eligible_report_types_raw(committee)
 
         return committee
 
