@@ -171,6 +171,29 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         delete_all_reports("C99999998")
         return Response(f"Deleted {report_count} Reports")
 
+    @action(detail=True, methods=["post"], url_path="update-version-number")
+    def update_version_number(self, request, pk):
+        try:
+            report: Report = self.get_object()
+        except Exception as e:
+            return Response({"detail": "Report not found."}, status=404)
+
+        payload = request.data
+        amendment = payload.get("amendment")
+        e_filing_id = payload.get("eFilingId")
+        try:
+            report.report_version = amendment
+            report.fec_report_id = e_filing_id
+            report.save()
+
+            return Response(ReportSerializer(report).data, status=200)
+
+        except Exception as e:
+            return Response(
+                {"detail": f"An error occurred while updating the report: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
     def create(self, request):
         response = {"message": "Create function is not offered in this path."}
         return Response(response, status=status.HTTP_405_METHOD_NOT_ALLOWED)
