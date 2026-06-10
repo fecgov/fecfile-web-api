@@ -306,7 +306,8 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
 
         report.amend()
 
-        # test that a successfully submitted report with no transactions can not be unamended
+        # test that a successfully submitted report
+        # with no transactions can not be unamended
         submission = UploadSubmission.objects.initiate_submission(
             str(report.id),
         )
@@ -330,7 +331,8 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         self.assertEqual(report_retrieve_response.status_code, 200)
         self.assertEqual(report_retrieve_response.data["can_unamend"], False)
 
-        # now amend the report and add a transaction, which should make the report unable to be unamended
+        # now amend the report and add a transaction,
+        # which should make the report unable to be unamended
         report.amend()
 
         create_schedule_a(
