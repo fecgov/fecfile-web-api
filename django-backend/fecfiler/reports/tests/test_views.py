@@ -17,7 +17,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class CommitteeMemberViewSetTest(FecfilerViewSetTest):
+class ReportViewSetTestCase(FecfilerViewSetTest):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         user = User.objects.create(email="test@fec.gov", username="gov")
@@ -316,3 +316,60 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         )
         # cannot be unamended because we added a transaction
         self.assertEqual(response.status_code, 400)
+
+    def test_update_version_number_success(self):
+        report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        payload = {"amendment": "2", "eFilingId": "FEC-112233"}
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{report.id}/update-version-number",
+            payload,
+            ReportViewSet,
+            "update_version_number",
+            committee=self.committee,
+            pk=report.id,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        updated_report = Report.objects.get(id=report.id)
+        self.assertEqual(updated_report.report_version, "2")
+        self.assertEqual(updated_report.fec_report_id, "FEC-112233")
+        self.assertEqual(response.data["id"], str(report.id))
+
+    def test_update_version_number_not_found(self):
+        fake_uuid = "00000000-0000-0000-0000-000000000000"
+        payload = {"amendment": "1", "eFilingId": "FEC-999999"}
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{fake_uuid}/update-version-number",
+            payload,
+            ReportViewSet,
+            "update_version_number",
+            committee=self.committee,
+            pk=fake_uuid,
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data["detail"], "Report not found.")
+
+    def test_update_version_number_server_error(self):
+        from unittest.mock import patch
+
+        report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        payload = {"amendment": 3, "eFilingId": "FEC-ERROR"}
+
+        with patch.object(
+            Report, "save", side_effect=Exception("Database connection failure")
+        ):
+            response = self.send_viewset_post_request(
+                f"/api/v1/reports/{report.id}/update-version-number",
+                payload,
+                ReportViewSet,
+                "update_version_number",
+                committee=self.committee,
+                pk=report.id,
+            )
+
+            self.assertEqual(response.status_code, 500)
+            self.assertIn(
+                "An error occurred while updating the report", response.data["detail"]
+            )

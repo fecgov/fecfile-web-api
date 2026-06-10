@@ -175,7 +175,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def update_version_number(self, request, pk):
         try:
             report: Report = self.get_object()
-        except Exception as e:
+        except Exception:
             return Response({"detail": "Report not found."}, status=404)
 
         payload = request.data
