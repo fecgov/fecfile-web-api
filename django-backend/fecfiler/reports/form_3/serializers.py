@@ -1,5 +1,5 @@
 from django.db import transaction
-from fecfiler.reports.models import Report
+from fecfiler.reports.models import Report, ReportTransaction
 from fecfiler.reports.form_3.models import Form3
 from fecfiler.reports.serializers import (
     ReportSerializer,
@@ -13,21 +13,187 @@ from rest_framework.serializers import (
     DateField,
     BooleanField,
 )
+from rest_framework.serializers import ValidationError
+from datetime import date
 import structlog
 
 logger = structlog.get_logger(__name__)
 
+COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS = ValidationError(
+    {
+        "coverage_from_date_and_coverage_to_date": [
+            "Coverage date(s) exclude existing transaction(s) for report"
+        ]
+    }
+)
 
-class Form3Serializer(ReportSerializer):
-    schema_name = "F3"
+
+class BaseForm3Serializer(ReportSerializer):
     report_type_category = CharField(required=False, allow_null=True)
     change_of_address = BooleanField(required=False, allow_null=True)
-    election_state = CharField(required=False, allow_null=True)
-    election_district = CharField(required=False, allow_null=True)
-
     election_code = CharField(required=False, allow_null=True)
     date_of_election = DateField(required=False, allow_null=True)
     state_of_election = CharField(required=False, allow_null=True)
+
+    def to_internal_value(self, data):
+        internal = super().to_internal_value(data)
+        report = ReportSerializer(context=self.context).to_internal_value(data)
+        internal.update(report)
+        return internal
+
+    def validate(self, data):
+        self._context = self.context.copy()
+        self._context["fields_to_ignore"] = self._context.get(
+            "fields_to_ignore", ["filer_committee_id_number"]
+        )
+        return super().validate(data)
+
+    def save(self, **kwargs):
+        committee_uuid = self.get_committee_uuid()
+        instance_id = self.instance.id if self.instance else None
+
+        if self.overlaps_other_f3_report(
+            instance_id,
+            committee_uuid,
+            self.validated_data,
+        ):
+            raise COVERAGE_DATE_REPORT_CODE_COLLISION
+
+        return super().save(**kwargs)
+
+    def update(self, instance, validated_data):
+        prior_coverage_through_date = instance.coverage_through_date
+        prior_coverage_from_date = instance.coverage_from_date
+
+        transactions_outside_coverage_dates = ReportTransaction.objects.filter(
+            ~Q(transaction__memo_code=True),
+            self.get_transaction_date_outside_coverage_dates_clause(),
+            transaction__deleted=None,
+            report_id=instance.id,
+        ).count()
+
+        if transactions_outside_coverage_dates > 0:
+            raise COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS
+
+        if self.overlaps_other_f3_report(
+            instance.id,
+            instance.committee_account.id,
+            validated_data,
+        ):
+            raise COVERAGE_DATE_REPORT_CODE_COLLISION
+
+        form = getattr(instance, self.related_form_attr)
+
+        for attr, value in validated_data.items():
+            if attr != "id":
+                setattr(form, attr, value)
+
+        form.save()
+
+        updated = super().update(instance, validated_data)
+
+        coverage_from_changed = prior_coverage_from_date != updated.coverage_from_date
+        coverage_through_changed = (
+            prior_coverage_through_date != updated.coverage_through_date
+        )
+
+        if coverage_from_changed or coverage_through_changed:
+            Report.mark_calculations_dirty(Report.objects.filter(id=updated.id))
+
+        return updated
+
+    def get_transaction_date_outside_coverage_dates_clause(self):
+        """Returns a clause that checks if the transaction date is outside
+        the coverage dates for the report.
+        """
+        from_date = self.validated_data["coverage_from_date"]
+        through_date = self.validated_data["coverage_through_date"]
+        return Q(
+            Q(
+                Q(transaction__schedule_a__isnull=False),
+                Q(
+                    Q(transaction__schedule_a__contribution_date__lt=from_date)
+                    | Q(transaction__schedule_a__contribution_date__gt=through_date)
+                ),
+            )
+            | Q(
+                Q(transaction__schedule_b__isnull=False),
+                Q(
+                    Q(transaction__schedule_b__expenditure_date__lt=from_date)
+                    | Q(transaction__schedule_b__expenditure_date__gt=through_date)
+                ),
+            )
+            | Q(
+                Q(
+                    transaction__schedule_c__isnull=False,
+                    transaction__loan_id__isnull=True,
+                ),
+                Q(
+                    Q(transaction__schedule_c__loan_incurred_date__lt=from_date)
+                    | Q(transaction__schedule_c__loan_incurred_date__gt=through_date)
+                ),
+            )
+            | Q(
+                Q(transaction__schedule_e__isnull=False),
+                Q(
+                    Q(transaction__schedule_e__disbursement_date__lt=from_date)
+                    | Q(transaction__schedule_e__disbursement_date__gt=through_date)
+                ),
+            )
+            | Q(
+                Q(transaction__schedule_e__isnull=False),
+                Q(
+                    Q(transaction__schedule_e__dissemination_date__lt=from_date)
+                    | Q(transaction__schedule_e__dissemination_date__gt=through_date)
+                ),
+            )
+            | Q(
+                Q(transaction__schedule_f__isnull=False),
+                Q(
+                    Q(transaction__schedule_f__expenditure_date__lt=from_date)
+                    | Q(transaction__schedule_f__expenditure_date__gt=through_date)
+                ),
+            )
+        )
+
+    def overlaps_other_f3_report(self, instance_id, committee_uuid, validated_data):
+        coverage_from_date = validated_data.get("coverage_from_date")
+        coverage_year = None
+        match (type(coverage_from_date)):
+            case date.__class__:
+                coverage_year = coverage_from_date.year
+            case str.__class__:
+                coverage_year = coverage_from_date[:4]
+
+        return (
+            Report.objects.filter(
+                ~Q(id=instance_id),
+                Q(committee_account__id=committee_uuid),
+                Q(
+                    coverage_from_date__gte=validated_data.get("coverage_from_date"),
+                    coverage_from_date__lte=validated_data.get("coverage_through_date"),
+                )
+                | Q(
+                    coverage_through_date__gte=validated_data.get("coverage_from_date"),
+                    coverage_through_date__lte=validated_data.get(
+                        "coverage_through_date"
+                    ),
+                )
+                | Q(
+                    coverage_from_date__year=coverage_year,
+                    report_code=validated_data.get("report_code"),
+                ),
+            ).count()
+            > 0
+        )
+
+
+class Form3Serializer(BaseForm3Serializer):
+    schema_name = "F3"
+    related_form_attr = "form_3"
+
+    election_state = CharField(required=False, allow_null=True)
+    election_district = CharField(required=False, allow_null=True)
 
     L6a_total_contributions_period = DecimalField(
         required=False, allow_null=True, max_digits=11, decimal_places=2
@@ -240,12 +406,6 @@ class Form3Serializer(ReportSerializer):
         required=False, allow_null=True, max_digits=11, decimal_places=2
     )
 
-    def to_internal_value(self, data):
-        internal = super().to_internal_value(data)
-        report = ReportSerializer(context=self.context).to_internal_value(data)
-        internal.update(report)
-        return internal
-
     def create(self, validated_data: dict):
         with transaction.atomic():
             form_3_data = get_model_data(validated_data, Form3)
@@ -254,38 +414,6 @@ class Form3Serializer(ReportSerializer):
             report_data["form_3_id"] = form_3.id
             report = super().create(report_data)
             return report
-
-    def update(self, instance, validated_data: dict):
-        with transaction.atomic():
-            for attr, value in validated_data.items():
-                if attr != "id":
-                    setattr(instance.form_3, attr, value)
-            instance.form_3.save()
-            updated = super().update(instance, validated_data)
-            return updated
-
-    def save(self, **kwargs):
-        """Raise a ValidationError if an F3 with the same report code
-        exists for the same year
-        """
-        committee_uuid = self.get_committee_uuid()
-        number_of_collisions = Report.objects.filter(
-            ~Q(id=(self.instance or Report()).id),
-            committee_account=committee_uuid,
-            coverage_from_date__year=self.validated_data["coverage_from_date"].year,
-            report_code=self.validated_data["report_code"],
-        ).count()
-        if number_of_collisions == 0:
-            return super(Form3Serializer, self).save(**kwargs)
-        else:
-            raise COVERAGE_DATE_REPORT_CODE_COLLISION
-
-    def validate(self, data):
-        self._context = self.context.copy()
-        self._context["fields_to_ignore"] = self._context.get(
-            "fields_to_ignore", ["filer_committee_id_number"]
-        )
-        return super().validate(data)
 
     class Meta(ReportSerializer.Meta):
         fields = (
