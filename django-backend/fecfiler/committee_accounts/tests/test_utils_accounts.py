@@ -415,12 +415,10 @@ class CommitteeAccountsUtilsTest(TestCase):
         self.assertEqual(eligible_types_None, ["F99"])
 
         test_committee_data_invalid = None
-
-        self.assertRaises(
-            ValueError,
-            get_eligible_report_types_raw,
+        eligible_types_invalid = get_eligible_report_types_raw(
             test_committee_data_invalid
         )
+        self.assertEqual(eligible_types_invalid, ["F99"])
 
     def test_get_eligible_report_types_processed(self):
         test_committee_data = {
@@ -430,8 +428,7 @@ class CommitteeAccountsUtilsTest(TestCase):
         self.assertEqual(eligible_types, ["F3X", "F24", "F1M", "F99", "F3"])
         test_committee_data_invalid = None
 
-        self.assertRaises(
-            ValueError,
-            get_eligible_report_types_processed,
+        eligible_types_invalid = get_eligible_report_types_processed(
             test_committee_data_invalid
         )
+        self.assertEqual(eligible_types_invalid, ["F99"])

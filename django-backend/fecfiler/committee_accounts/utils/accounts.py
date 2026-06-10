@@ -194,9 +194,9 @@ def get_production_committee_data(committee_id):
 def get_eligible_report_types_processed(committee_data: dict):
     if committee_data is None:
         logger.error(
-            "tried to retrieve eligible report types from invalid committee data"
+            "Tried to retrieve eligible report types from invalid committee data"
         )
-        raise ValueError()
+        return ["F99"]
 
     return ["F3X", "F24", "F1M", "F99", "F3"]
 
@@ -236,9 +236,9 @@ def get_processed_committee_data(committee_id):
 def get_eligible_report_types_raw(committee_data: dict):
     if committee_data is None:
         logger.error(
-            "tried to retrieve eligible report types from invalid committee data"
+            "Tried to retrieve eligible report types from invalid committee data"
         )
-        raise ValueError()
+        return ["F99"]
 
     committee_type = committee_data.get("committee_type")
     if committee_type is None:
