@@ -130,15 +130,11 @@ class WebServicesViewSet(viewsets.ViewSet):
             and report.upload_submission.fecfile_task_state
             not in [FECSubmissionState.SUCCEEDED, FECSubmissionState.FAILED]
         ):
-            logger.debug(
-                f"""There is already an active upload being generated for report
-                {report_id}: {report.upload_submission.fecfile_task_state}"""
-            )
+            logger.debug(f"""There is already an active upload being generated for report
+                {report_id}: {report.upload_submission.fecfile_task_state}""")
             return Response(
-                {
-                    "status": f"""There is already an active upload
-                     being generated for report {report_id}"""
-                },
+                {"status": f"""There is already an active upload
+                     being generated for report {report_id}"""},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -200,10 +196,8 @@ class WebServicesViewSet(viewsets.ViewSet):
                 {report_id}: {report.webprint_submission.fecfile_task_state}"""
             )
             return Response(
-                {
-                    "status": f"""There is already an active webprint being generated
-                    for report {report_id}"""
-                },
+                {"status": f"""There is already an active webprint being generated
+                    for report {report_id}"""},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
