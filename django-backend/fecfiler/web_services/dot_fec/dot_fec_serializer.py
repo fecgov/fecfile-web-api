@@ -1,6 +1,7 @@
 from datetime import datetime
 from fecfile_validate import validate
 from fecfiler.settings import BASE_DIR
+from decimal import Decimal, InvalidOperation
 from curses import ascii
 import os
 import json
@@ -71,6 +72,30 @@ def text_to_date_serializer(model_instance, field_name, mapping):
     return date_string
 
 
+def loan_interest_rate_serializer(model_instance, field_name, mapping):
+    schedule = model_instance.schedule_c or model_instance.schedule_c1
+    if schedule:
+        interest_rate = schedule.loan_interest_rate
+        is_percent = schedule.loan_interest_rate_is_percent
+
+        if not is_percent:
+            return interest_rate
+        else:
+            try:
+                return str(Decimal(interest_rate) / 100)
+            except InvalidOperation:
+                raise ValueError(
+                    f"Interest rate, {interest_rate}, "
+                    f"on transaction, {model_instance.id}, "
+                    "is not a valid number"
+                )
+    else:
+        raise ValueError(
+            "Attempted to serialize loan interest rate on "
+            f"a transaction, {model_instance.id}, without a schedule c/c1"
+        )
+
+
 def default_serializer(model_instance, field_name, mapping):
     """For most field types, just stringifying the value will work.
     In the case where the field is None, we want empty string rather than
@@ -89,6 +114,7 @@ FIELD_SERIALIZERS = {
     "BOOLEAN_YN": boolean_yn_serializer,
     "DATE": date_serializer,
     "TEXT_TO_DATE": text_to_date_serializer,
+    "LOAN_INTEREST_RATE": loan_interest_rate_serializer,
     None: default_serializer,
 }
 

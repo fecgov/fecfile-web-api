@@ -40,7 +40,7 @@ class ReportModelTestCase(TestCase):
         self.assertEqual(self.f24_report.form_type, "F24A")
 
     def test_unamending(self):
-        upload_submission = UploadSubmission(fec_report_id=self.f3x_report.report_id)
+        upload_submission = UploadSubmission(fec_report_id=self.f3x_report.fec_report_id)
         upload_submission.save()
         self.f3x_report.upload_submission = upload_submission
         self.f3x_report.save()
@@ -52,7 +52,9 @@ class ReportModelTestCase(TestCase):
         self.assertEqual(self.f3x_report.upload_submission, upload_submission)
 
         self.f3x_report.amend()
-        new_upload_submission = UploadSubmission(fec_report_id=self.f3x_report.report_id)
+        new_upload_submission = UploadSubmission(
+            fec_report_id=self.f3x_report.fec_report_id
+        )
         new_upload_submission.save()
         self.f3x_report.upload_submission = new_upload_submission
         self.f3x_report.amend()

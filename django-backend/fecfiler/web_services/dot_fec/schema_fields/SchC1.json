@@ -27,6 +27,7 @@
     "path": "schedule_c1.loan_amount"
   },
   "loan_interest_rate": {
+    "serializer": "LOAN_INTEREST_RATE",
     "path": "schedule_c1.loan_interest_rate"
   },
   "loan_incurred_date": {
