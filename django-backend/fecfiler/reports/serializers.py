@@ -1,5 +1,6 @@
 from .models import Report
 from rest_framework.serializers import (
+    BooleanField,
     SerializerMethodField,
     ModelSerializer,
     CharField,
@@ -102,6 +103,8 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     state = CharField(required=False, allow_null=True)
     zip = CharField(required=False, allow_null=True)
 
+    can_unamend = BooleanField(read_only=True, source="can_unamend_new")
+
     upload_submission = UploadSubmissionSerializer(
         read_only=True,
     )
@@ -153,7 +156,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                     representation[property] = form_1m[property]
 
         representation["can_delete"] = instance.can_delete
-        representation["can_unamend"] = instance.can_unamend
 
         return representation
 

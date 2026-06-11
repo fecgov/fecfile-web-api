@@ -138,6 +138,7 @@ class BaseSubmission(models.Model):
         self.fec_submission_id = fec_response_json.get("submission_id")
         self.fec_status = fec_response_json.get("status")
         self.fec_message = fec_response_json.get("message")
+
         self.save()
 
     def save_error(self, error):
@@ -232,6 +233,10 @@ class UploadSubmission(BaseSubmission):
             report.fec_report_id = self.fec_report_id
             report.save()
         super().save_fec_response(response_string)
+
+        if str(self.fec_status) == str(FECStatus.ACCEPTED.value):
+            if self.dot_fec is not None:
+                self.dot_fec.report.block_transactions_from_deletion()
 
     class Meta:
         db_table = "upload_submissions"

@@ -1,12 +1,17 @@
+import json
+
 from django.http import QueryDict
 from fecfiler.reports.views import ReportViewSet
 from fecfiler.reports.utils.report import delete_all_reports
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
+from fecfiler.reports.managers import STATUS_CODE_SUCCESS
+from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
+from fecfiler.web_services.models import FECStatus, UploadSubmission
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -90,7 +95,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         report_count = Report.objects.filter(
             committee_account__committee_id="C99999999"
         ).count()
-        transaction_count = Report.objects.filter(
+        transaction_count = Transaction.objects.filter(
             committee_account__committee_id="C99999999"
         ).count()
         self.assertGreater(report_count, 0)
@@ -107,7 +112,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         report_count = Report.objects.filter(
             committee_account__committee_id="C99999999"
         ).count()
-        transaction_count = Report.objects.filter(
+        transaction_count = Transaction.objects.filter(
             committee_account__committee_id="C99999999"
         ).count()
         self.assertEqual(report_count, 0)
@@ -165,8 +170,195 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         new_report_count = Report.objects.filter(
             committee_account__committee_id="C00000000"
         ).count()
-        new_transaction_count = Report.objects.filter(
+        new_transaction_count = Transaction.objects.filter(
             committee_account__committee_id="C00000000"
         ).count()
         self.assertEqual(report_count, new_report_count)
         self.assertEqual(transaction_count, new_transaction_count)
+
+    def test_amend(self):
+        """Test that a successfully submitted report can be amended."""
+        committee = CommitteeAccount.objects.create(committee_id="C00000001")
+        report = create_form3x(committee, "2026-01-01", "2026-02-01", {})
+        submission = UploadSubmission.objects.initiate_submission(
+            str(report.id),
+        )
+        submission.save_fec_response(
+            json.dumps(
+                {
+                    "submission_id": "fake_submission_id",
+                    "status": FECStatus.ACCEPTED.value,
+                    "message": "Test Save Response",
+                    "report_id": "1234",
+                }
+            )
+        )
+        self.assertEqual(
+            Report.objects.get(id=report.id).report_status,
+            STATUS_CODE_SUCCESS,
+        )
+
+        retrieve_response = self.send_viewset_get_request(
+            f"/api/v1/reports/{report.id}",
+            ReportViewSet,
+            "retrieve",
+            committee=committee,
+            pk=report.id,
+        )
+        self.assertEqual(retrieve_response.status_code, 200)
+        self.assertEqual(retrieve_response.data["report_status"], "Submission success")
+        self.assertEqual(retrieve_response.data["can_unamend"], False)
+
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{report.id}/amend",
+            {},
+            ReportViewSet,
+            "amend",
+            committee=committee,
+            pk=report.id,
+        )
+        self.assertEqual(response.status_code, 200)
+
+        retrieve_response = self.send_viewset_get_request(
+            f"/api/v1/reports/{report.id}",
+            ReportViewSet,
+            "retrieve",
+            committee=committee,
+            pk=report.id,
+        )
+        self.assertEqual(retrieve_response.status_code, 200)
+        self.assertEqual(retrieve_response.data["report_status"], "In progress")
+        self.assertEqual(retrieve_response.data["can_unamend"], True)
+
+    def test_unable_to_amend(self):
+        """Test that an in progress report cannot be amended,
+        but a successfully submitted report can be amended."""
+        report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{report.id}/amend",
+            {},
+            ReportViewSet,
+            "amend",
+            committee=self.committee,
+            pk=report.id,
+        )
+        # cannot be amended because report_status is not STATUS_CODE_SUCCESS
+        self.assertEqual(response.status_code, 400)
+
+    def test_unamend(self):
+        """Test an amended report can be unamended."""
+        report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        report_retrieve_response = self.send_viewset_get_request(
+            f"/api/v1/reports/{report.id}",
+            ReportViewSet,
+            "retrieve",
+            committee=self.committee,
+            pk=report.id,
+        )
+        self.assertEqual(report_retrieve_response.status_code, 200)
+        self.assertEqual(report_retrieve_response.data["can_unamend"], False)
+
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{report.id}/unamend",
+            {},
+            ReportViewSet,
+            "unamend",
+            committee=self.committee,
+            pk=report.id,
+        )
+        # cannot be unamended because report has not been amended
+        self.assertEqual(response.status_code, 400)
+
+        submission = UploadSubmission.objects.initiate_submission(
+            str(report.id),
+        )
+        submission.save_fec_response(
+            json.dumps(
+                {
+                    "submission_id": "fake_submission_id",
+                    "status": FECStatus.ACCEPTED.value,
+                    "message": "Test Save Response",
+                    "report_id": "1234",
+                }
+            )
+        )
+        report.amend()
+
+        report_retrieve_response = self.send_viewset_get_request(
+            f"/api/v1/reports/{report.id}",
+            ReportViewSet,
+            "retrieve",
+            committee=self.committee,
+            pk=report.id,
+        )
+        self.assertEqual(report_retrieve_response.status_code, 200)
+        self.assertEqual(report_retrieve_response.data["can_unamend"], True)
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{report.id}/unamend",
+            {},
+            ReportViewSet,
+            "unamend",
+            committee=self.committee,
+            pk=report.id,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        report.amend()
+
+        # test that a successfully submitted report
+        # with no transactions can not be unamended
+        submission = UploadSubmission.objects.initiate_submission(
+            str(report.id),
+        )
+        submission.save_fec_response(
+            json.dumps(
+                {
+                    "submission_id": "fake_submission_id",
+                    "status": FECStatus.ACCEPTED.value,
+                    "message": "Test Save Response",
+                    "report_id": "1234",
+                }
+            )
+        )
+        report_retrieve_response = self.send_viewset_get_request(
+            f"/api/v1/reports/{report.id}",
+            ReportViewSet,
+            "retrieve",
+            committee=self.committee,
+            pk=report.id,
+        )
+        self.assertEqual(report_retrieve_response.status_code, 200)
+        self.assertEqual(report_retrieve_response.data["can_unamend"], False)
+
+        # now amend the report and add a transaction,
+        # which should make the report unable to be unamended
+        report.amend()
+
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            None,
+            "2024-02-01",
+            "100.00",
+            report=report,
+        )
+        report_retrieve_response = self.send_viewset_get_request(
+            f"/api/v1/reports/{report.id}",
+            ReportViewSet,
+            "retrieve",
+            committee=self.committee,
+            pk=report.id,
+        )
+        self.assertEqual(report_retrieve_response.status_code, 200)
+        self.assertEqual(report_retrieve_response.data["can_unamend"], False)
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{report.id}/unamend",
+            {},
+            ReportViewSet,
+            "unamend",
+            committee=self.committee,
+            pk=report.id,
+        )
+        # cannot be unamended because we added a transaction
+        self.assertEqual(response.status_code, 400)

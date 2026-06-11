@@ -698,6 +698,53 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
         self.reports.set(report_ids)
 
+    # Returns a list containing all transactions related to this transaction
+    # through reatributions, loans, loan repayments, debts, and debt repayments
+    def get_related_transactions(self):
+        related_transactions = []
+
+        if self.reatt_redes is not None:
+            related_transactions.append(self.reatt_redes)
+
+        if self.loan is not None:
+            related_transactions.append(self.loan)
+
+            loan_chain = Transaction.objects.filter(
+                Q(
+                    schedule_c__isnull=False,
+                ) | Q(
+                    schedule_c1__isnull=False,
+                ) | Q(
+                    schedule_c2__isnull=False
+                ),
+                loan_id=self.loan_id,
+            ).exclude(id=self.id)
+            related_transactions += list(loan_chain.all())
+
+        if self.schedule_c is not None:
+            loan_children = Transaction.objects.filter(
+                loan_id=self.id,
+            )
+            related_transactions += list(loan_children.all())
+
+        if self.debt is not None:
+            related_transactions.append(self.debt)
+
+            debt_chain = Transaction.objects.filter(
+                debt_id=self.debt_id,
+                schedule_d__isnull=False,
+            ).exclude(id=self.id)
+            related_transactions += list(debt_chain.all())
+
+        if self.schedule_d is not None:
+            loan_children = Transaction.objects.filter(
+                debt_id=self.id,
+                reports=self.reports.first()
+            )
+            related_transactions += list(loan_children.all())
+
+        return related_transactions
+
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]
 

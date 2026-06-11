@@ -20,7 +20,7 @@ logger = structlog.get_logger(__name__)
 
 class Form3Serializer(ReportSerializer):
     schema_name = "F3"
-
+    report_type_category = CharField(required=False, allow_null=True)
     change_of_address = BooleanField(required=False, allow_null=True)
     election_state = CharField(required=False, allow_null=True)
     election_district = CharField(required=False, allow_null=True)
