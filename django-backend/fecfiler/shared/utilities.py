@@ -1,8 +1,10 @@
 import uuid
 import requests
+import structlog
 from rest_framework.status import HTTP_404_NOT_FOUND
 from fecfiler import settings
-import logging
+
+logger = structlog.get_logger(__name__)
 
 
 def generate_fec_uid():
@@ -50,9 +52,9 @@ def query_fec_api(endpoint, params, raise_for_404=True):
         "Content-Type": "application/json",
         "User-Agent": f"FECfile+ {settings.SPACE}",
     }
-    logging.info(f"Querying endpoint {endpoint}")
+    logger.info(f"Querying endpoint {endpoint}")
     response = requests.get(endpoint, headers=headers, params=params)
-    logging.info(f"Response received for endpoint {endpoint}: {response.status_code}")
+    logger.info(f"Response received for endpoint {endpoint}: {response.status_code}")
     if response.status_code != HTTP_404_NOT_FOUND or raise_for_404:
         response.raise_for_status()
     response_data = response.json()
