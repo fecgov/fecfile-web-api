@@ -181,8 +181,9 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         payload = request.data
         amendment = payload.get("amendment")
         e_filing_id = payload.get("eFilingId")
+        report.form_type = report.get_form_name() + ("N" if amendment == "0" else "A")
         try:
-            report.report_version = amendment
+            report.report_version = amendment if amendment != "0" else None
             report.fec_report_id = e_filing_id
             report.save()
 
