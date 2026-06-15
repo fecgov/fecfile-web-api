@@ -156,7 +156,7 @@ class WebServicesViewSet(viewsets.ViewSet):
 
         task = (
             task
-            | submit_to_fec.s(
+            | submit_to_fec.si(
                 submission_id, e_filing_password, False, backdoor_code, mock, mock_reject
             )
         ).apply_async(retry=False)
@@ -218,7 +218,7 @@ class WebServicesViewSet(viewsets.ViewSet):
         else:
             task = create_dot_fec.s(report_id, webprint_submission_id=submission_id)
 
-        task = (task | submit_to_webprint.s(submission_id, False, mock)).apply_async(
+        task = (task | submit_to_webprint.si(submission_id, False, mock)).apply_async(
             retry=False
         )
 
