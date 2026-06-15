@@ -7,6 +7,8 @@ from fecfiler.committee_accounts.utils.accounts import (
     get_committee_emails,
     get_production_committee_emails,
     get_test_committee_emails,
+    get_eligible_report_types_raw,
+    get_eligible_report_types_processed,
 )
 
 from fecfiler.user.models import User
@@ -170,6 +172,7 @@ class CommitteeAccountsUtilsTest(TestCase):
         with patch("fecfiler.shared.utilities.requests") as mock_requests:
             production_committee_data = {
                 "email": "list_of_emails",
+                "committee_type": "D",
             }
             # test when the raw endpoint has nothing and the processed endpoint has data
             self.mock_requests_get(
@@ -231,6 +234,7 @@ class CommitteeAccountsUtilsTest(TestCase):
                 "committee_id": "C12345678",
                 "email": "test@test.com",
                 "committee_type": "A",
+                "candidate_office": "H",
                 "treasurer_first_name": "Treasurer First",
                 "committee_str1": "Committee Street 1",
                 "committee_name": "Committee Name",
@@ -253,6 +257,10 @@ class CommitteeAccountsUtilsTest(TestCase):
                 committee_account_data.get("treasurer_name_1"), "Treasurer First"
             )
             self.assertEqual(committee_account_data.get("street_1"), "Committee Street 1")
+            self.assertEqual(
+                committee_account_data.get("eligible_report_types"),
+                ["F3", "F99"]
+            )
 
     def test_get_committee_account_data_from_test_PTY(self):  # noqa N802
         with (
@@ -365,3 +373,62 @@ class CommitteeAccountsUtilsTest(TestCase):
             self.assertEqual(committee_account_data.get("isPAC"), True)
             self.assertEqual(committee_account_data.get("isPTY"), True)
             self.assertEqual(committee_account_data.get("qualified"), False)
+
+    def test_get_eligible_report_types_raw(self):
+        test_committee_data_A_H = {
+            "committee_type": "A",
+            "candidate_office": "H",
+        }
+        eligible_types_A_H = get_eligible_report_types_raw(test_committee_data_A_H)
+        self.assertEqual(eligible_types_A_H, ["F3", "F99"])
+
+        test_committee_data_B_S = {
+            "committee_type": "B",
+            "candidate_office": "S",
+        }
+        eligible_types_B_S = get_eligible_report_types_raw(test_committee_data_B_S)
+        self.assertEqual(eligible_types_B_S, ["F3", "F99"])
+
+        test_committee_data_A_P = {
+            "committee_type": "A",
+            "candidate_office": "P",
+        }
+        eligible_types_A_P = get_eligible_report_types_raw(test_committee_data_A_P)
+        self.assertEqual(eligible_types_A_P, ["F99"])
+
+        test_committee_data_C = {
+            "committee_type": "C",
+        }
+        eligible_types_C = get_eligible_report_types_raw(test_committee_data_C)
+        self.assertEqual(eligible_types_C, ["F3X", "F24", "F1M", "F99"])
+
+        test_committee_data_FOO = {
+            "committee_type": "FOO",
+        }
+        eligible_types_FOO = get_eligible_report_types_raw(test_committee_data_FOO)
+        self.assertEqual(eligible_types_FOO, ["F99"])
+
+        test_committee_data_None = {
+            "committee_type": None,
+        }
+        eligible_types_None = get_eligible_report_types_raw(test_committee_data_None)
+        self.assertEqual(eligible_types_None, ["F99"])
+
+        test_committee_data_invalid = None
+        eligible_types_invalid = get_eligible_report_types_raw(
+            test_committee_data_invalid
+        )
+        self.assertEqual(eligible_types_invalid, ["F99"])
+
+    def test_get_eligible_report_types_processed(self):
+        test_committee_data = {
+            "committee_type": "A",
+        }
+        eligible_types = get_eligible_report_types_processed(test_committee_data)
+        self.assertEqual(eligible_types, ["F3X", "F24", "F1M", "F99", "F3"])
+        test_committee_data_invalid = None
+
+        eligible_types_invalid = get_eligible_report_types_processed(
+            test_committee_data_invalid
+        )
+        self.assertEqual(eligible_types_invalid, ["F99"])
