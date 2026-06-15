@@ -1,10 +1,23 @@
 from django.db.models import Model
 from fecfiler.reports.models import Report
+from fecfiler.reports.form_3.models import Form3
 from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.form_24.models import Form24
 from fecfiler.reports.form_99.models import Form99
 from fecfiler.memo_text.models import MemoText
+
+
+def create_form3(
+    committee,
+    coverage_from,
+    coverage_through,
+    data={},
+    report_code="Q1",
+):
+    return create_test_report(
+        Form3, "F3N", committee, report_code, coverage_from, coverage_through, data
+    )
 
 
 def create_form3x(
@@ -66,6 +79,7 @@ def create_report_memo(committee_account, report, text4000):
 
 
 FORM_CLASS_TO_FIELD = {
+    Form3: "form_3",
     Form3X: "form_3x",
     Form1M: "form_1m",
     Form24: "form_24",
