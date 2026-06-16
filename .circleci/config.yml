@@ -59,8 +59,10 @@ jobs:
           working_directory: ~/project/django-backend/
       - run:
           name: Run e2e tests
-          command: coverage run --rcfile=.coveragerc manage.py test --parallel 4 --timing --tag=e2e --settings=fecfiler.settings.test
+          command: coverage run --rcfile=.coveragerc manage.py test --parallel 4 --timing --tag=e2e
           working_directory: ~/project/django-backend/
+          environment:
+            E2E_TEST: "True"
 
       - run:
           name: Combine coverage data
