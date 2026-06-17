@@ -8,6 +8,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from ..views import ContactViewSet, DeletedContactsViewSet
 from .utils import create_test_individual_contact
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
+from fecfiler.transactions.tests.utils import create_schedule_a
 
 CANDIDATE_RESULTS = [
     {"name": "LNAME, FNAME I", "candidate_id": "P60012143", "office_sought": "P"},
@@ -448,6 +449,56 @@ class ContactViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["first_name"], "Other")
+
+    def test_destroy_unlinked_contact(self):
+        contact = Contact.objects.create(
+            type=Contact.ContactType.INDIVIDUAL,
+            last_name="Last",
+            first_name="First",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+
+        response = self.send_viewset_delete_request(
+            f"/api/v1/contacts/{str(contact.id)}/",
+            ContactViewSet,
+            "destroy",
+            pk=contact.id,
+        )
+
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Contact.objects.filter(id=contact.id).exists())
+        self.assertTrue(
+            Contact.all_objects.filter(id=contact.id, deleted__isnull=False).exists()
+        )
+
+    def test_destroy_linked_contact_returns_409(self):
+        contact = Contact.objects.create(
+            type=Contact.ContactType.INDIVIDUAL,
+            last_name="Last",
+            first_name="First",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.default_committee,
+            contact,
+            "2026-01-01",
+            "100",
+        )
+
+        response = self.send_viewset_delete_request(
+            f"/api/v1/contacts/{str(contact.id)}/",
+            ContactViewSet,
+            "destroy",
+            pk=contact.id,
+        )
+
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(
+            response.data,
+            {"detail": "Cannot delete contact linked to transactions or reports."},
+        )
+        self.assertTrue(Contact.objects.filter(id=contact.id).exists())
 
     def test_list_paginated(self):
         for i in range(10):

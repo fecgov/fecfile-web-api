@@ -12,6 +12,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import mixins, GenericViewSet
 from rest_framework import viewsets, pagination, filters, status
+from fecfiler.transactions.models import Transaction
+from fecfiler.reports.models import Form1M
 from .models import Contact
 from .serializers import ContactSerializer
 import fecfiler.settings as settings
@@ -314,6 +316,31 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         with transaction.atomic():
             return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        contact = self.get_object()
+        has_transaction_or_report = Transaction.objects.filter(
+            Q(contact_1_id=contact.id)
+            | Q(contact_2_id=contact.id)
+            | Q(contact_3_id=contact.id)
+            | Q(contact_4_id=contact.id)
+            | Q(contact_5_id=contact.id)
+        ).exists() or Form1M.objects.filter(
+            Q(contact_affiliated_id=contact.id)
+            | Q(contact_candidate_I_id=contact.id)
+            | Q(contact_candidate_II_id=contact.id)
+            | Q(contact_candidate_III_id=contact.id)
+            | Q(contact_candidate_IV_id=contact.id)
+            | Q(contact_candidate_V_id=contact.id)
+        ).exists()
+
+        if has_transaction_or_report:
+            return Response(
+                {"detail": "Cannot delete contact linked to transactions or reports."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return super().destroy(request, *args, **kwargs)
 
     def get_int_param_value(
         self, request, param_name: str, default_param_value: int, max_param_value: int
