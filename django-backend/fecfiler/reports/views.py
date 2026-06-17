@@ -179,6 +179,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response({"detail": "Report not found."}, status=404)
 
         payload = request.data
+        original_version = report.report_version
         amendment = payload.get("amendment")
         e_filing_id = payload.get("eFilingId")
         report.form_type = report.get_form_name() + ("N" if amendment == "0" else "A")
@@ -186,6 +187,12 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             report.report_version = amendment if amendment != "0" else None
             report.fec_report_id = e_filing_id
             report.save()
+            logger.info(
+                (
+                    f"Changed version of report {report.id} "
+                    f"from {original_version} to {amendment}"
+                )
+            )
 
             return Response(ReportSerializer(report).data, status=200)
 
