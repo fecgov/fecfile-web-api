@@ -7,7 +7,9 @@ def rename_transaction_types(apps, schema_editor):
     transaction = apps.get_model("transactions", "Transaction")
 
     type_mapping = {
-        "REFUND_RECEIPTS_FROM_UNREGISTERED_ORGANIZATION": "REFUND_RECEIPT_FROM_UNREGISTERED_ORGANIZATION",
+        "REFUND_RECEIPTS_FROM_UNREGISTERED_ORGANIZATION": (
+            "REFUND_RECEIPT_FROM_UNREGISTERED_ORGANIZATION"
+        ) ,
         "REFUND_RECEIPTS_FROM_UNREGISTERED_ORGANIZATION_VOID": (
             "REFUND_RECEIPT_FROM_UNREGISTERED_ORGANIZATION_VOID"
         ),
@@ -23,7 +25,8 @@ def reverse_rename_transaction_types(apps, schema_editor):
     transaction = apps.get_model("transactions", "Transaction")
 
     reverse_mapping = {
-        "REFUND_RECEIPT_FROM_UNREGISTERED_ORGANIZATION": "REFUND_RECEIPTS_FROM_UNREGISTERED_ORGANIZATION",
+        "REFUND_RECEIPT_FROM_UNREGISTERED_ORGANIZATION": (
+            "REFUND_RECEIPTS_FROM_UNREGISTERED_ORGANIZATION"),
         "REFUND_RECEIPT_FROM_UNREGISTERED_ORGANIZATION_VOID": (
             "REFUND_RECEIPTS_FROM_UNREGISTERED_ORGANIZATION_VOID"
         ),
