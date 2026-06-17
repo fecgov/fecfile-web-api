@@ -1,4 +1,5 @@
 from django.test import RequestFactory, TestCase
+from django.urls import resolve
 from fecfiler.committee_accounts.models import CommitteeAccount
 from rest_framework.test import force_authenticate
 
@@ -51,6 +52,14 @@ class FecfilerViewSetTest(TestCase):
         request = self.build_viewset_get_request(uri, authenticate, user, committee)
         response = viewset_class.as_view({"get": action_name})(request, **kwargs)
         return response
+
+    def send_nonviewset_post_request(self, uri, data, committee=None):
+        request = self.build_viewset_post_request(uri, {}, committee=committee)
+        match = resolve(uri)
+        view_function = match.func
+        view_args = match.args
+        view_kwargs = match.kwargs
+        return view_function(request, *view_args, **view_kwargs)
 
     def build_viewset_post_request(
         self,

@@ -191,6 +191,16 @@ def get_production_committee_data(committee_id):
     return committee_data
 
 
+def get_eligible_report_types_processed(committee_data: dict):
+    if committee_data is None:
+        logger.error(
+            "Tried to retrieve eligible report types from invalid committee data"
+        )
+        return ["F99"]
+
+    return ["F3X", "F24", "F1M", "F99", "F3"]
+
+
 def get_processed_committee_data(committee_id):
 
     params = {
@@ -216,7 +226,40 @@ def get_processed_committee_data(committee_id):
             committee_data.get("committee_type") in PRODUCTION_QUALIFIED_COMMITTEES
         )
 
+        committee_data[
+            "eligible_report_types"
+        ] = get_eligible_report_types_processed(committee_data)
+
     return committee_data
+
+
+def get_eligible_report_types_raw(committee_data: dict):
+    if committee_data is None:
+        logger.error(
+            "Tried to retrieve eligible report types from invalid committee data"
+        )
+        return ["F99"]
+
+    committee_type = committee_data.get("committee_type")
+    if committee_type is None:
+        logger.error("committee_type not found in raw committee data")
+
+    match (committee_type):
+        case "C" | "D" | "E" | "F" | "G" | "H":
+            return ["F3X", "F24", "F1M", "F99"]
+
+        case "A" | "B":
+            candidate_office = committee_data.get("candidate_office")
+            if candidate_office is None:
+                logger.error("candidate_office not found in raw committee data")
+
+            if candidate_office in ["H", "S"]:
+                return ["F3", "F99"]
+            else:
+                return ["F99"]
+
+        case _:
+            return ["F99"]
 
 
 def get_raw_committee_data(committee_id):
@@ -242,6 +285,9 @@ def get_raw_committee_data(committee_id):
         committee_data["filing_frequency"] = "Q"
 
         committee_data = convert_raw_to_processed(committee_data)
+        committee_data[
+            "eligible_report_types"
+        ] = get_eligible_report_types_raw(committee_data)
 
     return committee_data
 
@@ -307,6 +353,9 @@ def get_test_committee_data(committee_id):
         committee_data["filing_frequency"] = "Q"
 
         committee_data = convert_raw_to_processed(committee_data)
+        committee_data[
+            "eligible_report_types"
+        ] = get_eligible_report_types_raw(committee_data)
 
     return committee_data
 
@@ -337,6 +386,16 @@ def get_mocked_committee_data(committee_id):
             ),
             None,
         )
+
+        if committee is not None:
+            if committee.get("counts_as_processed"):
+                committee[
+                    "eligible_report_types"
+                ] = get_eligible_report_types_processed(committee)
+            else:
+                committee[
+                    "eligible_report_types"
+                ] = get_eligible_report_types_raw(committee)
 
         return committee
 

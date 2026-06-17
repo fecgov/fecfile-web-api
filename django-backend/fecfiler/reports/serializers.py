@@ -156,7 +156,6 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
                     representation[property] = form_1m[property]
 
         representation["can_delete"] = instance.can_delete
-        representation["can_unamend"] = instance.can_unamend
 
         return representation
 

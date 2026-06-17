@@ -13,6 +13,7 @@ from fecfiler.transactions.aggregation import process_aggregation_for_debts
 from django.db.models import Case, Value, When, CharField, IntegerField, F
 from django.db.models.functions import Concat, Trim
 from django.db import transaction as db_transaction
+from django.conf import settings
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -158,18 +159,20 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         report.unamend()
         return Response(f"unamended {report}")
 
-    @action(
-        detail=False,
-        methods=["post"],
-        url_path="e2e-delete-all-reports",
-    )
-    def e2e_delete_all_reports(self, request):
-        reports = Report.objects.filter(committee_account__committee_id="C99999999")
-        report_count = reports.count()
+    if settings.E2E_TEST:
 
-        delete_all_reports()
-        delete_all_reports("C99999998")
-        return Response(f"Deleted {report_count} Reports")
+        @action(
+            detail=False,
+            methods=["post"],
+            url_path="e2e-delete-all-reports",
+        )
+        def e2e_delete_all_reports(self, request):
+            reports = Report.objects.filter(committee_account__committee_id="C99999999")
+            report_count = reports.count()
+
+            delete_all_reports()
+            delete_all_reports("C99999998")
+            return Response(f"Deleted {report_count} Reports")
 
     @action(detail=True, methods=["post"], url_path="update-version-number")
     def update_version_number(self, request, pk):
