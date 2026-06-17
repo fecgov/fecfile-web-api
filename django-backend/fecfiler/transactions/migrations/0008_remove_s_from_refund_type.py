@@ -9,7 +9,7 @@ def rename_transaction_types(apps, schema_editor):
     type_mapping = {
         "REFUND_RECEIPTS_FROM_UNREGISTERED_ORGANIZATION": (
             "REFUND_RECEIPT_FROM_UNREGISTERED_ORGANIZATION"
-        ) ,
+        ),
         "REFUND_RECEIPTS_FROM_UNREGISTERED_ORGANIZATION_VOID": (
             "REFUND_RECEIPT_FROM_UNREGISTERED_ORGANIZATION_VOID"
         ),
