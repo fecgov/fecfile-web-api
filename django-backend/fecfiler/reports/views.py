@@ -185,10 +185,16 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         original_version = report.report_version
         amendment = payload.get("amendment")
         e_filing_id = payload.get("eFilingId")
-        report.form_type = report.get_form_name() + ("N" if amendment == "0" else "A")
+        original_amendment_date = payload.get("previousSubmissionDate")
+
         try:
+            report.form_type = report.get_form_name() + ("N" if amendment == "0" else "A")
+            report.can_unamend = amendment != "0"
             report.report_version = amendment if amendment != "0" else None
             report.fec_report_id = e_filing_id
+            if report.form_24:
+                report.form_24.original_amendment_date = original_amendment_date
+                report.form_24.save()
             report.save()
             logger.info(
                 (
@@ -200,8 +206,9 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             return Response(ReportSerializer(report).data, status=200)
 
         except Exception as e:
+            logger.error(e)
             return Response(
-                {"detail": f"An error occurred while updating the report: {str(e)}"},
+                {"detail": "An error occurred while updating the report"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
