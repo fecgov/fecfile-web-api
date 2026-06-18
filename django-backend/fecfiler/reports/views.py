@@ -205,8 +205,7 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
             return Response(ReportSerializer(report).data, status=200)
 
-        except Exception as e:
-            logger.error(e)
+        except Exception:
             return Response(
                 {"detail": "An error occurred while updating the report"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,

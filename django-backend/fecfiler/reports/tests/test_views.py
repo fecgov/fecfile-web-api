@@ -420,6 +420,21 @@ class ReportViewSetTest(FecfilerViewSetTest):
 
     def test_update_version_number_to_original(self):
         report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        submission = UploadSubmission.objects.initiate_submission(
+            str(report.id),
+        )
+        submission.save_fec_response(
+            json.dumps(
+                {
+                    "submission_id": "fake_submission_id",
+                    "status": FECStatus.ACCEPTED.value,
+                    "message": "Test Save Response",
+                    "report_id": "1234",
+                }
+            )
+        )
+        report.amend()
+
         payload = {"amendment": "0", "eFilingId": ""}
         response = self.send_viewset_post_request(
             f"/api/v1/reports/{report.id}/update-version-number",
@@ -435,7 +450,7 @@ class ReportViewSetTest(FecfilerViewSetTest):
         updated_report = Report.objects.get(id=report.id)
         self.assertEqual(updated_report.report_version, None)
         self.assertEqual(updated_report.form_type, "F3XN")
-        self.assertEqual(updated_report.fec_report_id, '')
+        self.assertEqual(updated_report.fec_report_id, "")
         self.assertEqual(response.data["id"], str(report.id))
 
     def test_update_version_number_not_found(self):
