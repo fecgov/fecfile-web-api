@@ -355,3 +355,19 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 f"The following ViewSets are missing CommitteeOwnedViewMixin:\n"
                 f"{error_message}"
             )
+
+    def test_activate_happy_path(self):
+        request = self.build_viewset_post_request(
+            "/api/v1/committees/C01234567/activate/",
+            {"filing_frequency": "Q"},
+        )
+        response = CommitteeViewSet.as_view(
+            {"post": "activate"}
+        )(request, pk="11111111-2222-3333-4444-555555555555")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            request.session["committee_id"], "C01234567"
+        )
+        self.assertEqual(
+            request.session["committee_uuid"], "11111111-2222-3333-4444-555555555555"
+        )
