@@ -32,6 +32,8 @@ def carry_forward_debts(report):
         for debt in all_debts_for_committee:
             if debt.balance_at_close != Decimal(0) and debt.balance_at_close is not None:
                 carry_forward_debt(debt, report)
+                previous_report.can_delete = False
+                previous_report.save()
 
 
 def carry_forward_debt(debt, report):
