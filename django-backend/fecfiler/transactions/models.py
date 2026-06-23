@@ -599,6 +599,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         debt_carry_forwards_and_repayments = Transaction.objects.filter(debt=self)
         for carry_forward_or_repayment in debt_carry_forwards_and_repayments:
             carry_forward_or_repayment.delete()
+            for report in carry_forward_or_repayment.reports.all():
+                previous_report = report.previous_report
+                if previous_report:
+                    if not previous_report.can_delete:
+                        previous_report.can_delete = previous_report.check_can_delete()
+                        if previous_report.can_delete:
+                            previous_report.save()
 
     # transactions related to a loan
     # delete any carry forwards or repayments related to this loan
@@ -606,6 +613,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         loan_carry_forwards_and_repayments = Transaction.objects.filter(loan=self)
         for carry_forward_or_repayment in loan_carry_forwards_and_repayments:
             carry_forward_or_repayment.delete()
+            for report in carry_forward_or_repayment.reports.all():
+                previous_report = report.previous_report
+                if previous_report:
+                    if not previous_report.can_delete:
+                        previous_report.can_delete = previous_report.check_can_delete()
+                        if previous_report.can_delete:
+                            previous_report.save()
 
     # REATTRIBUTION/REDESIGNATION
     # If this is a reattribution/redesignation 'from' transaction,
@@ -686,7 +700,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     report.save()
 
     def remove_from_report(self, report_id):
-        logger.info("\n\n\nHI I'M BEING RUN\n\n\n")
         ReportTransaction = apps.get_model("reports.ReportTransaction")
         report_transaction = ReportTransaction.objects.filter(
             transaction=self,

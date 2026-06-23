@@ -90,3 +90,8 @@ def carry_forward_loan(loan, report):
         # and link it to the new loan
         if child.schedule_c2 is not None:
             carry_forward_guarantor(report, new_loan, child)
+
+    previous_report = report.previous_report
+    if previous_report:
+        previous_report.can_delete = False
+        previous_report.save()

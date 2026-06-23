@@ -112,7 +112,7 @@ class Report(CommitteeOwnedModel):
     def can_delete_previous(self):
         previous = self.previous_report
         if previous is not None:
-            return self.previous_report.can_delete
+            return previous.can_delete
         else:
             return None
 
@@ -155,36 +155,7 @@ class Report(CommitteeOwnedModel):
             )
         )
 
-        logger.info(f"\n\n\nCan Delete: {str(can_delete)}\n\n\n")
         return can_delete
-
-        """
-        r_can_delete = report.upload_submission_id IS NULL
-        AND (report.report_version IS NULL OR report.report_version = '0')
-        AND (
-            report.form_3x_id IS NULL OR
-            (
-                report.form_24_id IS NULL
-                AND NOT EXISTS(
-                    SELECT DISTINCT rrt1.id
-                    FROM "reports_reporttransaction" rrt1
-                        JOIN "transactions_transaction" tt ON (
-                        rrt1."transaction_id" = tt."id"
-                        OR tt."reatt_redes_id" = rrt1."transaction_id"
-                        OR tt."parent_transaction_id" =
-                            rrt1."transaction_id"
-                        OR tt."debt_id" = rrt1."transaction_id"
-                        OR tt."loan_id" = rrt1."transaction_id"
-                    )
-                        INNER JOIN "reports_reporttransaction" rrt2 ON (
-                        rrt2."transaction_id" = tt."id"
-                        AND rrt2."report_id" <> report.id
-                    )
-                    WHERE rrt1."report_id" = report.id
-                )
-            )
-        );
-        """
 
     def save(self, *args, **kwargs):
         from fecfiler.transactions.schedule_c.utils import carry_forward_loans
@@ -395,7 +366,6 @@ class ReportTransaction(models.Model):
                 self.report.save()
 
     def delete(self, *args, **kwargs):
-        logger.info("\n\n\nWOAH, IT'S MY TURN\n\n\n")
         with db_transaction.atomic():
             super(ReportTransaction, self).delete(*args, **kwargs)
             if self.report.can_unamend:
