@@ -168,6 +168,7 @@ class ReportModelTestCase(TestCase):
 
         f3x_a = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
         f3x_b = create_form3x(self.committee, "2024-02-01", "2024-02-29", {})
+        f3x_c = create_form3x(self.committee, "2024-03-01", "2024-03-21", {})
 
         test_org = create_test_organization_contact(
             "Test Organization",
@@ -185,8 +186,21 @@ class ReportModelTestCase(TestCase):
         )[0]
 
         carry_forward_loans(f3x_b)
+        carry_forward_loans(f3x_c)
 
         test_loan.refresh_from_db()
+
+        f3x_a.refresh_from_db()
+        f3x_b.refresh_from_db()
+        f3x_c.refresh_from_db()
+
+        self.assertFalse(f3x_a.can_delete)
+        self.assertFalse(f3x_b.can_delete)
+        self.assertTrue(f3x_c.can_delete)
+        self.assertFalse(f3x_b.can_delete_previous)
+        self.assertFalse(f3x_c.can_delete_previous)
+
+        f3x_c.delete()
 
         f3x_a.refresh_from_db()
         f3x_b.refresh_from_db()
