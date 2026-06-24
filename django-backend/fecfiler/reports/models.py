@@ -136,23 +136,32 @@ class Report(CommitteeOwnedModel):
         ).exists()
 
     def check_for_blocking_transactions(self):
-        for report_transaction in ReportTransaction.objects.filter(report=self):
-            if self.check_transaction_blocking_deletion(report_transaction.transaction):
+        for transaction in self.transactions.all():
+            if self.check_transaction_blocking_deletion(transaction):
                 return True
 
         return False
 
     def check_can_delete(self):
-        can_delete = (
+
+        upload_clause = (
             self.upload_submission is None
             or str(self.upload_submission.fec_status) != "ACCEPTED"
-        ) and (
+        )
+        report_version_clause = (
             self.report_version is None or self.report_version == '0'
-        ) and (
+        )
+        form_24_or_blocked_by_transactions = (
             self.form_3x_id is None or (
                 self.form_24_id is None
                 and not self.check_for_blocking_transactions()
             )
+        )
+
+        can_delete = (
+            upload_clause
+            and report_version_clause
+            and form_24_or_blocked_by_transactions
         )
 
         return can_delete
