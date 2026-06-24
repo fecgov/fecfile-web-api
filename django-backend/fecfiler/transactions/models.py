@@ -588,6 +588,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             if self.memo_text:
                 self.memo_text.delete()
 
+            if self.schedule_c or self.schedule_d:
+                for report in self.reports.all():
+                    if not report.can_delete:
+                        report.can_delete = report.check_can_delete()
+                        if report.can_delete:
+                            report.save()
+
     def delete_children(self):
         child_transactions = Transaction.objects.filter(parent_transaction=self)
         for child in child_transactions:
@@ -599,13 +606,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         debt_carry_forwards_and_repayments = Transaction.objects.filter(debt=self)
         for carry_forward_or_repayment in debt_carry_forwards_and_repayments:
             carry_forward_or_repayment.delete()
-            for report in carry_forward_or_repayment.reports.all():
-                previous_report = report.previous_report
-                if previous_report:
-                    if not previous_report.can_delete:
-                        previous_report.can_delete = previous_report.check_can_delete()
-                        if previous_report.can_delete:
-                            previous_report.save()
 
     # transactions related to a loan
     # delete any carry forwards or repayments related to this loan
@@ -613,13 +613,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         loan_carry_forwards_and_repayments = Transaction.objects.filter(loan=self)
         for carry_forward_or_repayment in loan_carry_forwards_and_repayments:
             carry_forward_or_repayment.delete()
-            for report in carry_forward_or_repayment.reports.all():
-                previous_report = report.previous_report
-                if previous_report:
-                    if not previous_report.can_delete:
-                        previous_report.can_delete = previous_report.check_can_delete()
-                        if previous_report.can_delete:
-                            previous_report.save()
 
     # REATTRIBUTION/REDESIGNATION
     # If this is a reattribution/redesignation 'from' transaction,
@@ -713,7 +706,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         for report_transaction in remaining_reports:
             report = report_transaction.report
             if not report.can_delete:
-                report.can_delete = not report.check_transaction_blocking_deletion(self)
+                report.can_delete = report.check_can_delete(self)
                 if report.can_delete:
                     report.save()
 
@@ -737,7 +730,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             id__in=report_ids_to_reset_can_unamend
         )
         for report in reports_to_check_deletion:
-            report.can_delete = not report.check_transaction_blocking_deletion(self)
+            this_transaction_blocks = report.check_transaction_blocking_deletion(self)
+            if this_transaction_blocks:
+                report.can_delete = False
+            else:
+                report.can_delete = report.check_can_delete()
 
         Report.objects.bulk_update(reports_to_check_deletion, ["can_delete"])
 
