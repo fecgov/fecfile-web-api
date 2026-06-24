@@ -706,7 +706,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         for report_transaction in remaining_reports:
             report = report_transaction.report
             if not report.can_delete:
-                report.can_delete = report.check_can_delete(self)
+                report.can_delete = report.check_can_delete()
                 if report.can_delete:
                     report.save()
 
