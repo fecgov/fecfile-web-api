@@ -10,7 +10,7 @@ from datetime import datetime
 from django.db.models import Q
 from fecfiler.transactions.transaction_dependencies import (
     update_dependent_children,
-    update_dependent_parent,
+    update_dependent_parent_purpose_description_if_needed,
 )
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.transactions.models import (
@@ -154,7 +154,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
             logger.info(f"Created new transaction: {saved_transaction.id}")
-            update_dependent_parent(saved_transaction)
+            update_dependent_parent_purpose_description_if_needed(saved_transaction)
         return Response(saved_transaction.id)
 
     def update(self, request, *args, **kwargs):
@@ -168,7 +168,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         with db_transaction.atomic():
             response = super().destroy(request, *args, **kwargs)
             # update parents that depend on this transaction
-            update_dependent_parent(transaction)
+            update_dependent_parent_purpose_description_if_needed(transaction)
         return response
 
     def partial_update(self, request, pk=None):
