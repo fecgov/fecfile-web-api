@@ -53,9 +53,16 @@ def update_dependent_parent_purpose_description_if_needed(transaction: Transacti
     when thier children are created or deleted."""
 
     if transaction.transaction_type_identifier in PARTNERSHIP_ATTRIBUTIONS:
-        update_parent_purpose_description_for_partnership_attributions(transaction.parent_transaction)
-    elif transaction.transaction_type_identifier in CREDIT_CARD_PAYMENT_MEMOS + STAFF_REIMBURSEMENT_MEMOS + PAYMENT_TO_PAYROLL_MEMOS:
-        update_parent_purpose_description_for_credit_card_reimbursement_payroll_memos(transaction)
+        update_parent_purpose_description_for_partnership_attributions(
+            transaction.parent_transaction
+        )
+    elif transaction.transaction_type_identifier in (
+        CREDIT_CARD_PAYMENT_MEMOS + STAFF_REIMBURSEMENT_MEMOS + PAYMENT_TO_PAYROLL_MEMOS
+    ):
+        update_parent_purpose_description_for_credit_card_reimbursement_payroll_memos(
+            transaction
+        )
+
 
 def update_parent_purpose_description_for_partnership_attributions(parent: Transaction):
     """Update the contribution_purpose_descrip field for PARTNERSHIP_MEMO transactions
@@ -85,26 +92,41 @@ def update_parent_purpose_description_for_partnership_attributions(parent: Trans
             )
         )
 
-def update_parent_purpose_description_for_credit_card_reimbursement_payroll_memos(transaction: Transaction):    
+
+def update_parent_purpose_description_for_credit_card_reimbursement_payroll_memos(
+        transaction: Transaction):
     parent = transaction.parent_transaction
     if parent:
         children = parent.children.all()
-        has_itemized_children = children.exists() and children.filter(itemized=True).exists()
-        new_description = get_purpose_description_for_credit_card_reimbursement_payroll_memos(
-            transaction.transaction_type_identifier, has_itemized_children
+        has_itemized_children = (
+            children.exists() and children.filter(itemized=True).exists()
+        )
+        new_description = (
+            get_purpose_description_for_credit_card_reimbursement_payroll_memos(
+                transaction.transaction_type_identifier, has_itemized_children
+            )
         )
         if new_description:
-            parent.get_schedule().objects.filter(transaction__id=parent.id).update(
-                contribution_purpose_descrip=new_description
+            parent.get_schedule().__class__.objects.filter(
+                transaction__id=parent.id).update(
+                expenditure_purpose_descrip=new_description
             )
 
-def get_purpose_description_for_credit_card_reimbursement_payroll_memos(transaction_type_identifier, has_itemized_children: bool):
+
+def get_purpose_description_for_credit_card_reimbursement_payroll_memos(
+        transaction_type_identifier, has_itemized_children: bool):
     if transaction_type_identifier in CREDIT_CARD_PAYMENT_MEMOS:
-        return "Credit Card Memo: See Below" if has_itemized_children else "Credit card memo entries do not meet itemization threshold."
+        return "Credit Card Memo: See Below" if has_itemized_children else (
+            "Credit card memo entries do not meet itemization threshold."
+        )
     elif transaction_type_identifier in STAFF_REIMBURSEMENT_MEMOS:
-        return "Reimbursement Memo: See Below" if has_itemized_children else "Reimbursement memo entries do not meet itemization threshold."
+        return "Reimbursement Memo: See Below" if has_itemized_children else (
+            "Reimbursement memo entries do not meet itemization threshold."
+        )
     elif transaction_type_identifier in PAYMENT_TO_PAYROLL_MEMOS:
-        return "Payroll Memo: See Below" if has_itemized_children else "Payroll memo entries do not meet itemization threshold."
+        return "Payroll Memo: See Below" if has_itemized_children else (
+            "Payroll memo entries do not meet itemization threshold."
+        )
     return None
 
 
