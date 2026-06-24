@@ -36,8 +36,6 @@ def carry_forward_loans(report):
 
         for loan in loans_to_carry_forward:
             carry_forward_loan(loan, report)
-            previous_report.can_delete = False
-            previous_report.save()
 
 
 def carry_forward_loan(loan, report):
