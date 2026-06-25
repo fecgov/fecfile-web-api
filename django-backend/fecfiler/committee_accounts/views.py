@@ -56,6 +56,10 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee: CommitteeAccount = self.get_object()
         if not committee or committee.disabled is not None:
             return Response("Committee could not be activated", status=403)
+        filing_frequency = request.data.get("filing_frequency", None)
+        if filing_frequency:
+            committee.filing_frequency = filing_frequency
+            committee.save()
         request.session["committee_id"] = str(committee.committee_id)
         request.session["committee_uuid"] = str(committee.id)
 

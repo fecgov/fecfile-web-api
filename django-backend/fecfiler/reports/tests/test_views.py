@@ -1,6 +1,7 @@
 import json
 
 from django.http import QueryDict
+from django.test import tag
 from fecfiler.reports.views import ReportViewSet
 from fecfiler.reports.utils.report import delete_all_reports
 from fecfiler.reports.models import Report
@@ -17,7 +18,7 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-class CommitteeMemberViewSetTest(FecfilerViewSetTest):
+class ReportViewSetTest(FecfilerViewSetTest):
     def setUp(self):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         user = User.objects.create(email="test@fec.gov", username="gov")
@@ -80,6 +81,36 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
             self.assertGreaterEqual(ordering, last_ordering)
             last_ordering = ordering
 
+    def test_e2e_delete_all_reports_not_allowed(self):
+        e2e_committee = CommitteeAccount(committee_id="C99999999")
+        e2e_committee.save()
+
+        new_report = Report(committee_account=e2e_committee)
+        new_report.save()
+
+        new_transaction = Transaction(committee_account=e2e_committee)
+        new_transaction.save()
+        report_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
+        transaction_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
+        self.assertGreater(report_count, 0)
+        self.assertGreater(transaction_count, 0)
+        uri = "/api/v1/reports/e2e-delete-all-reports/"
+        response = self.send_nonviewset_post_request(uri, {}, committee=e2e_committee)
+        self.assertEqual(response.status_code, 405)
+        report_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
+        transaction_count = Report.objects.filter(
+            committee_account__committee_id="C99999999"
+        ).count()
+        self.assertGreater(report_count, 0)
+        self.assertGreater(transaction_count, 0)
+
+    @tag("e2e")
     def test_e2e_delete_all_reports(self):
         view = ReportViewSet()
 
@@ -102,12 +133,14 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         self.assertGreater(transaction_count, 0)
 
         view.format_kwarg = "format"
-        request = self.build_viewset_post_request(
-            "/api/v1/reports/e2e-delete-all-reports", {}
+        response = self.send_viewset_post_request(
+            "/api/v1/reports/e2e-delete-all-reports/",
+            {},
+            ReportViewSet,
+            "e2e_delete_all_reports",
+            committee=e2e_committee,
         )
-        request.query_params = QueryDict({})
-        view.request = request
-        view.e2e_delete_all_reports(request)
+        self.assertEqual(response.status_code, 200)
 
         report_count = Report.objects.filter(
             committee_account__committee_id="C99999999"
@@ -118,6 +151,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         self.assertEqual(report_count, 0)
         self.assertEqual(transaction_count, 0)
 
+    @tag("e2e")
     def test_delete_all_reports_for_a_committee(self):
         committee = CommitteeAccount.objects.get(committee_id="C00000000")
 
@@ -147,6 +181,7 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         self.assertEqual(report_count, 0)
         self.assertEqual(transaction_count, 0)
 
+    @tag("e2e")
     def test_delete_all_reports_for_a_different_committee(self):
         committee = CommitteeAccount.objects.get(committee_id="C00000000")
 
@@ -362,3 +397,96 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         )
         # cannot be unamended because we added a transaction
         self.assertEqual(response.status_code, 400)
+
+    def test_update_version_number_success(self):
+        report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        payload = {"amendment": "2", "eFilingId": "FEC-112233"}
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{report.id}/update-version-number",
+            payload,
+            ReportViewSet,
+            "update_version_number",
+            committee=self.committee,
+            pk=report.id,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        updated_report = Report.objects.get(id=report.id)
+        self.assertEqual(updated_report.report_version, "2")
+        self.assertEqual(updated_report.form_type, "F3XA")
+        self.assertEqual(updated_report.fec_report_id, "FEC-112233")
+        self.assertEqual(response.data["id"], str(report.id))
+
+    def test_update_version_number_to_original(self):
+        report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        submission = UploadSubmission.objects.initiate_submission(
+            str(report.id),
+        )
+        submission.save_fec_response(
+            json.dumps(
+                {
+                    "submission_id": "fake_submission_id",
+                    "status": FECStatus.ACCEPTED.value,
+                    "message": "Test Save Response",
+                    "report_id": "1234",
+                }
+            )
+        )
+        report.amend()
+
+        payload = {"amendment": "0", "eFilingId": ""}
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{report.id}/update-version-number",
+            payload,
+            ReportViewSet,
+            "update_version_number",
+            committee=self.committee,
+            pk=report.id,
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        updated_report = Report.objects.get(id=report.id)
+        self.assertEqual(updated_report.report_version, None)
+        self.assertEqual(updated_report.form_type, "F3XN")
+        self.assertEqual(updated_report.fec_report_id, "")
+        self.assertEqual(response.data["id"], str(report.id))
+
+    def test_update_version_number_not_found(self):
+        fake_uuid = "00000000-0000-0000-0000-000000000000"
+        payload = {"amendment": "1", "eFilingId": "FEC-999999"}
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/{fake_uuid}/update-version-number",
+            payload,
+            ReportViewSet,
+            "update_version_number",
+            committee=self.committee,
+            pk=fake_uuid,
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data["detail"], "Report not found.")
+
+    def test_update_version_number_server_error(self):
+        from unittest.mock import patch
+
+        report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        payload = {"amendment": 3, "eFilingId": "FEC-ERROR"}
+
+        with patch.object(
+            Report, "save", side_effect=Exception("Database connection failure")
+        ):
+            response = self.send_viewset_post_request(
+                f"/api/v1/reports/{report.id}/update-version-number",
+                payload,
+                ReportViewSet,
+                "update_version_number",
+                committee=self.committee,
+                pk=report.id,
+            )
+
+            self.assertEqual(response.status_code, 500)
+            self.assertIn(
+                "An error occurred while updating the report", response.data["detail"]
+            )
