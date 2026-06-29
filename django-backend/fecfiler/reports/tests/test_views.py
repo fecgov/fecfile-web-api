@@ -6,8 +6,11 @@ from fecfiler.reports.views import ReportViewSet
 from fecfiler.reports.utils.report import delete_all_reports
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.views import TransactionViewSet
 from fecfiler.reports.managers import STATUS_CODE_SUCCESS
-from fecfiler.transactions.tests.utils import create_schedule_a
+from fecfiler.transactions.tests.utils import create_schedule_a, create_loan
+from fecfiler.contacts.tests.utils import create_test_organization_contact
+from fecfiler.transactions.schedule_c.utils import carry_forward_loan
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
@@ -490,3 +493,99 @@ class ReportViewSetTest(FecfilerViewSetTest):
             self.assertIn(
                 "An error occurred while updating the report", response.data["detail"]
             )
+
+    def test_can_delete_reports_with_loan(self):
+        report_1 = create_form3x(self.committee, "2026-01-01", "2026-01-31", {})
+        report_2 = create_form3x(self.committee, "2026-02-01", "2026-02-28", {})
+        report_3 = create_form3x(self.committee, "2026-03-01", "2026-03-31", {})
+
+        self.assertTrue(report_1.check_can_delete())
+        self.assertTrue(report_2.check_can_delete())
+        self.assertTrue(report_3.check_can_delete())
+
+        test_org = create_test_organization_contact("Test Org", self.committee.id, {})
+        test_loan = create_loan(self.committee, test_org, 40000, "2120-01-31", "More")
+        test_loan.add_to_report(report_1.id)
+
+        carry_forward_loan(test_loan, report_2)
+        carry_forward_loan(test_loan, report_3)
+
+        self.assertFalse(report_1.check_can_delete())
+        self.assertFalse(report_2.check_can_delete())
+        self.assertTrue(report_3.check_can_delete())
+
+        self.send_viewset_delete_request(
+            f"api/v1/transactions/{test_loan.id}/",
+            TransactionViewSet,
+            "destroy",
+            pk=test_loan.id,
+        )
+
+        self.assertTrue(report_1.check_can_delete())
+        self.assertTrue(report_2.check_can_delete())
+        self.assertTrue(report_3.check_can_delete())
+
+    def test_delete_reports_with_loan_in_order(self):
+        report_1 = create_form3x(self.committee, "2026-01-01", "2026-01-31", {})
+        report_2 = create_form3x(self.committee, "2026-02-01", "2026-02-28", {})
+        report_3 = create_form3x(self.committee, "2026-03-01", "2026-03-31", {})
+
+        self.assertTrue(report_1.check_can_delete())
+        self.assertTrue(report_2.check_can_delete())
+        self.assertTrue(report_3.check_can_delete())
+
+        test_org = create_test_organization_contact("Test Org", self.committee.id, {})
+        test_loan = create_loan(self.committee, test_org, 40000, "2120-01-31", "More")
+        test_loan.add_to_report(report_1.id)
+
+        carry_forward_loan(test_loan, report_2)
+        carry_forward_loan(test_loan, report_3)
+
+        self.assertFalse(report_1.check_can_delete())
+        self.assertFalse(report_2.check_can_delete())
+        self.assertTrue(report_3.check_can_delete())
+
+        delete_1_response = self.send_viewset_delete_request(
+            f"api/v1/transactions/{report_1.id}/",
+            ReportViewSet,
+            "destroy",
+            pk=report_1.id,
+        )
+
+        self.assertEqual(delete_1_response.status_code, 400)
+
+        delete_2_response = self.send_viewset_delete_request(
+            f"api/v1/transactions/{report_2.id}/",
+            ReportViewSet,
+            "destroy",
+            pk=report_2.id,
+        )
+
+        self.assertEqual(delete_2_response.status_code, 400)
+
+        self.send_viewset_delete_request(
+            f"api/v1/transactions/{report_3.id}/",
+            ReportViewSet,
+            "destroy",
+            pk=report_3.id,
+        )
+
+        self.send_viewset_delete_request(
+            f"api/v1/transactions/{report_2.id}/",
+            ReportViewSet,
+            "destroy",
+            pk=report_2.id,
+        )
+
+        self.send_viewset_delete_request(
+            f"api/v1/transactions/{report_1.id}/",
+            ReportViewSet,
+            "destroy",
+            pk=report_1.id,
+        )
+
+        test_reports = Report.objects.filter(
+            id__in=[report_1.id, report_2.id, report_3.id]
+        )
+
+        self.assertFalse(test_reports.exists())
