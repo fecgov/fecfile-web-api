@@ -944,7 +944,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             ],
         }
         partnership_attribution_response = self.send_viewset_post_request(
-            f"api/v1/transactions/",
+            "api/v1/transactions/",
             partnership_attribution_payload,
             TransactionViewSet,
             "create",
