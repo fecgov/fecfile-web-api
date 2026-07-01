@@ -242,7 +242,7 @@ def get_eligible_report_types_processed(committee_data: dict):
         logger.error(
             f"Failed to find eligible reports for processed committee: {committee_key}"
         )
-        return ["F99"]
+        return fallback_reports
 
     return eligible_reports
 
