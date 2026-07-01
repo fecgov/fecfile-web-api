@@ -421,11 +421,34 @@ class CommitteeAccountsUtilsTest(TestCase):
         self.assertEqual(eligible_types_invalid, ["F99"])
 
     def test_get_eligible_report_types_processed(self):
-        test_committee_data = {
-            "committee_type": "A",
+        test_committee_data_AH = {
+            "designation": "A",
+            "committee_type": "H",
         }
-        eligible_types = get_eligible_report_types_processed(test_committee_data)
-        self.assertEqual(eligible_types, ["F3X", "F24", "F1M", "F99", "F3"])
+        eligible_types_AH = get_eligible_report_types_processed(test_committee_data_AH)
+        self.assertEqual(eligible_types_AH, ["F3", "F99"])
+
+        test_committee_data_JS = {
+            "designation": "J",
+            "committee_type": "S",
+        }
+        eligible_types_JS = get_eligible_report_types_processed(test_committee_data_JS)
+        self.assertEqual(eligible_types_JS, ["F3", "F99"])
+
+        test_committee_data_BO = {
+            "designation": "B",
+            "committee_type": "O",
+        }
+        eligible_types_BO = get_eligible_report_types_processed(test_committee_data_BO)
+        self.assertEqual(eligible_types_BO, ["F3X", "F24", "F1M", "F99"])
+
+        test_committee_data_UQ = {
+            "designation": "B",
+            "committee_type": "O",
+        }
+        eligible_types_UQ = get_eligible_report_types_processed(test_committee_data_UQ)
+        self.assertEqual(eligible_types_UQ, ["F3X", "F24", "F1M", "F99"])
+
         test_committee_data_invalid = None
 
         eligible_types_invalid = get_eligible_report_types_processed(
