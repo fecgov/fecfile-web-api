@@ -236,7 +236,13 @@ def get_eligible_report_types_processed(committee_data: dict):
     }
 
     committee_key = str(committee_designation) + str(committee_type)
-    eligible_reports = eligible_reports_dict.get(committee_key, ["F99"])
+    eligible_reports = eligible_reports_dict.get(committee_key, None)
+
+    if eligible_reports is None:
+        logger.error(
+            f"Failed to find eligible reports for processed committee: {committee_key}"
+        )
+        return ["F99"]
 
     return eligible_reports
 
