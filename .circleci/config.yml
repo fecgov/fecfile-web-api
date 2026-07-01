@@ -51,7 +51,7 @@ jobs:
           pkg-manager: pip
           app-dir: ~/project/
           cache-key-override: >-
-            pip-{{ .Branch }}{{ checksum 'requirements.txt' }}{{ checksum 'requirements-test.txt' }}
+            pip-{{ .Branch }}{{ checksum 'requirements-all.txt' }}
           pip-dependency-file: requirements-all.txt
 
       - run:
