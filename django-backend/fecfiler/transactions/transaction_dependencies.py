@@ -94,7 +94,8 @@ def update_parent_purpose_description_for_partnership_attributions(parent: Trans
 
 
 def update_parent_purpose_description_for_credit_card_reimbursement_payroll_memos(
-        transaction: Transaction):
+    transaction: Transaction,
+):
     parent = transaction.parent_transaction
     if parent:
         children = parent.children.all()
@@ -108,24 +109,30 @@ def update_parent_purpose_description_for_credit_card_reimbursement_payroll_memo
         )
         if new_description:
             parent.get_schedule().__class__.objects.filter(
-                transaction__id=parent.id).update(
-                expenditure_purpose_descrip=new_description
-            )
+                transaction__id=parent.id
+            ).update(expenditure_purpose_descrip=new_description)
 
 
 def get_purpose_description_for_credit_card_reimbursement_payroll_memos(
-        transaction_type_identifier, has_itemized_children: bool):
+    transaction_type_identifier, has_itemized_children: bool
+):
     if transaction_type_identifier in CREDIT_CARD_PAYMENT_MEMOS:
-        return "Credit Card Memo: See Below" if has_itemized_children else (
-            "Credit card memo entries do not meet itemization threshold."
+        return (
+            "Credit Card Memo: See Below"
+            if has_itemized_children
+            else ("Credit card memo entries do not meet itemization threshold.")
         )
     elif transaction_type_identifier in STAFF_REIMBURSEMENT_MEMOS:
-        return "Reimbursement Memo: See Below" if has_itemized_children else (
-            "Reimbursement memo entries do not meet itemization threshold."
+        return (
+            "Reimbursement Memo: See Below"
+            if has_itemized_children
+            else ("Reimbursement memo entries do not meet itemization threshold.")
         )
     elif transaction_type_identifier in PAYMENT_TO_PAYROLL_MEMOS:
-        return "Payroll Memo: See Below" if has_itemized_children else (
-            "Payroll memo entries do not meet itemization threshold."
+        return (
+            "Payroll Memo: See Below"
+            if has_itemized_children
+            else ("Payroll memo entries do not meet itemization threshold.")
         )
     return None
 
@@ -299,7 +306,7 @@ STAFF_REIMBURSEMENT_MEMOS = [
 
 # Subquery to check if a transaction has children.
 HAS_CHILDREN = Exists(
-    Transaction.objects.filter(parent_transaction_id=OuterRef("transaction__id")).values(
-        "id"
-    )[:1]
+    Transaction.objects.filter(
+        parent_transaction_id=OuterRef("transaction__id"), itemized=True
+    ).values("id")[:1]
 )

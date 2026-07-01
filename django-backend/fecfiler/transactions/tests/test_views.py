@@ -915,6 +915,66 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "JF Memo: (Partnership attributions do not meet itemization threshold)",
         )
 
+    def test_update_itemization_status_on_child(self):
+        """if a partnership receipt has no itemized attributions,
+        the contribution_purpose_descrip should be updated to reflect that
+        """
+        partnership_receipt = create_schedule_a(
+            "PARTNERSHIP_RECEIPT", self.committee, self.contact_1, "2023-01-01", "1000"
+        )
+
+        partnership_attribution_payload = {
+            "schedule_id": "A",
+            "form_type": "SA11AI",
+            "contribution_date": "2022-01-01",
+            "schema_name": "PARTNERSHIP_ATTRIBUTION",
+            "transaction_type_identifier": "PARTNERSHIP_ATTRIBUTION",
+            "aggregation_group": "GENERAL",
+            "parent_transaction_id": partnership_receipt.id,
+            "contribution_amount": "1",
+            "contact_1_id": str(self.contact_1.id),
+            "fields_to_validate": [
+                "schedule_id",
+                "form_type",
+                "schema_name",
+                "transaction_type_identifier",
+                "contribution_amount",
+                "parent_id",
+                "contact_1_id",
+            ],
+        }
+        partnership_attribution_response = self.send_viewset_post_request(
+            f"api/v1/transactions/",
+            partnership_attribution_payload,
+            TransactionViewSet,
+            "create",
+        )
+        self.assertEqual(partnership_attribution_response.status_code, 200)
+
+        partnership_receipt_response = self.send_viewset_get_request(
+            f"api/v1/transactions/{partnership_receipt.id}/",
+            TransactionViewSet,
+            "retrieve",
+            pk=partnership_receipt.id,
+        )
+        self.assertEqual(
+            partnership_receipt_response.data["contribution_purpose_descrip"],
+            "(Partnership attributions do not meet itemization threshold)",
+        )
+
+        partnership_attribution_payload["contribution_amount"] = "1000"
+        self.send_viewset_put_request(
+            f"api/v1/transactions/{partnership_attribution_response.data}/",
+            partnership_attribution_payload,
+            TransactionViewSet,
+            "update",
+        )
+        partnership_receipt.refresh_from_db()
+        self.assertEqual(
+            partnership_receipt.schedule_a.contribution_purpose_descrip,
+            "(See Partnership Attribution(s) below)",
+        )
+
     def test_loan_repayment_on_loan_by_committee(self):
         """Loan repayments should update loan balances on the original loan
         and on carried forward copies"""
@@ -1450,9 +1510,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "can_delete": True,
             "schema_name": "DEBTS",
             "schedule_id": "D",
-            "fields_to_validate": [
-                "incurred_amount"
-            ]
+            "fields_to_validate": ["incurred_amount"],
         }
 
         view_set = TransactionViewSet()
@@ -2108,12 +2166,16 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                     },
                 )
 
-                target = Transaction.objects.get_previous_queryset().select_related(
-                    "schedule_f"
-                ).get(id=target_transaction.id)
-                source = Transaction.objects.get_previous_queryset().select_related(
-                    "schedule_f"
-                ).get(id=source_transaction.id)
+                target = (
+                    Transaction.objects.get_previous_queryset()
+                    .select_related("schedule_f")
+                    .get(id=target_transaction.id)
+                )
+                source = (
+                    Transaction.objects.get_previous_queryset()
+                    .select_related("schedule_f")
+                    .get(id=source_transaction.id)
+                )
 
                 target.aggregate = Decimal("200.00")
                 target.calendar_ytd_per_election_office = Decimal("300.00")
