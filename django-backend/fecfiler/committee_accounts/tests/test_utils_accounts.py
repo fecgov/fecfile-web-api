@@ -449,6 +449,16 @@ class CommitteeAccountsUtilsTest(TestCase):
         eligible_types_UQ = get_eligible_report_types_processed(test_committee_data_UQ)
         self.assertEqual(eligible_types_UQ, ["F3X", "F24", "F1M", "F99"])
 
+        test_committee_data_non_existant = {
+            "designation": "Z",
+            "committee_type": "Z",
+        }
+
+        eligible_types_non_existant = get_eligible_report_types_processed(
+            test_committee_data_non_existant
+        )
+        self.assertEqual(eligible_types_non_existant, ["F99"])
+
         test_committee_data_invalid = None
 
         eligible_types_invalid = get_eligible_report_types_processed(
