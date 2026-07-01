@@ -588,6 +588,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             if self.memo_text:
                 self.memo_text.delete()
 
+            if self.schedule_c or self.schedule_d:
+                for report in self.reports.all():
+                    if not report.can_delete:
+                        report.can_delete = report.check_can_delete()
+                        if report.can_delete:
+                            report.save()
+
     def delete_children(self):
         child_transactions = Transaction.objects.filter(parent_transaction=self)
         for child in child_transactions:
@@ -672,6 +679,19 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 report_id=report_id
             )
 
+        other_reports = ReportTransaction.objects.filter(
+            transaction=self
+        ).exclude(
+            report_id=report_id
+        )
+
+        for report_transaction in other_reports:
+            report = report_transaction.report
+            if report.can_delete:
+                report.can_delete = not report.check_transaction_blocking_deletion(self)
+                if not report.can_delete:
+                    report.save()
+
     def remove_from_report(self, report_id):
         ReportTransaction = apps.get_model("reports.ReportTransaction")
         report_transaction = ReportTransaction.objects.filter(
@@ -681,6 +701,14 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
         if report_transaction is not None:
             report_transaction.delete()
+
+        remaining_reports = ReportTransaction.objects.filter(transaction=self)
+        for report_transaction in remaining_reports:
+            report = report_transaction.report
+            if not report.can_delete:
+                report.can_delete = report.check_can_delete()
+                if report.can_delete:
+                    report.save()
 
     def set_reports(self, report_ids):
         current_report_ids = set()
@@ -697,6 +725,18 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         ).update(can_unamend=False)
 
         self.reports.set(report_ids)
+
+        reports_to_check_deletion = Report.objects.filter(
+            id__in=report_ids_to_reset_can_unamend
+        )
+        for report in reports_to_check_deletion:
+            this_transaction_blocks = report.check_transaction_blocking_deletion(self)
+            if this_transaction_blocks:
+                report.can_delete = False
+            else:
+                report.can_delete = report.check_can_delete()
+
+        Report.objects.bulk_update(reports_to_check_deletion, ["can_delete"])
 
     # Returns a list containing all transactions related to this transaction
     # through reatributions, loans, loan repayments, debts, and debt repayments

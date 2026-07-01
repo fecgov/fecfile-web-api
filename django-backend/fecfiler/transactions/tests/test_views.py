@@ -5,7 +5,6 @@ from fecfiler.user.models import User
 from fecfiler.reports.models import Report
 import json
 from copy import deepcopy
-from fecfiler.reports.views import ReportViewSet
 from fecfiler.transactions.views import TransactionViewSet, TransactionOrderingFilter
 from fecfiler.transactions.models import Transaction
 from fecfiler.committee_accounts.models import CommitteeAccount
@@ -1225,9 +1224,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertTrue(Transaction.all_objects.get(id=q2_carried_over_debt.id).deleted)
         self.assertTrue(Transaction.all_objects.get(id=q3_carried_over_debt.id).deleted)
 
-    def test_delete_middle_of_debt_chain(self):
-        """Paying off a debt in one report should delete any carried forward
-        copies in future reports"""
+    def test_debt_aggregation_in_middle_of_chain_with_deletion(self):
         # create q1 and associated debt
         test_q1_report_2025 = create_form3x(
             self.committee, "2025-01-01", "2025-03-31", {}
@@ -1268,7 +1265,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(test_q3_carried_over_debt.schedule_d.balance_at_close, 1100.00)
 
         # make repayment in q2
-        create_schedule_b(
+        repayment = create_schedule_b(
             "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
             self.committee,
             self.test_org_contact,
@@ -1281,12 +1278,12 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         test_q3_carried_over_debt.refresh_from_db()
         self.assertEqual(test_q3_carried_over_debt.schedule_d.balance_at_close, 800.00)
 
-        # Delete q2 report and confirm that later debts are recalculated
+        # Delete repayment and confirm that later debts are recalculated
         self.send_viewset_delete_request(
-            f"api/v1/reports/{test_q2_report_2025.id}/",
-            ReportViewSet,
+            f"api/v1/transactions/{repayment.id}/",
+            TransactionViewSet,
             "destroy",
-            pk=test_q2_report_2025.id,
+            pk=repayment.id,
         )
         test_q3_carried_over_debt.refresh_from_db()
         self.assertEqual(test_q3_carried_over_debt.schedule_d.balance_at_close, 1100.00)
