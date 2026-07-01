@@ -218,6 +218,18 @@ class TransactionDependenciesTestCase(TestCase):
             None,
             parent.id,
         )
+
+        update_dependent_parent_purpose_description_if_needed(partnership_attribution)
+        parent.refresh_from_db()
+        self.assertEqual(
+            parent.schedule_a.contribution_purpose_descrip,
+            "(Partnership attributions do not meet itemization threshold)",
+        )
+
+        partnership_attribution.contribution_amount = 1000
+        partnership_attribution.force_itemized = True
+        partnership_attribution.itemized = True
+        partnership_attribution.save()
         update_dependent_parent_purpose_description_if_needed(partnership_attribution)
         parent.refresh_from_db()
         self.assertEqual(
@@ -263,5 +275,5 @@ class TransactionDependenciesTestCase(TestCase):
         credit_card_payment.refresh_from_db()
         self.assertEqual(
             credit_card_payment.schedule_b.expenditure_purpose_descrip,
-            "Credit card memo entries do not meet itemization threshold."
+            "Credit card memo entries do not meet itemization threshold.",
         )
