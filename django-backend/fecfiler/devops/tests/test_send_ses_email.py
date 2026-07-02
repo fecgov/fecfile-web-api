@@ -48,7 +48,7 @@ class SesEmailHelperTestCase(TestCase):
 class SendSesEmailCommandTestCase(TestCase):
     @patch("fecfiler.devops.management.commands.send_ses_email.send_email_notification")
     @patch(
-        "fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL", 
+        "fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL",
         "default-sender@example.com"
     )
     def test_command_uses_default_sender(self, send_email_notification_mock):
@@ -93,7 +93,7 @@ class SendSesEmailCommandTestCase(TestCase):
 
     @patch("fecfiler.devops.management.commands.send_ses_email.send_email_notification")
     @patch(
-        "fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL", 
+        "fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL",
         "default-sender@example.com"
     )
     def test_command_surfaces_ses_errors(self, send_email_notification_mock):
