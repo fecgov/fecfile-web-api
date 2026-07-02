@@ -11,14 +11,14 @@ djangorestframework==3.17.1
 drf-spectacular==0.29.0
 drf-spectacular-sidecar==2026.4.14
 Faker==37.6.0
-git+https://github.com/fecgov/fecfile-validate@1d2f1310492f3841e06312fa674d1f9cb6ed7857#egg=fecfile_validate&subdirectory=fecfile_validate_python
+git+https://github.com/fecgov/fecfile-validate@dd4279172d9c348563250c9bb8929856aaffe3b6#egg=fecfile_validate&subdirectory=fecfile_validate_python
 github3.py==4.0.1
 GitPython==3.1.50
 gunicorn==23.0.0
 invoke==2.2.0
 jwcrypto==1.5.7
 psycopg[pool]==3.3.0
-PyJWT==2.12.0
+PyJWT==2.13.0
 redis==4.5.5
 requests==2.33.0
 structlog==25.3.0

@@ -14,7 +14,7 @@ from rest_framework.viewsets import mixins, GenericViewSet
 from rest_framework import viewsets, pagination, filters, status
 from .models import Contact
 from .serializers import ContactSerializer
-import fecfiler.settings as settings
+from django.conf import settings
 from fecfiler.shared.utilities import query_fec_api, query_fec_api_single
 
 logger = structlog.get_logger(__name__)
@@ -340,21 +340,21 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         )
         return max_fecfile_results, max_fec_results
 
-    @action(detail=False, methods=["post"], url_path="e2e-delete-all-contacts")
-    def e2e_delete_all_contacts(self, request):
-        if not settings.E2E_TEST:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        committee_uuid = str(self.get_committee_uuid())
-        contacts_count = delete_all_contacts(
-            committee_uuid=committee_uuid,
-            log_method=None,
-        )
-        logger.info(
-            "E2E delete all contacts",
-            committee_id=committee_uuid,
-            purged=contacts_count,
-        )
-        return Response({"purged": contacts_count})
+    if settings.E2E_TEST:
+
+        @action(detail=False, methods=["post"], url_path="e2e-delete-all-contacts")
+        def e2e_delete_all_contacts(self, request):
+            committee_uuid = str(self.get_committee_uuid())
+            contacts_count = delete_all_contacts(
+                committee_uuid=committee_uuid,
+                log_method=None,
+            )
+            logger.info(
+                "E2E delete all contacts",
+                committee_id=committee_uuid,
+                purged=contacts_count,
+            )
+            return Response({"purged": contacts_count})
 
 
 class DeletedContactsViewSet(

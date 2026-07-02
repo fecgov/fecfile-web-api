@@ -243,7 +243,9 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
             with patch("fecfiler.shared.utilities.requests") as mock_requests:
                 mock_response = Mock()
                 mock_response.status_code = 200
-                mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
+                mock_response.json.return_value = {
+                    "results": [{"email": "test@fec.gov", "committee_type": "E"}]
+                }
                 mock_requests.get = Mock()
                 mock_requests.get.return_value = mock_response
                 response = self.send_viewset_get_request(
@@ -261,7 +263,9 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
             with patch("fecfiler.shared.utilities.requests") as mock_requests:
                 mock_response = Mock()
                 mock_response.status_code = 200
-                mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
+                mock_response.json.return_value = {
+                    "results": [{"email": "test@fec.gov", "committee_type": "C"}]
+                }
                 mock_requests.get = Mock()
                 mock_requests.get.return_value = mock_response
                 response = self.send_viewset_get_request(

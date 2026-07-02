@@ -15,6 +15,7 @@ from fecfiler.transactions.schedule_d.utils import add_schedule_d_contact_fields
 from fecfiler.transactions.schedule_e.utils import add_schedule_e_contact_fields
 from fecfiler.transactions.schedule_f.utils import add_schedule_f_contact_fields
 from fecfiler.transactions.itemization import calculate_itemization
+from django.db.models import Exists, OuterRef
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -68,19 +69,44 @@ def compose_transaction(transaction: Transaction):
 
 
 def compose_transactions(report_id):
-    report = Report.objects.get(id=report_id)
-    transactions = Transaction.objects.filter(
-        reports__id=report_id,
-        committee_account__id=report.committee_account.id,
+    report = Report.objects.select_related("committee_account").get(id=report_id)
+
+    itemized_children_subquery = Transaction.objects.filter(
+        parent_transaction_id=OuterRef("id"), deleted__isnull=True, itemized=True
     )
-    if transactions.exists():
+
+    transactions_queryset = (
+        Transaction.objects.filter(
+            reports__id=report_id,
+            committee_account__id=report.committee_account.id,
+        )
+        .annotate(has_cached_itemized_children=Exists(itemized_children_subquery))
+        .select_related("contact_1")
+        .prefetch_related(
+            "schedule_a",
+            "schedule_b",
+            "schedule_c",
+            "schedule_c1",
+            "schedule_c2",
+            "schedule_d",
+            "schedule_e",
+            "schedule_f",
+            "contact_2",
+            "contact_3",
+            "contact_4",
+            "contact_5",
+        )
+    )
+    transactions = list(transactions_queryset)
+    if transactions:
         logger.info(f"composing transactions: {report_id}")
         """Compose derived fields"""
+
         for transaction in transactions:
             compose_transaction(transaction)
 
         logger.info(f"Composed for {transactions[0].itemized}")
-        return [t for t in transactions if (t.itemized or report.form_24 is not None)]
+        return [t for t in transactions if (t.itemized or report.form_24_id is not None)]
     else:
         logger.info(f"no transactions found for report: {report_id}")
         return []
