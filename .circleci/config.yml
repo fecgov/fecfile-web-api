@@ -55,8 +55,14 @@ jobs:
       - run:
           name: Run tests
           # Use built-in Django test module
-          command: coverage run --rcfile=.coveragerc manage.py test --parallel 4 --timing
+          command: coverage run --rcfile=.coveragerc manage.py test --parallel 4 --timing --exclude-tag=e2e
           working_directory: ~/project/django-backend/
+      - run:
+          name: Run e2e tests
+          command: coverage run --rcfile=.coveragerc manage.py test --parallel 4 --timing --tag=e2e
+          working_directory: ~/project/django-backend/
+          environment:
+            E2E_TEST: "True"
 
       - run:
           name: Combine coverage data

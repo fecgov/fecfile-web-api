@@ -139,7 +139,6 @@ class TasksTestCase(TestCase):
             force_write_to_disk=True,
         )
         submit_to_fec(
-            dot_fec_id,
             upload_submission.id,
             "test_password",
             True,
@@ -178,12 +177,12 @@ class TasksTestCase(TestCase):
 
     def test_submit_no_password(self):
         upload_submission = UploadSubmission.objects.initiate_submission(str(self.f3x.id))
-        dot_fec_id = create_dot_fec(
+        create_dot_fec(
             str(self.f3x.id),
             upload_submission_id=upload_submission.id,
             force_write_to_disk=True,
         )
-        submit_to_fec(dot_fec_id, upload_submission.id, None, True, None, True)
+        submit_to_fec(upload_submission.id, None, True, None, True)
         upload_submission.refresh_from_db()
         self.assertEqual(
             upload_submission.fecfile_task_state, FECSubmissionState.FAILED.value
@@ -200,7 +199,7 @@ class TasksTestCase(TestCase):
         dot_fec_record = DotFEC.objects.get(id=dot_fec_id)
         path = Path(CELERY_LOCAL_STORAGE_DIRECTORY) / dot_fec_record.file_name
         path.unlink()
-        submit_to_fec(dot_fec_id, upload_submission.id, "test_password", True, None, True)
+        submit_to_fec(upload_submission.id, "test_password", True, None, True)
         upload_submission.refresh_from_db()
         self.assertEqual(
             upload_submission.fecfile_task_state, FECSubmissionState.FAILED.value
@@ -217,7 +216,7 @@ class TasksTestCase(TestCase):
             webprint_submission_id=webprint_submission.id,
             force_write_to_disk=True,
         )
-        webprint_id = submit_to_webprint(dot_fec_id, webprint_submission.id, True, True)
+        webprint_id = submit_to_webprint(webprint_submission.id, True, True)
         webprint_submission.refresh_from_db()
         self.assertEqual(webprint_id, webprint_submission.id)
         self.assertEqual(webprint_submission.dot_fec_id, dot_fec_id)

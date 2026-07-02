@@ -19,7 +19,8 @@
         "treasurer_state": "DC",
         "treasurer_zip": "20001",
         "update_date": "2024-01-01",
-        "email": "test@fec.gov"
+        "email": "test@fec.gov",
+        "counts_as_processed": true
     },
     {
         "committee_id": "C99999999",
@@ -44,7 +45,8 @@
         "state": "DC",
         "street_1": "1234 Street",
         "city": "Washington",
-        "zip": "20001"
+        "zip": "20001",
+        "counts_as_processed": true
     },
     {
         "committee_id": "C99999998",
@@ -69,6 +71,29 @@
         "state": "DC",
         "street_1": "1234 Street",
         "city": "Washington",
-        "zip": "20001"
+        "zip": "20001",
+        "counts_as_processed": false
+    },{
+        "committee_id": "C99999997",
+        "name": "Test Committee E",
+        "committee_type": "E",
+        "committee_type_label": "PAC - Qualified - Unauthorized",
+        "qualified": true,
+        "isPAC": true,
+        "isPTY": false,
+        "form_type": "F1",
+        "pdf_url": "https://docquery.fec.gov/pdf/161/201601019004427161/201601019004427161.pdf",
+        "receipt_date": "2024-01-01T00:00:00",
+        "report_year": 2024,
+        "treasurer_name": "Last, First",
+        "treasurer_name_1": "First",
+        "treasurer_name_2": "Last",
+        "treasurer_street_1": "treasuerer street",
+        "treasurer_city": "treasurer city",
+        "treasurer_state": "DC",
+        "treasurer_zip": "20001",
+        "update_date": "2024-01-01",
+        "email": "test@fec.gov",
+        "counts_as_processed": true
     }
 ]
