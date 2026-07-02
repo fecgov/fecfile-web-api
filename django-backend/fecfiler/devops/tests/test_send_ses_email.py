@@ -47,7 +47,10 @@ class SesEmailHelperTestCase(TestCase):
 
 class SendSesEmailCommandTestCase(TestCase):
     @patch("fecfiler.devops.management.commands.send_ses_email.send_email_notification")
-    @patch("fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL", "default-sender@example.com")
+    @patch(
+        "fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL", 
+        "default-sender@example.com"
+    )
     def test_command_uses_default_sender(self, send_email_notification_mock):
         send_email_notification_mock.return_value = {"MessageId": "message-id-123"}
 
@@ -89,7 +92,10 @@ class SendSesEmailCommandTestCase(TestCase):
             call_command("send_ses_email", "recipient@example.com", "test body")
 
     @patch("fecfiler.devops.management.commands.send_ses_email.send_email_notification")
-    @patch("fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL", "default-sender@example.com")
+    @patch(
+        "fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL", 
+        "default-sender@example.com"
+    )
     def test_command_surfaces_ses_errors(self, send_email_notification_mock):
         send_email_notification_mock.side_effect = ClientError(
             {
