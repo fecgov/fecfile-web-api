@@ -258,8 +258,7 @@ class CommitteeAccountsUtilsTest(TestCase):
             )
             self.assertEqual(committee_account_data.get("street_1"), "Committee Street 1")
             self.assertEqual(
-                committee_account_data.get("eligible_report_types"),
-                ["F3", "F99"]
+                committee_account_data.get("eligible_report_types"), ["F3", "F99"]
             )
 
     def test_get_committee_account_data_from_test_PTY(self):  # noqa N802
@@ -443,8 +442,8 @@ class CommitteeAccountsUtilsTest(TestCase):
         self.assertEqual(eligible_types_BO, ["F3X", "F24", "F1M", "F99"])
 
         test_committee_data_UQ = {
-            "designation": "B",
-            "committee_type": "O",
+            "designation": "U",
+            "committee_type": "Q",
         }
         eligible_types_UQ = get_eligible_report_types_processed(test_committee_data_UQ)
         self.assertEqual(eligible_types_UQ, ["F3X", "F24", "F1M", "F99"])
