@@ -1,5 +1,4 @@
 import boto3
-from requests import options
 from fecfiler.settings import (
     SES_ACCESS_KEY_ID, SES_SECRET_ACCESS_KEY, SES_REGION, SES_FROM_EMAIL
 )
