@@ -43,8 +43,12 @@ git secrets --register-aws $GLOBAL_TOKEN
 git secrets --add $GLOBAL_TOKEN '.*(dbpasswd|dbuser|dbname|dbhost|_key|apikey|password|guid|hostname|pw).*[=:][^(?=|>|.*=>|.*>$)]'
 git secrets --add $GLOBAL_TOKEN '.*(DBPASSWD|DBUSER|DBNAME|DBHOST|_KEY|APIKEY|PASSWORD|GUID|HOSTNAME|PW).*[=:][^(?=|>|.*=>|.*>$)]'
 git secrets --add $GLOBAL_TOKEN '.*(user|auth|USER|AUTH)\s*[=:][^(?=|>|.*=>|.*>$)]'
-git secrets --add $GLOBAL_TOKEN '.*(aws_access_key_id|aws_secret_access_key)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
 git secrets --add $GLOBAL_TOKEN '.*(AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
+git secrets --add $GLOBAL_TOKEN '.*(aws_access_key_id|aws_secret_access_key)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
+git secrets --add $GLOBAL_TOKEN '.*(S3_ACCESS_KEY_ID|S3_SECRET_ACCESS_KEY)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
+git secrets --add $GLOBAL_TOKEN '.*(s3_access_key_id|s3_secret_access_key)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
+git secrets --add $GLOBAL_TOKEN '.*(SES_ACCESS_KEY_ID|SES_SECRET_ACCESS_KEY)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
+git secrets --add $GLOBAL_TOKEN '.*(ses_access_key_id|ses_secret_access_key)\s*[=:]\s*['"'"'0-9a-zA-Z\/+]{20,42}'
 
 # Add rules targeting docker files
 git secrets --add --literal $GLOBAL_TOKEN 'POSTGRES_PASSWORD'
@@ -61,6 +65,10 @@ git secrets --add --literal $GLOBAL_TOKEN ''"'"'PASSWORD'"'"''
 git secrets --add --allowed --literal $GLOBAL_TOKEN ''"'"'PASSWORD'"'"': os.environ.get('"'"'FECFILE_DB_PASSWORD'"'"', '"'"'postgres'"'"')'
 git secrets --add --literal $GLOBAL_TOKEN 'AWS_SECRET_ACCESS_KEY'
 git secrets --add --allowed --literal $GLOBAL_TOKEN 'AWS_SECRET_ACCESS_KEY = os.environ.get('"'"'SECRET_KEY'"'"', None)'
+git secrets --add --literal $GLOBAL_TOKEN 'S3_SECRET_ACCESS_KEY'
+git secrets --add --allowed --literal $GLOBAL_TOKEN 'S3_SECRET_ACCESS_KEY = os.environ.get('"'"'SECRET_KEY'"'"', None)'
+git secrets --add --literal $GLOBAL_TOKEN 'SES_SECRET_ACCESS_KEY'
+git secrets --add --allowed --literal $GLOBAL_TOKEN 'SES_SECRET_ACCESS_KEY = os.environ.get('"'"'SECRET_KEY'"'"', None)'
 
 # Add rules to allow specific safe files that don't pass the above rule screens.
 git secrets --add --allowed --literal $GLOBAL_TOKEN 'install-git-secrets-hook.sh:'
