@@ -1,5 +1,8 @@
 import boto3
-from fecfiler.settings import SES_ACCESS_KEY_ID, SES_SECRET_ACCESS_KEY, SES_REGION
+from requests import options
+from fecfiler.settings import (
+    SES_ACCESS_KEY_ID, SES_SECRET_ACCESS_KEY, SES_REGION, SES_FROM_EMAIL
+)
 
 if SES_ACCESS_KEY_ID and SES_SECRET_ACCESS_KEY and SES_REGION:
     session = boto3.session.Session()
@@ -13,7 +16,7 @@ else:
     SES_CLIENT = None
 
 
-def send_email_notification(from_email, to_email, subject, body_text):
+def send_email_notification(to_email, subject, body_text, from_email=SES_FROM_EMAIL):
     if SES_CLIENT is None:
         raise RuntimeError(
             "SES client is not configured. Ensure SES_ACCESS_KEY_ID, "

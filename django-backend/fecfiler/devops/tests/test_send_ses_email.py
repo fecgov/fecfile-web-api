@@ -13,10 +13,10 @@ class SesEmailHelperTestCase(TestCase):
         ses_client_mock.send_email.return_value = {"MessageId": "test-message-id"}
 
         response = send_email_notification(
-            from_email="sender@example.com",
             to_email="recipient@example.com",
             subject="Test Subject",
             body_text="Hello from SES",
+            from_email="sender@example.com",
         )
 
         self.assertEqual(response["MessageId"], "test-message-id")
@@ -38,10 +38,10 @@ class SesEmailHelperTestCase(TestCase):
             "SES client is not configured",
         ):
             send_email_notification(
-                from_email="sender@example.com",
                 to_email="recipient@example.com",
                 subject="Test Subject",
                 body_text="Hello from SES",
+                from_email="sender@example.com",
             )
 
 
@@ -57,10 +57,10 @@ class SendSesEmailCommandTestCase(TestCase):
         call_command("send_ses_email", "recipient@example.com", "test body")
 
         send_email_notification_mock.assert_called_once_with(
-            from_email="default-sender@example.com",
             to_email="recipient@example.com",
             subject="FECFile SES PoC notification",
             body_text="test body",
+            from_email="default-sender@example.com",
         )
 
     @patch("fecfiler.devops.management.commands.send_ses_email.send_email_notification")
@@ -77,10 +77,10 @@ class SendSesEmailCommandTestCase(TestCase):
         )
 
         send_email_notification_mock.assert_called_once_with(
-            from_email="override-sender@example.com",
             to_email="recipient@example.com",
             subject="custom subject",
             body_text="test body",
+            from_email="override-sender@example.com",
         )
 
     @patch("fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL", None)

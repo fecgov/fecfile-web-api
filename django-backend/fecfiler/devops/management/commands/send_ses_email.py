@@ -49,10 +49,10 @@ class Command(FECCommand):
 
         try:
             response = send_email_notification(
-                from_email=from_email,
                 to_email=to_email,
                 subject=subject,
                 body_text=message,
+                from_email=from_email,
             )
         except Exception as exc:
             logger.error(
