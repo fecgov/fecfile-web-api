@@ -1,6 +1,6 @@
 import github3
 import structlog
-from fecfiler.settings import FECFILE_GITHUB_TOKEN
+from fecfiler.settings import FECFILE_GITHUB_TOKEN, PASS_THROUGH_FEEDBACK
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -43,6 +43,11 @@ class FeedbackViewSet(viewsets.ViewSet):
                 request.META["HTTP_USER_AGENT"],
             )
 
+            if PASS_THROUGH_FEEDBACK and not FECFILE_GITHUB_TOKEN:
+                logger.error(
+                    "FECFILE_GITHUB_TOKEN is not set, but PASS_THROUGH_FEEDBACK is True."
+                )
+                return Response({"status": "feedback submitted"})
             client = github3.login(token=FECFILE_GITHUB_TOKEN)
             client.repository("fecgov", "fecfile-feedback").create_issue(
                 escape(title), body=escape(body)

@@ -194,6 +194,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 MIGRATION_LINTER_OVERRIDE_MAKEMIGRATIONS = True
 
 FECFILE_GITHUB_TOKEN = env.get_credential("FECFILE_GITHUB_TOKEN")
+# For DEBUG: Fail silently when we try to submit feedback without a token.
+# Doesn't actually send feedback to GitHub
+PASS_THROUGH_FEEDBACK = get_boolean_from_string(
+    env.get_credential("PASS_THROUGH_FEEDBACK", "False")
+)
 
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
