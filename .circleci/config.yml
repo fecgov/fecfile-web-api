@@ -260,4 +260,4 @@ workflows:
             - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|feature\/363-email_service-develop_test|release\/sprint-[\.\d]+|release\/test|main/
