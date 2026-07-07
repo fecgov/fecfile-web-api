@@ -22,6 +22,11 @@ def send_email_notification(to_email, subject, body_text, from_email=SES_FROM_EM
             "SES_SECRET_ACCESS_KEY, and SES_REGION are set."
         )
 
+    if from_email is None:
+        raise ValueError(
+            "Sender email is not configured. Provide from_email or set SES_FROM_EMAIL."
+        )
+
     return SES_CLIENT.send_email(
         FromEmailAddress=from_email,
         Destination={"ToAddresses": [to_email]},
