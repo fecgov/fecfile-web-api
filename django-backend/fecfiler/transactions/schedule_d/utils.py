@@ -51,7 +51,7 @@ def carry_forward_debt(debt, report):
         # even if the debt is pulled forward multiple times.
         "debt_id": debt.debt_id or debt.id,
     }
-    return save_copy(
+    saved_copy = save_copy(
         Transaction(
             **model_to_dict(
                 debt,
@@ -70,3 +70,10 @@ def carry_forward_debt(debt, report):
         debt_data,
         links={"reports": [report]},
     )
+
+    previous_report = report.previous_report
+    if previous_report:
+        previous_report.can_delete = False
+        previous_report.save()
+
+    return saved_copy

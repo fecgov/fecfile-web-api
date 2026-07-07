@@ -104,6 +104,7 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     zip = CharField(required=False, allow_null=True)
 
     can_unamend = BooleanField(read_only=True, source="can_unamend_new")
+    can_delete = BooleanField(read_only=True)
 
     upload_submission = UploadSubmissionSerializer(
         read_only=True,

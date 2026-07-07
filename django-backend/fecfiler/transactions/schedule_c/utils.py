@@ -24,11 +24,12 @@ def add_schedule_c_contact_fields(instance, representation=None):
 
 
 def carry_forward_loans(report):
-    if report.previous_report:
+    previous_report = report.previous_report
+    if previous_report:
         loans_to_carry_forward = Transaction.objects.filter(
             ~Q(loan_balance=Decimal(0)) | Q(loan_balance__isnull=True),
             ~Q(memo_code=True),
-            reports=report.previous_report,
+            reports=previous_report,
             schedule_c_id__isnull=False,
             committee_account__id=report.committee_account.id,
         )
@@ -87,3 +88,8 @@ def carry_forward_loan(loan, report):
         # and link it to the new loan
         if child.schedule_c2 is not None:
             carry_forward_guarantor(report, new_loan, child)
+
+    previous_report = report.previous_report
+    if previous_report:
+        previous_report.can_delete = False
+        previous_report.save()
