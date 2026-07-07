@@ -20,6 +20,6 @@ if s3:
     os.environ["S3_STORAGE_BUCKET_NAME"] = s3.credentials.get("bucket")
 
 if ses:
-    os.environ["SES_ACCESS_KEY_ID"] = ses.credentials.get("access_key_id")
-    os.environ["SES_SECRET_ACCESS_KEY"] = ses.credentials.get("secret_access_key")
+    os.environ["SES_ACCESS_KEY_ID"] = ses.credentials.get("aws_access_key_id")
+    os.environ["SES_SECRET_ACCESS_KEY"] = ses.credentials.get("aws_secret_access_key")
     os.environ["SES_REGION"] = ses.credentials.get("region")
