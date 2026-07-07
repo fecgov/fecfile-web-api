@@ -533,7 +533,8 @@ S3_REGION = env.get_credential("S3_REGION")
 SES_ACCESS_KEY_ID = env.get_credential("SES_ACCESS_KEY_ID")
 SES_SECRET_ACCESS_KEY = env.get_credential("SES_SECRET_ACCESS_KEY")
 SES_REGION = env.get_credential("SES_REGION")
-SES_FROM_EMAIL = env.get_credential("SES_FROM_EMAIL")
+SES_DOMAIN = env.get_credential("SES_DOMAIN")
+SES_FROM_EMAIL = env.get_credential("SES_FROM_USER") + "@" + SES_DOMAIN if env.get_credential("SES_FROM_USER") else None
 S3_OBJECTS_MAX_AGE_DAYS = get_float_from_string(
     env.get_credential("S3_OBJECTS_MAX_AGE_DAYS", 365)
 )

@@ -23,3 +23,4 @@ if ses:
     os.environ["SES_ACCESS_KEY_ID"] = ses.credentials.get("aws_access_key_id")
     os.environ["SES_SECRET_ACCESS_KEY"] = ses.credentials.get("aws_secret_access_key")
     os.environ["SES_REGION"] = ses.credentials.get("region")
+    os.environ["SES_DOMAIN"] = ses.credentials.get("domain")

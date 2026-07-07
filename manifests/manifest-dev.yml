@@ -41,7 +41,7 @@ defaults: &defaults
     FLAG__ENABLE_IMPORT: True
     ENABLE_RESTRICTED_COMMANDS: True
     FEC_FORMAT_VERSION: 8.5
-    SES_FROM_EMAIL: test@fecfile.fec.gov
+    SES_FROM_USER: test
 
 applications:
   - name: fecfile-web-api

@@ -53,7 +53,7 @@ services:
       SES_ACCESS_KEY_ID:
       SES_SECRET_ACCESS_KEY:
       SES_REGION:
-      SES_FROM_EMAIL:
+      SES_FROM_USER:
       CELERY_WORKER_STORAGE: local
       MOCK_EFO_FILING: True
       EFO_FILING_API: https://efoservices.stage.efo.fec.gov
@@ -113,7 +113,7 @@ services:
       SES_ACCESS_KEY_ID:
       SES_SECRET_ACCESS_KEY:
       SES_REGION:
-      SES_FROM_EMAIL:
+      SES_FROM_USER:
       CELERY_WORKER_STORAGE: local
       MOCK_EFO_FILING: True
       EFO_FILING_API: https://efoservices.stage.efo.fec.gov
@@ -170,7 +170,7 @@ services:
       SES_ACCESS_KEY_ID:
       SES_SECRET_ACCESS_KEY:
       SES_REGION:
-      SES_FROM_EMAIL:
+      SES_FROM_USER:
       CELERY_WORKER_STORAGE: local
       MOCK_EFO_FILING: True
       EFO_FILING_API: https://efoservices.stage.efo.fec.gov
