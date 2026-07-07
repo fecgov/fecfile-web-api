@@ -30,6 +30,7 @@ allowed_commands = [
     "get_overview",
     "disable_committee_account",
     "enable_committee_account",
+    "send_ses_email",
 ]
 restricted_commands = [
     "loaddata",
