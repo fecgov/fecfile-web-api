@@ -64,11 +64,12 @@ git secrets --add --allowed --literal $GLOBAL_TOKEN ''"'"'USER'"'"': os.environ.
 git secrets --add --literal $GLOBAL_TOKEN ''"'"'PASSWORD'"'"''
 git secrets --add --allowed --literal $GLOBAL_TOKEN ''"'"'PASSWORD'"'"': os.environ.get('"'"'FECFILE_DB_PASSWORD'"'"', '"'"'postgres'"'"')'
 git secrets --add --literal $GLOBAL_TOKEN 'AWS_SECRET_ACCESS_KEY'
-git secrets --add --allowed --literal $GLOBAL_TOKEN 'AWS_SECRET_ACCESS_KEY = os.environ.get('"'"'SECRET_KEY'"'"', None)'
 git secrets --add --literal $GLOBAL_TOKEN 'S3_SECRET_ACCESS_KEY'
-git secrets --add --allowed --literal $GLOBAL_TOKEN 'S3_SECRET_ACCESS_KEY = os.environ.get('"'"'SECRET_KEY'"'"', None)'
+git secrets --add --allowed --literal $GLOBAL_TOKEN 's3.credentials.get('"'"'secret_access_key'"'"', None)'
+git secrets --add --allowed --literal $GLOBAL_TOKEN 'os.environ['"'"'S3_SECRET_ACCESS_KEY'"'"']'
 git secrets --add --literal $GLOBAL_TOKEN 'SES_SECRET_ACCESS_KEY'
-git secrets --add --allowed --literal $GLOBAL_TOKEN 'SES_SECRET_ACCESS_KEY = os.environ.get('"'"'SECRET_KEY'"'"', None)'
+git secrets --add --allowed --literal $GLOBAL_TOKEN 'ses.credentials.get('"'"'aws_secret_access_key'"'"', None)'
+git secrets --add --allowed --literal $GLOBAL_TOKEN 'os.environ['"'"'SES_SECRET_ACCESS_KEY'"'"']'
 
 # Add rules to allow specific safe files that don't pass the above rule screens.
 git secrets --add --allowed --literal $GLOBAL_TOKEN 'install-git-secrets-hook.sh:'
