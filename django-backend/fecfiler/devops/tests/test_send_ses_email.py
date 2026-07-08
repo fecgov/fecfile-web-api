@@ -9,6 +9,7 @@ from fecfiler.email import send_email_notification
 
 class SesEmailHelperTestCase(TestCase):
     @patch("fecfiler.email.SES_CLIENT")
+    @patch("fecfiler.email.SES_DOMAIN", "example.com")
     def test_send_email_notification_happy_path(self, ses_client_mock):
         ses_client_mock.send_email.return_value = {"MessageId": "test-message-id"}
 
@@ -16,7 +17,7 @@ class SesEmailHelperTestCase(TestCase):
             to_email="recipient@example.com",
             subject="Test Subject",
             body_text="Hello from SES",
-            from_email="sender@example.com",
+            from_user="sender",
         )
 
         self.assertEqual(response["MessageId"], "test-message-id")
@@ -41,7 +42,7 @@ class SesEmailHelperTestCase(TestCase):
                 to_email="recipient@example.com",
                 subject="Test Subject",
                 body_text="Hello from SES",
-                from_email="sender@example.com",
+                from_user="sender",
             )
 
 
@@ -60,7 +61,7 @@ class SendSesEmailCommandTestCase(TestCase):
             to_email="recipient@example.com",
             subject="FECFile SES PoC notification",
             body_text="test body",
-            from_email="default-sender@example.com",
+            from_user=None,
         )
 
     @patch("fecfiler.devops.management.commands.send_ses_email.send_email_notification")
@@ -72,7 +73,7 @@ class SendSesEmailCommandTestCase(TestCase):
             "send_ses_email",
             "recipient@example.com",
             "test body",
-            from_email="override-sender@example.com",
+            from_user="override-sender",
             subject="custom subject",
         )
 
@@ -80,7 +81,7 @@ class SendSesEmailCommandTestCase(TestCase):
             to_email="recipient@example.com",
             subject="custom subject",
             body_text="test body",
-            from_email="override-sender@example.com",
+            from_user="override-sender",
         )
 
     @patch("fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL", None)

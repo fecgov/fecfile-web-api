@@ -29,22 +29,23 @@ class Command(FECCommand):
             help="Optional email subject",
         )
         parser.add_argument(
-            "--from-email",
-            dest="from_email",
+            "--from-user",
+            dest="from_user",
             type=str,
             default=None,
-            help="Optional sender email override. Defaults to SES_FROM_EMAIL setting.",
+            help="Optional sender email username override, used with service domain. " +
+             "Defaults to SES_FROM_USER setting.",
         )
 
     def command(self, *args, **options):
         to_email = options["to_email"]
         message = options["message"]
         subject = options["subject"]
-        from_email = options.get("from_email") or SES_FROM_EMAIL
+        from_user = options.get("from_user")
 
-        if not from_email:
+        if not from_user and not SES_FROM_EMAIL:
             raise CommandError(
-                "No sender configured. Provide --from-email or set SES_FROM_EMAIL."
+                "No sender configured. Provide --from-user or set SES_FROM_USER."
             )
 
         try:
@@ -52,13 +53,13 @@ class Command(FECCommand):
                 to_email=to_email,
                 subject=subject,
                 body_text=message,
-                from_email=from_email,
+                from_user=from_user,
             )
         except Exception as exc:
             logger.error(
                 "SES email send failed",
                 to_email=to_email,
-                from_email=from_email,
+                from_user=from_user,
                 error=str(exc),
             )
             raise CommandError(f"Failed to send SES email: {exc}") from exc
@@ -67,7 +68,7 @@ class Command(FECCommand):
         logger.info(
             "SES email sent",
             to_email=to_email,
-            from_email=from_email,
+            from_user=from_user,
             message_id=message_id,
         )
         self.log(
