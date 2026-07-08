@@ -304,11 +304,16 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         fec_id = request.GET.get("fec_id")
         if fec_id is None:
             return HttpResponseBadRequest()
-        match = (
-            self.get_queryset()
-            .filter(Q(candidate_id=fec_id) | Q(committee_id=fec_id))
-            .first()
+        existing_id = request.GET.get("id")
+
+        queryset = self.get_queryset().filter(
+            Q(candidate_id=fec_id) | Q(committee_id=fec_id)
         )
+
+        if existing_id and existing_id != "undefined":
+            queryset = queryset.exclude(id=existing_id)
+
+        match = queryset.first()
         return Response(match.id if match else "")
 
     def update(self, request, *args, **kwargs):
