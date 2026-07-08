@@ -33,8 +33,10 @@ class Command(FECCommand):
             dest="from_user",
             type=str,
             default=None,
-            help="Optional sender email username override, used with service domain. " +
-             "Defaults to SES_FROM_USER setting.",
+            help=(
+                "Optional sender email username override, used with service domain. "
+                "Defaults to SES_FROM_USER setting."
+            ),
         )
 
     def command(self, *args, **options):
