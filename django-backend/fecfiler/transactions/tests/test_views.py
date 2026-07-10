@@ -5,7 +5,6 @@ from fecfiler.user.models import User
 from fecfiler.reports.models import Report
 import json
 from copy import deepcopy
-from fecfiler.reports.views import ReportViewSet
 from fecfiler.transactions.views import TransactionViewSet, TransactionOrderingFilter
 from fecfiler.transactions.models import Transaction
 from fecfiler.committee_accounts.models import CommitteeAccount
@@ -915,6 +914,66 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "JF Memo: (Partnership attributions do not meet itemization threshold)",
         )
 
+    def test_update_itemization_status_on_child(self):
+        """if a partnership receipt has no itemized attributions,
+        the contribution_purpose_descrip should be updated to reflect that
+        """
+        partnership_receipt = create_schedule_a(
+            "PARTNERSHIP_RECEIPT", self.committee, self.contact_1, "2023-01-01", "1000"
+        )
+
+        partnership_attribution_payload = {
+            "schedule_id": "A",
+            "form_type": "SA11AI",
+            "contribution_date": "2022-01-01",
+            "schema_name": "PARTNERSHIP_ATTRIBUTION",
+            "transaction_type_identifier": "PARTNERSHIP_ATTRIBUTION",
+            "aggregation_group": "GENERAL",
+            "parent_transaction_id": partnership_receipt.id,
+            "contribution_amount": "1",
+            "contact_1_id": str(self.contact_1.id),
+            "fields_to_validate": [
+                "schedule_id",
+                "form_type",
+                "schema_name",
+                "transaction_type_identifier",
+                "contribution_amount",
+                "parent_id",
+                "contact_1_id",
+            ],
+        }
+        partnership_attribution_response = self.send_viewset_post_request(
+            "api/v1/transactions/",
+            partnership_attribution_payload,
+            TransactionViewSet,
+            "create",
+        )
+        self.assertEqual(partnership_attribution_response.status_code, 200)
+
+        partnership_receipt_response = self.send_viewset_get_request(
+            f"api/v1/transactions/{partnership_receipt.id}/",
+            TransactionViewSet,
+            "retrieve",
+            pk=partnership_receipt.id,
+        )
+        self.assertEqual(
+            partnership_receipt_response.data["contribution_purpose_descrip"],
+            "(Partnership attributions do not meet itemization threshold)",
+        )
+
+        partnership_attribution_payload["contribution_amount"] = "1000"
+        self.send_viewset_put_request(
+            f"api/v1/transactions/{partnership_attribution_response.data}/",
+            partnership_attribution_payload,
+            TransactionViewSet,
+            "update",
+        )
+        partnership_receipt.refresh_from_db()
+        self.assertEqual(
+            partnership_receipt.schedule_a.contribution_purpose_descrip,
+            "(See Partnership Attribution(s) below)",
+        )
+
     def test_loan_repayment_on_loan_by_committee(self):
         """Loan repayments should update loan balances on the original loan
         and on carried forward copies"""
@@ -1165,9 +1224,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertTrue(Transaction.all_objects.get(id=q2_carried_over_debt.id).deleted)
         self.assertTrue(Transaction.all_objects.get(id=q3_carried_over_debt.id).deleted)
 
-    def test_delete_middle_of_debt_chain(self):
-        """Paying off a debt in one report should delete any carried forward
-        copies in future reports"""
+    def test_debt_aggregation_in_middle_of_chain_with_deletion(self):
         # create q1 and associated debt
         test_q1_report_2025 = create_form3x(
             self.committee, "2025-01-01", "2025-03-31", {}
@@ -1208,7 +1265,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(test_q3_carried_over_debt.schedule_d.balance_at_close, 1100.00)
 
         # make repayment in q2
-        create_schedule_b(
+        repayment = create_schedule_b(
             "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
             self.committee,
             self.test_org_contact,
@@ -1221,12 +1278,12 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         test_q3_carried_over_debt.refresh_from_db()
         self.assertEqual(test_q3_carried_over_debt.schedule_d.balance_at_close, 800.00)
 
-        # Delete q2 report and confirm that later debts are recalculated
+        # Delete repayment and confirm that later debts are recalculated
         self.send_viewset_delete_request(
-            f"api/v1/reports/{test_q2_report_2025.id}/",
-            ReportViewSet,
+            f"api/v1/transactions/{repayment.id}/",
+            TransactionViewSet,
             "destroy",
-            pk=test_q2_report_2025.id,
+            pk=repayment.id,
         )
         test_q3_carried_over_debt.refresh_from_db()
         self.assertEqual(test_q3_carried_over_debt.schedule_d.balance_at_close, 1100.00)
@@ -1450,9 +1507,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "can_delete": True,
             "schema_name": "DEBTS",
             "schedule_id": "D",
-            "fields_to_validate": [
-                "incurred_amount"
-            ]
+            "fields_to_validate": ["incurred_amount"],
         }
 
         view_set = TransactionViewSet()
@@ -2108,12 +2163,16 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                     },
                 )
 
-                target = Transaction.objects.get_previous_queryset().select_related(
-                    "schedule_f"
-                ).get(id=target_transaction.id)
-                source = Transaction.objects.get_previous_queryset().select_related(
-                    "schedule_f"
-                ).get(id=source_transaction.id)
+                target = (
+                    Transaction.objects.get_previous_queryset()
+                    .select_related("schedule_f")
+                    .get(id=target_transaction.id)
+                )
+                source = (
+                    Transaction.objects.get_previous_queryset()
+                    .select_related("schedule_f")
+                    .get(id=source_transaction.id)
+                )
 
                 target.aggregate = Decimal("200.00")
                 target.calendar_ytd_per_election_office = Decimal("300.00")

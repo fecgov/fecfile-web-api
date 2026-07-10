@@ -234,9 +234,15 @@ class UploadSubmission(BaseSubmission):
             report.save()
         super().save_fec_response(response_string)
 
-        if str(self.fec_status) == str(FECStatus.ACCEPTED.value):
-            if self.dot_fec is not None:
-                self.dot_fec.report.block_transactions_from_deletion()
+        if self.dot_fec is not None:
+            report = self.dot_fec.report
+            if str(self.fec_status) == str(FECStatus.ACCEPTED.value):
+                report.block_transactions_from_deletion()
+                report.can_delete = False
+            else:
+                report.can_delete = report.check_can_delete()
+
+            self.dot_fec.report.save()
 
     class Meta:
         db_table = "upload_submissions"

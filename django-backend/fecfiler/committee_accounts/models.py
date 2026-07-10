@@ -21,6 +21,7 @@ class CommitteeAccount(SoftDeleteModel):
     committee_id = models.CharField(
         max_length=9, unique=True, validators=[COMMITTEE_ID_REGEX]
     )
+    filing_frequency = models.TextField(null=True, blank=True, max_length=1)
     members = models.ManyToManyField(
         User,
         through="Membership",
