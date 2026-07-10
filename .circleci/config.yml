@@ -50,6 +50,8 @@ jobs:
       - python/install-packages:
           pkg-manager: pip
           app-dir: ~/project/
+          cache-key-override: |
+            pip-{{.Branch}}{{ checksum "requirements-all.txt" }}
           pip-dependency-file: requirements-all.txt
 
       - run:

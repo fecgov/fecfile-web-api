@@ -4,9 +4,9 @@ from fecfiler.contacts.models import Contact
 from fecfiler.transactions.transaction_dependencies import (
     get_jf_transfer_descriptions,
     update_dependent_children,
-    update_dependent_parent,
+    update_dependent_parent_purpose_description_if_needed,
 )
-from fecfiler.transactions.tests.utils import create_schedule_a
+from fecfiler.transactions.tests.utils import create_schedule_a, create_schedule_b
 
 
 class TransactionDependenciesTestCase(TestCase):
@@ -174,14 +174,14 @@ class TransactionDependenciesTestCase(TestCase):
         attribution_memo.save()
         self.assertIsNone(partnership_memo.schedule_a.contribution_purpose_descrip)
         self.assertIsNone(attribution_memo.schedule_a.contribution_purpose_descrip)
-        update_dependent_parent(attribution_memo)
+        update_dependent_parent_purpose_description_if_needed(attribution_memo)
         partnership_memo.refresh_from_db()
         self.assertEqual(
             partnership_memo.schedule_a.contribution_purpose_descrip,
             "JF Memo: Parent Contact (See Partnership Attribution(s) below)",
         )
         attribution_memo.delete()
-        update_dependent_parent(attribution_memo)
+        update_dependent_parent_purpose_description_if_needed(attribution_memo)
         partnership_memo.refresh_from_db()
         self.assertEqual(
             partnership_memo.schedule_a.contribution_purpose_descrip,
@@ -218,7 +218,19 @@ class TransactionDependenciesTestCase(TestCase):
             None,
             parent.id,
         )
-        update_dependent_parent(partnership_attribution)
+
+        update_dependent_parent_purpose_description_if_needed(partnership_attribution)
+        parent.refresh_from_db()
+        self.assertEqual(
+            parent.schedule_a.contribution_purpose_descrip,
+            "(Partnership attributions do not meet itemization threshold)",
+        )
+
+        partnership_attribution.contribution_amount = 1000
+        partnership_attribution.force_itemized = True
+        partnership_attribution.itemized = True
+        partnership_attribution.save()
+        update_dependent_parent_purpose_description_if_needed(partnership_attribution)
         parent.refresh_from_db()
         self.assertEqual(
             parent.schedule_a.contribution_purpose_descrip,
@@ -226,10 +238,42 @@ class TransactionDependenciesTestCase(TestCase):
         )
 
         partnership_attribution.delete()
-        update_dependent_parent(partnership_attribution)
+        update_dependent_parent_purpose_description_if_needed(partnership_attribution)
         parent.refresh_from_db()
 
         self.assertEqual(
             parent.schedule_a.contribution_purpose_descrip,
             "(Partnership attributions do not meet itemization threshold)",
+        )
+
+    def test_update_parent_purpose_description_for_credit_card_memo(self):
+        credit_card_payment = create_schedule_b(
+            "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
+            self.committee,
+            self.parent_contact,
+            "2020-01-01",
+            500,
+        )
+        credit_card_payment_memo = create_schedule_b(
+            "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT_MEMO",
+            self.committee,
+            self.parent_contact,
+            "2020-01-01",
+            50,
+        )
+        credit_card_payment_memo.parent_transaction = credit_card_payment
+        credit_card_payment_memo.save()
+        self.assertIsNone(credit_card_payment.schedule_b.expenditure_purpose_descrip)
+        update_dependent_parent_purpose_description_if_needed(credit_card_payment_memo)
+        credit_card_payment.refresh_from_db()
+        self.assertEqual(
+            credit_card_payment.schedule_b.expenditure_purpose_descrip,
+            "Credit Card Memo: See Below",
+        )
+        credit_card_payment_memo.delete()
+        update_dependent_parent_purpose_description_if_needed(credit_card_payment_memo)
+        credit_card_payment.refresh_from_db()
+        self.assertEqual(
+            credit_card_payment.schedule_b.expenditure_purpose_descrip,
+            "Credit card memo entries do not meet itemization threshold.",
         )

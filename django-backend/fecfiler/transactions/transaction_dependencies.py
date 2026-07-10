@@ -48,12 +48,27 @@ def update_dependent_children(transaction: Transaction):
         logger.debug(f"Updated {count} dependent transactions for {transaction}")
 
 
-def update_dependent_parent(transaction: Transaction):
+def update_dependent_parent_purpose_description_if_needed(transaction: Transaction):
     """Update the contribution_purpose_descrip field for PARTNERSHIP_MEMO transactions
     when thier children are created or deleted."""
 
     if transaction.transaction_type_identifier in PARTNERSHIP_ATTRIBUTIONS:
-        parent = transaction.parent_transaction
+        update_parent_purpose_description_for_partnership_attributions(
+            transaction.parent_transaction
+        )
+    elif transaction.transaction_type_identifier in (
+        CREDIT_CARD_PAYMENT_MEMOS + STAFF_REIMBURSEMENT_MEMOS + PAYMENT_TO_PAYROLL_MEMOS
+    ):
+        update_parent_purpose_description_for_credit_card_reimbursement_payroll_memos(
+            transaction
+        )
+
+
+def update_parent_purpose_description_for_partnership_attributions(parent: Transaction):
+    """Update the contribution_purpose_descrip field for PARTNERSHIP_MEMO transactions
+    when thier children are created or deleted."""
+
+    if parent:
         grandparent = parent.parent_transaction or {"transaction_type_identifier": None}
         grandparent_dependencies = JF_TRANSFER_DEPENDENCIES.get(
             getattr(grandparent, "transaction_type_identifier", None), {}
@@ -76,6 +91,50 @@ def update_dependent_parent(transaction: Transaction):
                 .values("new_description")[:1]
             )
         )
+
+
+def update_parent_purpose_description_for_credit_card_reimbursement_payroll_memos(
+    transaction: Transaction,
+):
+    parent = transaction.parent_transaction
+    if parent:
+        children = parent.children.all()
+        has_itemized_children = (
+            children.exists() and children.filter(itemized=True).exists()
+        )
+        new_description = (
+            get_purpose_description_for_credit_card_reimbursement_payroll_memos(
+                transaction.transaction_type_identifier, has_itemized_children
+            )
+        )
+        if new_description:
+            parent.get_schedule().__class__.objects.filter(
+                transaction__id=parent.id
+            ).update(expenditure_purpose_descrip=new_description)
+
+
+def get_purpose_description_for_credit_card_reimbursement_payroll_memos(
+    transaction_type_identifier, has_itemized_children: bool
+):
+    if transaction_type_identifier in CREDIT_CARD_PAYMENT_MEMOS:
+        return (
+            "Credit Card Memo: See Below"
+            if has_itemized_children
+            else ("Credit card memo entries do not meet itemization threshold.")
+        )
+    elif transaction_type_identifier in STAFF_REIMBURSEMENT_MEMOS:
+        return (
+            "Reimbursement Memo: See Below"
+            if has_itemized_children
+            else ("Reimbursement memo entries do not meet itemization threshold.")
+        )
+    elif transaction_type_identifier in PAYMENT_TO_PAYROLL_MEMOS:
+        return (
+            "Payroll Memo: See Below"
+            if has_itemized_children
+            else ("Payroll memo entries do not meet itemization threshold.")
+        )
+    return None
 
 
 def get_new_description_clause(
@@ -221,9 +280,33 @@ PARTNERSHIP_ATTRIBUTIONS = [
     "PARTNERSHIP_ATTRIBUTION_NATIONAL_PARTY_RECOUNT_JF_TRANSFER_MEMO",
 ]
 
+CREDIT_CARD_PAYMENT_MEMOS = [
+    "FEDERAL_ELECTION_ACTIVITY_CREDIT_CARD_PAYMENT_MEMO",
+    "INDEPENDENT_EXPENDITURE_CREDIT_CARD_PAYMENT_MEMO",
+    "NON_CONTRIBUTION_ACCOUNT_CREDIT_CARD_PAYMENT_MEMO",
+    "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT_MEMO",
+    "OTHER_DISBURSEMENT_CREDIT_CARD_PAYMENT_MEMO",
+]
+
+PAYMENT_TO_PAYROLL_MEMOS = [
+    "FEDERAL_ELECTION_ACTIVITY_PAYMENT_TO_PAYROLL_MEMO",
+    "INDEPENDENT_EXPENDITURE_PAYMENT_TO_PAYROLL_MEMO",
+    "NON_CONTRIBUTION_ACCOUNT_PAYMENT_TO_PAYROLL_MEMO",
+    "OPERATING_EXPENDITURE_PAYMENT_TO_PAYROLL_MEMO",
+    "OTHER_DISBURSEMENT_PAYMENT_TO_PAYROLL_MEMO",
+]
+
+STAFF_REIMBURSEMENT_MEMOS = [
+    "FEDERAL_ELECTION_ACTIVITY_STAFF_REIMBURSEMENT_MEMO",
+    "INDEPENDENT_EXPENDITURE_STAFF_REIMBURSEMENT_MEMO",
+    "NON_CONTRIBUTION_ACCOUNT_STAFF_REIMBURSEMENT_MEMO",
+    "OPERATING_EXPENDITURE_STAFF_REIMBURSEMENT_MEMO",
+    "OTHER_DISBURSEMENT_STAFF_REIMBURSEMENT_MEMO",
+]
+
 # Subquery to check if a transaction has children.
 HAS_CHILDREN = Exists(
-    Transaction.objects.filter(parent_transaction_id=OuterRef("transaction__id")).values(
-        "id"
-    )[:1]
+    Transaction.objects.filter(
+        parent_transaction_id=OuterRef("transaction__id"), itemized=True
+    ).values("id")[:1]
 )

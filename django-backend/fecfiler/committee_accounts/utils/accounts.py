@@ -192,13 +192,59 @@ def get_production_committee_data(committee_id):
 
 
 def get_eligible_report_types_processed(committee_data: dict):
+    fallback_reports = ["F99"]
     if committee_data is None:
         logger.error(
             "Tried to retrieve eligible report types from invalid committee data"
         )
-        return ["F99"]
+        return fallback_reports
 
-    return ["F3X", "F24", "F1M", "F99", "F3"]
+    committee_type = committee_data.get("committee_type")
+    if committee_type is None:
+        logger.error("committee_type not found in processed committee data")
+        return fallback_reports
+
+    committee_designation = committee_data.get("designation")
+    if committee_designation is None:
+        logger.error("designation not found in processed committee data")
+        return fallback_reports
+
+    eligible_reports_dict = {
+        "AH": ["F3", "F99"],
+        "AS": ["F3", "F99"],
+        "PH": ["F3", "F99"],
+        "PS": ["F3", "F99"],
+        "JH": ["F3", "F99"],
+        "JS": ["F3", "F99"],
+        "BO": ["F3X", "F24", "F1M", "F99"],
+        "BU": ["F3X", "F24", "F1M", "F99"],
+        "DN": ["F3X", "F24", "F1M", "F99"],
+        "DQ": ["F3X", "F24", "F1M", "F99"],
+        "JN": ["F3X", "F24", "F1M", "F99"],
+        "JQ": ["F3X", "F24", "F1M", "F99"],
+        "JX": ["F3X", "F24", "F1M", "F99"],
+        "JY": ["F3X", "F24", "F1M", "F99"],
+        "UD": ["F3X", "F24", "F1M", "F99"],
+        "UN": ["F3X", "F24", "F1M", "F99"],
+        "UO": ["F3X", "F24", "F1M", "F99"],
+        "UQ": ["F3X", "F24", "F1M", "F99"],
+        "UU": ["F3X", "F24", "F1M", "F99"],
+        "UV": ["F3X", "F24", "F1M", "F99"],
+        "UW": ["F3X", "F24", "F1M", "F99"],
+        "UX": ["F3X", "F24", "F1M", "F99"],
+        "UY": ["F3X", "F24", "F1M", "F99"],
+    }
+
+    committee_key = str(committee_designation) + str(committee_type)
+    eligible_reports = eligible_reports_dict.get(committee_key, None)
+
+    if eligible_reports is None:
+        logger.error(
+            f"Failed to find eligible reports for processed committee: {committee_key}"
+        )
+        return fallback_reports
+
+    return eligible_reports
 
 
 def get_processed_committee_data(committee_id):

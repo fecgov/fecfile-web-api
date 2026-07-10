@@ -108,6 +108,64 @@ class Report(CommitteeOwnedModel):
             .last()
         )
 
+    @property
+    def can_delete_previous(self):
+        previous = self.previous_report
+        if previous is not None:
+            return previous.can_delete
+        else:
+            return None
+
+    def check_transaction_blocking_deletion(self, transaction):
+        if self.form_24_id is not None:
+            return False
+
+        if self in transaction.reports.all():
+            related_transactions = transaction.get_related_transactions()
+            for trans in related_transactions:
+                if trans.reports.filter(
+                    coverage_from_date__gt=self.coverage_from_date
+                ).exists():
+                    return True
+
+        return transaction.reports.exclude(
+            id=self.id
+        ).filter(
+            Q(form_24_id__isnull=False)
+            | Q(coverage_from_date__gt=self.coverage_from_date)
+        ).exists()
+
+    def check_for_blocking_transactions(self):
+        for transaction in self.transactions.all():
+            if self.check_transaction_blocking_deletion(transaction):
+                return True
+
+        return False
+
+    def check_can_delete(self):
+
+        upload_clause = (
+            self.upload_submission is None
+            or str(self.upload_submission.fec_status) != "ACCEPTED"
+        )
+        report_version_clause = (
+            self.report_version is None or self.report_version == '0'
+        )
+        form_24_or_blocked_by_transactions = (
+            self.form_3x_id is None or (
+                self.form_24_id is None
+                and not self.check_for_blocking_transactions()
+            )
+        )
+
+        can_delete = (
+            upload_clause
+            and report_version_clause
+            and form_24_or_blocked_by_transactions
+        )
+
+        return can_delete
+
     def save(self, *args, **kwargs):
         from fecfiler.transactions.schedule_c.utils import carry_forward_loans
         from fecfiler.transactions.schedule_d.utils import carry_forward_debts
@@ -147,6 +205,7 @@ class Report(CommitteeOwnedModel):
     def amend(self):
         self.form_type = self.get_form_name() + "A"
         self.report_version = int(self.report_version or "0") + 1
+        self.can_delete = False
 
         if self.form_type == "F24A" and self.upload_submission is not None:
             self.form_24.original_amendment_date = self.upload_submission.created
@@ -163,6 +222,7 @@ class Report(CommitteeOwnedModel):
         self.report_version = int(self.report_version or "1") - 1
         if self.report_version == 0:
             self.report_version = None
+            self.can_delete = self.check_can_delete()
             self.form_type = self.get_form_name() + "N"
 
         if self.form_type == "F24":
@@ -194,14 +254,24 @@ class Report(CommitteeOwnedModel):
             reaggregate_callback()
 
         """delete report-transaction links"""
-        ReportTransaction.objects.filter(report=self).delete()
+        for report_transaction in ReportTransaction.objects.filter(report=self):
+            report_transaction.transaction.remove_from_report(self.id)
 
         for form_key in TABLE_TO_FORM:
             form = getattr(self, form_key)
             if form:
                 form.delete()
 
+        previous_report = None
+        if self.coverage_from_date:
+            previous_report = self.previous_report
+
         super(CommitteeOwnedModel, self).delete()
+
+        if previous_report and not previous_report.can_delete:
+            previous_report.can_delete = previous_report.check_can_delete()
+            if previous_report.can_delete:
+                previous_report.save()
 
     def block_transactions_from_deletion(self):
         from fecfiler.transactions.models import Transaction
