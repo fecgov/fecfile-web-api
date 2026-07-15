@@ -32,7 +32,7 @@ from fecfiler.transactions.aggregation import (
     process_aggregation_for_election,
 )
 from fecfiler.reports.models import Report
-from fecfiler.contacts.models import Contact
+from fecfiler.contacts.shared_models import CandidateOffice
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
@@ -286,9 +286,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             state = request.query_params.get("candidate_state")
             district = request.query_params.get("candidate_district")
 
-            if office != Contact.CandidateOffice.PRESIDENTIAL and not state:
+            if office != CandidateOffice.PRESIDENTIAL and not state:
                 raise ValueError("State required for non-presidential.")
-            if office == Contact.CandidateOffice.HOUSE and not district:
+            if office == CandidateOffice.HOUSE and not district:
                 raise ValueError("District required for House.")
 
             assert (
