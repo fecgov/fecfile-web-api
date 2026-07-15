@@ -54,6 +54,31 @@ date_formats = [
 ]
 
 
+def election_code_serializer(model_instance, field_name, mapping):
+    form_model = model_instance.form_3 or model_instance.form_3x
+    if form_model is None:
+        raise ValueError(
+            "Attempted to serialize election code on a report without a valid F3 or F3X"
+        )
+
+    report_code = getattr(model_instance, "report_code", None)
+    election_date = getattr(form_model, "date_of_election", None)
+    if report_code is None:
+        raise ValueError(
+            "Attempted to serialize election code on a report without a report type"
+        )
+
+    if report_code in ["12P", "12G", "12R", "12S", "12C"]:
+        if election_date is None:
+            raise ValueError(
+                f"Attempted to serialize election code on a {report_code} report"
+                "without an election date"
+            )
+        return report_code[-1] + str(election_date.year)
+    else:
+        return default_serializer(model_instance, field_name, mapping)
+
+
 def text_to_date_serializer(model_instance, field_name, mapping):
     date_string = get_value_from_path(
         model_instance, mapping.get("path", None) or field_name
@@ -115,6 +140,7 @@ FIELD_SERIALIZERS = {
     "DATE": date_serializer,
     "TEXT_TO_DATE": text_to_date_serializer,
     "LOAN_INTEREST_RATE": loan_interest_rate_serializer,
+    "ELECTION_CODE": election_code_serializer,
     None: default_serializer,
 }
 
