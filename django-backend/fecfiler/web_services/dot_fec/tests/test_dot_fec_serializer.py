@@ -6,6 +6,7 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import (
     get_field_mappings,
     get_value_from_path,
     loan_interest_rate_serializer,
+    election_code_serializer
 )
 from fecfiler.web_services.dot_fec.dot_fec_composer import Header
 from fecfiler.reports.models import Report
@@ -278,6 +279,26 @@ class DotFECSerializerTestCase(TestCase):
 
         rate = loan_interest_rate_serializer(loan, None, None)
         self.assertEqual(rate, "0.125")
+
+    def test_serialize_election_code(self):
+        for report_code, expected_value in [
+            ["12P", "P2027"],
+            ["12G", "G2027"],
+            ["12R", "R2027"],
+            ["12S", "S2027"],
+            ["12C", "C2027"],
+        ]:
+            test_report = create_form3x(
+                self.committee,
+                "2026-01-01",
+                "2026-01-31",
+                {"date_of_election": "2027-01-31"},
+                report_code
+            )
+            test_report.refresh_from_db()
+
+            election_code = election_code_serializer(test_report, "election_code", None)
+            self.assertEqual(election_code, expected_value)
 
     def test_serialize_loan_interest_rate_large_percent(self):
         contact_org = create_test_organization_contact(

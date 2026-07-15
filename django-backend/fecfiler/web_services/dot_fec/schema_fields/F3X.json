@@ -13,6 +13,7 @@
     "zip": {},
     "report_code": {},
     "election_code": {
+        "serializer": "ELECTION_CODE",
         "path": "form_3x.election_code"
     },
     "date_of_election": {
