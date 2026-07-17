@@ -882,7 +882,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         request = self.get_request(
             "api/v1/transactions/list/unassociated",
             {
-                "order_by":"amount",
+                "order_by": "amount",
             }
         )
 
