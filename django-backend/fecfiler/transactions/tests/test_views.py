@@ -991,7 +991,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 memo_code=receipt_data["memo"],
             )
 
-
         operating_expenditure_data = [
             {"date": "2023-01-01", "amount": "150.00", "memo": True},
             {"date": "2024-01-03", "amount": "250.00", "memo": False},
