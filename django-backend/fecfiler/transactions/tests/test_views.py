@@ -868,6 +868,15 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 memo_code=receipt_data["memo"],
             )
 
+        create_schedule_b(
+            "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
+            self.committee,
+            self.test_org_contact,
+            "2025-01-02",
+            Decimal("250.00"),
+            report=None,
+        )
+
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
             self.committee,
@@ -882,7 +891,9 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         request = self.get_request(
             "api/v1/transactions/list/unassociated",
             {
-                "order_by": "amount",
+                "page": 1,
+                "ordering": "-amount",
+                "page_size": 2,
             }
         )
 
@@ -892,9 +903,74 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         response = self.view.list_unassociated_transactions(request)
 
-        transactions = response.data
-        self.assertEqual(len(transactions), 4)
+        transactions = response.data["results"]
+        self.assertEqual(response.data["count"], 5)
+        self.assertEqual(len(transactions), 2)
         self.assertEqual(transactions[0]["amount"], '400.00')
+
+    def test_list_unassociated_by_schedule(self):
+        Transaction.objects.filter(
+            committee_account=self.committee
+        ).delete()
+
+        indiviual_receipt_data = [
+            {"date": "2023-01-01", "amount": "200.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-01", "amount": "300.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-02", "amount": "100.00", "group": "GENERAL", "memo": False},
+            {"date": "2024-01-03", "amount": "400.00", "group": "OTHER", "memo": False},
+        ]
+        for receipt_data in indiviual_receipt_data:
+            create_schedule_a(
+                "INDIVIDUAL_RECEIPT",
+                self.committee,
+                self.contact_1,
+                receipt_data["date"],
+                receipt_data["amount"],
+                group=receipt_data["group"],
+                report=None,
+                memo_code=receipt_data["memo"],
+            )
+
+        create_schedule_b(
+            "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
+            self.committee,
+            self.test_org_contact,
+            "2025-01-02",
+            Decimal("250.00"),
+            report=None,
+        )
+
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-05",
+            "500.00",
+            group="OTHER",
+            report=self.q1_report,
+            memo_code=False,
+        )
+
+        request = self.get_request(
+            "api/v1/transactions/list/unassociated",
+            {
+                "page": 1,
+                "ordering": "-amount",
+                "page_size": 5,
+                "schedules": "B"
+            }
+        )
+
+        self.view.request = request
+        self.view.action = "list"
+        self.view.format_kwarg = None
+
+        response = self.view.list_unassociated_transactions(request)
+
+        transactions = response.data["results"]
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(len(transactions), 1)
+        self.assertEqual(transactions[0]["amount"], '250.00')
 
     def test_destroy(self):
         response = self.send_viewset_delete_request(
