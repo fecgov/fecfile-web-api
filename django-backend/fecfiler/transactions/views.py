@@ -150,10 +150,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         return queryset
 
-    @action(detail=False, methods=["put"], url_path=r"list/unassociated")
+    @action(detail=False, methods=["get"], url_path=r"list/unassociated")
     def list_unassociated_transactions(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        queryset.filter(reports__isnull=True)  # evaluates to true when no many-to-many relationships exist
+
+        # __isnull evaluates to true when no many-to-many relationships exist
+        queryset = queryset.filter(reports__isnull=True)
+
         if "page" in request.query_params:
             page = self.paginate_queryset(queryset)
             if page is not None:

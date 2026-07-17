@@ -846,6 +846,10 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             self.assertEqual(ordered_queryset[i].id, memos_sorted[i].id)
 
     def test_list_unassociated(self):
+        Transaction.objects.filter(
+            committee_account=self.committee
+        ).delete()
+
         indiviual_receipt_data = [
             {"date": "2023-01-01", "amount": "200.00", "group": "GENERAL", "memo": True},
             {"date": "2024-01-01", "amount": "300.00", "group": "GENERAL", "memo": True},
@@ -860,16 +864,37 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 receipt_data["date"],
                 receipt_data["amount"],
                 group=receipt_data["group"],
+                report=None,
                 memo_code=receipt_data["memo"],
             )
 
-        transactions = self.send_viewset_get_request(
-            f"api/v1/transactions/list/unassociated/",
-            TransactionViewSet,
-            "retrieve",
-            pk=self.transaction.id,
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-05",
+            "500.00",
+            group="OTHER",
+            report=self.q1_report,
+            memo_code=False,
         )
-        print(transactions["data"].__dict__.keys())
+
+        request = self.get_request(
+            "api/v1/transactions/list/unassociated",
+            {
+                "order_by":"amount",
+            }
+        )
+
+        self.view.request = request
+        self.view.action = "list"
+        self.view.format_kwarg = None
+
+        response = self.view.list_unassociated_transactions(request)
+
+        transactions = response.data
+        self.assertEqual(len(transactions), 4)
+        self.assertEqual(transactions[0]["amount"], '400.00')
 
     def test_destroy(self):
         response = self.send_viewset_delete_request(
