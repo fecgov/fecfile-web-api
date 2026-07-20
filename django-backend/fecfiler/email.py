@@ -1,7 +1,10 @@
-import boto3
 from fecfiler.settings import (
     SES_ACCESS_KEY_ID, SES_SECRET_ACCESS_KEY, SES_REGION, SES_DOMAIN, SES_FROM_EMAIL
 )
+import boto3
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 if SES_ACCESS_KEY_ID and SES_SECRET_ACCESS_KEY and SES_REGION:
     session = boto3.session.Session()
@@ -29,13 +32,33 @@ def send_email_notification(to_email, subject, body_text, from_user=None):
     else:
         from_email = f"{from_user}@{SES_DOMAIN}" if from_user else SES_FROM_EMAIL
 
-    return SES_CLIENT.send_email(
-        FromEmailAddress=from_email,
-        Destination={"ToAddresses": [to_email]},
-        Content={
-            "Simple": {
-                "Subject": {"Data": subject},
-                "Body": {"Text": {"Data": body_text}},
-            }
-        },
+    try:
+        response = SES_CLIENT.send_email(
+            FromEmailAddress=from_email,
+            Destination={"ToAddresses": [to_email]},
+            Content={
+                "Simple": {
+                    "Subject": {"Data": subject},
+                    "Body": {"Text": {"Data": body_text}},
+                }
+            },
+        )
+    except Exception as e:
+        logger.error(
+            "SES email send failed",
+            subject=subject,
+            to_email=to_email,
+            from_email=from_email,
+            error=str(e),
+        )
+
+    message_id = response.get("MessageId", "unknown")
+    logger.info(
+        "SES email sent",
+        subject=subject,
+        to_email=to_email,
+        from_email=from_email,
+        message_id=message_id,
     )
+
+    return response
