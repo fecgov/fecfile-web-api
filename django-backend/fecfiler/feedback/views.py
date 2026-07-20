@@ -1,11 +1,10 @@
 import github3
 import structlog
-from fecfiler.settings import FECFILE_GITHUB_TOKEN
+from fecfiler.settings import FECFILE_GITHUB_TOKEN, MOCK_EFO_FILING
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.utils.html import escape
-
 from .serializers import FeedbackSerializer
 
 logger = structlog.get_logger(__name__)
@@ -42,11 +41,11 @@ class FeedbackViewSet(viewsets.ViewSet):
                 serializer.validated_data["location"],
                 request.META["HTTP_USER_AGENT"],
             )
-
-            client = github3.login(token=FECFILE_GITHUB_TOKEN)
-            client.repository("fecgov", "fecfile-feedback").create_issue(
-                escape(title), body=escape(body)
-            )
+            if not MOCK_EFO_FILING:
+                client = github3.login(token=FECFILE_GITHUB_TOKEN)
+                client.repository("fecgov", "fecfile-feedback").create_issue(
+                    escape(title), body=escape(body)
+                )
 
             return Response({"status": "feedback submitted"})
         except Exception as error:
