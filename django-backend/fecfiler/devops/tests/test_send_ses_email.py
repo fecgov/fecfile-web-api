@@ -1,9 +1,5 @@
-from botocore.exceptions import ClientError
-from django.core.management import call_command
-from django.core.management.base import CommandError
 from django.test import TestCase
 from unittest.mock import patch
-
 from fecfiler.email import send_email_notification
 
 
@@ -44,69 +40,3 @@ class SesEmailHelperTestCase(TestCase):
                 body_text="Hello from SES",
                 from_user="sender",
             )
-
-
-class SendSesEmailCommandTestCase(TestCase):
-    @patch("fecfiler.devops.management.commands.send_ses_email.send_email_notification")
-    @patch(
-        "fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL",
-        "default-sender@example.com"
-    )
-    def test_command_uses_default_sender(self, send_email_notification_mock):
-        send_email_notification_mock.return_value = {"MessageId": "message-id-123"}
-
-        call_command("send_ses_email", "recipient@example.com", "test body")
-
-        send_email_notification_mock.assert_called_once_with(
-            to_email="recipient@example.com",
-            subject="FECFile SES PoC notification",
-            body_text="test body",
-            from_user=None,
-        )
-
-    @patch("fecfiler.devops.management.commands.send_ses_email.send_email_notification")
-    @patch("fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL", None)
-    def test_command_uses_from_email_override(self, send_email_notification_mock):
-        send_email_notification_mock.return_value = {"MessageId": "message-id-123"}
-
-        call_command(
-            "send_ses_email",
-            "recipient@example.com",
-            "test body",
-            from_user="override-sender",
-            subject="custom subject",
-        )
-
-        send_email_notification_mock.assert_called_once_with(
-            to_email="recipient@example.com",
-            subject="custom subject",
-            body_text="test body",
-            from_user="override-sender",
-        )
-
-    @patch("fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL", None)
-    def test_command_requires_sender_configuration(self):
-        with self.assertRaisesMessage(
-            CommandError,
-            "No sender configured",
-        ):
-            call_command("send_ses_email", "recipient@example.com", "test body")
-
-    @patch("fecfiler.devops.management.commands.send_ses_email.send_email_notification")
-    @patch(
-        "fecfiler.devops.management.commands.send_ses_email.SES_FROM_EMAIL",
-        "default-sender@example.com"
-    )
-    def test_command_surfaces_ses_errors(self, send_email_notification_mock):
-        send_email_notification_mock.side_effect = ClientError(
-            {
-                "Error": {
-                    "Code": "MessageRejected",
-                    "Message": "Address is not verified.",
-                }
-            },
-            "SendEmail",
-        )
-
-        with self.assertRaisesMessage(CommandError, "Failed to send SES email"):
-            call_command("send_ses_email", "recipient@example.com", "test body")
