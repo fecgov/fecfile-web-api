@@ -13,7 +13,7 @@ if redis:
     os.environ["REDIS_URL"] = f"rediss://:{password}@{hostname}:{port}"
 
 if s3:
-    os.environ["AWS_ACCESS_KEY_ID"] = s3.credentials.get("access_key_id")
-    os.environ["AWS_SECRET_ACCESS_KEY"] = s3.credentials.get("secret_access_key")
-    os.environ["AWS_STORAGE_BUCKET_NAME"] = s3.credentials.get("bucket")
-    os.environ["AWS_REGION"] = s3.credentials.get("region")
+    os.environ["S3_ACCESS_KEY_ID"] = s3.credentials.get("access_key_id")
+    os.environ["S3_SECRET_ACCESS_KEY"] = s3.credentials.get("secret_access_key")
+    os.environ["S3_REGION"] = s3.credentials.get("region")
+    os.environ["S3_STORAGE_BUCKET_NAME"] = s3.credentials.get("bucket")
