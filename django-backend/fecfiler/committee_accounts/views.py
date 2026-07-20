@@ -56,13 +56,16 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee: CommitteeAccount = self.get_object()
         if not committee or committee.disabled is not None:
             return Response("Committee could not be activated", status=403)
-        filing_frequency = request.data.get("filing_frequency", None)
-        if filing_frequency:
-            committee.filing_frequency = filing_frequency
-            committee.save()
+        try:
+            self.update_committee_record_for_activate(committee)
+        except Exception as e:
+            logger.error(
+                f"User {request.user.email} failed to update "
+                f"committee record for committee activation "
+                f"{committee.committee_id}: {str(e)}"
+            )
         request.session["committee_id"] = str(committee.committee_id)
         request.session["committee_uuid"] = str(committee.id)
-
         return Response("Committee activated")
 
     @action(detail=False, methods=["get"])
@@ -116,6 +119,13 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     def add_committee_account_data(self, committee_account):
         committee_data = get_committee_account_data(committee_account["committee_id"])
         return {**committee_account, **(committee_data or {})}
+
+    def update_committee_record_for_activate(self, committee: CommitteeAccount):
+        committee_data = get_committee_account_data(committee.committee_id)
+        committee.filing_frequency = committee_data.get("filing_frequency", None)
+        committee.candidate_office = committee_data.get("candidate_office", None)
+        committee.candidate_state = committee_data.get("candidate_state", None)
+        committee.save()
 
 
 class CommitteeOwnedViewMixin(viewsets.GenericViewSet):

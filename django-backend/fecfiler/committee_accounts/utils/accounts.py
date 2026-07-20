@@ -187,6 +187,8 @@ def get_production_committee_data(committee_id):
     if committee_data is None:
         # if no processed data, try raw endpoint
         committee_data = get_raw_committee_data(committee_id)
+    else:
+        augment_processed_committee_data(committee_data)
 
     return committee_data
 
@@ -248,7 +250,6 @@ def get_eligible_report_types_processed(committee_data: dict):
 
 
 def get_processed_committee_data(committee_id):
-
     params = {
         "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
         "committee_id": committee_id,
@@ -256,7 +257,10 @@ def get_processed_committee_data(committee_id):
     committee_data = query_fec_api_single(
         f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/", params
     )
+    return committee_data
 
+
+def augment_processed_committee_data(committee_data: dict):
     if committee_data:
         # Committee Type Label
         committee_data["committee_type_label"] = committee_data.get(
@@ -276,7 +280,29 @@ def get_processed_committee_data(committee_id):
             "eligible_report_types"
         ] = get_eligible_report_types_processed(committee_data)
 
+        add_candidate_office_state_if_needed(committee_data)
+
     return committee_data
+
+
+def add_candidate_office_state_if_needed(committee_data: dict):
+    if committee_data and "F3" in committee_data["eligible_report_types"]:
+        committee_id = committee_data.get("committee_id", None)
+        params = {
+            "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
+            "committee_id": committee_id,
+        }
+        candidate = query_fec_api_single(
+            f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/candidates/",
+            params
+        )
+        if candidate:
+            committee_data["candidate_office"] = candidate.get("office", None)
+            committee_data["candidate_state"] = candidate.get("state", None)
+        else:
+            logger.error(
+                f"Failed to retrieve candidate data for committee {committee_id}"
+            )
 
 
 def get_eligible_report_types_raw(committee_data: dict):
@@ -470,5 +496,6 @@ def convert_raw_to_processed(committee_data):
     committee_data["city"] = committee_data.get("committee_city", None)
     committee_data["state"] = committee_data.get("committee_state", None)
     committee_data["zip"] = committee_data.get("committee_zip", None)
+    committee_data["candidate_state"] = committee_data.get("state", None)
 
     return committee_data
