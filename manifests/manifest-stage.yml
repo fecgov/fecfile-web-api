@@ -41,6 +41,7 @@ defaults: &defaults
     FLAG__ENABLE_IMPORT: True
     ENABLE_RESTRICTED_COMMANDS: True
     FEC_FORMAT_VERSION: 8.5
+    SES_FROM_USER: no-reply+stage
 
 applications:
   - name: fecfile-web-api
