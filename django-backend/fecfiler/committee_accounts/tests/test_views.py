@@ -357,17 +357,40 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
             )
 
     def test_activate_happy_path(self):
-        request = self.build_viewset_post_request(
-            "/api/v1/committees/C01234567/activate/",
-            {"filing_frequency": "Q"},
-        )
-        response = CommitteeViewSet.as_view(
-            {"post": "activate"}
-        )(request, pk="11111111-2222-3333-4444-555555555555")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            request.session["committee_id"], "C01234567"
-        )
-        self.assertEqual(
-            request.session["committee_uuid"], "11111111-2222-3333-4444-555555555555"
-        )
+        with patch("fecfiler.committee_accounts.utils.accounts.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
+            with patch(
+                "fecfiler.committee_accounts.utils.accounts.get_mocked_committee_data"
+            ) as mock_committee:
+                test_filing_frequency = "Q"
+                test_candidate_office = "P"
+                test_candidate_state = "DC"
+                mock_committee.return_value = {
+                    "name": "TEST",
+                    "email": "test@fec.gov",
+                    "filing_frequency": test_filing_frequency,
+                    "candidate_office": test_candidate_office,
+                    "candidate_state": test_candidate_state,
+                }
+                request = self.build_viewset_post_request(
+                    "/api/v1/committees/C01234567/activate/",
+                    {},
+                )
+                response = CommitteeViewSet.as_view(
+                    {"post": "activate"}
+                )(request, pk="11111111-2222-3333-4444-555555555555")
+                committee = CommitteeAccount.objects.filter(
+                    id="11111111-2222-3333-4444-555555555555"
+                ).first()
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(committee.filing_frequency, test_filing_frequency)
+                self.assertEqual(committee.candidate_office, test_candidate_office)
+                self.assertEqual(committee.candidate_state, test_candidate_state)
+                self.assertEqual(
+                    request.session["committee_id"], "C01234567"
+                )
+                self.assertEqual(
+                    request.session["committee_uuid"],
+                    "11111111-2222-3333-4444-555555555555"
+                )
