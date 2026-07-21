@@ -216,6 +216,7 @@ def get_eligible_report_types_processed(committee_data: dict):
         "PS": ["F3", "F99"],
         "JH": ["F3", "F99"],
         "JS": ["F3", "F99"],
+        "BN": ["F3X", "F24", "F1M", "F99"],
         "BO": ["F3X", "F24", "F1M", "F99"],
         "BU": ["F3X", "F24", "F1M", "F99"],
         "DN": ["F3X", "F24", "F1M", "F99"],
