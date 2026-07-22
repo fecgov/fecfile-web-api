@@ -1,5 +1,6 @@
 from django.test import TestCase
 from ..models import Contact
+from ..shared_models import ContactType
 
 
 class ContactTestCase(TestCase):
@@ -7,7 +8,7 @@ class ContactTestCase(TestCase):
 
     def setUp(self):
         self.valid_contact = Contact(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name="Last",
             first_name="First",
             street_1="Street",
@@ -20,7 +21,7 @@ class ContactTestCase(TestCase):
 
     def test_get_contact(self):
         contact = Contact.objects.get(last_name="Lastname")
-        self.assertEqual(contact.type, Contact.ContactType.INDIVIDUAL)
+        self.assertEqual(contact.type, ContactType.INDIVIDUAL)
 
     def test_save_and_delete(self):
         self.valid_contact.save()

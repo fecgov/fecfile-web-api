@@ -5,6 +5,7 @@ import uuid
 
 from django.test import tag
 from ..models import Contact
+from ..shared_models import ContactType
 from fecfiler.committee_accounts.models import CommitteeAccount
 from ..views import ContactViewSet, DeletedContactsViewSet
 from .utils import create_test_individual_contact
@@ -61,13 +62,13 @@ class ContactViewSetTest(FecfilerViewSetTest):
         deleted_last="Deleted",
     ):
         active_contact = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name=active_last,
             first_name=active_first,
             committee_account_id=committee_uuid,
         )
         deleted_contact = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name=deleted_last,
             first_name=deleted_first,
             committee_account_id=committee_uuid,
@@ -321,7 +322,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
     def test_restore(self):
         contact = Contact.objects.create(
             id="a5061946-0000-0000-82f6-f1782c333d70",
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name="Last",
             first_name="First",
             committee_account_id="11111111-2222-3333-4444-555555555555",
@@ -414,7 +415,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
 
     def test_update(self):
         contact = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name="Last",
             first_name="First",
             committee_account_id="11111111-2222-3333-4444-555555555555",

@@ -5,6 +5,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.transactions.tests.utils import create_schedule_a
 from fecfiler.contacts.models import Contact
+from fecfiler.contacts.shared_models import ContactType
 from datetime import datetime
 import structlog
 
@@ -35,7 +36,7 @@ class DotFECReattributionsTestCase(TestCase):
         )
 
         self.individual = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name="last name",
             first_name="First name",
             committee_id=self.committee.committee_id,
@@ -50,7 +51,7 @@ class DotFECReattributionsTestCase(TestCase):
         )
 
         self.individual_2 = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name="last name 2",
             first_name="First name 2",
             committee_id=self.committee.committee_id,
