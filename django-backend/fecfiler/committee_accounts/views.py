@@ -57,7 +57,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         if not committee or committee.disabled is not None:
             return Response("Committee could not be activated", status=403)
         try:
-            self.update_committee_record_for_activate(committee)
+            committee = self.update_committee_record_for_activate(committee)
         except Exception as e:
             logger.error(
                 f"User {request.user.email} failed to update "
@@ -66,7 +66,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             )
         request.session["committee_id"] = str(committee.committee_id)
         request.session["committee_uuid"] = str(committee.id)
-        return Response("Committee activated")
+        return Response(self.get_serializer(committee).data)
 
     @action(detail=False, methods=["get"])
     def active(self, request):
@@ -126,6 +126,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee.candidate_office = committee_data.get("candidate_office", None)
         committee.candidate_state = committee_data.get("candidate_state", None)
         committee.save()
+        return committee
 
 
 class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
