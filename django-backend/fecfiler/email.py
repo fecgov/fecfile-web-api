@@ -18,7 +18,7 @@ else:
     SES_CLIENT = None
 
 
-def send_email_notification(to_email, subject, body_text, from_user=None):
+def send_email_notification(to_email, subject, body_text=None, body_html=None, from_user=None):
     if SES_CLIENT is None:
         raise RuntimeError(
             "SES client is not configured. Ensure SES_ACCESS_KEY_ID, "
@@ -32,6 +32,15 @@ def send_email_notification(to_email, subject, body_text, from_user=None):
     else:
         from_email = f"{from_user}@{SES_DOMAIN}" if from_user else SES_FROM_EMAIL
 
+    if body_text is None and body_html is None:
+        raise ValueError("At least one of body_text or body_html must be provided.")
+
+    body = {}
+    if body_text is not None:
+        body["Text"] = {"Data": body_text}
+    if body_html is not None:
+        body["Html"] = {"Data": body_html}
+
     try:
         response = SES_CLIENT.send_email(
             FromEmailAddress=from_email,
@@ -39,7 +48,7 @@ def send_email_notification(to_email, subject, body_text, from_user=None):
             Content={
                 "Simple": {
                     "Subject": {"Data": subject},
-                    "Body": {"Text": {"Data": body_text}},
+                    "Body": {**body},
                 }
             },
         )
