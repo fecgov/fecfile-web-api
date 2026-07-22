@@ -243,7 +243,8 @@ def get_eligible_report_types_processed(committee_data: dict):
 
     if eligible_reports is None:
         logger.error(
-            f"Failed to find eligible reports for processed committee: {committee_key}"
+            f"Failed to find eligible reports for processed committee "
+            f"{committee_data.get('committee_id')}: {committee_key}"
         )
         return fallback_reports
 
