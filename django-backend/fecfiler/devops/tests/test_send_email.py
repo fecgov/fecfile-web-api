@@ -27,6 +27,7 @@ class SesEmailHelperTestCase(TestCase):
                 }
             },
         )
+
     @patch("fecfiler.email.SES_CLIENT")
     @patch("fecfiler.email.SES_DOMAIN", "example.com")
     def test_send_email_notification_html_happy_path(self, ses_client_mock):
@@ -54,7 +55,6 @@ class SesEmailHelperTestCase(TestCase):
                 }
             },
         )
-
 
     @patch("fecfiler.email.SES_CLIENT", None)
     def test_send_email_notification_requires_ses_client(self):

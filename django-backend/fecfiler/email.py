@@ -18,7 +18,9 @@ else:
     SES_CLIENT = None
 
 
-def send_email_notification(to_email, subject, body_text=None, body_html=None, from_user=None):
+def send_email_notification(
+        to_email, subject, body_text=None, body_html=None, from_user=None
+    ):
     if SES_CLIENT is None:
         raise RuntimeError(
             "SES client is not configured. Ensure SES_ACCESS_KEY_ID, "
