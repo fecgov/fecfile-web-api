@@ -150,6 +150,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         return queryset
 
+    @action(detail=False, methods=["get"], url_path=r"list/unassociated")
+    def list_unassociated_transactions(self, request, *args, **kwargs):
+        if "page" not in request.query_params or request.query_params["page"] is None:
+            return Response("page is required", status=400)
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # __isnull evaluates to true when no many-to-many relationships exist
+        queryset = queryset.filter(reports__isnull=True)
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
