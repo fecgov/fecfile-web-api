@@ -233,10 +233,19 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 raise ValidationError("Invalid role")
 
             new_member = add_user_to_committee(email, committee_id, role)
-            logger.info(f"""
-                User {request.user.id} added {email} to committee
-                {committee_id} as {role}
-                """)
+
+            # if no Exception was returned, send email notification to the user
+            if not isinstance(new_member, BaseException):
+                logger.info(
+                    f"User {request.user.first_name} added {email} to committee "
+                    f"{committee_id} as {role}"
+                )
+            else:
+                logger.error(
+                    f"User {request.user.id} attempted to add {email} to committee "
+                    f"{committee_id} as {role}"
+                )
+
             return Response(CommitteeMembershipSerializer(new_member).data, status=200)
         except Exception as e:
             logger.error(f"""
