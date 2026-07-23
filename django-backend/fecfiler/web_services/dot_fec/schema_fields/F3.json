@@ -19,6 +19,7 @@
         "path": "form_3.election_district"
     },
     "election_code": {
+        "serializer": "ELECTION_CODE",
         "path": "form_3.election_code"
     },
     "date_of_election": {
