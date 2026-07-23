@@ -254,11 +254,14 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                     "You can access the committee account by signing in to FECfile+:\n"
                     f"https://{envbit}fecfile.fec.gov/"
                 )
+
+                # send_email_notification raises an exception (and logs) if sending fails
+                # but we want to continue regardless
                 try:
                     send_email_notification(
                         to_email=email, subject=subject, body_text=body_text
                     )
-                except Exception as e:
+                except Exception:
                     pass
 
                 logger.info(
