@@ -254,7 +254,9 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                     "You can access the committee account by signing in to FECfile+:\n"
                     f"https://{envbit}fecfile.fec.gov/"
                 )
-                send_email_notification(to_email=email, subject=subject, body_text=body_text)
+                send_email_notification(
+                    to_email=email, subject=subject, body_text=body_text
+                )
 
                 logger.info(
                     f"User {request.user.first_name} added {email} to committee "
