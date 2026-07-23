@@ -4,6 +4,8 @@ from rest_framework import filters, viewsets, mixins, pagination, status
 from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from fecfiler import settings
+from fecfiler.email import send_email_notification
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.committee_accounts.utils.accounts import (
     create_committee_account,
@@ -236,6 +238,24 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
             # if no Exception was returned, send email notification to the user
             if not isinstance(new_member, BaseException):
+                subject = f"[FECfile+] Invite to committee {committee_id}"
+
+                # adjust links based on space
+                if settings.SPACE == "prod":
+                    envbit = ""
+                else:
+                    envbit = f"{settings.SPACE}."
+
+                body_text = (
+                    "ADDED TO FECfile+ COMMITTEE\n"
+                    "\n"
+                    f"{request.user.id} has added you as a {role} to {committee_id}.\n"
+                    "\n"
+                    "You can access the committee account by signing in to FECfile+:\n"
+                    f"https://{envbit}fecfile.fec.gov/"
+                )
+                send_email_notification(to_email=email, subject=subject, body_text=body_text)
+
                 logger.info(
                     f"User {request.user.first_name} added {email} to committee "
                     f"{committee_id} as {role}"
