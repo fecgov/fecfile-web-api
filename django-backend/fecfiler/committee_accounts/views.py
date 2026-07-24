@@ -238,6 +238,11 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
             # if no Exception was returned, send email notification to the user
             if not isinstance(new_member, BaseException):
+                logger.info(
+                    f"User {request.user.first_name} added {email} to committee "
+                    f"{committee_id} as {role}"
+                )
+
                 subject = f"[FECfile+] Invite to committee {committee_id}"
 
                 # adjust links based on space
@@ -249,25 +254,21 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 body_text = (
                     "ADDED TO FECfile+ COMMITTEE\n"
                     "\n"
-                    f"{request.user.id} has added you as a {role} to {committee_id}.\n"
+                    f"{request.user.first_name} has added you as a {role} "
+                    f"to {committee_id}.\n"
                     "\n"
                     "You can access the committee account by signing in to FECfile+:\n"
                     f"https://{envbit}fecfile.fec.gov/"
                 )
 
-                # send_email_notification raises an exception (and logs) if sending fails
-                # but we want to continue regardless
                 try:
                     send_email_notification(
                         to_email=email, subject=subject, body_text=body_text
                     )
-                except Exception:
-                    pass
-
-                logger.info(
-                    f"User {request.user.first_name} added {email} to committee "
-                    f"{committee_id} as {role}"
-                )
+                except Exception as e:
+                    logger.error(
+                        f"Emailing {email} invite to {committee_id} failed: {str(e)}"
+                    )
             else:
                 logger.error(
                     f"User {request.user.id} attempted to add {email} to committee "
