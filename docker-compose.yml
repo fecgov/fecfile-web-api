@@ -159,6 +159,10 @@ services:
       S3_SECRET_ACCESS_KEY:
       S3_STORAGE_BUCKET_NAME:
       S3_REGION:
+      SES_ACCESS_KEY_ID:
+      SES_SECRET_ACCESS_KEY:
+      SES_REGION:
+      SES_DOMAIN:
       CELERY_WORKER_STORAGE: local
       MOCK_EFO_FILING: True
       EFO_FILING_API: https://efoservices.stage.efo.fec.gov
