@@ -446,15 +446,15 @@ class CommitteeAccountsUtilsTest(TestCase):
             "committee_type": "Q",
         }
 
+        eligible_types_UQ = get_eligible_report_types_processed(test_committee_data_UQ)
+        self.assertEqual(eligible_types_UQ, ["F3X", "F24", "F1M", "F99"])
+
         test_committee_data_BN = {
             "designation": "B",
             "committee_type": "N",
         }
         eligible_types_BN = get_eligible_report_types_processed(test_committee_data_BN)
         self.assertEqual(eligible_types_BN, ["F3X", "F24", "F1M", "F99"])
-
-        eligible_types_UQ = get_eligible_report_types_processed(test_committee_data_UQ)
-        self.assertEqual(eligible_types_UQ, ["F3X", "F24", "F1M", "F99"])
 
         test_committee_data_non_existant = {
             "designation": "Z",
