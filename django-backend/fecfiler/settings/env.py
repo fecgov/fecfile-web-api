@@ -1,7 +1,7 @@
-import cfenv
+from cfenv import AppEnv
 import os
 
-env = cfenv.AppEnv()
+env = AppEnv()
 
 redis = env.get_service(name="fecfile-api-redis")
 s3 = env.get_service(name="fecfile-api-s3")
