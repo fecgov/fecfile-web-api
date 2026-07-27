@@ -357,7 +357,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def sendAddUserToCommitteeEmail(committee_id, email, first_name, role):
+    def sendAddUserToCommitteeEmail(self, committee_id, email, first_name, role):
         subject = f"[FECfile+] Invite to committee {committee_id}"
 
         # adjust links based on space
