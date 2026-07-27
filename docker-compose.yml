@@ -196,6 +196,7 @@ services:
       FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
       FLAG__ENABLE_IMPORT: True
       FLAG__ENABLE_EMAIL: True
+      SES_FROM_USER: no-reply+local
     deploy:
       resources:
         limits:

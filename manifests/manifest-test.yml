@@ -42,7 +42,6 @@ defaults: &defaults
     FLAG__ENABLE_EMAIL: False
     ENABLE_RESTRICTED_COMMANDS: True
     FEC_FORMAT_VERSION: 8.5
-    SES_FROM_USER: no-reply+test
 
 applications:
   - name: fecfile-web-api
