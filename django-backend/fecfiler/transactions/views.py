@@ -327,9 +327,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         ):
             return Response(
                 """
-            contact_2_id, general_election_year, date,
-                and aggregation_group required.
-            """,
+                contact_2_id, general_election_year, date,
+                    and aggregation_group required.
+                """,
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
