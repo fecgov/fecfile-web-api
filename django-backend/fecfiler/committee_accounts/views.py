@@ -68,12 +68,6 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         request.session["committee_uuid"] = str(committee_data.get("id"))
         return Response(committee_data)
 
-    @action(detail=False, methods=["get"])
-    def active(self, request):
-        committee_uuid = request.session["committee_uuid"]
-        committee = self.get_queryset().filter(id=committee_uuid).first()
-        return Response(self.get_serializer(committee).data)
-
     @action(detail=False, methods=["post"])
     def create_account(self, request):
         try:
