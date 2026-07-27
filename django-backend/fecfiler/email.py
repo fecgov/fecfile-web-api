@@ -1,12 +1,13 @@
 from fecfiler.settings import (
-    SES_ACCESS_KEY_ID, SES_SECRET_ACCESS_KEY, SES_REGION, SES_DOMAIN, SES_FROM_EMAIL
+    SES_ACCESS_KEY_ID, SES_SECRET_ACCESS_KEY, SES_REGION, SES_DOMAIN, SES_FROM_EMAIL,
+    FLAG__ENABLE_EMAIL
 )
 import boto3
 import structlog
 
 logger = structlog.get_logger(__name__)
 
-if SES_ACCESS_KEY_ID and SES_SECRET_ACCESS_KEY and SES_REGION:
+if FLAG__ENABLE_EMAIL and SES_ACCESS_KEY_ID and SES_SECRET_ACCESS_KEY and SES_REGION:
     session = boto3.session.Session()
     SES_CLIENT = session.client(
         "sesv2",
@@ -23,8 +24,8 @@ def send_email_notification(
 ):
     if SES_CLIENT is None:
         raise RuntimeError(
-            "SES client is not configured. Ensure SES_ACCESS_KEY_ID, "
-            "SES_SECRET_ACCESS_KEY, and SES_REGION are set."
+            "SES client is not available. Ensure FLAG__ENABLE_EMAIL is True "
+            "and SES_ACCESS_KEY_ID, SES_SECRET_ACCESS_KEY, and SES_REGION are set."
         )
 
     if from_user is None and SES_FROM_EMAIL is None:
