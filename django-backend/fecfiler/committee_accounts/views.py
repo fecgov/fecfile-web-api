@@ -57,16 +57,16 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         if not committee or committee.disabled is not None:
             return Response("Committee could not be activated", status=403)
         try:
-            committee = self.update_committee_record_for_activate(committee)
+            committee_data = self.update_committee_record_for_activate(committee)
         except Exception as e:
             logger.error(
                 f"User {request.user.email} failed to update "
                 f"committee record for committee activation "
-                f"{committee.committee_id}: {str(e)}"
+                f"{committee_data.get("committee_id")}: {str(e)}"
             )
-        request.session["committee_id"] = str(committee.committee_id)
-        request.session["committee_uuid"] = str(committee.id)
-        return Response(self.get_serializer(committee).data)
+        request.session["committee_id"] = str(committee_data.get("committee_id"))
+        request.session["committee_uuid"] = str(committee_data.get("id"))
+        return Response(committee_data)
 
     @action(detail=False, methods=["get"])
     def active(self, request):
@@ -81,10 +81,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             if not committee_id:
                 raise Exception("no committee_id provided")
             account = create_committee_account(committee_id, request.user)
-
-            return Response(
-                self.add_committee_account_data(CommitteeAccountSerializer(account).data)
-            )
+            return Response(self.get_serializer(account).data)
         except Exception as e:
             logger.error(
                 f"User {request.user.email} failed to create committee account "
@@ -126,7 +123,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee.candidate_office = committee_data.get("candidate_office", None)
         committee.candidate_state = committee_data.get("candidate_state", None)
         committee.save()
-        return committee
+        return {**CommitteeAccountSerializer(committee).data, **(committee_data or {})}
 
 
 class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
