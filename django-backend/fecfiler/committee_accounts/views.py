@@ -242,33 +242,12 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                     f"User {request.user.first_name} added {email} to committee "
                     f"{committee_id} as {role}"
                 )
-
-                subject = f"[FECfile+] Invite to committee {committee_id}"
-
-                # adjust links based on space
-                if settings.SPACE == "prod":
-                    envbit = ""
-                else:
-                    envbit = f"{settings.SPACE}."
-
-                body_text = (
-                    "ADDED TO FECfile+ COMMITTEE\n"
-                    "\n"
-                    f"{request.user.first_name} has added you as a {role} "
-                    f"to {committee_id}.\n"
-                    "\n"
-                    "You can access the committee account by signing in to FECfile+:\n"
-                    f"https://{envbit}fecfile.fec.gov/"
+                self.sendAddUserToCommitteeEmail(
+                    committee_id,
+                    email,
+                    request.user.first_name,
+                    role
                 )
-
-                try:
-                    send_email_notification(
-                        to_email=email, subject=subject, body_text=body_text
-                    )
-                except Exception as e:
-                    logger.error(
-                        f"Emailing {email} invite to {committee_id} failed: {str(e)}"
-                    )
             else:
                 logger.error(
                     f"User {request.user.id} attempted to add {email} to committee "
@@ -377,3 +356,31 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def sendAddUserToCommitteeEmail(committee_id, email, first_name, role):
+        subject = f"[FECfile+] Invite to committee {committee_id}"
+
+        # adjust links based on space
+        if settings.SPACE == "prod":
+            envbit = ""
+        else:
+            envbit = f"{settings.SPACE}."
+
+        body_text = (
+            "ADDED TO FECfile+ COMMITTEE\n"
+            "\n"
+            f"{first_name} has added you as a {role} "
+            f"to {committee_id}.\n"
+            "\n"
+            "You can access the committee account by signing in to FECfile+:\n"
+            f"https://{envbit}fecfile.fec.gov/"
+        )
+
+        try:
+            send_email_notification(
+                to_email=email, subject=subject, body_text=body_text
+            )
+        except Exception as e:
+            logger.error(
+                f"Emailing {email} invite to {committee_id} failed: {str(e)}"
+            )
