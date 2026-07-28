@@ -24,7 +24,8 @@
         "email": "test@fec.gov",
         "counts_as_processed": true,
         "candidate_office": "P",
-        "candidate_state": "DC"
+        "candidate_state": "DC",
+        "candidate_district": 1
     },
     {
         "committee_id": "C99999999",
@@ -54,7 +55,8 @@
         "zip": "20001",
         "counts_as_processed": true,
         "candidate_office": "P",
-        "candidate_state": "DC"
+        "candidate_state": "DC",
+        "candidate_district": 2
     },
     {
         "committee_id": "C99999998",
@@ -83,7 +85,8 @@
         "zip": "20001",
         "counts_as_processed": false,
         "candidate_office": "P",
-        "candidate_state": "DC"
+        "candidate_state": "DC",
+        "candidate_district": 3
     },{
         "committee_id": "C99999997",
         "name": "Test Committee E",
@@ -109,7 +112,8 @@
         "email": "test@fec.gov",
         "counts_as_processed": true,
         "candidate_office": "P",
-        "candidate_state": "DC"
+        "candidate_state": "DC",
+        "candidate_district": 4
     },{
         "committee_id": "C99999996",
         "name": "Test Committee - F3",
@@ -135,6 +139,7 @@
         "email": "test@test.com",
         "counts_as_processed": true,
         "candidate_office": "P",
-        "candidate_state": "DC"
+        "candidate_state": "DC",
+        "candidate_district": 5
     }
 ]

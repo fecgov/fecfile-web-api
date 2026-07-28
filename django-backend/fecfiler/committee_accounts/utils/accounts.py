@@ -301,6 +301,7 @@ def add_candidate_office_state_if_needed(committee_data: dict):
         if candidate:
             committee_data["candidate_office"] = candidate.get("office", None)
             committee_data["candidate_state"] = candidate.get("state", None)
+            committee_data["candidate_distrct"] = candidate.get("district_number", None)
         else:
             logger.error(
                 f"Failed to retrieve candidate data for committee {committee_id}"
