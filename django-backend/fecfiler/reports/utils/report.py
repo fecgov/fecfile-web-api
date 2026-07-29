@@ -11,7 +11,7 @@ from fecfiler.transactions.models import Transaction
 from fecfiler.memo_text.models import MemoText
 from fecfiler.committee_accounts.utils.shared import is_valid_committee_id
 from fecfiler.s3 import S3_SESSION
-from fecfiler.settings import AWS_STORAGE_BUCKET_NAME
+from fecfiler.settings import S3_STORAGE_BUCKET_NAME
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -43,7 +43,7 @@ def reset_submitting_report(id):
     if dot_fec_record:
         if S3_SESSION is not None:
             file_name = dot_fec_record.file_name
-            s3_object = S3_SESSION.Object(AWS_STORAGE_BUCKET_NAME, file_name)
+            s3_object = S3_SESSION.Object(S3_STORAGE_BUCKET_NAME, file_name)
             s3_object.delete()
             logger.info(f"Deleted dotfec file {file_name} from S3.")
         dot_fec_record.delete()

@@ -467,6 +467,14 @@ class CommitteeAccountsUtilsTest(TestCase):
         eligible_types_JS = get_eligible_report_types_processed(test_committee_data_JS)
         self.assertEqual(eligible_types_JS, ["F3", "F99"])
 
+        test_committee_data_BN = {
+            "designation": "B",
+            "committee_type": "N",
+        }
+
+        eligible_types_BN = get_eligible_report_types_processed(test_committee_data_BN)
+        self.assertEqual(eligible_types_BN, ["F3X", "F24", "F1M", "F99"])
+
         test_committee_data_BO = {
             "designation": "B",
             "committee_type": "O",
@@ -474,17 +482,31 @@ class CommitteeAccountsUtilsTest(TestCase):
         eligible_types_BO = get_eligible_report_types_processed(test_committee_data_BO)
         self.assertEqual(eligible_types_BO, ["F3X", "F24", "F1M", "F99"])
 
+        test_committee_data_BQ = {
+            "designation": "B",
+            "committee_type": "Q",
+        }
+        eligible_types_BQ = get_eligible_report_types_processed(test_committee_data_BQ)
+        self.assertEqual(eligible_types_BQ, ["F3X", "F24", "F1M", "F99"])
+
+        test_committee_data_BV = {
+            "designation": "B",
+            "committee_type": "V",
+        }
+        eligible_types_BV = get_eligible_report_types_processed(test_committee_data_BV)
+        self.assertEqual(eligible_types_BV, ["F3X", "F24", "F1M", "F99"])
+
+        test_committee_data_BW = {
+            "designation": "B",
+            "committee_type": "W",
+        }
+        eligible_types_BW = get_eligible_report_types_processed(test_committee_data_BW)
+        self.assertEqual(eligible_types_BW, ["F3X", "F24", "F1M", "F99"])
+
         test_committee_data_UQ = {
             "designation": "U",
             "committee_type": "Q",
         }
-
-        test_committee_data_BN = {
-            "designation": "B",
-            "committee_type": "N",
-        }
-        eligible_types_BN = get_eligible_report_types_processed(test_committee_data_BN)
-        self.assertEqual(eligible_types_BN, ["F3X", "F24", "F1M", "F99"])
 
         eligible_types_UQ = get_eligible_report_types_processed(test_committee_data_UQ)
         self.assertEqual(eligible_types_UQ, ["F3X", "F24", "F1M", "F99"])
