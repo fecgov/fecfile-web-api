@@ -365,12 +365,14 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 test_filing_frequency = "Q"
                 test_candidate_office = "P"
                 test_candidate_state = "DC"
+                test_candidate_district = "2"
                 mock_committee.return_value = {
                     "name": "TEST",
                     "email": "test@fec.gov",
                     "filing_frequency": test_filing_frequency,
                     "candidate_office": test_candidate_office,
                     "candidate_state": test_candidate_state,
+                    "candidate_district": test_candidate_district,
                 }
                 request = self.build_viewset_post_request(
                     "/api/v1/committees/C01234567/activate/",
@@ -387,6 +389,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 self.assertEqual(committee.filing_frequency, test_filing_frequency)
                 self.assertEqual(committee.candidate_office, test_candidate_office)
                 self.assertEqual(committee.candidate_state, test_candidate_state)
+                self.assertEqual(committee.candidate_district, test_candidate_district)
                 self.assertEqual(
                     request.session["committee_id"], "C01234567"
                 )

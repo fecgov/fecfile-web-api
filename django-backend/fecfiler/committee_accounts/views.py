@@ -127,7 +127,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee.filing_frequency = committee_data.get("filing_frequency", None)
         committee.candidate_office = committee_data.get("candidate_office", None)
         committee.candidate_state = committee_data.get("candidate_state", None)
-        committee.candidate_distrct = committee_data.get("candidate_district", None)
+        committee.candidate_district = committee_data.get("candidate_district", None)
         committee.save()
         return committee
 

@@ -304,7 +304,7 @@ def add_candidate_office_state_if_needed(committee_data: dict):
         if candidate:
             committee_data["candidate_office"] = candidate.get("office", None)
             committee_data["candidate_state"] = candidate.get("state", None)
-            committee_data["candidate_distrct"] = candidate.get("district_number", None)
+            committee_data["candidate_district"] = candidate.get("district_number", None)
         else:
             logger.error(
                 f"Failed to retrieve candidate data for committee {committee_id}"
@@ -416,7 +416,7 @@ def get_test_committee_data(committee_id):
     committee_data = get_committee_from_test_fec(committee_id)
     if committee_data:
 
-        # PAC/PTY
+        # PAC/PTYC00412304
         committee_data["isPTY"] = is_test_efo_pty(committee_data)
         committee_data["isPAC"] = not committee_data["isPTY"]
 
@@ -503,5 +503,6 @@ def convert_raw_to_processed(committee_data):
     committee_data["state"] = committee_data.get("committee_state", None)
     committee_data["zip"] = committee_data.get("committee_zip", None)
     committee_data["candidate_state"] = committee_data.get("state", None)
+    committee_data["candidate_district"] = committee_data.get("candidate_district", None)
 
     return committee_data

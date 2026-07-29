@@ -334,13 +334,15 @@ class CommitteeAccountsUtilsTest(TestCase):
             }
             test_candidate_office = 'test_candidate_office'
             test_candidate_state = 'DC'
+            test_candidate_district = '2'
             self.mock_requests_get(
                 mock_requests,
                 [
                     self.mock_response(200, production_committee_data),
                     self.mock_response(200, {
                         "office": test_candidate_office,
-                        "state": test_candidate_state
+                        "state": test_candidate_state,
+                        "district_number": test_candidate_district,
                     }),
                 ],
             )
@@ -350,6 +352,9 @@ class CommitteeAccountsUtilsTest(TestCase):
             )
             self.assertEqual(
                 committee_account_data.get("candidate_state"), test_candidate_state
+            )
+            self.assertEqual(
+                committee_account_data.get("candidate_district"), test_candidate_district
             )
 
     def test_get_committee_account_data_from_production_processed_pac_pty(self):
