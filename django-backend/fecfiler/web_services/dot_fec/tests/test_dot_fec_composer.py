@@ -11,7 +11,12 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import (
     FS_STR,
 )
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.reports.tests.utils import create_form3x, create_form3, create_form99, create_report_memo
+from fecfiler.reports.tests.utils import (
+    create_form3x,
+    create_form3,
+    create_form99,
+    create_report_memo
+)
 from fecfiler.transactions.tests.utils import (
     create_schedule_a,
 )
@@ -26,7 +31,11 @@ from datetime import datetime
 class DotFECSerializerTestCase(TestCase):
 
     def setUp(self):
-        self.committee = CommitteeAccount.objects.create(committee_id="C00000000", candidate_state="AK", candidate_district="0")
+        self.committee = CommitteeAccount.objects.create(
+            committee_id="C00000000",
+            candidate_state="AK",
+            candidate_district="0"
+        )
         coverage_from = datetime.strptime("2024-01-01", "%Y-%m-%d")
         coverage_through = datetime.strptime("2024-02-01", "%Y-%m-%d")
         self.f3x = create_form3x(
