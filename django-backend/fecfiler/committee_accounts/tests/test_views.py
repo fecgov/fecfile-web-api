@@ -365,7 +365,7 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 test_filing_frequency = "Q"
                 test_candidate_office = "P"
                 test_candidate_state = "DC"
-                test_candidate_district = "2"
+                test_candidate_district = "02"
                 mock_committee.return_value = {
                     "name": "TEST",
                     "email": "test@fec.gov",
