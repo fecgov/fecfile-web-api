@@ -416,7 +416,7 @@ def get_test_committee_data(committee_id):
     committee_data = get_committee_from_test_fec(committee_id)
     if committee_data:
 
-        # PAC/PTYC00412304
+        # PAC/PTY
         committee_data["isPTY"] = is_test_efo_pty(committee_data)
         committee_data["isPAC"] = not committee_data["isPTY"]
 
