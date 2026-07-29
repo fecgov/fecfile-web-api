@@ -11,7 +11,7 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import (
     FS_STR,
 )
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.reports.tests.utils import create_form3x, create_form99, create_report_memo
+from fecfiler.reports.tests.utils import create_form3x, create_form3, create_form99, create_report_memo
 from fecfiler.transactions.tests.utils import (
     create_schedule_a,
 )
@@ -26,7 +26,7 @@ from datetime import datetime
 class DotFECSerializerTestCase(TestCase):
 
     def setUp(self):
-        self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
+        self.committee = CommitteeAccount.objects.create(committee_id="C00000000", candidate_state="AK", candidate_district="0")
         coverage_from = datetime.strptime("2024-01-01", "%Y-%m-%d")
         coverage_through = datetime.strptime("2024-02-01", "%Y-%m-%d")
         self.f3x = create_form3x(
@@ -34,6 +34,11 @@ class DotFECSerializerTestCase(TestCase):
             coverage_from,
             coverage_through,
             {"L38_net_operating_expenditures_ytd": format(381.00, ".2f")},
+        )
+        self.f3 = create_form3(
+            self.committee,
+            datetime.strptime("2024-02-02", "%Y-%m-%d"),
+            datetime.strptime("2024-02-29", "%Y-%m-%d"),
         )
         self.f99 = create_form99(
             self.committee,
@@ -158,6 +163,13 @@ class DotFECSerializerTestCase(TestCase):
             "\nBEHOLD! A large text string\nwith new lines",
         )
         self.assertEqual(split_content[4], "[ENDTEXT]")
+
+    def test_f3(self):
+        content = compose_dot_fec(self.f3.id)
+        split_content = content.split(CRLF_STR)
+        split_report_row = split_content[1].split(FS_STR)
+        self.assertEqual(split_report_row[9], "AK")
+        self.assertEqual(split_report_row[10], "0")
 
     @patch("fecfiler.web_services.dot_fec.dot_fec_composer.FEC_FORMAT_VERSION", None)
     def test_missing_fec_format_version_raises_error(self):
