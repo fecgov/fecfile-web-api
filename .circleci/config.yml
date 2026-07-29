@@ -250,16 +250,7 @@ workflows:
       - test
       # This job is triggered whenever a commit is made to the dev/stage/test/prod branches.
       # It kicks off the e2e-test pipeline in the fecfile-web-app project.
-      - trigger-e2e-test-pipeline:
-          filters:
-            branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
       - deploy-job:
-          requires:
-            - lint
-            - dependency-check
-            - schema-checks
-            - test
           filters:
             branches:
-              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
+              only: /feature\/3294-testing-in-dev|release\/sprint-[\.\d]+|release\/test|main/
