@@ -342,7 +342,7 @@ class CommitteeAccountsUtilsTest(TestCase):
                     self.mock_response(200, {
                         "office": test_candidate_office,
                         "state": test_candidate_state,
-                        "district_number": test_candidate_district,
+                        "district": test_candidate_district,
                     }),
                 ],
             )
