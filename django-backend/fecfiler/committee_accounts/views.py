@@ -4,6 +4,8 @@ from rest_framework import filters, viewsets, mixins, pagination, status
 from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from fecfiler import settings
+from fecfiler.email import send_email_notification
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.committee_accounts.utils.accounts import (
     create_committee_account,
@@ -235,10 +237,25 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 raise ValidationError("Invalid role")
 
             new_member = add_user_to_committee(email, committee_id, role)
-            logger.info(f"""
-                User {request.user.id} added {email} to committee
-                {committee_id} as {role}
-                """)
+
+            # if no Exception was returned, send email notification to the user
+            if not isinstance(new_member, BaseException):
+                logger.info(
+                    f"User {request.user.first_name} added {email} to committee "
+                    f"{committee_id} as {role}"
+                )
+                self.sendAddUserToCommitteeEmail(
+                    committee_id,
+                    email,
+                    request.user.first_name,
+                    role
+                )
+            else:
+                logger.error(
+                    f"User {request.user.id} attempted to add {email} to committee "
+                    f"{committee_id} as {role}"
+                )
+
             return Response(CommitteeMembershipSerializer(new_member).data, status=200)
         except Exception as e:
             logger.error(f"""
@@ -341,3 +358,31 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def sendAddUserToCommitteeEmail(self, committee_id, email, first_name, role):
+        subject = f"[FECfile+] Invite to committee {committee_id}"
+
+        # adjust links based on space
+        if settings.SPACE == "prod":
+            envbit = ""
+        else:
+            envbit = f"{settings.SPACE}."
+
+        body_text = (
+            "ADDED TO FECfile+ COMMITTEE\n"
+            "\n"
+            f"{first_name} has added you as a {role} "
+            f"to {committee_id}.\n"
+            "\n"
+            "You can access the committee account by signing in to FECfile+:\n"
+            f"https://{envbit}fecfile.fec.gov/"
+        )
+
+        try:
+            send_email_notification(
+                to_email=email, subject=subject, body_text=body_text
+            )
+        except Exception as e:
+            logger.error(
+                f"Emailing {email} invite to {committee_id} failed: {str(e)}"
+            )

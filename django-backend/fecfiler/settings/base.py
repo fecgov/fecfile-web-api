@@ -526,13 +526,19 @@ WARNING: This will BREAK submitting to fec because it will no longer conform to 
 """
 OUTPUT_TEST_INFO_IN_DOT_FEC = env.get_credential("OUTPUT_TEST_INFO_IN_DOT_FEC")
 
-AWS_ACCESS_KEY_ID = env.get_credential("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
-AWS_REGION = env.get_credential("AWS_REGION")
+S3_ACCESS_KEY_ID = env.get_credential("S3_ACCESS_KEY_ID")
+S3_SECRET_ACCESS_KEY = env.get_credential("S3_SECRET_ACCESS_KEY")
+S3_STORAGE_BUCKET_NAME = env.get_credential("S3_STORAGE_BUCKET_NAME")
+S3_REGION = env.get_credential("S3_REGION")
 S3_OBJECTS_MAX_AGE_DAYS = get_float_from_string(
     env.get_credential("S3_OBJECTS_MAX_AGE_DAYS", 365)
 )
+SES_ACCESS_KEY_ID = env.get_credential("SES_ACCESS_KEY_ID")
+SES_SECRET_ACCESS_KEY = env.get_credential("SES_SECRET_ACCESS_KEY")
+SES_REGION = env.get_credential("SES_REGION")
+SES_DOMAIN = env.get_credential("SES_DOMAIN")
+SES_FROM_USER = env.get_credential("SES_FROM_USER") or "no-reply"
+SES_FROM_EMAIL = SES_FROM_USER + "@" + SES_DOMAIN if SES_DOMAIN else None
 
 """FEATURE FLAGS
 """
@@ -549,6 +555,7 @@ if FLAG__COMMITTEE_DATA_SOURCE not in valid_sources:
 
 FLAG__ENABLE_IMPORT = env.get_credential("FLAG__ENABLE_IMPORT")
 
+FLAG__ENABLE_EMAIL = env.get_credential("FLAG__ENABLE_EMAIL")
 
 PRODUCTION_OPEN_FEC_API = env.get_credential("PRODUCTION_OPEN_FEC_API")
 PRODUCTION_OPEN_FEC_API_KEY = env.get_credential("PRODUCTION_OPEN_FEC_API_KEY")
