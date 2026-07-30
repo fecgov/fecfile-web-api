@@ -633,9 +633,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATION_TO"
         )
 
-        if (
-            is_reattribution_from
-        ):
+        if (is_reattribution_from):
             # Refresh parent's state from DB before calling delete
             parent = self.parent_transaction
             parent.refresh_from_db(fields=["deleted"])
