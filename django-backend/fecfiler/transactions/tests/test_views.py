@@ -271,7 +271,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 },
             )
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["aggregate"], 0)
 
     def test_get_previous_entity_same_day(self):
         view_set = TransactionViewSet()
@@ -321,7 +322,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 },
             )
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["aggregate"], 0)
 
     def test_get_entity_date_leapfrogging(self):
         view_set = TransactionViewSet()
@@ -472,7 +474,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 },
             )
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["aggregate"], 0)
 
         transaction_data = {
             **self.transaction_serializer.to_representation(third_transaction),
@@ -2228,7 +2231,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
             "general_election_year": "2022",
         }
-        self._run_payee_candidate_test(view_set, params, 404)
+        self._run_payee_candidate_test(view_set, params, 200)
 
         # No date should return 400
         params["date"] = ""
@@ -2269,15 +2272,15 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         params["date"] = "2024-01-15"
         params["contact_2_id"] = str(contact_com.id)
-        self._run_payee_candidate_test(view_set, params, 404)
+        self._run_payee_candidate_test(view_set, params, 200)
 
         params["general_election_year"] = "2020"
         params["contact_2_id"] = str(contact_can.id)
-        self._run_payee_candidate_test(view_set, params, 404)
+        self._run_payee_candidate_test(view_set, params, 200)
 
         params["aggregation_group"] = "THIS_DOESNT_MATCH_ANYTHING"
         params["general_election_year"] = "2022"
-        self._run_payee_candidate_test(view_set, params, 404)
+        self._run_payee_candidate_test(view_set, params, 200)
 
         params["transaction_id"] = str(transaction_3.id)
         params["aggregation_group"] = "COORDINATED_PARTY_EXPENDITURES"
