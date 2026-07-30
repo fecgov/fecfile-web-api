@@ -458,6 +458,61 @@ class TransactionModelTestCase(TestCase):
         self.assertIsNotNone(reattribution_from.deleted)
         self.assertIsNotNone(reattribution_to.deleted)
 
+    def test_delete_reattribution_without_copy_does_not_delete_original(self):
+        # this isn't a copy, don't delete the original
+        self.partnership_receipt.schedule_a.reattribution_redesignation_tag = (
+            "REATTRIBUTED"
+        )
+        self.partnership_receipt.schedule_a.save()
+
+        reattribution_to = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-01",
+            amount="10.00",
+        )
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.save()
+        reattribution_to.reatt_redes = self.partnership_receipt
+        reattribution_to.save()
+
+        reattribution_from = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="-10.00",
+            parent_id=reattribution_to.id,
+        )
+        reattribution_from.schedule_a.reattribution_redesignation_tag = (
+            "REATTRIBUTED_FROM"
+        )
+        reattribution_from.schedule_a.save()
+        reattribution_from.reatt_redes = self.partnership_receipt
+        reattribution_from.save()
+
+        reattribution_to.delete()
+        self.partnership_receipt.refresh_from_db()
+        reattribution_to.refresh_from_db()
+        reattribution_from.refresh_from_db()
+
+        self.assertIsNone(self.partnership_receipt.deleted)
+        self.assertIsNotNone(reattribution_to.deleted)
+        self.assertIsNotNone(reattribution_from.deleted)
+
+        undelete(reattribution_to)
+        undelete(reattribution_from)
+
+        reattribution_from.delete()
+        self.partnership_receipt.refresh_from_db()
+        reattribution_to.refresh_from_db()
+        reattribution_from.refresh_from_db()
+
+        self.assertIsNone(self.partnership_receipt.deleted)
+        self.assertIsNotNone(reattribution_to.deleted)
+        self.assertIsNotNone(reattribution_from.deleted)
+
     def test_delete_reattribution_with_copy(self):
         self.assertIsNone(self.partnership_receipt.deleted)
 
