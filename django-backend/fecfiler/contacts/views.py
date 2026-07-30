@@ -300,6 +300,32 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
+    def duplicate_check(self, request):
+        params = request.query_params
+        query = Q()
+        if candidate_id := params.get("candidate_id"):
+            query |= Q(candidate_id=candidate_id)
+        if committee_id := params.get("committee_id"):
+            query |= Q(committee_id=committee_id)
+        if name := params.get("name"):
+            query |= Q(name__iexact=name, type="ORG")
+
+        first_name = params.get("first_name")
+        last_name = params.get("last_name")
+        if first_name and last_name:
+            query |= Q(
+                first_name__iexact=first_name, last_name__iexact=last_name, type="IND"
+            )
+
+        if not query:
+            return Response({"results": []})
+
+        queryset = self.get_queryset().filter(query)
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response({"results": serializer.data})
+
+    @action(detail=False)
     def get_contact_id(self, request):
         fec_id = request.GET.get("fec_id")
         if fec_id is None:

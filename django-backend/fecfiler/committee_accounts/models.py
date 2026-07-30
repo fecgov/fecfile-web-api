@@ -27,6 +27,7 @@ class CommitteeAccount(SoftDeleteModel):
         choices=CandidateOffice.choices, max_length=1, null=True, blank=True
     )
     candidate_state = models.TextField(null=True, blank=True)
+    candidate_district = models.TextField(null=True, blank=True)
     members = models.ManyToManyField(
         User,
         through="Membership",

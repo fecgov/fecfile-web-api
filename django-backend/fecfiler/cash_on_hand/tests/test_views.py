@@ -21,7 +21,8 @@ class CashOnHandYearlyViewSetTest(FecfilerViewSetTest):
             "cash_on_hand_for_year",
             year="2024",
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {})
 
     def test_get_override(self):
         create_cash_on_hand_yearly(self.committee, "2024", 1)
