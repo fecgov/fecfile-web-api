@@ -211,7 +211,6 @@ class TransactionSerializer(
                 ).to_representation(instance.debt)
             # represent original reattribution/redesignation transaction
             if instance.reatt_redes:
-                new_context["add_reports"] = True
                 representation["reatt_redes"] = TransactionSerializer(
                     context=new_context
                 ).to_representation(instance.reatt_redes)
@@ -222,29 +221,23 @@ class TransactionSerializer(
                     for child in instance.children.all()
                 ]
 
-            self.add_reports(instance, representation)
-
-        if self.context.get("add_reports", False):
-            self.add_reports(instance, representation)
+            representation["reports"] = []
+            representation["report_ids"] = []
+            for report in instance.reports.all():
+                representation["report_ids"].append(report.id)
+                representation["reports"].append(
+                    {
+                        "id": report.id,
+                        "coverage_from_date": report.coverage_from_date,
+                        "coverage_through_date": report.coverage_through_date,
+                        "report_code": report.report_code,
+                        "report_type": report.report_type,
+                        "report_code_label": get_report_code_label(report),
+                    }
+                )
 
         representation["can_delete"] = instance.can_delete
         return representation
-
-    def add_reports(self, instance, representation):
-        representation["reports"] = []
-        representation["report_ids"] = []
-        for report in instance.reports.all():
-            representation["report_ids"].append(report.id)
-            representation["reports"].append(
-                {
-                    "id": report.id,
-                    "coverage_from_date": report.coverage_from_date,
-                    "coverage_through_date": report.coverage_through_date,
-                    "report_code": report.report_code,
-                    "report_type": report.report_type,
-                    "report_code_label": get_report_code_label(report),
-                }
-            )
 
     def validate(self, data):
         initial_data = getattr(self, "initial_data")
