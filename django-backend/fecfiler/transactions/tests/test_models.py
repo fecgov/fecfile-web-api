@@ -459,7 +459,6 @@ class TransactionModelTestCase(TestCase):
         self.assertIsNotNone(reattribution_to.deleted)
 
     def test_delete_reattribution_without_copy_does_not_delete_original(self):
-        # this isn't a copy, don't delete the original
         self.partnership_receipt.schedule_a.reattribution_redesignation_tag = (
             "REATTRIBUTED"
         )
