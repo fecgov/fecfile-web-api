@@ -639,7 +639,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             parent.refresh_from_db(fields=["deleted"])
             parent.delete()
 
-        # If this reattribution/redesignation is tied to a pulled-forward copy of
+        # If this reattribution/redesignation is tied to a copy of
         # the original transaction, delete the copy
         if (
             self.reatt_redes
