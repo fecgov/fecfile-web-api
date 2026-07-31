@@ -618,22 +618,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     # If this is a reattribution/redesignation 'from' transaction,
     # delete the 'to' transaction
     def delete_reattribution_redesignations(self):
-        is_reattribution_from = (
+        if (
             self.schedule_a
             and self.schedule_a.reattribution_redesignation_tag == "REATTRIBUTED_FROM"
         ) or (
             self.schedule_b
             and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATED_FROM"
-        )
-        is_reattribution_to = (
-            self.schedule_a
-            and self.schedule_a.reattribution_redesignation_tag == "REATTRIBUTED_TO"
-        ) or (
-            self.schedule_b
-            and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATION_TO"
-        )
-
-        if (is_reattribution_from):
+        ):
             # Refresh parent's state from DB before calling delete
             parent = self.parent_transaction
             parent.refresh_from_db(fields=["deleted"])
@@ -641,25 +632,21 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
         # If this reattribution/redesignation is tied to a copy of
         # the original transaction, delete the copy
+        target = self.reatt_redes
+        has_copy_chain_link = target and target.reatt_redes_id is not None
+        has_matching_associated_with = (
+            # Some pulled-forward copies are identified by matching
+            # transaction_id and associated-with transaction_id.
+            target
+            and target.reatt_redes
+            and target.transaction_id == target.reatt_redes.transaction_id
+        )
         if (
-            self.reatt_redes
-            and (is_reattribution_to or is_reattribution_from)
-            and (
-                (
-                    self.reatt_redes.schedule_a
-                    and self.reatt_redes.schedule_a.reattribution_redesignation_tag
-                    == "REATTRIBUTED"
-                )
-                or (
-                    self.reatt_redes.schedule_b
-                    and self.reatt_redes.schedule_b.reattribution_redesignation_tag
-                    == "REDESIGNATED"
-                )
-            )
-            and self.reatt_redes.reatt_redes_id is not None
+            target
+            and (has_copy_chain_link or has_matching_associated_with)
         ):
             # Refresh reatt_redes' state from DB before calling delete
-            reatt_redes = self.reatt_redes
+            reatt_redes = target
             reatt_redes.refresh_from_db(fields=["deleted"])
             reatt_redes.delete()
 

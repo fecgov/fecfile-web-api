@@ -601,15 +601,71 @@ class TransactionModelTestCase(TestCase):
         self.assertIsNotNone(reattribution_to.deleted)
         self.assertIsNotNone(reattribution_from.deleted)
 
-        undelete(reattribution_to)
-        undelete(reattribution_from)
+    def test_delete_reattribution_with_copy_without_copy_tag(self):
+        copy_of_receipt_for_reattribution = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="100.00",
+            report=self.m1_report,
+        )
+        copy_of_receipt_for_reattribution.reatt_redes = self.partnership_receipt
+        # Intentionally leave copy tag unset to exercise link-based copy detection.
+        copy_of_receipt_for_reattribution.save()
 
-        reattribution_from.delete()
+        reattribution_to = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-01",
+            amount="10.00",
+            report=self.m1_report,
+        )
+        reattribution_to.reatt_redes = copy_of_receipt_for_reattribution
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.save()
+        reattribution_to.save()
+
+        reattribution_from = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="-10.00",
+            report=self.m1_report,
+            parent_id=reattribution_to.id,
+        )
+        reattribution_from.reatt_redes = copy_of_receipt_for_reattribution
+        reattribution_from.schedule_a.reattribution_redesignation_tag = (
+            "REATTRIBUTED_FROM"
+        )
+        reattribution_from.schedule_a.save()
+        reattribution_from.save()
+
+        reattribution_to.delete()
         self.partnership_receipt.refresh_from_db()
+        copy_of_receipt_for_reattribution.refresh_from_db()
         reattribution_to.refresh_from_db()
         reattribution_from.refresh_from_db()
 
         self.assertIsNone(self.partnership_receipt.deleted)
+        self.assertIsNotNone(copy_of_receipt_for_reattribution.deleted)
+        self.assertIsNotNone(reattribution_to.deleted)
+        self.assertIsNotNone(reattribution_from.deleted)
+
+        undelete(reattribution_to)
+        undelete(reattribution_from)
+        undelete(copy_of_receipt_for_reattribution)
+
+        reattribution_from.delete()
+        self.partnership_receipt.refresh_from_db()
+        copy_of_receipt_for_reattribution.refresh_from_db()
+        reattribution_to.refresh_from_db()
+        reattribution_from.refresh_from_db()
+
+        self.assertIsNone(self.partnership_receipt.deleted)
+        self.assertIsNotNone(copy_of_receipt_for_reattribution.deleted)
         self.assertIsNotNone(reattribution_to.deleted)
         self.assertIsNotNone(reattribution_from.deleted)
 
