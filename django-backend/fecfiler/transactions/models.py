@@ -641,10 +641,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             and target.reatt_redes
             and target.transaction_id == target.reatt_redes.transaction_id
         )
-        if (
-            target
-            and (has_copy_chain_link or has_matching_associated_with)
-        ):
+        if target and (has_copy_chain_link or has_matching_associated_with):
             # Refresh reatt_redes' state from DB before calling delete
             reatt_redes = target
             reatt_redes.refresh_from_db(fields=["deleted"])
