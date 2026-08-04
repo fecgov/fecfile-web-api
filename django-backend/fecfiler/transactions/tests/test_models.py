@@ -404,7 +404,7 @@ class TransactionModelTestCase(TestCase):
             "2024-01-01",
             amount="10.00",
         )
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.reatt_redes = self.partnership_receipt
         reattribution_to.save()
@@ -417,7 +417,7 @@ class TransactionModelTestCase(TestCase):
             parent_id=reattribution_to.id,
         )
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.reatt_redes = self.partnership_receipt
@@ -484,7 +484,7 @@ class TransactionModelTestCase(TestCase):
             report=self.m1_report,
         )
         reattribution_to.reatt_redes = copy_of_receipt_for_reattribution
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.save()
         reattribution_from = create_schedule_a(
@@ -498,7 +498,7 @@ class TransactionModelTestCase(TestCase):
         )
         reattribution_from.reatt_redes = copy_of_receipt_for_reattribution
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.save()
@@ -572,7 +572,7 @@ class TransactionModelTestCase(TestCase):
             "2024-01-01",
             amount="10.00",
         )
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.reatt_redes = self.partnership_receipt
         reattribution_to.save()
@@ -586,7 +586,7 @@ class TransactionModelTestCase(TestCase):
             parent_id=reattribution_to.id,
         )
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.reatt_redes = self.partnership_receipt
@@ -623,7 +623,7 @@ class TransactionModelTestCase(TestCase):
             report=self.m1_report,
         )
         reattribution_to.reatt_redes = copy_of_receipt_for_reattribution
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.save()
 
@@ -638,7 +638,7 @@ class TransactionModelTestCase(TestCase):
         )
         reattribution_from.reatt_redes = copy_of_receipt_for_reattribution
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.save()
@@ -680,7 +680,7 @@ class TransactionModelTestCase(TestCase):
             amount="10.00",
         )
         reattribution_to.reatt_redes = self.earmark_receipt
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.save()
         reattribution_from = create_schedule_a(
@@ -693,7 +693,7 @@ class TransactionModelTestCase(TestCase):
         )
         reattribution_from.reatt_redes = self.earmark_receipt
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.save()
@@ -738,7 +738,7 @@ class TransactionModelTestCase(TestCase):
             report=self.m2_report,
         )
         reattribution_to.reatt_redes = reatt_pull_forward
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.save()
 
@@ -753,7 +753,7 @@ class TransactionModelTestCase(TestCase):
         )
         reattribution_from.reatt_redes = reatt_pull_forward
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.save()
@@ -930,7 +930,7 @@ class TransactionModelTestCase(TestCase):
             report=m2_report,
         )
         reattribution_to.reatt_redes = copy_of_transaction_for_reattribution
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.save()
         reattribution_from = create_schedule_a(
@@ -944,7 +944,7 @@ class TransactionModelTestCase(TestCase):
         )
         reattribution_from.reatt_redes = copy_of_transaction_for_reattribution
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.save()

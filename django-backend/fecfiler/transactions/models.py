@@ -617,13 +617,15 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     # REATTRIBUTION/REDESIGNATION
     # If this is a reattribution/redesignation 'from' transaction,
     # delete the 'to' transaction
+    # "why not handle the reverse here?" - deleting the 'to' will already delete
+    # the 'from' via the parent-child deletion
     def delete_reattribution_redesignations(self):
         if (
             self.schedule_a
-            and self.schedule_a.reattribution_redesignation_tag == "REATTRIBUTED_FROM"
+            and self.schedule_a.reattribution_redesignation_tag == "REATTRIBUTION_FROM"
         ) or (
             self.schedule_b
-            and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATED_FROM"
+            and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATION_FROM"
         ):
             # Refresh parent's state from DB before calling delete
             parent = self.parent_transaction
