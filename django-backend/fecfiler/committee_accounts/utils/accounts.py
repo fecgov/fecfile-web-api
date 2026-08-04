@@ -502,7 +502,7 @@ def convert_raw_to_processed(committee_data):
     committee_data["city"] = committee_data.get("committee_city", None)
     committee_data["state"] = committee_data.get("committee_state", None)
     committee_data["zip"] = committee_data.get("committee_zip", None)
-    committee_data["candidate_state"] = committee_data.get("state", None)
+    committee_data["candidate_state"] = committee_data.get("election_state", None)
     committee_data["candidate_district"] = committee_data.get("candidate_district", None)
 
     return committee_data
