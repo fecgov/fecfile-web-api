@@ -388,11 +388,13 @@ class CommitteeAccountsUtilsTest(TestCase):
             patch("fecfiler.committee_accounts.utils.accounts.settings") as settings,
         ):
             settings.FLAG__COMMITTEE_DATA_SOURCE = "PRODUCTION"
+            test_election_state = 'DC'
             production_committee_data = {
                 "committee_id": "C12345678",
                 "email": "email",
                 "committee_type": "D",
                 "designation": "D",
+                "election_state": test_election_state,
             }
             # no response in processed endpoint and data in raw endpoint
             self.mock_requests_get(
@@ -410,6 +412,10 @@ class CommitteeAccountsUtilsTest(TestCase):
             self.assertEqual(committee_account_data.get("isPAC"), True)
             self.assertEqual(committee_account_data.get("isPTY"), True)
             self.assertEqual(committee_account_data.get("qualified"), False)
+            self.assertEqual(
+                committee_account_data.get("candidate_state"),
+                test_election_state
+            )
 
     def test_get_eligible_report_types_raw(self):
         test_committee_data_A_H = {

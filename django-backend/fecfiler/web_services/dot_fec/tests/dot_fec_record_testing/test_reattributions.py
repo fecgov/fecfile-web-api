@@ -104,7 +104,7 @@ class DotFECReattributionsTestCase(TestCase):
             itemized=True,
         )
         self.reattribution_to.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_TO"
+            "REATTRIBUTION_TO"
         )
         self.reattribution_to.schedule_a.contribution_purpose_descrip = (
             f"Reattribution to {self.individual_2.first_name} "
@@ -124,7 +124,7 @@ class DotFECReattributionsTestCase(TestCase):
             itemized=True,
         )
         self.reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         self.reattribution_from.schedule_a.contribution_purpose_descrip = (
             f"Reattribution from {self.individual.first_name} {self.individual.last_name}"
