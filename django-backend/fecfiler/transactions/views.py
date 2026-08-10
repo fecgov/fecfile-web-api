@@ -32,7 +32,7 @@ from fecfiler.transactions.aggregation import (
     process_aggregation_for_election,
 )
 from fecfiler.reports.models import Report
-from fecfiler.contacts.models import Contact
+from fecfiler.contacts.shared_models import CandidateOffice
 from fecfiler.contacts.serializers import create_or_update_contact
 from fecfiler.transactions.schedule_c.views import save_hook as schedule_c_save_hook
 from fecfiler.transactions.schedule_c2.views import save_hook as schedule_c2_save_hook
@@ -150,6 +150,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         return queryset
 
+    @action(detail=False, methods=["get"], url_path=r"list/unassociated")
+    def list_unassociated_transactions(self, request, *args, **kwargs):
+        if "page" not in request.query_params or request.query_params["page"] is None:
+            return Response("page is required", status=400)
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        # __isnull evaluates to true when no many-to-many relationships exist
+        queryset = queryset.filter(reports__isnull=True)
+
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(request.data, request)
@@ -261,14 +275,12 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
     def previous_transaction_by_entity(self, request):
-        try:
-            contact_1_id = request.query_params["contact_1_id"]
-            assert (
-                contact_1_id
-                and request.query_params.get("date")
-                and request.query_params.get("aggregation_group")
-            )
-        except (KeyError, AssertionError):
+        contact_1_id = request.query_params["contact_1_id"]
+        if (
+            not contact_1_id
+            or not request.query_params.get("date")
+            or not request.query_params.get("aggregation_group")
+        ):
             return Response(
                 "contact_1_id, date, and aggregation_group are required.",
                 status=status.HTTP_400_BAD_REQUEST,
@@ -286,18 +298,25 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             state = request.query_params.get("candidate_state")
             district = request.query_params.get("candidate_district")
 
-            if office != Contact.CandidateOffice.PRESIDENTIAL and not state:
+            if office != CandidateOffice.PRESIDENTIAL and not state:
                 raise ValueError("State required for non-presidential.")
-            if office == Contact.CandidateOffice.HOUSE and not district:
+            if office == CandidateOffice.HOUSE and not district:
                 raise ValueError("District required for House.")
 
-            assert (
-                election_code
-                and request.query_params.get("date")
-                and request.query_params.get("aggregation_group")
+            if (
+                not election_code
+                or not request.query_params.get("date")
+                or not request.query_params.get("aggregation_group")
+            ):
+                return Response(
+                    "election_code, date, and aggregation_group are required",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except ValueError:
+            return Response(
+                "election_code, date, and aggregation_group are required",
+                status=status.HTTP_400_BAD_REQUEST,
             )
-        except (KeyError, AssertionError, ValueError) as e:
-            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
         filters = Q(
             schedule_e__election_code=election_code, contact_2__candidate_office=office
@@ -311,21 +330,19 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path=r"previous/payee-candidate")
     def previous_transaction_by_payee_candidate(self, request):
-        try:
-            contact_2_id = request.query_params["contact_2_id"]
-            gen_election_year = request.query_params["general_election_year"]
+        contact_2_id = request.query_params["contact_2_id"]
+        gen_election_year = request.query_params["general_election_year"]
 
-            assert (
-                contact_2_id
-                and gen_election_year
-                and request.query_params.get("date")
-                and request.query_params.get("aggregation_group")
-            )
-        except (KeyError, AssertionError):
+        if (
+            not contact_2_id
+            or not gen_election_year
+            or not request.query_params.get("date")
+            or not request.query_params.get("aggregation_group")
+        ):
             return Response(
                 """
                 contact_2_id, general_election_year, date,
-                 and aggregation_group required.
+                    and aggregation_group required.
                 """,
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -390,7 +407,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     "aggregate_general_elec_expended": 0,
                     "message": "No previous transaction found.",
                 },
-                status=status.HTTP_404_NOT_FOUND,
             )
 
         if original_transaction and (

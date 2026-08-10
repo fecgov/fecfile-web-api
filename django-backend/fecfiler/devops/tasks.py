@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from .utils.redis import set_redis_value, get_redis_value
 from fecfiler.settings import (
     SYSTEM_STATUS_CACHE_AGE,
-    AWS_STORAGE_BUCKET_NAME,
+    S3_STORAGE_BUCKET_NAME,
     S3_OBJECTS_MAX_AGE_DAYS,
 )
 from fecfiler.s3 import S3_SESSION
@@ -49,11 +49,11 @@ def size_analysis():
 @shared_task
 def delete_expired_s3_objects():
     try:
-        bucket = S3_SESSION.Bucket(AWS_STORAGE_BUCKET_NAME)
+        bucket = S3_SESSION.Bucket(S3_STORAGE_BUCKET_NAME)
     except Exception as e:
         logger.error(
             "Failed to access S3 bucket",
-            bucket_name=AWS_STORAGE_BUCKET_NAME,
+            bucket_name=S3_STORAGE_BUCKET_NAME,
             error=str(e),
         )
         return
@@ -103,7 +103,7 @@ def log_s3_bucket_size():
     capacity_gbytes = 5000
     logged_size_redis_key = LOGGED_S3_SIZE_REDIS_KEY
     current_size_bytes = 0
-    bucket = S3_SESSION.Bucket(AWS_STORAGE_BUCKET_NAME)
+    bucket = S3_SESSION.Bucket(S3_STORAGE_BUCKET_NAME)
     for object in bucket.objects.all():
         current_size_bytes += object.size
     return log_resource_size(

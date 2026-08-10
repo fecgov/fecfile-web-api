@@ -4,6 +4,7 @@ from django.db import models
 from django.core.validators import RegexValidator
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.user.models import User
+from fecfiler.contacts.shared_models import CandidateOffice
 from django.core.exceptions import ValidationError
 
 COMMITTEE_ID_REGEX = RegexValidator(r"^C[0-9]{8}$", "invalid committee id format")
@@ -22,6 +23,11 @@ class CommitteeAccount(SoftDeleteModel):
         max_length=9, unique=True, validators=[COMMITTEE_ID_REGEX]
     )
     filing_frequency = models.TextField(null=True, blank=True, max_length=1)
+    candidate_office = models.CharField(
+        choices=CandidateOffice.choices, max_length=1, null=True, blank=True
+    )
+    candidate_state = models.TextField(null=True, blank=True)
+    candidate_district = models.TextField(null=True, blank=True)
     members = models.ManyToManyField(
         User,
         through="Membership",

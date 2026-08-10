@@ -6,6 +6,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form1m
 from datetime import datetime
 from fecfiler.contacts.models import Contact
+from fecfiler.contacts.shared_models import ContactType
 from fecfiler.web_services.models import UploadSubmission
 import structlog
 
@@ -17,7 +18,7 @@ class DotFECForm1MTestCase(TestCase):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
 
         self.organization = Contact.objects.create(
-            type=Contact.ContactType.ORGANIZATION,
+            type=ContactType.ORGANIZATION,
             name="Test Org",
             committee_id=self.committee.id,
             street_1="5678 Road St",
@@ -28,7 +29,7 @@ class DotFECForm1MTestCase(TestCase):
         )
 
         self.candidate = Contact.objects.create(
-            type=Contact.ContactType.CANDIDATE,
+            type=ContactType.CANDIDATE,
             last_name="Candidate last",
             first_name="Candidate first",
             middle_name="Candidate middle",
@@ -42,7 +43,7 @@ class DotFECForm1MTestCase(TestCase):
         )
 
         self.candidate_2 = Contact.objects.create(
-            type=Contact.ContactType.CANDIDATE,
+            type=ContactType.CANDIDATE,
             last_name="Candidate last 2",
             first_name="Candidate first 2",
             middle_name="Candidate middle 2",
@@ -56,7 +57,7 @@ class DotFECForm1MTestCase(TestCase):
         )
 
         self.candidate_3 = Contact.objects.create(
-            type=Contact.ContactType.CANDIDATE,
+            type=ContactType.CANDIDATE,
             last_name="Candidate last 3",
             first_name="Candidate first 3",
             middle_name="Candidate middle 3",
@@ -70,7 +71,7 @@ class DotFECForm1MTestCase(TestCase):
         )
 
         self.candidate_4 = Contact.objects.create(
-            type=Contact.ContactType.CANDIDATE,
+            type=ContactType.CANDIDATE,
             last_name="Candidate last 4",
             first_name="Candidate first 4",
             middle_name="Candidate middle 4",
@@ -84,7 +85,7 @@ class DotFECForm1MTestCase(TestCase):
         )
 
         self.candidate_5 = Contact.objects.create(
-            type=Contact.ContactType.CANDIDATE,
+            type=ContactType.CANDIDATE,
             last_name="Candidate last 5",
             first_name="Candidate first 5",
             middle_name="Candidate middle 5",

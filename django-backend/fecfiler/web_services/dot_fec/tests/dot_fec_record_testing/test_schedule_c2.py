@@ -7,6 +7,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.transactions.tests.utils import create_loan_from_bank
 from fecfiler.contacts.models import Contact
+from fecfiler.contacts.shared_models import ContactType
 from datetime import datetime
 from fecfiler.web_services.models import UploadSubmission
 import structlog
@@ -31,7 +32,7 @@ class DotFECScheduleC2TestCase(TestCase):
         self.f3x.save()
 
         self.organization = Contact.objects.create(
-            type=Contact.ContactType.ORGANIZATION,
+            type=ContactType.ORGANIZATION,
             name="Test Org",
             committee_id=self.committee.id,
             street_1="5678 Road St",
@@ -42,7 +43,7 @@ class DotFECScheduleC2TestCase(TestCase):
         )
 
         self.individual = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name="last name",
             first_name="First name",
             committee_id="C87654321",

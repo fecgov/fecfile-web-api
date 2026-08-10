@@ -271,7 +271,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 },
             )
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["aggregate"], 0)
 
     def test_get_previous_entity_same_day(self):
         view_set = TransactionViewSet()
@@ -321,7 +322,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 },
             )
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["aggregate"], 0)
 
     def test_get_entity_date_leapfrogging(self):
         view_set = TransactionViewSet()
@@ -472,7 +474,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 },
             )
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["aggregate"], 0)
 
         transaction_data = {
             **self.transaction_serializer.to_representation(third_transaction),
@@ -844,6 +847,167 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(ordered_queryset.count(), len(indiviual_receipt_data))
         for i in range(ordered_queryset.count()):
             self.assertEqual(ordered_queryset[i].id, memos_sorted[i].id)
+
+    def test_list_unassociated(self):
+        Transaction.objects.filter(
+            committee_account=self.committee
+        ).delete()
+
+        indiviual_receipt_data = [
+            {"date": "2023-01-01", "amount": "200.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-01", "amount": "300.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-02", "amount": "100.00", "group": "GENERAL", "memo": False},
+            {"date": "2024-01-03", "amount": "400.00", "group": "OTHER", "memo": False},
+        ]
+        for receipt_data in indiviual_receipt_data:
+            create_schedule_a(
+                "INDIVIDUAL_RECEIPT",
+                self.committee,
+                self.contact_1,
+                receipt_data["date"],
+                receipt_data["amount"],
+                group=receipt_data["group"],
+                report=None,
+                memo_code=receipt_data["memo"],
+            )
+
+        create_schedule_b(
+            "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
+            self.committee,
+            self.test_org_contact,
+            "2025-01-02",
+            Decimal("250.00"),
+            report=None,
+        )
+
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-05",
+            "500.00",
+            group="OTHER",
+            report=self.q1_report,
+            memo_code=False,
+        )
+
+        request = self.get_request(
+            "api/v1/transactions/list/unassociated",
+            {
+                "page": 1,
+                "ordering": "amount",
+                "page_size": 2,
+            }
+        )
+
+        self.view.request = request
+        self.view.action = "list"
+        self.view.format_kwarg = None
+
+        response = self.view.list_unassociated_transactions(request)
+
+        transactions = response.data["results"]
+        self.assertEqual(response.data["count"], 5)
+        self.assertEqual(len(transactions), 2)
+        self.assertEqual(transactions[0]["amount"], '100.00')
+
+    def test_list_unassociated_non_paginated(self):
+        request = self.get_request(
+            "api/v1/transactions/list/unassociated",
+            {
+                "ordering": "date",
+            }
+        )
+
+        self.view.request = request
+        self.view.action = "list"
+        self.view.format_kwarg = None
+
+        response = self.view.list_unassociated_transactions(request)
+        self.assertEqual(response.status_code, 400)
+
+        request = self.get_request(
+            "api/v1/transactions/list/unassociated",
+            {
+                "ordering": "date",
+                "page": None,
+            }
+        )
+
+        self.view.request = request
+        response = self.view.list_unassociated_transactions(request)
+        self.assertEqual(response.status_code, 400)
+
+        request = self.get_request(
+            "api/v1/transactions/list/unassociated",
+            {
+                "ordering": "date",
+                "page": 1,
+            }
+        )
+
+        self.view.request = request
+        response = self.view.list_unassociated_transactions(request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_list_unassociated_by_schedule(self):
+        Transaction.objects.filter(
+            committee_account=self.committee
+        ).delete()
+
+        indiviual_receipt_data = [
+            {"date": "2023-01-01", "amount": "200.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-01", "amount": "300.00", "group": "GENERAL", "memo": True},
+            {"date": "2024-01-02", "amount": "100.00", "group": "GENERAL", "memo": False},
+            {"date": "2024-01-03", "amount": "400.00", "group": "OTHER", "memo": False},
+        ]
+        for receipt_data in indiviual_receipt_data:
+            create_schedule_a(
+                "INDIVIDUAL_RECEIPT",
+                self.committee,
+                self.contact_1,
+                receipt_data["date"],
+                receipt_data["amount"],
+                group=receipt_data["group"],
+                report=None,
+                memo_code=receipt_data["memo"],
+            )
+
+        operating_expenditure_data = [
+            {"date": "2023-01-01", "amount": "150.00", "memo": True},
+            {"date": "2024-01-03", "amount": "250.00", "memo": False},
+        ]
+        for expenditure_data in operating_expenditure_data:
+            create_schedule_b(
+                "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
+                self.committee,
+                self.test_org_contact,
+                expenditure_data["date"],
+                expenditure_data["amount"],
+                report=None,
+                memo_code=expenditure_data["memo"],
+            )
+
+        request = self.get_request(
+            "api/v1/transactions/list/unassociated",
+            {
+                "page": 1,
+                "ordering": "-amount",
+                "page_size": 5,
+                "schedules": "B"
+            }
+        )
+
+        self.view.request = request
+        self.view.action = "list"
+        self.view.format_kwarg = None
+
+        response = self.view.list_unassociated_transactions(request)
+
+        transactions = response.data["results"]
+        self.assertEqual(response.data["count"], 2)
+        self.assertEqual(len(transactions), 2)
+        self.assertEqual(transactions[0]["amount"], '250.00')
 
     def test_destroy(self):
         response = self.send_viewset_delete_request(
@@ -2067,7 +2231,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "aggregation_group": "COORDINATED_PARTY_EXPENDITURES",
             "general_election_year": "2022",
         }
-        self._run_payee_candidate_test(view_set, params, 404)
+        self._run_payee_candidate_test(view_set, params, 200)
 
         # No date should return 400
         params["date"] = ""
@@ -2108,15 +2272,15 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         params["date"] = "2024-01-15"
         params["contact_2_id"] = str(contact_com.id)
-        self._run_payee_candidate_test(view_set, params, 404)
+        self._run_payee_candidate_test(view_set, params, 200)
 
         params["general_election_year"] = "2020"
         params["contact_2_id"] = str(contact_can.id)
-        self._run_payee_candidate_test(view_set, params, 404)
+        self._run_payee_candidate_test(view_set, params, 200)
 
         params["aggregation_group"] = "THIS_DOESNT_MATCH_ANYTHING"
         params["general_election_year"] = "2022"
-        self._run_payee_candidate_test(view_set, params, 404)
+        self._run_payee_candidate_test(view_set, params, 200)
 
         params["transaction_id"] = str(transaction_3.id)
         params["aggregation_group"] = "COORDINATED_PARTY_EXPENDITURES"

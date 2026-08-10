@@ -13,10 +13,10 @@
     "zip": {},
     "report_code": {},
     "election_state": {
-        "path": "form_3.election_state"
+        "path": "committee_account.candidate_state"
     },
     "election_district": {
-        "path": "form_3.election_district"
+        "path": "committee_account.candidate_district"
     },
     "election_code": {
         "serializer": "ELECTION_CODE",
