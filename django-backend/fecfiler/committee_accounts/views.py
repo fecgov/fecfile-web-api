@@ -4,6 +4,8 @@ from rest_framework import filters, viewsets, mixins, pagination, status
 from django.contrib.sessions.exceptions import SuspiciousSession
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from fecfiler import settings
+from fecfiler.email import send_email_notification
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
 from fecfiler.committee_accounts.utils.accounts import (
     create_committee_account,
@@ -56,20 +58,17 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
         committee: CommitteeAccount = self.get_object()
         if not committee or committee.disabled is not None:
             return Response("Committee could not be activated", status=403)
-        filing_frequency = request.data.get("filing_frequency", None)
-        if filing_frequency:
-            committee.filing_frequency = filing_frequency
-            committee.save()
-        request.session["committee_id"] = str(committee.committee_id)
-        request.session["committee_uuid"] = str(committee.id)
-
-        return Response("Committee activated")
-
-    @action(detail=False, methods=["get"])
-    def active(self, request):
-        committee_uuid = request.session["committee_uuid"]
-        committee = self.get_queryset().filter(id=committee_uuid).first()
-        return Response(self.get_serializer(committee).data)
+        try:
+            committee_data = self.update_committee_record_for_activate(committee)
+        except Exception as e:
+            logger.error(
+                f"User {request.user.email} failed to update "
+                f"committee record for committee activation "
+                f"{committee_data.get("committee_id")}: {str(e)}"
+            )
+        request.session["committee_id"] = str(committee_data.get("committee_id"))
+        request.session["committee_uuid"] = str(committee_data.get("id"))
+        return Response(committee_data)
 
     @action(detail=False, methods=["post"])
     def create_account(self, request):
@@ -78,10 +77,7 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
             if not committee_id:
                 raise Exception("no committee_id provided")
             account = create_committee_account(committee_id, request.user)
-
-            return Response(
-                self.add_committee_account_data(CommitteeAccountSerializer(account).data)
-            )
+            return Response(self.get_serializer(account).data)
         except Exception as e:
             logger.error(
                 f"User {request.user.email} failed to create committee account "
@@ -116,6 +112,15 @@ class CommitteeViewSet(viewsets.GenericViewSet, mixins.ListModelMixin):
     def add_committee_account_data(self, committee_account):
         committee_data = get_committee_account_data(committee_account["committee_id"])
         return {**committee_account, **(committee_data or {})}
+
+    def update_committee_record_for_activate(self, committee: CommitteeAccount):
+        committee_data = get_committee_account_data(committee.committee_id)
+        committee.filing_frequency = committee_data.get("filing_frequency", None)
+        committee.candidate_office = committee_data.get("candidate_office", None)
+        committee.candidate_state = committee_data.get("candidate_state", None)
+        committee.candidate_district = committee_data.get("candidate_district", None)
+        committee.save()
+        return {**CommitteeAccountSerializer(committee).data, **(committee_data or {})}
 
 
 class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
@@ -233,10 +238,25 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 raise ValidationError("Invalid role")
 
             new_member = add_user_to_committee(email, committee_id, role)
-            logger.info(f"""
-                User {request.user.id} added {email} to committee
-                {committee_id} as {role}
-                """)
+
+            # if no Exception was returned, send email notification to the user
+            if not isinstance(new_member, BaseException):
+                logger.info(
+                    f"User {request.user.first_name} added {email} to committee "
+                    f"{committee_id} as {role}"
+                )
+                self.sendAddUserToCommitteeEmail(
+                    committee_id,
+                    email,
+                    request.user.first_name,
+                    role
+                )
+            else:
+                logger.error(
+                    f"User {request.user.id} attempted to add {email} to committee "
+                    f"{committee_id} as {role}"
+                )
+
             return Response(CommitteeMembershipSerializer(new_member).data, status=200)
         except Exception as e:
             logger.error(f"""
@@ -339,3 +359,31 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def sendAddUserToCommitteeEmail(self, committee_id, email, first_name, role):
+        subject = f"[FECfile+] Invite to committee {committee_id}"
+
+        # adjust links based on space
+        if settings.SPACE == "prod":
+            envbit = ""
+        else:
+            envbit = f"{settings.SPACE}."
+
+        body_text = (
+            "ADDED TO FECfile+ COMMITTEE\n"
+            "\n"
+            f"{first_name} has added you as a {role} "
+            f"to {committee_id}.\n"
+            "\n"
+            "You can access the committee account by signing in to FECfile+:\n"
+            f"https://{envbit}fecfile.fec.gov/"
+        )
+
+        try:
+            send_email_notification(
+                to_email=email, subject=subject, body_text=body_text
+            )
+        except Exception as e:
+            logger.error(
+                f"Emailing {email} invite to {committee_id} failed: {str(e)}"
+            )

@@ -81,6 +81,8 @@ front-end/.vscode/launch.json
 
 # Celery Beat
 django-backend/celerybeat-schedule
+django-backend/celerybeat-schedule-shm
+django-backend/celerybeat-schedule-wal
 
 # login.gov certs
 *.crt

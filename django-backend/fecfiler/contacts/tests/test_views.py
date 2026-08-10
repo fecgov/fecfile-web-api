@@ -5,6 +5,7 @@ import uuid
 
 from django.test import tag
 from ..models import Contact
+from ..shared_models import ContactType
 from fecfiler.committee_accounts.models import CommitteeAccount
 from ..views import ContactViewSet, DeletedContactsViewSet
 from .utils import create_test_individual_contact
@@ -61,13 +62,13 @@ class ContactViewSetTest(FecfilerViewSetTest):
         deleted_last="Deleted",
     ):
         active_contact = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name=active_last,
             first_name=active_first,
             committee_account_id=committee_uuid,
         )
         deleted_contact = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name=deleted_last,
             first_name=deleted_first,
             committee_account_id=committee_uuid,
@@ -321,7 +322,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
     def test_restore(self):
         contact = Contact.objects.create(
             id="a5061946-0000-0000-82f6-f1782c333d70",
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name="Last",
             first_name="First",
             committee_account_id="11111111-2222-3333-4444-555555555555",
@@ -414,7 +415,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
 
     def test_update(self):
         contact = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name="Last",
             first_name="First",
             committee_account_id="11111111-2222-3333-4444-555555555555",
@@ -461,3 +462,112 @@ class ContactViewSetTest(FecfilerViewSetTest):
             self.assertTrue(response is None)
         except TypeError:
             self.assertTrue(response is not None)
+
+    def test_duplicate_check_empty_query_params(self):
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"results": []})
+
+    def test_duplicate_check_candidate_id(self):
+        contact = Contact.objects.create(
+            type=ContactType.CANDIDATE,
+            candidate_id="P12345678",
+            last_name="CandidateLast",
+            first_name="CandidateFirst",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check?candidate_id=P12345678",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], str(contact.id))
+
+    def test_duplicate_check_committee_id(self):
+        contact = Contact.objects.create(
+            type=ContactType.COMMITTEE,
+            committee_id="C98765432",
+            name="Test Committee",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check?committee_id=C98765432",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], str(contact.id))
+
+    def test_duplicate_check_organization_case_insensitive_and_type_scoped(self):
+        org_contact = Contact.objects.create(
+            type=ContactType.ORGANIZATION,
+            name="Acme Corporation",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+
+        Contact.objects.create(
+            type=ContactType.COMMITTEE,
+            committee_id="C11111111",
+            name="Acme Corporation",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check?name=acme%20CORPORATION",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], str(org_contact.id))
+
+    def test_duplicate_check_individual_case_insensitive_and_type_scoped(self):
+        ind_contact = Contact.objects.create(
+            type=ContactType.INDIVIDUAL,
+            first_name="Jane",
+            last_name="McCammon",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+        Contact.objects.create(
+            type=ContactType.CANDIDATE,
+            candidate_id="P87654321",
+            first_name="Jane",
+            last_name="McCammon",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check?first_name=jAnE&last_name=mccammon",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], str(ind_contact.id))
+
+    def test_duplicate_check_individual_missing_first_or_last_name(self):
+        Contact.objects.create(
+            type=ContactType.INDIVIDUAL,
+            first_name="Jane",
+            last_name="McCammon",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check?last_name=McCammon",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"results": []})

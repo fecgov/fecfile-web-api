@@ -22,7 +22,10 @@
         "treasurer_zip": "20001",
         "update_date": "2024-01-01",
         "email": "test@fec.gov",
-        "counts_as_processed": true
+        "counts_as_processed": true,
+        "candidate_office": "P",
+        "candidate_state": "DC",
+        "candidate_district": "01"
     },
     {
         "committee_id": "C99999999",
@@ -50,7 +53,10 @@
         "street_1": "1234 Street",
         "city": "Washington",
         "zip": "20001",
-        "counts_as_processed": true
+        "counts_as_processed": true,
+        "candidate_office": "P",
+        "candidate_state": "DC",
+        "candidate_district": "02"
     },
     {
         "committee_id": "C99999998",
@@ -77,7 +83,10 @@
         "street_1": "1234 Street",
         "city": "Washington",
         "zip": "20001",
-        "counts_as_processed": false
+        "counts_as_processed": false,
+        "candidate_office": "P",
+        "candidate_state": "DC",
+        "candidate_district": "03"
     },{
         "committee_id": "C99999997",
         "name": "Test Committee E",
@@ -101,7 +110,10 @@
         "treasurer_zip": "20001",
         "update_date": "2024-01-01",
         "email": "test@fec.gov",
-        "counts_as_processed": true
+        "counts_as_processed": true,
+        "candidate_office": "P",
+        "candidate_state": "DC",
+        "candidate_district": "04"
     },{
         "committee_id": "C99999996",
         "name": "Test Committee - F3",
@@ -125,6 +137,9 @@
         "treasurer_zip": "20001",
         "update_date": "2024-01-01",
         "email": "test@test.com",
-        "counts_as_processed": true
+        "counts_as_processed": true,
+        "candidate_office": "P",
+        "candidate_state": "DC",
+        "candidate_district": "05"
     }
 ]

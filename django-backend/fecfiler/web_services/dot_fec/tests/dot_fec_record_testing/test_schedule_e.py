@@ -6,6 +6,7 @@ from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.transactions.tests.utils import create_ie, create_schedule_a
 from fecfiler.contacts.models import Contact
+from fecfiler.contacts.shared_models import ContactType
 from datetime import datetime
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.transactions.serializers import REATTRIBUTED
@@ -31,7 +32,7 @@ class DotFECScheduleETestCase(TestCase):
         self.f3x.save()
 
         self.contact_1 = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name="last name",
             first_name="First name",
             committee_account_id=self.committee.id,
@@ -46,7 +47,7 @@ class DotFECScheduleETestCase(TestCase):
         )
 
         self.contact_2 = Contact.objects.create(
-            type=Contact.ContactType.CANDIDATE,
+            type=ContactType.CANDIDATE,
             last_name="last name",
             first_name="First name",
             committee_account_id=self.committee.id,
@@ -60,7 +61,7 @@ class DotFECScheduleETestCase(TestCase):
         )
 
         self.contact_3 = Contact.objects.create(
-            type=Contact.ContactType.ORGANIZATION,
+            type=ContactType.ORGANIZATION,
             name="Test Org",
             committee_account_id=self.committee.id,
             street_1="5678 Road St",
