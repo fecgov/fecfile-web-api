@@ -27,8 +27,6 @@ from fecfiler.contacts.tests.utils import (
 from datetime import datetime, date
 from fecfiler.reports.tests.utils import (
     create_form3,
-    create_form3x,
-    create_report_memo,
 )
 
 
