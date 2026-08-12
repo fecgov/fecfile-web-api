@@ -1,4 +1,6 @@
 import structlog
+from django.contrib.sessions.middleware import SessionMiddleware
+from django.db import connections
 
 
 class HeaderMiddleware:
@@ -9,6 +11,16 @@ class HeaderMiddleware:
         response = self.get_response(request)
         response["cache-control"] = "no-cache, no-store"
         return response
+
+
+class FecfileSessionMiddleware(SessionMiddleware):
+    def process_response(self, request, response):
+        # pool.check() immediately validates every idle connection; broken ones
+        # are discarded and replaced, bypassing the getconn backoff.
+        pool = getattr(connections["default"], "pool", None)
+        if pool is not None and not pool.closed:
+            pool.check()
+        return super().process_response(request, response)
 
 
 class StructlogContextMiddleware:

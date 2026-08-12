@@ -138,7 +138,7 @@ MIDDLEWARE += [
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
     "fecfiler.oidc.middleware.TimeoutMiddleware.TimeoutMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
+    "fecfiler.middleware.FecfileSessionMiddleware",
     "fecfiler.middleware.StructlogContextMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -186,6 +186,19 @@ database["OPTIONS"]["pool"] = {
     # max_idle: psycopg default 10 minutes
     "max_idle": int(env.get_credential("DB_POOL_MAX_IDLE", "600")),
 }
+
+# Cap new TCP connection attempts so pool workers do not block indefinitely when
+# the DB is briefly unreachable (Docker drops SYN packets during container restart).
+database["OPTIONS"]["connect_timeout"] = int(
+    env.get_credential("DB_CONNECT_TIMEOUT", "1")
+)
+
+# Enable Django connection health checks. Django's psycopg pooling backend
+# intentionally does not support persistent connections: CONN_MAX_AGE must remain 0
+# when the pool is enabled. The pool itself checks connection health when
+# CONN_HEALTH_CHECKS is true, which is the correct recovery mechanism for a restart.
+database["CONN_HEALTH_CHECKS"] = True
+database["CONN_MAX_AGE"] = 0
 
 # Database
 DATABASES = {"default": database}
