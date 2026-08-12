@@ -4,7 +4,7 @@ import cfenv
 import logging
 import structlog
 from celery import Celery
-from celery.signals import setup_logging
+from celery.signals import setup_logging, task_prerun
 from django_structlog.celery.steps import DjangoStructLogInitStep
 from fecfiler import settings
 
@@ -43,6 +43,14 @@ def receiver_setup_logging(loglevel, logfile, format, colorize, **kwargs):
         cache_logger_on_first_use=True,
     )
     logger.info("Starting Celery: logging set up")
+
+
+@task_prerun.connect
+def clear_stale_db_connections(**kwargs):
+    from django.db import connections
+    pool = getattr(connections["default"], "pool", None)
+    if pool is not None and hasattr(pool, "_tasks") and not pool.closed:
+        pool.check()
 
 
 if env.get_service(name="fecfile-api-redis"):

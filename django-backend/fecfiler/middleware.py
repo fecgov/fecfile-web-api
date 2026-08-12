@@ -3,11 +3,19 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.db import connections
 
 
+def _pool_check():
+    """Validate all idle pool connections; broken ones are replaced immediately."""
+    pool = getattr(connections["default"], "pool", None)
+    if pool is not None and hasattr(pool, "_tasks") and not pool.closed:
+        pool.check()
+
+
 class HeaderMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
+        _pool_check()
         response = self.get_response(request)
         response["cache-control"] = "no-cache, no-store"
         return response
@@ -15,11 +23,7 @@ class HeaderMiddleware:
 
 class FecfileSessionMiddleware(SessionMiddleware):
     def process_response(self, request, response):
-        # pool.check() immediately validates every idle connection; broken ones
-        # are discarded and replaced, bypassing the getconn backoff.
-        pool = getattr(connections["default"], "pool", None)
-        if pool is not None and not pool.closed:
-            pool.check()
+        _pool_check()
         return super().process_response(request, response)
 
 
