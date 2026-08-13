@@ -27,7 +27,6 @@ from django.db.models import Q, Value, Case, When, IntegerField
 import structlog
 from rest_framework.permissions import BasePermission
 
-
 logger = structlog.get_logger(__name__)
 
 
