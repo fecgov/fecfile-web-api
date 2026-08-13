@@ -63,7 +63,7 @@ def send_email_notification(
             from_email=from_email,
             error=str(e),
         )
-        return response
+        raise ValueError(f"Failed to send email: {e}")
 
     message_id = response.get("MessageId", "unknown")
     logger.info(
