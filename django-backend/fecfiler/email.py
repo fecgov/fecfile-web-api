@@ -24,7 +24,7 @@ def send_email_notification(
 ):
     if SES_CLIENT is None:
         raise RuntimeError(
-            "SES client is not available. Ensure FLAG__ENABLE_EMAIL is True "
+            "Email is not enabled. To enable email, ensure FLAG__ENABLE_EMAIL is True "
             "and SES_ACCESS_KEY_ID, SES_SECRET_ACCESS_KEY, and SES_REGION are set."
         )
 
