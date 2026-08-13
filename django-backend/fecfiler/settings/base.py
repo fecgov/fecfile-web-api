@@ -553,9 +553,13 @@ if FLAG__COMMITTEE_DATA_SOURCE not in valid_sources:
         + f" must be valid source ({valid_sources})"
     )
 
-FLAG__ENABLE_IMPORT = env.get_credential("FLAG__ENABLE_IMPORT")
+FLAG__ENABLE_IMPORT = get_boolean_from_string(
+    env.get_credential("FLAG__ENABLE_IMPORT", "False")
+)
 
-FLAG__ENABLE_EMAIL = env.get_credential("FLAG__ENABLE_EMAIL")
+FLAG__ENABLE_EMAIL = get_boolean_from_string(
+    env.get_credential("FLAG__ENABLE_EMAIL", "False")
+)
 
 PRODUCTION_OPEN_FEC_API = env.get_credential("PRODUCTION_OPEN_FEC_API")
 PRODUCTION_OPEN_FEC_API_KEY = env.get_credential("PRODUCTION_OPEN_FEC_API_KEY")
