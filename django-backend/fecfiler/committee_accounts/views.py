@@ -13,6 +13,7 @@ from fecfiler.committee_accounts.utils.accounts import (
     raise_if_cannot_create_committee_account,
 )
 from fecfiler.user.utils import delete_active_sessions_for_user_and_committee
+from fecfiler.settings import FLAG__ENABLE_EMAIL
 from django.http import (
     HttpResponseBadRequest,
     HttpResponseServerError,
@@ -245,12 +246,13 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                     f"User {request.user.first_name} added {email} to committee "
                     f"{committee_id} as {role}"
                 )
-                self.sendAddUserToCommitteeEmail(
-                    committee_id,
-                    email,
-                    request.user.first_name,
-                    role
-                )
+                if FLAG__ENABLE_EMAIL:
+                    self.sendAddUserToCommitteeEmail(
+                        committee_id,
+                        email,
+                        request.user.first_name,
+                        role
+                    )
             else:
                 logger.error(
                     f"User {request.user.id} attempted to add {email} to committee "
