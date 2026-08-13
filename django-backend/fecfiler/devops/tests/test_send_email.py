@@ -60,7 +60,7 @@ class SesEmailHelperTestCase(TestCase):
     def test_send_email_notification_requires_ses_client(self):
         with self.assertRaisesMessage(
             RuntimeError,
-            "SES client is not available",
+            "Email is not enabled",
         ):
             send_email_notification(
                 to_email="recipient@example.com",
