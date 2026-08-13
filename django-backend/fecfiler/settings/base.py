@@ -175,7 +175,6 @@ database = dj_database_url.config()
 database.setdefault("OPTIONS", {})
 database["OPTIONS"]["application_name"] = f"{APPLICATION_NAME}_{APPLICATION_INDEX}"
 database["CONN_HEALTH_CHECKS"] = True
-database["CONN_MAX_AGE"] = 0
 
 # psycopg pool settings:
 # https://www.psycopg.org/psycopg3/docs/api/pool.html#psycopg_pool.ConnectionPool
@@ -188,26 +187,7 @@ database["OPTIONS"]["pool"] = {
     "max_size": int(env.get_credential("DB_POOL_MAX_SIZE", "4")),
     # max_idle: psycopg default is 10m, prune before 350s AWS timeout
     "max_idle": int(env.get_credential("DB_POOL_MAX_IDLE", "300")),
-    # Retire conns older than 30m
-    "max_lifetime": int(env.get_credential("DB_POOL_MAX_LIFETIME", "1800")),
-    # getconn() should give up on trying to get a connection faster
-    "timeout": float(env.get_credential("DB_POOL_TIMEOUT", "10.0")),
-    # controls how long AttemptWithBackoff will retry before resetting _growing and _nconns
-    "reconnect_timeout": float(env.get_credential("DB_POOL_RECONNECT_TIMEOUT", "15.0")),
 }
-
-# fail fast on unreachable db instead of blocking for default 30s
-database["OPTIONS"]["connect_timeout"] = int(
-    env.get_credential("DB_CONNECT_TIMEOUT", "3")
-)
-
-# TCP Keepalives prevent firewalls / NAT gateways from silently dropping idle connections
-database["OPTIONS"].update({
-    "keepalives": 1,
-    "keepalives_idle": 30,
-    "keepalives_interval": 10,
-    "keepalives_count": 5,
-})
 
 # Database
 DATABASES = {"default": database}
