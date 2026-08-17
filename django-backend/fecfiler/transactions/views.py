@@ -262,13 +262,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     @action(detail=False, methods=["post"], url_path=r"remove-from-report")
     def remove_transaction_from_report(self, request):
+        committee_uuid = self.get_committee_uuid()
         try:
-            report = Report.objects.get(id=request.data.get("report_id"))
+            report = Report.objects.get(
+                id=request.data.get("report_id"),
+                committee_account_id=committee_uuid
+            )
         except Report.DoesNotExist:
             return Response("No report matching id provided", status=404)
 
         try:
-            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+            transaction = Transaction.objects.get(
+                id=request.data.get("transaction_id"),
+                committee_account_id=committee_uuid
+            )
         except Transaction.DoesNotExist:
             return Response("No transaction matching id provided", status=404)
 
