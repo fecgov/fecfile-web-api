@@ -16,7 +16,7 @@ from fecfiler.transactions.utils_aggregation_prep import (
 )
 from fecfiler.transactions.utils_aggregation_service import (
     update_aggregates_for_affected_transactions,
-    calculate_loan_payment_to_date
+    calculate_loan_payment_to_date,
 )
 from fecfiler.transactions.schedule_a.models import ScheduleA
 from fecfiler.transactions.schedule_b.models import ScheduleB
@@ -27,6 +27,7 @@ from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.transactions.schedule_f.models import ScheduleF
 from fecfiler.contacts.models import Contact
+from django.contrib.sessions.exceptions import SuspiciousSession
 
 import uuid
 import structlog
@@ -358,9 +359,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
                 election_changed = (
                     old_election_code and old_election_code != current_election_code
-                ) or (
-                    old_contact_2_id and old_contact_2_id != self.contact_2_id
-                )
+                ) or (old_contact_2_id and old_contact_2_id != self.contact_2_id)
 
                 if election_changed:
                     # Find a transaction in the old election to trigger recalculation
@@ -388,24 +387,25 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         if old_snapshot and old_snapshot.get("election_year"):
             old_election_year = old_snapshot.get("election_year")
             current_election_year = (
-                self.schedule_f.general_election_year
-                if self.schedule_f else None
+                self.schedule_f.general_election_year if self.schedule_f else None
             )
 
             if old_election_year != current_election_year:
                 # Find first transaction in old election year chain to
                 # recalculate
-                old_chain_first = Transaction.objects.filter(
-                    ~Q(id=self.id),
-                    contact_2_id=old_snapshot.get("contact_2_id"),
-                    schedule_f__isnull=False,
-                    schedule_f__general_election_year=old_election_year,
-                ).order_by("date", "created").first()
+                old_chain_first = (
+                    Transaction.objects.filter(
+                        ~Q(id=self.id),
+                        contact_2_id=old_snapshot.get("contact_2_id"),
+                        schedule_f__isnull=False,
+                        schedule_f__general_election_year=old_election_year,
+                    )
+                    .order_by("date", "created")
+                    .first()
+                )
 
                 if old_chain_first:
-                    process_aggregation_by_payee_candidate(
-                        old_chain_first, None
-                    )
+                    process_aggregation_by_payee_candidate(old_chain_first, None)
 
         # Always recalculate current transaction's chain
         # Note: This handles date leapfrogging by recalculating
@@ -424,10 +424,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         # Check if old_snapshot was passed from view (for Schedule A, B, F)
         # This is needed because schedule is saved before transaction,
         # so DB already has new values
-        passed_old_snapshot = getattr(self, '_passed_old_snapshot', None)
+        passed_old_snapshot = getattr(self, "_passed_old_snapshot", None)
 
         # Check if aggregation should be skipped (for cascading child saves)
-        skip_aggregation = getattr(self, '_skip_aggregation', False)
+        skip_aggregation = getattr(self, "_skip_aggregation", False)
 
         # Avoid recursion when service adjusts fields via save(update_fields=...)
         update_fields = kwargs.get("update_fields")
@@ -480,9 +480,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             # Handle itemization and loan calculations after aggregates are updated
             try:
                 action = "create" if is_create else "update"
-                update_aggregates_for_affected_transactions(
-                    Transaction, self, action
-                )
+                update_aggregates_for_affected_transactions(Transaction, self, action)
             except Exception as e:
                 logger.error(
                     "Failed to process itemization and loans on save",
@@ -669,19 +667,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     def add_to_report(self, report_id):
         ReportTransaction = apps.get_model("reports.ReportTransaction")
         report_transaction = ReportTransaction.objects.filter(
-            transaction=self,
-            report_id=report_id
+            transaction=self, report_id=report_id
         ).first()
 
         if report_transaction is None:
-            ReportTransaction.objects.create(
-                transaction=self,
-                report_id=report_id
-            )
+            ReportTransaction.objects.create(transaction=self, report_id=report_id)
 
-        other_reports = ReportTransaction.objects.filter(
-            transaction=self
-        ).exclude(
+        other_reports = ReportTransaction.objects.filter(transaction=self).exclude(
             report_id=report_id
         )
 
@@ -695,8 +687,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     def remove_from_report(self, report_id):
         ReportTransaction = apps.get_model("reports.ReportTransaction")
         report_transaction = ReportTransaction.objects.filter(
-            transaction=self,
-            report_id=report_id
+            transaction=self, report_id=report_id
         ).first()
 
         if report_transaction is not None:
@@ -711,6 +702,17 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     report.save()
 
     def set_reports(self, report_ids):
+        Report = apps.get_model("reports.Report")
+        report_ids = set(
+            str(rid)
+            for rid in Report.objects.filter(
+                id__in=report_ids,
+                committee_account=self.committee_account,
+            ).values_list("id", flat=True)
+        )
+        if len(report_ids) == 0:
+            raise SuspiciousSession("request ids don't match")
+
         current_report_ids = set()
         current_report_id_dicts = list(self.reports.values("id"))
         for report_id_dict in current_report_id_dicts:
@@ -719,10 +721,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         updated_report_ids = set(report_ids)
         report_ids_to_reset_can_unamend = current_report_ids ^ updated_report_ids
 
-        Report = apps.get_model("reports.Report")
-        Report.objects.filter(
-            id__in=report_ids_to_reset_can_unamend
-        ).update(can_unamend=False)
+        Report.objects.filter(id__in=report_ids_to_reset_can_unamend).update(
+            can_unamend=False
+        )
 
         self.reports.set(report_ids)
 
@@ -752,11 +753,11 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             loan_chain = Transaction.objects.filter(
                 Q(
                     schedule_c__isnull=False,
-                ) | Q(
+                )
+                | Q(
                     schedule_c1__isnull=False,
-                ) | Q(
-                    schedule_c2__isnull=False
-                ),
+                )
+                | Q(schedule_c2__isnull=False),
                 loan_id=self.loan_id,
             ).exclude(id=self.id)
             related_transactions += list(loan_chain.all())
@@ -778,8 +779,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
         if self.schedule_d is not None:
             loan_children = Transaction.objects.filter(
-                debt_id=self.id,
-                reports=self.reports.first()
+                debt_id=self.id, reports=self.reports.first()
             )
             related_transactions += list(loan_children.all())
 
