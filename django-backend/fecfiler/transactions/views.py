@@ -479,7 +479,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         old_snapshot = None  # Initialize early
 
         if is_existing:
-            original_instance = Transaction.objects.get(pk=transaction_data["id"])
+            original_instance = Transaction.objects.get(
+                pk=transaction_data["id"], committee_account=committee_id
+            )
             if original_instance is not None:
                 # Capture old_snapshot IMMEDIATELY after loading, before serializer
                 # modifies it
