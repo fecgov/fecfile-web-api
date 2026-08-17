@@ -112,7 +112,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         schedules_to_include = schedule_filters.split(",") if schedule_filters else []
 
         queryset = Transaction.objects.get_list_queryset(
-            schedules_to_include, report_type, report_code_label
+            self.get_committee_uuid(),
+            schedules_to_include,
+            report_type,
+            report_code_label,
         )
 
         report_id = (
