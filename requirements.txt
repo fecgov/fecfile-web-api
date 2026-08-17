@@ -6,7 +6,7 @@ dj_database_url==2.3.0
 django-deprecate-fields==0.2.3
 django-migration-linter==5.2.0
 django-structlog==9.1.1
-Django==5.2.14
+Django==5.2.17
 djangorestframework==3.17.1
 drf-spectacular==0.29.0
 drf-spectacular-sidecar==2026.4.14
