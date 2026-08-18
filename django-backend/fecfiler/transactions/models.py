@@ -27,6 +27,7 @@ from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.transactions.schedule_f.models import ScheduleF
 from fecfiler.contacts.models import Contact
+from django.contrib.sessions.exceptions import SuspiciousSession
 
 import uuid
 import structlog
@@ -711,6 +712,22 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     report.save()
 
     def set_reports(self, report_ids):
+        Report = apps.get_model("reports.Report")
+        input_report_ids = set(str(rid) for rid in report_ids) if report_ids else set()
+        if input_report_ids:
+            valid_report_ids = set(
+                str(rid)
+                for rid in Report.objects.filter(
+                    id__in=input_report_ids,
+                    committee_account=self.committee_account,
+                ).values_list("id", flat=True)
+            )
+            if valid_report_ids != input_report_ids:
+                raise SuspiciousSession("request ids don't match")
+            report_ids = valid_report_ids
+        else:
+            report_ids = set()
+
         current_report_ids = set()
         current_report_id_dicts = list(self.reports.values("id"))
         for report_id_dict in current_report_id_dicts:
@@ -719,7 +736,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         updated_report_ids = set(report_ids)
         report_ids_to_reset_can_unamend = current_report_ids ^ updated_report_ids
 
-        Report = apps.get_model("reports.Report")
         Report.objects.filter(
             id__in=report_ids_to_reset_can_unamend
         ).update(can_unamend=False)
