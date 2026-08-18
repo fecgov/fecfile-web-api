@@ -2,14 +2,19 @@ from .models import MemoText
 from django.db import transaction
 from fecfiler.validation import serializers
 from rest_framework.serializers import UUIDField, ModelSerializer
-from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
+from fecfiler.committee_accounts.serializers import (
+    CommitteeOwnedSerializer,
+    ReportCommitteeValidationMixin,
+)
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
 class MemoTextSerializer(
-    serializers.FecSchemaValidatorSerializerMixin, CommitteeOwnedSerializer
+    serializers.FecSchemaValidatorSerializerMixin,
+    CommitteeOwnedSerializer,
+    ReportCommitteeValidationMixin,
 ):
     schema_name = "Text"
     report_id = UUIDField(required=True, allow_null=False)
@@ -46,6 +51,9 @@ class MemoTextSerializer(
                 "back_reference_tran_id_number",
             ],
         )
+
+        self.validate_report_committee_ownership(data)
+
         return super().validate(data)
 
 
