@@ -5,7 +5,6 @@ from rest_framework.serializers import ModelSerializer, ChoiceField, SerializerM
 from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.types import OpenApiTypes
 import structlog
-from fecfiler.validation import serializers
 
 logger = structlog.get_logger(__name__)
 
@@ -83,26 +82,3 @@ class CommitteeMembershipSerializer(CommitteeOwnedSerializer):
     @extend_schema_field(OpenApiTypes.STR)
     def get_email(self, instance):
         return instance.user.email if instance.user else instance.pending_email
-
-
-class ReportCommitteeValidationMixin:
-    """Mixin to validate that report_id belongs to the serializer's committee_account."""
-
-    def validate_report_committee_ownership(self, data):
-        from fecfiler.reports.models import Report
-
-        committee_account = data.get("committee_account")
-        report_id = data.get("report_id")
-        if report_id:
-            exists = Report.objects.filter(
-                id=report_id, committee_account=committee_account
-            ).exists()
-            if not exists:
-                raise serializers.ValidationError(
-                    {
-                        "report_id": (
-                            "Invalid report_id or report does not belong "
-                            "to this committee account."
-                        )
-                    }
-                )

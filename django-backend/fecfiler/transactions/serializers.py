@@ -277,6 +277,8 @@ class TransactionSerializer(
                 "beneficiary_candidate_state",
             ],
         )
+
+        self.validate_memo_text_committee_ownership(data)
         super().validate(data_to_validate)
         return data
 
