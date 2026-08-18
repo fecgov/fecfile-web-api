@@ -100,6 +100,9 @@ class ReportCommitteeValidationMixin:
             if not exists:
                 raise serializers.ValidationError(
                     {
-                        "report_id": "Invalid report_id or report does not belong to this committee account."
+                        "report_id": (
+                            "Invalid report_id or report does not belong "
+                            "to this committee account."
+                        )
                     }
                 )

@@ -50,6 +50,7 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
             data,
             MemoTextViewSet,
             "create",
+            committee=self.committee,
         )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["text4000"], "test_new_text")
@@ -68,6 +69,7 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
             data,
             MemoTextViewSet,
             "create",
+            committee=self.committee,
         )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["text4000"], "test_existing_text")
@@ -76,9 +78,10 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
             f"/api/v1/memo-text/?report_id={self.q1_report.id}",
             MemoTextViewSet,
             "list",
+            committee=self.committee,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
 
     def test_cannot_get_other_committee_memos(self):
         committee2 = CommitteeAccount.objects.create(committee_id="C00000001")
