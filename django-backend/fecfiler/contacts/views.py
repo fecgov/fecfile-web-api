@@ -415,7 +415,7 @@ class DeletedContactsViewSet(
     @action(detail=False, methods=["post"])
     def restore(self, request):
         ids_to_restore = request.data
-        contacts = self.queryset.filter(id__in=ids_to_restore)
+        contacts = self.get_queryset().filter(id__in=ids_to_restore)
         if len(ids_to_restore) != contacts.count():
             return Response(
                 "Contact Ids are invalid",
