@@ -2354,7 +2354,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                     expected_schedule_f_aggregate,
                 )
 
-    def committee_locked_parent_transaction(self):
+    def test_committee_locked_parent_transaction(self):
         other_committee = CommitteeAccount(
             committee_id="C12344321"
         )
@@ -2405,7 +2405,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         self.assertEqual(response.status_code, 400)
 
-    def inverted_committee_locked_parent_transaction(self):
+    def test_inverted_committee_locked_parent_transaction(self):
         other_committee = CommitteeAccount(
             committee_id="C12344321"
         )
