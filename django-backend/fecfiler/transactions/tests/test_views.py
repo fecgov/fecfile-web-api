@@ -2395,11 +2395,15 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         payload["parent_transaction_id"] = original_transaction.id
         payload.pop("contact_1")
 
-        request = self.post_request(payload)
-        response = TransactionViewSet().save_transaction(request.data, request)
+        response = self.send_viewset_post_request(
+            f"/api/v1/transactions/",
+            payload,
+            TransactionViewSet,
+            "create",
+            committee=other_committee
+        )
 
-        self.assertNotIsInstance(response, Transaction)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
 
     def inverted_committee_locked_parent_transaction(self):
         other_committee = CommitteeAccount(
@@ -2442,14 +2446,15 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         payload["parent_transaction_id"] = original_transaction.id
         payload.pop("contact_1")
 
-        request = self.post_request(payload)
-        response = TransactionViewSet().save_transaction(request.data, request)
-
-        self.assertIsInstance(response, Transaction)
-        self.assertEqual(
-            response.committee_account,
-            response.parent_transaction.committee_account
+        response = self.send_viewset_post_request(
+            f"/api/v1/transactions/",
+            payload,
+            TransactionViewSet,
+            "create",
+            committee=other_committee
         )
+
+        self.assertEqual(response.status_code, 200)
 
     def _run_payee_candidate_test(self, view_set, params, expected):
         response = view_set.previous_transaction_by_payee_candidate(
