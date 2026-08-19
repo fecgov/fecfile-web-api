@@ -1021,7 +1021,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(response.data["count"], 2)
         self.assertEqual(len(transactions), 2)
         self.assertEqual(transactions[0]["amount"], "250.00")
-<<<<<<< HEAD
 
     def test_list_committee_transactions(self):
         c1 = CommitteeAccount.objects.create(committee_id="C00000001")
@@ -1085,14 +1084,14 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         c1_response = self.send_viewset_get_request(
-            f"/api/v1/transactions/",
+            "/api/v1/transactions/",
             TransactionViewSet,
             "list",
             committee=c1,
         )
 
         c2_response = self.send_viewset_get_request(
-            f"/api/v1/transactions/",
+            "/api/v1/transactions/",
             TransactionViewSet,
             "list",
             committee=c2,
@@ -1109,63 +1108,13 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
     def test_crud_committee_transactions(self):
         c1 = CommitteeAccount.objects.create(committee_id="C00000001")
         c1_q1_report = create_form3x(c1, "2024-01-01", "2024-02-01", {})
-        c1_org_contact = create_test_organization_contact(
-            "test-org-name1",
-            c1.id,
-            {
-                "street_1": "test_sa1",
-                "street_2": "test_sa2",
-                "city": "test_c1",
-                "state": "AL",
-                "zip": "12345",
-                "telephone": "555-555-5555",
-                "country": "USA",
-            },
-        )
         c1_ind_contact = create_test_individual_contact(
             "test_ln1",
             "test_fn1",
             c1.id,
         )
 
-        c1_sa = create_schedule_a(
-            "INDIVIDUAL_RECEIPT",
-            c1,
-            c1_ind_contact,
-            "2023-01-01",
-            "500.00",
-            group="OTHER",
-            report=c1_q1_report,
-            memo_code=False,
-        )
-
-        c1_sb = create_schedule_b(
-            "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
-            c1,
-            c1_org_contact,
-            "2023-01-02",
-            Decimal("250.00"),
-            report=c1_q1_report,
-        )
-
         c2 = CommitteeAccount.objects.create(committee_id="C00000002")
-        c2_q1_report = create_form3x(c2, "2024-01-01", "2024-02-01", {})
-        c2_ind_contact = create_test_individual_contact(
-            "test_ln2",
-            "test_fn2",
-            c2.id,
-        )
-
-        c2_sa = create_schedule_a(
-            "INDIVIDUAL_RECEIPT",
-            c2,
-            c2_ind_contact,
-            "2023-01-01",
-            "500.00",
-            group="OTHER",
-            report=c2_q1_report,
-            memo_code=False,
-        )
 
         ind_receipt_payload = {
             "schedule_id": "A",
@@ -1197,7 +1146,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "create",
             committee=c2,
         )
-        # self.assertEqual(c2_post_response.status_code, 500)
+        self.assertEqual(c2_post_response.status_code, 500)
 
         c1_post_response = self.send_viewset_post_request(
             "api/v1/transactions/",
@@ -1217,7 +1166,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             pk=c1_post_response.data,
             committee=c2,
         )
-        # self.assertEqual(c2_get_response.status_code, 500)
+        self.assertEqual(c2_get_response.status_code, 404)
 
         c1_get_response = self.send_viewset_get_request(
             f"api/v1/transactions/{c1_post_response.data}/",
@@ -1238,7 +1187,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             pk=c1_post_response.data,
             committee=c2,
         )
-        # self.assertEqual(c2_put_response.status_code, 500)
+        self.assertEqual(c2_put_response.status_code, 500)
 
         c1_put_response = self.send_viewset_put_request(
             f"api/v1/transactions/{c1_post_response.data}/",
@@ -1259,7 +1208,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             pk=c1_post_response.data,
             committee=c2,
         )
-        # self.assertEqual(c2_delete_response.status_code, 500)
+        self.assertEqual(c2_delete_response.status_code, 404)
 
         c1_delete_response = self.send_viewset_delete_request(
             f"api/v1/transactions/{c1_post_response.data}/",
@@ -1269,8 +1218,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             committee=c1,
         )
         self.assertEqual(c1_delete_response.status_code, 204)
-=======
->>>>>>> develop
 
     def test_destroy(self):
         response = self.send_viewset_delete_request(
