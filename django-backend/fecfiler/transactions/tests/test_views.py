@@ -2452,7 +2452,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             payload,
             TransactionViewSet,
             "create",
-            committee=other_committee
+            committee=self.committee
         )
 
         self.assertEqual(response.status_code, 400)
