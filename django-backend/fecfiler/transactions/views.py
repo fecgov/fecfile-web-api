@@ -484,7 +484,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         ).filter(id=child_id, committee_account_id=committee_id).first()
         if child_instance is None:
             raise ValidationError(
-                {"children": ["Invalid child_id or child does not belong."]}
+                {"children": ["Invalid child_id or child"]}
             )
         return child_instance
 
