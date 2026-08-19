@@ -604,7 +604,10 @@ class ReportViewSetTest(FecfilerViewSetTest):
 
         view = ReportViewSet()
         view.format_kwarg = "format"
-        request = self.build_viewset_get_request("/api/v1/reports", committee=other_committee)
+        request = self.build_viewset_get_request(
+            "/api/v1/reports",
+            committee=other_committee
+        )
         request.query_params = {"page": 1}
         view.request = request
         response = view.list(request)
