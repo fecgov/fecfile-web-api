@@ -2396,7 +2396,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         payload.pop("contact_1")
 
         response = self.send_viewset_post_request(
-            f"/api/v1/transactions/",
+            "/api/v1/transactions/",
             payload,
             TransactionViewSet,
             "create",
