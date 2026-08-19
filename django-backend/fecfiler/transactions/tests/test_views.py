@@ -262,6 +262,83 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 400)
 
+    def test_create_transaction_with_child_from_other_committee_fails(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
+        other_report = create_form3x(other_committee, "2024-01-01", "2024-02-01", {})
+
+        other_payload = deepcopy(self.payloads["IN_KIND"])
+        other_payload["report_ids"] = [str(other_report.id)]
+        other_payload["children"][0]["report_ids"] = [str(other_report.id)]
+        response = self.send_viewset_post_request(
+            "/api/v1/transactions/",
+            other_payload,
+            TransactionViewSet,
+            "create",
+            committee=other_committee,
+        )
+        self.assertEqual(response.status_code, 200)
+
+        foreign_child_id = str(Transaction.objects.get(pk=response.data).children[0].id)
+
+        payload = deepcopy(self.payloads["IN_KIND"])
+        payload["report_ids"] = [str(self.q1_report.id)]
+        payload["children"] = [foreign_child_id]
+
+        response = self.send_viewset_post_request(
+            "/api/v1/transactions/",
+            payload,
+            TransactionViewSet,
+            "create",
+            committee=self.committee,
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_transaction_with_child_from_other_committee_fails(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000002")
+        other_report = create_form3x(other_committee, "2024-01-01", "2024-02-01", {})
+
+        other_payload = deepcopy(self.payloads["IN_KIND"])
+        other_payload["report_ids"] = [str(other_report.id)]
+        other_payload["children"][0]["report_ids"] = [str(other_report.id)]
+        response = self.send_viewset_post_request(
+            "/api/v1/transactions/",
+            other_payload,
+            TransactionViewSet,
+            "create",
+            committee=other_committee,
+        )
+        self.assertEqual(response.status_code, 200)
+
+        foreign_child_id = str(Transaction.objects.get(pk=response.data).children[0].id)
+
+        payload = deepcopy(self.payloads["IN_KIND"])
+        payload["report_ids"] = [str(self.q1_report.id)]
+        payload["children"][0]["report_ids"] = [str(self.q1_report.id)]
+        response = self.send_viewset_post_request(
+            "/api/v1/transactions/",
+            payload,
+            TransactionViewSet,
+            "create",
+            committee=self.committee,
+        )
+        self.assertEqual(response.status_code, 200)
+
+        transaction = Transaction.objects.get(pk=response.data)
+
+        updated_payload = deepcopy(self.payloads["IN_KIND"])
+        updated_payload["id"] = str(transaction.id)
+        updated_payload["report_ids"] = [str(self.q1_report.id)]
+        updated_payload["children"] = [foreign_child_id]
+
+        response = self.send_viewset_put_request(
+            f"/api/v1/transactions/{transaction.id}/",
+            updated_payload,
+            TransactionViewSet,
+            "update",
+            committee=self.committee,
+        )
+        self.assertEqual(response.status_code, 400)
+
     def test_get_queryset(self):
         for i in range(8):
             create_schedule_a(
