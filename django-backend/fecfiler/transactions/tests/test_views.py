@@ -233,6 +233,35 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             updated_transaction.children[0].schedule_b.expenditure_amount, 999
         )
 
+    def test_update_with_memo_text_of_other_committee_fails(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
+        payload = deepcopy(self.payloads["IN_KIND"])
+        payload["memo_text"] = {
+            "fields_to_validate": ["rec_type", "report_id", "text4000"],
+            "text4000": "test memo",
+            "report_id": str(self.q1_report.id),
+            "rec_type": "TEXT",
+        }
+        response = self.send_viewset_post_request(
+            "/api/v1/transactions/",
+            payload,
+            TransactionViewSet,
+            "create",
+            committee=self.committee,
+        )
+        transaction = Transaction.objects.get(pk=response.data)
+        self.assertEqual(transaction.committee_account_id, self.committee.id)
+        updated_payload = deepcopy(self.payloads["IN_KIND"])
+        updated_payload["memo_text_id"] = transaction.memo_text.id
+        response = self.send_viewset_post_request(
+            "/api/v1/transactions/",
+            updated_payload,
+            TransactionViewSet,
+            "create",
+            committee=other_committee,
+        )
+        self.assertEqual(response.status_code, 400)
+
     def test_get_queryset(self):
         for i in range(8):
             create_schedule_a(
@@ -1353,6 +1382,17 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             partnership_receipt.schedule_a.contribution_purpose_descrip,
             "(See Partnership Attribution(s) below)",
         )
+
+    def test_transaction_lookup_no_committee_activated(self):
+        # User is authenticated but hasn't activated a committee
+        super().set_default_committee(None)
+        response = self.send_viewset_get_request(
+            "/api/v1/transactions/",
+            TransactionViewSet,
+            "list",
+            authenticate=True
+        )
+        self.assertEqual(response.status_code, 403)
 
     def test_loan_repayment_on_loan_by_committee(self):
         """Loan repayments should update loan balances on the original loan

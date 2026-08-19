@@ -571,3 +571,71 @@ class ContactViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {"results": []})
+
+    def test_CRUD_committee_locked_list(self):
+        main_committee = CommitteeAccount(
+            committee_id="C43211234",
+            id="33333333-2222-1111-2222-333333333333"
+        )
+        other_committee = CommitteeAccount(
+            committee_id="C12344321",
+            id="55555555-4444-3333-2222-111111111111"
+        )
+
+        main_committee.save()
+        other_committee.save()
+
+        for i in range(5):
+            create_test_individual_contact(
+                f"last{i}", f"first{i}", main_committee.id
+            )
+            create_test_individual_contact(
+                f"last{i}", f"first{i}", other_committee.id
+            )
+
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts?page=1",
+            ContactViewSet,
+            "list",
+            committee=main_committee
+        )
+        self.assertEqual(len(response.data["results"]), 5)
+
+    def test_CRUD_committee_locked_update(self):
+        main_committee = CommitteeAccount(
+            committee_id="C43211234",
+            id="33333333-2222-1111-2222-333333333333"
+        )
+        other_committee = CommitteeAccount(
+            committee_id="C12344321",
+            id="55555555-4444-3333-2222-111111111111"
+        )
+
+        main_committee.save()
+        other_committee.save()
+
+        contact = Contact.objects.create(
+            type=ContactType.INDIVIDUAL,
+            last_name="Last",
+            first_name="First",
+            committee_account_id=main_committee.id,
+        )
+        response = self.send_viewset_put_request(
+            f"/api/v1/contacts/{str(contact.id)}/",
+            {
+                "first_name": "Other",
+                "last_name": "other",
+                "street_1": "1",
+                "city": "here",
+                "zip": "1",
+                "state": "MD",
+                "country": "USA",
+                "type": "IND",
+            },
+            ContactViewSet,
+            "update",
+            pk=contact.id,
+            committee=other_committee
+        )
+
+        self.assertEqual(response.status_code, 404)

@@ -474,7 +474,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def save_transaction(self, transaction_data, request):
         committee_id = request.session["committee_uuid"]
-        report_ids = transaction_data.pop("report_ids", [])
         children = transaction_data.pop("children", [])
         schedule = transaction_data.get("schedule_id")
         transaction_data["parent_transaction"] = transaction_data.get(
@@ -551,6 +550,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction_instance = transaction_serializer.save(**save_kwargs)
 
         # Link the transaction to all the reports it references in report_ids
+        report_ids = transaction_data.get("report_ids", [])
         transaction_instance.set_reports(report_ids)
 
         # handle loans and debts
