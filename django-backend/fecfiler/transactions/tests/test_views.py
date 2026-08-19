@@ -205,13 +205,13 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         request.data = {}
         return request
 
-    def xtest_save_transaction_pair(self):
+    def test_save_transaction_pair(self):
         request = self.post_request(self.payloads["IN_KIND"])
         transaction = TransactionViewSet().save_transaction(request.data, request)
         self.assertEqual("John", transaction.contact_1.first_name)
         self.assertEqual("Smith", transaction.contact_1.last_name)
 
-    def xtest_update(self):
+    def test_update(self):
         request = self.post_request(self.payloads["IN_KIND"])
         transaction = TransactionViewSet().save_transaction(request.data, request)
         updated_payload = deepcopy(self.payloads["IN_KIND"])
@@ -227,7 +227,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             updated_transaction.children[0].schedule_b.expenditure_amount, 999
         )
 
-    def xtest_get_queryset(self):
+    def test_get_queryset(self):
         for i in range(8):
             create_schedule_a(
                 "INDIVIDUAL_RECEIPT",
@@ -251,7 +251,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         view_set.request = self.post_request({}, {"schedules": ""})
         self.assertEqual(view_set.get_queryset().count(), 13)
 
-    def xtest_get_previous_entity(self):
+    def test_get_previous_entity(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
@@ -274,7 +274,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["aggregate"], 0)
 
-    def xtest_get_previous_entity_same_day(self):
+    def test_get_previous_entity_same_day(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
@@ -325,7 +325,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["aggregate"], 0)
 
-    def xtest_get_entity_date_leapfrogging(self):
+    def test_get_entity_date_leapfrogging(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
@@ -378,7 +378,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         saved_transaction = view_set.get_queryset().get(id=first_transaction.id)
         self.assertEqual(str(saved_transaction.aggregate), "200.00")
 
-    def xtest_get_entity_date_leapfrogging_and_contact_change(self):
+    def test_get_entity_date_leapfrogging_and_contact_change(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
@@ -433,7 +433,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(str(second_transaction.aggregate), "47.00")
         self.assertEqual(str(third_transaction.aggregate), "178.00")
 
-    def xtest_get_entity_move_date_backwards(self):
+    def test_get_entity_move_date_backwards(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request({}, {"contact_1_id": str(self.contact_1.id)})
@@ -512,7 +512,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(second_transaction.aggregate, 225.00)
         self.assertEqual(third_transaction.aggregate, 25.00)
 
-    def xtest_get_previous_election(self):
+    def test_get_previous_election(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
         view_set.request = self.post_request(
@@ -561,7 +561,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             aggregation_amounts.get("calendar_ytd_per_election_office"), 300.00
         )
 
-    def xtest_get_previous_election_leapfrogging(self):
+    def test_get_previous_election_leapfrogging(self):
         view_set = TransactionViewSet()
         view_set.format_kwarg = {}
 
@@ -586,7 +586,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             aggregation_amounts.get("calendar_ytd_per_election_office"), 147.00
         )
 
-    def xtest_inherited_election_aggregate(self):
+    def test_inherited_election_aggregate(self):
         response = self.send_viewset_get_request(
             f"/api/v1/transactions/{self.transaction.id}/",
             TransactionViewSet,
@@ -597,7 +597,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         logger.debug(transaction)
         self.assertEqual(transaction.get("_calendar_ytd_per_election_office"), "153.00")
 
-    def xtest_reatt_redes_multisave_transactions(self):
+    def test_reatt_redes_multisave_transactions(self):
         txn1 = deepcopy(self.payloads["IN_KIND"])
         txn1["contributor_last_name"] = "one"
         txn2 = deepcopy(self.payloads["IN_KIND"])
@@ -612,7 +612,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         transactions = response.data
         self.assertEqual(len(transactions), 2)
 
-    def xtest_add_transaction_to_report(self):
+    def test_add_transaction_to_report(self):
         report_id = str(self.q1_report.id)
         transaction_id = str(self.transaction.id)
 
@@ -647,7 +647,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "No report matching id provided")
 
-    def xtest_add_transaction_family_to_report_from_parent(self):
+    def test_add_transaction_family_to_report_from_parent(self):
         jf_transfer = create_schedule_a(
             "JOINT_FUNDRAISING_TRANSFER",
             self.committee,
@@ -680,7 +680,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertIn(self.q2_report, jf_transfer.reports.all())
         self.assertIn(self.q2_report, partnership_jf_transfer_memo.reports.all())
 
-    def xtest_add_transaction_family_to_report_from_child(self):
+    def test_add_transaction_family_to_report_from_child(self):
         jf_transfer = create_schedule_a(
             "JOINT_FUNDRAISING_TRANSFER",
             self.committee,
@@ -713,7 +713,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertIn(self.q2_report, jf_transfer.reports.all())
         self.assertIn(self.q2_report, partnership_jf_transfer_memo.reports.all())
 
-    def xtest_remove_transaction_from_report(self):
+    def test_remove_transaction_from_report(self):
         report_id = str(self.q1_report.id)
         transaction_id = str(self.transaction.id)
 
@@ -746,7 +746,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, "No report matching id provided")
 
-    def xtest_save_debt(self):
+    def test_save_debt(self):
         payload = self.payloads["DEBT"]
         payload["report_ids"] = [str(self.q1_report.id)]
         view_set = TransactionViewSet()
@@ -760,7 +760,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             report_coverage_from_date,
         )
 
-    def xtest_sorting_memo_code(self):
+    def test_sorting_memo_code(self):
         indiviual_receipt_data = [
             {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo": False},
             {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo": None},
@@ -778,7 +778,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(ordered_queryset.first().id, memos_sorted.first().id)
 
-    def xtest_sorting_memo_code_inverted(self):
+    def test_sorting_memo_code_inverted(self):
         indiviual_receipt_data = [
             {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo": False},
             {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo": None},
@@ -799,7 +799,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(ordered_queryset.first().id, memos_inverted.first().id)
 
-    def xtest_sorting_memos_only_true(self):
+    def test_sorting_memos_only_true(self):
         indiviual_receipt_data = [
             {"date": "2023-01-01", "amount": "123.45", "group": "GENERAL", "memo": True},
             {"date": "2024-01-01", "amount": "100.00", "group": "GENERAL", "memo": True},
@@ -825,7 +825,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(ordered_queryset.first().id, memos_sorted.first().id)
 
-    def xtest_multi_sorting(self):
+    def test_multi_sorting(self):
         indiviual_receipt_data = [
             {"date": "2023-01-01", "amount": "200.00", "group": "GENERAL", "memo": True},
             {"date": "2024-01-01", "amount": "300.00", "group": "GENERAL", "memo": True},
@@ -848,7 +848,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         for i in range(ordered_queryset.count()):
             self.assertEqual(ordered_queryset[i].id, memos_sorted[i].id)
 
-    def xtest_list_unassociated(self):
+    def test_list_unassociated(self):
         Transaction.objects.filter(committee_account=self.committee).delete()
 
         indiviual_receipt_data = [
@@ -909,7 +909,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(len(transactions), 2)
         self.assertEqual(transactions[0]["amount"], "100.00")
 
-    def xtest_list_unassociated_non_paginated(self):
+    def test_list_unassociated_non_paginated(self):
         request = self.get_request(
             "api/v1/transactions/list/unassociated",
             {
@@ -948,7 +948,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         response = self.view.list_unassociated_transactions(request)
         self.assertEqual(response.status_code, 200)
 
-    def xtest_list_unassociated_by_schedule(self):
+    def test_list_unassociated_by_schedule(self):
         Transaction.objects.filter(committee_account=self.committee).delete()
 
         indiviual_receipt_data = [
@@ -1247,7 +1247,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(c1_delete_response.status_code, 204)
 
-    def xtest_destroy(self):
+    def test_destroy(self):
         response = self.send_viewset_delete_request(
             f"api/v1/transactions/{self.transaction.id}/",
             TransactionViewSet,
@@ -1257,7 +1257,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Transaction.objects.filter(pk=self.transaction.pk).exists())
 
-    def xtest_destroy_with_dependent_parent(self):
+    def test_destroy_with_dependent_parent(self):
         jf_transfer = create_schedule_a(
             "JOINT_FUNDRAISING_TRANSFER",
             self.committee,
@@ -1316,7 +1316,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "JF Memo: (Partnership attributions do not meet itemization threshold)",
         )
 
-    def xtest_update_itemization_status_on_child(self):
+    def test_update_itemization_status_on_child(self):
         """if a partnership receipt has no itemized attributions,
         the contribution_purpose_descrip should be updated to reflect that
         """
@@ -1376,7 +1376,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "(See Partnership Attribution(s) below)",
         )
 
-    def xtest_loan_repayment_on_loan_by_committee(self):
+    def test_loan_repayment_on_loan_by_committee(self):
         """Loan repayments should update loan balances on the original loan
         and on carried forward copies"""
         # create original report
@@ -1445,7 +1445,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         for child_loan in child_loans:
             self.assertEqual(child_loan.loan_balance, 750.00)
 
-    def xtest_delete_carried_forward_loan_on_repayment_to_orignal_loan(self):
+    def test_delete_carried_forward_loan_on_repayment_to_orignal_loan(self):
         """Paying off a loan in the original report should delete any carried forward
         copies in future reports"""
         # create q1 and associated loan
@@ -1498,7 +1498,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertTrue(Transaction.all_objects.get(id=q2_carried_over_loan.id).deleted)
         self.assertTrue(Transaction.all_objects.get(id=q3_carried_over_loan.id).deleted)
 
-    def xtest_delete_carried_forward_loan_on_repayment_to_carried_forward_loan(self):
+    def test_delete_carried_forward_loan_on_repayment_to_carried_forward_loan(self):
         """Paying off a loan in one report should delete any carried forward
         copies in future reports"""
         # create q1 and associated loan
@@ -1576,7 +1576,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             Transaction.all_objects.get(pk=test_q2_carried_over_loan.id).deleted
         )
 
-    def xtest_delete_carried_forward_debt_on_repayment_to_orignal_debt(self):
+    def test_delete_carried_forward_debt_on_repayment_to_orignal_debt(self):
         """Paying off a debt in the original report should delete any carried forward
         copies in future reports"""
         # create q1 and associated debt
@@ -1626,7 +1626,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertTrue(Transaction.all_objects.get(id=q2_carried_over_debt.id).deleted)
         self.assertTrue(Transaction.all_objects.get(id=q3_carried_over_debt.id).deleted)
 
-    def xtest_debt_aggregation_in_middle_of_chain_with_deletion(self):
+    def test_debt_aggregation_in_middle_of_chain_with_deletion(self):
         # create q1 and associated debt
         test_q1_report_2025 = create_form3x(
             self.committee, "2025-01-01", "2025-03-31", {}
@@ -1690,7 +1690,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         test_q3_carried_over_debt.refresh_from_db()
         self.assertEqual(test_q3_carried_over_debt.schedule_d.balance_at_close, 1100.00)
 
-    def xtest_delete_carried_forward_debt_on_repayment_to_carried_forward_debt(self):
+    def test_delete_carried_forward_debt_on_repayment_to_carried_forward_debt(self):
         """Paying off a debt in one report should delete any carried forward
         copies in future reports"""
         # create q1 and associated debt
@@ -1766,7 +1766,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             Transaction.all_objects.get(pk=test_q2_carried_over_debt.id).deleted
         )
 
-    def xtest_debt_incurred_prior_aggregation(self):
+    def test_debt_incurred_prior_aggregation(self):
         # create three reports
         test_q1_report_2026 = create_form3x(
             self.committee, "2026-01-01", "2026-03-31", {}
@@ -1832,7 +1832,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(q3_debt.schedule_d.incurred_amount, 0.00)
         self.assertEqual(q3_debt.schedule_d.balance_at_close, 1500.00)
 
-    def xtest_updating_debt(self):
+    def test_updating_debt(self):
         # create three reports
         test_q1_report_2026 = create_form3x(
             self.committee, "2026-01-01", "2026-03-31", {}
@@ -1936,7 +1936,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(q3_debt.schedule_d.incurred_amount, 0.00)
         self.assertEqual(q3_debt.schedule_d.balance_at_close, 1500.00)
 
-    def xtest_create_schedule_f_debt_repayment(self):
+    def test_create_schedule_f_debt_repayment(self):
         """Making a schedule f debt repayment should reduce the balance accordingly"""
         # create q1 and associated debt
         test_q1_report_2025 = create_form3x(
@@ -1965,7 +1965,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             850.00,
         )
 
-    def xtest_delete_schedule_f_debt_repayment(self):
+    def test_delete_schedule_f_debt_repayment(self):
         """Making a schedule f debt repayment should reduce the balance accordingly"""
         # create q1 and associated debt
         test_q1_report_2025 = create_form3x(
@@ -2079,7 +2079,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         schedule_f_debt_repayment_payload["expenditure_amount"] = repayment_amount
         return schedule_f_debt_repayment_payload
 
-    def xtest_schedule_f_aggregation(self):
+    def test_schedule_f_aggregation(self):
         report = create_form3x(
             self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
         )
@@ -2230,7 +2230,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         trans_d.refresh_from_db()
         self.assertEqual(trans_d.schedule_f.aggregate_general_elec_expended, 250.00)
 
-    def xtest_schedule_f_aggregation_edge_cases(self):
+    def test_schedule_f_aggregation_edge_cases(self):
         report = create_form3x(
             self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
         )
@@ -2371,7 +2371,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(transaction_1.schedule_f.aggregate_general_elec_expended, 153.00)
         self.assertEqual(transaction_2.schedule_f.aggregate_general_elec_expended, 200.00)
 
-    def xtest_previous_transaction_by_payee_candidate(self):
+    def test_previous_transaction_by_payee_candidate(self):
         report = create_form3x(
             self.committee, "2023-01-01", "2023-03-31", {}, report_code="Q1"
         )
@@ -2530,7 +2530,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             transaction_2.schedule_f.aggregate_general_elec_expended,
         )
 
-    def xtest_adjust_running_totals_schedule_f_year_behavior(self):
+    def test_adjust_running_totals_schedule_f_year_behavior(self):
         view_set = TransactionViewSet()
         cases = [
             ("2024", Decimal("25.00")),
