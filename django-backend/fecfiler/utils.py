@@ -33,28 +33,10 @@ def _safe_log_value(value):
     return str(value)
 
 
-def _is_safe_for_exception_logging(exc):
-    if not isinstance(exc, BaseException):
-        return False
-
-    detail = getattr(exc, "detail", None)
-    if isinstance(detail, (dict, list, tuple, set)):
-        return False
-
-    for arg in getattr(exc, "args", ()):
-        if isinstance(arg, (dict, list, tuple, set)):
-            return False
-
-    return True
-
-
 def custom_exception_handler(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
-    if _is_safe_for_exception_logging(exc):
-        logger.exception(_safe_log_value(exc), exc_info=False)
-    else:
-        logger.error("Exception: %s", _safe_log_value(exc))
+    logger.exception(_safe_log_value(exc), exc_info=False)
     response = exception_handler(exc, context)
 
     if response is None:
