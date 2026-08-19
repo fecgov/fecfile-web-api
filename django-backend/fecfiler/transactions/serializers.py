@@ -282,11 +282,15 @@ class TransactionSerializer(
 
         self.validate_report_committee_ownership(initial_data)
         self.validate_memo_text_committee_ownership(data)
-        self.validate_transaction_committee_ownership(data, "parent_transaction")
-        self.validate_transaction_committee_ownership(data, "loan")
-        self.validate_transaction_committee_ownership(data, "debt")
-        self.validate_transaction_committee_ownership(data, "reatt_redes")
-        
+        self.validate_transaction_committee_ownership(
+            initial_data,
+            data,
+            "parent_transaction"
+        )
+        self.validate_transaction_committee_ownership(initial_data, data, "loan")
+        self.validate_transaction_committee_ownership(initial_data, data, "debt")
+        self.validate_transaction_committee_ownership(initial_data, data, "reatt_redes")
+
         super().validate(data_to_validate)
         return data
 
@@ -375,10 +379,16 @@ class TransactionSerializer(
             if not representation.get(property):
                 representation[property] = schedule[property]
 
-    
-    def validate_transaction_committee_ownership(self, data, transaction_key):
-        committee_account = data.get("committee_account")
-        id = data.get(f"{transaction_key}_id")
+    def validate_transaction_committee_ownership(
+        self,
+        initial_data,
+        resolved_data,
+        transaction_key
+    ):
+        committee_account = initial_data.get("committee_account")
+
+        id = initial_data.get(f"{transaction_key}_id")
+
         validation_error = serializers.ValidationError(
             {
                 f"{transaction_key} id": (
@@ -387,8 +397,11 @@ class TransactionSerializer(
                 )
             }
         )
-        
-        if id != getattr(data.get(transaction_key, {}), "id", None):
+
+        associated_object = resolved_data.get(transaction_key, {})
+        associated_object_id = getattr(associated_object, "id", None)
+
+        if str(associated_object_id) != str(id):
             raise validation_error
         if id:
             exists = Transaction.objects.filter(
