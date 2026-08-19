@@ -225,9 +225,16 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         updated_payload["contribution_amount"] = 999
         updated_payload["children"][0]["id"] = str(transaction.children[0].id)
         updated_payload["children"][0]["expenditure_amount"] = 999
-        request = self.post_request(updated_payload)
-        transaction = TransactionViewSet().save_transaction(request.data, request)
-        updated_transaction = Transaction.objects.get(id=transaction.id)
+        response = self.send_viewset_put_request(
+            f"api/v1/transactions/{transaction.id}/",
+            updated_payload,
+            TransactionViewSet,
+            "update",
+            pk=transaction.id,
+            committee=self.committee,
+        )
+
+        updated_transaction = Transaction.objects.get(pk=response.data)
         self.assertEqual(updated_transaction.schedule_a.contribution_amount, 999)
         self.assertEqual(
             updated_transaction.children[0].schedule_b.expenditure_amount, 999
@@ -1216,7 +1223,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             pk=c1_post_response.data,
             committee=c2,
         )
-        self.assertEqual(c2_put_response.status_code, 500)
+        self.assertEqual(c2_put_response.status_code, 404)
 
         c1_put_response = self.send_viewset_put_request(
             f"api/v1/transactions/{c1_post_response.data}/",
@@ -1376,6 +1383,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             partnership_attribution_payload,
             TransactionViewSet,
             "update",
+            pk=partnership_attribution_response.data,
         )
         partnership_receipt.refresh_from_db()
         self.assertEqual(
@@ -1926,12 +1934,14 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "schedule_id": "D",
             "fields_to_validate": ["incurred_amount"],
         }
-
-        view_set = TransactionViewSet()
-        view_set.format_kwarg = {}
-        view_set.request = self.put_request(update_payload)
-
-        self.view.save_transaction(update_payload, view_set.request)
+        self.send_viewset_put_request(
+            f"api/v1/transactions/{test_debt.id}/",
+            update_payload,
+            TransactionViewSet,
+            "update",
+            pk=test_debt.id,
+            committee=self.committee,
+        )
 
         # Test assertions
         test_debt.refresh_from_db()
