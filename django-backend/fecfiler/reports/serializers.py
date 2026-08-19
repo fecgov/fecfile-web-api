@@ -222,8 +222,7 @@ class ReportCommitteeValidationMixin:
                 raise ValidationError(
                     {
                         "report_id": (
-                            "Invalid report_id or report does not belong "
-                            "to this committee account."
+                            "Invalid report_id or report does not belong."
                         )
                     }
                 )
@@ -238,9 +237,6 @@ class ReportCommitteeValidationMixin:
             if valid_count != len(unique_ids):
                 raise ValidationError(
                     {
-                        "report_ids": (
-                            "One or more report_ids are invalid or do not belong "
-                            "to this committee account."
-                        )
+                        "report_ids": "One or more report_ids are invalid"
                     }
                 )

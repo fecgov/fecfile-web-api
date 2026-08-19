@@ -149,32 +149,36 @@ class ContactCommitteeValidationMixin:
     """Mixin to validate that contact ids belongs to
     the serializer's committee_account."""
 
-    def validate_contact_committee_ownership(self, data, contact_field):
+    def validate_contact_committee_ownership(self, data, contact_fields):
+        if isinstance(contact_fields, str):
+            contact_fields = [contact_fields]
+
         committee_account = data.get("committee_account")
-        contact = data.get(contact_field)
-        contact_id = data.get(f"{contact_field}_id")
-        if contact_id:
+        errors = {}
+
+        for contact_field in contact_fields:
+            contact = data.get(contact_field)
+            contact_id = data.get(f"{contact_field}_id")
+
+            if not contact_id:
+                continue
+
             if (
-                contact and contact.get("id") is not None
+                contact
+                and contact.get("id") is not None
                 and contact.get("id") != contact_id
             ):
-                raise ValidationError(
-                    {
-                        contact_field: (
-                            "Invalid contact id or contact does not belong "
-                            "to this committee account."
-                        )
-                    }
+                errors[contact_field] = (
+                    f"{contact_field}_id does not match the id in {contact_field}"
                 )
+                continue
+
             exists = Contact.objects.filter(
                 id=contact_id, committee_account=committee_account
             ).exists()
+
             if not exists:
-                raise ValidationError(
-                    {
-                        contact_field: (
-                            "Invalid contact id or contact does not belong "
-                            "to this committee account."
-                        )
-                    }
-                )
+                errors[contact_field] = "Invalid contact id or contact does not belong."
+
+        if errors:
+            raise ValidationError(errors)

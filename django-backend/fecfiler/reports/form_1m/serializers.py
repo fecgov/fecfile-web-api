@@ -187,12 +187,15 @@ class Form1MSerializer(ReportSerializer, ContactCommitteeValidationMixin):
         self.context["fields_to_ignore"] = self.context.get(
             "fields_to_ignore", ["filer_committee_id_number"]
         )
-        self.validate_contact_committee_ownership(data, 'contact_affiliated')
-        self.validate_contact_committee_ownership(data, 'contact_candidate_I')
-        self.validate_contact_committee_ownership(data, 'contact_candidate_II')
-        self.validate_contact_committee_ownership(data, 'contact_candidate_III')
-        self.validate_contact_committee_ownership(data, 'contact_candidate_IV')
-        self.validate_contact_committee_ownership(data, 'contact_candidate_V')
+        self.validate_contact_committee_ownership(data, [
+            'contact_affiliated',
+            'contact_candidate_I',
+            'contact_candidate_II',
+            'contact_candidate_III',
+            'contact_candidate_IV',
+            'contact_candidate_V'
+        ])
+
         return super().validate(data)
 
     class Meta(ReportSerializer.Meta):

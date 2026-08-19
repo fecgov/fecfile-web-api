@@ -285,11 +285,13 @@ class TransactionSerializer(
 
         self.validate_report_committee_ownership(initial_data)
         self.validate_memo_text_committee_ownership(data)
-        self.validate_contact_committee_ownership(data, 'contact_1')
-        self.validate_contact_committee_ownership(data, 'contact_2')
-        self.validate_contact_committee_ownership(data, 'contact_3')
-        self.validate_contact_committee_ownership(data, 'contact_4')
-        self.validate_contact_committee_ownership(data, 'contact_5')
+        self.validate_contact_committee_ownership(data, [
+            'contact_1',
+            'contact_2',
+            'contact_3',
+            'contact_4',
+            'contact_5'
+        ])
         super().validate(data_to_validate)
         return data
 
