@@ -222,3 +222,20 @@ class ReportCommitteeValidationMixin:
                         )
                     }
                 )
+
+        report_ids = data.get("report_ids", [])
+        if report_ids:
+            unique_ids = set(str(rid) for rid in report_ids) if report_ids else set()
+            valid_count = Report.objects.filter(
+                id__in=unique_ids, committee_account=committee_account
+            ).count()
+
+            if valid_count != len(unique_ids):
+                raise ValidationError(
+                    {
+                        "report_ids": (
+                            "One or more report_ids are invalid or do not belong "
+                            "to this committee account."
+                        )
+                    }
+                )

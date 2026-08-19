@@ -713,21 +713,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
     def set_reports(self, report_ids):
         Report = apps.get_model("reports.Report")
-        input_report_ids = set(str(rid) for rid in report_ids) if report_ids else set()
-        if input_report_ids:
-            valid_report_ids = set(
-                str(rid)
-                for rid in Report.objects.filter(
-                    id__in=input_report_ids,
-                    committee_account=self.committee_account,
-                ).values_list("id", flat=True)
-            )
-            if valid_report_ids != input_report_ids:
-                raise SuspiciousSession("request ids don't match")
-            report_ids = valid_report_ids
-        else:
-            report_ids = set()
-
         current_report_ids = set()
         current_report_id_dicts = list(self.reports.values("id"))
         for report_id_dict in current_report_id_dicts:

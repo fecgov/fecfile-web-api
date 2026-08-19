@@ -2,7 +2,7 @@ from django.db.models import Sum
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
-from fecfiler.reports.serializers import ReportSerializer
+from fecfiler.reports.serializers import ReportCommitteeValidationMixin, ReportSerializer
 from fecfiler.contacts.serializers import ContactSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import empty, ModelSerializer
@@ -61,6 +61,7 @@ class TransactionSerializer(
     LinkedMemoTextSerializerMixin,
     FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
+    ReportCommitteeValidationMixin
 ):
     """id must be explicitly configured in order to have it in validated_data
     https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
@@ -278,6 +279,7 @@ class TransactionSerializer(
             ],
         )
 
+        self.validate_report_committee_ownership(initial_data)
         self.validate_memo_text_committee_ownership(data)
         super().validate(data_to_validate)
         return data
