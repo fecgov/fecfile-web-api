@@ -5,6 +5,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
 from django.db.models import Q
@@ -455,6 +456,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             ):
                 target.schedule_f.aggregate_general_elec_expended -= amount
 
+    def check_parent_transaction_ownership(self, parent_id, committee_id):
+        # ensures that the parent transaction belongs to the given committee id
+        parent_instance = Transaction.objects.filter(
+            id=parent_id, committee_account_id=committee_id
+        ).first()
+
+        if parent_instance is None:
+            raise ValidationError({
+                "parent_transaction": [
+                    "Parent does not exist or does not belong to this committee"
+                ]
+            })
+        return parent_instance
+
     def save_transaction(self, transaction_data, request):
         committee_id = request.session["committee_uuid"]
         report_ids = transaction_data.pop("report_ids", [])
@@ -463,6 +478,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction_data["parent_transaction"] = transaction_data.get(
             "parent_transaction_id", None
         )
+        self.check_parent_transaction_ownership(
+            transaction_data["parent_transaction"],
+            committee_id
+        )
+
         transaction_data["debt"] = transaction_data.get("debt_id", None)
         transaction_data["loan"] = transaction_data.get("loan_id", None)
         transaction_data["reatt_redes"] = transaction_data.get("reatt_redes_id", None)
