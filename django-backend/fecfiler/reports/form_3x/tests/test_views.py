@@ -127,6 +127,8 @@ class Form3XViewSetTest(FecfilerViewSetTest):
                 'treasurer_last_name': "Treasurer",
                 'treasurer_first_name': "Mr",
                 'date_signed': "2004-01-01",
+                "coverage_from_date": "2025-01-01",
+                "coverage_through_date": "2025-02-01"
             },
             Form3XViewSet,
             "update",
