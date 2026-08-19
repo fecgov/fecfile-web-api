@@ -3,19 +3,24 @@ import json
 from django.http import QueryDict
 from django.test import tag
 from fecfiler.reports.views import ReportViewSet
+from fecfiler.reports.form_1m.views import Form1MViewSet
 from fecfiler.reports.utils.report import delete_all_reports
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.views import TransactionViewSet
 from fecfiler.reports.managers import STATUS_CODE_SUCCESS
 from fecfiler.transactions.tests.utils import create_schedule_a, create_loan
-from fecfiler.contacts.tests.utils import create_test_organization_contact
+from fecfiler.contacts.tests.utils import (
+    create_test_committee_contact,
+    create_test_organization_contact
+)
 from fecfiler.transactions.schedule_c.utils import carry_forward_loan
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
 from fecfiler.web_services.models import FECStatus, UploadSubmission
+from copy import deepcopy
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -23,6 +28,73 @@ logger = structlog.get_logger(__name__)
 
 class ReportViewSetTest(FecfilerViewSetTest):
     def setUp(self):
+        self.fields_to_validate = [
+            'committee_type',
+            'filer_committee_id_number',
+            'committee_name',
+            'street_1',
+            'street_2',
+            'city',
+            'state',
+            'zip',
+            'affiliated_date_form_f1_filed',
+            'affiliated_committee_fec_id',
+            'affiliated_committee_name',
+            'I_candidate_id_number',
+            'I_candidate_last_name',
+            'I_candidate_first_name',
+            'I_candidate_middle_name',
+            'I_candidate_prefix',
+            'I_candidate_suffix',
+            'I_candidate_office',
+            'I_candidate_state',
+            'I_candidate_district',
+            'I_date_of_contribution',
+            'II_candidate_id_number',
+            'II_candidate_last_name',
+            'II_candidate_first_name',
+            'II_candidate_middle_name',
+            'II_candidate_prefix',
+            'II_candidate_suffix',
+            'II_candidate_office',
+            'II_candidate_state',
+            'II_candidate_district',
+            'II_date_of_contribution',
+            'III_candidate_id_number',
+            'III_candidate_last_name',
+            'III_candidate_first_name',
+            'III_candidate_middle_name',
+            'III_candidate_prefix',
+            'III_candidate_suffix',
+            'III_candidate_office',
+            'III_candidate_state',
+            'III_candidate_district',
+            'III_date_of_contribution',
+            'IV_candidate_id_number',
+            'IV_candidate_last_name',
+            'IV_candidate_first_name',
+            'IV_candidate_middle_name',
+            'IV_candidate_prefix',
+            'IV_candidate_suffix',
+            'IV_candidate_office',
+            'IV_candidate_state',
+            'IV_candidate_district',
+            'IV_date_of_contribution',
+            'V_candidate_id_number',
+            'V_candidate_last_name',
+            'V_candidate_first_name',
+            'V_candidate_middle_name',
+            'V_candidate_prefix',
+            'V_candidate_suffix',
+            'V_candidate_office',
+            'V_candidate_state',
+            'V_candidate_district',
+            'V_date_of_contribution',
+            'date_of_original_registration',
+            'date_of_51st_contributor',
+            'date_committee_met_requirements',
+            'statusBy',
+        ]
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         user = User.objects.create(email="test@fec.gov", username="gov")
         super().set_default_user(user)
@@ -589,6 +661,145 @@ class ReportViewSetTest(FecfilerViewSetTest):
         )
 
         self.assertFalse(test_reports.exists())
+
+    def test_create_contact_other_committee_fails(self):
+        contact_1 = create_test_committee_contact(
+            "test-com-name5",
+            "C00000005",
+            self.committee.id,
+            {
+                "street_1": "test_sa5",
+                "street_2": "test_sa5",
+                "city": "test_c5",
+                "state": "AL",
+                "zip": "12345",
+                "telephone": "555-555-5555",
+                "country": "USA",
+            },
+        )
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
+        other_contact_1 = create_test_committee_contact(
+            "test-com-name1",
+            "C00000002",
+            other_committee.id,
+            {
+                "street_1": "test_sa1",
+                "street_2": "test_sa2",
+                "city": "test_c1",
+                "state": "AL",
+                "zip": "12345",
+                "telephone": "555-555-5555",
+                "country": "USA",
+            },
+        )
+        payload = {
+            "report_type": "F1M",
+            "form_type": "F1MN",
+            "contact_affiliated": {
+                "type": "COM",
+                "street_1": "test_sa1",
+                "street_2": "test_sa2",
+                "city": "test_c1",
+                "state": "AL",
+                "zip": "12345",
+                "country": "USA",
+                "committee_id": other_committee.committee_id,
+                "name": "test-com-name1"
+            },
+            "contact_affiliated_id": str(other_contact_1.id),
+            "affiliated_date_form_f1_filed": "2026-08-19",
+            "affiliated_committee_fec_id": str(other_contact_1.committee_id),
+            "affiliated_committee_name": str(other_contact_1.name),
+            "filer_committee_id_number": other_committee.committee_id,
+            "committee_name": "other committee",
+            "street_1": "1234 Street",
+            "city": "Washington",
+            "state": "DC",
+            "zip": "20001",
+            "committee_type": "X",
+            "contact_candidate_I_id": None,
+            "I_candidate_id_number": None,
+            "I_candidate_last_name": None,
+            "I_candidate_first_name": None,
+            "I_candidate_middle_name": None,
+            "I_candidate_prefix": None,
+            "I_candidate_suffix": None,
+            "I_candidate_office": None,
+            "I_candidate_state": None,
+            "I_candidate_district": None,
+            "I_date_of_contribution": None,
+            "contact_candidate_II_id": None,
+            "II_candidate_id_number": None,
+            "II_candidate_last_name": None,
+            "II_candidate_first_name": None,
+            "II_candidate_middle_name": None,
+            "II_candidate_prefix": None,
+            "II_candidate_suffix": None,
+            "II_candidate_office": None,
+            "II_candidate_state": None,
+            "II_candidate_district": None,
+            "II_date_of_contribution": None,
+            "contact_candidate_III_id": None,
+            "III_candidate_id_number": None,
+            "III_candidate_last_name": None,
+            "III_candidate_first_name": None,
+            "III_candidate_middle_name": None,
+            "III_candidate_prefix": None,
+            "III_candidate_suffix": None,
+            "III_candidate_office": None,
+            "III_candidate_state": None,
+            "III_candidate_district": None,
+            "III_date_of_contribution": None,
+            "contact_candidate_IV_id": None,
+            "IV_candidate_id_number": None,
+            "IV_candidate_last_name": None,
+            "IV_candidate_first_name": None,
+            "IV_candidate_middle_name": None,
+            "IV_candidate_prefix": None,
+            "IV_candidate_suffix": None,
+            "IV_candidate_office": None,
+            "IV_candidate_state": None,
+            "IV_candidate_district": None,
+            "IV_date_of_contribution": None,
+            "contact_candidate_V_id": None,
+            "V_candidate_id_number": None,
+            "V_candidate_last_name": None,
+            "V_candidate_first_name": None,
+            "V_candidate_middle_name": None,
+            "V_candidate_prefix": None,
+            "V_candidate_suffix": None,
+            "V_candidate_office": None,
+            "V_candidate_state": None,
+            "V_candidate_district": None,
+            "V_date_of_contribution": None,
+            "date_of_51st_contributor": None,
+            "date_of_original_registration": None,
+            "date_committee_met_requirements": None
+        }
+        fields = f"?fields_to_validate={",".join(self.fields_to_validate)}"
+
+        response = self.send_viewset_post_request(
+            f"/api/v1/reports/form-1m/{fields}/",
+            payload,
+            Form1MViewSet,
+            "create",
+            committee=other_committee,
+        )
+        self.assertEqual(response.status_code, 201)
+        updated_payload = deepcopy(payload)
+        updated_payload["id"] = str(response.data.get('id'))
+        del updated_payload["contact_affiliated"]
+        updated_payload["contact_affiliated_id"] = str(contact_1.id)
+        response = self.send_viewset_put_request(
+            f"/api/v1/reports/form-1m/{updated_payload['id']}/{fields}/",
+            updated_payload,
+            Form1MViewSet,
+            "update",
+            committee=other_committee,
+            pk=updated_payload['id']
+        )
+
+        self.assertEqual(response.status_code, 400)
 
     def test_CRUD_committee_locked_list(self):
         other_committee = CommitteeAccount(

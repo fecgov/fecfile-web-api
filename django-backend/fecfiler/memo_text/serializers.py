@@ -89,17 +89,16 @@ class LinkedMemoTextSerializerMixin(ModelSerializer):
 
     def validate_memo_text_committee_ownership(self, data):
         committee_account = data.get("committee_account")
-        id = data.get("memo_text_id")
-        if id:
+        memo_text_id = data.get("memo_text_id")
+        if memo_text_id:
             exists = MemoText.objects.filter(
-                id=id, committee_account=committee_account
+                id=memo_text_id, committee_account=committee_account
             ).exists()
             if not exists:
                 raise serializers.ValidationError(
                     {
                         "memo_text_id": (
-                            "Invalid memo_text_id or memo text does not belong "
-                            "to this committee account."
+                            "Invalid memo_text_id or memo text"
                         )
                     }
                 )
