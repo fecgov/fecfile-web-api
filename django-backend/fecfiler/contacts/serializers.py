@@ -18,7 +18,6 @@ logger = structlog.get_logger(__name__)
 
 
 def create_or_update_contact(validated_data: dict, contact_key, user_committee_id):
-
     if not user_committee_id:
         raise Exception("Tried to save contact without user_committee_id")
 
@@ -32,8 +31,17 @@ def create_or_update_contact(validated_data: dict, contact_key, user_committee_i
         contact_data.pop("committee_account", None)
 
         if contact_id:
-            Contact.objects.filter(id=contact_id).update(**contact_data)
-            contact = Contact.objects.get(id=contact_id)
+            updated = Contact.objects.filter(
+                id=contact_id, committee_account_id=user_committee_id
+            ).update(**contact_data)
+            if updated == 0:
+                raise ValidationError(
+                    f"Contact {contact_id} does not exist for this committee."
+                )
+            contact = Contact.objects.get(
+                id=contact_id,
+                committee_account_id=user_committee_id
+            )
         else:
             contact = Contact.objects.create(**contact_data)
             validated_data[contact_key + "_id"] = contact.id

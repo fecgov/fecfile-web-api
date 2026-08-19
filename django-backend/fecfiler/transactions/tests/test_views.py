@@ -206,15 +206,21 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         return request
 
     def test_save_transaction_pair(self):
-        request = self.post_request(self.payloads["IN_KIND"])
+        payload = self.payloads["IN_KIND"]
+        payload["report_ids"] = [str(self.q1_report.id)]
+        payload["children"][0]["report_ids"] = [str(self.q1_report.id)]
+        request = self.post_request(payload)
         transaction = TransactionViewSet().save_transaction(request.data, request)
         self.assertEqual("John", transaction.contact_1.first_name)
         self.assertEqual("Smith", transaction.contact_1.last_name)
 
     def test_update(self):
-        request = self.post_request(self.payloads["IN_KIND"])
-        transaction = TransactionViewSet().save_transaction(request.data, request)
         updated_payload = deepcopy(self.payloads["IN_KIND"])
+        updated_payload["report_ids"] = [str(self.q1_report.id)]
+        updated_payload["children"][0]["report_ids"] = [str(self.q1_report.id)]
+        request = self.post_request(updated_payload)
+        transaction = TransactionViewSet().save_transaction(request.data, request)
+        updated_payload = deepcopy(updated_payload)
         updated_payload["id"] = str(transaction.id)
         updated_payload["contribution_amount"] = 999
         updated_payload["children"][0]["id"] = str(transaction.children[0].id)
@@ -337,6 +343,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             self.contact_3,
             "2023-01-12",
             "153.00",
+            report=self.q1_report,
         )
 
         second_transaction = create_schedule_a(
@@ -345,6 +352,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             self.contact_3,
             "2023-01-12",
             "47.00",
+            report=self.q1_report,
         )
 
         response = view_set.previous_transaction_by_entity(
@@ -370,6 +378,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "schedule_id": "A",
                 "schema_name": "INDIVIDUAL_RECEIPT",
                 "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
+                "report_ids": [str(self.q1_report.id)],
             },
         }
 
@@ -389,6 +398,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             self.contact_3,
             "2023-01-12",
             "153.00",
+            report=self.q1_report,
         )
 
         second_transaction = create_schedule_a(
@@ -397,6 +407,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             self.contact_3,
             "2023-01-15",
             "47.00",
+            report=self.q1_report,
         )
 
         third_transaction = create_schedule_a(
@@ -405,6 +416,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             self.contact_2,
             "2023-01-20",
             "25.00",
+            report=self.q1_report,
         )
 
         first_transaction.contact_1 = self.contact_2
@@ -420,6 +432,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "contributor_city": "Testville",
                 "contributor_state": "IL",
                 "contributor_zip": "12345",
+                "report_ids": [str(self.q1_report.id)],
             },
         }
 
@@ -445,6 +458,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             self.contact_3,
             "2023-01-12",
             "153.00",
+            report=self.q1_report,
         )
 
         second_transaction = create_schedule_a(
@@ -453,6 +467,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             self.contact_3,
             "2023-01-15",
             "47.00",
+            report=self.q1_report,
         )
 
         third_transaction = create_schedule_a(
@@ -461,6 +476,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             self.contact_3,
             "2023-01-18",
             "25.00",
+            report=self.q1_report,
         )
 
         response = view_set.previous_transaction_by_entity(
@@ -484,6 +500,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 "schedule_id": "A",
                 "schema_name": "INDIVIDUAL_RECEIPT",
                 "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
+                "report_ids": [str(self.q1_report.id)],
             },
         }
 
@@ -600,10 +617,15 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
     def test_reatt_redes_multisave_transactions(self):
         txn1 = deepcopy(self.payloads["IN_KIND"])
         txn1["contributor_last_name"] = "one"
+        txn1["report_ids"] = [str(self.q1_report.id)]
+        txn1["children"][0]["report_ids"] = [str(self.q1_report.id)]
         txn2 = deepcopy(self.payloads["IN_KIND"])
         txn2["contributor_last_name"] = "two"
+        txn2["report_ids"] = [str(self.q1_report.id)]
         txn3 = deepcopy(self.payloads["IN_KIND"])
         txn3["contributor_last_name"] = "three"
+        txn3["report_ids"] = [str(self.q1_report.id)]
+        txn3["children"][0]["report_ids"] = [str(self.q1_report.id)]
         txn2["children"] = [txn3]
         payload = [txn1, txn2]
 
@@ -999,6 +1021,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(response.data["count"], 2)
         self.assertEqual(len(transactions), 2)
         self.assertEqual(transactions[0]["amount"], "250.00")
+<<<<<<< HEAD
 
     def test_list_committee_transactions(self):
         c1 = CommitteeAccount.objects.create(committee_id="C00000001")
@@ -1246,6 +1269,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             committee=c1,
         )
         self.assertEqual(c1_delete_response.status_code, 204)
+=======
+>>>>>>> develop
 
     def test_destroy(self):
         response = self.send_viewset_delete_request(
@@ -1321,7 +1346,12 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         the contribution_purpose_descrip should be updated to reflect that
         """
         partnership_receipt = create_schedule_a(
-            "PARTNERSHIP_RECEIPT", self.committee, self.contact_1, "2023-01-01", "1000"
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2023-01-01",
+            "1000",
+            report=self.q1_report,
         )
 
         partnership_attribution_payload = {
@@ -1334,6 +1364,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "parent_transaction_id": partnership_receipt.id,
             "contribution_amount": "1",
             "contact_1_id": str(self.contact_1.id),
+            "report_ids": [self.q1_report.id],
             "fields_to_validate": [
                 "schedule_id",
                 "form_type",
@@ -2319,6 +2350,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             **transaction_1_data,
             "expenditure_date": "2024-01-15",
             "id": transaction_1.id,
+            "report_ids": [str(report.id)],
         }
 
         transaction_1 = view_set.save_transaction(
@@ -2333,6 +2365,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         move_transaction_1_again_data = {
             **move_transaction_1_data,
             "expenditure_date": "2024-01-10",
+            "report_ids": [str(report.id)],
         }
 
         transaction_1 = view_set.save_transaction(
@@ -2347,6 +2380,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         change_ge_transaction_1_data = {
             **move_transaction_1_again_data,
             "general_election_year": "1999",
+            "report_ids": [str(report.id)],
         }
 
         transaction_1 = view_set.save_transaction(
@@ -2361,6 +2395,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         change_ge_transaction_1_back_data = {
             **move_transaction_1_again_data,
             "general_election_year": "2022",
+            "report_ids": [str(report.id)],
         }
 
         transaction_1 = view_set.save_transaction(

@@ -245,13 +245,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     @action(detail=False, methods=["post"], url_path=r"add-to-report")
     def add_transaction_to_report(self, request):
+        committee_uuid = request.session["committee_uuid"]
         try:
-            report = Report.objects.get(id=request.data.get("report_id"))
+            report = Report.objects.get(
+                id=request.data.get("report_id"),
+                committee_account_id=committee_uuid,
+            )
         except Report.DoesNotExist:
             return Response("No report matching id provided", status=404)
 
         try:
-            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+            transaction = Transaction.objects.get(
+                id=request.data.get("transaction_id"),
+                committee_account_id=committee_uuid,
+            )
             transactions = transaction.get_transaction_family()
             for t in transactions:
                 t.add_to_report(report.id)
@@ -262,13 +269,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     @action(detail=False, methods=["post"], url_path=r"remove-from-report")
     def remove_transaction_from_report(self, request):
+        committee_uuid = request.session["committee_uuid"]
         try:
-            report = Report.objects.get(id=request.data.get("report_id"))
+            report = Report.objects.get(
+                id=request.data.get("report_id"),
+                committee_account_id=committee_uuid,
+            )
         except Report.DoesNotExist:
             return Response("No report matching id provided", status=404)
 
         try:
-            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+            transaction = Transaction.objects.get(
+                id=request.data.get("transaction_id"),
+                committee_account_id=committee_uuid,
+            )
         except Transaction.DoesNotExist:
             return Response("No transaction matching id provided", status=404)
 
@@ -479,7 +493,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         old_snapshot = None  # Initialize early
 
         if is_existing:
-            original_instance = Transaction.objects.get(pk=transaction_data["id"])
+            original_instance = Transaction.objects.get(
+                pk=transaction_data["id"], committee_account=committee_id
+            )
             if original_instance is not None:
                 # Capture old_snapshot IMMEDIATELY after loading, before serializer
                 # modifies it
