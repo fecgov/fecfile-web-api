@@ -177,7 +177,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
-            saved_transaction = self.save_transaction(request.data, request)
+            saved_transaction = self.save_transaction(
+                request.data,
+                request,
+                instance=self.get_object()
+            )
             update_dependent_parent_purpose_description_if_needed(saved_transaction)
         return Response(saved_transaction.id)
 
@@ -484,7 +488,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             )
         return child_instance
 
-    def save_transaction(self, transaction_data, request):
+    def save_transaction(self, transaction_data, request, instance=None):
         committee_id = request.session["committee_uuid"]
         children = transaction_data.pop("children", [])
         schedule = transaction_data.get("schedule_id")
@@ -504,7 +508,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         old_snapshot = None  # Initialize early
 
         if is_existing:
-            original_instance = Transaction.objects.get(
+            original_instance = instance or Transaction.objects.get(
                 pk=transaction_data["id"], committee_account=committee_id
             )
             if original_instance is not None:

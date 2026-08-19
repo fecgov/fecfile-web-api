@@ -225,9 +225,16 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         updated_payload["contribution_amount"] = 999
         updated_payload["children"][0]["id"] = str(transaction.children[0].id)
         updated_payload["children"][0]["expenditure_amount"] = 999
-        request = self.post_request(updated_payload)
-        transaction = TransactionViewSet().save_transaction(request.data, request)
-        updated_transaction = Transaction.objects.get(id=transaction.id)
+        response = self.send_viewset_put_request(
+            f"api/v1/transactions/{transaction.id}/",
+            updated_payload,
+            TransactionViewSet,
+            "update",
+            pk=transaction.id,
+            committee=self.committee,
+        )
+
+        updated_transaction = Transaction.objects.get(pk=response.data)
         self.assertEqual(updated_transaction.schedule_a.contribution_amount, 999)
         self.assertEqual(
             updated_transaction.children[0].schedule_b.expenditure_amount, 999
@@ -1128,6 +1135,203 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(len(transactions), 2)
         self.assertEqual(transactions[0]["amount"], "250.00")
 
+    def test_list_committee_transactions(self):
+        c1 = CommitteeAccount.objects.create(committee_id="C00000001")
+        c1_q1_report = create_form3x(c1, "2024-01-01", "2024-02-01", {})
+        c1_org_contact = create_test_organization_contact(
+            "test-org-name1",
+            c1.id,
+            {
+                "street_1": "test_sa1",
+                "street_2": "test_sa2",
+                "city": "test_c1",
+                "state": "AL",
+                "zip": "12345",
+                "telephone": "555-555-5555",
+                "country": "USA",
+            },
+        )
+        c1_ind_contact = create_test_individual_contact(
+            "test_ln1",
+            "test_fn1",
+            c1.id,
+        )
+
+        c1_sa = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            c1,
+            c1_ind_contact,
+            "2023-01-01",
+            "500.00",
+            group="OTHER",
+            report=c1_q1_report,
+            memo_code=False,
+        )
+
+        c1_sb = create_schedule_b(
+            "OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT",
+            c1,
+            c1_org_contact,
+            "2023-01-02",
+            Decimal("250.00"),
+            report=c1_q1_report,
+        )
+
+        c2 = CommitteeAccount.objects.create(committee_id="C00000002")
+        c2_q1_report = create_form3x(c2, "2024-01-01", "2024-02-01", {})
+        c2_ind_contact = create_test_individual_contact(
+            "test_ln2",
+            "test_fn2",
+            c2.id,
+        )
+
+        c2_sa = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            c2,
+            c2_ind_contact,
+            "2023-01-01",
+            "500.00",
+            group="OTHER",
+            report=c2_q1_report,
+            memo_code=False,
+        )
+
+        c1_response = self.send_viewset_get_request(
+            "/api/v1/transactions/",
+            TransactionViewSet,
+            "list",
+            committee=c1,
+        )
+
+        c2_response = self.send_viewset_get_request(
+            "/api/v1/transactions/",
+            TransactionViewSet,
+            "list",
+            committee=c2,
+        )
+
+        self.assertEqual(len(c1_response.data), 2)
+        for transaction in c1_response.data:
+            self.assertIn(transaction["id"], [str(c1_sa.id), str(c1_sb.id)])
+
+        self.assertEqual(len(c2_response.data), 1)
+        for transaction in c2_response.data:
+            self.assertIn(transaction["id"], [str(c2_sa.id)])
+
+    def test_crud_committee_transactions(self):
+        c1 = CommitteeAccount.objects.create(committee_id="C00000001")
+        c1_q1_report = create_form3x(c1, "2024-01-01", "2024-02-01", {})
+        c1_ind_contact = create_test_individual_contact(
+            "test_ln1",
+            "test_fn1",
+            c1.id,
+        )
+
+        c2 = CommitteeAccount.objects.create(committee_id="C00000002")
+
+        ind_receipt_payload = {
+            "schedule_id": "A",
+            "form_type": "SA11AI",
+            "contribution_date": "2023-01-01",
+            "schema_name": "INDIVIDUAL_RECEIPT",
+            "transaction_type_identifier": "INDIVIDUAL_RECEIPT",
+            "aggregation_group": "GENERAL",
+            "contribution_amount": "100",
+            "contact_1_id": str(c1_ind_contact.id),
+            "report_ids": [str(c1_q1_report.id)],
+            "fields_to_validate": [
+                "schedule_id",
+                "form_type",
+                "schema_name",
+                "transaction_type_identifier",
+                "contribution_amount",
+                "parent_id",
+                "contact_1_id",
+            ],
+        }
+
+        # CREATE
+
+        c2_post_response = self.send_viewset_post_request(
+            "api/v1/transactions/",
+            ind_receipt_payload,
+            TransactionViewSet,
+            "create",
+            committee=c2,
+        )
+        self.assertEqual(c2_post_response.status_code, 400)
+
+        c1_post_response = self.send_viewset_post_request(
+            "api/v1/transactions/",
+            ind_receipt_payload,
+            TransactionViewSet,
+            "create",
+            committee=c1,
+        )
+        self.assertEqual(c1_post_response.status_code, 200)
+
+        # READ
+
+        c2_get_response = self.send_viewset_get_request(
+            f"api/v1/transactions/{c1_post_response.data}/",
+            TransactionViewSet,
+            "retrieve",
+            pk=c1_post_response.data,
+            committee=c2,
+        )
+        self.assertEqual(c2_get_response.status_code, 404)
+
+        c1_get_response = self.send_viewset_get_request(
+            f"api/v1/transactions/{c1_post_response.data}/",
+            TransactionViewSet,
+            "retrieve",
+            pk=c1_post_response.data,
+            committee=c1,
+        )
+        self.assertEqual(c1_get_response.status_code, 200)
+
+        # UPDATE
+
+        c2_put_response = self.send_viewset_put_request(
+            f"api/v1/transactions/{c1_post_response.data}/",
+            ind_receipt_payload,
+            TransactionViewSet,
+            "update",
+            pk=c1_post_response.data,
+            committee=c2,
+        )
+        self.assertEqual(c2_put_response.status_code, 404)
+
+        c1_put_response = self.send_viewset_put_request(
+            f"api/v1/transactions/{c1_post_response.data}/",
+            ind_receipt_payload,
+            TransactionViewSet,
+            "update",
+            pk=c1_post_response.data,
+            committee=c1,
+        )
+        self.assertEqual(c1_put_response.status_code, 200)
+
+        # DELETE
+
+        c2_delete_response = self.send_viewset_delete_request(
+            f"api/v1/transactions/{c1_post_response.data}/",
+            TransactionViewSet,
+            "destroy",
+            pk=c1_post_response.data,
+            committee=c2,
+        )
+        self.assertEqual(c2_delete_response.status_code, 404)
+
+        c1_delete_response = self.send_viewset_delete_request(
+            f"api/v1/transactions/{c1_post_response.data}/",
+            TransactionViewSet,
+            "destroy",
+            pk=c1_post_response.data,
+            committee=c1,
+        )
+        self.assertEqual(c1_delete_response.status_code, 204)
+
     def test_destroy(self):
         response = self.send_viewset_delete_request(
             f"api/v1/transactions/{self.transaction.id}/",
@@ -1256,12 +1460,21 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             partnership_attribution_payload,
             TransactionViewSet,
             "update",
+            pk=partnership_attribution_response.data
         )
         partnership_receipt.refresh_from_db()
         self.assertEqual(
             partnership_receipt.schedule_a.contribution_purpose_descrip,
             "(See Partnership Attribution(s) below)",
         )
+
+    def test_transaction_lookup_no_committee_activated(self):
+        # User is authenticated but hasn't activated a committee
+        super().set_default_committee(None)
+        response = self.send_viewset_get_request(
+            "/api/v1/transactions/", TransactionViewSet, "list", authenticate=True
+        )
+        self.assertEqual(response.status_code, 403)
 
     def test_loan_repayment_on_loan_by_committee(self):
         """Loan repayments should update loan balances on the original loan
@@ -1798,12 +2011,14 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "schedule_id": "D",
             "fields_to_validate": ["incurred_amount"],
         }
-
-        view_set = TransactionViewSet()
-        view_set.format_kwarg = {}
-        view_set.request = self.put_request(update_payload)
-
-        self.view.save_transaction(update_payload, view_set.request)
+        self.send_viewset_put_request(
+            f"api/v1/transactions/{test_debt.id}/",
+            update_payload,
+            TransactionViewSet,
+            "update",
+            pk=test_debt.id,
+            committee=self.committee,
+        )
 
         # Test assertions
         test_debt.refresh_from_db()
