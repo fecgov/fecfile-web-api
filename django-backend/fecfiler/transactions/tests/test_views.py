@@ -1174,7 +1174,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         partnership_attribution_payload["contribution_amount"] = "1000"
-        print("PUT")
         self.send_viewset_put_request(
             f"api/v1/transactions/{partnership_attribution_response.data}/",
             partnership_attribution_payload,
