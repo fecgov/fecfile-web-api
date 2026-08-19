@@ -120,9 +120,13 @@ class Form3XViewSetTest(FecfilerViewSetTest):
         )
 
         response = self.send_viewset_put_request(
-            f"/api/v1/reports/form3x/{str(report.form_3x.id)}/",
+            f"/api/v1/reports/form3x/{str(report.id)}/",
             {
-                "report_code":"Q2"
+                "report_code":"Q2",
+                'form_type': "F3XN",
+                'treasurer_last_name': "Treasurer",
+                'treasurer_first_name': "Mr",
+                'date_signed': "2004-01-01",
             },
             Form3XViewSet,
             "update",
