@@ -2382,3 +2382,57 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             self.post_request({}, params)
         )
         self.assertEqual(response.status_code, expected)
+
+    def test_update_transaction_cannot_change_debt_id(self):
+        test_q1_report_2025 = create_form3x(
+            self.committee, "2025-01-01", "2025-03-31", {}
+        )
+
+        debt_1 = create_debt(
+            self.committee,
+            self.test_org_contact,
+            "1000.00",
+            report=test_q1_report_2025,
+        )
+        debt_2 = create_debt(
+            self.committee,
+            self.test_org_contact,
+            "500.00",
+            report=test_q1_report_2025,
+        )
+
+        process_aggregation_for_debts(debt_1)
+        process_aggregation_for_debts(debt_2)
+
+        repayment_payload = self.create_debt_repayment_payload(
+            debt_1,
+            test_q1_report_2025,
+            "2025-04-03",
+            350,
+        )
+
+        create_response = self.send_viewset_post_request(
+            "api/v1/transactions/",
+            repayment_payload,
+            TransactionViewSet,
+            "create",
+        )
+        self.assertEqual(create_response.status_code, 200)
+
+        repayment_id = create_response.data
+
+        repayment = Transaction.objects.get(pk=repayment_id)
+
+        self.assertEqual(repayment.debt_id, debt_1.id)
+
+        repayment_payload["debt_id"] = str(debt_2.id)
+
+        response = self.send_viewset_put_request(
+            f"api/v1/transactions/{repayment.id}/",
+            repayment_payload,
+            TransactionViewSet,
+            "update",
+            pk=repayment.id,
+        )
+
+        self.assertEqual(response.status_code, 400)
