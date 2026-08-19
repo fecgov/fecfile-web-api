@@ -1,5 +1,3 @@
-import json
-
 from rest_framework.exceptions import ValidationError
 from django.http import HttpResponseServerError
 from fecfiler.oidc.utils import delete_user_logged_in_cookies
@@ -9,32 +7,11 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
-def _safe_log_value(value):
-    if value is None:
-        return "None"
-
-    if isinstance(value, BaseException):
-        detail = getattr(value, "detail", None)
-        if isinstance(detail, (dict, list, tuple, set)):
-            try:
-                return json.dumps(detail, default=str, sort_keys=True)
-            except TypeError:
-                return str(detail)
-        elif getattr(value, "args", None):
-            value = value.args[0] if len(value.args) == 1 else value.args
-
-    if isinstance(value, (dict, list, tuple, set)):
-        try:
-            return json.dumps(value, default=str, sort_keys=True)
-        except TypeError:
-            pass
-    return str(value)
-
-
 def custom_exception_handler(exc, context):
     # Call REST framework's default exception handler first,
     # to get the standard error response.
-    logger.exception(_safe_log_value(exc), exc_info=False)
+
+    logger.exception(exc)
     response = exception_handler(exc, context)
 
     if response is None:
@@ -51,7 +28,7 @@ def custom_exception_handler(exc, context):
     # Do not allow an error response body unless validation
     data = getattr(response, "data")
     exception_type = type(exc)
-    logger.error("Error: %s", _safe_log_value(data))
+    logger.error(f"Error: {data}")
     if data and exception_type is not ValidationError:
         response.data = None
 
