@@ -13,7 +13,10 @@ from fecfiler.web_services.serializers import (
     UploadSubmissionSerializer,
     WebPrintSubmissionSerializer,
 )
-from fecfiler.contacts.serializers import ContactSerializer
+from fecfiler.contacts.serializers import (
+    ContactCommitteeValidationMixin,
+    ContactSerializer,
+)
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from fecfiler.reports.form_3.models import Form3
 from fecfiler.reports.form_3x.models import Form3X
@@ -93,7 +96,11 @@ class ReportForm1MSerializer(ModelSerializer):
         model = Form1M
 
 
-class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMixin):
+class ReportSerializer(
+    CommitteeOwnedSerializer,
+    FecSchemaValidatorSerializerMixin,
+    ContactCommitteeValidationMixin,
+):
     id = UUIDField(required=False)
 
     committee_name = CharField(required=False, allow_null=True)
@@ -205,8 +212,6 @@ class ReportCommitteeValidationMixin:
     """Mixin to validate that report_id belongs to the serializer's committee_account."""
 
     def validate_report_committee_ownership(self, data):
-        from fecfiler.reports.models import Report
-
         committee_account = data.get("committee_account")
         report_id = data.get("report_id")
         if report_id:
@@ -225,7 +230,7 @@ class ReportCommitteeValidationMixin:
 
         report_ids = data.get("report_ids", [])
         if report_ids:
-            unique_ids = set(str(rid) for rid in report_ids) if report_ids else set()
+            unique_ids = {str(rid) for rid in report_ids}
             valid_count = Report.objects.filter(
                 id__in=unique_ids, committee_account=committee_account
             ).count()

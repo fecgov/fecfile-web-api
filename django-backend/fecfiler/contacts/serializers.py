@@ -39,8 +39,7 @@ def create_or_update_contact(validated_data: dict, contact_key, user_committee_i
                     f"Contact {contact_id} does not exist for this committee."
                 )
             contact = Contact.objects.get(
-                id=contact_id,
-                committee_account_id=user_committee_id
+                id=contact_id, committee_account_id=user_committee_id
             )
         else:
             contact = Contact.objects.create(**contact_data)
@@ -144,3 +143,38 @@ class ContactSerializer(
             "created",
             "updated",
         ]
+
+
+class ContactCommitteeValidationMixin:
+    """Mixin to validate that contact ids belongs to
+    the serializer's committee_account."""
+
+    def validate_contact_committee_ownership(self, data, contact_field):
+        committee_account = data.get("committee_account")
+        contact = data.get(contact_field)
+        contact_id = data.get(f"{contact_field}_id")
+        if contact_id:
+            if (
+                contact and contact.get("id") is not None
+                and contact.get("id") != contact_id
+            ):
+                raise ValidationError(
+                    {
+                        contact_field: (
+                            "Invalid contact id or contact does not belong "
+                            "to this committee account."
+                        )
+                    }
+                )
+            exists = Contact.objects.filter(
+                id=contact_id, committee_account=committee_account
+            ).exists()
+            if not exists:
+                raise ValidationError(
+                    {
+                        contact_field: (
+                            "Invalid contact id or contact does not belong "
+                            "to this committee account."
+                        )
+                    }
+                )

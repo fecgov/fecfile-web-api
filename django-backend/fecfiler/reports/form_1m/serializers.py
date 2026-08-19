@@ -2,7 +2,11 @@ from django.db import transaction
 from fecfiler.reports.models import Report
 from fecfiler.reports.form_1m.models import Form1M
 from fecfiler.reports.serializers import ReportSerializer
-from fecfiler.contacts.serializers import ContactSerializer, create_or_update_contact
+from fecfiler.contacts.serializers import (
+    ContactCommitteeValidationMixin,
+    ContactSerializer,
+    create_or_update_contact
+)
 from fecfiler.shared.utilities import get_model_data
 from rest_framework.serializers import CharField, DateField, UUIDField
 import structlog
@@ -69,7 +73,7 @@ CONTACT_KEYS = [
 ]
 
 
-class Form1MSerializer(ReportSerializer):
+class Form1MSerializer(ReportSerializer, ContactCommitteeValidationMixin):
     schema_name = "F1M"
 
     committee_type = CharField(required=False, allow_null=True)
@@ -183,6 +187,12 @@ class Form1MSerializer(ReportSerializer):
         self.context["fields_to_ignore"] = self.context.get(
             "fields_to_ignore", ["filer_committee_id_number"]
         )
+        self.validate_contact_committee_ownership(data, 'contact_affiliated')
+        self.validate_contact_committee_ownership(data, 'contact_candidate_I')
+        self.validate_contact_committee_ownership(data, 'contact_candidate_II')
+        self.validate_contact_committee_ownership(data, 'contact_candidate_III')
+        self.validate_contact_committee_ownership(data, 'contact_candidate_IV')
+        self.validate_contact_committee_ownership(data, 'contact_candidate_V')
         return super().validate(data)
 
     class Meta(ReportSerializer.Meta):

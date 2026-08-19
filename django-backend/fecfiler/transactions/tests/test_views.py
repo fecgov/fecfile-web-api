@@ -2406,6 +2406,31 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                     expected_schedule_f_aggregate,
                 )
 
+    def test_create_with_contact_of_other_committee_fails(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
+        other_contact_1 = create_test_individual_contact(
+            "last name",
+            "First name",
+            other_committee.id,
+            {
+                "street_1": "123 test street",
+                "city": "testville",
+                "state": "AK",
+                "zip": "12345",
+            },
+        )
+        payload = deepcopy(self.payloads["IN_KIND"])
+        payload["contact_1"] = {}
+        payload["contact_1_id"] = other_contact_1.id
+        response = self.send_viewset_post_request(
+            "/api/v1/transactions/",
+            payload,
+            TransactionViewSet,
+            "create",
+            committee=self.committee,
+        )
+        self.assertEqual(response.status_code, 400)
+
     def _run_payee_candidate_test(self, view_set, params, expected):
         response = view_set.previous_transaction_by_payee_candidate(
             self.post_request({}, params)
