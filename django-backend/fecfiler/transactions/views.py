@@ -5,6 +5,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
 from django.db.models import Q
@@ -472,6 +473,17 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             ):
                 target.schedule_f.aggregate_general_elec_expended -= amount
 
+    def get_child_instance(self, child_id, committee_id):
+        # ensure that child transaction belongs to this committee
+        child_instance = Transaction.objects.select_related(
+            "schedule_a", "schedule_b", "schedule_e", "contact_2"
+        ).filter(id=child_id, committee_account_id=committee_id).first()
+        if child_instance is None:
+            raise ValidationError(
+                {"children": ["Child transaction does not belong to this committee."]}
+            )
+        return child_instance
+
     def save_transaction(self, transaction_data, request):
         committee_id = request.session["committee_uuid"]
         children = transaction_data.pop("children", [])
@@ -591,39 +603,39 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         for child_transaction_data in children:
             if type(child_transaction_data) is str:
+                child_id = child_transaction_data
+                child_instance = self.get_child_instance(child_id, committee_id)
+
                 # Capture old state BEFORE updating
-                try:
-                    child_instance = Transaction.objects.select_related(
-                        "schedule_a", "schedule_b", "schedule_e", "contact_2"
-                    ).get(id=child_transaction_data)
+                old_snapshot = None
+                if child_instance.get_schedule_name() in [
+                    Schedule.A,
+                    Schedule.B,
+                    Schedule.E,
+                ]:
+                    eff = calculate_effective_amount(child_instance)
+                    old_snapshot = create_old_snapshot(child_instance, eff)
 
-                    # Capture old snapshot if this is an aggregating schedule
-                    old_snapshot = None
-                    if child_instance.get_schedule_name() in [
-                        Schedule.A,
-                        Schedule.B,
-                        Schedule.E,
-                    ]:
-                        eff = calculate_effective_amount(child_instance)
-                        old_snapshot = create_old_snapshot(child_instance, eff)
+                # Update parent and skip aggregation during save
+                child_instance.parent_transaction_id = transaction_instance.id
+                child_instance._skip_aggregation = True
+                if old_snapshot:
+                    child_instance._passed_old_snapshot = old_snapshot
+                child_instance.save()
 
-                    # Update parent and skip aggregation during save
-                    child_instance.parent_transaction_id = transaction_instance.id
-                    child_instance._skip_aggregation = True
-                    if old_snapshot:
-                        child_instance._passed_old_snapshot = old_snapshot
-                    child_instance.save()
-
-                    # Track child for post-save aggregation
-                    if child_instance.get_schedule_name() in [
-                        Schedule.A,
-                        Schedule.B,
-                        Schedule.E,
-                    ]:
-                        child_instances_to_aggregate.append(child_instance)
-                except Transaction.DoesNotExist:
-                    pass
+                # Track child for post-save aggregation
+                if child_instance.get_schedule_name() in [
+                    Schedule.A,
+                    Schedule.B,
+                    Schedule.E,
+                ]:
+                    child_instances_to_aggregate.append(child_instance)
             else:
+                child_id = child_transaction_data.get("id")
+                if child_id:
+                    # we don't need the instance but want to check that it belongs to this committee
+                    child_instance = self.get_child_instance(child_id, committee_id)
+
                 child_transaction_data["parent_transaction_id"] = transaction_instance.id
                 child_transaction_data.pop("parent_transaction", None)
                 if child_transaction_data.get("use_parent_contact", None):
