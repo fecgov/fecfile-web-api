@@ -178,7 +178,7 @@ class ContactCommitteeValidationMixin:
             ).exists()
 
             if not exists:
-                errors[contact_field] = "Invalid contact id or contact does not belong."
+                errors[contact_field] = "Invalid contact id or contact."
 
         if errors:
             raise ValidationError(errors)

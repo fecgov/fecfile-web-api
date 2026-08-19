@@ -222,7 +222,7 @@ class ReportCommitteeValidationMixin:
                 raise ValidationError(
                     {
                         "report_id": (
-                            "Invalid report_id or report does not belong."
+                            "Invalid report_id or report."
                         )
                     }
                 )

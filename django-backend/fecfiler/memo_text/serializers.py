@@ -98,7 +98,7 @@ class LinkedMemoTextSerializerMixin(ModelSerializer):
                 raise serializers.ValidationError(
                     {
                         "memo_text_id": (
-                            "Invalid memo_text_id or memo text does not belong."
+                            "Invalid memo_text_id or memo text"
                         )
                     }
                 )
