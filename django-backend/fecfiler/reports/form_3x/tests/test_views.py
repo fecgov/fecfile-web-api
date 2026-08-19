@@ -102,3 +102,32 @@ class Form3XViewSetTest(FecfilerViewSetTest):
         response = view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["coverage_from_date"], "2004-05-28")
+
+    def test_CRUD_committee_locked_update(self):
+        other_committee = CommitteeAccount(
+            committee_id="C12344321",
+            id="55555555-4444-3333-2222-111111111111"
+        )
+
+        other_committee.save()
+
+        report = create_form3x(
+            self.committee,
+            "2024-01-01",
+            "2024-02-01",
+            {},
+            report_code="Q1",
+        )
+
+        response = self.send_viewset_put_request(
+            f"/api/v1/reports/form3x/{str(report.form_3x.id)}/",
+            {
+                "report_code":"Q2"
+            },
+            Form3XViewSet,
+            "update",
+            pk=report.id,
+            committee=other_committee
+        )
+
+        self.assertEqual(response.status_code, 404)

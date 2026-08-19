@@ -589,3 +589,23 @@ class ReportViewSetTest(FecfilerViewSetTest):
         )
 
         self.assertFalse(test_reports.exists())
+
+    def test_CRUD_committee_locked_list(self):
+        other_committee = CommitteeAccount(
+            id="12344321-1221-1221-1221-123456654321",
+            committee_id="C43211234",
+        )
+
+        other_committee.save()
+
+        for _ in range(5):
+            create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+            create_form3x(other_committee, "2024-01-01", "2024-02-01", {})
+
+        view = ReportViewSet()
+        view.format_kwarg = "format"
+        request = self.build_viewset_get_request("/api/v1/reports", committee=other_committee)
+        request.query_params = {"page": 1}
+        view.request = request
+        response = view.list(request)
+        self.assertEqual(len(response.data["results"]), 5)
