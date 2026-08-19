@@ -23,13 +23,14 @@ def _safe_log_value(value):
         elif getattr(value, "args", None):
             value = value.args[0] if len(value.args) == 1 else value.args
 
-    if isinstance(value, (str, int, float, bool)):
-        return str(value)
+    # if isinstance(value, (str, int, float, bool)):
+    #     return str(value)
     if isinstance(value, (dict, list, tuple, set)):
         try:
             return json.dumps(value, default=str, sort_keys=True)
         except TypeError:
-            return str(value)
+            pass
+            # return str(value)
     return str(value)
 
 
