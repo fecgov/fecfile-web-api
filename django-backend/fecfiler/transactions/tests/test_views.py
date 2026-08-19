@@ -342,6 +342,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             updated_payload,
             TransactionViewSet,
             "update",
+            pk=transaction.id,
             committee=self.committee,
         )
         self.assertEqual(response.status_code, 400)
