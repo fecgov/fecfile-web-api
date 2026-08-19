@@ -2361,7 +2361,12 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         other_committee.save()
 
-        receipt_data = {"date": "2023-01-01", "amount": "200.00", "group": "GENERAL", "memo": True}
+        receipt_data = {
+            "date": "2023-01-01",
+            "amount": "200.00",
+            "group": "GENERAL",
+            "memo": True
+        }
 
         good_contact = create_test_individual_contact(
             "Good",
