@@ -27,7 +27,6 @@ from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.transactions.schedule_f.models import ScheduleF
 from fecfiler.contacts.models import Contact
-from django.contrib.sessions.exceptions import SuspiciousSession
 
 import uuid
 import structlog
