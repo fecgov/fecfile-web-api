@@ -2446,7 +2446,10 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         response = TransactionViewSet().save_transaction(request.data, request)
 
         self.assertIsInstance(response, Transaction)
-        self.assertEqual(response.committee_account, response.contact_1.committee_account)
+        self.assertEqual(
+            response.committee_account,
+            response.parent_transaction.committee_account
+        )
 
     def _run_payee_candidate_test(self, view_set, params, expected):
         response = view_set.previous_transaction_by_payee_candidate(
