@@ -375,7 +375,6 @@ class TransactionSerializer(
             if not representation.get(property):
                 representation[property] = schedule[property]
 
-
     def validate_transaction_committee_ownership(self, data, transaction_key):
         committee_account = data.get("committee_account")
         id = data.get(f"{transaction_key}_id")
