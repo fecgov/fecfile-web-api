@@ -633,8 +633,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             else:
                 child_id = child_transaction_data.get("id")
                 if child_id:
-                    # we don't need the instance 
-                    # but want to check that it belongs to this committee
+                    # we don't need the instance but...
+                    # we do want to check that it belongs to this committee
                     child_instance = self.get_child_instance(child_id, committee_id)
 
                 child_transaction_data["parent_transaction_id"] = transaction_instance.id
