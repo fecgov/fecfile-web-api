@@ -112,7 +112,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         schedules_to_include = schedule_filters.split(",") if schedule_filters else []
 
         queryset = Transaction.objects.get_list_queryset(
-            schedules_to_include, report_type, report_code_label
+            self.get_committee_uuid(),
+            schedules_to_include,
+            report_type,
+            report_code_label,
         )
 
         report_id = (
@@ -242,13 +245,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     @action(detail=False, methods=["post"], url_path=r"add-to-report")
     def add_transaction_to_report(self, request):
+        committee_uuid = request.session["committee_uuid"]
         try:
-            report = Report.objects.get(id=request.data.get("report_id"))
+            report = Report.objects.get(
+                id=request.data.get("report_id"),
+                committee_account_id=committee_uuid,
+            )
         except Report.DoesNotExist:
             return Response("No report matching id provided", status=404)
 
         try:
-            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+            transaction = Transaction.objects.get(
+                id=request.data.get("transaction_id"),
+                committee_account_id=committee_uuid,
+            )
             transactions = transaction.get_transaction_family()
             for t in transactions:
                 t.add_to_report(report.id)
@@ -259,13 +269,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     @action(detail=False, methods=["post"], url_path=r"remove-from-report")
     def remove_transaction_from_report(self, request):
+        committee_uuid = request.session["committee_uuid"]
         try:
-            report = Report.objects.get(id=request.data.get("report_id"))
+            report = Report.objects.get(
+                id=request.data.get("report_id"),
+                committee_account_id=committee_uuid,
+            )
         except Report.DoesNotExist:
             return Response("No report matching id provided", status=404)
 
         try:
-            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+            transaction = Transaction.objects.get(
+                id=request.data.get("transaction_id"),
+                committee_account_id=committee_uuid,
+            )
         except Transaction.DoesNotExist:
             return Response("No transaction matching id provided", status=404)
 
@@ -457,7 +474,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def save_transaction(self, transaction_data, request):
         committee_id = request.session["committee_uuid"]
-        report_ids = transaction_data.pop("report_ids", [])
         children = transaction_data.pop("children", [])
         schedule = transaction_data.get("schedule_id")
         transaction_data["parent_transaction"] = transaction_data.get(
@@ -476,7 +492,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         old_snapshot = None  # Initialize early
 
         if is_existing:
-            original_instance = Transaction.objects.get(pk=transaction_data["id"])
+            original_instance = Transaction.objects.get(
+                pk=transaction_data["id"], committee_account=committee_id
+            )
             if original_instance is not None:
                 # Capture old_snapshot IMMEDIATELY after loading, before serializer
                 # modifies it
@@ -532,6 +550,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction_instance = transaction_serializer.save(**save_kwargs)
 
         # Link the transaction to all the reports it references in report_ids
+        report_ids = transaction_data.get("report_ids", [])
         transaction_instance.set_reports(report_ids)
 
         # handle loans and debts
