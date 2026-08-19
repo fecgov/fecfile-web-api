@@ -1295,7 +1295,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         c2_put_response = self.send_viewset_put_request(
             f"api/v1/transactions/{c1_post_response.data}/",
-            ind_receipt_payload,
+            ind_receipt_payload | {"id": c1_post_response.data},
             TransactionViewSet,
             "update",
             pk=c1_post_response.data,
@@ -1461,7 +1461,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             partnership_attribution_payload,
             TransactionViewSet,
             "update",
-            pk=partnership_attribution_response.data
+            pk=partnership_attribution_response.data,
         )
         partnership_receipt.refresh_from_db()
         self.assertEqual(
