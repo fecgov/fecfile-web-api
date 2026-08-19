@@ -1157,6 +1157,17 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "(See Partnership Attribution(s) below)",
         )
 
+    def test_transaction_lookup_no_committee_activated(self):
+        # User is authenticated but hasn't activated a committee
+        super().set_default_committee(None)
+        response = self.send_viewset_get_request(
+            "/api/v1/transactions/",
+            TransactionViewSet,
+            "list",
+            authenticate=True
+        )
+        self.assertEqual(response.status_code, 403)
+
     def test_loan_repayment_on_loan_by_committee(self):
         """Loan repayments should update loan balances on the original loan
         and on carried forward copies"""

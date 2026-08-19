@@ -164,6 +164,6 @@ class FecfilerViewSetTest(TestCase):
                 committee if committee is not None else self.default_committee
             )
             request.session = {
-                "committee_uuid": str(request_committee.id),
-                "committee_id": str(request_committee.committee_id),
+                "committee_uuid": str(request_committee.id) if request_committee else None,
+                "committee_id": str(request_committee.committee_id) if request_committee else None,
             }
