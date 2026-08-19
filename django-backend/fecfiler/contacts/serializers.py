@@ -36,7 +36,7 @@ def create_or_update_contact(validated_data: dict, contact_key, user_committee_i
             ).update(**contact_data)
             if updated == 0:
                 raise ValidationError(
-                    f"Contact {contact_id} does not exist for this committee."
+                    f"Contact {contact_id} could not be found."
                 )
             contact = Contact.objects.get(
                 id=contact_id, committee_account_id=user_committee_id
