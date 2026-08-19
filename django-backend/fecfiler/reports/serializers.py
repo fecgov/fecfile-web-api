@@ -199,3 +199,43 @@ class ReportSerializer(CommitteeOwnedSerializer, FecSchemaValidatorSerializerMix
     def get_report_status(self, instance):
         status_code = getattr(instance, "report_status", STATUS_CODE_IN_PROGRESS)
         return REPORT_STATUS_MAP.get(status_code, "In progress")
+
+
+class ReportCommitteeValidationMixin:
+    """Mixin to validate that report_id belongs to the serializer's committee_account."""
+
+    def validate_report_committee_ownership(self, data):
+        from fecfiler.reports.models import Report
+
+        committee_account = data.get("committee_account")
+        report_id = data.get("report_id")
+        if report_id:
+            exists = Report.objects.filter(
+                id=report_id, committee_account=committee_account
+            ).exists()
+            if not exists:
+                raise ValidationError(
+                    {
+                        "report_id": (
+                            "Invalid report_id or report does not belong "
+                            "to this committee account."
+                        )
+                    }
+                )
+
+        report_ids = data.get("report_ids", [])
+        if report_ids:
+            unique_ids = set(str(rid) for rid in report_ids) if report_ids else set()
+            valid_count = Report.objects.filter(
+                id__in=unique_ids, committee_account=committee_account
+            ).count()
+
+            if valid_count != len(unique_ids):
+                raise ValidationError(
+                    {
+                        "report_ids": (
+                            "One or more report_ids are invalid or do not belong "
+                            "to this committee account."
+                        )
+                    }
+                )
