@@ -16,6 +16,7 @@ from rest_framework.serializers import (
     ListField,
 )
 from fecfiler.transactions.models import Transaction
+from fecfiler.validation import serializers
 from fecfiler.transactions.schedule_a.serializers import ScheduleASerializer
 from fecfiler.transactions.schedule_b.serializers import ScheduleBSerializer
 from fecfiler.transactions.schedule_c.serializers import ScheduleCSerializer
@@ -281,6 +282,11 @@ class TransactionSerializer(
 
         self.validate_report_committee_ownership(initial_data)
         self.validate_memo_text_committee_ownership(data)
+        self.validate_transaction_committee_ownership(data, "parent_transaction")
+        self.validate_transaction_committee_ownership(data, "loan")
+        self.validate_transaction_committee_ownership(data, "debt")
+        self.validate_transaction_committee_ownership(data, "reatt_redes")
+        
         super().validate(data_to_validate)
         return data
 
@@ -368,6 +374,28 @@ class TransactionSerializer(
         for property in schedule:
             if not representation.get(property):
                 representation[property] = schedule[property]
+
+    
+    def validate_transaction_committee_ownership(self, data, transaction_key):
+        committee_account = data.get("committee_account")
+        id = data.get(f"{transaction_key}_id")
+        validation_error = serializers.ValidationError(
+            {
+                f"{transaction_key} id": (
+                    f"Invalid {transaction_key}_id or transaction does not belong "
+                    "to this committee account."
+                )
+            }
+        )
+        
+        if id != getattr(data.get(transaction_key, {}), "id", None):
+            raise validation_error
+        if id:
+            exists = Transaction.objects.filter(
+                id=id, committee_account=committee_account
+            ).exists()
+            if not exists:
+                raise validation_error
 
 
 class TransactionListSerializer(ModelSerializer):
