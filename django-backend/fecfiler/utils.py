@@ -3,15 +3,51 @@ from django.http import HttpResponseServerError
 from fecfiler.oidc.utils import delete_user_logged_in_cookies
 from rest_framework.views import exception_handler
 import structlog
+import json
 
 logger = structlog.get_logger(__name__)
 
 
-def custom_exception_handler(exc, context):
-    # Call REST framework's default exception handler first,
-    # to get the standard error response.
+def _safe_log_value(value):
+    if value is None:
+        return "None"
 
-    logger.exception(exc)
+    if isinstance(value, BaseException):
+        detail = getattr(value, "detail", None)
+        if isinstance(detail, (dict, list, tuple, set)):
+            try:
+                return json.dumps(detail, default=str, sort_keys=True)
+            except TypeError:
+                return str(detail)
+        elif getattr(value, "args", None):
+            value = value.args[0] if len(value.args) == 1 else value.args
+
+    if isinstance(value, (dict, list, tuple, set)):
+        try:
+            return json.dumps(value, default=str, sort_keys=True)
+        except TypeError:
+            pass
+    return str(value)
+
+def _is_safe_for_exception_logging(exc):
+    if not isinstance(exc, BaseException):
+        return False
+
+    detail = getattr(exc, "detail", None)
+    if isinstance(detail, (dict, list, tuple, set)):
+        return False
+
+    for arg in getattr(exc, "args", ()):
+        if isinstance(arg, (dict, list, tuple, set)):
+            return False
+
+    return True
+
+def custom_exception_handler(exc, context):
+    if _is_safe_for_exception_logging(exc):
+        logger.exception(_safe_log_value(exc))
+    else:
+        logger.error("Exception: %s", _safe_log_value(exc))
     response = exception_handler(exc, context)
 
     if response is None:
