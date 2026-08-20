@@ -2719,7 +2719,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             other_committee.id
         )
         evil_contact = create_test_individual_contact(
-            "Good",
+            "Evil",
             "Guy",
             self.committee.id
         )
