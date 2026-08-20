@@ -2926,7 +2926,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         self.assertEqual(response.status_code, 400)
 
-    def test_update_report_debt_from_other_committee_fails(self):
+    def test_update_transaction_with_debt_from_other_committee_fails(self):
         test_q1_report_2025 = create_form3x(
             self.committee, "2025-01-01", "2025-03-31", {}
         )
