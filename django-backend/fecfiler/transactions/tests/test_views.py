@@ -2383,7 +2383,59 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, expected)
 
-    def test_update_transaction_cannot_change_debt_id(self):
+    def test_create_transaction_with_debt_from_other_committee_fails(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000003")
+        other_report = create_form3x(
+            other_committee,
+            "2025-01-01",
+            "2025-03-31",
+            {},
+        )
+        other_contact = create_test_organization_contact(
+            "other-org-name",
+            other_committee.id,
+            {
+                "street_1": "other test street",
+                "city": "otherville",
+                "state": "OH",
+                "zip": "43215",
+            },
+        )
+
+        foreign_debt = create_debt(
+            other_committee,
+            other_contact,
+            "500.00",
+            report=other_report,
+        )
+
+        committee_debt = create_debt(
+            self.committee,
+            self.test_org_contact,
+            "1000.00",
+            report=self.q1_report,
+        )
+
+        payload = self.create_debt_repayment_payload(
+            committee_debt,
+            self.q1_report,
+            "2025-04-03",
+            350,
+        )
+
+        payload["debt_id"] = str(foreign_debt.id)
+
+        response = self.send_viewset_post_request(
+            "/api/v1/transactions/",
+            payload,
+            TransactionViewSet,
+            "create",
+            committee=self.committee,
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_report_debt_from_other_committee_fails(self):
         test_q1_report_2025 = create_form3x(
             self.committee, "2025-01-01", "2025-03-31", {}
         )
@@ -2394,11 +2446,32 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "1000.00",
             report=test_q1_report_2025,
         )
+
+        committee_2 = CommitteeAccount.objects.create(committee_id="C00000001")
+
+        test_q1_report_2025_committee_2 = create_form3x(
+            committee_2, "2025-01-01", "2025-03-31", {}
+        )
+
+        test_org_contact_committee_2 = create_test_organization_contact(
+            "test-org-name2",
+            committee_2.id,
+            {
+                "street_1": "test_sa2",
+                "street_2": "test_sa2",
+                "city": "test_c2",
+                "state": "AL",
+                "zip": "12345",
+                "telephone": "555-555-5556",
+                "country": "USA",
+            },
+        )
+
         debt_2 = create_debt(
-            self.committee,
-            self.test_org_contact,
+            committee_2,
+            test_org_contact_committee_2,
             "500.00",
-            report=test_q1_report_2025,
+            report=test_q1_report_2025_committee_2,
         )
 
         process_aggregation_for_debts(debt_1)
@@ -2420,7 +2493,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.assertEqual(create_response.status_code, 200)
 
         repayment_id = create_response.data
-
         repayment = Transaction.objects.get(pk=repayment_id)
 
         self.assertEqual(repayment.debt_id, debt_1.id)
