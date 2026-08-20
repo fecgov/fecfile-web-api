@@ -29,6 +29,7 @@ def _safe_log_value(value):
             pass
     return str(value)
 
+
 def _is_safe_for_exception_logging(exc):
     if not isinstance(exc, BaseException):
         return False
@@ -42,6 +43,7 @@ def _is_safe_for_exception_logging(exc):
             return False
 
     return True
+
 
 def custom_exception_handler(exc, context):
     if _is_safe_for_exception_logging(exc):
