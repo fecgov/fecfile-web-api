@@ -3,7 +3,10 @@ from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from fecfiler.reports.serializers import ReportCommitteeValidationMixin, ReportSerializer
-from fecfiler.contacts.serializers import ContactSerializer
+from fecfiler.contacts.serializers import (
+    ContactCommitteeValidationMixin,
+    ContactSerializer
+)
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import empty, ModelSerializer
 from collections import OrderedDict
@@ -62,7 +65,8 @@ class TransactionSerializer(
     LinkedMemoTextSerializerMixin,
     FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
-    ReportCommitteeValidationMixin
+    ReportCommitteeValidationMixin,
+    ContactCommitteeValidationMixin
 ):
     """id must be explicitly configured in order to have it in validated_data
     https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
@@ -286,7 +290,13 @@ class TransactionSerializer(
         self.validate_transaction_committee_ownership(initial_data, "loan")
         self.validate_transaction_committee_ownership(initial_data, "debt")
         self.validate_transaction_committee_ownership(initial_data, "reatt_redes")
-
+        self.validate_contact_committee_ownership(data, [
+            'contact_1',
+            'contact_2',
+            'contact_3',
+            'contact_4',
+            'contact_5'
+        ])
         super().validate(data_to_validate)
         return data
 

@@ -262,4 +262,4 @@ workflows:
             - test
           filters:
             branches:
-              only: /hotfix\/unified-hotfix|release\/sprint-[\.\d]+|release\/test|main/
+              only: /develop|release\/sprint-[\.\d]+|release\/test|main/
