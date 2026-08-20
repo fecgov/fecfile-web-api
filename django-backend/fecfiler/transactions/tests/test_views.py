@@ -347,6 +347,107 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 400)
 
+    def test_create_transaction_with_loan_from_other_committee_fails(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000003")
+        other_report = create_form3x(other_committee, "2024-01-01", "2024-02-01", {})
+        other_contact = create_test_individual_contact(
+            "other last name",
+            "Other first name",
+            other_committee.id,
+        )
+        foreign_loan = create_loan(
+            other_committee,
+            other_contact,
+            "6000.00",
+            "2025-12-31",
+            "6%",
+            report=other_report,
+        )
+
+        committee_loan = create_loan(
+            self.committee,
+            self.contact_1,
+            "1000.00",
+            "2025-12-31",
+            "5%",
+            report=self.q1_report,
+        )
+        payload = self.create_loan_repayment_received_payload(
+            committee_loan,
+            self.q1_report,
+            "2025-01-03",
+            100.00,
+        )
+        payload["loan_id"] = str(foreign_loan.id)
+
+        response = self.send_viewset_post_request(
+            "/api/v1/transactions/",
+            payload,
+            TransactionViewSet,
+            "create",
+            committee=self.committee,
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_update_transaction_with_loan_from_other_committee_fails(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000004")
+        other_report = create_form3x(other_committee, "2024-01-01", "2024-02-01", {})
+        other_contact = create_test_individual_contact(
+            "other last name",
+            "Other first name",
+            other_committee.id,
+        )
+        foreign_loan = create_loan(
+            other_committee,
+            other_contact,
+            "6000.00",
+            "2025-12-31",
+            "6%",
+            report=other_report,
+        )
+
+        committee_loan = create_loan(
+            self.committee,
+            self.contact_1,
+            "1000.00",
+            "2025-12-31",
+            "5%",
+            report=self.q1_report,
+        )
+        payload = self.create_loan_repayment_received_payload(
+            committee_loan,
+            self.q1_report,
+            "2025-01-03",
+            100.00,
+        )
+        response = self.send_viewset_post_request(
+            "/api/v1/transactions/",
+            payload,
+            TransactionViewSet,
+            "create",
+            committee=self.committee,
+        )
+        self.assertEqual(response.status_code, 200)
+
+        repayment_transaction = Transaction.objects.get(pk=response.data)
+
+        updated_payload = deepcopy(payload)
+        updated_payload["id"] = str(repayment_transaction.id)
+        updated_payload["loan_id"] = str(foreign_loan.id)
+
+        response = self.send_viewset_put_request(
+            f"/api/v1/transactions/{repayment_transaction.id}/",
+            updated_payload,
+            TransactionViewSet,
+            "update",
+            pk=repayment_transaction.id,
+            committee=self.committee,
+        )
+        self.assertEqual(response.status_code, 400)
+
+        repayment_transaction.refresh_from_db()
+        self.assertEqual(repayment_transaction.loan_id, committee_loan.id)
+
     def test_get_queryset(self):
         for i in range(8):
             create_schedule_a(
