@@ -286,10 +286,15 @@ class TransactionSerializer(
 
         self.validate_report_committee_ownership(initial_data)
         self.validate_memo_text_committee_ownership(data)
-        self.validate_transaction_committee_ownership(initial_data, "parent_transaction")
-        self.validate_transaction_committee_ownership(initial_data, "loan")
-        self.validate_transaction_committee_ownership(initial_data, "debt")
-        self.validate_transaction_committee_ownership(initial_data, "reatt_redes")
+        self.validate_transaction_committee_ownerships(
+            initial_data,
+            [
+                "parent_transaction",
+                "reatt_redes",
+                "loan",
+                "debt",
+            ]
+        )
         self.validate_contact_committee_ownership(data, [
             'contact_1',
             'contact_2',
@@ -385,29 +390,37 @@ class TransactionSerializer(
             if not representation.get(property):
                 representation[property] = schedule[property]
 
-    def validate_transaction_committee_ownership(self, data, transaction_key):
+    def validate_transaction_committee_ownerships(self, data, relationship_keys):
+        if isinstance(relationship_keys, str):
+            relationship_keys = [relationship_keys]
+
         committee_account = data.get("committee_account")
-        id = data.get(f"{transaction_key}_id")
-        validation_error = serializers.ValidationError(
-            {
-                f"{transaction_key} id": (
-                    f"Invalid {transaction_key}_id or transaction does not belong "
-                    "to this committee account."
-                )
-            }
-        )
 
-        associated_object = data.get(transaction_key, {})
-        associated_object_id = getattr(associated_object, "id", None)
+        for relationship_key in relationship_keys:
+            outer_id = data.get(f"{relationship_key}_id")
+            validation_error = serializers.ValidationError(
+                {
+                    f"{relationship_key} id": (
+                        f"Invalid {relationship_key}_id or transaction does not belong "
+                        "to this committee account."
+                    )
+                }
+            )
 
-        if associated_object_id is not None and associated_object_id != id:
-            raise validation_error
-        if id:
-            exists = Transaction.objects.filter(
-                id=id, committee_account=committee_account
-            ).exists()
-            if not exists:
-                raise validation_error
+            associated_object = data.get(relationship_key, {})
+            associated_object_id = getattr(associated_object, "id", None)
+
+            if associated_object_id is not None and outer_id is not None:
+                if str(associated_object_id) != str(outer_id):
+                    raise validation_error
+
+            relationship_id = associated_object_id or outer_id
+            if relationship_id:
+                exists = Transaction.objects.filter(
+                    id=relationship_id, committee_account=committee_account
+                ).exists()
+                if not exists:
+                    raise validation_error
 
 
 class TransactionListSerializer(ModelSerializer):
