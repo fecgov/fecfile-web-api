@@ -282,11 +282,11 @@ class TransactionSerializer(
 
         self.validate_report_committee_ownership(initial_data)
         self.validate_memo_text_committee_ownership(data)
-        self.validate_transaction_committee_ownership(data, "parent_transaction")
-        self.validate_transaction_committee_ownership(data, "loan")
-        self.validate_transaction_committee_ownership(data, "debt")
-        self.validate_transaction_committee_ownership(data, "reatt_redes")
-        
+        self.validate_transaction_committee_ownership(initial_data, "parent_transaction")
+        self.validate_transaction_committee_ownership(initial_data, "loan")
+        self.validate_transaction_committee_ownership(initial_data, "debt")
+        self.validate_transaction_committee_ownership(initial_data, "reatt_redes")
+
         super().validate(data_to_validate)
         return data
 
@@ -375,7 +375,6 @@ class TransactionSerializer(
             if not representation.get(property):
                 representation[property] = schedule[property]
 
-    
     def validate_transaction_committee_ownership(self, data, transaction_key):
         committee_account = data.get("committee_account")
         id = data.get(f"{transaction_key}_id")
@@ -387,8 +386,11 @@ class TransactionSerializer(
                 )
             }
         )
-        
-        if id != getattr(data.get(transaction_key, {}), "id", None):
+
+        associated_object = data.get(transaction_key, {})
+        associated_object_id = getattr(associated_object, "id", None)
+
+        if associated_object_id is not None and associated_object_id != id:
             raise validation_error
         if id:
             exists = Transaction.objects.filter(

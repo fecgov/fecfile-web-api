@@ -2406,8 +2406,60 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                     expected_schedule_f_aggregate,
                 )
 
+    def test_committee_locked_parent_transaction(self):
+        other_committee = CommitteeAccount(
+            committee_id="C12344321"
+        )
+
+        other_committee.save()
+
+        receipt_data = {
+            "date": "2023-01-01",
+            "amount": "200.00",
+            "group": "GENERAL",
+            "memo": True
+        }
+
+        good_contact = create_test_individual_contact(
+            "Good",
+            "Guy",
+            other_committee.id
+        )
+        evil_contact = create_test_individual_contact(
+            "Good",
+            "Guy",
+            self.committee.id
+        )
+
+        original_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            other_committee,
+            good_contact,
+            receipt_data["date"],
+            receipt_data["amount"],
+            group=receipt_data["group"],
+            report=None,
+            memo_code=receipt_data["memo"],
+        )
+
+        payload = self.payloads["INDIVIDUAL_RECEIPT"]
+        payload["contact_1_id"] = evil_contact.id
+        payload["parent_transaction_id"] = original_transaction.id
+        payload.pop("contact_1")
+
+        response = self.send_viewset_post_request(
+            "/api/v1/transactions/",
+            payload,
+            TransactionViewSet,
+            "create",
+            committee=self.committee
+        )
+
+        self.assertEqual(response.status_code, 400)
+
     def _run_payee_candidate_test(self, view_set, params, expected):
         response = view_set.previous_transaction_by_payee_candidate(
             self.post_request({}, params)
         )
+
         self.assertEqual(response.status_code, expected)
