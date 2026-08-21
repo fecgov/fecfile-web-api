@@ -154,7 +154,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         return queryset
 
-    # @action(detail=False, methods=["get"], url_path=r"list/unassociated")
+    @action(detail=False, methods=["get"], url_path=r"list/unassociated")
     def list_unassociated_transactions(self, request, *args, **kwargs):
         if "page" not in request.query_params or request.query_params["page"] is None:
             return Response("page is required", status=400)
