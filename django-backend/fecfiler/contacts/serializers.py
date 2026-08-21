@@ -18,7 +18,6 @@ logger = structlog.get_logger(__name__)
 
 
 def create_or_update_contact(validated_data: dict, contact_key, user_committee_id):
-
     if not user_committee_id:
         raise Exception("Tried to save contact without user_committee_id")
 
@@ -32,8 +31,16 @@ def create_or_update_contact(validated_data: dict, contact_key, user_committee_i
         contact_data.pop("committee_account", None)
 
         if contact_id:
-            Contact.objects.filter(id=contact_id).update(**contact_data)
-            contact = Contact.objects.get(id=contact_id)
+            updated = Contact.objects.filter(
+                id=contact_id, committee_account_id=user_committee_id
+            ).update(**contact_data)
+            if updated == 0:
+                raise ValidationError(
+                    f"Contact {contact_id} could not be found."
+                )
+            contact = Contact.objects.get(
+                id=contact_id, committee_account_id=user_committee_id
+            )
         else:
             contact = Contact.objects.create(**contact_data)
             validated_data[contact_key + "_id"] = contact.id
@@ -136,3 +143,42 @@ class ContactSerializer(
             "created",
             "updated",
         ]
+
+
+class ContactCommitteeValidationMixin:
+    """Mixin to validate that contact ids belongs to
+    the serializer's committee_account."""
+
+    def validate_contact_committee_ownership(self, data, contact_fields):
+        if isinstance(contact_fields, str):
+            contact_fields = [contact_fields]
+
+        committee_account = data.get("committee_account")
+        errors = {}
+
+        for contact_field in contact_fields:
+            contact = data.get(contact_field)
+            contact_id = data.get(f"{contact_field}_id")
+
+            if not contact_id:
+                continue
+
+            if (
+                contact
+                and contact.get("id") is not None
+                and contact.get("id") != contact_id
+            ):
+                errors[contact_field] = (
+                    f"{contact_field}_id does not match the id in {contact_field}"
+                )
+                continue
+
+            exists = Contact.objects.filter(
+                id=contact_id, committee_account=committee_account
+            ).exists()
+
+            if not exists:
+                errors[contact_field] = "Invalid contact id or contact."
+
+        if errors:
+            raise ValidationError(errors)

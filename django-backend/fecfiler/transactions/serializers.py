@@ -2,8 +2,11 @@ from django.db.models import Sum
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.memo_text.serializers import LinkedMemoTextSerializerMixin
 from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
-from fecfiler.reports.serializers import ReportSerializer
-from fecfiler.contacts.serializers import ContactSerializer
+from fecfiler.reports.serializers import ReportCommitteeValidationMixin, ReportSerializer
+from fecfiler.contacts.serializers import (
+    ContactCommitteeValidationMixin,
+    ContactSerializer
+)
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import empty, ModelSerializer
 from collections import OrderedDict
@@ -16,6 +19,7 @@ from rest_framework.serializers import (
     ListField,
 )
 from fecfiler.transactions.models import Transaction
+from fecfiler.validation import serializers
 from fecfiler.transactions.schedule_a.serializers import ScheduleASerializer
 from fecfiler.transactions.schedule_b.serializers import ScheduleBSerializer
 from fecfiler.transactions.schedule_c.serializers import ScheduleCSerializer
@@ -61,6 +65,8 @@ class TransactionSerializer(
     LinkedMemoTextSerializerMixin,
     FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
+    ReportCommitteeValidationMixin,
+    ContactCommitteeValidationMixin
 ):
     """id must be explicitly configured in order to have it in validated_data
     https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
@@ -277,6 +283,25 @@ class TransactionSerializer(
                 "beneficiary_candidate_state",
             ],
         )
+
+        self.validate_report_committee_ownership(initial_data)
+        self.validate_memo_text_committee_ownership(data)
+        self.validate_transaction_committee_ownerships(
+            initial_data,
+            [
+                "parent_transaction",
+                "reatt_redes",
+                "loan",
+                "debt",
+            ]
+        )
+        self.validate_contact_committee_ownership(data, [
+            'contact_1',
+            'contact_2',
+            'contact_3',
+            'contact_4',
+            'contact_5'
+        ])
         super().validate(data_to_validate)
         return data
 
@@ -364,6 +389,38 @@ class TransactionSerializer(
         for property in schedule:
             if not representation.get(property):
                 representation[property] = schedule[property]
+
+    def validate_transaction_committee_ownerships(self, data, relationship_keys):
+        if isinstance(relationship_keys, str):
+            relationship_keys = [relationship_keys]
+
+        committee_account = data.get("committee_account")
+
+        for relationship_key in relationship_keys:
+            outer_id = data.get(f"{relationship_key}_id")
+            validation_error = serializers.ValidationError(
+                {
+                    f"{relationship_key} id": (
+                        f"Invalid {relationship_key}_id or transaction does not belong "
+                        "to this committee account."
+                    )
+                }
+            )
+
+            associated_object = data.get(relationship_key, {})
+            associated_object_id = getattr(associated_object, "id", None)
+
+            if associated_object_id is not None and outer_id is not None:
+                if str(associated_object_id) != str(outer_id):
+                    raise validation_error
+
+            relationship_id = associated_object_id or outer_id
+            if relationship_id:
+                exists = Transaction.objects.filter(
+                    id=relationship_id, committee_account=committee_account
+                ).exists()
+                if not exists:
+                    raise validation_error
 
 
 class TransactionListSerializer(ModelSerializer):
