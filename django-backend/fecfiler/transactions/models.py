@@ -711,6 +711,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                     report.save()
 
     def set_reports(self, report_ids):
+        Report = apps.get_model("reports.Report")
         current_report_ids = set()
         current_report_id_dicts = list(self.reports.values("id"))
         for report_id_dict in current_report_id_dicts:
@@ -719,7 +720,6 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         updated_report_ids = set(report_ids)
         report_ids_to_reset_can_unamend = current_report_ids ^ updated_report_ids
 
-        Report = apps.get_model("reports.Report")
         Report.objects.filter(
             id__in=report_ids_to_reset_can_unamend
         ).update(can_unamend=False)

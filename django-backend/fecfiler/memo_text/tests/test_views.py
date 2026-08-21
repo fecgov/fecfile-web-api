@@ -50,6 +50,7 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
             data,
             MemoTextViewSet,
             "create",
+            committee=self.committee,
         )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["text4000"], "test_new_text")
@@ -68,6 +69,7 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
             data,
             MemoTextViewSet,
             "create",
+            committee=self.committee,
         )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["text4000"], "test_existing_text")
@@ -76,9 +78,10 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
             f"/api/v1/memo-text/?report_id={self.q1_report.id}",
             MemoTextViewSet,
             "list",
+            committee=self.committee,
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data), 2)
 
     def test_cannot_get_other_committee_memos(self):
         committee2 = CommitteeAccount.objects.create(committee_id="C00000001")
@@ -90,3 +93,72 @@ class MemoTextViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
+
+    def test_cannot_create_other_committee_memo(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
+        other_committee_report = create_form3x(
+            other_committee, "2024-01-01", "2024-02-01", {}
+        )
+        data = {
+            "report_id": str(other_committee_report.id),
+            "rec_type": "TEXT",
+            "text4000": "test_new_text",
+            "committee_account": str(other_committee.id),
+            "transaction_id_number": "id_number",
+            "transaction_uuid": None,
+            "fields_to_validate": [
+                "report_id",
+                "rec_type",
+                "text4000",
+                "committee_account",
+                "transaction_id_number",
+                "transaction_uuid",
+            ],
+        }
+        response = self.send_viewset_post_request(
+            "/api/v1/memo-text/",
+            data,
+            MemoTextViewSet,
+            "create",
+            committee=self.committee,
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_cannot_update_other_committee_memo(self):
+        other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
+        other_committee_report = create_form3x(
+            other_committee, "2024-01-01", "2024-02-01", {}
+        )
+        data = {
+            "report_id": str(other_committee_report.id),
+            "rec_type": "TEXT",
+            "text4000": "test_new_text",
+            "committee_account": str(other_committee.id),
+            "transaction_id_number": "id_number",
+            "transaction_uuid": None,
+            "fields_to_validate": [
+                "report_id",
+                "rec_type",
+                "text4000",
+                "committee_account",
+                "transaction_id_number",
+                "transaction_uuid",
+            ],
+        }
+        response = self.send_viewset_post_request(
+            "/api/v1/memo-text/",
+            data,
+            MemoTextViewSet,
+            "create",
+            committee=other_committee,
+        )
+        self.assertEqual(response.status_code, 201)
+
+        response = self.send_viewset_put_request(
+            "/api/v1/memo-text/",
+            data,
+            MemoTextViewSet,
+            "update",
+            committee=self.committee,
+        )
+        self.assertEqual(response.status_code, 500)

@@ -1,7 +1,7 @@
 from uuid import UUID
 from .utils.committee_membership import add_user_to_committee
 from rest_framework import filters, viewsets, mixins, pagination, status
-from django.contrib.sessions.exceptions import SuspiciousSession
+from django.core.exceptions import PermissionDenied
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from fecfiler import settings
@@ -134,9 +134,9 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
         return super().get_queryset().filter(committee_account_id=committee_uuid)
 
     def get_committee_uuid(self):
-        committee_uuid = self.request.session["committee_uuid"]
+        committee_uuid = self.request.session.get("committee_uuid")
         if not committee_uuid:
-            raise SuspiciousSession("session has invalid committee_uuid")
+            raise PermissionDenied("You must activate a committee account")
         return committee_uuid
 
     def list(self, request, *args, **kwargs):

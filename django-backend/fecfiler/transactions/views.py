@@ -5,6 +5,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.viewsets import ModelViewSet
 from datetime import datetime
 from django.db.models import Q
@@ -112,7 +113,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         schedules_to_include = schedule_filters.split(",") if schedule_filters else []
 
         queryset = Transaction.objects.get_list_queryset(
-            schedules_to_include, report_type, report_code_label
+            self.get_committee_uuid(),
+            schedules_to_include,
+            report_type,
+            report_code_label,
         )
 
         report_id = (
@@ -150,7 +154,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         return queryset
 
-    @action(detail=False, methods=["get"], url_path=r"list/unassociated")
+    # @action(detail=False, methods=["get"], url_path=r"list/unassociated")
     def list_unassociated_transactions(self, request, *args, **kwargs):
         if "page" not in request.query_params or request.query_params["page"] is None:
             return Response("page is required", status=400)
@@ -173,7 +177,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
-            saved_transaction = self.save_transaction(request.data, request)
+            saved_transaction = self.save_transaction(
+                request.data,
+                request,
+                instance=self.get_object()
+            )
             update_dependent_parent_purpose_description_if_needed(saved_transaction)
         return Response(saved_transaction.id)
 
@@ -242,13 +250,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     @action(detail=False, methods=["post"], url_path=r"add-to-report")
     def add_transaction_to_report(self, request):
+        committee_uuid = request.session["committee_uuid"]
         try:
-            report = Report.objects.get(id=request.data.get("report_id"))
+            report = Report.objects.get(
+                id=request.data.get("report_id"),
+                committee_account_id=committee_uuid,
+            )
         except Report.DoesNotExist:
             return Response("No report matching id provided", status=404)
 
         try:
-            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+            transaction = Transaction.objects.get(
+                id=request.data.get("transaction_id"),
+                committee_account_id=committee_uuid,
+            )
             transactions = transaction.get_transaction_family()
             for t in transactions:
                 t.add_to_report(report.id)
@@ -259,13 +274,20 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     @action(detail=False, methods=["post"], url_path=r"remove-from-report")
     def remove_transaction_from_report(self, request):
+        committee_uuid = request.session["committee_uuid"]
         try:
-            report = Report.objects.get(id=request.data.get("report_id"))
+            report = Report.objects.get(
+                id=request.data.get("report_id"),
+                committee_account_id=committee_uuid,
+            )
         except Report.DoesNotExist:
             return Response("No report matching id provided", status=404)
 
         try:
-            transaction = Transaction.objects.get(id=request.data.get("transaction_id"))
+            transaction = Transaction.objects.get(
+                id=request.data.get("transaction_id"),
+                committee_account_id=committee_uuid,
+            )
         except Transaction.DoesNotExist:
             return Response("No transaction matching id provided", status=404)
 
@@ -455,9 +477,19 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             ):
                 target.schedule_f.aggregate_general_elec_expended -= amount
 
-    def save_transaction(self, transaction_data, request):
+    def get_child_instance(self, child_id, committee_id):
+        # ensure that child transaction belongs to this committee
+        child_instance = Transaction.objects.select_related(
+            "schedule_a", "schedule_b", "schedule_e", "contact_2"
+        ).filter(id=child_id, committee_account_id=committee_id).first()
+        if child_instance is None:
+            raise ValidationError(
+                {"children": ["Invalid child_id or child"]}
+            )
+        return child_instance
+
+    def save_transaction(self, transaction_data, request, instance=None):
         committee_id = request.session["committee_uuid"]
-        report_ids = transaction_data.pop("report_ids", [])
         children = transaction_data.pop("children", [])
         schedule = transaction_data.get("schedule_id")
         transaction_data["parent_transaction"] = transaction_data.get(
@@ -476,7 +508,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         old_snapshot = None  # Initialize early
 
         if is_existing:
-            original_instance = Transaction.objects.get(pk=transaction_data["id"])
+            original_instance = instance or Transaction.objects.get(
+                pk=transaction_data["id"], committee_account=committee_id
+            )
             if original_instance is not None:
                 # Capture old_snapshot IMMEDIATELY after loading, before serializer
                 # modifies it
@@ -532,6 +566,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction_instance = transaction_serializer.save(**save_kwargs)
 
         # Link the transaction to all the reports it references in report_ids
+        report_ids = transaction_data.get("report_ids", [])
         transaction_instance.set_reports(report_ids)
 
         # handle loans and debts
@@ -572,39 +607,39 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         for child_transaction_data in children:
             if type(child_transaction_data) is str:
+                child_id = child_transaction_data
+                child_instance = self.get_child_instance(child_id, committee_id)
+
                 # Capture old state BEFORE updating
-                try:
-                    child_instance = Transaction.objects.select_related(
-                        "schedule_a", "schedule_b", "schedule_e", "contact_2"
-                    ).get(id=child_transaction_data)
+                old_snapshot = None
+                if child_instance.get_schedule_name() in [
+                    Schedule.A,
+                    Schedule.B,
+                    Schedule.E,
+                ]:
+                    eff = calculate_effective_amount(child_instance)
+                    old_snapshot = create_old_snapshot(child_instance, eff)
 
-                    # Capture old snapshot if this is an aggregating schedule
-                    old_snapshot = None
-                    if child_instance.get_schedule_name() in [
-                        Schedule.A,
-                        Schedule.B,
-                        Schedule.E,
-                    ]:
-                        eff = calculate_effective_amount(child_instance)
-                        old_snapshot = create_old_snapshot(child_instance, eff)
+                # Update parent and skip aggregation during save
+                child_instance.parent_transaction_id = transaction_instance.id
+                child_instance._skip_aggregation = True
+                if old_snapshot:
+                    child_instance._passed_old_snapshot = old_snapshot
+                child_instance.save()
 
-                    # Update parent and skip aggregation during save
-                    child_instance.parent_transaction_id = transaction_instance.id
-                    child_instance._skip_aggregation = True
-                    if old_snapshot:
-                        child_instance._passed_old_snapshot = old_snapshot
-                    child_instance.save()
-
-                    # Track child for post-save aggregation
-                    if child_instance.get_schedule_name() in [
-                        Schedule.A,
-                        Schedule.B,
-                        Schedule.E,
-                    ]:
-                        child_instances_to_aggregate.append(child_instance)
-                except Transaction.DoesNotExist:
-                    pass
+                # Track child for post-save aggregation
+                if child_instance.get_schedule_name() in [
+                    Schedule.A,
+                    Schedule.B,
+                    Schedule.E,
+                ]:
+                    child_instances_to_aggregate.append(child_instance)
             else:
+                child_id = child_transaction_data.get("id")
+                if child_id:
+                    # check that it belongs to this committee
+                    self.get_child_instance(child_id, committee_id)
+
                 child_transaction_data["parent_transaction_id"] = transaction_instance.id
                 child_transaction_data.pop("parent_transaction", None)
                 if child_transaction_data.get("use_parent_contact", None):
