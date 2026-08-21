@@ -174,17 +174,19 @@ APPLICATION_INDEX = env.get_credential("CF_INSTANCE_INDEX", "0")
 database = dj_database_url.config()
 database.setdefault("OPTIONS", {})
 database["OPTIONS"]["application_name"] = f"{APPLICATION_NAME}_{APPLICATION_INDEX}"
+database["CONN_HEALTH_CHECKS"] = True
+
 # psycopg pool settings:
 # https://www.psycopg.org/psycopg3/docs/api/pool.html#psycopg_pool.ConnectionPool
 # this works for celery workers as well
 # https://docs.celeryq.dev/en/main/django/first-steps-with-django.html#django-connection-pool
 database["OPTIONS"]["pool"] = {
     # min_size: psycopg default is 4
-    "min_size": int(env.get_credential("DB_POOL_MIN_SIZE", "4")),
+    "min_size": int(env.get_credential("DB_POOL_MIN_SIZE", "0")),
     # max_size: default to no overflow
     "max_size": int(env.get_credential("DB_POOL_MAX_SIZE", "4")),
-    # max_idle: psycopg default 10 minutes
-    "max_idle": int(env.get_credential("DB_POOL_MAX_IDLE", "600")),
+    # max_idle: psycopg default is 10m, prune before 350s AWS timeout
+    "max_idle": int(env.get_credential("DB_POOL_MAX_IDLE", "300")),
 }
 
 # Database
