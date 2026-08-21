@@ -58,6 +58,8 @@ applications:
       DB_POOL_MIN_SIZE: 50
       DB_POOL_MAX_SIZE: 50
       DB_POOL_MAX_IDLE: 600
+      GUNICORN_WORKERS: 9
+      GUNICORN_THREADS: 8
       CELERY_WORKER_CONCURRENCY: 50
     no-route: true
     health-check-type: process
