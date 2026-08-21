@@ -1,3 +1,4 @@
+from django.http import response
 from decimal import Decimal
 from rest_framework import status
 from rest_framework.request import HttpRequest, Request
@@ -1572,9 +1573,12 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
     def test_transaction_lookup_no_committee_activated(self):
         # User is authenticated but hasn't activated a committee
-        super().set_default_committee(None)
         response = self.send_viewset_get_request(
-            "/api/v1/transactions/", TransactionViewSet, "list", authenticate=True
+            "/api/v1/transactions/",
+            TransactionViewSet,
+            "list",
+            authenticate=True,
+            committee=None,
         )
         self.assertEqual(response.status_code, 403)
 

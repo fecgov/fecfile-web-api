@@ -10,6 +10,7 @@ class FecfilerViewSetTest(TestCase):
     fixtures = ["C01234567_user_and_committee"]
     default_user = None
     default_committee = None
+    _DEFAULT = object()
 
     def set_default_user(self, default_user):
         self.default_user = default_user
@@ -30,8 +31,8 @@ class FecfilerViewSetTest(TestCase):
         self,
         uri,
         authenticate=True,
-        user=None,
-        committee=None,
+        user=_DEFAULT,
+        committee=_DEFAULT,
     ):
         request = self.factory.get(uri)
         self.init_request(
@@ -45,8 +46,8 @@ class FecfilerViewSetTest(TestCase):
         viewset_class,
         action_name,
         authenticate=True,
-        user=None,
-        committee=None,
+        user=_DEFAULT,
+        committee=_DEFAULT,
         **kwargs,
     ):
         request = self.build_viewset_get_request(uri, authenticate, user, committee)
@@ -67,8 +68,8 @@ class FecfilerViewSetTest(TestCase):
         data,
         headers={},
         authenticate=True,
-        user=None,
-        committee=None,
+        user=_DEFAULT,
+        committee=_DEFAULT,
     ):
         request = self.factory.post(uri, data, content_type="application/json", **headers)
         self.init_request(
@@ -84,8 +85,8 @@ class FecfilerViewSetTest(TestCase):
         action_name,
         headers={},
         authenticate=True,
-        user=None,
-        committee=None,
+        user=_DEFAULT,
+        committee=_DEFAULT,
         **kwargs,
     ):
         request = self.build_viewset_post_request(
@@ -99,8 +100,8 @@ class FecfilerViewSetTest(TestCase):
         uri,
         data,
         authenticate=True,
-        user=None,
-        committee=None,
+        user=_DEFAULT,
+        committee=_DEFAULT,
     ):
         request = self.factory.put(
             uri,
@@ -119,8 +120,8 @@ class FecfilerViewSetTest(TestCase):
         viewset_class,
         action_name,
         authenticate=True,
-        user=None,
-        committee=None,
+        user=_DEFAULT,
+        committee=_DEFAULT,
         **kwargs,
     ):
         request = self.build_viewset_put_request(uri, data, authenticate, user, committee)
@@ -131,8 +132,8 @@ class FecfilerViewSetTest(TestCase):
         self,
         uri,
         authenticate=True,
-        user=None,
-        committee=None,
+        user=_DEFAULT,
+        committee=_DEFAULT,
     ):
         request = self.factory.delete(uri)
         self.init_request(
@@ -146,22 +147,22 @@ class FecfilerViewSetTest(TestCase):
         viewset_class,
         action_name,
         authenticate=True,
-        user=None,
-        committee=None,
+        user=_DEFAULT,
+        committee=_DEFAULT,
         **kwargs,
     ):
         request = self.build_viewset_delete_request(uri, authenticate, user, committee)
         response = viewset_class.as_view({"delete": action_name})(request, **kwargs)
         return response
 
-    def init_request(self, request, authenticate=True, user=None, committee=None):
+    def init_request(self, request, authenticate=True, user=_DEFAULT, committee=_DEFAULT):
         if authenticate:
-            request_user = user if user is not None else self.default_user
+            request_user = user if user is not self._DEFAULT else self.default_user
             request.user = request_user
             force_authenticate(request, request_user)
 
             request_committee = (
-                committee if committee is not None else self.default_committee
+                committee if committee is not self._DEFAULT else self.default_committee
             )
             request.session = {
                 "committee_uuid": (
