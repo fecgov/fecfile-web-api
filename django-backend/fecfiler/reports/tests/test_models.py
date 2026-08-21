@@ -1,7 +1,7 @@
 from django.test import TestCase
 from fecfiler.web_services.models import UploadSubmission
 from fecfiler.reports.models import Report, Form24, Form3X
-from fecfiler.reports.tests.utils import create_form3x, create_form24
+from fecfiler.reports.tests.utils import create_form3x, create_form24, create_form1m
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.transactions.tests.utils import (
     create_ie,
@@ -24,6 +24,7 @@ class ReportModelTestCase(TestCase):
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         self.f24_report = create_form24(self.committee)
         self.f3x_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        self.f1m_report = create_form1m(self.committee)
         self.contact_1 = Contact.objects.create(committee_account_id=self.committee.id)
 
     def test_amending(self):
@@ -45,6 +46,17 @@ class ReportModelTestCase(TestCase):
             self.f24_report.form_24.original_amendment_date, new_upload_submission.created
         )
         self.assertEqual(self.f24_report.form_type, "F24A")
+
+    def test_amending_f1m(self):
+        self.assertEqual(self.f1m_report.form_type, "F1MN")
+        self.assertEqual(self.f1m_report.report_version, None)
+
+        self.f1m_report.amend()
+        self.assertEqual(self.f1m_report.form_type, "F1MA")
+        self.assertEqual(self.f1m_report.report_version, 1)
+
+        self.f1m_report.amend()
+        self.assertEqual(self.f1m_report.report_version, 2)
 
     def test_unamending(self):
         upload_submission = UploadSubmission(fec_report_id=self.f3x_report.fec_report_id)

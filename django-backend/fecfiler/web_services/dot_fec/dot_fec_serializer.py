@@ -68,7 +68,16 @@ def election_code_serializer(model_instance, field_name, mapping):
             "Attempted to serialize election code on a report without a report type"
         )
 
-    if report_code in ["12P", "12G", "12R", "12S", "12C"]:
+    if report_code in [
+        "12P",
+        "12G",
+        "12R",
+        "12S",
+        "12C",
+        "30G",
+        "30S",
+        "30R",
+    ]:
         if election_date is None:
             raise ValueError(
                 f"Attempted to serialize election code on a {report_code} report"
