@@ -22,4 +22,4 @@ python manage.py load_mocked_committee_data
 
 # Start the Gunicorn server
 echo "Starting Gunicorn server..."
-exec gunicorn --bind 0.0.0.0:8080 fecfiler.wsgi -w "$GUNICORN_WORKERS" --threads="$GUNICORN_THREADS" --reload
+exec gunicorn --bind 0.0.0.0:8080 fecfiler.wsgi -w $GUNICORN_WORKERS --threads=$GUNICORN_THREADS --reload
