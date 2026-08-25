@@ -439,8 +439,10 @@ def add_migration_logs(logger: logging.Logger, method_name: str, event_dict):
 
 
 def process_log_tokens(logger, method_name, event_dict):
-    event_dict["event"] = re.sub(r'user ".*?"', 'user ""', event_dict["event"])
-    event_dict["event"] = re.sub(r'database ".*?"', 'database ""', event_dict["event"])
+    event_dict["event"] = re.sub(r'user ".*?"', 'user "****"', event_dict["event"])
+    event_dict["event"] = re.sub(
+        r'database ".*?"', 'database "****"', event_dict["event"]
+    )
     return event_dict
 
 
