@@ -1,7 +1,7 @@
 boto3==1.35.72
 celery==5.6.3
 cfenv==0.5.3
-cryptography==48.0.1
+cryptography==50.0.0
 dj_database_url==2.3.0
 django-deprecate-fields==0.2.3
 django-migration-linter==5.2.0
@@ -13,7 +13,7 @@ drf-spectacular-sidecar==2026.4.14
 Faker==37.6.0
 git+https://github.com/fecgov/fecfile-validate@8384e8c2747e64ebacd85031dcb9d214cfa513c5#egg=fecfile_validate&subdirectory=fecfile_validate_python
 github3.py==4.0.1
-GitPython==3.1.58
+GitPython==3.1.59
 gunicorn==23.0.0
 invoke==2.2.0
 jwcrypto==1.5.7
