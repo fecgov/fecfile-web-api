@@ -242,15 +242,17 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
             # if no Exception was returned, send email notification to the user
             if not isinstance(new_member, BaseException):
+                # fall back to email if name is unavailable
+                full_name = request.user.get_full_name() or request.user.email
                 logger.info(
-                    f"User {request.user.first_name} added {email} to committee "
+                    f"User {full_name} added {email} to committee "
                     f"{committee_id} as {role}"
                 )
                 if FLAG__ENABLE_EMAIL:
-                    self.sendAddUserToCommitteeEmail(
+                    self.sendAddMemberEmailNotification(
                         committee_id,
                         email,
-                        request.user.first_name,
+                        full_name,
                         role
                     )
             else:
@@ -362,7 +364,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def sendAddUserToCommitteeEmail(self, committee_id, email, first_name, role):
+    def sendAddMemberEmailNotification(self, committee_id, email, first_name, role):
         subject = f"[FECfile+] Invite to committee {committee_id}"
 
         # adjust links based on space
