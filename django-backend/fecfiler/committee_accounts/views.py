@@ -368,7 +368,9 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def sendAddMemberEmailNotification(self, committee_id, committee_name, email, full_name, role):
+    def sendAddMemberEmailNotification(
+            self, committee_id, committee_name, email, full_name, role
+    ):
         subject = f"{full_name} has added you to a FECfile+ committee account"
 
         # adjust links based on space
@@ -382,7 +384,8 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
             fecfile_link = f"https://{envbit}fecfile.fec.gov/login"
 
         body_text = (
-            f"{full_name} has added you as a {role} in FECfile+ for the following committee:\n"
+            f"{full_name} has added you as a {role} in FECfile+ "
+            "for the following committee:\n"
             "\n"
             f"Committee ID: {committee_id}\n"
             f"Committee Name: {committee_name}\n"
@@ -407,7 +410,8 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
             "\n"
             "FEC.gov: https://www.fec.gov/\n"
             "Electronic filing overview: "
-            "https://www.fec.gov/help-candidates-and-committees/filing-reports/electronic-filing/\n"
+            "https://www.fec.gov/help-candidates-and-committees/"
+            "filing-reports/electronic-filing/\n"
             "Privacy Policy: https://www.fec.gov/about/privacy-and-security-policy/"
         )
 
