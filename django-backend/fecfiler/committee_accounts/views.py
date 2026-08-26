@@ -249,11 +249,15 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                     f"{committee_id} as {role}"
                 )
                 if FLAG__ENABLE_EMAIL:
+                    committee_data = get_committee_account_data(committee_id)
+                    committee_name = committee_data.get("name", None)
+
                     self.sendAddMemberEmailNotification(
                         committee_id,
+                        committee_name,
                         email,
                         full_name,
-                        role
+                        role,
                     )
             else:
                 logger.error(
@@ -364,23 +368,47 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def sendAddMemberEmailNotification(self, committee_id, email, first_name, role):
-        subject = f"[FECfile+] Invite to committee {committee_id}"
+    def sendAddMemberEmailNotification(self, committee_id, committee_name, email, full_name, role):
+        subject = f"{full_name} has added you to a FECfile+ committee account"
 
         # adjust links based on space
-        if settings.SPACE == "prod":
-            envbit = ""
+        if settings.SPACE == "local":
+            fecfile_link = "http://localhost:4200/login"
         else:
-            envbit = f"{settings.SPACE}."
+            if not settings.SPACE or settings.SPACE == "prod":
+                envbit = ""
+            else:
+                envbit = f"{settings.SPACE}."
+            fecfile_link = f"https://{envbit}fecfile.fec.gov/login"
 
         body_text = (
-            "ADDED TO FECfile+ COMMITTEE\n"
+            f"{full_name} has added you as a {role} in FECfile+ for the following committee:\n"
             "\n"
-            f"{first_name} has added you as a {role} "
-            f"to {committee_id}.\n"
+            f"Committee ID: {committee_id}\n"
+            f"Committee Name: {committee_name}\n"
             "\n"
             "You can access the committee account by signing in to FECfile+:\n"
-            f"https://{envbit}fecfile.fec.gov/"
+            f"{fecfile_link}\n"
+            "\n"
+            "Important: You must have a Login.gov account to sign in to FECfile+. "
+            "If you don't already have a Login.gov account for this email, "
+            "select \"Create an account\" to get started.\n"
+            "\n"
+            "==================================================================\n"
+            "\n"
+            "If you are receiving this email in error or have any questions, "
+            "please contact the FEC Electronic Filing Office "
+            "toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307.\n"
+            "\n"
+            f"FECfile+: {fecfile_link}\n"
+            "Contact us: "
+            "https://www.fec.gov/contact/"
+            "#filing-reports-and-amendments-reporting-specific-transactions\n"
+            "\n"
+            "FEC.gov: https://www.fec.gov/\n"
+            "Electronic filing overview: "
+            "https://www.fec.gov/help-candidates-and-committees/filing-reports/electronic-filing/\n"
+            "Privacy Policy: https://www.fec.gov/about/privacy-and-security-policy/"
         )
 
         try:
