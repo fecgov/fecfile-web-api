@@ -215,6 +215,8 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
                 FEC_API_COMMITTEE_LOOKUP_ENDPOINT, params, False
             )
         else:
+            print("I'm a line without test coverage!")
+            print("So am I!")
             fec_api_committees = []
 
         fecfile_committees = list(
