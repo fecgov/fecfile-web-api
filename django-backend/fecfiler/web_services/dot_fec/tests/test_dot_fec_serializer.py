@@ -6,7 +6,7 @@ from fecfiler.web_services.dot_fec.dot_fec_serializer import (
     get_field_mappings,
     get_value_from_path,
     loan_interest_rate_serializer,
-    election_code_serializer
+    election_code_serializer,
 )
 from fecfiler.web_services.dot_fec.dot_fec_composer import Header
 from fecfiler.reports.models import Report
@@ -18,13 +18,16 @@ from fecfiler.reports.tests.utils import create_form3x, create_report_memo
 from fecfiler.transactions.tests.utils import (
     create_schedule_a,
     create_loan,
-    create_loan_from_bank
+    create_loan_from_bank,
 )
 from fecfiler.contacts.tests.utils import (
     create_test_individual_contact,
-    create_test_organization_contact
+    create_test_organization_contact,
 )
 from datetime import datetime, date
+from fecfiler.reports.tests.utils import (
+    create_form3,
+)
 
 
 class DotFECSerializerTestCase(TestCase):
@@ -209,10 +212,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertIsNone(bogus_value)
 
     def test_serialize_loan_interest_rate_user_defined(self):
-        contact_org = create_test_organization_contact(
-            "Organization",
-            self.committee.id
-        )
+        contact_org = create_test_organization_contact("Organization", self.committee.id)
         loan = create_loan(
             self.committee,
             contact_org,
@@ -226,10 +226,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(rate, "twelve percent")
 
     def test_serialize_loan_interest_rate_bad_value(self):
-        contact_org = create_test_organization_contact(
-            "Organization",
-            self.committee.id
-        )
+        contact_org = create_test_organization_contact("Organization", self.committee.id)
         loan = create_loan(
             self.committee,
             contact_org,
@@ -244,10 +241,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertRaises(ValueError, loan_interest_rate_serializer, loan, None, None)
 
     def test_serialize_loan_interest_rate_invalid_percent_sign(self):
-        contact_org = create_test_organization_contact(
-            "Organization",
-            self.committee.id
-        )
+        contact_org = create_test_organization_contact("Organization", self.committee.id)
         loan = create_loan(
             self.committee,
             contact_org,
@@ -262,10 +256,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertRaises(ValueError, loan_interest_rate_serializer, loan, None, None)
 
     def test_serialize_loan_interest_rate_no_percent_sign(self):
-        contact_org = create_test_organization_contact(
-            "Organization",
-            self.committee.id
-        )
+        contact_org = create_test_organization_contact("Organization", self.committee.id)
         loan = create_loan(
             self.committee,
             contact_org,
@@ -287,13 +278,34 @@ class DotFECSerializerTestCase(TestCase):
             ["12R", "R2027"],
             ["12S", "S2027"],
             ["12C", "C2027"],
+            ["30G", "G2027"],
+            ["30S", "S2027"],
+            ["30R", "R2027"],
         ]:
             test_report = create_form3x(
                 self.committee,
                 "2026-01-01",
                 "2026-01-31",
                 {"date_of_election": "2027-01-31"},
-                report_code
+                report_code,
+            )
+            test_report.refresh_from_db()
+
+            election_code = election_code_serializer(test_report, "election_code", None)
+            self.assertEqual(election_code, expected_value)
+
+    def test_serialize_f3_election_code(self):
+        for report_code, expected_value in [
+            ["30G", "G2027"],
+            ["30S", "S2027"],
+            ["30R", "R2027"],
+        ]:
+            test_report = create_form3(
+                self.committee,
+                "2026-01-01",
+                "2026-01-31",
+                {"date_of_election": "2027-01-31"},
+                report_code,
             )
             test_report.refresh_from_db()
 
@@ -301,10 +313,7 @@ class DotFECSerializerTestCase(TestCase):
             self.assertEqual(election_code, expected_value)
 
     def test_serialize_loan_interest_rate_large_percent(self):
-        contact_org = create_test_organization_contact(
-            "Organization",
-            self.committee.id
-        )
+        contact_org = create_test_organization_contact("Organization", self.committee.id)
         loan = create_loan(
             self.committee,
             contact_org,
@@ -320,10 +329,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(rate, "1.255")
 
     def test_serialize_loan_interest_rate_whole_number(self):
-        contact_org = create_test_organization_contact(
-            "Organization",
-            self.committee.id
-        )
+        contact_org = create_test_organization_contact("Organization", self.committee.id)
         loan = create_loan(
             self.committee,
             contact_org,
@@ -339,10 +345,7 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(rate, "0.02")
 
     def test_serialize_loan_interest_rate_c1(self):
-        contact_org = create_test_organization_contact(
-            "Organization",
-            self.committee.id
-        )
+        contact_org = create_test_organization_contact("Organization", self.committee.id)
         loan, _, agreement, _ = create_loan_from_bank(
             self.committee,
             contact_org,
