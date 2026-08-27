@@ -8,6 +8,7 @@ defaults: &defaults
   services:
     - fecfile-api-rds
     - fecfile-api-s3
+    - fecfile-api-ses
     - fecfile-api-redis
     - fecfile-api-creds-stage
   env: &default-env
