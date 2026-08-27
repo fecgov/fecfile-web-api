@@ -13,7 +13,7 @@ finance information. The project code is distributed across these repositories:
 - [fecfile-api-proxy](https://github.com/fecgov/fecfile-api-proxy): Reverse proxy for API for IP blocking and rate limiting
 - [fecfile-validate](https://github.com/fecgov/fecfile-validate): data validation rules and engine
 
----
+----
 
 ## Set up
 
