@@ -18,6 +18,7 @@ from django.http import (
     HttpResponseBadRequest,
     HttpResponseServerError,
 )
+from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
@@ -383,36 +384,15 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 envbit = f"{settings.SPACE}."
             fecfile_link = f"https://{envbit}fecfile.fec.gov/login"
 
-        body_text = (
-            f"{full_name} has added you as a {role} in FECfile+ "
-            "for the following committee:\n"
-            "\n"
-            f"Committee ID: {committee_id}\n"
-            f"Committee Name: {committee_name}\n"
-            "\n"
-            "You can access the committee account by signing in to FECfile+:\n"
-            f"{fecfile_link}\n"
-            "\n"
-            "Important: You must have a Login.gov account to sign in to FECfile+. "
-            "If you don't already have a Login.gov account for this email, "
-            "select \"Create an account\" to get started.\n"
-            "\n"
-            "==================================================================\n"
-            "\n"
-            "If you are receiving this email in error or have any questions, "
-            "please contact the FEC Electronic Filing Office "
-            "toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307.\n"
-            "\n"
-            f"FECfile+: {fecfile_link}\n"
-            "Contact us: "
-            "https://www.fec.gov/contact/"
-            "#filing-reports-and-amendments-reporting-specific-transactions\n"
-            "\n"
-            "FEC.gov: https://www.fec.gov/\n"
-            "Electronic filing overview: "
-            "https://www.fec.gov/help-candidates-and-committees/"
-            "filing-reports/electronic-filing/\n"
-            "Privacy Policy: https://www.fec.gov/about/privacy-and-security-policy/"
+        body_text = render_to_string(
+            "emails/add_member_notification.txt",
+            {
+                "full_name": full_name,
+                "role": role,
+                "committee_id": committee_id,
+                "committee_name": committee_name,
+                "fecfile_link": fecfile_link,
+            },
         )
 
         try:

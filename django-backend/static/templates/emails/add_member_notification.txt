@@ -1,0 +1,20 @@
+{{ full_name }} has added you as a {{ role }} in FECfile+ for the following committee:
+
+Committee ID: {{ committee_id }}
+Committee Name: {{ committee_name }}
+
+You can access the committee account by signing in to FECfile+:
+{{ fecfile_link }}
+
+Important: You must have a Login.gov account to sign in to FECfile+. If you don't already have a Login.gov account for this email, select "Create an account" to get started.
+
+==================================================================
+
+If you are receiving this email in error or have any questions, please contact the FEC Electronic Filing Office toll-free at (800) 424-9530 ext. 1307 or locally at (202) 694-1307.
+
+FECfile+: {{ fecfile_link }}
+Contact us: https://www.fec.gov/contact/#filing-reports-and-amendments-reporting-specific-transactions
+
+FEC.gov: https://www.fec.gov/
+Electronic filing overview: https://www.fec.gov/help-candidates-and-committees/filing-reports/electronic-filing/
+Privacy Policy: https://www.fec.gov/about/privacy-and-security-policy/
