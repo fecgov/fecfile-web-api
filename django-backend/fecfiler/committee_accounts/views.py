@@ -376,28 +376,33 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
         # adjust links based on space
         if settings.SPACE == "local":
-            fecfile_link = "http://localhost:4200/login"
+            fecfile_link = "http://localhost:4200"
         else:
             if not settings.SPACE or settings.SPACE == "prod":
                 envbit = ""
             else:
                 envbit = f"{settings.SPACE}."
-            fecfile_link = f"https://{envbit}fecfile.fec.gov/login"
+            fecfile_link = f"https://{envbit}fecfile.fec.gov"
 
+        email_dict = {
+            "full_name": full_name,
+            "role": role,
+            "committee_id": committee_id,
+            "committee_name": committee_name,
+            "fecfile_link": fecfile_link,
+        }
         body_text = render_to_string(
             "emails/add_member_notification.txt",
-            {
-                "full_name": full_name,
-                "role": role,
-                "committee_id": committee_id,
-                "committee_name": committee_name,
-                "fecfile_link": fecfile_link,
-            },
+            email_dict,
+        )
+        body_html = render_to_string(
+            "emails/add_member_notification.html",
+            email_dict,
         )
 
         try:
             send_email_notification(
-                to_email=email, subject=subject, body_text=body_text
+                to_email=email, subject=subject, body_text=body_text, body_html=body_html
             )
         except Exception as e:
             logger.error(
