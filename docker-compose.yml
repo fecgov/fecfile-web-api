@@ -25,14 +25,14 @@ services:
 
   celery-worker:
     build:
-      context: "./"
-      dockerfile: "${WORKER_DOCKERFILE:-Worker_Dockerfile}"
+      context: './'
+      dockerfile: '${WORKER_DOCKERFILE:-Worker_Dockerfile}'
     image: fecfile-celery-worker
     container_name: fecfile-celery-worker
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     depends_on:
       - db
       - redis
@@ -80,15 +80,15 @@ services:
 
   scheduler:
     build:
-      context: "./"
-      dockerfile: "${SCHEDULER_DOCKERFILE:-Scheduler_Dockerfile}"
+      context: './'
+      dockerfile: '${SCHEDULER_DOCKERFILE:-Scheduler_Dockerfile}'
     image: fecfile-celery-beat
     container_name: fecfile-scheduler
     command: celery -A fecfiler beat -l info
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     depends_on:
       - db
       - redis
@@ -128,14 +128,14 @@ services:
 
   api:
     build:
-      context: "./"
-      dockerfile: "${API_DOCKERFILE:-Dockerfile}"
+      context: './'
+      dockerfile: '${API_DOCKERFILE:-Dockerfile}'
     image: fecfile-api
     container_name: fecfile-api
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
     depends_on:
       - db
       - redis
@@ -190,8 +190,6 @@ services:
       DB_POOL_MIN_SIZE: 0
       DB_POOL_MAX_SIZE: 8
       DB_POOL_MAX_IDLE: 600
-      GUNICORN_WORKERS: 9
-      GUNICORN_THREADS: 8
       MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS: 0
 
       # ---- FEATURE FLAGS ----
@@ -226,14 +224,14 @@ services:
       - ./:/mnt/locust
     # command: -f /mnt/locust/performance-testing/locust_run.py --master -H https://dev-api.fecfile.fec.gov
     command: -f /mnt/locust/performance-testing/locust_run.py --master -H http://fecfile-api-proxy:8080 -r .5
-    profiles: [locust]
+    profiles: [ locust ]
 
   locust-follower:
     image: locustio/locust
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
-    profiles: [locust]
+    profiles: [ locust ]
 
   locust-leader-app:
     image: locustio/locust
@@ -242,11 +240,11 @@ services:
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run_app.py --master -H https://dev.fecfile.fec.gov
-    profiles: [locust-app]
+    profiles: [ locust-app ]
 
   locust-follower-app:
     image: locustio/locust
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run_app.py --worker --master-host locust-leader-app -L DEBUG
-    profiles: [locust-app]
+    profiles: [ locust-app ]
