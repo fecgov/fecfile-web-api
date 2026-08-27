@@ -62,6 +62,15 @@ def get_num_reports():
     logger.info(f"{f'Number of reports: {Report.objects.count()}':<60}")
 
 
+def get_filing_frequency():
+    quarterly_count = CommitteeAccount.objects.filter(filing_frequency="Q").count()
+    monthly_count = CommitteeAccount.objects.filter(filing_frequency="M").count()
+
+    logger.info(f"{f'Committee filing frequency:':<60}")
+    logger.info(f"{f'   Quarterly: {quarterly_count}':<60}")
+    logger.info(f"{f'   Monthly: {monthly_count}':<60}")
+
+
 def get_num_reports_per_committee(committee_id=None):
     if committee_id:
         report_count = Report.objects.filter(
