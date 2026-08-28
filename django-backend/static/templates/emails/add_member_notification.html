@@ -44,9 +44,8 @@
         height: auto;
       }
 
-      a {
-        color: #0aacfa;
-        text-decoration: underline;
+      p {
+        margin: 0 0 20px;
       }
 
       .email-shell {
@@ -88,7 +87,11 @@
       }
 
       .email-content {
-        padding: 30px 60px 20px;
+        padding: 20px 60px 0px;
+      }
+
+      .email-content .divider {
+        margin-bottom: 5px;
       }
 
       .email-title {
@@ -97,10 +100,6 @@
         font-size: 24px;
         line-height: 1.3;
         color: #1a1a1a;
-      }
-
-      .email-copy {
-        margin: 0 0 20px;
       }
 
       .meta-list {
@@ -130,14 +129,6 @@
         text-decoration: underline;
       }
 
-      .email-content .divider {
-        margin: 20px 0;
-      }
-
-      .support-note {
-        margin: 0;
-      }
-
       .footer-primary,
       .footer-secondary {
         text-align: center;
@@ -153,6 +144,11 @@
         justify-content: center;
       }
 
+      .footer-secondary {
+        background-color: #e8e8e8;
+        padding-top: 15px;
+      }
+
       .footer-links {
         display: flex;
         align-items: center;
@@ -162,34 +158,21 @@
         margin: 0;
       }
 
-      .footer-primary a,
-      .footer-primary .footer-separator,
-      .footer-secondary a,
-      .footer-secondary .footer-separator {
-        color: #ffffff;
+      .footer-links a {
         text-decoration: none;
-        font-size: 14px;
       }
 
-      .footer-primary .footer-separator {
-        margin: 0 12px;
+      .footer-primary .footer-links,
+      .footer-primary .footer-links a {
+        color: #ffffff;
       }
 
-      .footer-secondary {
-        background-color: #e8e8e8;
-        padding-top: 15px;
-      }
-
-      .footer-secondary .footer-links {
+      .footer-secondary .footer-links,
+      .footer-secondary .footer-links a {
         color: #212121;
       }
 
-      .footer-secondary a,
-      .footer-secondary .footer-separator {
-        color: #212121;
-      }
-
-      .footer-secondary .footer-separator {
+      .footer-separator {
         margin: 0 12px;
       }
 
@@ -228,7 +211,7 @@
           <div class="email-content">
             <h1 class="email-title">Added to FECfile+ Committee Account</h1>
 
-            <p class="email-copy">
+            <p>
               {{ full_name }} has added you as a {{ role }} in FECfile+ for the following committee:
             </p>
 
@@ -243,17 +226,17 @@
               </div>
             </div>
 
-            <p class="email-copy">
+            <p>
               You can access the committee account by <a href="{{ fecfile_link }}/login" class="email-link">signing in to FECfile+</a>.
             </p>
 
-            <p class="email-copy">
+            <p>
               <strong>Important:</strong> You must have a Login.gov account to sign in to FECfile+. If you don't already have a Login.gov account for this email, select “Create an account” to get started.
             </p>
 
             <div class="divider" aria-hidden="true"></div>
 
-            <p class="support-note">
+            <p>
               If you are receiving this email in error or have any questions, please contact the FEC Electronic Filing Office toll-free at <a href="tel:8004249530,1307" class="email-link">(800) 424-9530 ext. 1307</a> or locally at <a href="tel:2026941307" class="email-link">(202) 694-1307</a>.
             </p>
           </div>
