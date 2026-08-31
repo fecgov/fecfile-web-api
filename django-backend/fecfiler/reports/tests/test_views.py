@@ -119,11 +119,8 @@ class ReportViewSetTest(FecfilerViewSetTest):
         request.query_params = {}
         view.request = request
         response = view.list(request)
-        try:
-            response.data["results"]  # A non-paginated response will throw an error here
-            self.assertTrue(response is None)
-        except TypeError:
-            self.assertTrue(response is not None)
+        response.data["results"]  # A non-paginated response will throw an error here
+        self.assertEqual(response.data["results"], [])
 
     def test_ordering(self):
         view = ReportViewSet()
