@@ -1085,7 +1085,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         for i in range(ordered_queryset.count()):
             self.assertEqual(ordered_queryset[i].id, memos_sorted[i].id)
 
-    def test_list_unassociated(self):
+    def test_list_unassigned(self):
         Transaction.objects.filter(committee_account=self.committee).delete()
 
         indiviual_receipt_data = [
@@ -1127,7 +1127,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         request = self.get_request(
-            "api/v1/transactions/list/unassociated",
+            "api/v1/transactions/list/unassigned",
             {
                 "page": 1,
                 "ordering": "amount",
@@ -1139,16 +1139,16 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.view.action = "list"
         self.view.format_kwarg = None
 
-        response = self.view.list_unassociated_transactions(request)
+        response = self.view.list_unassigned_transactions(request)
 
         transactions = response.data["results"]
         self.assertEqual(response.data["count"], 5)
         self.assertEqual(len(transactions), 2)
         self.assertEqual(transactions[0]["amount"], "100.00")
 
-    def test_list_unassociated_non_paginated(self):
+    def test_list_unassigned_non_paginated(self):
         request = self.get_request(
-            "api/v1/transactions/list/unassociated",
+            "api/v1/transactions/list/unassigned",
             {
                 "ordering": "date",
             },
@@ -1158,11 +1158,11 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.view.action = "list"
         self.view.format_kwarg = None
 
-        response = self.view.list_unassociated_transactions(request)
+        response = self.view.list_unassigned_transactions(request)
         self.assertEqual(response.status_code, 400)
 
         request = self.get_request(
-            "api/v1/transactions/list/unassociated",
+            "api/v1/transactions/list/unassigned",
             {
                 "ordering": "date",
                 "page": None,
@@ -1170,11 +1170,11 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         self.view.request = request
-        response = self.view.list_unassociated_transactions(request)
+        response = self.view.list_unassigned_transactions(request)
         self.assertEqual(response.status_code, 400)
 
         request = self.get_request(
-            "api/v1/transactions/list/unassociated",
+            "api/v1/transactions/list/unassigned",
             {
                 "ordering": "date",
                 "page": 1,
@@ -1182,10 +1182,10 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         self.view.request = request
-        response = self.view.list_unassociated_transactions(request)
+        response = self.view.list_unassigned_transactions(request)
         self.assertEqual(response.status_code, 200)
 
-    def test_list_unassociated_by_schedule(self):
+    def test_list_unassigned_by_schedule(self):
         Transaction.objects.filter(committee_account=self.committee).delete()
 
         indiviual_receipt_data = [
@@ -1222,7 +1222,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             )
 
         request = self.get_request(
-            "api/v1/transactions/list/unassociated",
+            "api/v1/transactions/list/unassigned",
             {"page": 1, "ordering": "-amount", "page_size": 5, "schedules": "B"},
         )
 
@@ -1230,7 +1230,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.view.action = "list"
         self.view.format_kwarg = None
 
-        response = self.view.list_unassociated_transactions(request)
+        response = self.view.list_unassigned_transactions(request)
 
         transactions = response.data["results"]
         self.assertEqual(response.data["count"], 2)

@@ -154,8 +154,8 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         return queryset
 
-    # @action(detail=False, methods=["get"], url_path=r"list/unassociated")
-    def list_unassociated_transactions(self, request, *args, **kwargs):
+    @action(detail=False, methods=["get"], url_path=r"list/unassigned")
+    def list_unassigned_transactions(self, request, *args, **kwargs):
         if "page" not in request.query_params or request.query_params["page"] is None:
             return Response("page is required", status=400)
 
@@ -294,6 +294,35 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction.remove_from_report(report.id)
 
         return Response("Transaction removed from report")
+
+    @action(detail=False, methods=["get"], url_path=r"outside")
+    def transactions_outside_report(self, request):
+        from_date_str = request.query_params.get("from")
+        through_date_str = request.query_params.get("through")
+
+        if not from_date_str or not through_date_str:
+            return Response(
+                {"error": "Both 'from' and 'through' query parameters are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            from_date = datetime.strptime(from_date_str, "%m/%d/%Y").date()
+            through_date = datetime.strptime(through_date_str, "%m/%d/%Y").date()
+        except ValueError:
+            return Response(
+                {"error": "Invalid date format. Use MM/DD/YYYY."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        queryset = self.filter_queryset(self.get_queryset())
+        outside_queryset = queryset.filter(date__isnull=False).exclude(
+            date__range=(from_date, through_date)
+        )
+
+        count = outside_queryset.count()
+        return Response(count, status=status.HTTP_200_OK)
+
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
     def previous_transaction_by_entity(self, request):

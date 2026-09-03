@@ -194,6 +194,8 @@ def get_production_committee_data(committee_id):
 
 
 def get_eligible_report_types_processed(committee_data: dict):
+
+    return ["F3", "F99", 'F3X', 'F24', 'F1M']
     fallback_reports = ["F99"]
     if committee_data is None:
         logger.error(
