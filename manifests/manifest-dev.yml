@@ -3,7 +3,7 @@ defaults: &defaults
   instances: 1
   stack: cflinuxfs4
   buildpacks:
-    - https://github.com/cloudfoundry/python-buildpack.git#v1.9.4
+    - python_buildpack
   memory: 1G
   services:
     - fecfile-api-rds
