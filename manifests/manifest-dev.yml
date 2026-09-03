@@ -3,7 +3,7 @@ defaults: &defaults
   instances: 1
   stack: cflinuxfs4
   buildpacks:
-    - python_buildpack
+    - https://github.com/cloudfoundry/python-buildpack.git#v1.9.4
   memory: 1G
   services:
     - fecfile-api-rds
@@ -13,6 +13,7 @@ defaults: &defaults
     - fecfile-api-creds-dev
   env: &default-env
     SPACE: dev
+    BP_PIP_VERSION: latest
     DISABLE_COLLECTSTATIC: 1
     DJANGO_SETTINGS_MODULE: fecfiler.settings.production
     FFAPI_COOKIE_DOMAIN: fecfile.fec.gov
