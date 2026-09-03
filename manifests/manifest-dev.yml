@@ -8,10 +8,12 @@ defaults: &defaults
   services:
     - fecfile-api-rds
     - fecfile-api-s3
+    - fecfile-api-ses
     - fecfile-api-redis
     - fecfile-api-creds-dev
   env: &default-env
     SPACE: dev
+    BP_PIP_VERSION: latest
     DISABLE_COLLECTSTATIC: 1
     DJANGO_SETTINGS_MODULE: fecfiler.settings.production
     FFAPI_COOKIE_DOMAIN: fecfile.fec.gov
@@ -24,8 +26,10 @@ defaults: &defaults
     STAGE_OPEN_FEC_API: https://api-stage.open.fec.gov/v1/
     FEC_AGENCY_ID: FEC
     SESSION_COOKIE_AGE: 3600 # Value in seconds (1 hour)
-    DB_POOL_MIN_SIZE: 8
+    DB_POOL_MIN_SIZE: 0
     DB_POOL_MAX_SIZE: 8
+    GUNICORN_WORKERS: 9
+    GUNICORN_THREADS: 8
     DB_POOL_MAX_IDLE: 600
     BP_PIP_VERSION: latest
     LOG_FORMAT: KEY_VALUE
@@ -39,7 +43,7 @@ defaults: &defaults
     # ---- FEATURE FLAGS ----
     FLAG__COMMITTEE_DATA_SOURCE: TEST # Values are PRODUCTION, TEST, MOCKED
     FLAG__ENABLE_IMPORT: True
-    FLAG__ENABLE_EMAIL: True
+    FLAG__ENABLE_EMAIL: False
     ENABLE_RESTRICTED_COMMANDS: True
     FEC_FORMAT_VERSION: 8.5
 

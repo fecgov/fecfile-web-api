@@ -7,7 +7,9 @@ import dj_database_url
 import structlog
 import logging
 import sys
+import re
 
+from copy import deepcopy
 from enum import Enum
 from .env import env
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
@@ -174,17 +176,19 @@ APPLICATION_INDEX = env.get_credential("CF_INSTANCE_INDEX", "0")
 database = dj_database_url.config()
 database.setdefault("OPTIONS", {})
 database["OPTIONS"]["application_name"] = f"{APPLICATION_NAME}_{APPLICATION_INDEX}"
+database["CONN_HEALTH_CHECKS"] = True
+
 # psycopg pool settings:
 # https://www.psycopg.org/psycopg3/docs/api/pool.html#psycopg_pool.ConnectionPool
 # this works for celery workers as well
 # https://docs.celeryq.dev/en/main/django/first-steps-with-django.html#django-connection-pool
 database["OPTIONS"]["pool"] = {
     # min_size: psycopg default is 4
-    "min_size": int(env.get_credential("DB_POOL_MIN_SIZE", "4")),
+    "min_size": int(env.get_credential("DB_POOL_MIN_SIZE", "0")),
     # max_size: default to no overflow
     "max_size": int(env.get_credential("DB_POOL_MAX_SIZE", "4")),
-    # max_idle: psycopg default 10 minutes
-    "max_idle": int(env.get_credential("DB_POOL_MAX_IDLE", "600")),
+    # max_idle: psycopg default is 10m, prune before 350s AWS timeout
+    "max_idle": int(env.get_credential("DB_POOL_MAX_IDLE", "300")),
 }
 
 # Database
@@ -290,33 +294,45 @@ class NotErrorFilter(logging.Filter):
 
 def get_logging_config(log_format=LINE):
     stream_handler = "logging.StreamHandler"
+    json_formatter = {
+        "()": structlog.stdlib.ProcessorFormatter,
+        "processors": [
+            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+            structlog.processors.ExceptionRenderer(
+                structlog.processors.ExceptionDictTransformer(show_locals=False)
+            ),
+            structlog.processors.JSONRenderer(),
+        ],
+    }
+    psycopg_json_formatter = deepcopy(json_formatter)
+    psycopg_json_formatter["processors"] = [process_log_tokens] + psycopg_json_formatter[
+        "processors"
+    ]
+    plain_console_formatter = {
+        "()": structlog.stdlib.ProcessorFormatter,
+        "processors": [
+            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+            structlog.processors.dict_tracebacks,
+            structlog.dev.ConsoleRenderer(
+                colors=True, exception_formatter=structlog.dev.rich_traceback
+            ),
+        ],
+        "foreign_pre_chain": [
+            structlog.contextvars.merge_contextvars,
+        ],
+    }
+    psycopg_plain_console_formatter = deepcopy(plain_console_formatter)
+    psycopg_plain_console_formatter["processors"] = [
+        process_log_tokens
+    ] + psycopg_plain_console_formatter["processors"]
     logging_config = {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            "json_formatter": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processors": [
-                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-                    structlog.processors.ExceptionRenderer(
-                        structlog.processors.ExceptionDictTransformer(show_locals=False)
-                    ),
-                    structlog.processors.JSONRenderer(),
-                ],
-            },
-            "plain_console": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processors": [
-                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-                    structlog.processors.dict_tracebacks,
-                    structlog.dev.ConsoleRenderer(
-                        colors=True, exception_formatter=structlog.dev.rich_traceback
-                    ),
-                ],
-                "foreign_pre_chain": [
-                    structlog.contextvars.merge_contextvars,
-                ],
-            },
+            "json_formatter": json_formatter,
+            "psycopg_json_formatter": psycopg_json_formatter,
+            "plain_console": plain_console_formatter,
+            "psycopg_plain_console": psycopg_plain_console_formatter,
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
@@ -350,6 +366,11 @@ def get_logging_config(log_format=LINE):
                 "formatter": "plain_console",
                 "stream": sys.stderr,
             },
+            "psycopg_console": {
+                "class": stream_handler,
+                "formatter": "psycopg_plain_console",
+                "stream": sys.stdout,
+            },
             "cloud": {
                 "class": stream_handler,
                 "formatter": "json_formatter",
@@ -361,6 +382,11 @@ def get_logging_config(log_format=LINE):
                 "class": stream_handler,
                 "formatter": "json_formatter",
                 "stream": sys.stderr,
+            },
+            "psycopg_cloud": {
+                "class": stream_handler,
+                "formatter": "psycopg_json_formatter",
+                "stream": sys.stdout,
             },
         },
     }
@@ -374,6 +400,11 @@ def get_logging_config(log_format=LINE):
             "fecfiler": {
                 "handlers": ["console", "console_error"],
                 "level": "DEBUG",
+            },
+            "psycopg": {
+                "handlers": [
+                    "psycopg_console",
+                ],
             },
         }
         if ENABLE_PL_SQL_LOGGING is True:
@@ -391,6 +422,11 @@ def get_logging_config(log_format=LINE):
                 "handlers": ["cloud", "cloud_error"],
                 "level": "INFO",
             },
+            "psycopg": {
+                "handlers": [
+                    "psycopg_cloud",
+                ],
+            },
         }
 
     return logging_config
@@ -399,6 +435,14 @@ def get_logging_config(log_format=LINE):
 def add_migration_logs(logger: logging.Logger, method_name: str, event_dict):
     if "/migrations/" in event_dict.get("pathname", ""):
         event_dict["MIGRATION_LOG"] = True
+    return event_dict
+
+
+def process_log_tokens(logger, method_name, event_dict):
+    event_dict["event"] = re.sub(r'user ".*?"', 'user "****"', event_dict["event"])
+    event_dict["event"] = re.sub(
+        r'database ".*?"', 'database "****"', event_dict["event"]
+    )
     return event_dict
 
 
