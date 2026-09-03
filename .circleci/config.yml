@@ -201,6 +201,8 @@ jobs:
 
       - python/install-packages:
           pkg-manager: pip
+          cache-key-override: |
+            pip-v2-{{.Branch}}{{ checksum "requirements-all.txt" }}
           pip-dependency-file: requirements.txt
 
       - run:
