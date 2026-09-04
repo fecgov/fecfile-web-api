@@ -1,8 +1,44 @@
+[project]
+name="fecfile-api"
+version="1.0.0"
+requires-python = ">= 3.13.15"
+dependencies = [
+    "boto3==1.35.72",
+    "celery==5.6.3",
+    "cfenv==0.5.3",
+    "cryptography==50.0.0",
+    "dj-database-url==2.3.0",
+    "django==5.2.17",
+    "django-deprecate-fields==0.2.3",
+    "django-migration-linter==5.2.0",
+    "django-structlog==9.1.1",
+    "djangorestframework==3.17.1",
+    "drf-spectacular==0.29.0",
+    "drf-spectacular-sidecar==2026.4.14",
+    "faker==37.6.0",
+    "fecfile-validate",
+    "github3-py==4.0.1",
+    "gitpython==3.1.59",
+    "gunicorn==23.0.0",
+    "invoke==2.2.0",
+    "jwcrypto==1.5.7",
+    "lxml==6.1.0",
+    "psycopg[pool]==3.3.0",
+    "pyjwt==2.13.0",
+    "redis==5.3.1",
+    "requests==2.33.0",
+    "sqlparse==0.6.0",
+    "structlog==25.3.0",
+    "urllib3==2.7.0",
+    "whitenoise==6.12.0",
+    "zeep==4.3.3",
+]
+
+
 [tool.black]
 line-length = 90
 
 [tool.deptry]
-requirements_files_dev  = ["requirements-test.txt"]
 known_first_party = ["fecfiler", "locust_data_generator"]
 
 [tool.deptry.per_rule_ignores]
@@ -22,3 +58,21 @@ DEP002 = [
     "whitenoise",
     "drf-spectacular-sidecar",
 ]
+
+[tool.uv.sources]
+fecfile-validate = { git = "https://github.com/fecgov/fecfile-validate", subdirectory = "fecfile_validate_python", rev = "377210f453f8a6424193ab229a2d918a9b73d436" }
+
+[dependency-groups]
+dev = [
+    "coverage==7.15.0",
+    "deptry==0.21.1",
+    "dj-static==0.0.6",
+    "django-silk==5.4.3",
+    "flake8==7.2.0",
+    "liccheck==0.6.2",
+    "pygments==2.20.0",
+    "rich==13.9.4",
+    "static3==0.7.0",
+    "tblib==3.1.0",
+]
+
