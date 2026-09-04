@@ -112,11 +112,9 @@ def logout_committee_sessions(committee_id):
             sessions_to_delete.append(session.pk)
 
     Session.objects.filter(pk__in=sessions_to_delete).delete()
-    logger.info(
-        f"""
+    logger.info(f"""
         Successfully logged out {len(sessions_to_delete)} users from {committee_id}
-        """
-    )
+        """)
 
 
 def enable_committee_account(committee_id):
@@ -194,8 +192,6 @@ def get_production_committee_data(committee_id):
 
 
 def get_eligible_report_types_processed(committee_data: dict):
-
-    return ["F3", "F99", 'F3X', 'F24', 'F1M']
     fallback_reports = ["F99"]
     if committee_data is None:
         logger.error(
@@ -283,9 +279,9 @@ def augment_processed_committee_data(committee_data: dict):
             committee_data.get("committee_type") in PRODUCTION_QUALIFIED_COMMITTEES
         )
 
-        committee_data[
-            "eligible_report_types"
-        ] = get_eligible_report_types_processed(committee_data)
+        committee_data["eligible_report_types"] = get_eligible_report_types_processed(
+            committee_data
+        )
 
         add_candidate_office_state_if_needed(committee_data)
 
@@ -301,7 +297,7 @@ def add_candidate_office_state_if_needed(committee_data: dict):
         }
         candidate = query_fec_api_single(
             f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/candidates/",
-            params
+            params,
         )
         if candidate:
             committee_data["candidate_office"] = candidate.get("office", None)
@@ -365,9 +361,9 @@ def get_raw_committee_data(committee_id):
         committee_data["filing_frequency"] = "Q"
 
         committee_data = convert_raw_to_processed(committee_data)
-        committee_data[
-            "eligible_report_types"
-        ] = get_eligible_report_types_raw(committee_data)
+        committee_data["eligible_report_types"] = get_eligible_report_types_raw(
+            committee_data
+        )
 
     return committee_data
 
@@ -433,9 +429,9 @@ def get_test_committee_data(committee_id):
         committee_data["filing_frequency"] = "Q"
 
         committee_data = convert_raw_to_processed(committee_data)
-        committee_data[
-            "eligible_report_types"
-        ] = get_eligible_report_types_raw(committee_data)
+        committee_data["eligible_report_types"] = get_eligible_report_types_raw(
+            committee_data
+        )
 
     return committee_data
 
@@ -469,13 +465,13 @@ def get_mocked_committee_data(committee_id):
 
         if committee is not None:
             if committee.get("counts_as_processed"):
-                committee[
-                    "eligible_report_types"
-                ] = get_eligible_report_types_processed(committee)
+                committee["eligible_report_types"] = get_eligible_report_types_processed(
+                    committee
+                )
             else:
-                committee[
-                    "eligible_report_types"
-                ] = get_eligible_report_types_raw(committee)
+                committee["eligible_report_types"] = get_eligible_report_types_raw(
+                    committee
+                )
 
         return committee
 

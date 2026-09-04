@@ -185,7 +185,9 @@ class F3SerializerTestCase(TestCase):
             report_a,
             {
                 "coverage_from_date": datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
-                "coverage_through_date": datetime.strptime("2024-02-28", "%Y-%m-%d").date(),
+                "coverage_through_date": datetime.strptime(
+                    "2024-02-28", "%Y-%m-%d"
+                ).date(),
             },
         )
 

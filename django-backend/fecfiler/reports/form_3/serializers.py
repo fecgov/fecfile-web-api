@@ -1,4 +1,5 @@
 from django.db.transaction import atomic
+from fecfiler.settings import FLAG__ENABLE_UNASSIGNED_TRANSACTIONS
 from fecfiler.reports.models import Report, ReportTransaction
 from fecfiler.reports.form_3.models import Form3
 from fecfiler.reports.serializers import (
@@ -19,7 +20,13 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-
+COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS = ValidationError(
+    {
+        "coverage_from_date_and_coverage_to_date": [
+            "Coverage date(s) exclude existing transaction(s) for report"
+        ]
+    }
+)
 
 
 class BaseForm3Serializer(ReportSerializer):
@@ -67,9 +74,12 @@ class BaseForm3Serializer(ReportSerializer):
                 report_id=instance.id,
             )
             if transactions_outside_coverage_dates.exists():
-                transactions_outside_coverage_dates.delete()
-                if instance.can_unamend:
-                    instance.can_unamend = False
+                if FLAG__ENABLE_UNASSIGNED_TRANSACTIONS:
+                    transactions_outside_coverage_dates.delete()
+                    if instance.can_unamend:
+                        instance.can_unamend = False
+                else:
+                    raise COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS
 
             if self.overlaps_other_f3_report(
                 instance.id,
