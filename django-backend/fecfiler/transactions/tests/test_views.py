@@ -1304,6 +1304,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "list",
             committee=c1,
         )
+        self.assertEqual(c1_response.status_code, 200)
+        c1_response_results = c1_response.data["results"]
 
         c2_response = self.send_viewset_get_request(
             "/api/v1/transactions/",
@@ -1311,13 +1313,15 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "list",
             committee=c2,
         )
+        self.assertEqual(c2_response.status_code, 200)
+        c2_response_results = c2_response.data["results"]
 
-        self.assertEqual(len(c1_response.data), 2)
-        for transaction in c1_response.data:
+        self.assertEqual(len(c1_response_results), 2)
+        for transaction in c1_response_results:
             self.assertIn(transaction["id"], [str(c1_sa.id), str(c1_sb.id)])
 
-        self.assertEqual(len(c2_response.data), 1)
-        for transaction in c2_response.data:
+        self.assertEqual(len(c2_response_results), 1)
+        for transaction in c2_response_results:
             self.assertIn(transaction["id"], [str(c2_sa.id)])
 
     def test_crud_committee_transactions(self):
@@ -2801,9 +2805,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 )
 
     def test_committee_locked_parent_transaction(self):
-        other_committee = CommitteeAccount(
-            committee_id="C12344321"
-        )
+        other_committee = CommitteeAccount(committee_id="C12344321")
 
         other_committee.save()
 
@@ -2811,19 +2813,11 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "date": "2023-01-01",
             "amount": "200.00",
             "group": "GENERAL",
-            "memo": True
+            "memo": True,
         }
 
-        good_contact = create_test_individual_contact(
-            "Good",
-            "Guy",
-            other_committee.id
-        )
-        evil_contact = create_test_individual_contact(
-            "Evil",
-            "Guy",
-            self.committee.id
-        )
+        good_contact = create_test_individual_contact("Good", "Guy", other_committee.id)
+        evil_contact = create_test_individual_contact("Evil", "Guy", self.committee.id)
 
         original_transaction = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -2862,7 +2856,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             payload,
             TransactionViewSet,
             "create",
-            committee=self.committee
+            committee=self.committee,
         )
 
         self.assertEqual(response.status_code, 400)

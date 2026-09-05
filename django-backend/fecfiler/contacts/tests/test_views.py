@@ -457,11 +457,8 @@ class ContactViewSetTest(FecfilerViewSetTest):
             ContactViewSet,
             "list",
         )
-        try:
-            response.data["results"]  # A non-paginated response will throw an error here
-            self.assertTrue(response is None)
-        except TypeError:
-            self.assertTrue(response is not None)
+        response.data["results"]  # A non-paginated response will throw an error here
+        self.assertEqual(len(response.data["results"]), 4)  # fixture count
 
     def test_duplicate_check_empty_query_params(self):
         response = self.send_viewset_get_request(
@@ -574,41 +571,30 @@ class ContactViewSetTest(FecfilerViewSetTest):
 
     def test_CRUD_committee_locked_list(self):
         main_committee = CommitteeAccount(
-            committee_id="C43211234",
-            id="33333333-2222-1111-2222-333333333333"
+            committee_id="C43211234", id="33333333-2222-1111-2222-333333333333"
         )
         other_committee = CommitteeAccount(
-            committee_id="C12344321",
-            id="55555555-4444-3333-2222-111111111111"
+            committee_id="C12344321", id="55555555-4444-3333-2222-111111111111"
         )
 
         main_committee.save()
         other_committee.save()
 
         for i in range(5):
-            create_test_individual_contact(
-                f"last{i}", f"first{i}", main_committee.id
-            )
-            create_test_individual_contact(
-                f"last{i}", f"first{i}", other_committee.id
-            )
+            create_test_individual_contact(f"last{i}", f"first{i}", main_committee.id)
+            create_test_individual_contact(f"last{i}", f"first{i}", other_committee.id)
 
         response = self.send_viewset_get_request(
-            "/api/v1/contacts?page=1",
-            ContactViewSet,
-            "list",
-            committee=main_committee
+            "/api/v1/contacts?page=1", ContactViewSet, "list", committee=main_committee
         )
         self.assertEqual(len(response.data["results"]), 5)
 
     def test_CRUD_committee_locked_update(self):
         main_committee = CommitteeAccount(
-            committee_id="C43211234",
-            id="33333333-2222-1111-2222-333333333333"
+            committee_id="C43211234", id="33333333-2222-1111-2222-333333333333"
         )
         other_committee = CommitteeAccount(
-            committee_id="C12344321",
-            id="55555555-4444-3333-2222-111111111111"
+            committee_id="C12344321", id="55555555-4444-3333-2222-111111111111"
         )
 
         main_committee.save()
@@ -635,7 +621,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
             ContactViewSet,
             "update",
             pk=contact.id,
-            committee=other_committee
+            committee=other_committee,
         )
 
         self.assertEqual(response.status_code, 404)

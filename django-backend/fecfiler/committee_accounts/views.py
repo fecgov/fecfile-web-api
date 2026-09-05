@@ -140,17 +140,6 @@ class CommitteeOwnedViewMixin(viewsets.GenericViewSet):
             raise PermissionDenied("You must activate a committee account")
         return committee_uuid
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        if "page" in request.query_params:
-            page = self.paginate_queryset(queryset)
-            if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-
 
 class IsCommitteeAdministrator(BasePermission):
     """
@@ -316,6 +305,28 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         except ValidationError as e:
             logger.error(f"{str(e)}")
             return Response({"error": str(e)}, status=400)
+
+    @action(detail=False)
+    def validation_check(self, request):
+        params = request.query_params
+        email = params.get("email")
+        if email:
+            matches = self.get_queryset().filter(email__iexact=email).count()
+            if matches != 0:
+                return Response({"valid": False})
+        return Response({"valid": True})
+
+    @action(detail=False)
+    def member_count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
+
+    @action(detail=False)
+    def admin_count(self, request):
+        count = self.get_queryset().filter(
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR
+        ).count()
+        return Response({"count": count})
 
     def update(self, request, *args, **kwargs):
         existing_member = self.get_object()

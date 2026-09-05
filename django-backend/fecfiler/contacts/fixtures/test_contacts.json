@@ -65,5 +65,22 @@
             "updated": "2022-02-09T00:00:00.000Z",
             "committee_account_id": "11111111-2222-3333-4444-555555555555"
         }
+    },
+    {
+        "model": "contacts.contact",
+        "fields": {
+            "id": "ae0581ac-5ba6-4a3c-bb02-115c064d67d7",
+            "type": "IND",
+            "last_name": "Lastname3",
+            "first_name": "Firstname3",
+            "street_1": "Street",
+            "city": "City",
+            "state": "State",
+            "zip": "12345678",
+            "country": "Country",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z",
+            "committee_account_id": "99999999-8888-7777-6666-555555555555"
+        }
     }
 ]
