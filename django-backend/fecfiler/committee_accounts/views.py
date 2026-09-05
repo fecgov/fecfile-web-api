@@ -18,6 +18,7 @@ from django.http import (
     HttpResponseBadRequest,
     HttpResponseServerError,
 )
+from django.template.loader import render_to_string
 from django.core.exceptions import ValidationError
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializers import CommitteeAccountSerializer, CommitteeMembershipSerializer
@@ -231,16 +232,22 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
 
             # if no Exception was returned, send email notification to the user
             if not isinstance(new_member, BaseException):
+                # fall back to email if name is unavailable
+                full_name = request.user.get_full_name() or request.user.email
                 logger.info(
-                    f"User {request.user.first_name} added {email} to committee "
+                    f"User {full_name} added {email} to committee "
                     f"{committee_id} as {role}"
                 )
                 if FLAG__ENABLE_EMAIL:
-                    self.sendAddUserToCommitteeEmail(
+                    committee_data = get_committee_account_data(committee_id)
+                    committee_name = committee_data.get("name", None)
+
+                    self.sendAddMemberEmailNotification(
                         committee_id,
+                        committee_name,
                         email,
-                        request.user.first_name,
-                        role
+                        full_name,
+                        role,
                     )
             else:
                 logger.error(
@@ -373,28 +380,40 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
-    def sendAddUserToCommitteeEmail(self, committee_id, email, first_name, role):
-        subject = f"[FECfile+] Invite to committee {committee_id}"
+    def sendAddMemberEmailNotification(
+            self, committee_id, committee_name, email, full_name, role
+    ):
+        subject = f"{full_name} has added you to a FECfile+ committee account"
 
         # adjust links based on space
-        if settings.SPACE == "prod":
-            envbit = ""
+        if settings.SPACE == "local":
+            fecfile_link = "http://localhost:4200"
         else:
-            envbit = f"{settings.SPACE}."
+            if not settings.SPACE or settings.SPACE == "prod":
+                envbit = ""
+            else:
+                envbit = f"{settings.SPACE}."
+            fecfile_link = f"https://{envbit}fecfile.fec.gov"
 
-        body_text = (
-            "ADDED TO FECfile+ COMMITTEE\n"
-            "\n"
-            f"{first_name} has added you as a {role} "
-            f"to {committee_id}.\n"
-            "\n"
-            "You can access the committee account by signing in to FECfile+:\n"
-            f"https://{envbit}fecfile.fec.gov/"
+        email_dict = {
+            "full_name": full_name,
+            "role": role,
+            "committee_id": committee_id,
+            "committee_name": committee_name,
+            "fecfile_link": fecfile_link,
+        }
+        body_text = render_to_string(
+            "emails/add_member_notification.txt",
+            email_dict,
+        )
+        body_html = render_to_string(
+            "emails/add_member_notification.html",
+            email_dict,
         )
 
         try:
             send_email_notification(
-                to_email=email, subject=subject, body_text=body_text
+                to_email=email, subject=subject, body_text=body_text, body_html=body_html
             )
         except Exception as e:
             logger.error(
