@@ -299,6 +299,28 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
             logger.error(f"{str(e)}")
             return Response({"error": str(e)}, status=400)
 
+    @action(detail=False)
+    def validation_check(self, request):
+        params = request.query_params
+        email = params.get("email")
+        if email:
+            matches = self.get_queryset().filter(email__iexact=email).count()
+            if matches != 0:
+                return Response({"valid": False})
+        return Response({"valid": True})
+
+    @action(detail=False)
+    def member_count(self, request):
+        count = self.get_queryset().count()
+        return Response({"count": count})
+
+    @action(detail=False)
+    def admin_count(self, request):
+        count = self.get_queryset().filter(
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR
+        ).count()
+        return Response({"count": count})
+
     def update(self, request, *args, **kwargs):
         existing_member = self.get_object()
         committee = existing_member.committee_account

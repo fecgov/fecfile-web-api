@@ -103,5 +103,17 @@
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z"
         }
+    },
+    {
+        "model": "committee_accounts.Membership",
+        "pk": "2a598495-a77d-463b-991f-f75dc98d058a",
+        "fields": {
+            "role": "MANAGER",
+            "committee_account_id": "99999999-8888-7777-6666-555555555555",
+            "user_id": "fb20ffc3-285e-448e-9e56-9ca1fd43e7d3",
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
     }
 ]

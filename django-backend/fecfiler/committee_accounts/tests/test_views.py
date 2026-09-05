@@ -230,6 +230,47 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.data["is_active"], True)
         self.assertEqual(response.data["role"], Membership.CommitteeRole.MANAGER)
 
+    def test_validation_check_email_is_valid(self):
+        params = "?email=test_does_not_exist@fec.gov"
+        response = self.send_viewset_get_request(
+            "/api/v1/committee-members/validation_check/" + params,
+            CommitteeMembershipViewSet,
+            "validation_check",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["valid"])
+
+    def test_validation_check_email_is_invalid(self):
+        response = self.send_viewset_get_request(
+            "/api/v1/committee-members/validation_check/?email=test@fec.gov",
+            CommitteeMembershipViewSet,
+            "validation_check",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data["valid"])
+
+    def test_member_count(self):
+        response = self.send_viewset_get_request(
+            "/api/v1/committee-members/member_count/",
+            CommitteeMembershipViewSet,
+            "member_count",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 3)
+
+    def test_admin_count(self):
+        response = self.send_viewset_get_request(
+            "/api/v1/committee-members/admin_count/",
+            CommitteeMembershipViewSet,
+            "admin_count",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 2)
+
 
 class CommitteeViewSetTest(FecfilerViewSetTest):
     fixtures = ["C01234567_user_and_committee"]
@@ -378,9 +419,9 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                     "/api/v1/committees/C01234567/activate/",
                     {},
                 )
-                response = CommitteeViewSet.as_view(
-                    {"post": "activate"}
-                )(request, pk="11111111-2222-3333-4444-555555555555")
+                response = CommitteeViewSet.as_view({"post": "activate"})(
+                    request, pk="11111111-2222-3333-4444-555555555555"
+                )
                 committee = CommitteeAccount.objects.filter(
                     id="11111111-2222-3333-4444-555555555555"
                 ).first()
@@ -390,10 +431,8 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 self.assertEqual(committee.candidate_office, test_candidate_office)
                 self.assertEqual(committee.candidate_state, test_candidate_state)
                 self.assertEqual(committee.candidate_district, test_candidate_district)
-                self.assertEqual(
-                    request.session["committee_id"], "C01234567"
-                )
+                self.assertEqual(request.session["committee_id"], "C01234567")
                 self.assertEqual(
                     request.session["committee_uuid"],
-                    "11111111-2222-3333-4444-555555555555"
+                    "11111111-2222-3333-4444-555555555555",
                 )
