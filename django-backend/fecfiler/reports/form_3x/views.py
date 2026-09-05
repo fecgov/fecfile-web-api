@@ -4,7 +4,7 @@ from rest_framework.viewsets import ModelViewSet
 from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType, STATUS_CODE_IN_PROGRESS
 from fecfiler.reports.views import ReportViewSet
-from .serializers import Form3XSerializer
+from .serializers import Form3XSerializer, ReportSerializer
 import structlog
 from rest_framework.response import Response
 from fecfiler.reports.report_code_label import report_code_label_mapping
@@ -72,7 +72,7 @@ class Form3XViewSet(ReportViewSet):
 
         if associated_form3x is None:
             return Response(None)
-        return Response(Form3XSerializer(associated_form3x).data)
+        return Response(ReportSerializer(associated_form3x).data)
 
     @action(detail=False, methods=["get"], url_path=r"final")
     def get_final_report(self, request):
