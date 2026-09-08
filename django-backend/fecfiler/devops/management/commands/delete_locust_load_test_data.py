@@ -5,7 +5,7 @@ from fecfiler.devops.utils.load_test import LoadTestUtils
 
 
 class Command(FECCommand):
-    help = "Delete Locust load test data"
+    help = "Delete locust test data from load mirror"
     command_name = "delete_locust_load_test_data"
 
     def command(self, *args, **options):

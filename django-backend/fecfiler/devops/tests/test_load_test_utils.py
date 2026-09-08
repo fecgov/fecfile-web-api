@@ -243,7 +243,8 @@ class LoadTestUtilsTestCase(TestCase):
             "delete_load_test_committees_and_data",
             wraps=self.utils.delete_load_test_committees_and_data,
         ):
-            CommitteeAccount.objects.filter(committee_id="C33333333").first().hard_delete()
+            CommitteeAccount.objects.filter(committee_id="C33333333") \
+                .first().hard_delete()
             self.utils.delete_orphaned_test_user()
 
         self.assertTrue(User.objects.filter(email__iexact="test@test.com").exists())
