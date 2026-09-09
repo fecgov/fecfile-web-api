@@ -180,6 +180,32 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 400)
 
+    @patch("fecfiler.committee_accounts.views.send_email_notification")
+    @patch("fecfiler.committee_accounts.views.settings")
+    def test_add_member_email_template_renders_expected_values(
+        self, mock_settings, mock_send_email
+    ):
+        mock_settings.SPACE = "local"
+
+        viewset = CommitteeMembershipViewSet()
+        viewset.sendAddMemberEmailNotification(
+            committee_id="C12345678",
+            committee_name="Example Committee",
+            email="invitee@fec.gov",
+            full_name="Alex Admin",
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+        )
+
+        self.assertEqual(mock_send_email.call_count, 1)
+        body_text = mock_send_email.call_args.kwargs["body_text"]
+
+        self.assertIn("Alex Admin has added you as a", body_text)
+        self.assertIn("Committee ID: C12345678", body_text)
+        self.assertIn("Committee Name: Example Committee", body_text)
+        self.assertIn("http://localhost:4200/login", body_text)
+        self.assertNotIn("{{", body_text)
+        self.assertNotIn("}}", body_text)
+
     def test_update_membership_forbidden(self):
         user = User.objects.get(id="fb20ffc3-285e-448e-9e56-9ca1fd43e7d3")
         response = self.send_viewset_put_request(
@@ -243,7 +269,9 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
             with patch("fecfiler.shared.utilities.requests") as mock_requests:
                 mock_response = Mock()
                 mock_response.status_code = 200
-                mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
+                mock_response.json.return_value = {
+                    "results": [{"email": "test@fec.gov", "committee_type": "E"}]
+                }
                 mock_requests.get = Mock()
                 mock_requests.get.return_value = mock_response
                 response = self.send_viewset_get_request(
@@ -261,7 +289,9 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
             with patch("fecfiler.shared.utilities.requests") as mock_requests:
                 mock_response = Mock()
                 mock_response.status_code = 200
-                mock_response.json.return_value = {"results": [{"email": "test@fec.gov"}]}
+                mock_response.json.return_value = {
+                    "results": [{"email": "test@fec.gov", "committee_type": "C"}]
+                }
                 mock_requests.get = Mock()
                 mock_requests.get.return_value = mock_response
                 response = self.send_viewset_get_request(
@@ -351,3 +381,45 @@ class CommitteeViewSetTest(FecfilerViewSetTest):
                 f"The following ViewSets are missing CommitteeOwnedViewMixin:\n"
                 f"{error_message}"
             )
+
+    def test_activate_happy_path(self):
+        with patch("fecfiler.committee_accounts.utils.accounts.settings") as settings:
+            settings.FLAG__COMMITTEE_DATA_SOURCE = "MOCKED"
+            with patch(
+                "fecfiler.committee_accounts.utils.accounts.get_mocked_committee_data"
+            ) as mock_committee:
+                test_filing_frequency = "Q"
+                test_candidate_office = "P"
+                test_candidate_state = "DC"
+                test_candidate_district = "02"
+                mock_committee.return_value = {
+                    "name": "TEST",
+                    "email": "test@fec.gov",
+                    "filing_frequency": test_filing_frequency,
+                    "candidate_office": test_candidate_office,
+                    "candidate_state": test_candidate_state,
+                    "candidate_district": test_candidate_district,
+                }
+                request = self.build_viewset_post_request(
+                    "/api/v1/committees/C01234567/activate/",
+                    {},
+                )
+                response = CommitteeViewSet.as_view(
+                    {"post": "activate"}
+                )(request, pk="11111111-2222-3333-4444-555555555555")
+                committee = CommitteeAccount.objects.filter(
+                    id="11111111-2222-3333-4444-555555555555"
+                ).first()
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(committee.filing_frequency, test_filing_frequency)
+                self.assertEqual(committee.candidate_office, test_candidate_office)
+                self.assertEqual(committee.candidate_state, test_candidate_state)
+                self.assertEqual(committee.candidate_district, test_candidate_district)
+                self.assertEqual(
+                    request.session["committee_id"], "C01234567"
+                )
+                self.assertEqual(
+                    request.session["committee_uuid"],
+                    "11111111-2222-3333-4444-555555555555"
+                )

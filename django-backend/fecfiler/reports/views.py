@@ -1,17 +1,19 @@
 from rest_framework import filters, status, pagination
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .models import Report
+from .managers import STATUS_CODE_SUCCESS
 from .report_code_label import report_code_label_case
-from fecfiler.web_services.models import UploadSubmission
 from fecfiler.reports.utils.report import delete_all_reports
 from .serializers import ReportSerializer
 from fecfiler.transactions.aggregation import process_aggregation_for_debts
 from django.db.models import Case, Value, When, CharField, IntegerField, F
 from django.db.models.functions import Concat, Trim
 from django.db import transaction as db_transaction
+from django.conf import settings
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -140,32 +142,74 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     @action(detail=True, methods=["post"], url_name="amend")
     def amend(self, request, pk):
         report = self.get_object()
+        if report.report_status != STATUS_CODE_SUCCESS:
+            raise ValidationError(
+                f"Report {report.id} cannot be amended.",
+            )
         report.amend()
         return Response(f"amended {report}")
 
     @action(detail=True, methods=["post"], url_name="unamend")
     def unamend(self, request, pk):
         report: Report = self.get_object()
-        latest_submission = (
-            UploadSubmission.objects.filter(fec_report_id=report.report_id)
-            .order_by("-created")
-            .first()
-        )
-        report.unamend(latest_submission)
+        if not report.can_unamend:
+            raise ValidationError(
+                f"Report {report.id} cannot be unamended.",
+            )
+        report.unamend()
         return Response(f"unamended {report}")
 
-    @action(
-        detail=False,
-        methods=["post"],
-        url_path="e2e-delete-all-reports",
-    )
-    def e2e_delete_all_reports(self, request):
-        reports = Report.objects.filter(committee_account__committee_id="C99999999")
-        report_count = reports.count()
+    if settings.E2E_TEST:
 
-        delete_all_reports()
-        delete_all_reports("C99999998")
-        return Response(f"Deleted {report_count} Reports")
+        @action(
+            detail=False,
+            methods=["post"],
+            url_path="e2e-delete-all-reports",
+        )
+        def e2e_delete_all_reports(self, request):
+            reports = Report.objects.filter(committee_account__committee_id="C99999999")
+            report_count = reports.count()
+
+            delete_all_reports()
+            delete_all_reports("C99999998")
+            return Response(f"Deleted {report_count} Reports")
+
+    @action(detail=True, methods=["post"], url_path="update-version-number")
+    def update_version_number(self, request, pk):
+        try:
+            report: Report = self.get_object()
+        except Exception:
+            return Response({"detail": "Report not found."}, status=404)
+
+        payload = request.data
+        original_version = report.report_version
+        amendment = payload.get("amendment")
+        e_filing_id = payload.get("eFilingId")
+        original_amendment_date = payload.get("previousSubmissionDate")
+
+        try:
+            report.form_type = report.get_form_name() + ("N" if amendment == "0" else "A")
+            report.can_unamend = amendment != "0"
+            report.report_version = amendment if amendment != "0" else None
+            report.fec_report_id = e_filing_id
+            if report.form_24:
+                report.form_24.original_amendment_date = original_amendment_date
+                report.form_24.save()
+            report.save()
+            logger.info(
+                (
+                    f"Changed version of report {report.id} "
+                    f"from {original_version} to {amendment}"
+                )
+            )
+
+            return Response(ReportSerializer(report).data, status=200)
+
+        except Exception:
+            return Response(
+                {"detail": "An error occurred while updating the report"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
     def create(self, request):
         response = {"message": "Create function is not offered in this path."}

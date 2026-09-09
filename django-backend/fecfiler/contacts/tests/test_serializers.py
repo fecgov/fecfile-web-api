@@ -1,5 +1,5 @@
 from django.test import TestCase
-from ..models import Contact
+from ..shared_models import ContactType
 from ..serializers import ContactSerializer
 from rest_framework.request import HttpRequest, Request
 from fecfiler.user.models import User
@@ -10,7 +10,7 @@ class ContactSerializerTestCase(TestCase):
 
     def setUp(self):
         self.valid_contact = {
-            "type": Contact.ContactType.INDIVIDUAL,
+            "type": ContactType.INDIVIDUAL,
             "last_name": "Last",
             "first_name": "First",
             "street_1": "Street",
@@ -22,7 +22,7 @@ class ContactSerializerTestCase(TestCase):
         }
 
         self.invalid_contact = {
-            "type": Contact.ContactType.INDIVIDUAL,
+            "type": ContactType.INDIVIDUAL,
             "last_name": "Last",
             "first_name": "First",
             "street_1": "Street",

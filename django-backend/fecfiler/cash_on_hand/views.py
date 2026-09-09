@@ -30,7 +30,7 @@ class CashOnHandYearlyViewSet(CommitteeOwnedViewMixin):
     def get_cash_on_hand_for_year(self, request, year):
         cash_on_hand = self.get_queryset().filter(year=year).first()
         if cash_on_hand is None:
-            return Response(status=404)
+            return Response({})
         serializer = self.get_serializer(cash_on_hand)
         return Response(serializer.data)
 

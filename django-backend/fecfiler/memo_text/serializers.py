@@ -3,13 +3,16 @@ from django.db import transaction
 from fecfiler.validation import serializers
 from rest_framework.serializers import UUIDField, ModelSerializer
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
+from fecfiler.reports.serializers import ReportCommitteeValidationMixin
 import structlog
 
 logger = structlog.get_logger(__name__)
 
 
 class MemoTextSerializer(
-    serializers.FecSchemaValidatorSerializerMixin, CommitteeOwnedSerializer
+    serializers.FecSchemaValidatorSerializerMixin,
+    CommitteeOwnedSerializer,
+    ReportCommitteeValidationMixin,
 ):
     schema_name = "Text"
     report_id = UUIDField(required=True, allow_null=False)
@@ -46,6 +49,9 @@ class MemoTextSerializer(
                 "back_reference_tran_id_number",
             ],
         )
+
+        self.validate_report_committee_ownership(data)
+
         return super().validate(data)
 
 
@@ -80,3 +86,19 @@ class LinkedMemoTextSerializerMixin(ModelSerializer):
             memo_object = MemoText.objects.get(id=memo_text_id)
             memo_object.delete()
             validated_data["memo_text_id"] = None
+
+    def validate_memo_text_committee_ownership(self, data):
+        committee_account = data.get("committee_account")
+        memo_text_id = data.get("memo_text_id")
+        if memo_text_id:
+            exists = MemoText.objects.filter(
+                id=memo_text_id, committee_account=committee_account
+            ).exists()
+            if not exists:
+                raise serializers.ValidationError(
+                    {
+                        "memo_text_id": (
+                            "Invalid memo_text_id or memo text"
+                        )
+                    }
+                )

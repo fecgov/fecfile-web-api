@@ -1,12 +1,13 @@
 from uuid import UUID
 from ..models import Contact
+from ..shared_models import ContactType
 
 
 def create_test_individual_contact(
     last_name: str, first_name: str, committee_account_id: UUID, kwargs={}
 ):
     return Contact.objects.create(
-        type=Contact.ContactType.INDIVIDUAL,
+        type=ContactType.INDIVIDUAL,
         last_name=last_name,
         first_name=first_name,
         committee_account_id=committee_account_id,
@@ -16,7 +17,7 @@ def create_test_individual_contact(
 
 def create_test_organization_contact(name: str, committee_account_id: UUID, kwargs={}):
     return Contact.objects.create(
-        type=Contact.ContactType.ORGANIZATION,
+        type=ContactType.ORGANIZATION,
         name=name,
         committee_account_id=committee_account_id,
         **kwargs
@@ -27,7 +28,7 @@ def create_test_committee_contact(
     name: str, committee_id: str, committee_account_id: UUID, kwargs={}
 ):
     return Contact.objects.create(
-        type=Contact.ContactType.COMMITTEE,
+        type=ContactType.COMMITTEE,
         name=name,
         committee_id=committee_id,
         committee_account_id=committee_account_id,
@@ -46,7 +47,7 @@ def create_test_candidate_contact(
     kwargs={},
 ):
     return Contact.objects.create(
-        type=Contact.ContactType.CANDIDATE,
+        type=ContactType.CANDIDATE,
         last_name=last_name,
         first_name=first_name,
         committee_account_id=committee_account_id,

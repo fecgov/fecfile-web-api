@@ -5,7 +5,7 @@ from fecfiler.settings import (
     FLAG__COMMITTEE_DATA_SOURCE,
     MOCK_OPENFEC_REDIS_URL,
     BASE_DIR,
-    AWS_STORAGE_BUCKET_NAME,
+    S3_STORAGE_BUCKET_NAME,
 )
 import redis
 import structlog
@@ -202,7 +202,7 @@ def get_dump_filename(committee_id):
 def save_to_s3(filename, formatted_json):
     try:
         logger.info(f"Uploading file to s3: {filename}")
-        s3_object = S3_SESSION.Object(AWS_STORAGE_BUCKET_NAME, filename)
+        s3_object = S3_SESSION.Object(S3_STORAGE_BUCKET_NAME, filename)
         s3_object.put(Body=formatted_json.encode("utf-8"))
         logger.info("Successfully uploaded file to s3")
     except Exception as E:
@@ -283,7 +283,7 @@ def load_mocked_committee_data(s3=False):
                 committee_data = file.read()
         else:
             s3_object = S3_SESSION.Object(
-                AWS_STORAGE_BUCKET_NAME, "mock_committee_data.json"
+                S3_STORAGE_BUCKET_NAME, "mock_committee_data.json"
             )
             file = s3_object.get()["Body"]
             committee_data = file.read()

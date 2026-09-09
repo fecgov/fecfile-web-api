@@ -157,5 +157,26 @@
             "created": "2022-02-09T00:00:00.000Z",
             "updated": "2022-02-09T00:00:00.000Z"
         }
+    },
+    {
+        "model": "committee_accounts.CommitteeAccount",
+        "pk": "7c176dc0-7062-49b5-bc35-000c99999996",
+        "fields": {
+            "committee_id": "C99999996",
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
+    },
+    {
+        "model": "committee_accounts.Membership",
+        "pk": "d4ca18d2-06c1-42b7-0001-000c99999996",
+        "fields": {
+            "role": "COMMITTEE_ADMINISTRATOR",
+            "committee_account_id": "7c176dc0-7062-49b5-bc35-000c99999996",
+            "user_id": "e100e1da-cbfc-4189-aece-d139048a8e0a",
+            "pending_email": null,
+            "created": "2022-02-09T00:00:00.000Z",
+            "updated": "2022-02-09T00:00:00.000Z"
+        }
     }
 ]

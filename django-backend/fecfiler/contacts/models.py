@@ -2,21 +2,11 @@ import uuid
 from django.db import models
 from fecfiler.soft_delete.models import SoftDeleteModel
 from fecfiler.committee_accounts.models import CommitteeOwnedModel
+from .shared_models import ContactType, CandidateOffice
 
 
 class Contact(SoftDeleteModel, CommitteeOwnedModel):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-
-    class ContactType(models.TextChoices):
-        COMMITTEE = "COM"
-        ORGANIZATION = "ORG"
-        INDIVIDUAL = "IND"
-        CANDIDATE = "CAN"
-
-    class CandidateOffice(models.TextChoices):
-        HOUSE = "H"
-        SENATE = "S"
-        PRESIDENTIAL = "P"
 
     """Generated model from json schema"""
     type = models.CharField(
@@ -52,7 +42,7 @@ class Contact(SoftDeleteModel, CommitteeOwnedModel):
         db_table = "contacts"
 
     def __str__(self):
-        if self.type in [Contact.ContactType.CANDIDATE, Contact.ContactType.INDIVIDUAL]:
+        if self.type in [ContactType.CANDIDATE, ContactType.INDIVIDUAL]:
             return f"{self.last_name}, {self.first_name}"
         else:
             return self.name

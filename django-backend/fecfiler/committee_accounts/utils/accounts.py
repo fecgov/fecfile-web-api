@@ -1,5 +1,6 @@
 import re
 from rest_framework.exceptions import ValidationError
+from .shared import is_valid_committee_id
 from ..models import CommitteeAccount, Membership
 from fecfiler import settings
 import redis
@@ -130,6 +131,9 @@ def enable_committee_account(committee_id):
 
 
 def get_committee_emails(committee_id):
+    if not is_valid_committee_id(committee_id):
+        raise ValueError(f"Invalid committee id: {committee_id}")
+
     match settings.FLAG__COMMITTEE_DATA_SOURCE:
         case "PRODUCTION":
             emails = get_production_committee_emails(committee_id)
@@ -141,6 +145,9 @@ def get_committee_emails(committee_id):
 
 
 def get_committee_account_data(committee_id):
+    if not is_valid_committee_id(committee_id):
+        raise ValueError(f"Invalid committee id: {committee_id}")
+
     match settings.FLAG__COMMITTEE_DATA_SOURCE:
         case "PRODUCTION":
             committee = get_production_committee_data(committee_id)
@@ -180,12 +187,74 @@ def get_production_committee_data(committee_id):
     if committee_data is None:
         # if no processed data, try raw endpoint
         committee_data = get_raw_committee_data(committee_id)
+    else:
+        augment_processed_committee_data(committee_data)
 
     return committee_data
 
 
-def get_processed_committee_data(committee_id):
+def get_eligible_report_types_processed(committee_data: dict):
+    fallback_reports = ["F99"]
+    if committee_data is None:
+        logger.error(
+            "Tried to retrieve eligible report types from invalid committee data"
+        )
+        return fallback_reports
 
+    committee_type = committee_data.get("committee_type")
+    if committee_type is None:
+        logger.error("committee_type not found in processed committee data")
+        return fallback_reports
+
+    committee_designation = committee_data.get("designation")
+    if committee_designation is None:
+        logger.error("designation not found in processed committee data")
+        return fallback_reports
+
+    eligible_reports_dict = {
+        "AH": ["F3", "F99"],
+        "AS": ["F3", "F99"],
+        "PH": ["F3", "F99"],
+        "PS": ["F3", "F99"],
+        "JH": ["F3", "F99"],
+        "JS": ["F3", "F99"],
+        "BN": ["F3X", "F24", "F1M", "F99"],
+        "BO": ["F3X", "F24", "F1M", "F99"],
+        "BQ": ["F3X", "F24", "F1M", "F99"],
+        "BU": ["F3X", "F24", "F1M", "F99"],
+        "BV": ["F3X", "F24", "F1M", "F99"],
+        "BW": ["F3X", "F24", "F1M", "F99"],
+        "DN": ["F3X", "F24", "F1M", "F99"],
+        "DQ": ["F3X", "F24", "F1M", "F99"],
+        "JN": ["F3X", "F24", "F1M", "F99"],
+        "JQ": ["F3X", "F24", "F1M", "F99"],
+        "JX": ["F3X", "F24", "F1M", "F99"],
+        "JY": ["F3X", "F24", "F1M", "F99"],
+        "UD": ["F3X", "F24", "F1M", "F99"],
+        "UN": ["F3X", "F24", "F1M", "F99"],
+        "UO": ["F3X", "F24", "F1M", "F99"],
+        "UQ": ["F3X", "F24", "F1M", "F99"],
+        "UU": ["F3X", "F24", "F1M", "F99"],
+        "UV": ["F3X", "F24", "F1M", "F99"],
+        "UW": ["F3X", "F24", "F1M", "F99"],
+        "UX": ["F3X", "F24", "F1M", "F99"],
+        "UY": ["F3X", "F24", "F1M", "F99"],
+    }
+
+    committee_key = str(committee_designation) + str(committee_type)
+    eligible_reports = eligible_reports_dict.get(committee_key, None)
+
+    if eligible_reports is None:
+        logger.error(
+            f"Failed to find eligible reports for processed committee "
+            f"{committee_data.get('committee_id')}: {committee_key}"
+        )
+        return fallback_reports
+
+    return eligible_reports
+
+
+def get_processed_committee_data(committee_id):
     params = {
         "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
         "committee_id": committee_id,
@@ -193,7 +262,10 @@ def get_processed_committee_data(committee_id):
     committee_data = query_fec_api_single(
         f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/", params
     )
+    return committee_data
 
+
+def augment_processed_committee_data(committee_data: dict):
     if committee_data:
         # Committee Type Label
         committee_data["committee_type_label"] = committee_data.get(
@@ -209,7 +281,63 @@ def get_processed_committee_data(committee_id):
             committee_data.get("committee_type") in PRODUCTION_QUALIFIED_COMMITTEES
         )
 
+        committee_data[
+            "eligible_report_types"
+        ] = get_eligible_report_types_processed(committee_data)
+
+        add_candidate_office_state_if_needed(committee_data)
+
     return committee_data
+
+
+def add_candidate_office_state_if_needed(committee_data: dict):
+    if committee_data and "F3" in committee_data["eligible_report_types"]:
+        committee_id = committee_data.get("committee_id", None)
+        params = {
+            "api_key": settings.PRODUCTION_OPEN_FEC_API_KEY,
+            "committee_id": committee_id,
+        }
+        candidate = query_fec_api_single(
+            f"{settings.PRODUCTION_OPEN_FEC_API}committee/{committee_id}/candidates/",
+            params
+        )
+        if candidate:
+            committee_data["candidate_office"] = candidate.get("office", None)
+            committee_data["candidate_state"] = candidate.get("state", None)
+            committee_data["candidate_district"] = candidate.get("district", None)
+        else:
+            logger.error(
+                f"Failed to retrieve candidate data for committee {committee_id}"
+            )
+
+
+def get_eligible_report_types_raw(committee_data: dict):
+    if committee_data is None:
+        logger.error(
+            "Tried to retrieve eligible report types from invalid committee data"
+        )
+        return ["F99"]
+
+    committee_type = committee_data.get("committee_type")
+    if committee_type is None:
+        logger.error("committee_type not found in raw committee data")
+
+    match (committee_type):
+        case "C" | "D" | "E" | "F" | "G" | "H":
+            return ["F3X", "F24", "F1M", "F99"]
+
+        case "A" | "B":
+            candidate_office = committee_data.get("candidate_office")
+            if candidate_office is None:
+                logger.error("candidate_office not found in raw committee data")
+
+            if candidate_office in ["H", "S"]:
+                return ["F3", "F99"]
+            else:
+                return ["F99"]
+
+        case _:
+            return ["F99"]
 
 
 def get_raw_committee_data(committee_id):
@@ -235,6 +363,9 @@ def get_raw_committee_data(committee_id):
         committee_data["filing_frequency"] = "Q"
 
         committee_data = convert_raw_to_processed(committee_data)
+        committee_data[
+            "eligible_report_types"
+        ] = get_eligible_report_types_raw(committee_data)
 
     return committee_data
 
@@ -300,6 +431,9 @@ def get_test_committee_data(committee_id):
         committee_data["filing_frequency"] = "Q"
 
         committee_data = convert_raw_to_processed(committee_data)
+        committee_data[
+            "eligible_report_types"
+        ] = get_eligible_report_types_raw(committee_data)
 
     return committee_data
 
@@ -331,6 +465,16 @@ def get_mocked_committee_data(committee_id):
             None,
         )
 
+        if committee is not None:
+            if committee.get("counts_as_processed"):
+                committee[
+                    "eligible_report_types"
+                ] = get_eligible_report_types_processed(committee)
+            else:
+                committee[
+                    "eligible_report_types"
+                ] = get_eligible_report_types_raw(committee)
+
         return committee
 
 
@@ -358,5 +502,7 @@ def convert_raw_to_processed(committee_data):
     committee_data["city"] = committee_data.get("committee_city", None)
     committee_data["state"] = committee_data.get("committee_state", None)
     committee_data["zip"] = committee_data.get("committee_zip", None)
+    committee_data["candidate_state"] = committee_data.get("election_state", None)
+    committee_data["candidate_district"] = committee_data.get("candidate_district", None)
 
     return committee_data

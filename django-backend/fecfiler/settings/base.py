@@ -5,17 +5,18 @@ Django settings for the FECFile project.
 import os
 import dj_database_url
 import structlog
-from structlog.processors import CallsiteParameter
 import logging
 import sys
+import re
 
+from copy import deepcopy
 from enum import Enum
 from .env import env
-from corsheaders.defaults import default_headers
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
 from fecfiler.web_services.profilers import WEB_SERVICES_PROFILING
 from math import floor
 from celery.schedules import crontab
+from django.core.exceptions import ImproperlyConfigured
 
 
 class CeleryStorageType(Enum):
@@ -26,7 +27,7 @@ class CeleryStorageType(Enum):
 # Space where this will be run (prod, dev, stage, test)
 SPACE = env.get_credential("SPACE")
 if not SPACE:
-    raise Exception(
+    raise ImproperlyConfigured(
         "SPACE is not set! "
         "Set to match where the application is running (e.g. prod, dev, stage, test)"
     )
@@ -56,7 +57,7 @@ CSRF_TRUSTED_ORIGINS = ["https://*.app.cloud.gov"]
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.get_credential("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
-    raise Exception("DJANGO_SECRET_KEY is not set!")
+    raise ImproperlyConfigured("DJANGO_SECRET_KEY is not set!")
 SECRET_KEY_FALLBACKS = env.get_credential("DJANGO_SECRET_KEY_FALLBACKS", [])
 
 
@@ -82,9 +83,10 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+    "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
-    "corsheaders",
+    "drf_spectacular_sidecar",
     "django_structlog",
     "django_migration_linter",
     "fecfiler.committee_accounts",
@@ -100,20 +102,17 @@ INSTALLED_APPS = [
     "fecfiler.devops",
     "fecfiler.mock_oidc_provider",
     "fecfiler.cash_on_hand",
-    "fecfiler.openapi",
 ]
 
 MIDDLEWARE = []
 
+STATIC_URL = "/static/"
+STATIC_ROOT = "static"
 
 if INCLUDE_SILK:
-    STATIC_URL = "/static/"
     STATICFILES_DIRS = (os.path.join(BASE_DIR, "staticfiles"),)
-    STATIC_ROOT = "static"
-
     INSTALLED_APPS += [
         "silk",
-        "django.contrib.staticfiles",
     ]
     MIDDLEWARE = ["silk.middleware.SilkyMiddleware"]
 
@@ -130,10 +129,15 @@ if INCLUDE_SILK:
 
     SILKY_DYNAMIC_PROFILING = WEB_SERVICES_PROFILING
 
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 MIDDLEWARE += [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "fecfiler.middleware.HeaderMiddleware",
     "fecfiler.oidc.middleware.TimeoutMiddleware.TimeoutMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -149,7 +153,7 @@ MIDDLEWARE += [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["fecfiler/openapi/templates", "static/templates"],
+        "DIRS": ["static/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -162,17 +166,6 @@ TEMPLATES = [
     },
 ]
 
-CORS_ALLOWED_ORIGIN_REGEXES = [r"https://(.*?)\.app\.cloud\.gov$"]
-
-CORS_ALLOW_HEADERS = (
-    *default_headers,
-    "enctype",
-    "token",
-    "cache-control",
-)
-
-CORS_ALLOW_CREDENTIALS = True
-
 # In cloud environemnt, name will be from VCAP_APPLICATION
 # - otherwise from DJANGO_APPLICATION which we set in docker-compose.yml
 APPLICATION_NAME = env.name or env.get_credential("DJANGO_APPLICATION", "FECFILE")
@@ -183,17 +176,19 @@ APPLICATION_INDEX = env.get_credential("CF_INSTANCE_INDEX", "0")
 database = dj_database_url.config()
 database.setdefault("OPTIONS", {})
 database["OPTIONS"]["application_name"] = f"{APPLICATION_NAME}_{APPLICATION_INDEX}"
+database["CONN_HEALTH_CHECKS"] = True
+
 # psycopg pool settings:
 # https://www.psycopg.org/psycopg3/docs/api/pool.html#psycopg_pool.ConnectionPool
 # this works for celery workers as well
 # https://docs.celeryq.dev/en/main/django/first-steps-with-django.html#django-connection-pool
 database["OPTIONS"]["pool"] = {
     # min_size: psycopg default is 4
-    "min_size": int(env.get_credential("DB_POOL_MIN_SIZE", "4")),
+    "min_size": int(env.get_credential("DB_POOL_MIN_SIZE", "0")),
     # max_size: default to no overflow
     "max_size": int(env.get_credential("DB_POOL_MAX_SIZE", "4")),
-    # max_idle: psycopg default 10 minutes
-    "max_idle": int(env.get_credential("DB_POOL_MAX_IDLE", "600")),
+    # max_idle: psycopg default is 10m, prune before 350s AWS timeout
+    "max_idle": int(env.get_credential("DB_POOL_MAX_IDLE", "300")),
 }
 
 # Database
@@ -228,7 +223,7 @@ OIDC_OP_AUTODISCOVER_ENDPOINT = env.get_credential(
     "OIDC_OP_AUTODISCOVER_ENDPOINT",
 )
 if not OIDC_OP_AUTODISCOVER_ENDPOINT:
-    raise Exception("OIDC_OP_AUTODISCOVER_ENDPOINT is not set!")
+    raise ImproperlyConfigured("OIDC_OP_AUTODISCOVER_ENDPOINT is not set!")
 
 MOCK_OIDC_PROVIDER = get_boolean_from_string(
     env.get_credential("MOCK_OIDC_PROVIDER", "False")
@@ -282,7 +277,13 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
+    "TITLE": "FECfile+ API",
+    "DESCRIPTION": "",
+    "VERSION": "0.0.0 (v1)",
     "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_DIST": "SIDECAR",
+    "SWAGGER_UI_FAVICON_HREF": "SIDECAR",
+    "REDOC_DIST": "SIDECAR",
 }
 
 
@@ -292,33 +293,46 @@ class NotErrorFilter(logging.Filter):
 
 
 def get_logging_config(log_format=LINE):
+    stream_handler = "logging.StreamHandler"
+    json_formatter = {
+        "()": structlog.stdlib.ProcessorFormatter,
+        "processors": [
+            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+            structlog.processors.ExceptionRenderer(
+                structlog.processors.ExceptionDictTransformer(show_locals=False)
+            ),
+            structlog.processors.JSONRenderer(),
+        ],
+    }
+    psycopg_json_formatter = deepcopy(json_formatter)
+    psycopg_json_formatter["processors"] = [process_log_tokens] + psycopg_json_formatter[
+        "processors"
+    ]
+    plain_console_formatter = {
+        "()": structlog.stdlib.ProcessorFormatter,
+        "processors": [
+            structlog.stdlib.ProcessorFormatter.remove_processors_meta,
+            structlog.processors.dict_tracebacks,
+            structlog.dev.ConsoleRenderer(
+                colors=True, exception_formatter=structlog.dev.rich_traceback
+            ),
+        ],
+        "foreign_pre_chain": [
+            structlog.contextvars.merge_contextvars,
+        ],
+    }
+    psycopg_plain_console_formatter = deepcopy(plain_console_formatter)
+    psycopg_plain_console_formatter["processors"] = [
+        process_log_tokens
+    ] + psycopg_plain_console_formatter["processors"]
     logging_config = {
         "version": 1,
         "disable_existing_loggers": False,
         "formatters": {
-            "json_formatter": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processors": [
-                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-                    structlog.processors.ExceptionRenderer(
-                        structlog.processors.ExceptionDictTransformer(show_locals=False)
-                    ),
-                    structlog.processors.JSONRenderer(),
-                ],
-            },
-            "plain_console": {
-                "()": structlog.stdlib.ProcessorFormatter,
-                "processors": [
-                    structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-                    structlog.processors.dict_tracebacks,
-                    structlog.dev.ConsoleRenderer(
-                        colors=True, exception_formatter=structlog.dev.rich_traceback
-                    ),
-                ],
-                "foreign_pre_chain": [
-                    structlog.contextvars.merge_contextvars,
-                ],
-            },
+            "json_formatter": json_formatter,
+            "psycopg_json_formatter": psycopg_json_formatter,
+            "plain_console": plain_console_formatter,
+            "psycopg_plain_console": psycopg_plain_console_formatter,
             "key_value": {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processors": [
@@ -341,28 +355,38 @@ def get_logging_config(log_format=LINE):
         },
         "handlers": {
             "console": {
-                "class": "logging.StreamHandler",
+                "class": stream_handler,
                 "formatter": "plain_console",
                 "stream": sys.stdout,
                 "filters": ["not_error"],
             },
             "console_error": {
                 "level": "ERROR",
-                "class": "logging.StreamHandler",
+                "class": stream_handler,
                 "formatter": "plain_console",
                 "stream": sys.stderr,
             },
+            "psycopg_console": {
+                "class": stream_handler,
+                "formatter": "psycopg_plain_console",
+                "stream": sys.stdout,
+            },
             "cloud": {
-                "class": "logging.StreamHandler",
+                "class": stream_handler,
                 "formatter": "json_formatter",
                 "stream": sys.stdout,
                 "filters": ["not_error"],
             },
             "cloud_error": {
                 "level": "ERROR",
-                "class": "logging.StreamHandler",
+                "class": stream_handler,
                 "formatter": "json_formatter",
                 "stream": sys.stderr,
+            },
+            "psycopg_cloud": {
+                "class": stream_handler,
+                "formatter": "psycopg_json_formatter",
+                "stream": sys.stdout,
             },
         },
     }
@@ -376,6 +400,11 @@ def get_logging_config(log_format=LINE):
             "fecfiler": {
                 "handlers": ["console", "console_error"],
                 "level": "DEBUG",
+            },
+            "psycopg": {
+                "handlers": [
+                    "psycopg_console",
+                ],
             },
         }
         if ENABLE_PL_SQL_LOGGING is True:
@@ -393,6 +422,11 @@ def get_logging_config(log_format=LINE):
                 "handlers": ["cloud", "cloud_error"],
                 "level": "INFO",
             },
+            "psycopg": {
+                "handlers": [
+                    "psycopg_cloud",
+                ],
+            },
         }
 
     return logging_config
@@ -404,18 +438,20 @@ def add_migration_logs(logger: logging.Logger, method_name: str, event_dict):
     return event_dict
 
 
+def process_log_tokens(logger, method_name, event_dict):
+    event_dict["event"] = re.sub(r'user ".*?"', 'user "****"', event_dict["event"])
+    event_dict["event"] = re.sub(
+        r'database ".*?"', 'database "****"', event_dict["event"]
+    )
+    return event_dict
+
+
 def get_logging_processors():
     """
     get structlog processors
     We will need to set these explicitly for Celery too
     """
     return [
-        structlog.processors.CallsiteParameterAdder(
-            [
-                CallsiteParameter.PATHNAME,
-                CallsiteParameter.LINENO,
-            ]
-        ),
         add_migration_logs,
         structlog.contextvars.merge_contextvars,
         structlog.stdlib.filter_by_level,
@@ -492,13 +528,17 @@ EFO_FILING_API = env.get_credential("EFO_FILING_API")
 EFO_FILING_API_KEY = env.get_credential("EFO_FILING_API_KEY")
 if not MOCK_EFO_FILING:
     if EFO_FILING_API is None:
-        raise Exception("EFO_FILING_API must be set if MOCK_EFO_FILING is False")
+        raise ImproperlyConfigured(
+            "EFO_FILING_API must be set if MOCK_EFO_FILING is False"
+        )
     if EFO_FILING_API_KEY is None:
-        raise Exception("EFO_FILING_API_KEY must be set if MOCK_EFO_FILING is False")
+        raise ImproperlyConfigured(
+            "EFO_FILING_API_KEY must be set if MOCK_EFO_FILING is False"
+        )
 FEC_AGENCY_ID = env.get_credential("FEC_AGENCY_ID")
 FEC_FORMAT_VERSION = env.get_credential("FEC_FORMAT_VERSION")
 MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS = get_float_from_string(
-    env.get_credential("MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS", 10)
+    env.get_credential("MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS", 0)
 )  # Duration of mock dot fec submission in seconds, default to 10 seconds
 
 """EFO POLLING SETTINGS
@@ -530,13 +570,19 @@ WARNING: This will BREAK submitting to fec because it will no longer conform to 
 """
 OUTPUT_TEST_INFO_IN_DOT_FEC = env.get_credential("OUTPUT_TEST_INFO_IN_DOT_FEC")
 
-AWS_ACCESS_KEY_ID = env.get_credential("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = env.get_credential("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = env.get_credential("AWS_STORAGE_BUCKET_NAME")
-AWS_REGION = env.get_credential("AWS_REGION")
+S3_ACCESS_KEY_ID = env.get_credential("S3_ACCESS_KEY_ID")
+S3_SECRET_ACCESS_KEY = env.get_credential("S3_SECRET_ACCESS_KEY")
+S3_STORAGE_BUCKET_NAME = env.get_credential("S3_STORAGE_BUCKET_NAME")
+S3_REGION = env.get_credential("S3_REGION")
 S3_OBJECTS_MAX_AGE_DAYS = get_float_from_string(
     env.get_credential("S3_OBJECTS_MAX_AGE_DAYS", 365)
 )
+SES_ACCESS_KEY_ID = env.get_credential("SES_ACCESS_KEY_ID")
+SES_SECRET_ACCESS_KEY = env.get_credential("SES_SECRET_ACCESS_KEY")
+SES_REGION = env.get_credential("SES_REGION")
+SES_DOMAIN = env.get_credential("SES_DOMAIN")
+SES_FROM_USER = env.get_credential("SES_FROM_USER") or "no-reply"
+SES_FROM_EMAIL = SES_FROM_USER + "@" + SES_DOMAIN if SES_DOMAIN else None
 
 """FEATURE FLAGS
 """
@@ -546,11 +592,18 @@ S3_OBJECTS_MAX_AGE_DAYS = get_float_from_string(
 FLAG__COMMITTEE_DATA_SOURCE = env.get_credential("FLAG__COMMITTEE_DATA_SOURCE")
 valid_sources = ["PRODUCTION", "TEST", "MOCKED"]
 if FLAG__COMMITTEE_DATA_SOURCE not in valid_sources:
-    raise Exception(
+    raise ImproperlyConfigured(
         f'FLAG__COMMITTEE_DATA_SOURCE "{FLAG__COMMITTEE_DATA_SOURCE}"'
         + f" must be valid source ({valid_sources})"
     )
 
+FLAG__ENABLE_IMPORT = get_boolean_from_string(
+    env.get_credential("FLAG__ENABLE_IMPORT", "False")
+)
+
+FLAG__ENABLE_EMAIL = get_boolean_from_string(
+    env.get_credential("FLAG__ENABLE_EMAIL", "False")
+)
 
 PRODUCTION_OPEN_FEC_API = env.get_credential("PRODUCTION_OPEN_FEC_API")
 PRODUCTION_OPEN_FEC_API_KEY = env.get_credential("PRODUCTION_OPEN_FEC_API_KEY")

@@ -25,14 +25,14 @@ services:
 
   celery-worker:
     build:
-      context: './'
-      dockerfile: '${WORKER_DOCKERFILE:-Worker_Dockerfile}'
+      context: "./"
+      dockerfile: "${WORKER_DOCKERFILE:-Worker_Dockerfile}"
     image: fecfile-celery-worker
     container_name: fecfile-celery-worker
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - 'host.docker.internal:host-gateway'
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
       - redis
@@ -46,10 +46,10 @@ services:
       DJANGO_SETTINGS_MODULE: fecfiler.settings.local
       DJANGO_SECRET_KEY:
       FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
-      AWS_ACCESS_KEY_ID:
-      AWS_SECRET_ACCESS_KEY:
-      AWS_STORAGE_BUCKET_NAME:
-      AWS_REGION:
+      S3_ACCESS_KEY_ID:
+      S3_SECRET_ACCESS_KEY:
+      S3_STORAGE_BUCKET_NAME:
+      S3_REGION:
       CELERY_WORKER_STORAGE: local
       MOCK_EFO_FILING: True
       EFO_FILING_API: https://efoservices.stage.efo.fec.gov
@@ -65,9 +65,12 @@ services:
       INCLUDE_SILK: "${INCLUDE_SILK}"
       DJANGO_APPLICATION: FECFILE_CELERY_WORKER
       E2E_TEST: "${E2E_TEST:-False}" # E2E-only endpoints disabled by default, set to True to enable
-      DB_POOL_MIN_SIZE: 8
-      DB_POOL_MAX_SIZE: 20
+      DB_POOL_MIN_SIZE: 0
+      DB_POOL_MAX_SIZE: 8
       DB_POOL_MAX_IDLE: 600
+      CELERY_WORKER_CONCURRENCY: 10
+      MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS: 0
+      FLAG__ENABLE_IMPORT: True
     deploy:
       resources:
         limits:
@@ -77,15 +80,15 @@ services:
 
   scheduler:
     build:
-      context: './'
-      dockerfile: '${SCHEDULER_DOCKERFILE:-Scheduler_Dockerfile}'
+      context: "./"
+      dockerfile: "${SCHEDULER_DOCKERFILE:-Scheduler_Dockerfile}"
     image: fecfile-celery-beat
     container_name: fecfile-scheduler
     command: celery -A fecfiler beat -l info
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - 'host.docker.internal:host-gateway'
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
       - redis
@@ -99,10 +102,10 @@ services:
       DJANGO_SETTINGS_MODULE: fecfiler.settings.local
       DJANGO_SECRET_KEY:
       FECFILE_FEC_WEBSITE_API_KEY: DEMO_KEY
-      AWS_ACCESS_KEY_ID:
-      AWS_SECRET_ACCESS_KEY:
-      AWS_STORAGE_BUCKET_NAME:
-      AWS_REGION:
+      S3_ACCESS_KEY_ID:
+      S3_SECRET_ACCESS_KEY:
+      S3_STORAGE_BUCKET_NAME:
+      S3_REGION:
       CELERY_WORKER_STORAGE: local
       MOCK_EFO_FILING: True
       EFO_FILING_API: https://efoservices.stage.efo.fec.gov
@@ -117,6 +120,7 @@ services:
       FEC_FORMAT_VERSION: 8.5
       INCLUDE_SILK: "${INCLUDE_SILK}"
       E2E_TEST: "${E2E_TEST:-False}"
+      FLAG__ENABLE_IMPORT: True
     deploy:
       resources:
         limits:
@@ -124,14 +128,14 @@ services:
 
   api:
     build:
-      context: './'
-      dockerfile: '${API_DOCKERFILE:-Dockerfile}'
+      context: "./"
+      dockerfile: "${API_DOCKERFILE:-Dockerfile}"
     image: fecfile-api
     container_name: fecfile-api
     volumes:
       - ./django-backend:/opt/nxg_fec
     extra_hosts:
-      - 'host.docker.internal:host-gateway'
+      - "host.docker.internal:host-gateway"
     depends_on:
       - db
       - redis
@@ -151,10 +155,14 @@ services:
       LOGIN_REDIRECT_CLIENT_URL: http://localhost:4200
       LOGOUT_REDIRECT_URL: http://localhost:8080/api/v1/oidc/logout-redirect
       SYSTEM_STATUS_CACHE_AGE:
-      AWS_ACCESS_KEY_ID:
-      AWS_SECRET_ACCESS_KEY:
-      AWS_STORAGE_BUCKET_NAME:
-      AWS_REGION:
+      S3_ACCESS_KEY_ID:
+      S3_SECRET_ACCESS_KEY:
+      S3_STORAGE_BUCKET_NAME:
+      S3_REGION:
+      SES_ACCESS_KEY_ID:
+      SES_SECRET_ACCESS_KEY:
+      SES_REGION:
+      SES_DOMAIN:
       CELERY_WORKER_STORAGE: local
       MOCK_EFO_FILING: True
       EFO_FILING_API: https://efoservices.stage.efo.fec.gov
@@ -179,12 +187,18 @@ services:
       INCLUDE_SILK: "${INCLUDE_SILK}"
       DJANGO_APPLICATION: FECFILE_API
       E2E_TEST: "${E2E_TEST:-False}"
-      DB_POOL_MIN_SIZE: 8
-      DB_POOL_MAX_SIZE: 20
+      DB_POOL_MIN_SIZE: 0
+      DB_POOL_MAX_SIZE: 8
       DB_POOL_MAX_IDLE: 600
+      GUNICORN_WORKERS: 9
+      GUNICORN_THREADS: 8
+      MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS: 0
 
       # ---- FEATURE FLAGS ----
       FLAG__COMMITTEE_DATA_SOURCE: MOCKED # Values are PRODUCTION, TEST, and MOCKED
+      FLAG__ENABLE_IMPORT: True
+      FLAG__ENABLE_EMAIL: True
+      SES_FROM_USER: no-reply+local
     deploy:
       resources:
         limits:
@@ -219,7 +233,7 @@ services:
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run.py --worker --master-host locust-leader -L DEBUG
-    profiles: [ locust ]
+    profiles: [locust]
 
   locust-leader-app:
     image: locustio/locust
@@ -228,11 +242,11 @@ services:
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run_app.py --master -H https://dev.fecfile.fec.gov
-    profiles: [ locust-app ]
+    profiles: [locust-app]
 
   locust-follower-app:
     image: locustio/locust
     volumes:
       - ./:/mnt/locust
     command: -f /mnt/locust/performance-testing/locust_run_app.py --worker --master-host locust-leader-app -L DEBUG
-    profiles: [ locust-app ]
+    profiles: [locust-app]

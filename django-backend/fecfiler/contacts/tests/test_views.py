@@ -3,7 +3,9 @@ from copy import deepcopy
 from unittest.mock import patch, Mock
 import uuid
 
+from django.test import tag
 from ..models import Contact
+from ..shared_models import ContactType
 from fecfiler.committee_accounts.models import CommitteeAccount
 from ..views import ContactViewSet, DeletedContactsViewSet
 from .utils import create_test_individual_contact
@@ -60,13 +62,13 @@ class ContactViewSetTest(FecfilerViewSetTest):
         deleted_last="Deleted",
     ):
         active_contact = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name=active_last,
             first_name=active_first,
             committee_account_id=committee_uuid,
         )
         deleted_contact = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name=deleted_last,
             first_name=deleted_first,
             committee_account_id=committee_uuid,
@@ -135,7 +137,6 @@ class ContactViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 400)
 
-    @patch("fecfiler.contacts.views.settings.E2E_TEST", False)
     @patch("requests.get", side_effect=mocked_requests_get_candidates)
     def test_candidate_lookup_happy_path(self, mock_get):
         response = self.send_viewset_get_request(
@@ -169,7 +170,6 @@ class ContactViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 400)
 
-    @patch("fecfiler.contacts.views.settings.E2E_TEST", False)
     @patch("requests.get", side_effect=mocked_requests_get_committees)
     def test_committee_lookup_happy_path(self, mock_get):
         response = self.send_viewset_get_request(
@@ -322,7 +322,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
     def test_restore(self):
         contact = Contact.objects.create(
             id="a5061946-0000-0000-82f6-f1782c333d70",
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name="Last",
             first_name="First",
             committee_account_id="11111111-2222-3333-4444-555555555555",
@@ -341,10 +341,19 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, ["a5061946-0000-0000-82f6-f1782c333d70"])
 
-    @patch("fecfiler.contacts.views.settings")
-    def test_e2e_delete_all_contacts(self, mock_settings):
-        mock_settings.E2E_TEST = True
+    def test_e2e_delete_all_contacts_requires_e2e_flag(self):
+        active_contact, deleted_contact = self._create_active_and_deleted_contacts(
+            self.default_committee.id
+        )
+        uri = "/api/v1/contacts/e2e-delete-all-contacts/"
+        response = self.send_nonviewset_post_request(uri, {})
 
+        self.assertEqual(response.status_code, 405)
+        self.assertTrue(Contact.objects.filter(id=active_contact.id).exists())
+        self.assertTrue(Contact.all_objects.filter(id=deleted_contact.id).exists())
+
+    @tag("e2e")
+    def test_e2e_delete_all_contacts(self):
         active_contact, deleted_contact = self._create_active_and_deleted_contacts(
             self.default_committee.id
         )
@@ -357,23 +366,8 @@ class ContactViewSetTest(FecfilerViewSetTest):
             self.default_committee.id, active_contact.id, deleted_contact.id
         )
 
-    @patch("fecfiler.contacts.views.settings")
-    def test_e2e_delete_all_contacts_requires_e2e_flag(self, mock_settings):
-        mock_settings.E2E_TEST = False
-
-        active_contact, deleted_contact = self._create_active_and_deleted_contacts(
-            self.default_committee.id
-        )
-        response = self._post_e2e_delete_all_contacts()
-
-        self.assertEqual(response.status_code, 404)
-        self.assertTrue(Contact.objects.filter(id=active_contact.id).exists())
-        self.assertTrue(Contact.all_objects.filter(id=deleted_contact.id).exists())
-
-    @patch("fecfiler.contacts.views.settings")
-    def test_e2e_delete_all_contacts_scoped_to_committee(self, mock_settings):
-        mock_settings.E2E_TEST = True
-
+    @tag("e2e")
+    def test_e2e_delete_all_contacts_scoped_to_committee(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000002")
         other_active_contact, other_deleted_contact = (
             self._create_active_and_deleted_contacts(
@@ -398,9 +392,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertTrue(Contact.objects.filter(id=other_active_contact.id).exists())
         self.assertTrue(Contact.all_objects.filter(id=other_deleted_contact.id).exists())
         self.assertEqual(
-            Contact.objects.filter(
-                committee_account_id=other_committee.id
-            ).count(),
+            Contact.objects.filter(committee_account_id=other_committee.id).count(),
             1,
         )
         self.assertEqual(
@@ -410,10 +402,8 @@ class ContactViewSetTest(FecfilerViewSetTest):
             0,
         )
 
-    @patch("fecfiler.contacts.views.settings")
-    def test_e2e_delete_all_contacts_no_contacts(self, mock_settings):
-        mock_settings.E2E_TEST = True
-
+    @tag("e2e")
+    def test_e2e_delete_all_contacts_no_contacts(self):
         empty_committee = CommitteeAccount.objects.create(committee_id="C00000003")
         expected_count = self._get_committee_contact_count(empty_committee.id)
         self.assertEqual(expected_count, 0)
@@ -425,7 +415,7 @@ class ContactViewSetTest(FecfilerViewSetTest):
 
     def test_update(self):
         contact = Contact.objects.create(
-            type=Contact.ContactType.INDIVIDUAL,
+            type=ContactType.INDIVIDUAL,
             last_name="Last",
             first_name="First",
             committee_account_id="11111111-2222-3333-4444-555555555555",
@@ -472,3 +462,180 @@ class ContactViewSetTest(FecfilerViewSetTest):
             self.assertTrue(response is None)
         except TypeError:
             self.assertTrue(response is not None)
+
+    def test_duplicate_check_empty_query_params(self):
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"results": []})
+
+    def test_duplicate_check_candidate_id(self):
+        contact = Contact.objects.create(
+            type=ContactType.CANDIDATE,
+            candidate_id="P12345678",
+            last_name="CandidateLast",
+            first_name="CandidateFirst",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check?candidate_id=P12345678",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], str(contact.id))
+
+    def test_duplicate_check_committee_id(self):
+        contact = Contact.objects.create(
+            type=ContactType.COMMITTEE,
+            committee_id="C98765432",
+            name="Test Committee",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check?committee_id=C98765432",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], str(contact.id))
+
+    def test_duplicate_check_organization_case_insensitive_and_type_scoped(self):
+        org_contact = Contact.objects.create(
+            type=ContactType.ORGANIZATION,
+            name="Acme Corporation",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+
+        Contact.objects.create(
+            type=ContactType.COMMITTEE,
+            committee_id="C11111111",
+            name="Acme Corporation",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check?name=acme%20CORPORATION",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], str(org_contact.id))
+
+    def test_duplicate_check_individual_case_insensitive_and_type_scoped(self):
+        ind_contact = Contact.objects.create(
+            type=ContactType.INDIVIDUAL,
+            first_name="Jane",
+            last_name="McCammon",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+        Contact.objects.create(
+            type=ContactType.CANDIDATE,
+            candidate_id="P87654321",
+            first_name="Jane",
+            last_name="McCammon",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check?first_name=jAnE&last_name=mccammon",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        results = response.data["results"]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["id"], str(ind_contact.id))
+
+    def test_duplicate_check_individual_missing_first_or_last_name(self):
+        Contact.objects.create(
+            type=ContactType.INDIVIDUAL,
+            first_name="Jane",
+            last_name="McCammon",
+            committee_account_id="11111111-2222-3333-4444-555555555555",
+        )
+
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check?last_name=McCammon",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {"results": []})
+
+    def test_CRUD_committee_locked_list(self):
+        main_committee = CommitteeAccount(
+            committee_id="C43211234",
+            id="33333333-2222-1111-2222-333333333333"
+        )
+        other_committee = CommitteeAccount(
+            committee_id="C12344321",
+            id="55555555-4444-3333-2222-111111111111"
+        )
+
+        main_committee.save()
+        other_committee.save()
+
+        for i in range(5):
+            create_test_individual_contact(
+                f"last{i}", f"first{i}", main_committee.id
+            )
+            create_test_individual_contact(
+                f"last{i}", f"first{i}", other_committee.id
+            )
+
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts?page=1",
+            ContactViewSet,
+            "list",
+            committee=main_committee
+        )
+        self.assertEqual(len(response.data["results"]), 5)
+
+    def test_CRUD_committee_locked_update(self):
+        main_committee = CommitteeAccount(
+            committee_id="C43211234",
+            id="33333333-2222-1111-2222-333333333333"
+        )
+        other_committee = CommitteeAccount(
+            committee_id="C12344321",
+            id="55555555-4444-3333-2222-111111111111"
+        )
+
+        main_committee.save()
+        other_committee.save()
+
+        contact = Contact.objects.create(
+            type=ContactType.INDIVIDUAL,
+            last_name="Last",
+            first_name="First",
+            committee_account_id=main_committee.id,
+        )
+        response = self.send_viewset_put_request(
+            f"/api/v1/contacts/{str(contact.id)}/",
+            {
+                "first_name": "Other",
+                "last_name": "other",
+                "street_1": "1",
+                "city": "here",
+                "zip": "1",
+                "state": "MD",
+                "country": "USA",
+                "type": "IND",
+            },
+            ContactViewSet,
+            "update",
+            pk=contact.id,
+            committee=other_committee
+        )
+
+        self.assertEqual(response.status_code, 404)

@@ -10,6 +10,7 @@ from ...utils.common_queries import (
     get_transaction_types_breakdown,
     get_transaction_tiers_breakdown,
     get_carryover_type_transactions,
+    get_filing_frequency,
 )
 import structlog
 
@@ -33,6 +34,7 @@ class Command(FECCommand):
         committee_id = options["committee_id"]
         if not committee_id:
             get_num_committees()
+            get_filing_frequency()
             get_num_users()
             get_num_reports()
 

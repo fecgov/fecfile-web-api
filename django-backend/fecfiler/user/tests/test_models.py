@@ -26,3 +26,8 @@ class UserModelTestCase(TestCase):
         pending_membership.refresh_from_db()
         self.assertEqual(pending_membership.user, new_user)
         self.assertEqual(pending_membership.pending_email, None)
+
+    def test_logging_on_user_creation(self):
+        with self.assertLogs("fecfiler.user.managers", level="INFO") as log:
+            User.objects.create_user("username", email="test@test.com")
+            self.assertIn("New User Created: test@test.com", log.output[0])

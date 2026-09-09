@@ -223,7 +223,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         return self.transaction_set.all()
 
     @property
-    def can_delete(self):
+    def can_delete(self) -> bool:
         return len(self.blocking_reports) == 0
 
     @property
@@ -583,10 +583,17 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             self.delete_children()
             self.delete_debts()
             self.delete_loans()
-            self.delete_reattribution_redesigntations()
+            self.delete_reattribution_redesignations()
             self.delete_coupled_transactions()
             if self.memo_text:
                 self.memo_text.delete()
+
+            if self.schedule_c or self.schedule_d:
+                for report in self.reports.all():
+                    if not report.can_delete:
+                        report.can_delete = report.check_can_delete()
+                        if report.can_delete:
+                            report.save()
 
     def delete_children(self):
         child_transactions = Transaction.objects.filter(parent_transaction=self)
@@ -610,13 +617,15 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     # REATTRIBUTION/REDESIGNATION
     # If this is a reattribution/redesignation 'from' transaction,
     # delete the 'to' transaction
-    def delete_reattribution_redesigntations(self):
+    # "why not handle the reverse here?" - deleting the 'to' will already delete
+    # the 'from' via the parent-child deletion
+    def delete_reattribution_redesignations(self):
         if (
             self.schedule_a
-            and self.schedule_a.reattribution_redesignation_tag == "REATTRIBUTED_FROM"
+            and self.schedule_a.reattribution_redesignation_tag == "REATTRIBUTION_FROM"
         ) or (
             self.schedule_b
-            and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATED_FROM"
+            and self.schedule_b.reattribution_redesignation_tag == "REDESIGNATION_FROM"
         ):
             # Refresh parent's state from DB before calling delete
             parent = self.parent_transaction
@@ -625,20 +634,18 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
         # If this reattribution/redesignation is tied to a copy of
         # the original transaction, delete the copy
-        if self.reatt_redes and (
-            (
-                self.reatt_redes.schedule_a
-                and self.reatt_redes.schedule_a.reattribution_redesignation_tag
-                == "REATTRIBUTED"
-            )
-            or (
-                self.reatt_redes.schedule_b
-                and self.reatt_redes.schedule_b.reattribution_redesignation_tag
-                == "REDESIGNATED"
-            )
-        ):
+        target = self.reatt_redes
+        has_copy_chain_link = target and target.reatt_redes_id is not None
+        has_matching_associated_with = (
+            # Some pulled-forward copies are identified by matching
+            # transaction_id and associated-with transaction_id.
+            target
+            and target.reatt_redes
+            and target.transaction_id == target.reatt_redes.transaction_id
+        )
+        if target and (has_copy_chain_link or has_matching_associated_with):
             # Refresh reatt_redes' state from DB before calling delete
-            reatt_redes = self.reatt_redes
+            reatt_redes = target
             reatt_redes.refresh_from_db(fields=["deleted"])
             reatt_redes.delete()
 
@@ -672,6 +679,19 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 report_id=report_id
             )
 
+        other_reports = ReportTransaction.objects.filter(
+            transaction=self
+        ).exclude(
+            report_id=report_id
+        )
+
+        for report_transaction in other_reports:
+            report = report_transaction.report
+            if report.can_delete:
+                report.can_delete = not report.check_transaction_blocking_deletion(self)
+                if not report.can_delete:
+                    report.save()
+
     def remove_from_report(self, report_id):
         ReportTransaction = apps.get_model("reports.ReportTransaction")
         report_transaction = ReportTransaction.objects.filter(
@@ -682,7 +702,16 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         if report_transaction is not None:
             report_transaction.delete()
 
+        remaining_reports = ReportTransaction.objects.filter(transaction=self)
+        for report_transaction in remaining_reports:
+            report = report_transaction.report
+            if not report.can_delete:
+                report.can_delete = report.check_can_delete()
+                if report.can_delete:
+                    report.save()
+
     def set_reports(self, report_ids):
+        Report = apps.get_model("reports.Report")
         current_report_ids = set()
         current_report_id_dicts = list(self.reports.values("id"))
         for report_id_dict in current_report_id_dicts:
@@ -691,12 +720,70 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         updated_report_ids = set(report_ids)
         report_ids_to_reset_can_unamend = current_report_ids ^ updated_report_ids
 
-        Report = apps.get_model("reports.Report")
         Report.objects.filter(
             id__in=report_ids_to_reset_can_unamend
         ).update(can_unamend=False)
 
         self.reports.set(report_ids)
+
+        reports_to_check_deletion = Report.objects.filter(
+            id__in=report_ids_to_reset_can_unamend
+        )
+        for report in reports_to_check_deletion:
+            this_transaction_blocks = report.check_transaction_blocking_deletion(self)
+            if this_transaction_blocks:
+                report.can_delete = False
+            else:
+                report.can_delete = report.check_can_delete()
+
+        Report.objects.bulk_update(reports_to_check_deletion, ["can_delete"])
+
+    # Returns a list containing all transactions related to this transaction
+    # through reatributions, loans, loan repayments, debts, and debt repayments
+    def get_related_transactions(self):
+        related_transactions = []
+
+        if self.reatt_redes is not None:
+            related_transactions.append(self.reatt_redes)
+
+        if self.loan is not None:
+            related_transactions.append(self.loan)
+
+            loan_chain = Transaction.objects.filter(
+                Q(
+                    schedule_c__isnull=False,
+                ) | Q(
+                    schedule_c1__isnull=False,
+                ) | Q(
+                    schedule_c2__isnull=False
+                ),
+                loan_id=self.loan_id,
+            ).exclude(id=self.id)
+            related_transactions += list(loan_chain.all())
+
+        if self.schedule_c is not None:
+            loan_children = Transaction.objects.filter(
+                loan_id=self.id,
+            )
+            related_transactions += list(loan_children.all())
+
+        if self.debt is not None:
+            related_transactions.append(self.debt)
+
+            debt_chain = Transaction.objects.filter(
+                debt_id=self.debt_id,
+                schedule_d__isnull=False,
+            ).exclude(id=self.id)
+            related_transactions += list(debt_chain.all())
+
+        if self.schedule_d is not None:
+            loan_children = Transaction.objects.filter(
+                debt_id=self.id,
+                reports=self.reports.first()
+            )
+            related_transactions += list(loan_children.all())
+
+        return related_transactions
 
     class Meta:
         indexes = [models.Index(fields=["_form_type"])]

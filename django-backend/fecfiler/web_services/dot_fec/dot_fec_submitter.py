@@ -2,15 +2,11 @@ import copy
 import json
 from uuid import uuid4 as uuid
 from zeep import Client
+from django.utils import timezone
 from abc import ABC, abstractmethod
 from django.utils import timezone
 from fecfiler.web_services.models import FECStatus, BaseSubmission
-from fecfiler.settings import (
-    EFO_FILING_API,
-    EFO_FILING_API_KEY,
-    FEC_AGENCY_ID,
-    MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS,
-)
+import fecfiler.settings as settings
 import structlog
 import time
 
@@ -33,14 +29,14 @@ class DotFECSubmitter(ABC):
         json_obj = {
             "committee_id": dot_fec_record.report.committee_account.committee_id,
             "password": e_filing_password,
-            "api_key": EFO_FILING_API_KEY,
+            "api_key": settings.EFO_FILING_API_KEY,
             "email_1": dot_fec_record.report.confirmation_email_1,
             "email_2": dot_fec_record.report.confirmation_email_2,
-            "agency_id": FEC_AGENCY_ID,
+            "agency_id": settings.FEC_AGENCY_ID,
             "wait": False,
         }
-        if dot_fec_record.report.report_id:
-            json_obj["amendment_id"] = dot_fec_record.report.report_id
+        if dot_fec_record.report.fec_report_id:
+            json_obj["amendment_id"] = dot_fec_record.report.fec_report_id
             if backdoor_code:
                 json_obj["amendment_id"] += backdoor_code
         self.log_submission_json(json_obj, dot_fec_record, backdoor_code)
@@ -51,7 +47,7 @@ class DotFECSubmitter(ABC):
         copy_json_obj.pop("password", None)
         copy_json_obj.pop("api_key", None)
         if "amendment_id" in copy_json_obj and backdoor_code:
-            copy_json_obj["amendment_id"] = dot_fec_record.report.report_id + "xxxxx"
+            copy_json_obj["amendment_id"] = dot_fec_record.report.fec_report_id + "xxxxx"
         logger.info(f"submission json: {json.dumps(copy_json_obj)}")
 
 
@@ -59,7 +55,9 @@ class EFODotFECSubmitter(DotFECSubmitter):
     """Submitter class for submitting .FEC files to EFO's webload service"""
 
     def __init__(self) -> None:
-        self.fec_soap_client = Client(f"{EFO_FILING_API}/webload/services/upload?wsdl")
+        self.fec_soap_client = Client(
+            f"{settings.EFO_FILING_API}/webload/services/upload?wsdl"
+        )
 
     def submit(self, dot_fec_bytes, json_payload, fec_report_id=None):
         response = self.fec_soap_client.service.upload(json_payload, dot_fec_bytes)
@@ -96,13 +94,13 @@ class MockDotFECSubmitter(DotFECSubmitter):
                 "submission_id": "fake_submission_id",
                 "status": self.get_fec_status_for_poll(submission),
                 "message": "We didn't really send anything to FEC",
-                "report_id": str(uuid()),
+                "report_id": submission.fec_report_id or str(uuid()),
             }
         )
 
     def get_fec_status_for_poll(self, submission: BaseSubmission):
         submission_complete = timezone.now() >= submission.created + timezone.timedelta(
-            seconds=MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS
+            seconds=settings.MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS
         )
         return (
             FECStatus.ACCEPTED.value
@@ -130,6 +128,6 @@ class MockDotFECSubmitterFailure(DotFECSubmitter):
                 "submission_id": "fake_submission_id",
                 "status": FECStatus.REJECTED.value,
                 "message": "We didn't really send anything to FEC",
-                "report_id": str(uuid()),
+                "report_id": submission.fec_report_id or str(uuid()),
             }
         )

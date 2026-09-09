@@ -141,7 +141,9 @@ class TransactionManager(SoftDeleteManager):
             )
         )
 
-    def get_list_queryset(self, schedules_to_include, report_type, report_code_label):
+    def get_list_queryset(
+        self, committee_account_id, schedules_to_include, report_type, report_code_label
+    ):
         active_schedules = (
             schedules_to_include
             if (schedules_to_include and len(schedules_to_include) > 0)
@@ -163,6 +165,7 @@ class TransactionManager(SoftDeleteManager):
         return (
             super()
             .get_queryset()
+            .filter(committee_account_id=committee_account_id)
             .annotate(
                 schedule=schedule_clause,
                 date=date_clause,

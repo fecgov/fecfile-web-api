@@ -1,5 +1,5 @@
 from fecfiler.settings import (
-    AWS_STORAGE_BUCKET_NAME,
+    S3_STORAGE_BUCKET_NAME,
     LOGIN_DOT_GOV_X509_COUNTRY,
     LOGIN_DOT_GOV_X509_STATE,
     LOGIN_DOT_GOV_X509_LOCALITY,
@@ -160,7 +160,7 @@ def stage_login_dot_gov_cert(x509_cert: Certificate):
         filename = (
             f"gen_x509_pk_{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}.crt"
         )
-        s3_object = S3_SESSION.Object(AWS_STORAGE_BUCKET_NAME, filename)
+        s3_object = S3_SESSION.Object(S3_STORAGE_BUCKET_NAME, filename)
         s3_object.put(Body=x509_cert_bytes)
         logger.info(f"Cert saved as {filename}")
     except Exception as e:
@@ -170,7 +170,7 @@ def stage_login_dot_gov_cert(x509_cert: Certificate):
 def cleanup_login_dot_gov_certs():
     try:
         logger.info("Cleaning up certs")
-        bucket = S3_SESSION.Bucket(AWS_STORAGE_BUCKET_NAME)
+        bucket = S3_SESSION.Bucket(S3_STORAGE_BUCKET_NAME)
         bucket.objects.filter(Prefix="gen_x509_pk_").delete()
     except Exception as e:
         raise Exception("Failed cleanup login dot x509 certs") from e

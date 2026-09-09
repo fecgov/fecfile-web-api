@@ -1,4 +1,5 @@
 from decimal import Decimal
+import json
 from django.test import TestCase
 from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.reports.models import ReportTransaction
@@ -25,6 +26,7 @@ from fecfiler.web_services.models import (
     FECStatus,
     UploadSubmission,
 )
+from fecfiler.web_services.tasks import create_dot_fec
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -402,7 +404,7 @@ class TransactionModelTestCase(TestCase):
             "2024-01-01",
             amount="10.00",
         )
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.reatt_redes = self.partnership_receipt
         reattribution_to.save()
@@ -415,7 +417,7 @@ class TransactionModelTestCase(TestCase):
             parent_id=reattribution_to.id,
         )
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.reatt_redes = self.partnership_receipt
@@ -482,7 +484,7 @@ class TransactionModelTestCase(TestCase):
             report=self.m1_report,
         )
         reattribution_to.reatt_redes = copy_of_receipt_for_reattribution
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.save()
         reattribution_from = create_schedule_a(
@@ -496,7 +498,7 @@ class TransactionModelTestCase(TestCase):
         )
         reattribution_from.reatt_redes = copy_of_receipt_for_reattribution
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.save()
@@ -557,6 +559,116 @@ class TransactionModelTestCase(TestCase):
         self.assertIsNotNone(reattribution_to.deleted)
         self.assertIsNotNone(reattribution_from.deleted)
 
+    def test_delete_reattribution_without_copy_does_not_delete_original(self):
+        self.partnership_receipt.schedule_a.reattribution_redesignation_tag = (
+            "REATTRIBUTED"
+        )
+        self.partnership_receipt.schedule_a.save()
+
+        reattribution_to = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-01",
+            amount="10.00",
+        )
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
+        reattribution_to.schedule_a.save()
+        reattribution_to.reatt_redes = self.partnership_receipt
+        reattribution_to.save()
+
+        reattribution_from = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="-10.00",
+            parent_id=reattribution_to.id,
+        )
+        reattribution_from.schedule_a.reattribution_redesignation_tag = (
+            "REATTRIBUTION_FROM"
+        )
+        reattribution_from.schedule_a.save()
+        reattribution_from.reatt_redes = self.partnership_receipt
+        reattribution_from.save()
+
+        reattribution_to.delete()
+        self.partnership_receipt.refresh_from_db()
+        reattribution_to.refresh_from_db()
+        reattribution_from.refresh_from_db()
+
+        self.assertIsNone(self.partnership_receipt.deleted)
+        self.assertIsNotNone(reattribution_to.deleted)
+        self.assertIsNotNone(reattribution_from.deleted)
+
+    def test_delete_reattribution_with_copy_without_copy_tag(self):
+        copy_of_receipt_for_reattribution = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="100.00",
+            report=self.m1_report,
+        )
+        copy_of_receipt_for_reattribution.reatt_redes = self.partnership_receipt
+        # Intentionally leave copy tag unset to exercise link-based copy detection.
+        copy_of_receipt_for_reattribution.save()
+
+        reattribution_to = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-01",
+            amount="10.00",
+            report=self.m1_report,
+        )
+        reattribution_to.reatt_redes = copy_of_receipt_for_reattribution
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
+        reattribution_to.schedule_a.save()
+        reattribution_to.save()
+
+        reattribution_from = create_schedule_a(
+            "PARTNERSHIP_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-01",
+            amount="-10.00",
+            report=self.m1_report,
+            parent_id=reattribution_to.id,
+        )
+        reattribution_from.reatt_redes = copy_of_receipt_for_reattribution
+        reattribution_from.schedule_a.reattribution_redesignation_tag = (
+            "REATTRIBUTION_FROM"
+        )
+        reattribution_from.schedule_a.save()
+        reattribution_from.save()
+
+        reattribution_to.delete()
+        self.partnership_receipt.refresh_from_db()
+        copy_of_receipt_for_reattribution.refresh_from_db()
+        reattribution_to.refresh_from_db()
+        reattribution_from.refresh_from_db()
+
+        self.assertIsNone(self.partnership_receipt.deleted)
+        self.assertIsNotNone(copy_of_receipt_for_reattribution.deleted)
+        self.assertIsNotNone(reattribution_to.deleted)
+        self.assertIsNotNone(reattribution_from.deleted)
+
+        undelete(reattribution_to)
+        undelete(reattribution_from)
+        undelete(copy_of_receipt_for_reattribution)
+
+        reattribution_from.delete()
+        self.partnership_receipt.refresh_from_db()
+        copy_of_receipt_for_reattribution.refresh_from_db()
+        reattribution_to.refresh_from_db()
+        reattribution_from.refresh_from_db()
+
+        self.assertIsNone(self.partnership_receipt.deleted)
+        self.assertIsNotNone(copy_of_receipt_for_reattribution.deleted)
+        self.assertIsNotNone(reattribution_to.deleted)
+        self.assertIsNotNone(reattribution_from.deleted)
+
     def test_delete_reattribution_earmark(self):
         self.assertIsNone(self.earmark_receipt.deleted)
         self.assertIsNone(self.earmark_memo.deleted)
@@ -568,7 +680,7 @@ class TransactionModelTestCase(TestCase):
             amount="10.00",
         )
         reattribution_to.reatt_redes = self.earmark_receipt
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.save()
         reattribution_from = create_schedule_a(
@@ -581,7 +693,7 @@ class TransactionModelTestCase(TestCase):
         )
         reattribution_from.reatt_redes = self.earmark_receipt
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.save()
@@ -626,7 +738,7 @@ class TransactionModelTestCase(TestCase):
             report=self.m2_report,
         )
         reattribution_to.reatt_redes = reatt_pull_forward
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.save()
 
@@ -641,7 +753,7 @@ class TransactionModelTestCase(TestCase):
         )
         reattribution_from.reatt_redes = reatt_pull_forward
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.save()
@@ -734,8 +846,7 @@ class TransactionModelTestCase(TestCase):
         self.payment_2.refresh_from_db()
         self.assertTrue(self.loan.can_delete)
         self.assertTrue(self.loan_made.can_delete)
-        # Can delete carried forward debt, but the UI won't let you
-        self.assertTrue(self.carried_forward_loan.can_delete)
+        self.assertTrue(self.carried_forward_loan.can_delete)  # UI blocks from deletion
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
 
@@ -743,8 +854,19 @@ class TransactionModelTestCase(TestCase):
             self.m1_report.id
         )
         self.m1_report.refresh_from_db()
-        self.m1_report.upload_submission.fec_status = FECStatus.ACCEPTED
+        dot_fec_id = create_dot_fec(
+            self.m1_report.id,
+            self.m1_report.upload_submission.id
+        )
+        self.m1_report.upload_submission.dot_fec_id = dot_fec_id
         self.m1_report.upload_submission.save()
+        self.m1_report.refresh_from_db()
+        self.m1_report.upload_submission.save_fec_response(
+            json.dumps({
+                "status": str(FECStatus.ACCEPTED.value),
+                "report_id": "test_report_id"
+            })
+        )
         self.m1_report.refresh_from_db()
         self.loan.refresh_from_db()
         self.loan_made.refresh_from_db()
@@ -754,8 +876,7 @@ class TransactionModelTestCase(TestCase):
         self.assertFalse(self.loan.can_delete)
         self.assertFalse(self.loan_made.can_delete)
         self.assertFalse(self.payment_1.can_delete)
-        # Can delete carried forward loan, but the UI won't let you
-        self.assertTrue(self.carried_forward_loan.can_delete)
+        self.assertFalse(self.carried_forward_loan.can_delete)
         # Payment 2 can still be deleted because
         # it is a repayment on the loan in an active report
         self.assertTrue(self.payment_2.can_delete)
@@ -769,8 +890,7 @@ class TransactionModelTestCase(TestCase):
         self.payment_2.refresh_from_db()
         self.assertTrue(self.loan.can_delete)
         self.assertTrue(self.loan_made.can_delete)
-        # Can delete carried forward loan, but the UI won't let you
-        self.assertTrue(self.carried_forward_loan.can_delete)
+        self.assertTrue(self.carried_forward_loan.can_delete)  # UI blocks from deletion
         self.assertTrue(self.payment_1.can_delete)
         self.assertTrue(self.payment_2.can_delete)
 
@@ -810,7 +930,7 @@ class TransactionModelTestCase(TestCase):
             report=m2_report,
         )
         reattribution_to.reatt_redes = copy_of_transaction_for_reattribution
-        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTED_TO"
+        reattribution_to.schedule_a.reattribution_redesignation_tag = "REATTRIBUTION_TO"
         reattribution_to.schedule_a.save()
         reattribution_to.save()
         reattribution_from = create_schedule_a(
@@ -824,7 +944,7 @@ class TransactionModelTestCase(TestCase):
         )
         reattribution_from.reatt_redes = copy_of_transaction_for_reattribution
         reattribution_from.schedule_a.reattribution_redesignation_tag = (
-            "REATTRIBUTED_FROM"
+            "REATTRIBUTION_FROM"
         )
         reattribution_from.schedule_a.save()
         reattribution_from.save()
@@ -842,6 +962,21 @@ class TransactionModelTestCase(TestCase):
             self.m2_report.id
         )
         m2_report.save()
+        m2_report.refresh_from_db()
+        dot_fec_id = create_dot_fec(
+            m2_report.id,
+            m2_report.upload_submission.id
+        )
+        m2_report.upload_submission.dot_fec_id = dot_fec_id
+        m2_report.upload_submission.save()
+        m2_report.refresh_from_db()
+        m2_report.upload_submission.save_fec_response(
+            json.dumps({
+                "status": str(FECStatus.ACCEPTED.value),
+                "report_id": "test_report_id"
+            })
+        )
+        m2_report.refresh_from_db()
         transaction.refresh_from_db()
         copy_of_transaction_for_reattribution.refresh_from_db()
         reattribution_to.refresh_from_db()
@@ -855,6 +990,7 @@ class TransactionModelTestCase(TestCase):
     def test_can_delete_debt(self):
         m1_report = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
         m2_report = create_form3x(self.committee, "2024-02-01", "2024-03-01", {})
+        m3_report = create_form3x(self.committee, "2024-03-01", "2024-04-01", {})
         original_debt = create_debt(
             self.committee, self.contact_1, Decimal("123.00"), report=m1_report
         )
@@ -884,15 +1020,55 @@ class TransactionModelTestCase(TestCase):
 
         self.assertTrue(original_debt.can_delete)
         self.assertTrue(m1_repayment.can_delete)
-        # Can delete carried forward debt, but the UI won't let you
-        self.assertTrue(carried_forward_debt.can_delete)
+        self.assertTrue(carried_forward_debt.can_delete)  # UI blocks from deletion
         self.assertTrue(m2_repayment.can_delete)
 
-        m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
+        UploadSubmission.objects.initiate_submission(
             m2_report.id
         )
+        m2_report.refresh_from_db()
+        dot_fec_id = create_dot_fec(
+            m2_report.id,
+            m2_report.upload_submission.id
+        )
+        m2_report.upload_submission.dot_fec_id = dot_fec_id
         m2_report.upload_submission.save()
+        m2_report.refresh_from_db()
+        m2_report.upload_submission.save_fec_response(
+            json.dumps({
+                "status": str(FECStatus.ACCEPTED.value),
+                "report_id": "test_report_id"
+            })
+        )
+        original_debt.refresh_from_db()
+        m1_repayment.refresh_from_db()
+        carried_forward_debt.refresh_from_db()
+        m2_repayment.refresh_from_db()
+        self.assertFalse(original_debt.can_delete)
+        self.assertTrue(m1_repayment.can_delete)
+        self.assertFalse(carried_forward_debt.can_delete)
+        self.assertFalse(m2_repayment.can_delete)
+
+        m2_report.upload_submission = None
         m2_report.save()
+        UploadSubmission.objects.initiate_submission(
+            m1_report.id
+        )
+        m1_report.refresh_from_db()
+        dot_fec_id = create_dot_fec(
+            m1_report.id,
+            m1_report.upload_submission.id
+        )
+        m1_report.upload_submission.dot_fec_id = dot_fec_id
+        m1_report.upload_submission.save()
+        m1_report.refresh_from_db()
+        m1_report.upload_submission.save_fec_response(
+            json.dumps({
+                "status": str(FECStatus.ACCEPTED.value),
+                "report_id": "test_report_id"
+            })
+        )
+        m1_report.refresh_from_db()
         original_debt.refresh_from_db()
         m1_repayment.refresh_from_db()
         carried_forward_debt.refresh_from_db()
@@ -902,45 +1078,42 @@ class TransactionModelTestCase(TestCase):
         self.assertFalse(carried_forward_debt.can_delete)
         self.assertFalse(m2_repayment.can_delete)
 
-        m2_report.upload_submission = None
-        m2_report.save()
-        m1_report.upload_submission = UploadSubmission.objects.initiate_submission(
-            m1_report.id
+        m1_report.amend()
+
+        m3_report = create_form3x(self.committee, "2024-03-01", "2024-04-01", {})
+        carry_forward_debt(original_debt, m3_report)
+        UploadSubmission.objects.initiate_submission(
+            m3_report.id
         )
-        m1_report.save()
+        m3_report.refresh_from_db()
+        dot_fec_id = create_dot_fec(
+            m3_report.id,
+            m3_report.upload_submission.id
+        )
+        m3_report.upload_submission.dot_fec_id = dot_fec_id
+        m3_report.upload_submission.save()
+        m3_report.refresh_from_db()
+        m3_report.upload_submission.save_fec_response(
+            json.dumps({
+                "status": str(FECStatus.ACCEPTED.value),
+                "report_id": "test_report_id"
+            })
+        )
+        m3_report.refresh_from_db()
+        # self.assertFalse(original_debt.can_delete)
+        m2_report.amend()
+        original_debt.refresh_from_db()
+        self.assertFalse(original_debt.can_delete)
+        m3_report.amend()
+        m3_report.save()
         original_debt.refresh_from_db()
         m1_repayment.refresh_from_db()
         carried_forward_debt.refresh_from_db()
         m2_repayment.refresh_from_db()
-        self.assertFalse(original_debt.can_delete)
-        self.assertFalse(m1_repayment.can_delete)
-        # Can delete carried forward debt, but the UI won't let you
+        self.assertTrue(original_debt.can_delete)
+        self.assertTrue(m1_repayment.can_delete)
         self.assertTrue(carried_forward_debt.can_delete)
         self.assertTrue(m2_repayment.can_delete)
-
-        m1_report.upload_submission = None
-        m1_report.save()
-
-        m3_report = create_form3x(self.committee, "2024-03-01", "2024-04-01", {})
-        carry_forward_debt(original_debt, m3_report)
-        # m2_report.upload_submission = UploadSubmission.objects.initiate_submission(
-        #     m2_report.id
-        # )
-        # m2_report.save()
-        m3_report.upload_submission = UploadSubmission.objects.initiate_submission(
-            m3_report.id
-        )
-        m3_report.save()
-        original_debt.refresh_from_db()
-        # self.assertFalse(original_debt.can_delete)
-        m2_report.upload_submission = None
-        m2_report.save()
-        original_debt.refresh_from_db()
-        self.assertFalse(original_debt.can_delete)
-        m3_report.upload_submission = None
-        m3_report.save()
-        original_debt.refresh_from_db()
-        self.assertTrue(original_debt.can_delete)
 
     def set_up_jf_transfer(self):
         jf_transfer = create_schedule_a(
@@ -1465,6 +1638,45 @@ class TransactionModelTestCase(TestCase):
 
         # Transaction 4 should now have aggregate of $20 (10 + 10)
         self.assertEqual(transaction_4.aggregate, Decimal("20.00"))
+
+    def test_repayment_helper_methods(self):
+        self.assertTrue(self.payment_1.is_loan_repayment())
+        self.assertFalse(self.loan.is_loan_repayment())
+
+        debt = create_debt(self.committee, self.contact_1, Decimal("40.00"))
+        repayment = create_schedule_b(
+            "OPERATING_EXPENDITURE",
+            self.committee,
+            self.contact_1,
+            "2024-01-10",
+            "5.00",
+            "GENERAL_DISBURSEMENT",
+        )
+        repayment.debt = debt
+        repayment.save()
+
+        self.assertTrue(repayment.is_debt_repayment())
+        self.assertFalse(debt.is_debt_repayment())
+
+    def test_get_old_snapshot_short_circuits(self):
+        transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_3,
+            "2024-01-05",
+            "100.00",
+        )
+
+        snapshot = {
+            "date": transaction.get_date(),
+            "effective_amount": Decimal("100.00"),
+        }
+        self.assertEqual(
+            transaction._get_old_snapshot("A", False, snapshot),
+            snapshot,
+        )
+        self.assertIsNone(transaction._get_old_snapshot("A", True, None))
+        self.assertIsNone(transaction._get_old_snapshot("C", False, None))
 
     def test_creating_a_transaction_resets_can_unamend(self):
         # Create a report that can be unamended

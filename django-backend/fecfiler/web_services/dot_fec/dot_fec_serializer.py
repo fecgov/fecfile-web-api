@@ -1,6 +1,7 @@
 from datetime import datetime
 from fecfile_validate import validate
 from fecfiler.settings import BASE_DIR
+from decimal import Decimal, InvalidOperation
 from curses import ascii
 import os
 import json
@@ -53,6 +54,40 @@ date_formats = [
 ]
 
 
+def election_code_serializer(model_instance, field_name, mapping):
+    form_model = model_instance.form_3 or model_instance.form_3x
+    if form_model is None:
+        raise ValueError(
+            "Attempted to serialize election code on a report without a valid F3 or F3X"
+        )
+
+    report_code = getattr(model_instance, "report_code", None)
+    election_date = getattr(form_model, "date_of_election", None)
+    if report_code is None:
+        raise ValueError(
+            "Attempted to serialize election code on a report without a report type"
+        )
+
+    if report_code in [
+        "12P",
+        "12G",
+        "12R",
+        "12S",
+        "12C",
+        "30G",
+        "30S",
+        "30R",
+    ]:
+        if election_date is None:
+            raise ValueError(
+                f"Attempted to serialize election code on a {report_code} report"
+                "without an election date"
+            )
+        return report_code[-1] + str(election_date.year)
+    else:
+        return default_serializer(model_instance, field_name, mapping)
+
+
 def text_to_date_serializer(model_instance, field_name, mapping):
     date_string = get_value_from_path(
         model_instance, mapping.get("path", None) or field_name
@@ -69,6 +104,30 @@ def text_to_date_serializer(model_instance, field_name, mapping):
         f"Returning value as is."
     )
     return date_string
+
+
+def loan_interest_rate_serializer(model_instance, field_name, mapping):
+    schedule = model_instance.schedule_c or model_instance.schedule_c1
+    if schedule:
+        interest_rate = schedule.loan_interest_rate
+        is_percent = schedule.loan_interest_rate_is_percent
+
+        if not is_percent:
+            return interest_rate
+        else:
+            try:
+                return str(Decimal(interest_rate) / 100)
+            except InvalidOperation:
+                raise ValueError(
+                    f"Interest rate, {interest_rate}, "
+                    f"on transaction, {model_instance.id}, "
+                    "is not a valid number"
+                )
+    else:
+        raise ValueError(
+            "Attempted to serialize loan interest rate on "
+            f"a transaction, {model_instance.id}, without a schedule c/c1"
+        )
 
 
 def default_serializer(model_instance, field_name, mapping):
@@ -89,6 +148,8 @@ FIELD_SERIALIZERS = {
     "BOOLEAN_YN": boolean_yn_serializer,
     "DATE": date_serializer,
     "TEXT_TO_DATE": text_to_date_serializer,
+    "LOAN_INTEREST_RATE": loan_interest_rate_serializer,
+    "ELECTION_CODE": election_code_serializer,
     None: default_serializer,
 }
 

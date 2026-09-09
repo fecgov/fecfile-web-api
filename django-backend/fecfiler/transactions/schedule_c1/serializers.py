@@ -1,5 +1,6 @@
 from rest_framework.serializers import (
     CharField,
+    BooleanField,
     ModelSerializer,
 )
 from fecfiler.transactions.schedule_c1.models import ScheduleC1
@@ -23,6 +24,8 @@ class ScheduleC1Serializer(ModelSerializer):
     lender_city = CharField(required=False, allow_null=True)
     lender_state = CharField(required=False, allow_null=True)
     lender_zip = CharField(required=False, allow_null=True)
+    loan_interest_rate_is_percent = BooleanField(required=False, allow_null=True)
+    loan_due_date_is_date = BooleanField(required=False, allow_null=True)
 
     def create(self, validated_data):
         model_data = get_model_data(validated_data, ScheduleC1)

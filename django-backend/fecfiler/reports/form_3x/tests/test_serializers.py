@@ -1,6 +1,6 @@
 from django.test import TestCase
-from ..serializers import (
-    Form3XSerializer,
+from ..serializers import Form3XSerializer
+from fecfiler.reports.form_3.serializers import (
     COVERAGE_DATE_REPORT_CODE_COLLISION,
     COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS,
 )
@@ -161,9 +161,7 @@ class F3XSerializerTestCase(TestCase):
             serializer.update,
             report_a,
             {
-                "coverage_from_date": datetime.strptime(
-                    "2024-01-01", "%Y-%m-%d"
-                ).date(),
+                "coverage_from_date": datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
                 "coverage_through_date": datetime.strptime(
                     "2024-05-31", "%Y-%m-%d"
                 ).date(),
@@ -186,9 +184,7 @@ class F3XSerializerTestCase(TestCase):
             serializer.update,
             report_a,
             {
-                "coverage_from_date": datetime.strptime(
-                    "2024-01-01", "%Y-%m-%d"
-                ).date(),
+                "coverage_from_date": datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
                 "coverage_through_date": datetime.strptime(
                     "2024-02-28", "%Y-%m-%d"
                 ).date(),
@@ -274,9 +270,7 @@ class F3XSerializerTestCase(TestCase):
         serializer.update(
             report,
             {
-                "coverage_from_date": datetime.strptime(
-                    "2025-01-01", "%Y-%m-%d"
-                ).date(),
+                "coverage_from_date": datetime.strptime("2025-01-01", "%Y-%m-%d").date(),
                 "coverage_through_date": datetime.strptime(
                     "2025-01-31", "%Y-%m-%d"
                 ).date(),
@@ -301,9 +295,7 @@ class F3XSerializerTestCase(TestCase):
         serializer.update(
             report,
             {
-                "coverage_from_date": datetime.strptime(
-                    "2025-01-01", "%Y-%m-%d"
-                ).date(),
+                "coverage_from_date": datetime.strptime("2025-01-01", "%Y-%m-%d").date(),
                 "coverage_through_date": datetime.strptime(
                     "2025-01-31", "%Y-%m-%d"
                 ).date(),

@@ -14,7 +14,7 @@ from rest_framework.viewsets import mixins, GenericViewSet
 from rest_framework import viewsets, pagination, filters, status
 from .models import Contact
 from .serializers import ContactSerializer
-import fecfiler.settings as settings
+from django.conf import settings
 from fecfiler.shared.utilities import query_fec_api, query_fec_api_single
 
 logger = structlog.get_logger(__name__)
@@ -300,6 +300,32 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         return JsonResponse(return_value)
 
     @action(detail=False)
+    def duplicate_check(self, request):
+        params = request.query_params
+        query = Q()
+        if candidate_id := params.get("candidate_id"):
+            query |= Q(candidate_id=candidate_id)
+        if committee_id := params.get("committee_id"):
+            query |= Q(committee_id=committee_id)
+        if name := params.get("name"):
+            query |= Q(name__iexact=name, type="ORG")
+
+        first_name = params.get("first_name")
+        last_name = params.get("last_name")
+        if first_name and last_name:
+            query |= Q(
+                first_name__iexact=first_name, last_name__iexact=last_name, type="IND"
+            )
+
+        if not query:
+            return Response({"results": []})
+
+        queryset = self.get_queryset().filter(query)
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response({"results": serializer.data})
+
+    @action(detail=False)
     def get_contact_id(self, request):
         fec_id = request.GET.get("fec_id")
         if fec_id is None:
@@ -340,21 +366,21 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         )
         return max_fecfile_results, max_fec_results
 
-    @action(detail=False, methods=["post"], url_path="e2e-delete-all-contacts")
-    def e2e_delete_all_contacts(self, request):
-        if not settings.E2E_TEST:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        committee_uuid = str(self.get_committee_uuid())
-        contacts_count = delete_all_contacts(
-            committee_uuid=committee_uuid,
-            log_method=None,
-        )
-        logger.info(
-            "E2E delete all contacts",
-            committee_id=committee_uuid,
-            purged=contacts_count,
-        )
-        return Response({"purged": contacts_count})
+    if settings.E2E_TEST:
+
+        @action(detail=False, methods=["post"], url_path="e2e-delete-all-contacts")
+        def e2e_delete_all_contacts(self, request):
+            committee_uuid = str(self.get_committee_uuid())
+            contacts_count = delete_all_contacts(
+                committee_uuid=committee_uuid,
+                log_method=None,
+            )
+            logger.info(
+                "E2E delete all contacts",
+                committee_id=committee_uuid,
+                purged=contacts_count,
+            )
+            return Response({"purged": contacts_count})
 
 
 class DeletedContactsViewSet(
@@ -389,7 +415,7 @@ class DeletedContactsViewSet(
     @action(detail=False, methods=["post"])
     def restore(self, request):
         ids_to_restore = request.data
-        contacts = self.queryset.filter(id__in=ids_to_restore)
+        contacts = self.get_queryset().filter(id__in=ids_to_restore)
         if len(ids_to_restore) != contacts.count():
             return Response(
                 "Contact Ids are invalid",

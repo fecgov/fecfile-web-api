@@ -33,8 +33,9 @@ A_B_OVER_TWO_HUNDRED_TYPES = (
 
 class CascadeDirection(Enum):
     """Direction for cascading itemization changes."""
-    TO_PARENTS = 'up'
-    TO_CHILDREN = 'down'
+
+    TO_PARENTS = "up"
+    TO_CHILDREN = "down"
 
 
 def has_itemized_children(transaction) -> bool:
@@ -47,12 +48,12 @@ def has_itemized_children(transaction) -> bool:
     Returns:
         Boolean indicating if any children are itemized
     """
+    if hasattr(transaction, "has_cached_itemized_children"):
+        return transaction.has_cached_itemized_children
     transaction_model = transaction.__class__
 
     return transaction_model.objects.filter(
-        parent_transaction_id=transaction.id,
-        deleted__isnull=True,
-        itemized=True
+        parent_transaction_id=transaction.id, deleted__isnull=True, itemized=True
     ).exists()
 
 
@@ -127,9 +128,7 @@ def get_all_parent_ids(transaction) -> List[UUID]:
 
 
 def _cascade_itemization_generic(
-    transaction,
-    direction: CascadeDirection,
-    should_be_itemized: bool
+    transaction, direction: CascadeDirection, should_be_itemized: bool
 ) -> None:
     """
     Generic cascade function for itemization changes.
@@ -147,7 +146,8 @@ def _cascade_itemization_generic(
 
     # Get related transaction IDs
     related_ids = (
-        get_all_parent_ids(transaction) if direction == CascadeDirection.TO_PARENTS
+        get_all_parent_ids(transaction)
+        if direction == CascadeDirection.TO_PARENTS
         else get_all_children_ids(transaction.id)
     )
 
@@ -157,8 +157,7 @@ def _cascade_itemization_generic(
     # Build query for transactions that need updating
     transaction_model = transaction.__class__
     base_query = transaction_model.objects.filter(
-        id__in=related_ids,
-        deleted__isnull=True
+        id__in=related_ids, deleted__isnull=True
     )
 
     # Only include transactions that need updating (different from target state)

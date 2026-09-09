@@ -1,4 +1,3 @@
-from fecfiler.reports.models import Report
 from ..views import Form3XViewSet
 from ..models import Form3X
 from fecfiler.user.models import User
@@ -83,20 +82,6 @@ class Form3XViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
-    def test_amend(self):
-        response = self.send_viewset_post_request(
-            f"/api/v1/reports/{self.q1_report.id}/amend/",
-            {},
-            Form3XViewSet,
-            "amend",
-            pk=self.q1_report.id,
-        )
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            Report.objects.filter(id=self.q1_report.id).first().form_type,
-            "F3XA",
-        )
-
     def test_final(self):
         request = self.build_viewset_get_request("/api/v1/reports/form-f3x/final")
         request.query_params = {"year": "2004"}
@@ -117,3 +102,38 @@ class Form3XViewSetTest(FecfilerViewSetTest):
         response = view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["coverage_from_date"], "2004-05-28")
+
+    def test_CRUD_committee_locked_update(self):
+        other_committee = CommitteeAccount(
+            committee_id="C12344321",
+            id="55555555-4444-3333-2222-111111111111"
+        )
+
+        other_committee.save()
+
+        report = create_form3x(
+            self.committee,
+            "2024-01-01",
+            "2024-02-01",
+            {},
+            report_code="Q1",
+        )
+
+        response = self.send_viewset_put_request(
+            f"/api/v1/reports/form3x/{str(report.id)}/",
+            {
+                "report_code": "Q2",
+                'form_type': "F3XN",
+                'treasurer_last_name': "Treasurer",
+                'treasurer_first_name': "Mr",
+                'date_signed': "2004-01-01",
+                "coverage_from_date": "2025-01-01",
+                "coverage_through_date": "2025-02-01"
+            },
+            Form3XViewSet,
+            "update",
+            pk=report.id,
+            committee=other_committee
+        )
+
+        self.assertEqual(response.status_code, 404)

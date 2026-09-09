@@ -1,5 +1,5 @@
 from fecfiler.committee_accounts.models import CommitteeAccount, Membership
-from django.contrib.sessions.exceptions import SuspiciousSession
+from django.core.exceptions import PermissionDenied
 from rest_framework.relations import PrimaryKeyRelatedField
 from rest_framework.serializers import ModelSerializer, ChoiceField, SerializerMethodField
 from drf_spectacular.utils import extend_schema_field
@@ -32,10 +32,10 @@ class CommitteeOwnedSerializer(ModelSerializer):
 
     def get_committee_uuid(self):
         request = self.context["request"]
-        get_committee_uuid = request.session["committee_uuid"]
-        if not get_committee_uuid:
-            raise SuspiciousSession("session has invalid committee_uuid")
-        return get_committee_uuid
+        committee_uuid = request.session.get("committee_uuid")
+        if not committee_uuid:
+            raise PermissionDenied("You must activate a committee account")
+        return committee_uuid
 
 
 class CommitteeMembershipSerializer(CommitteeOwnedSerializer):

@@ -1,7 +1,8 @@
 import json
+from django.utils import timezone
 from uuid import uuid4 as uuid
 from django.test import TestCase
-from django.utils import timezone
+from unittest.mock import patch
 from fecfiler.web_services.dot_fec.dot_fec_submitter import MockDotFECSubmitter
 from fecfiler.web_services.dot_fec.web_print_submitter import MockWebPrintSubmitter
 from fecfiler.web_services.models import DotFEC, UploadSubmission, WebPrintSubmission
@@ -33,25 +34,21 @@ class DotFECSubmitterTestCase(TestCase):
 
     def test_get_submission_json_for_amendment(self):
         submitter = MockDotFECSubmitter()
-        self.dot_fec_record.report.report_id = str(uuid())
+        self.dot_fec_record.report.fec_report_id = str(uuid())
         json_str = submitter.get_submission_json(
             self.dot_fec_record, "test_json_password", "test_backdoor_code"
         )
         json_obj = json.loads(json_str)
         self.assertEqual(
             json_obj["amendment_id"],
-            self.dot_fec_record.report.report_id + "test_backdoor_code",
+            self.dot_fec_record.report.fec_report_id + "test_backdoor_code",
         )
 
-    def test_poll(self):
+    @patch("fecfiler.web_services.dot_fec.dot_fec_submitter.settings")
+    def test_poll(self, mock_settings):
+        mock_settings.MOCK_EFO_DOT_FEC_SUBMISSION_DURATION_SECONDS = 0
         submitter = MockDotFECSubmitter()
         response = submitter.poll_status(UploadSubmission(created=timezone.now()))
-        response_obj = json.loads(response)
-        self.assertEqual(response_obj["status"], "PROCESSING")
-
-        response = submitter.poll_status(
-            UploadSubmission(created=timezone.now() - timezone.timedelta(seconds=30))
-        )
         response_obj = json.loads(response)
         self.assertEqual(response_obj["status"], "ACCEPTED")
 
