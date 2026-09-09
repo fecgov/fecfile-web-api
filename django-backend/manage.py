@@ -38,6 +38,7 @@ restricted_commands = [
     # COMMITTEE ACCOUNT COMMANDS #
     "load_mocked_committee_data",
     "gen_locust_load_test_data",
+    "delete_locust_load_test_data",
     "delete_committee_account",
     "load_committee_data",
     # REPORT COMMANDS #
