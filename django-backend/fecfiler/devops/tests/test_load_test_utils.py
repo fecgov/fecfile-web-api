@@ -135,9 +135,6 @@ class LoadTestUtilsTestCase(TestCase):
                     "aws-rds": [
                         {"name": "fecfile-api-rds"},
                     ],
-                    "s3": [
-                        {"name": "load-fecfile-api-s3"},
-                    ],
                 }
             ),
         },
