@@ -32,6 +32,7 @@ from fecfiler.transactions.aggregation import (
     process_aggregation_by_payee_candidate,
 )
 from fecfiler.transactions.schedule_d.views import create_in_future_reports
+from unittest.mock import patch
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -1085,7 +1086,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         for i in range(ordered_queryset.count()):
             self.assertEqual(ordered_queryset[i].id, memos_sorted[i].id)
 
-    def test_list_unassociated(self):
+    @patch("fecfiler.transactions.views.FLAG__ENABLE_UNASSIGNED_TRANSACTIONS", True)
+    def test_list_unassigned(self):
         Transaction.objects.filter(committee_account=self.committee).delete()
 
         indiviual_receipt_data = [
@@ -1127,7 +1129,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         request = self.get_request(
-            "api/v1/transactions/list/unassociated",
+            "api/v1/transactions/list/unassigned",
             {
                 "page": 1,
                 "ordering": "amount",
@@ -1139,16 +1141,17 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.view.action = "list"
         self.view.format_kwarg = None
 
-        response = self.view.list_unassociated_transactions(request)
+        response = self.view.list_unassigned_transactions(request)
 
         transactions = response.data["results"]
         self.assertEqual(response.data["count"], 5)
         self.assertEqual(len(transactions), 2)
         self.assertEqual(transactions[0]["amount"], "100.00")
 
-    def test_list_unassociated_non_paginated(self):
+    @patch("fecfiler.transactions.views.FLAG__ENABLE_UNASSIGNED_TRANSACTIONS", True)
+    def test_list_unassigned_non_paginated(self):
         request = self.get_request(
-            "api/v1/transactions/list/unassociated",
+            "api/v1/transactions/list/unassigned",
             {
                 "ordering": "date",
             },
@@ -1158,11 +1161,11 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.view.action = "list"
         self.view.format_kwarg = None
 
-        response = self.view.list_unassociated_transactions(request)
+        response = self.view.list_unassigned_transactions(request)
         self.assertEqual(response.status_code, 400)
 
         request = self.get_request(
-            "api/v1/transactions/list/unassociated",
+            "api/v1/transactions/list/unassigned",
             {
                 "ordering": "date",
                 "page": None,
@@ -1170,11 +1173,11 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         self.view.request = request
-        response = self.view.list_unassociated_transactions(request)
+        response = self.view.list_unassigned_transactions(request)
         self.assertEqual(response.status_code, 400)
 
         request = self.get_request(
-            "api/v1/transactions/list/unassociated",
+            "api/v1/transactions/list/unassigned",
             {
                 "ordering": "date",
                 "page": 1,
@@ -1182,10 +1185,11 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         self.view.request = request
-        response = self.view.list_unassociated_transactions(request)
+        response = self.view.list_unassigned_transactions(request)
         self.assertEqual(response.status_code, 200)
 
-    def test_list_unassociated_by_schedule(self):
+    @patch("fecfiler.transactions.views.FLAG__ENABLE_UNASSIGNED_TRANSACTIONS", True)
+    def test_list_unassigned_by_schedule(self):
         Transaction.objects.filter(committee_account=self.committee).delete()
 
         indiviual_receipt_data = [
@@ -1222,7 +1226,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             )
 
         request = self.get_request(
-            "api/v1/transactions/list/unassociated",
+            "api/v1/transactions/list/unassigned",
             {"page": 1, "ordering": "-amount", "page_size": 5, "schedules": "B"},
         )
 
@@ -1230,7 +1234,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         self.view.action = "list"
         self.view.format_kwarg = None
 
-        response = self.view.list_unassociated_transactions(request)
+        response = self.view.list_unassigned_transactions(request)
 
         transactions = response.data["results"]
         self.assertEqual(response.data["count"], 2)
@@ -2801,9 +2805,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 )
 
     def test_committee_locked_parent_transaction(self):
-        other_committee = CommitteeAccount(
-            committee_id="C12344321"
-        )
+        other_committee = CommitteeAccount(committee_id="C12344321")
 
         other_committee.save()
 
@@ -2811,19 +2813,11 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "date": "2023-01-01",
             "amount": "200.00",
             "group": "GENERAL",
-            "memo": True
+            "memo": True,
         }
 
-        good_contact = create_test_individual_contact(
-            "Good",
-            "Guy",
-            other_committee.id
-        )
-        evil_contact = create_test_individual_contact(
-            "Evil",
-            "Guy",
-            self.committee.id
-        )
+        good_contact = create_test_individual_contact("Good", "Guy", other_committee.id)
+        evil_contact = create_test_individual_contact("Evil", "Guy", self.committee.id)
 
         original_transaction = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -2862,7 +2856,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             payload,
             TransactionViewSet,
             "create",
-            committee=self.committee
+            committee=self.committee,
         )
 
         self.assertEqual(response.status_code, 400)
@@ -2999,3 +2993,91 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         self.assertEqual(response.status_code, 400)
+
+    @patch("fecfiler.transactions.views.FLAG__ENABLE_UNASSIGNED_TRANSACTIONS", True)
+    def test_transactions_outside_report_missing_params(self):
+        request = self.get_request("/api/v1/transactions/outside")
+        self.view.request = request
+        response = self.view.transactions_outside_report(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(
+            response.data["error"],
+            "Both 'from' and 'through' query parameters are required.",
+        )
+
+        request = self.get_request(
+            "/api/v1/transactions/outside", params={"from": "01/01/2024"}
+        )
+        self.view.request = request
+        response = self.view.transactions_outside_report(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch("fecfiler.transactions.views.FLAG__ENABLE_UNASSIGNED_TRANSACTIONS", True)
+    def test_transactions_outside_report_invalid_date_format(self):
+        request = self.get_request(
+            "/api/v1/transactions/outside",
+            params={"from": "2024-01-01", "through": "03/31/2024"},
+        )
+        self.view.request = request
+        response = self.view.transactions_outside_report(request)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data["error"], "Invalid date format. Use MM/DD/YYYY.")
+
+    @patch("fecfiler.transactions.views.FLAG__ENABLE_UNASSIGNED_TRANSACTIONS", True)
+    def test_transactions_outside_report_success_and_memo_exclusion(self):
+        Transaction.objects.filter(committee_account=self.committee).delete()
+
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-05",
+            "100.00",
+            memo_code=False,
+        )
+
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-10",
+            "150.00",
+            memo_code=None,
+        )
+
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-01-15",
+            "200.00",
+            memo_code=True,
+        )
+
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-02-15",
+            "300.00",
+            memo_code=False,
+        )
+
+        create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-04-05",
+            "400.00",
+            memo_code=False,
+        )
+
+        request = self.get_request(
+            "/api/v1/transactions/outside",
+            params={"from": "02/01/2024", "through": "03/31/2024"},
+        )
+        self.view.request = request
+        response = self.view.transactions_outside_report(request)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, 3)
