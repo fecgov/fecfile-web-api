@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Added to FECfile+ Committee Account</title>
+    <style>
+      @font-face {
+        font-family: karla;
+        src: url(https://fecfile.fec.gov/assets/fonts/karla-regular.ttf);
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: karla-bold;
+        src: url(https://fecfile.fec.gov/assets/fonts/karla-bold.ttf);
+        font-weight: 700;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      body, a {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100% !important;
+        background-color: #e8e8e8;
+        color: #212121;
+        font-family: karla, Arial, Helvetica, sans-serif;
+        font-size: 14px;
+      }
+
+      img {
+        border: 0;
+        outline: none;
+        text-decoration: none;
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+
+      p {
+        margin: 0 0 20px;
+      }
+
+      .email-shell {
+        background-color: #e8e8e8;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      .email-wrapper {
+        padding: 20px 0px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      .email-container {
+        width: 600px;
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+      }
+
+      .email-banner {
+        padding-bottom: 2px;
+      }
+
+      .email-banner img {
+        width: 100%;
+        max-width: 600px !important;
+        height: 89px !important;
+        max-height: 89px !important;
+        display: block;
+      }
+
+      .divider {
+        height: 1px;
+        background-color: #e8e8e8;
+        font-size: 0;
+        line-height: 0;
+      }
+
+      .email-content {
+        padding: 20px 60px 0px;
+      }
+
+      .email-content .divider {
+        margin-bottom: 5px;
+      }
+
+      .email-title {
+        margin: 0 0 20px;
+        font-family: karla-bold, Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        font-size: 24px;
+        line-height: 1.3;
+        color: #1a1a1a;
+      }
+
+      .meta-list {
+        width: 100%;
+        margin: 0 0 20px;
+      }
+
+      .meta-item {
+        display: flex;
+        align-items: flex-start;
+        margin: 0 0 8px;
+        color: #212121;
+      }
+
+      .meta-label {
+        width: 42%;
+        padding: 0 10px 0 0;
+        font-weight: bold;
+      }
+
+      .meta-value {
+        flex: 1;
+      }
+
+      a.email-link {
+        color: #212121 !important;
+        text-decoration: underline dotted !important;
+      }
+
+      .footer-primary,
+      .footer-secondary {
+        text-align: center;
+      }
+
+      .footer-primary {
+        font-family: karla-bold, Arial, Helvetica, sans-serif;
+        font-weight: bold;
+        background-color: #112e51;
+        max-height: 80px;
+        padding: 33px 0;
+      }
+
+      .footer-secondary {
+        background-color: #e8e8e8;
+        padding-top: 15px;
+      }
+
+      .footer-links a {
+        text-decoration: none;
+      }
+
+      .footer-primary .footer-links,
+      .footer-primary .footer-links a {
+        color: #ffffff;
+      }
+
+      .footer-secondary .footer-links,
+      .footer-secondary .footer-links a {
+        color: #212121;
+      }
+
+      .footer-separator {
+        margin: 0 12px;
+      }
+
+      @media screen and (max-width: 640px) {
+        .email-container {
+          width: 100% !important;
+        }
+
+        .email-content {
+          padding-left: 20px !important;
+          padding-right: 20px !important;
+        }
+
+        .meta-item {
+          display: block;
+        }
+
+        .meta-label {
+          width: 100%;
+          display: block;
+          padding-right: 0;
+          margin-bottom: 4px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-shell">
+      <div class="email-wrapper">
+        <div class="email-container">
+          <div class="email-banner">
+            <img src="{{ fecfile_link }}/assets/img/email_banner_600.png" alt="Email from FEC.gov" width="600" height="89" />
+          </div>
+          <div class="divider" aria-hidden="true"></div>
+
+          <div class="email-content">
+            <h1 class="email-title">Added to FECfile+ Committee Account</h1>
+
+            <p>
+              {{ full_name }} has added you as a {{ role }} in FECfile+ for the following committee:
+            </p>
+
+            <div class="meta-list">
+              <div class="meta-item">
+                <div class="meta-label">Committee ID:</div>
+                <div class="meta-value">{{ committee_id }}</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">Committee name:</div>
+                <div class="meta-value">{{ committee_name }}</div>
+              </div>
+            </div>
+
+            <p>
+              You can access the committee account by
+              <a href="{{ fecfile_link }}/login" class="email-link">signing in to FECfile+</a>.
+            </p>
+
+            <p>
+              <strong>Important:</strong> You must have a Login.gov account to sign in to FECfile+.
+              If you don't already have a Login.gov account for this email, select “Create an account”
+              to get started.
+            </p>
+
+            <div class="divider" aria-hidden="true"></div>
+
+            <p>
+              If you are receiving this email in error or have any questions,
+              please contact the FEC Electronic Filing Office
+              toll-free at <a href="tel:8004249530,1307" class="email-link">(800) 424-9530 ext. 1307</a>
+              or locally at <a href="tel:2026941307" class="email-link">(202) 694-1307</a>.
+            </p>
+          </div>
+
+          <div class="footer-primary">
+            <div class="footer-links">
+              <a href="{{ fecfile_link }}/login">FECfile+</a>
+              <span class="footer-separator">|</span>
+              <a href="https://www.fec.gov/contact/#filing-reports-and-amendments-reporting-specific-transactions">Contact Us</a>
+            </div>
+          </div>
+
+          <div class="footer-secondary">
+            <div class="footer-links">
+              <a href="https://www.fec.gov/">FEC.gov</a>
+              <span class="footer-separator">|</span>
+              <a href="https://www.fec.gov/help-candidates-and-committees/filing-reports/electronic-filing/">Electronic filing overview</a>
+              <span class="footer-separator">|</span>
+              <a href="https://www.fec.gov/about/privacy-and-security-policy/">Privacy Policy</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
