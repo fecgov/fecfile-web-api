@@ -22,21 +22,24 @@ class Form24ViewSetTest(FecfilerViewSetTest):
         self.f24_report_2 = create_form24(self.committee, data={"name": self.test_name_2})
         self.f24_report_3 = create_form24(self.committee, data={"name": self.test_name_3})
 
-    def test_names_happy_path(self):
-        expected_json = [
-            {
-                "name": self.test_name_2,
-            },
-            {
-                "name": self.test_name_3,
-            },
-        ]
-
+    def test_validation_check_email_is_valid(self):
+        params = f"?name=test_does_not_exist&exclude_ids={self.f24_report_1.id}"
         response = self.send_viewset_get_request(
-            "/api/v1/reports/form-24/names/?exclude_ids=" + str(self.f24_report_1.id),
+            "/api/v1/reports/form-24/validation_check/" + params,
             Form24ViewSet,
-            "names",
+            "validation_check",
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
+        self.assertTrue(response.data["valid"])
+
+    def test_validation_check_email_is_invalid(self):
+        params = "?name=test_name_2&exclude_ids=" + str(self.f24_report_1.id)
+        response = self.send_viewset_get_request(
+            "/api/v1/reports/form-24/validation_check/" + params,
+            Form24ViewSet,
+            "validation_check",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data["valid"])
