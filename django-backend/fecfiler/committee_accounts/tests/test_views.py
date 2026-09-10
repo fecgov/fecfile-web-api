@@ -180,6 +180,32 @@ class CommitteeMemberViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 400)
 
+    @patch("fecfiler.committee_accounts.views.send_email_notification")
+    @patch("fecfiler.committee_accounts.views.settings")
+    def test_add_member_email_template_renders_expected_values(
+        self, mock_settings, mock_send_email
+    ):
+        mock_settings.SPACE = "local"
+
+        viewset = CommitteeMembershipViewSet()
+        viewset.sendAddMemberEmailNotification(
+            committee_id="C12345678",
+            committee_name="Example Committee",
+            email="invitee@fec.gov",
+            full_name="Alex Admin",
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+        )
+
+        self.assertEqual(mock_send_email.call_count, 1)
+        body_text = mock_send_email.call_args.kwargs["body_text"]
+
+        self.assertIn("Alex Admin has added you as a", body_text)
+        self.assertIn("Committee ID: C12345678", body_text)
+        self.assertIn("Committee Name: Example Committee", body_text)
+        self.assertIn("http://localhost:4200/login", body_text)
+        self.assertNotIn("{{", body_text)
+        self.assertNotIn("}}", body_text)
+
     def test_update_membership_forbidden(self):
         user = User.objects.get(id="fb20ffc3-285e-448e-9e56-9ca1fd43e7d3")
         response = self.send_viewset_put_request(

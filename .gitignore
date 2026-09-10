@@ -56,7 +56,6 @@ testem.log
 django-backend/.cache/
 django-backend/.local/
 
-
 ### Bower ###
 */bower_components
 *.bower-cache
@@ -90,3 +89,6 @@ django-backend/celerybeat-schedule-wal
 #profiling
 static/
 *.prof
+
+# exceptions
+!django-backend/static/
