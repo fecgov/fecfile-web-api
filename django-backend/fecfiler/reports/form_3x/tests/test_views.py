@@ -82,6 +82,46 @@ class Form3XViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(str(response.content, encoding="utf8"), expected_json)
 
+    def test_associated_no_dates(self):
+        response = self.send_viewset_get_request(
+            "/api/v1/reports/form-f3x/associated/",
+            Form3XViewSet,
+            "get_associated_form3x_report",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data)
+
+    def test_associated_empty_dates(self):
+        response = self.send_viewset_get_request(
+            "/api/v1/reports/form-f3x/associated/?disbursement_date=&dissemination_date=",
+            Form3XViewSet,
+            "get_associated_form3x_report",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data)
+
+    def test_associated_disbursement_date_happy_path(self):
+        response = self.send_viewset_get_request(
+            "/api/v1/reports/form-f3x/associated/?disbursement_date=2004-02-01",
+            Form3XViewSet,
+            "get_associated_form3x_report",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], str(self.q1_report.id))
+
+    def test_associated_dissemination_date_happy_path(self):
+        response = self.send_viewset_get_request(
+            "/api/v1/reports/form-f3x/associated/?dissemination_date=2005-03-02",
+            Form3XViewSet,
+            "get_associated_form3x_report",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], str(self.m4_report.id))
+
     def test_final(self):
         request = self.build_viewset_get_request("/api/v1/reports/form-f3x/final")
         request.query_params = {"year": "2004"}
@@ -105,8 +145,7 @@ class Form3XViewSetTest(FecfilerViewSetTest):
 
     def test_CRUD_committee_locked_update(self):
         other_committee = CommitteeAccount(
-            committee_id="C12344321",
-            id="55555555-4444-3333-2222-111111111111"
+            committee_id="C12344321", id="55555555-4444-3333-2222-111111111111"
         )
 
         other_committee.save()
@@ -123,17 +162,17 @@ class Form3XViewSetTest(FecfilerViewSetTest):
             f"/api/v1/reports/form3x/{str(report.id)}/",
             {
                 "report_code": "Q2",
-                'form_type': "F3XN",
-                'treasurer_last_name': "Treasurer",
-                'treasurer_first_name': "Mr",
-                'date_signed': "2004-01-01",
+                "form_type": "F3XN",
+                "treasurer_last_name": "Treasurer",
+                "treasurer_first_name": "Mr",
+                "date_signed": "2004-01-01",
                 "coverage_from_date": "2025-01-01",
-                "coverage_through_date": "2025-02-01"
+                "coverage_through_date": "2025-02-01",
             },
             Form3XViewSet,
             "update",
             pk=report.id,
-            committee=other_committee
+            committee=other_committee,
         )
 
         self.assertEqual(response.status_code, 404)
