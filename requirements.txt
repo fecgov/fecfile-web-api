@@ -16,7 +16,7 @@ github3.py==4.0.1
 GitPython==3.1.59
 gunicorn==23.0.0
 invoke==2.2.0
-jwcrypto==1.5.7
+jwcrypto==1.5.9
 psycopg[pool]==3.3.0
 PyJWT==2.13.0
 redis==5.3.1
