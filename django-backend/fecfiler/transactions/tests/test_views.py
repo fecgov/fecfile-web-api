@@ -1104,7 +1104,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 receipt_data["date"],
                 receipt_data["amount"],
                 group=receipt_data["group"],
-                report=None,
                 memo_code=receipt_data["memo"],
             )
 
@@ -1114,7 +1113,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             self.test_org_contact,
             "2025-01-02",
             Decimal("250.00"),
-            report=None,
         )
 
         create_schedule_a(
@@ -1128,65 +1126,16 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             memo_code=False,
         )
 
-        request = self.get_request(
-            "api/v1/transactions/list/unassigned",
-            {
-                "page": 1,
-                "ordering": "amount",
-                "page_size": 2,
-            },
+        response = self.send_viewset_get_request(
+            "/api/v1/transactions/?page=1&ordering=amount&page_size=5",
+            TransactionViewSet,
+            "list",
+            committee=self.committee,
         )
-
-        self.view.request = request
-        self.view.action = "list"
-        self.view.format_kwarg = None
-
-        response = self.view.list_unassigned_transactions(request)
 
         transactions = response.data["results"]
         self.assertEqual(response.data["count"], 5)
-        self.assertEqual(len(transactions), 2)
-        self.assertEqual(transactions[0]["amount"], "100.00")
-
-    @patch("fecfiler.transactions.views.FLAG__ENABLE_UNASSIGNED_TRANSACTIONS", True)
-    def test_list_unassigned_non_paginated(self):
-        request = self.get_request(
-            "api/v1/transactions/list/unassigned",
-            {
-                "ordering": "date",
-            },
-        )
-
-        self.view.request = request
-        self.view.action = "list"
-        self.view.format_kwarg = None
-
-        response = self.view.list_unassigned_transactions(request)
-        self.assertEqual(response.status_code, 400)
-
-        request = self.get_request(
-            "api/v1/transactions/list/unassigned",
-            {
-                "ordering": "date",
-                "page": None,
-            },
-        )
-
-        self.view.request = request
-        response = self.view.list_unassigned_transactions(request)
-        self.assertEqual(response.status_code, 400)
-
-        request = self.get_request(
-            "api/v1/transactions/list/unassigned",
-            {
-                "ordering": "date",
-                "page": 1,
-            },
-        )
-
-        self.view.request = request
-        response = self.view.list_unassigned_transactions(request)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(transactions[0]["amount"], '100.00')
 
     @patch("fecfiler.transactions.views.FLAG__ENABLE_UNASSIGNED_TRANSACTIONS", True)
     def test_list_unassigned_by_schedule(self):
@@ -1206,7 +1155,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 receipt_data["date"],
                 receipt_data["amount"],
                 group=receipt_data["group"],
-                report=None,
                 memo_code=receipt_data["memo"],
             )
 
@@ -1221,25 +1169,19 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
                 self.test_org_contact,
                 expenditure_data["date"],
                 expenditure_data["amount"],
-                report=None,
                 memo_code=expenditure_data["memo"],
             )
 
-        request = self.get_request(
-            "api/v1/transactions/list/unassigned",
-            {"page": 1, "ordering": "-amount", "page_size": 5, "schedules": "B"},
+        response = self.send_viewset_get_request(
+            "/api/v1/transactions/?page=1&ordering=-amount&page_size=5&schedules=B",
+            TransactionViewSet,
+            "list",
+            committee=self.committee,
         )
-
-        self.view.request = request
-        self.view.action = "list"
-        self.view.format_kwarg = None
-
-        response = self.view.list_unassigned_transactions(request)
 
         transactions = response.data["results"]
         self.assertEqual(response.data["count"], 2)
-        self.assertEqual(len(transactions), 2)
-        self.assertEqual(transactions[0]["amount"], "250.00")
+        self.assertEqual(transactions[0]["amount"], '250.00')
 
     def test_list_committee_transactions(self):
         c1 = CommitteeAccount.objects.create(committee_id="C00000001")
@@ -1303,7 +1245,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         c1_response = self.send_viewset_get_request(
-            "/api/v1/transactions/",
+            f"/api/v1/transactions/?report_id={c1_q1_report.id}",
             TransactionViewSet,
             "list",
             committee=c1,
@@ -1312,7 +1254,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         c1_response_results = c1_response.data["results"]
 
         c2_response = self.send_viewset_get_request(
-            "/api/v1/transactions/",
+            f"/api/v1/transactions/?report_id={c2_q1_report.id}",
             TransactionViewSet,
             "list",
             committee=c2,

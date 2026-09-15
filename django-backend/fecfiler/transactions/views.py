@@ -127,7 +127,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             if self.request
             else None
         )
-        queryset = queryset.filter(reports__id=report_id) if report_id else queryset
+        action = getattr(self, "action", None)
+        if report_id:
+            queryset = queryset.filter(reports__id=report_id)
+        elif action == "list" and FLAG__ENABLE_UNASSIGNED_TRANSACTIONS:
+            queryset = queryset.filter(reports__isnull=True)
 
         if schedules_to_include:
             queryset = queryset.filter(
@@ -153,25 +157,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             )
 
         return queryset
-
-    @action(detail=False, methods=["get"], url_path=r"list/unassigned")
-    def list_unassigned_transactions(self, request, *args, **kwargs):
-        if not FLAG__ENABLE_UNASSIGNED_TRANSACTIONS:
-            return Response(
-                {"error": "Unassigned transactions are not enabled."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if "page" not in request.query_params or request.query_params["page"] is None:
-            return Response("page is required", status=400)
-
-        queryset = self.filter_queryset(self.get_queryset())
-
-        # __isnull evaluates to true when no many-to-many relationships exist
-        queryset = queryset.filter(reports__isnull=True)
-
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         with db_transaction.atomic():
