@@ -1,7 +1,7 @@
 from django.db import transaction as db_transaction, models
 from rest_framework import pagination
 from rest_framework.filters import OrderingFilter
-
+from fecfiler.settings import FLAG__ENABLE_UNASSIGNED_TRANSACTIONS
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -154,8 +154,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         return queryset
 
-    # @action(detail=False, methods=["get"], url_path=r"list/unassociated")
-    def list_unassociated_transactions(self, request, *args, **kwargs):
+    @action(detail=False, methods=["get"], url_path=r"list/unassigned")
+    def list_unassigned_transactions(self, request, *args, **kwargs):
+        if not FLAG__ENABLE_UNASSIGNED_TRANSACTIONS:
+            return Response(
+                {"error": "Unassigned transactions are not enabled."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         if "page" not in request.query_params or request.query_params["page"] is None:
             return Response("page is required", status=400)
 
@@ -178,9 +183,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(
-                request.data,
-                request,
-                instance=self.get_object()
+                request.data, request, instance=self.get_object()
             )
             update_dependent_parent_purpose_description_if_needed(saved_transaction)
         return Response(saved_transaction.id)
@@ -294,6 +297,41 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction.remove_from_report(report.id)
 
         return Response("Transaction removed from report")
+
+    @action(detail=False, methods=["get"], url_path=r"outside")
+    def transactions_outside_report(self, request):
+        if not FLAG__ENABLE_UNASSIGNED_TRANSACTIONS:
+            return Response(
+                {"error": "Unassigned transactions are not enabled."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        from_date_str = request.query_params.get("from")
+        through_date_str = request.query_params.get("through")
+
+        if not from_date_str or not through_date_str:
+            return Response(
+                {"error": "Both 'from' and 'through' query parameters are required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            from_date = datetime.strptime(from_date_str, "%m/%d/%Y").date()
+            through_date = datetime.strptime(through_date_str, "%m/%d/%Y").date()
+        except ValueError:
+            return Response(
+                {"error": "Invalid date format. Use MM/DD/YYYY."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        queryset = (
+            self.filter_queryset(self.get_queryset())
+            .filter(date__isnull=False)
+            .exclude(date__range=(from_date, through_date))
+            .exclude(memo_code=True)
+        )
+
+        count = queryset.count()
+        return Response(count, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["get"], url_path=r"previous/entity")
     def previous_transaction_by_entity(self, request):
@@ -479,13 +517,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def get_child_instance(self, child_id, committee_id):
         # ensure that child transaction belongs to this committee
-        child_instance = Transaction.objects.select_related(
-            "schedule_a", "schedule_b", "schedule_e", "contact_2"
-        ).filter(id=child_id, committee_account_id=committee_id).first()
-        if child_instance is None:
-            raise ValidationError(
-                {"children": ["Invalid child_id or child"]}
+        child_instance = (
+            Transaction.objects.select_related(
+                "schedule_a", "schedule_b", "schedule_e", "contact_2"
             )
+            .filter(id=child_id, committee_account_id=committee_id)
+            .first()
+        )
+        if child_instance is None:
+            raise ValidationError({"children": ["Invalid child_id or child"]})
         return child_instance
 
     def save_transaction(self, transaction_data, request, instance=None):

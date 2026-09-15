@@ -2,11 +2,10 @@ from django.test import TestCase
 from ..serializers import (
     Form3Serializer,
     COVERAGE_DATE_REPORT_CODE_COLLISION,
-    COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS,
 )
 
 from fecfiler.user.models import User
-from fecfiler.reports.models import Report
+from fecfiler.reports.models import Report, ReportTransaction
 from rest_framework.request import Request, HttpRequest
 from fecfiler.reports.tests.utils import create_form3
 from fecfiler.transactions.tests.utils import create_schedule_a
@@ -170,18 +169,19 @@ class F3SerializerTestCase(TestCase):
 
     def test_update_coverage_to_exclude_transaction(self):
         report_a = create_form3(self.committee, "2024-01-01", "2024-03-31")
-        create_schedule_a(
+        transaction = create_schedule_a(
             "INDIVIDUAL_RECEIPT", self.committee, None, "2024-03-31", 250, report=report_a
         )
+
+        self.assertEqual(ReportTransaction.objects.filter(report=report_a).count(), 1)
 
         serializer = Form3Serializer(
             data=self.valid_f3_report,
             context={"request": self.mock_request},
         )
-        serializer.is_valid()
-        self.assertRaises(
-            type(COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS),
-            serializer.update,
+        self.assertTrue(serializer.is_valid())
+
+        serializer.update(
             report_a,
             {
                 "coverage_from_date": datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
@@ -190,6 +190,13 @@ class F3SerializerTestCase(TestCase):
                 ).date(),
             },
         )
+
+        self.assertFalse(
+            ReportTransaction.objects.filter(
+                report=report_a, transaction=transaction
+            ).exists()
+        )
+        self.assertEqual(ReportTransaction.objects.filter(report=report_a).count(), 0)
 
     def test_update_coverage_to_exclude_memo_transaction(self):
         report_a = create_form3(self.committee, "2024-01-01", "2024-03-31")
