@@ -50,7 +50,7 @@ date_formats = [
     "%m/%d/%y",  # "01/02/24"
     "%m-%d-%Y",  # "01-02-2024"
     "%m-%d-%y",  # "01-02-24"
-    "%Y-%m-%d",  # "2024-01-10" without time
+    "%Y-%m-%d",  # "2024-01-02" without time
 ]
 
 
@@ -98,7 +98,7 @@ def text_to_date_serializer(model_instance, field_name, mapping):
             date_object = datetime.strptime(date_string, date_format).date()
             return date_object.strftime("%Y%m%d") if date_object else ""
         except ValueError:
-            continue  # If it fails, try the next format
+            continue
     logger.debug(
         f"unable to match manually entered date {date_string} with any known formats.  "
         f"Returning value as is."
