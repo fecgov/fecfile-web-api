@@ -89,7 +89,7 @@ class TransactionViewTestCase(TestCase):
         )
         for t in transactions:
             t.refresh_from_db()
-        self.assertEqual(transactions[0].aggregate, None)
+        self.assertEqual(transactions[0].aggregate, Decimal("0.00"))
         self.assertEqual(transactions[0].force_unaggregated, True)
         self.assertEqual(transactions[1].aggregate, Decimal("200"))
 
@@ -157,11 +157,9 @@ class TransactionViewTestCase(TestCase):
             )
             parnership_attribution_jf_transfer_memo.save()
 
-        view = (
-            Transaction.objects
-            .filter(committee_account__id=self.committee.id)
-            .order_by("date")
-        )
+        view = Transaction.objects.filter(
+            committee_account__id=self.committee.id
+        ).order_by("date")
 
         self.assertEqual(view[0].itemized, True)
         self.assertEqual(view[0].aggregate, 500)
@@ -312,9 +310,7 @@ class TransactionViewTestCase(TestCase):
         second_repayment.save()
         process_aggregation_for_debts(original_debt)
 
-        view = Transaction.objects.filter(
-            committee_account__id=self.committee.id
-        )
+        view = Transaction.objects.filter(committee_account__id=self.committee.id)
         original_debt_view = view.filter(id=original_debt.id).first()
         self.assertEqual(original_debt_view.incurred_prior, Decimal("0"))
         self.assertEqual(original_debt_view.payment_prior, Decimal("0"))
@@ -362,9 +358,7 @@ class TransactionViewTestCase(TestCase):
             "SB21B",
         )
 
-        view = Transaction.objects.filter(
-            committee_account__id=self.committee.id
-        )
+        view = Transaction.objects.filter(committee_account__id=self.committee.id)
         self.assertEqual(view[0].line_label, "11(a)(i)")
         self.assertEqual(view[1].line_label, "11(a)(ii)")
         self.assertEqual(view[2].line_label, "11(a)(ii)")
