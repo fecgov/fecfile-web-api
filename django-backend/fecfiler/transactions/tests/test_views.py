@@ -3085,3 +3085,131 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, 3)
+
+    def test_update_itemization_aggregation_unaggregate(self):
+        test_q1_report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        test_ind_receipt_1 = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2026-01-01",
+            100,
+            "GENERAL",
+            report=test_q1_report,
+        )
+        test_ind_receipt_2 = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2026-01-02",
+            50,
+            "GENERAL",
+            report=test_q1_report,
+        )
+        test_ind_receipt_3 = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2026-01-03",
+            10,
+            "GENERAL",
+            report=test_q1_report,
+        )
+
+        # FORCE UNAGGREGATE
+        test_unaggregate_payload = {
+            "force_unaggregated": True,
+            "schedule_id": "A",
+            "schema_name": "INDIVIDUAL_RECEIPT",
+        }
+
+        id = test_ind_receipt_2.id
+        self.send_viewset_put_request(
+            f"api/v1/transactions/{id}/update-itemization-aggregation/",
+            test_unaggregate_payload,
+            TransactionViewSet,
+            "update_itemization_aggregation",
+            pk=id,
+        )
+        test_ind_receipt_1.refresh_from_db()
+        test_ind_receipt_2.refresh_from_db()
+        test_ind_receipt_3.refresh_from_db()
+
+        # receipt 1
+        self.assertEqual(
+            test_ind_receipt_1.schedule_a.contribution_amount,
+            100,
+        )
+        self.assertEqual(
+            test_ind_receipt_1.aggregate,
+            100,
+        )
+
+        # receipt 2
+        self.assertEqual(
+            test_ind_receipt_2.schedule_a.contribution_amount,
+            50,
+        )
+        self.assertEqual(
+            test_ind_receipt_2.aggregate,
+            100,
+        )
+
+        # receipt 3
+        self.assertEqual(
+            test_ind_receipt_3.schedule_a.contribution_amount,
+            10,
+        )
+        self.assertEqual(
+            test_ind_receipt_3.aggregate,
+            110,
+        )
+
+        # FORCE AGGREGATE
+        test_aggregate_payload = {
+            "force_unaggregated": False,
+            "schedule_id": "A",
+            "schema_name": "INDIVIDUAL_RECEIPT",
+        }
+
+        id = test_ind_receipt_2.id
+        self.send_viewset_put_request(
+            f"api/v1/transactions/{id}/update-itemization-aggregation/",
+            test_aggregate_payload,
+            TransactionViewSet,
+            "update_itemization_aggregation",
+            pk=id,
+        )
+        test_ind_receipt_1.refresh_from_db()
+        test_ind_receipt_2.refresh_from_db()
+        test_ind_receipt_3.refresh_from_db()
+
+        # receipt 1
+        self.assertEqual(
+            test_ind_receipt_1.schedule_a.contribution_amount,
+            100,
+        )
+        self.assertEqual(
+            test_ind_receipt_1.aggregate,
+            100,
+        )
+
+        # receipt 2
+        self.assertEqual(
+            test_ind_receipt_2.schedule_a.contribution_amount,
+            50,
+        )
+        self.assertEqual(
+            test_ind_receipt_2.aggregate,
+            150,
+        )
+
+        # receipt 3
+        self.assertEqual(
+            test_ind_receipt_3.schedule_a.contribution_amount,
+            10,
+        )
+        self.assertEqual(
+            test_ind_receipt_3.aggregate,
+            160,
+        )
