@@ -1,6 +1,9 @@
 from django.test import TestCase
 from unittest.mock import patch, MagicMock
 from fecfiler.devops.utils.load_test import LoadTestUtils
+from fecfiler.committee_accounts.models import CommitteeAccount, Membership
+from fecfiler.user.models import User
+import json
 
 
 class LoadTestUtilsTestCase(TestCase):
@@ -69,3 +72,176 @@ class LoadTestUtilsTestCase(TestCase):
             committee_account_id=mock_committee.id,
             user=mock_user,
         )
+
+    @patch.dict(
+        "os.environ",
+        {
+            "VCAP_APPLICATION": json.dumps(
+                {
+                    "application_name": "load-fecfile-web-api",
+                }
+            ),
+            "VCAP_SERVICES": json.dumps(
+                {
+                    "aws-rds": [
+                        {"name": "load-fecfile-api-rds"},
+                    ],
+                    "s3": [
+                        {"name": "load-fecfile-api-s3"},
+                    ],
+                }
+            ),
+        },
+        clear=False,
+    )
+    def test_validate_load_mirror_runtime_success(self):
+        self.utils.validate_load_mirror_runtime()
+
+    @patch.dict(
+        "os.environ",
+        {
+            "VCAP_APPLICATION": json.dumps(
+                {
+                    "application_name": "fecfile-web-api",
+                }
+            ),
+            "VCAP_SERVICES": json.dumps(
+                {
+                    "aws-rds": [
+                        {"name": "load-fecfile-api-rds"},
+                    ],
+                    "s3": [
+                        {"name": "load-fecfile-api-s3"},
+                    ],
+                }
+            ),
+        },
+        clear=False,
+    )
+    def test_validate_load_mirror_runtime_fails_for_non_load_app(self):
+        with self.assertRaisesRegex(ValueError, "load testing mirror"):
+            self.utils.validate_load_mirror_runtime()
+
+    @patch.dict(
+        "os.environ",
+        {
+            "VCAP_APPLICATION": json.dumps(
+                {
+                    "application_name": "load-fecfile-web-api",
+                }
+            ),
+            "VCAP_SERVICES": json.dumps(
+                {
+                    "aws-rds": [
+                        {"name": "fecfile-api-rds"},
+                    ],
+                }
+            ),
+        },
+        clear=False,
+    )
+    def test_validate_load_mirror_runtime_fails_without_required_rds(self):
+        with self.assertRaisesRegex(ValueError, "load testing mirror"):
+            self.utils.validate_load_mirror_runtime()
+
+    @patch.dict(
+        "os.environ",
+        {
+            "VCAP_APPLICATION": json.dumps(
+                {
+                    "application_name": "load-fecfile-web-api",
+                }
+            ),
+            "VCAP_SERVICES": json.dumps(
+                {
+                    "aws-rds": [
+                        {"name": "load-fecfile-api-rds"},
+                    ],
+                }
+            ),
+        },
+        clear=False,
+    )
+    def test_validate_load_mirror_runtime_succeeds_with_only_required_rds(self):
+        self.utils.validate_load_mirror_runtime()
+
+    @patch.dict(
+        "os.environ",
+        {
+            "VCAP_APPLICATION": json.dumps(
+                {
+                    "application_name": "load-fecfile-web-api",
+                }
+            ),
+            "VCAP_SERVICES": "not-json",
+        },
+        clear=False,
+    )
+    def test_validate_load_mirror_runtime_fails_for_invalid_service_json(self):
+        with self.assertRaisesRegex(ValueError, "Could not parse VCAP_SERVICES"):
+            self.utils.validate_load_mirror_runtime()
+
+    def test_delete_load_test_committees_and_data_deletes_only_marked_data(self):
+        load_user = User.objects.create(
+            email="test@test.com",
+            username="test@test.com",
+        )
+        keep_user = User.objects.create(
+            email="keep@example.com",
+            username="keep@example.com",
+        )
+
+        load_committee = CommitteeAccount.objects.create(committee_id="C33333333")
+        keep_committee = CommitteeAccount.objects.create(committee_id="C12345678")
+
+        Membership.objects.create(
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            committee_account=load_committee,
+            user=load_user,
+        )
+        Membership.objects.create(
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            committee_account=keep_committee,
+            user=keep_user,
+        )
+
+        self.utils.delete_load_test_committees_and_data()
+
+        self.assertFalse(
+            CommitteeAccount.all_objects.filter(committee_id="C33333333").exists()
+        )
+        self.assertTrue(
+            CommitteeAccount.all_objects.filter(committee_id="C12345678").exists()
+        )
+        self.assertFalse(User.objects.filter(email__iexact="test@test.com").exists())
+        self.assertTrue(User.objects.filter(email__iexact="keep@example.com").exists())
+
+    def test_delete_load_test_committees_and_data_keeps_test_user_with_memberships(self):
+        load_user = User.objects.create(
+            email="test@test.com",
+            username="test@test.com",
+        )
+        committee = CommitteeAccount.objects.create(committee_id="C33333333")
+        other_committee = CommitteeAccount.objects.create(committee_id="C87654321")
+
+        Membership.objects.create(
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            committee_account=committee,
+            user=load_user,
+        )
+        Membership.objects.create(
+            role=Membership.CommitteeRole.COMMITTEE_ADMINISTRATOR,
+            committee_account=other_committee,
+            user=load_user,
+        )
+
+        with patch.object(
+            LoadTestUtils,
+            "delete_load_test_committees_and_data",
+            wraps=self.utils.delete_load_test_committees_and_data,
+        ):
+            CommitteeAccount.objects.filter(committee_id="C33333333") \
+                .first().hard_delete()
+            self.utils.delete_orphaned_test_user()
+
+        self.assertTrue(User.objects.filter(email__iexact="test@test.com").exists())
