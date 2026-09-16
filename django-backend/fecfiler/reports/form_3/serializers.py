@@ -1,4 +1,5 @@
-from django.db import transaction
+from django.db.transaction import atomic
+from fecfiler.settings import FLAG__ENABLE_UNASSIGNED_TRANSACTIONS
 from fecfiler.reports.models import Report, ReportTransaction
 from fecfiler.reports.form_3.models import Form3
 from fecfiler.reports.serializers import (
@@ -62,45 +63,50 @@ class BaseForm3Serializer(ReportSerializer):
         return super().save(**kwargs)
 
     def update(self, instance, validated_data):
-        prior_coverage_through_date = instance.coverage_through_date
-        prior_coverage_from_date = instance.coverage_from_date
+        with atomic():
+            prior_coverage_through_date = instance.coverage_through_date
+            prior_coverage_from_date = instance.coverage_from_date
 
-        transactions_outside_coverage_dates = ReportTransaction.objects.filter(
-            ~Q(transaction__memo_code=True),
-            self.get_transaction_date_outside_coverage_dates_clause(),
-            transaction__deleted=None,
-            report_id=instance.id,
-        ).count()
+            transactions_outside_coverage_dates = ReportTransaction.objects.filter(
+                ~Q(transaction__memo_code=True),
+                self.get_transaction_date_outside_coverage_dates_clause(),
+                transaction__deleted=None,
+                report_id=instance.id,
+            )
+            if transactions_outside_coverage_dates.exists():
+                if FLAG__ENABLE_UNASSIGNED_TRANSACTIONS:
+                    transactions_outside_coverage_dates.delete()
+                    if instance.can_unamend:
+                        instance.can_unamend = False
+                else:
+                    raise COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS
 
-        if transactions_outside_coverage_dates > 0:
-            raise COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS
+            if self.overlaps_other_f3_report(
+                instance.id,
+                instance.committee_account.id,
+                validated_data,
+            ):
+                raise COVERAGE_DATE_REPORT_CODE_COLLISION
 
-        if self.overlaps_other_f3_report(
-            instance.id,
-            instance.committee_account.id,
-            validated_data,
-        ):
-            raise COVERAGE_DATE_REPORT_CODE_COLLISION
+            form = getattr(instance, self.related_form_attr)
 
-        form = getattr(instance, self.related_form_attr)
+            for attr, value in validated_data.items():
+                if attr != "id":
+                    setattr(form, attr, value)
 
-        for attr, value in validated_data.items():
-            if attr != "id":
-                setattr(form, attr, value)
+            form.save()
 
-        form.save()
+            updated = super().update(instance, validated_data)
 
-        updated = super().update(instance, validated_data)
+            coverage_from_changed = prior_coverage_from_date != updated.coverage_from_date
+            coverage_through_changed = (
+                prior_coverage_through_date != updated.coverage_through_date
+            )
 
-        coverage_from_changed = prior_coverage_from_date != updated.coverage_from_date
-        coverage_through_changed = (
-            prior_coverage_through_date != updated.coverage_through_date
-        )
+            if coverage_from_changed or coverage_through_changed:
+                Report.mark_calculations_dirty(Report.objects.filter(id=updated.id))
 
-        if coverage_from_changed or coverage_through_changed:
-            Report.mark_calculations_dirty(Report.objects.filter(id=updated.id))
-
-        return updated
+            return updated
 
     def get_transaction_date_outside_coverage_dates_clause(self):
         """Returns a clause that checks if the transaction date is outside
@@ -407,7 +413,7 @@ class Form3Serializer(BaseForm3Serializer):
     )
 
     def create(self, validated_data: dict):
-        with transaction.atomic():
+        with atomic():
             form_3_data = get_model_data(validated_data, Form3)
             report_data = get_model_data(validated_data, Report)
             form_3 = Form3.objects.create(**form_3_data)

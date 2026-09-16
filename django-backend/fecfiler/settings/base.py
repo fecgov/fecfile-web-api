@@ -605,6 +605,10 @@ FLAG__ENABLE_EMAIL = get_boolean_from_string(
     env.get_credential("FLAG__ENABLE_EMAIL", "False")
 )
 
+FLAG__ENABLE_UNASSIGNED_TRANSACTIONS = get_boolean_from_string(
+    env.get_credential("FLAG__ENABLE_UNASSIGNED_TRANSACTIONS", "False")
+)
+
 PRODUCTION_OPEN_FEC_API = env.get_credential("PRODUCTION_OPEN_FEC_API")
 PRODUCTION_OPEN_FEC_API_KEY = env.get_credential("PRODUCTION_OPEN_FEC_API_KEY")
 
