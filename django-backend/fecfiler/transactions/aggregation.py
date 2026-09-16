@@ -22,7 +22,6 @@ from django.db.models import Q, Sum, Value, DecimalField, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 import structlog
 
-
 logger = structlog.get_logger(__name__)
 
 
@@ -194,7 +193,6 @@ def process_aggregation_for_entity_contact(
         "committee_account_id": committee_account_id,
         "aggregation_group": aggregation_group,
         "contact_1_id": contact_1_id,
-        "force_unaggregated__isnull": True,
     }
 
     all_transactions = (
@@ -305,7 +303,6 @@ def process_aggregation_for_election(transaction_instance, earliest_date=None):
         "schedule_e__election_code": schedule_e.election_code,
         "contact_2__candidate_office": contact_2.candidate_office,
         "date__year": year,
-        "force_unaggregated__isnull": True,
         "deleted__isnull": True,
     }
 

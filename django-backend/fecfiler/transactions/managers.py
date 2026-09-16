@@ -394,7 +394,7 @@ class TransactionManager(SoftDeleteManager):
         )
 
     def ENTITY_AGGREGATE_CLAUSE(self):  # noqa: N802
-        return Window(expression=Sum("effective_amount"), **self.entity_aggregate_window)
+        return Window(expression=Sum(self.AGGREGATE), **self.entity_aggregate_window)
 
     def ELECTION_AGGREGATE_CLAUSE(self):  # noqa: N802
         return Window(expression=Sum(self.AGGREGATE), **self.election_aggregate_window)
