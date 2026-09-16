@@ -129,9 +129,10 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         )
         action = getattr(self, "action", None)
         if report_id:
-            queryset = queryset.filter(reports__id=report_id)
-        elif action == "list" and FLAG__ENABLE_UNASSIGNED_TRANSACTIONS:
-            queryset = queryset.filter(reports__isnull=True)
+            if report_id != 'null':
+                queryset = queryset.filter(reports__id=report_id)
+            elif action == "list" and FLAG__ENABLE_UNASSIGNED_TRANSACTIONS:
+                queryset = queryset.filter(reports__isnull=True)
 
         if schedules_to_include:
             queryset = queryset.filter(

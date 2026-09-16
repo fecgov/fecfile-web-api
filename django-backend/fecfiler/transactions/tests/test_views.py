@@ -1127,7 +1127,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
         response = self.send_viewset_get_request(
-            "/api/v1/transactions/?page=1&ordering=amount&page_size=5",
+            "/api/v1/transactions/?page=1&ordering=amount&page_size=5&report_id=null",
             TransactionViewSet,
             "list",
             committee=self.committee,
@@ -1135,7 +1135,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         transactions = response.data["results"]
         self.assertEqual(response.data["count"], 5)
-        self.assertEqual(transactions[0]["amount"], '100.00')
+        self.assertEqual(transactions[0]["amount"], "100.00")
 
     @patch("fecfiler.transactions.views.FLAG__ENABLE_UNASSIGNED_TRANSACTIONS", True)
     def test_list_unassigned_by_schedule(self):
@@ -1173,7 +1173,12 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             )
 
         response = self.send_viewset_get_request(
-            "/api/v1/transactions/?page=1&ordering=-amount&page_size=5&schedules=B",
+            "/api/v1/transactions/?"
+            "page=1&"
+            "ordering=-amount&"
+            "page_size=5&"
+            "schedules=B&"
+            "report_id=null",
             TransactionViewSet,
             "list",
             committee=self.committee,
@@ -1181,7 +1186,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         transactions = response.data["results"]
         self.assertEqual(response.data["count"], 2)
-        self.assertEqual(transactions[0]["amount"], '250.00')
+        self.assertEqual(transactions[0]["amount"], "250.00")
 
     def test_list_committee_transactions(self):
         c1 = CommitteeAccount.objects.create(committee_id="C00000001")
