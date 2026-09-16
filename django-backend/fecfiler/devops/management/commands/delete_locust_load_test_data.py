@@ -1,7 +1,9 @@
 from django.core.management.base import CommandError
-
 from .fecfile_base import FECCommand
 from fecfiler.devops.utils.load_test import LoadTestUtils
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class Command(FECCommand):
@@ -15,4 +17,8 @@ class Command(FECCommand):
         except ValueError as error:
             raise CommandError(str(error)) from error
 
-        load_test_utils.delete_load_test_committees_and_data()
+        try:
+            load_test_utils.delete_load_test_committees_and_data()
+        except Exception as e:
+            logger.error(f"Error occurred while deleting locust load test data: {e}")
+            raise
