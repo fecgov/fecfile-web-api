@@ -11,7 +11,7 @@ djangorestframework==3.17.2
 drf-spectacular==0.29.0
 drf-spectacular-sidecar==2026.4.14
 Faker==37.6.0
-git+https://github.com/fecgov/fecfile-validate@b998cb04e7cf26ef4f2bbb990b6f1ee8c82d145f#egg=fecfile_validate&subdirectory=fecfile_validate_python
+git+https://github.com/fecgov/fecfile-validate@cdfc56958288372ecbe9b0ab321edcc20d695cda#egg=fecfile_validate&subdirectory=fecfile_validate_python
 github3.py==4.0.1
 GitPython==3.1.59
 gunicorn==23.0.0
