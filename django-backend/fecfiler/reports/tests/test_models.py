@@ -63,15 +63,15 @@ class ReportModelTestCase(TestCase):
         transactions = []
         for i in range(5):
             transactions.append(
-                    create_schedule_a(
-                    "INDIVIDUAL_RECEIPT",
-                    self.committee,
-                    self.contact_1,
-                    self.f3x_report.coverage_from_date,
-                    225 + i,
-                    report=self.f3x_report
-                )
+                create_schedule_a(
+                "INDIVIDUAL_RECEIPT",
+                self.committee,
+                self.contact_1,
+                self.f3x_report.coverage_from_date,
+                225 + i,
+                report=self.f3x_report
             )
+        )
 
         upload_submission = UploadSubmission(fec_report_id=self.f3x_report.fec_report_id)
         upload_submission.save()
