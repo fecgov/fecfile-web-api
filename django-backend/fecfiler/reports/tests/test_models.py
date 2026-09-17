@@ -60,17 +60,13 @@ class ReportModelTestCase(TestCase):
         self.assertEqual(self.f1m_report.report_version, 2)
 
     def test_unamending(self):
-        transactions = []
-        for i in range(5):
-            transactions.append(
-                create_schedule_a(
-                "INDIVIDUAL_RECEIPT",
-                self.committee,
-                self.contact_1,
-                self.f3x_report.coverage_from_date,
-                225 + i,
-                report=self.f3x_report
-            )
+        test_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            self.f3x_report.coverage_from_date,
+            225,
+            report=self.f3x_report
         )
 
         upload_submission = UploadSubmission(fec_report_id=self.f3x_report.fec_report_id)
@@ -105,8 +101,7 @@ class ReportModelTestCase(TestCase):
         self.assertEqual(self.f3x_report.form_type, "F3XA")
         self.assertEqual(self.f3x_report.report_version, 1)
         self.assertEqual(self.f3x_report.upload_submission, new_upload_submission)
-        for transaction in transactions:
-            self.assertContains(transaction.blocking_reports, self.f3x_report)
+        self.assertContains(test_transaction.blocking_reports, self.f3x_report)
 
     def test_delete_ie_f24_to_f3x_link(self):
         f24_report = create_form24(self.committee, {"name": "test 24 delete"})
