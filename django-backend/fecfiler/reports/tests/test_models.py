@@ -13,6 +13,7 @@ from fecfiler.contacts.tests.utils import create_test_organization_contact
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.schedule_c.utils import carry_forward_loans
 from fecfiler.transactions.schedule_d.utils import carry_forward_debts
+from fecfiler.transactions.tests.utils import create_schedule_a
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -87,10 +88,24 @@ class ReportModelTestCase(TestCase):
         new_upload_submission.save()
         self.f3x_report.upload_submission = new_upload_submission
         self.f3x_report.amend()
+
+        test_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            self.committee,
+            self.contact_1,
+            self.f3x_report.coverage_from_date,
+            225,
+            report=self.f3x_report
+        )
+
         self.f3x_report.unamend()
+
         self.assertEqual(self.f3x_report.form_type, "F3XA")
         self.assertEqual(self.f3x_report.report_version, 1)
         self.assertEqual(self.f3x_report.upload_submission, new_upload_submission)
+
+        test_transaction.refresh_from_db()
+        self.assertIn(self.f3x_report.id, test_transaction.blocking_reports)
 
     def test_delete_ie_f24_to_f3x_link(self):
         f24_report = create_form24(self.committee, {"name": "test 24 delete"})
