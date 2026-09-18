@@ -2,9 +2,9 @@ from django.http import JsonResponse
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from fecfiler.reports.models import Report
-from fecfiler.reports.managers import ReportType
+from fecfiler.reports.managers import ReportType, STATUS_CODE_IN_PROGRESS
 from fecfiler.reports.views import ReportViewSet
-from .serializers import Form3XSerializer
+from .serializers import Form3XSerializer, ReportSerializer
 import structlog
 from rest_framework.response import Response
 from fecfiler.reports.report_code_label import report_code_label_mapping
@@ -48,6 +48,31 @@ class Form3XViewSet(ReportViewSet):
             self.get_queryset().filter(coverage_through_date__gt=json_date_string)
         )
         return Response(Form3XSerializer(data, many=True).data)
+
+    @action(detail=False, methods=["get"], url_path=r"associated")
+    def get_associated_form3x_report(self, request):
+        disbursement_date = request.GET.get("disbursement_date", None)
+        dissemination_date = request.GET.get("dissemination_date", None)
+        base_query = self.get_queryset().filter(
+            report_status=STATUS_CODE_IN_PROGRESS,
+            coverage_from_date__isnull=False,
+            coverage_through_date__isnull=False,
+        )
+        associated_form3x = None
+        if disbursement_date:
+            associated_form3x = base_query.filter(
+                coverage_from_date__lte=disbursement_date,
+                coverage_through_date__gte=disbursement_date,
+            ).first()
+        if associated_form3x is None and dissemination_date:
+            associated_form3x = base_query.filter(
+                coverage_from_date__lte=dissemination_date,
+                coverage_through_date__gte=dissemination_date,
+            ).first()
+
+        if associated_form3x is None:
+            return Response(None)
+        return Response(ReportSerializer(associated_form3x).data)
 
     @action(detail=False, methods=["get"], url_path=r"final")
     def get_final_report(self, request):
