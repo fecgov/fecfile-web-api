@@ -121,6 +121,7 @@ class TransactionManager(SoftDeleteManager):
                 loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
                 report_code_label=self.REPORT_CODE_LABEL_CLAUSE(),
                 report_type=self.REPORT_TYPE_CLAUSE(),
+                line_number=self.LINE_CLAUSE(),
             )
             .alias(order_key=self.ORDER_KEY_CLAUSE())
             .order_by("order_key")
@@ -176,6 +177,7 @@ class TransactionManager(SoftDeleteManager):
                 name=self.DISPLAY_NAME_CLAUSE,
                 transaction_ptr_id=F("id"),
                 line_label=self.LINE_LABEL_CLAUSE(),
+                line_number=self.LINE_CLAUSE(),
                 report_code_label=report_code_label_clause,
                 loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
                 report_type=report_type_clause,
@@ -520,6 +522,27 @@ class TransactionManager(SoftDeleteManager):
                 for line, label in label_map.items()
             ]
         )
+
+    def LINE_CLAUSE(self):  # noqa: N802
+        return Case(
+            *[
+                When(
+                    **{f"reports__{form_id}__isnull": False},
+                    transaction_type_identifier=transaction_type_identifier,
+                    then=Value(line)
+                )
+                for (form_id, transaction_type_identifier), line in self.LINE_MAPPINGS.items()
+            ],
+            default=Value("foo"),
+            output_field=CharField()
+        )
+
+
+    LINE_MAPPINGS= {
+        ("form_3_id","OFFSET_TO_OPERATING_EXPENDITURES"): "SA15",
+        ("form_3x_id","OFFSET_TO_OPERATING_EXPENDITURES"): "SA14",
+    }
+
 
     A_11 = ["SA11A", "SA11AI", "SA11AII", "SA11B", "SA11C"]
     A = ["SA12", "SA13", "SA14", "SA15", "SA16", "SA17"]

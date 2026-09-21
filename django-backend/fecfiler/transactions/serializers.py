@@ -119,6 +119,7 @@ class TransactionSerializer(
         max_digits=11, decimal_places=2, read_only=True
     )  # debt payments
     line_label = CharField(read_only=True)
+    line_number = CharField(read_only=True)
     report_code_label = CharField(read_only=True)
 
     class Meta:
@@ -170,6 +171,7 @@ class TransactionSerializer(
                 "payment_amount",
                 "balance_at_close",
                 "line_label",
+                "line_number",
                 "report_code_label",
             ]
 
@@ -433,6 +435,7 @@ class TransactionListSerializer(ModelSerializer):
     form_type = CharField(required=False, allow_null=True)
     transaction_id = UUIDField(read_only=True)
     line_label = CharField(read_only=True)
+    line_number = CharField(read_only=True)
     itemized = BooleanField(read_only=True)
     force_unaggregated = BooleanField(read_only=True)
     name = CharField(read_only=True)
@@ -456,6 +459,7 @@ class TransactionListSerializer(ModelSerializer):
             "form_type",
             "transaction_id",
             "line_label",
+            "line_number",
             "itemized",
             "force_unaggregated",
             "name",
