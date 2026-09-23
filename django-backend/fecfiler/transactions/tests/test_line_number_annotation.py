@@ -144,8 +144,8 @@ class TransactionLineNumberAnnotationTestCase(FecfilerViewSetTest):
                 for report_type in mismatches[tti].keys():
                     found, expected = mismatches[tti][report_type]
                     error_message += (
-                        f"\n        {report_type}".ljust(16) +
-                        f"| {found} != {expected}"
+                        f"\n        {report_type}".ljust(16)
+                        + f"| {found} != {expected}"
                     )
 
             raise AssertionError(error_message)
