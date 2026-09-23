@@ -26,7 +26,7 @@ schedule_a_test_mappings = [
 ]
 
 
-class TransactionViewsTestCase(FecfilerViewSetTest):
+class TransactionLineNumberAnnotationTestCase(FecfilerViewSetTest):
     json_content_type = "application/json"
 
     @classmethod
