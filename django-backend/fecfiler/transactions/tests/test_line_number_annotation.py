@@ -107,6 +107,7 @@ class TransactionLineNumberAnnotationTestCase(FecfilerViewSetTest):
         return request
 
     def test_sch_a_line_number_annotation(self):
+        mismatches = {}
         for tti, entity_type, line_number_mappings in schedule_a_test_mappings:
             for report_type in line_number_mappings.keys():
                 report = self.get_report_for_type(report_type)
@@ -126,7 +127,25 @@ class TransactionLineNumberAnnotationTestCase(FecfilerViewSetTest):
                 )
                 queryset = self.view.get_queryset()
                 saved_transaction = queryset.get(id=new_transaction.id)
-                self.assertEqual(
-                    saved_transaction.form_type,
-                    line_number_mappings[report_type]
-                )
+                if saved_transaction.form_type != line_number_mappings[report_type]:
+                    tti_mismatches = mismatches.get(tti, None) or {}
+                    mismatches[tti] = {
+                        report_type: [
+                            saved_transaction.form_type,
+                            line_number_mappings[report_type]
+                        ],
+                        **tti_mismatches
+                    }
+
+        if len(mismatches.keys()) > 0:
+            error_message = "\nTransaction Line Number mismatches found:"
+            for tti in mismatches.keys():
+                error_message += f"\n    {tti}"
+                for report_type in mismatches[tti].keys():
+                    found, expected = mismatches[tti][report_type]
+                    error_message += (
+                        f"\n        {report_type}".ljust(16) +
+                        f"| {found} != {expected}"
+                    )
+
+            raise AssertionError(error_message)
