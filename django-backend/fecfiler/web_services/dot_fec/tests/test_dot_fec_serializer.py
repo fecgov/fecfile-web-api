@@ -92,11 +92,13 @@ class DotFECSerializerTestCase(TestCase):
     def test_serialize_field(self):
         f3x_field_mappings = get_field_mappings("F3X")
         schc_field_mappings = get_field_mappings("SchC")
+
         # TEXT
         serialized_text = serialize_field(
             self.f3x, "treasurer_last_name", f3x_field_mappings
         )
         self.assertEqual(serialized_text, "Lastname")
+
         serialized_text_undefined = serialize_field(
             Report(), "treasurer_last_name", f3x_field_mappings
         )
@@ -107,72 +109,159 @@ class DotFECSerializerTestCase(TestCase):
             self.f3x, "L6b_cash_on_hand_beginning_period", f3x_field_mappings
         )
         self.assertEqual(serialized_numeric, "6.00")
+
         self.f3x.form_3x.L6b_cash_on_hand_beginning_period = Decimal("0.00")
-        serialized_numeric_0 = serialize_field(  # 0.00 should be serialized as 0.00
-            self.f3x, "L6b_cash_on_hand_beginning_period", f3x_field_mappings
+
+        serialized_numeric_0 = serialize_field(
+            self.f3x,
+            "L6b_cash_on_hand_beginning_period",
+            f3x_field_mappings,
         )
         self.assertEqual(serialized_numeric_0, "0.00")
-        serialized_numeric_undefined = (
-            serialize_field(  # undefined should be serialized as ""
-                Report(), "L6b_cash_on_hand_beginning_period", f3x_field_mappings
-            )
+
+        serialized_numeric_undefined = serialize_field(
+            Report(),
+            "L6b_cash_on_hand_beginning_period",
+            f3x_field_mappings,
         )
         self.assertEqual(serialized_numeric_undefined, "")
 
         # DECIMAL
         scha_field_mappings = get_field_mappings("SchA")
+
         serialized_decimal = serialize_field(
-            self.transaction, "contribution_amount", scha_field_mappings
+            self.transaction,
+            "contribution_amount",
+            scha_field_mappings,
         )
         self.assertEqual(serialized_decimal, "1234.56")
+
         transaction = Transaction()
         transaction.schedule_a = ScheduleA()
+
         serialized_decimal_undefined = serialize_field(
-            transaction, "contribution_amount", scha_field_mappings
+            transaction,
+            "contribution_amount",
+            scha_field_mappings,
         )
         self.assertEqual(serialized_decimal_undefined, "")
 
         # DATE
-        serialzed_date = serialize_field(self.f3x, "date_signed", f3x_field_mappings)
+        serialzed_date = serialize_field(
+            self.f3x,
+            "date_signed",
+            f3x_field_mappings,
+        )
         self.assertEqual(serialzed_date, "20040729")
+
         serialzed_date_undefined = serialize_field(
-            Report(), "date_signed", f3x_field_mappings
+            Report(),
+            "date_signed",
+            f3x_field_mappings,
         )
         self.assertEqual(serialzed_date_undefined, "")
 
         # BOOLEAN_X
         serialized_boolean_x_true = serialize_field(
-            self.f3x, "change_of_address", f3x_field_mappings
+            self.f3x,
+            "change_of_address",
+            f3x_field_mappings,
         )
         self.assertEqual(serialized_boolean_x_true, "X")
+
         serialized_boolean_x_false = serialize_field(
-            self.f3x, "qualified_committee", f3x_field_mappings
+            self.f3x,
+            "qualified_committee",
+            f3x_field_mappings,
         )
         self.assertEqual(serialized_boolean_x_false, "")
+
         serialized_boolean_x_undefined = serialize_field(
-            Report(), "qualified_committee", f3x_field_mappings
+            Report(),
+            "qualified_committee",
+            f3x_field_mappings,
         )
         self.assertEqual(serialized_boolean_x_undefined, "")
 
         # BOOLEAN_YN
         serialized_boolean_yn_true = serialize_field(
-            self.schc_transaction1, "secured", schc_field_mappings
+            self.schc_transaction1,
+            "secured",
+            schc_field_mappings,
         )
         self.assertEqual(serialized_boolean_yn_true, "Y")
+
         serialized_boolean_yn_false = serialize_field(
-            self.schc_transaction1, "personal_funds", schc_field_mappings
+            self.schc_transaction1,
+            "personal_funds",
+            schc_field_mappings,
         )
         self.assertEqual(serialized_boolean_yn_false, "N")
+
         serialized_boolean_yn_undefined = serialize_field(
-            self.schc_transaction2, "personal_funds", schc_field_mappings
+            self.schc_transaction2,
+            "personal_funds",
+            schc_field_mappings,
         )
-        # N Because model has default=False, otherwise would be ''
         self.assertEqual(serialized_boolean_yn_undefined, "N")
+
+    def test_serialize_schedule_a_election_fields(self):
+        scha_field_mappings = get_field_mappings("SchA")
+
+        self.transaction.schedule_a.election_code = "G2027"
+        self.transaction.schedule_a.election_other_description = None
+        self.transaction.schedule_a.save()
+
+        election_code = serialize_field(
+            self.transaction,
+            "election_code",
+            scha_field_mappings,
+        )
+        election_other_description = serialize_field(
+            self.transaction,
+            "election_other_description",
+            scha_field_mappings,
+        )
+
+        self.assertEqual(election_code, "G2027")
+        self.assertEqual(election_other_description, "")
+
+        self.transaction.schedule_a.election_code = "O2027"
+        self.transaction.schedule_a.election_other_description = "Special election"
+        self.transaction.schedule_a.save()
+
+        election_code = serialize_field(
+            self.transaction,
+            "election_code",
+            scha_field_mappings,
+        )
+        election_other_description = serialize_field(
+            self.transaction,
+            "election_other_description",
+            scha_field_mappings,
+        )
+
+        self.assertEqual(election_code, "O2027")
+        self.assertEqual(election_other_description, "Special election")
+
+    def test_serialize_schedule_a_election_fields_in_correct_columns(self):
+        self.transaction.schedule_a.election_code = "G2027"
+        self.transaction.schedule_a.election_other_description = "Special election"
+        self.transaction.schedule_a.save()
+
+        transaction_row = serialize_instance("SchA", self.transaction)
+        split_row = transaction_row.split(FS_STR)
+
+        # COL_SEQ is 1-based in the FEC schema, while split_row is 0-based.
+        self.assertEqual(split_row[17], "G2027")
+        self.assertEqual(split_row[18], "Special election")
 
     def test_serialize_f3x_summary_instance(self):
         self.assertEqual(self.f3x.form_type, "F3XN")
+
         summary_row = serialize_instance("F3X", self.f3x)
         split_row = summary_row.split(FS_STR)
+
         self.assertEqual(split_row[0], "F3XN")
         self.assertEqual(split_row[21], "20040729")
         self.assertEqual(split_row[3], "X")
@@ -181,11 +270,16 @@ class DotFECSerializerTestCase(TestCase):
     def test_serialize_schedule_a_transaction_instance(self):
         transaction_row = serialize_instance("SchA", self.transaction)
         split_row = transaction_row.split(FS_STR)
+
         self.assertEqual(split_row[0], "SA11AI")
 
     def test_serialize_report_level_memo_instance(self):
-        report_level_memo_row = serialize_instance("Text", self.report_level_memo_text)
+        report_level_memo_row = serialize_instance(
+            "Text",
+            self.report_level_memo_text,
+        )
         split_row = report_level_memo_row.split(FS_STR)
+
         self.assertEqual(split_row[0], "TEXT")
         self.assertEqual(split_row[1], "C00000000")
         self.assertEqual(split_row[2], "REPORT_MEMO_TEXT1")
@@ -193,8 +287,12 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_row[5], "dahtest2")
 
     def test_serialize_header_instance(self):
-        report_level_memo_row = serialize_instance("HDR", self.header)
+        report_level_memo_row = serialize_instance(
+            "HDR",
+            self.header,
+        )
         split_row = report_level_memo_row.split(FS_STR)
+
         self.assertEqual(split_row[0], "HDR")
         self.assertEqual(split_row[1], "FEC")
         self.assertEqual(split_row[2], "8.5")
@@ -202,17 +300,30 @@ class DotFECSerializerTestCase(TestCase):
         self.assertEqual(split_row[4], "0.0.1")
 
     def test_get_value_from_path(self):
-        form_type = get_value_from_path(self.transaction, "form_type")
+        form_type = get_value_from_path(
+            self.transaction,
+            "form_type",
+        )
         self.assertEqual(form_type, "SA11AI")
+
         contribution_date = get_value_from_path(
-            self.transaction, "schedule_a.contribution_date"
+            self.transaction,
+            "schedule_a.contribution_date",
         )
         self.assertEqual(contribution_date, date(2020, 4, 19))
-        bogus_value = get_value_from_path(self.transaction, "not.real.path")
+
+        bogus_value = get_value_from_path(
+            self.transaction,
+            "not.real.path",
+        )
         self.assertIsNone(bogus_value)
 
     def test_serialize_loan_interest_rate_user_defined(self):
-        contact_org = create_test_organization_contact("Organization", self.committee.id)
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id,
+        )
+
         loan = create_loan(
             self.committee,
             contact_org,
@@ -222,11 +333,19 @@ class DotFECSerializerTestCase(TestCase):
             False,
         )
 
-        rate = loan_interest_rate_serializer(loan, None, None)
+        rate = loan_interest_rate_serializer(
+            loan,
+            None,
+            None,
+        )
         self.assertEqual(rate, "twelve percent")
 
     def test_serialize_loan_interest_rate_bad_value(self):
-        contact_org = create_test_organization_contact("Organization", self.committee.id)
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id,
+        )
+
         loan = create_loan(
             self.committee,
             contact_org,
@@ -235,13 +354,24 @@ class DotFECSerializerTestCase(TestCase):
             "twelve percent",
             False,
         )
+
         loan.schedule_c.loan_interest_rate_is_percent = True
         loan.schedule_c.save()
 
-        self.assertRaises(ValueError, loan_interest_rate_serializer, loan, None, None)
+        self.assertRaises(
+            ValueError,
+            loan_interest_rate_serializer,
+            loan,
+            None,
+            None,
+        )
 
     def test_serialize_loan_interest_rate_invalid_percent_sign(self):
-        contact_org = create_test_organization_contact("Organization", self.committee.id)
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id,
+        )
+
         loan = create_loan(
             self.committee,
             contact_org,
@@ -250,13 +380,24 @@ class DotFECSerializerTestCase(TestCase):
             "12.5%",
             False,
         )
+
         loan.schedule_c.loan_interest_rate_is_percent = True
         loan.schedule_c.save()
 
-        self.assertRaises(ValueError, loan_interest_rate_serializer, loan, None, None)
+        self.assertRaises(
+            ValueError,
+            loan_interest_rate_serializer,
+            loan,
+            None,
+            None,
+        )
 
     def test_serialize_loan_interest_rate_no_percent_sign(self):
-        contact_org = create_test_organization_contact("Organization", self.committee.id)
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id,
+        )
+
         loan = create_loan(
             self.committee,
             contact_org,
@@ -265,10 +406,15 @@ class DotFECSerializerTestCase(TestCase):
             "12.5",
             False,
         )
+
         loan.schedule_c.loan_interest_rate_is_percent = True
         loan.schedule_c.save()
 
-        rate = loan_interest_rate_serializer(loan, None, None)
+        rate = loan_interest_rate_serializer(
+            loan,
+            None,
+            None,
+        )
         self.assertEqual(rate, "0.125")
 
     def test_serialize_election_code(self):
@@ -291,7 +437,11 @@ class DotFECSerializerTestCase(TestCase):
             )
             test_report.refresh_from_db()
 
-            election_code = election_code_serializer(test_report, "election_code", None)
+            election_code = election_code_serializer(
+                test_report,
+                "election_code",
+                None,
+            )
             self.assertEqual(election_code, expected_value)
 
     def test_serialize_f3_election_code(self):
@@ -309,11 +459,19 @@ class DotFECSerializerTestCase(TestCase):
             )
             test_report.refresh_from_db()
 
-            election_code = election_code_serializer(test_report, "election_code", None)
+            election_code = election_code_serializer(
+                test_report,
+                "election_code",
+                None,
+            )
             self.assertEqual(election_code, expected_value)
 
     def test_serialize_loan_interest_rate_large_percent(self):
-        contact_org = create_test_organization_contact("Organization", self.committee.id)
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id,
+        )
+
         loan = create_loan(
             self.committee,
             contact_org,
@@ -322,14 +480,23 @@ class DotFECSerializerTestCase(TestCase):
             "125.5",
             False,
         )
+
         loan.schedule_c.loan_interest_rate_is_percent = True
         loan.schedule_c.save()
 
-        rate = loan_interest_rate_serializer(loan, None, None)
+        rate = loan_interest_rate_serializer(
+            loan,
+            None,
+            None,
+        )
         self.assertEqual(rate, "1.255")
 
     def test_serialize_loan_interest_rate_whole_number(self):
-        contact_org = create_test_organization_contact("Organization", self.committee.id)
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id,
+        )
+
         loan = create_loan(
             self.committee,
             contact_org,
@@ -338,14 +505,23 @@ class DotFECSerializerTestCase(TestCase):
             "2",
             False,
         )
+
         loan.schedule_c.loan_interest_rate_is_percent = True
         loan.schedule_c.save()
 
-        rate = loan_interest_rate_serializer(loan, None, None)
+        rate = loan_interest_rate_serializer(
+            loan,
+            None,
+            None,
+        )
         self.assertEqual(rate, "0.02")
 
     def test_serialize_loan_interest_rate_c1(self):
-        contact_org = create_test_organization_contact("Organization", self.committee.id)
+        contact_org = create_test_organization_contact(
+            "Organization",
+            self.committee.id,
+        )
+
         loan, _, agreement, _ = create_loan_from_bank(
             self.committee,
             contact_org,
@@ -354,13 +530,23 @@ class DotFECSerializerTestCase(TestCase):
             "2",
             False,
         )
+
         loan.schedule_c.loan_interest_rate_is_percent = True
         loan.schedule_c.save()
+
         agreement.schedule_c1.loan_interest_rate_is_percent = True
         agreement.schedule_c1.save()
 
-        loan_rate = loan_interest_rate_serializer(loan, None, None)
+        loan_rate = loan_interest_rate_serializer(
+            loan,
+            None,
+            None,
+        )
         self.assertEqual(loan_rate, "0.02")
 
-        agreement_rate = loan_interest_rate_serializer(loan, None, None)
+        agreement_rate = loan_interest_rate_serializer(
+            loan,
+            None,
+            None,
+        )
         self.assertEqual(agreement_rate, "0.02")

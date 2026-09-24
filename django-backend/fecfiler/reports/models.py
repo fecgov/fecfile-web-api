@@ -232,6 +232,7 @@ class Report(CommitteeOwnedModel):
         self.upload_submission = self.previous_upload_submission
         self.can_unamend = False
         self.save()
+        self.block_transactions_from_deletion()
 
     def delete(self):
         if not self.can_delete:
