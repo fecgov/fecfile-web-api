@@ -569,6 +569,26 @@ class ContactViewSetTest(FecfilerViewSetTest):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {"results": []})
 
+    def test_duplicate_check_max_results_limit(self):
+        for _ in range(25):
+            Contact.objects.create(
+                type=ContactType.INDIVIDUAL,
+                first_name="First",
+                last_name="Last",
+                committee_account_id="11111111-2222-3333-4444-555555555555",
+            )
+
+        response = self.send_viewset_get_request(
+            "/api/v1/contacts/duplicate_check?first_name=First&last_name=Last",
+            ContactViewSet,
+            "duplicate_check",
+        )
+        self.assertEqual(response.status_code, 200)
+        results = response.data["results"]
+
+        # Verify that even though 25 matching records exist, only 20 are returned
+        self.assertEqual(len(results), 20)
+
     def test_CRUD_committee_locked_list(self):
         main_committee = CommitteeAccount(
             committee_id="C43211234", id="33333333-2222-1111-2222-333333333333"
