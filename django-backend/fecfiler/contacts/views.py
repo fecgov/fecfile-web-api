@@ -320,7 +320,7 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         if not query:
             return Response({"results": []})
 
-        queryset = self.get_queryset().filter(query)
+        queryset = self.get_queryset().filter(query)[:20]
         serializer = self.get_serializer(queryset, many=True)
 
         return Response({"results": serializer.data})
