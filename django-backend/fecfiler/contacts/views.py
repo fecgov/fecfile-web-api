@@ -320,9 +320,17 @@ class ContactViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet):
         if not query:
             return Response({"results": []})
 
-        queryset = self.get_queryset().filter(query)[:20]
-        serializer = self.get_serializer(queryset, many=True)
+        queryset = self.get_queryset().filter(query)
 
+        if self.paginator is not None:
+            self.paginator.page_size = 20
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
         return Response({"results": serializer.data})
 
     @action(detail=False)
