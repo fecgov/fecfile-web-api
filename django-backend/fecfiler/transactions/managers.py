@@ -21,6 +21,7 @@ from django.db.models import (
     CharField,
     DecimalField,
     DateField,
+    FilteredRelation,
     UUIDField,
     OuterRef,
     Subquery,
@@ -42,6 +43,7 @@ from fecfiler.reports.report_code_label import (
     report_type_case,
     limited_label_case,
 )
+from fecfiler.transactions.line_mappings import LINE_MAPPINGS
 from django.contrib.postgres.expressions import ArraySubquery
 
 # Itemization threshold defined by FEC regulations
@@ -81,6 +83,9 @@ class TransactionManager(SoftDeleteManager):
             super()
             .get_queryset()
             .annotate(
+                non_f24_reports=FilteredRelation("reports",condition=Q(reports__form_24_id__isnull=True))
+            )
+            .annotate(
                 schedule=self.SCHEDULE_CLAUSE(),
                 date=self.DATE_CLAUSE,
                 amount=self.AMOUNT_CLAUSE,
@@ -118,7 +123,6 @@ class TransactionManager(SoftDeleteManager):
                     "_calendar_ytd_per_election_office",
                 ),
                 line_label=self.LINE_LABEL_CLAUSE(),
-                loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
                 report_code_label=self.REPORT_CODE_LABEL_CLAUSE(),
                 report_type=self.REPORT_TYPE_CLAUSE(),
                 line_number=self.LINE_CLAUSE(),
@@ -179,7 +183,6 @@ class TransactionManager(SoftDeleteManager):
                 line_label=self.LINE_LABEL_CLAUSE(),
                 line_number=self.LINE_CLAUSE(),
                 report_code_label=report_code_label_clause,
-                loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
                 report_type=report_type_clause,
                 back_reference_tran_id_number=back_ref_id_clause,
                 report_ids_list=reports_subquery,
@@ -470,16 +473,6 @@ class TransactionManager(SoftDeleteManager):
             .values("report_type")[:1]
         )
 
-    def LOAN_AGREEMENT_CLAUSE(self):
-        return Subquery(
-            self.model._base_manager.filter(
-                parent_transaction_id=OuterRef("pk"),
-                transaction_type_identifier="C1_LOAN_AGREEMENT",
-                deleted__isnull=True,
-            ).values("id")[:1],
-            output_field=UUIDField(),
-        )
-
     def ORDER_KEY_CLAUSE(self):  # noqa: N802
         return Case(
             When(
@@ -524,6 +517,22 @@ class TransactionManager(SoftDeleteManager):
         )
 
     def LINE_CLAUSE(self):  # noqa: N802
+        return Subquery(
+            self.model._base_manager.filter(
+                reports=OuterRef("pk"),
+                form_24__isnull=True,
+            ).annotate(line_number=Case(
+                *[
+                    When(
+                        **{f"{form_id}__isnull": False},
+                        transaction_type_identifier=transaction_type_identifier,
+                        then=Value(line)
+                    )
+                    for (form_id, transaction_type_identifier), line in LINE_MAPPINGS.items()
+                ]
+            )).values("line_number")[:1],
+            output_field=UUIDField(),
+        )
         return Case(
             *[
                 When(
@@ -531,17 +540,13 @@ class TransactionManager(SoftDeleteManager):
                     transaction_type_identifier=transaction_type_identifier,
                     then=Value(line)
                 )
-                for (form_id, transaction_type_identifier), line in self.LINE_MAPPINGS.items()
+                for (form_id, transaction_type_identifier), line in LINE_MAPPINGS.items()
             ],
             default=Value("foo"),
             output_field=CharField()
         )
 
 
-    LINE_MAPPINGS= {
-        ("form_3_id","OFFSET_TO_OPERATING_EXPENDITURES"): "SA15",
-        ("form_3x_id","OFFSET_TO_OPERATING_EXPENDITURES"): "SA14",
-    }
 
 
     A_11 = ["SA11A", "SA11AI", "SA11AII", "SA11B", "SA11C"]
