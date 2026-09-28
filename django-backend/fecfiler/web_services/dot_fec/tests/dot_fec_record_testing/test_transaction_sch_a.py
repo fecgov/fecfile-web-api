@@ -13,7 +13,6 @@ from fecfiler.contacts.tests.utils import (
 )
 from datetime import datetime
 
-
 # Tests .FEC composition for SCHA records
 
 
@@ -271,6 +270,28 @@ class DotFECSchARecordsTestCase(TestCase):
         self.assertEqual(
             self.transaction_donor_row[35], self.contact_can.candidate_district
         )
+
+    def test_candidate_contribution_fields(self):
+        candidate_contribution = create_schedule_a(
+            "CONTRIBUTION_FROM_CANDIDATE",
+            self.committee,
+            self.contact_can,
+            datetime.strptime("2024-01-10", "%Y-%m-%d"),
+            "100.00",
+            form_type="SA11D",
+        )
+        add_schedule_a_contact_fields(candidate_contribution)
+        candidate_row = serialize_instance("SchA", candidate_contribution).split(FS_STR)
+
+        self.assertEqual(candidate_row[5], "CAN")
+        self.assertEqual(candidate_row[7], self.contact_can.last_name)
+        self.assertEqual(candidate_row[8], self.contact_can.first_name)
+        self.assertEqual(candidate_row[27], self.contact_can.candidate_id)
+        self.assertEqual(candidate_row[28], self.contact_can.last_name)
+        self.assertEqual(candidate_row[29], self.contact_can.first_name)
+        self.assertEqual(candidate_row[33], self.contact_can.candidate_office)
+        self.assertEqual(candidate_row[34], self.contact_can.candidate_state)
+        self.assertEqual(candidate_row[35], self.contact_can.candidate_district)
 
     def test_conduit_fields(self):
         # Conduit Fields are not (currently) populated for any SchA transactions
