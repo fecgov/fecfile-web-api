@@ -11,13 +11,13 @@ class ElectionCycle(
     CommitteeOwnedModel,
 ):
     class Office(models.TextChoices):
-        HOUSE = "House", "House"
-        PRESIDENTIAL = "Presidential", "Presidential"
-        SENATE = "Senate", "Senate"
+        HOUSE = "House"
+        PRESIDENTIAL = "Presidential"
+        SENATE = "Senate"
 
     class ElectionType(models.TextChoices):
-        GENERAL = "General", "General"
-        SPECIAL = "Special", "Special"
+        GENERAL = "General"
+        SPECIAL = "Special"
 
     id = models.UUIDField(
         default=uuid.uuid4,
