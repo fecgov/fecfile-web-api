@@ -23,6 +23,9 @@ import structlog
 logger = structlog.get_logger(__name__)
 
 
+RUN_ALL_TRANSACTION_TYPES = False
+
+
 # IF THERE IS A MISMATCH, YOU MUST CHECK THE SPEC SHEET.  THIS IS NOT A SOURCE OF TRUTH
 
 
@@ -140,6 +143,18 @@ schedule_a_test_mappings = [
     ["DEBT_PAYMENT_TO_COMMITTEE", "IND", {"F3": "SA15"}],
 ]
 
+schedule_a_test_mappings_sampler = [
+    ["LOAN_REPAYMENT_RECEIVED", "COM", {"F3X": "SA14"}],
+    ["LOAN_RECEIVED_FROM_CANDIDATE", "CAN", {"F3": "SA13A"}],
+    ["TRIBAL_RECOUNT_RECEIPT", "ORG", {"F3": "SA15", "F3X": "SA17"}],
+    ["PARTY_JF_TRANSFER_MEMO", "COM", {"F3": "SA12", "F3X": "SA12"}],
+    ["PAC_RETURN", "COM", {"F3": "SA11C", "F3X": "SA11C"}],
+    ["CONTRIBUTION_FROM_CANDIDATE", "CAN", {"F3": "SA11D"}],
+    ["PARTY_RECEIPT", "COM", {"F3": "SA11B", "F3X": "SA11B"}],
+    ["EARMARK_MEMO", "IND", unitemized_f3_and_f3x],
+    ["CONDUIT_EARMARK_RECEIPT_DEPOSITED", "IND", unitemized_f3x],
+]
+
 schedule_b_test_mappings = [
     ["OPERATING_EXPENDITURE", "ORG", {"F3": "SB17", "F3X": "SB21B"}],
     ["OPERATING_EXPENDITURE_VOID", "ORG", {"F3": "SB17", "F3X": "SB21B"}],
@@ -228,6 +243,16 @@ schedule_b_test_mappings = [
     ["CANDIDATE_LOAN_REPAYMENT", "CAN", {"F3": "SB19A"}],
     ["OTHER_LOAN_REPAYMENT", "ORG", {"F3": "SB19B"}],
     ["DEBT_PAYMENT_BY_COMMITTEE", "ORG", {"F3": "SB17"}],
+]
+
+schedule_b_test_mappings_sampler = [
+    ["OTHER_DISBURSEMENT_VOID", "COM", {"F3": "SB21", "F3X": "SB29"}],
+    ["OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT", "ORG", {"F3": "SB17", "F3X": "SB21B"}],
+    ["LOAN_MADE", "COM", {"F3X": "SB27"}],
+    ["CANDIDATE_LOAN_REPAYMENT", "CAN", {"F3": "SB19A"}],
+    ["REFUND_PAC_CONTRIBUTION_VOID", "COM", {"F3": "SB20C", "F3X": "SB28C"}],
+    ["OPERATING_EXPENDITURE_PAYMENT_TO_PAYROLL_MEMO", "IND", {"F3": "SB17", "F3X": "SB21B"}],  # noqa: E501
+    ["OTHER_DISBURSEMENT_PAYMENT_TO_PAYROLL_MEMO", "IND", {"F3X": "SB29"}],
 ]
 
 schedule_c_test_mappings = [
@@ -363,7 +388,11 @@ class TransactionLineNumberAnnotationTestCase(FecfilerViewSetTest):
 
     def test_sch_a_line_number_annotation(self):
         mismatches = {}
-        for tti, entity_type, line_number_mappings in schedule_a_test_mappings:
+        schedule_mappings = schedule_a_test_mappings
+        if not RUN_ALL_TRANSACTION_TYPES:
+            schedule_mappings = schedule_a_test_mappings_sampler
+
+        for tti, entity_type, line_number_mappings in schedule_mappings:
             for report_type in line_number_mappings.keys():
                 if report_type != "Unitemized":
                     report = self.get_report_for_type(report_type)
@@ -402,7 +431,11 @@ class TransactionLineNumberAnnotationTestCase(FecfilerViewSetTest):
 
     def test_sch_b_line_number_annotation(self):
         mismatches = {}
-        for tti, entity_type, line_number_mappings in schedule_b_test_mappings:
+        schedule_mappings = schedule_b_test_mappings
+        if not RUN_ALL_TRANSACTION_TYPES:
+            schedule_mappings = schedule_b_test_mappings_sampler
+
+        for tti, entity_type, line_number_mappings in schedule_mappings:
             for report_type in line_number_mappings.keys():
                 report = self.get_report_for_type(report_type)
                 new_transaction = create_schedule_b(
