@@ -43,7 +43,7 @@ from fecfiler.reports.report_code_label import (
     report_type_case,
     limited_label_case,
 )
-from fecfiler.transactions.line_mappings import LINE_MAPPINGS
+from fecfiler.transactions.line_mappings import LINE_MAPPINGS_BY_FORM_AND_LINE
 from django.contrib.postgres.expressions import ArraySubquery
 
 # Itemization threshold defined by FEC regulations
@@ -83,7 +83,12 @@ class TransactionManager(SoftDeleteManager):
             super()
             .get_queryset()
             .annotate(
-                non_f24_reports=FilteredRelation("reports",condition=Q(reports__form_24_id__isnull=True))
+                non_f24_report=Subquery(
+                    Report.objects.filter(
+                        transaction_id=OuterRef("id"),
+                        form_24_id__isnull=True,
+                    ).values("id")[:1]
+                ),
             )
             .annotate(
                 schedule=self.SCHEDULE_CLAUSE(),
@@ -171,6 +176,14 @@ class TransactionManager(SoftDeleteManager):
             super()
             .get_queryset()
             .filter(committee_account_id=committee_account_id)
+            .annotate(
+                non_f24_report=Subquery(
+                    Report.objects.filter(
+                        transaction_id=OuterRef("id"),
+                        form_24_id__isnull=True,
+                    ).values("id")[:1]
+                ),
+            )
             .annotate(
                 schedule=schedule_clause,
                 date=date_clause,
@@ -518,20 +531,20 @@ class TransactionManager(SoftDeleteManager):
 
     def LINE_CLAUSE(self):  # noqa: N802
         return Subquery(
-            self.model._base_manager.filter(
-                reports=OuterRef("pk"),
-                form_24__isnull=True,
-            ).annotate(line_number=Case(
+            
+            Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
+            .annotate(transaction_type_identifier=OuterRef("transaction_type_identifier"))
+            .annotate(line_number=Case(
                 *[
                     When(
                         **{f"{form_id}__isnull": False},
-                        transaction_type_identifier=transaction_type_identifier,
+                        transaction_type_identifier__in=transaction_type_identifiers,
                         then=Value(line)
                     )
-                    for (form_id, transaction_type_identifier), line in LINE_MAPPINGS.items()
+                    for (form_id, line), transaction_type_identifiers in LINE_MAPPINGS_BY_FORM_AND_LINE.items()
                 ]
             )).values("line_number")[:1],
-            output_field=UUIDField(),
+            output_field=CharField(),
         )
         return Case(
             *[
