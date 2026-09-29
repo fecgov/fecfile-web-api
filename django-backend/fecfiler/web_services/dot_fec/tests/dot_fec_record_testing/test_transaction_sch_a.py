@@ -90,7 +90,7 @@ class DotFECSchARecordsTestCase(TestCase):
                 "street_1": "1234 Test Ln",
                 "street_2": "Unit 321",
                 "city": "Testville",
-                "state": "AL",
+                "state": "AZ",
                 "zip": "12345",
                 "employer": "Testerson Inc.",
                 "occupation": "Tester",
@@ -286,11 +286,22 @@ class DotFECSchARecordsTestCase(TestCase):
         self.assertEqual(candidate_row[5], "CAN")
         self.assertEqual(candidate_row[7], self.contact_can.last_name)
         self.assertEqual(candidate_row[8], self.contact_can.first_name)
+        self.assertEqual(candidate_row[9], self.contact_can.middle_name)
+        self.assertEqual(candidate_row[10], self.contact_can.prefix)
+        self.assertEqual(candidate_row[11], self.contact_can.suffix)
+        self.assertEqual(candidate_row[12], self.contact_can.street_1)
+        self.assertEqual(candidate_row[13], self.contact_can.street_2)
+        self.assertEqual(candidate_row[14], self.contact_can.city)
+        self.assertEqual(candidate_row[15], "AZ")
+        self.assertEqual(candidate_row[16], self.contact_can.zip)
         self.assertEqual(candidate_row[27], self.contact_can.candidate_id)
         self.assertEqual(candidate_row[28], self.contact_can.last_name)
         self.assertEqual(candidate_row[29], self.contact_can.first_name)
+        self.assertEqual(candidate_row[30], self.contact_can.middle_name)
+        self.assertEqual(candidate_row[31], self.contact_can.prefix)
+        self.assertEqual(candidate_row[32], self.contact_can.suffix)
         self.assertEqual(candidate_row[33], self.contact_can.candidate_office)
-        self.assertEqual(candidate_row[34], self.contact_can.candidate_state)
+        self.assertEqual(candidate_row[34], "AL")
         self.assertEqual(candidate_row[35], self.contact_can.candidate_district)
 
     def test_conduit_fields(self):
