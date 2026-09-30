@@ -97,7 +97,7 @@ class TransactionSerializer(
         required=False, allow_null=True, read_only=True
     )
     back_reference_sched_name = CharField(required=False, allow_null=True, read_only=True)
-    form_type = CharField(required=False, allow_null=True)
+    form_type = CharField(required=False, allow_null=True, read_only=True)
     itemized = BooleanField(read_only=True)
     name = CharField(read_only=True)
     date = DateField(read_only=True)
@@ -432,7 +432,7 @@ class TransactionListSerializer(ModelSerializer):
     back_reference_tran_id_number = CharField(
         required=False, allow_null=True, read_only=True
     )
-    form_type = CharField(required=False, allow_null=True)
+    form_type = CharField(required=False, allow_null=True, read_only=True)
     transaction_id = UUIDField(read_only=True)
     line_label = CharField(read_only=True)
     line_number = CharField(read_only=True)

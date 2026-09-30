@@ -147,7 +147,7 @@ class DotFECReattributionsTestCase(TestCase):
         self.split_to = serialized_to.split(FS_STR)
 
     def test_form_type(self):
-        self.assertEqual(self.receipt_copy.form_type, "SA11AI")
+        self.assertEqual(self.receipt_copy.form_type(), "SA11AI")
         for i in self.split_copy:
             logger.info(i)
         self.assertEqual(self.split_copy[0], "SA11AI")
@@ -166,11 +166,11 @@ class DotFECReattributionsTestCase(TestCase):
 
     def test_back_reference(self):
         self.assertEqual(self.split_copy[3], self.individual_receipt.transaction_id)
-        self.assertEqual(self.split_copy[4], self.individual_receipt.form_type)
+        self.assertEqual(self.split_copy[4], self.individual_receipt.form_type())
         self.assertEqual(self.split_from[3], self.receipt_copy.transaction_id)
-        self.assertEqual(self.split_from[4], self.receipt_copy.form_type)
+        self.assertEqual(self.split_from[4], self.receipt_copy.form_type())
         self.assertEqual(self.split_to[3], self.receipt_copy.transaction_id)
-        self.assertEqual(self.split_to[4], self.receipt_copy.form_type)
+        self.assertEqual(self.split_to[4], self.receipt_copy.form_type())
 
     def test_contributor(self):
         self.assertEqual(self.split_copy[6], "")

@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Case, CharField, Value, When
 from django.apps import apps
 from django.contrib.postgres.fields import ArrayField
 from fecfiler.soft_delete.models import SoftDeleteModel
@@ -27,6 +27,7 @@ from fecfiler.transactions.schedule_d.models import ScheduleD
 from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.transactions.schedule_f.models import ScheduleF
 from fecfiler.contacts.models import Contact
+from fecfiler.transactions.line_mappings import LINE_MAPPINGS_BY_FORM_AND_LINE
 
 import uuid
 import structlog
@@ -91,13 +92,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     # query in a Just-In-Time fashion.
     _form_type = models.TextField(null=True, blank=True)
 
-    @property
+    
     def form_type(self):
         return self._form_type
 
-    @form_type.setter
-    def form_type(self, value):
-        self._form_type = value
 
     transaction_id = models.TextField(
         null=False, blank=False, unique=False, default=generate_fec_uid
@@ -692,6 +690,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 if not report.can_delete:
                     report.save()
 
+        self.set_and_save_form_type()
+
     def remove_from_report(self, report_id):
         ReportTransaction = apps.get_model("reports.ReportTransaction")
         report_transaction = ReportTransaction.objects.filter(
@@ -709,6 +709,26 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 report.can_delete = report.check_can_delete()
                 if report.can_delete:
                     report.save()
+
+        self.set_and_save_form_type()
+
+
+    def set_and_save_form_type(self):
+        ReportTransaction = apps.get_model("reports.ReportTransaction")
+        line_number = ReportTransaction.objects.filter(transaction_id=self.id).annotate(line_number=Case(
+                *[
+                When(
+                    **{f"report__{form_id}__isnull": False},
+                    transaction__transaction_type_identifier__in=transaction_type_identifier,
+                    then=Value(line)
+                )
+                for (form_id, line), transaction_type_identifier in LINE_MAPPINGS_BY_FORM_AND_LINE.items()
+            ],
+            default=Value(None),
+            output_field=CharField()
+        )).filter(line_number__isnull=False).first().line_number
+        self._form_type = line_number
+        self.save(update_fields=["_form_type"])
 
     def set_reports(self, report_ids):
         Report = apps.get_model("reports.Report")
@@ -737,6 +757,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 report.can_delete = report.check_can_delete()
 
         Report.objects.bulk_update(reports_to_check_deletion, ["can_delete"])
+        self.set_and_save_form_type()
 
     # Returns a list containing all transactions related to this transaction
     # through reatributions, loans, loan repayments, debts, and debt repayments

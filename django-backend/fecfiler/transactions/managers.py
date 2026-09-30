@@ -83,14 +83,6 @@ class TransactionManager(SoftDeleteManager):
             super()
             .get_queryset()
             .annotate(
-                non_f24_report=Subquery(
-                    Report.objects.filter(
-                        transaction_id=OuterRef("id"),
-                        form_24_id__isnull=True,
-                    ).values("id")[:1]
-                ),
-            )
-            .annotate(
                 schedule=self.SCHEDULE_CLAUSE(),
                 date=self.DATE_CLAUSE,
                 amount=self.AMOUNT_CLAUSE,
@@ -130,7 +122,6 @@ class TransactionManager(SoftDeleteManager):
                 line_label=self.LINE_LABEL_CLAUSE(),
                 report_code_label=self.REPORT_CODE_LABEL_CLAUSE(),
                 report_type=self.REPORT_TYPE_CLAUSE(),
-                line_number=self.LINE_CLAUSE(),
             )
             .alias(order_key=self.ORDER_KEY_CLAUSE())
             .order_by("order_key")
@@ -177,14 +168,6 @@ class TransactionManager(SoftDeleteManager):
             .get_queryset()
             .filter(committee_account_id=committee_account_id)
             .annotate(
-                non_f24_report=Subquery(
-                    Report.objects.filter(
-                        transaction_id=OuterRef("id"),
-                        form_24_id__isnull=True,
-                    ).values("id")[:1]
-                ),
-            )
-            .annotate(
                 schedule=schedule_clause,
                 date=date_clause,
                 amount=amount_clause,
@@ -194,7 +177,6 @@ class TransactionManager(SoftDeleteManager):
                 name=self.DISPLAY_NAME_CLAUSE,
                 transaction_ptr_id=F("id"),
                 line_label=self.LINE_LABEL_CLAUSE(),
-                line_number=self.LINE_CLAUSE(),
                 report_code_label=report_code_label_clause,
                 report_type=report_type_clause,
                 back_reference_tran_id_number=back_ref_id_clause,
@@ -529,35 +511,6 @@ class TransactionManager(SoftDeleteManager):
             ]
         )
 
-    def LINE_CLAUSE(self):  # noqa: N802
-        return Subquery(
-            
-            Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
-            .annotate(transaction_type_identifier=OuterRef("transaction_type_identifier"))
-            .annotate(line_number=Case(
-                *[
-                    When(
-                        **{f"{form_id}__isnull": False},
-                        transaction_type_identifier__in=transaction_type_identifiers,
-                        then=Value(line)
-                    )
-                    for (form_id, line), transaction_type_identifiers in LINE_MAPPINGS_BY_FORM_AND_LINE.items()
-                ]
-            )).values("line_number")[:1],
-            output_field=CharField(),
-        )
-        return Case(
-            *[
-                When(
-                    **{f"reports__{form_id}__isnull": False},
-                    transaction_type_identifier=transaction_type_identifier,
-                    then=Value(line)
-                )
-                for (form_id, transaction_type_identifier), line in LINE_MAPPINGS.items()
-            ],
-            default=Value("foo"),
-            output_field=CharField()
-        )
 
 
 

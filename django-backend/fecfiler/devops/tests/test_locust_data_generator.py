@@ -123,7 +123,7 @@ class LocustDataGeneratorTestCase(TestCase):
             )
             self.assertEqual(transaction.contact_1_id, test_contact.id)
             self.assertEqual(transaction.aggregation_group, "GENERAL")
-            self.assertEqual(transaction.form_type, "SA11AI")
+            self.assertEqual(transaction.form_type(), "SA11AI")
 
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Transaction.objects.bulk_update",
@@ -212,7 +212,7 @@ class LocustDataGeneratorTestCase(TestCase):
             )
             self.assertEqual(transaction.contact_1_id, test_contact.id)
             self.assertEqual(transaction.aggregation_group, "GENERAL")
-            self.assertEqual(transaction.form_type, "SB21B")
+            self.assertEqual(transaction.form_type(), "SB21B")
 
     @patch(
         "fecfiler.devops.utils.locust_data_generator.Transaction.objects.bulk_update",
