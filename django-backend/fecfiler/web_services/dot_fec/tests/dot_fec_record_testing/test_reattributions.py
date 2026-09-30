@@ -148,7 +148,7 @@ class DotFECReattributionsTestCase(TestCase):
 
     def test_form_type(self):
         self.assertEqual(self.receipt_copy.form_type, "SA11AI")
-        for i in self.split_copy:   
+        for i in self.split_copy:
             logger.info(i)
         self.assertEqual(self.split_copy[0], "SA11AI")
         self.assertEqual(self.split_from[0], "SA11AI")

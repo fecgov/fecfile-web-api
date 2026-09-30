@@ -196,7 +196,6 @@ class Report(CommitteeOwnedModel):
                 return form_code
         return None
 
-
     def amend(self):
         self.form_type = self.get_form_name() + "A"
         self.report_version = int(self.report_version or "0") + 1

@@ -21,8 +21,6 @@ from django.db.models import (
     CharField,
     DecimalField,
     DateField,
-    FilteredRelation,
-    UUIDField,
     OuterRef,
     Subquery,
     F,
@@ -43,7 +41,6 @@ from fecfiler.reports.report_code_label import (
     report_type_case,
     limited_label_case,
 )
-from fecfiler.transactions.line_mappings import LINE_MAPPINGS_BY_FORM_AND_LINE
 from django.contrib.postgres.expressions import ArraySubquery
 
 # Itemization threshold defined by FEC regulations
@@ -510,10 +507,6 @@ class TransactionManager(SoftDeleteManager):
                 for line, label in label_map.items()
             ]
         )
-
-
-
-
 
     A_11 = ["SA11A", "SA11AI", "SA11AII", "SA11B", "SA11C"]
     A = ["SA12", "SA13", "SA14", "SA15", "SA16", "SA17"]
