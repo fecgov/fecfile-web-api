@@ -2,6 +2,7 @@ from fecfiler.reports.form_3x.models import Form3X
 from fecfiler.reports.models import Report
 from fecfiler.transactions.models import Transaction
 from fecfiler.cash_on_hand.models import CashOnHandYearly
+from fecfiler.transactions.line_mappings import LINE_MAPPINGS_BY_FORM_AND_LINE
 from django.db.models import Q, Sum
 from django.db.models.functions import Coalesce
 from decimal import Decimal
@@ -492,6 +493,7 @@ def calculate_cash_on_hand_fields(report, column_a, column_b):
     return column_a, column_b
 
 
-def get_line(form_type, field="amount"):
-    query = Q(~Q(memo_code=True), form_type=form_type)
+def get_line(line_number, field="amount"):
+    transaction_types = LINE_MAPPINGS_BY_FORM_AND_LINE.get(("form_3x_id", line_number), [])
+    query = Q(~Q(memo_code=True), transaction_type__in=transaction_types)
     return Coalesce(Sum(field, filter=query), Decimal(0.0))
