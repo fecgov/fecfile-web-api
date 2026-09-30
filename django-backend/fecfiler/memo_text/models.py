@@ -41,7 +41,7 @@ class MemoText(SoftDeleteModel, CommitteeOwnedModel, ReportMixin):
     def back_reference_sched_form_name(self):
         transaction = self.get_transaction()
         if transaction:
-            return transaction.form_type()
+            return transaction.form_type
         if self.report:
             return self.report.form_type
 

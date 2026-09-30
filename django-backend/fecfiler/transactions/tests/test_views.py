@@ -2096,7 +2096,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "entity_type": test_debt.entity_type,
             "memo_code": test_debt.memo_code,
             "contact_1_id": test_debt.contact_1.id,
-            "form_type": test_debt.form_type(),
+            "form_type": test_debt.form_type,
             "name": test_debt.contact_1.name,
             "date": test_debt.get_date(),
             "loan_balance": test_debt.schedule_d.balance_at_close,

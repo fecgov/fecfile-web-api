@@ -92,10 +92,13 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     # query in a Just-In-Time fashion.
     _form_type = models.TextField(null=True, blank=True)
 
-    
+    @property
     def form_type(self):
         return self._form_type
 
+    @form_type.setter
+    def form_type(self, value):
+        self._form_type = value
 
     transaction_id = models.TextField(
         null=False, blank=False, unique=False, default=generate_fec_uid
