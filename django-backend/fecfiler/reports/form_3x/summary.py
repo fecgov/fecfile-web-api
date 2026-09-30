@@ -338,7 +338,7 @@ def calculate_summary_column_b(report):
     # build summary
     column_b = ytd_transactions.aggregate(
         line_11ai=get_line("SA11AI"),
-        line_11aii=get_line("SA11AII"),
+        line_11aii=get_line("SA11AI", itemized=False),
         line_11b=get_line("SA11B"),
         line_11c=get_line("SA11C"),
         line_12=get_line("SA12"),
@@ -493,9 +493,11 @@ def calculate_cash_on_hand_fields(report, column_a, column_b):
     return column_a, column_b
 
 
-def get_line(line_number, field="amount"):
+def get_line(line_number, field="amount", itemized=None):
     transaction_types = LINE_MAPPINGS_BY_FORM_AND_LINE.get(
         ("form_3x_id", line_number), []
     )
     query = Q(~Q(memo_code=True), transaction_type_identifier__in=transaction_types)
+    if itemized is not None:
+        query.add(Q(itemized=itemized), Q.AND)
     return Coalesce(Sum(field, filter=query), Decimal(0.0))

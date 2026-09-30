@@ -26,7 +26,6 @@ def create_schedule_a(
     date: str | None,
     amount: str | int | float,
     group: str = "GENERAL",
-    form_type: str = "SA11AI",
     memo_code: bool = False,
     itemized: bool | None = None,
     report: Report | None = None,
@@ -35,7 +34,6 @@ def create_schedule_a(
     purpose_description: str | None = None,
 ):
     transaction_data = {
-        "_form_type": form_type,
         "memo_code": memo_code,
         "force_itemized": itemized,
         "loan_id": loan_id,
@@ -65,7 +63,6 @@ def create_schedule_b(
     date: str,
     amount: str,
     group: str = "GENERAL",
-    form_type: str = "SB",
     memo_code: bool = False,
     report: Report | None = None,
     loan_id: UUID | None = None,
@@ -80,7 +77,6 @@ def create_schedule_b(
         report=report,
         schedule_data={"expenditure_date": date, "expenditure_amount": amount},
         transaction_data={
-            "_form_type": form_type,
             "memo_code": memo_code,
             "loan_id": loan_id,
             "debt_id": debt_id,
@@ -116,7 +112,6 @@ def create_ie(
             "date_signed": date_signed,
         },
         transaction_data={
-            "_form_type": "SE",
             "memo_code": memo_code,
         },
     )
@@ -126,7 +121,6 @@ def create_debt(
     committee: CommitteeAccount,
     contact: Contact,
     incurred_amount: Decimal,
-    form_type: str = "SD9",
     type: str = "DEBT_OWED_BY_COMMITTEE",
     report: Report | None = None,
 ):
@@ -142,7 +136,6 @@ def create_debt(
                 report.coverage_from_date if report is not None else None
             ),
         },
-        transaction_data={"_form_type": form_type},
     )
 
 
@@ -154,7 +147,6 @@ def create_loan(
     loan_interest_rate: str,
     secured: bool = False,
     type: str = "LOAN_RECEIVED_FROM_INDIVIDUAL",
-    form_type: str = "SC/9",
     loan_incurred_date: str | datetime | None = None,
     report: Report | None = None,
 ):
@@ -172,7 +164,7 @@ def create_loan(
             "loan_incurred_date": loan_incurred_date,
             "report_coverage_through_date": report_coverage_through_date,
         },
-        transaction_data={"_form_type": form_type},
+        transaction_data={},
         report=report,
     )
 
@@ -221,7 +213,7 @@ def create_loan_from_bank(
             "loan_due_date": loan_due_date,
             "loan_interest_rate": loan_interest_rate,
         },
-        transaction_data={"_form_type": "SC1/10", "parent_transaction_id": loan.id},
+        transaction_data={"parent_transaction_id": loan.id},
     )
     guarantor = create_test_transaction(
         "C2_LOAN_GUARANTOR",
@@ -231,7 +223,7 @@ def create_loan_from_bank(
         group=None,
         report=report,
         schedule_data={},
-        transaction_data={"_form_type": "SC2/10", "parent_transaction_id": loan.id},
+        transaction_data={"parent_transaction_id": loan.id},
     )
     return loan, loan_receipt, loan_agreement, guarantor
 
@@ -245,7 +237,6 @@ def create_schedule_f(
     contact_4: Contact | None = None,
     contact_5: Contact | None = None,
     group: str = "COORDINATED_PARTY_EXPENDITURES",
-    form_type: str = "SF",
     memo_code: bool = False,
     schedule_data=None,
     report: Report | None = None,
@@ -263,7 +254,6 @@ def create_schedule_f(
         report=report,
         schedule_data=schedule_data,
         transaction_data={
-            "_form_type": form_type,
             "memo_code": memo_code,
         },
     )
@@ -373,7 +363,6 @@ def gen_schedule_f_request_data(
         "expenditure_date": date,
         "expenditure_purpose_descrip": "PURPOSE",
         "fields_to_validate": [
-            "form_type",
             "transaction_type_identifier",
             "filer_designated_to_make_coordinated_expenditures",
             "designating_committee_id_number",
@@ -415,7 +404,7 @@ def gen_schedule_f_request_data(
             "payee_candidate_state",
             "payee_candidate_district",
             "memo_code",
-            "memo_text_description"
+            "memo_text_description",
         ],
         "filer_designated_to_make_coordinated_expenditures": None,
         "first_name": None,
@@ -457,9 +446,7 @@ def gen_schedule_f_request_data(
         "quinary_street_1": None,
         "quinary_street_2": None,
         "quinary_zip": None,
-        "report_ids": [
-            report_uuid
-        ],
+        "report_ids": [report_uuid],
         "schedule_id": "F",
         "schema_name": "COORDINATED_PARTY_EXPENDITURES",
         "state": None,
@@ -475,5 +462,5 @@ def gen_schedule_f_request_data(
         "suffix": None,
         "text4000": None,
         "transaction_type_identifier": "COORDINATED_PARTY_EXPENDITURE",
-        "zip": None
+        "zip": None,
     }

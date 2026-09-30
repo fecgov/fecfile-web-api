@@ -1,3 +1,5 @@
+from fecfiler.transactions.models import Transaction
+
 from fecfiler.transactions.tests.utils import (
     create_ie,
     create_schedule_b,
@@ -19,7 +21,6 @@ sc10 = "SC/10"
 
 
 def generate_data(committee, contact, f3x, schedules):
-    debt = None
     other_f3x = create_form3x(
         committee,
         datetime.strptime("2007-01-30", "%Y-%m-%d").date(),
@@ -30,18 +31,16 @@ def generate_data(committee, contact, f3x, schedules):
         sch_a_transactions = [
             {
                 "date": "2005-02-01",
-                "amount": "10000.23",
+                "amount": "10000000.23",
                 "group": "GENERAL",
-                "form_type": "SA11AI",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
             },
             {
                 "date": "2005-02-08",
-                "amount": "3.77",
+                "amount": "300000.77",
                 "group": "GENERAL",
-                "form_type": "SA11AII",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": False,
@@ -50,7 +49,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "444.44",
                 "group": "GENERAL",
-                "form_type": "SA11B",
                 "tti": "PARTY_RECEIPT",
                 "memo": False,
                 "itemized": False,
@@ -59,7 +57,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "555.55",
                 "group": "OTHER",
-                "form_type": "SA11C",
                 "tti": "PARTY_RECEIPT",
                 "memo": False,
                 "itemized": False,
@@ -68,7 +65,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "1212.12",
                 "group": "GENERAL",
-                "form_type": "SA12",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": False,
@@ -77,7 +73,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "1313.13",
                 "group": "GENERAL",
-                "form_type": "SA13",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": False,
@@ -86,7 +81,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "1414.14",
                 "group": "GENERAL",
-                "form_type": "SA14",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": False,
@@ -95,8 +89,7 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "1234.56",
                 "group": "GENERAL",
-                "form_type": "SA15",
-                "tti": "OFFSET_TO_OPEX",
+                "tti": "OFFSET_TO_OPERATING_EXPENDITURES",
                 "memo": False,
                 "itemized": False,
             },
@@ -104,8 +97,7 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "891.23",
                 "group": "GENERAL",
-                "form_type": "SA15",
-                "tti": "OFFSET_TO_OPEX",
+                "tti": "OFFSET_TO_OPERATING_EXPENDITURES",
                 "memo": False,
                 "itemized": False,
             },
@@ -113,8 +105,7 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "10000.23",
                 "group": "GENERAL",
-                "form_type": "SA15",
-                "tti": "OFFSET_TO_OPEX",
+                "tti": "OFFSET_TO_OPERATING_EXPENDITURES",
                 "memo": True,
                 "itemized": False,
             },
@@ -122,7 +113,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "16",
                 "group": "GENERAL",
-                "form_type": "SA16",
                 "tti": "REFUND_TO_FEDERAL_CANDIDATE",
                 "memo": False,
                 "itemized": False,
@@ -131,7 +121,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "200.50",
                 "group": "GENERAL",
-                "form_type": "SA17",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": False,
@@ -140,7 +129,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "-1",
                 "group": "GENERAL",
-                "form_type": "SA17",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": False,
@@ -149,20 +137,20 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "amount": "800.50",
                 "group": "GENERAL",
-                "form_type": "SA17",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": False,
             },
         ]
-        debt_a = gen_schedule_a(sch_a_transactions, f3x, committee, contact)
-
+        gen_schedule_a(sch_a_transactions, f3x, committee, contact)
+        print(
+            f"HEY Transaction: {Transaction.objects.filter(date='2005-02-08').first().form_type}"
+        )
         sch_a_transactions = [
             {
                 "date": "2005-01-01",
                 "amount": "100",
                 "group": "GENERAL",
-                "form_type": "SA11AI",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": False,
@@ -171,7 +159,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2022-03-01",
                 "amount": "8.23",
                 "group": "GENERAL",
-                "form_type": "SA11AI",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -180,7 +167,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-01-01",
                 "amount": "100",
                 "group": "GENERAL",
-                "form_type": "SA11B",
                 "tti": "PARTY_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -189,7 +175,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-03-01",
                 "amount": "500.00",
                 "group": "GENERAL",
-                "form_type": "SA11B",
                 "tti": "PARTY_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -198,7 +183,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-01-01",
                 "amount": "100",
                 "group": "GENERAL",
-                "form_type": "SA11C",
                 "tti": "PARTY_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -207,7 +191,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-03-01",
                 "amount": "500.00",
                 "group": "GENERAL",
-                "form_type": "SA11C",
                 "tti": "PARTY_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -216,7 +199,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-03-01",
                 "amount": "500.00",
                 "group": "GENERAL",
-                "form_type": "SA12",
                 "tti": "PARTY_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -225,7 +207,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-01-01",
                 "amount": "100",
                 "group": "GENERAL",
-                "form_type": "SA12",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -234,7 +215,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-03-01",
                 "amount": "500.00",
                 "group": "GENERAL",
-                "form_type": "SA13",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -243,7 +223,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-01-01",
                 "amount": "100",
                 "group": "GENERAL",
-                "form_type": "SA13",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -252,7 +231,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-03-01",
                 "amount": "500.00",
                 "group": "GENERAL",
-                "form_type": "SA14",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -261,7 +239,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-01-01",
                 "amount": "100",
                 "group": "GENERAL",
-                "form_type": "SA14",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -270,7 +247,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-03-01",
                 "amount": "500.00",
                 "group": "GENERAL",
-                "form_type": "SA15",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -279,7 +255,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-01-01",
                 "amount": "100",
                 "group": "GENERAL",
-                "form_type": "SA15",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -288,7 +263,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-01-01",
                 "amount": "100",
                 "group": "GENERAL",
-                "form_type": "SA16",
                 "tti": "REFUND_TO_FEDERAL_CANDIDATE",
                 "memo": False,
                 "itemized": True,
@@ -297,7 +271,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-05-01",
                 "amount": "1000.00",
                 "group": "GENERAL",
-                "form_type": "SA16",
                 "tti": "REFUND_TO_FEDERAL_CANDIDATE",
                 "memo": False,
                 "itemized": True,
@@ -306,7 +279,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-03-01",
                 "amount": "300.00",
                 "group": "GENERAL",
-                "form_type": "SA17",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -315,7 +287,6 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-01-01",
                 "amount": "100",
                 "group": "GENERAL",
-                "form_type": "SA17",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": False,
                 "itemized": True,
@@ -324,14 +295,12 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-03-01",
                 "amount": "500.00",
                 "group": "GENERAL",
-                "form_type": "SA17",
                 "tti": "INDIVIDUAL_RECEIPT",
                 "memo": True,
                 "itemized": True,
             },
         ]
-        debt_b = gen_schedule_a(sch_a_transactions, other_f3x, committee, contact)
-        debt = debt_b or debt_a
+        gen_schedule_a(sch_a_transactions, other_f3x, committee, contact)
 
     if "b" in schedules:
         sch_b_transactions = [
@@ -340,70 +309,60 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-02-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB21B",
             },
             {
                 "amount": 22,
                 "date": "2005-02-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB22",
             },
             {
                 "amount": 14,
                 "date": "2005-02-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB23",
             },
             {
                 "amount": 44,
                 "date": "2005-02-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB26",
             },
             {
                 "amount": 31,
                 "date": "2005-02-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB27",
             },
             {
                 "amount": 101.50,
                 "date": "2005-02-01",
                 "type": "REFUND_INDIVIDUAL_CONTRIBUTION",
                 "group": "GENERAL",
-                "form_type": "SB28A",
             },
             {
                 "amount": 201.50,
                 "date": "2005-02-01",
                 "type": "REFUND_PARTY_CONTRIBUTION",
                 "group": "GENERAL",
-                "form_type": "SB28B",
             },
             {
                 "amount": 301.50,
                 "date": "2005-02-01",
                 "type": "REFUND_PAC_CONTRIBUTION",
                 "group": "GENERAL",
-                "form_type": "SB28C",
             },
             {
                 "amount": 201.50,
                 "date": "2005-02-01",
                 "type": "REFUND_PAC_CONTRIBUTION",
                 "group": "GENERAL",
-                "form_type": "SB29",
             },
             {
                 "amount": 102.25,
                 "date": "2005-02-01",
                 "type": "FEDERAL_ELECTION_ACTIVITY_100PCT_PAYMENT",
                 "group": "GENERAL",
-                "form_type": "SB30B",
             },
         ]
         gen_schedule_b(sch_b_transactions, f3x, committee, contact)
@@ -413,140 +372,120 @@ def generate_data(committee, contact, f3x, schedules):
                 "date": "2005-01-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB21B",
             },
             {
                 "amount": 100,
                 "date": "2004-12-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB21B",
             },
             {
                 "amount": 100,
                 "date": "2005-01-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB22",
             },
             {
                 "amount": 1000,
                 "date": "2005-05-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB22",
             },
             {
                 "amount": 50,
                 "date": "2005-01-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB23",
             },
             {
                 "amount": 1000,
                 "date": "2005-05-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB23",
             },
             {
                 "amount": 17,
                 "date": "2005-01-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB26",
             },
             {
                 "amount": 1000,
                 "date": "2005-05-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB26",
             },
             {
                 "amount": 10,
                 "date": "2005-01-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB27",
             },
             {
                 "amount": 100,
                 "date": "2005-05-01",
                 "type": "TRANSFER_TO_AFFILIATES",
                 "group": "GENERAL",
-                "form_type": "SB27",
             },
             {
                 "amount": 1000.00,
                 "date": "2005-01-01",
                 "type": "REFUND_INDIVIDUAL_CONTRIBUTION",
                 "group": "GENERAL",
-                "form_type": "SB28A",
             },
             {
                 "amount": 500,
                 "date": "2005-03-01",
                 "type": "REFUND_INDIVIDUAL_CONTRIBUTION",
                 "group": "GENERAL",
-                "form_type": "SB28A",
             },
             {
                 "amount": 2000.00,
                 "date": "2005-01-01",
                 "type": "REFUND_PARTY_CONTRIBUTION",
                 "group": "GENERAL",
-                "form_type": "SB28B",
             },
             {
                 "amount": 500,
                 "date": "2005-03-01",
                 "type": "REFUND_PARTY_CONTRIBUTION",
                 "group": "GENERAL",
-                "form_type": "SB28B",
             },
             {
                 "amount": 3000.00,
                 "date": "2005-01-01",
                 "type": "REFUND_PAC_CONTRIBUTION",
                 "group": "GENERAL",
-                "form_type": "SB28C",
             },
             {
                 "amount": 500,
                 "date": "2005-03-01",
                 "type": "REFUND_PAC_CONTRIBUTION",
                 "group": "GENERAL",
-                "form_type": "SB28C",
             },
             {
                 "amount": 1000.00,
                 "date": "2005-01-01",
                 "type": "OTHER_DISBURSEMENT",
                 "group": "GENERAL",
-                "form_type": "SB29",
             },
             {
                 "amount": 500,
                 "date": "2005-03-01",
                 "type": "OTHER_DISBURSEMENT",
                 "group": "GENERAL",
-                "form_type": "SB29",
             },
             {
                 "amount": 600.00,
                 "date": "2005-03-01",
                 "type": "FEDERAL_ELECTION_ACTIVITY_100PCT_PAYMENT",
                 "group": "GENERAL",
-                "form_type": "SB30B",
             },
             {
                 "amount": 1000.00,
                 "date": "2005-01-01",
                 "type": "FEDERAL_ELECTION_ACTIVITY_100PCT_PAYMENT",
                 "group": "GENERAL",
-                "form_type": "SB30B",
             },
         ]
         gen_schedule_b(sch_b_transactions, other_f3x, committee, contact)
@@ -557,13 +496,13 @@ def generate_data(committee, contact, f3x, schedules):
                 "amount": 150,
                 "date": "2005-02-01",
                 "percent": "2.0",
-                "form_type": "SC/9",
+                "transaction_type_identifier": "LOAN_BY_COMMITTEE",
             },
             {
                 "amount": 30,
                 "date": "2005-02-01",
                 "percent": "2.0",
-                "form_type": sc10,
+                "transaction_type_identifier": "LOAN_RECEIVED_FROM_INDIVIDUAL",
             },
         ]
         gen_schedule_c(sch_c_transactions, f3x, committee, contact)
@@ -572,25 +511,25 @@ def generate_data(committee, contact, f3x, schedules):
                 "amount": 100,
                 "date": "2005-01-01",
                 "percent": "2.0",
-                "form_type": "SC/9",
+                "transaction_type_identifier": "LOAN_BY_COMMITTEE",
             },
             {
                 "amount": 100,
                 "date": "2004-12-01",
                 "percent": "2.0",
-                "form_type": "SC/9",
+                "transaction_type_identifier": "LOAN_BY_COMMITTEE",
             },
             {
                 "amount": 100,
                 "date": "2005-01-01",
                 "percent": "2.0",
-                "form_type": sc10,
+                "transaction_type_identifier": "LOAN_RECEIVED_FROM_INDIVIDUAL",
             },
             {
                 "amount": 100,
                 "date": "2004-12-01",
                 "percent": "2.0",
-                "form_type": sc10,
+                "transaction_type_identifier": "LOAN_RECEIVED_FROM_BANK",
             },
         ]
         gen_schedule_c(sch_c_transactions, other_f3x, committee, contact)
@@ -600,12 +539,12 @@ def generate_data(committee, contact, f3x, schedules):
             {
                 "amount": 100,
                 "date": "2005-02-01",
-                "form_type": "SD9",
+                "transaction_type_identifier": "DEBT_OWED_TO_COMMITTEE",
             },
             {
                 "amount": 220,
                 "date": "2005-02-01",
-                "form_type": "SD10",
+                "transaction_type_identifier": "DEBT_OWED_BY_COMMITTEE",
             },
         ]
         gen_schedule_d(sch_d_transactions, f3x, committee, contact)
@@ -613,22 +552,22 @@ def generate_data(committee, contact, f3x, schedules):
             {
                 "amount": 100,
                 "date": "2005-01-01",
-                "form_type": "SD9",
+                "transaction_type_identifier": "DEBT_OWED_TO_COMMITTEE",
             },
             {
                 "amount": 100,
                 "date": "2004-01-01",
-                "form_type": "SD9",
+                "transaction_type_identifier": "DEBT_OWED_TO_COMMITTEE",
             },
             {
                 "amount": 220,
                 "date": "2005-02-01",
-                "form_type": "SD10",
+                "transaction_type_identifier": "DEBT_OWED_BY_COMMITTEE",
             },
             {
                 "amount": 220,
                 "date": "2009-02-01",
-                "form_type": "SD10",
+                "transaction_type_identifier": "DEBT_OWED_BY_COMMITTEE",
             },
         ]
         gen_schedule_d(sch_d_transactions, other_f3x, committee, contact)
@@ -843,59 +782,49 @@ def generate_data(committee, contact, f3x, schedules):
             contact_5,
         )
 
-    return debt
-
 
 def gen_schedule_a(transaction_data, f3x, committee, contact):
     debt = None
     for data in transaction_data:
-        scha = create_schedule_a(
+        create_schedule_a(
             data["tti"],
             committee,
             contact,
             data["date"],
             data["amount"],
             data["group"],
-            data["form_type"],
             data["memo"],
             data["itemized"],
+            f3x,
         )
-        scha.add_to_report(f3x.id)
-        scha.save()
-        if data["form_type"] == "SA11AII":
-            debt = scha
     return debt
 
 
 def gen_schedule_b(transaction_data, f3x, committee, contact):
     for data in transaction_data:
-        schb = create_schedule_b(
+        create_schedule_b(
             data["type"],
             committee,
             contact,
             data["date"],
             data["amount"],
             data["group"],
-            data["form_type"],
+            report=f3x,
         )
-
-        schb.add_to_report(f3x.id)
-        schb.save()
 
 
 def gen_schedule_c(transaction_data, f3x, committee, contact):
     for data in transaction_data:
-        schc = create_loan(
+        create_loan(
             committee,
             contact,
             data["amount"],
             data["date"],
             data["percent"],
             False,
-            "LOAN_RECEIVED_FROM_INDIVIDUAL",
-            data["form_type"],
+            data["transaction_type_identifier"],
+            report=f3x,
         )
-        schc.add_to_report(f3x.id)
 
 
 def gen_schedule_d(transaction_data, f3x, committee, contact):
@@ -904,16 +833,15 @@ def gen_schedule_d(transaction_data, f3x, committee, contact):
             committee,
             contact,
             data["amount"],
-            data["form_type"],
-            "DEBT_OWED_BY_COMMITTEE",
-            f3x
+            data["transaction_type_identifier"],
+            f3x,
         )
         process_aggregation_for_debts(schd)
 
 
 def gen_schedule_e(transaction_data, f3x, committee, contact, candidate):
     for data in transaction_data:
-        sche = create_ie(
+        create_ie(
             committee,
             contact,
             data["disbursement_date"],
@@ -923,8 +851,8 @@ def gen_schedule_e(transaction_data, f3x, committee, contact, candidate):
             None,
             candidate,
             data["memo_code"],
+            f3x,
         )
-        sche.add_to_report(f3x.id)
 
 
 def gen_schedule_f(
@@ -938,7 +866,7 @@ def gen_schedule_f(
     contact_5,
 ):
     for data in transaction_data:
-        schf = create_schedule_f(
+        create_schedule_f(
             data["type"],
             committee,
             contact_1,
@@ -956,7 +884,5 @@ def gen_schedule_f(
                 "category_code": data["category_code"],
                 "memo_text_description": data["memo_text"],
             },
+            report=f3x,
         )
-
-        schf.add_to_report(f3x.id)
-        schf.save()
