@@ -371,6 +371,10 @@ class TransactionManager(SoftDeleteManager):
         When(force_unaggregated=True, then=Decimal(0)), default=F("effective_amount")
     )
 
+    ENTITY_AGGREGATE_AMOUNT = Case(
+        When(force_unaggregated=True, then=None), default=F("effective_amount")
+    )
+
     def ITEMIZATION_CLAUSE(self):  # noqa: N802
         over_two_hundred_types = (
             schedule_a_over_two_hundred_types
@@ -394,7 +398,9 @@ class TransactionManager(SoftDeleteManager):
         )
 
     def ENTITY_AGGREGATE_CLAUSE(self):  # noqa: N802
-        return Window(expression=Sum("effective_amount"), **self.entity_aggregate_window)
+        return Window(
+            expression=Sum(self.ENTITY_AGGREGATE_AMOUNT), **self.entity_aggregate_window
+        )
 
     def ELECTION_AGGREGATE_CLAUSE(self):  # noqa: N802
         return Window(expression=Sum(self.AGGREGATE), **self.election_aggregate_window)
