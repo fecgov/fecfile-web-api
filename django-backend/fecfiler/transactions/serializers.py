@@ -269,6 +269,7 @@ class TransactionSerializer(
         self._context["fields_to_ignore"] = self._context.get(
             "fields_to_ignore",
             [
+                "form_type",
                 "filer_committee_id_number",
                 "back_reference_tran_id_number",
                 "contribution_aggregate",

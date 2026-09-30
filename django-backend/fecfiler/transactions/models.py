@@ -718,7 +718,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
 
     def set_and_save_form_type(self):
         ReportTransaction = apps.get_model("reports.ReportTransaction")
-        line_number = ReportTransaction.objects.filter(transaction_id=self.id).annotate(line_number=Case(
+        report = ReportTransaction.objects.filter(transaction_id=self.id).annotate(line_number=Case(
                 *[
                 When(
                     **{f"report__{form_id}__isnull": False},
@@ -729,8 +729,8 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
             ],
             default=Value(None),
             output_field=CharField()
-        )).filter(line_number__isnull=False).first().line_number
-        self._form_type = line_number
+        )).filter(line_number__isnull=False).first()
+        self._form_type = report.line_number if report else None
         self.save(update_fields=["_form_type"])
 
     def set_reports(self, report_ids):
