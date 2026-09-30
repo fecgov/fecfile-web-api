@@ -494,6 +494,8 @@ def calculate_cash_on_hand_fields(report, column_a, column_b):
 
 
 def get_line(line_number, field="amount"):
-    transaction_types = LINE_MAPPINGS_BY_FORM_AND_LINE.get(("form_3x_id", line_number), [])
+    transaction_types = LINE_MAPPINGS_BY_FORM_AND_LINE.get(
+        ("form_3x_id", line_number), []
+    )
     query = Q(~Q(memo_code=True), transaction_type__in=transaction_types)
     return Coalesce(Sum(field, filter=query), Decimal(0.0))
