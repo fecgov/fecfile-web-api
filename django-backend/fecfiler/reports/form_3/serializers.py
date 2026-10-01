@@ -134,17 +134,23 @@ class BaseForm3Serializer(ReportSerializer):
                 ),
             )
             | Q(
+                # if there's a disbursement date, check
+                # only if there is not a disbursement date, check the dissemination date
                 Q(transaction__schedule_e__isnull=False),
                 Q(
-                    Q(transaction__schedule_e__disbursement_date__lt=from_date)
-                    | Q(transaction__schedule_e__disbursement_date__gt=through_date)
-                ),
-            )
-            | Q(
-                Q(transaction__schedule_e__isnull=False),
-                Q(
-                    Q(transaction__schedule_e__dissemination_date__lt=from_date)
-                    | Q(transaction__schedule_e__dissemination_date__gt=through_date)
+                    Q(transaction__schedule_e__disbursement_date__isnull=False)
+                    & (
+                        Q(transaction__schedule_e__disbursement_date__lt=from_date)
+                        | Q(transaction__schedule_e__disbursement_date__gt=through_date)
+                    )
+                    | Q(
+                        transaction__schedule_e__dissemination_date__isnull=False,
+                        transaction__schedule_e__disbursement_date__isnull=True,
+                    )
+                    & Q(
+                        Q(transaction__schedule_e__dissemination_date__lt=from_date)
+                        | Q(transaction__schedule_e__dissemination_date__gt=through_date)
+                    )
                 ),
             )
             | Q(
