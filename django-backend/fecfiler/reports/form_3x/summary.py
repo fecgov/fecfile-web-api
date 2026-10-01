@@ -232,8 +232,8 @@ def calculate_summary_column_a(report: Report):
         committee_account_id=committee_id,
     )
     column_a = report_transactions.aggregate(
-        line_11ai=get_line("SA11AI"),
-        line_11aii=get_line("SA11AII"),
+        line_11ai=get_line("SA11AI", itemized=True),
+        line_11aii=get_line("SA11AI", itemized=False),
         line_11b=get_line("SA11B"),
         line_11c=get_line("SA11C"),
         line_12=get_line("SA12"),
@@ -337,7 +337,7 @@ def calculate_summary_column_b(report):
 
     # build summary
     column_b = ytd_transactions.aggregate(
-        line_11ai=get_line("SA11AI"),
+        line_11ai=get_line("SA11AI", itemized=True),
         line_11aii=get_line("SA11AI", itemized=False),
         line_11b=get_line("SA11B"),
         line_11c=get_line("SA11C"),
