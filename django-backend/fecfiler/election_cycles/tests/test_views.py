@@ -59,7 +59,7 @@ class ElectionCyclesViewSetTestCase(TestCase):
         self.assertEqual(ElectionCycle.objects.count(), 2)
 
     def test_update_election_cycle(self):
-        update_data = {**self.valid_payload, "office": "Presidential"}
+        update_data = {**self.valid_payload, "office": "Senate"}
         response = self.client.put(
             f"/api/v1/election-cycles/{self.cycle_1.id}/",
             data=update_data,
@@ -67,7 +67,7 @@ class ElectionCyclesViewSetTestCase(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.cycle_1.refresh_from_db()
-        self.assertEqual(self.cycle_1.office, "Presidential")
+        self.assertEqual(self.cycle_1.office, "Senate")
 
     def test_destroy_election_cycle(self):
         response = self.client.delete(f"/api/v1/election-cycles/{self.cycle_1.id}/")
