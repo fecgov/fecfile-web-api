@@ -18,7 +18,7 @@ gunicorn==23.0.0
 invoke==2.2.0
 jwcrypto==1.6.1
 psycopg[pool]==3.3.0
-PyJWT==2.13.0
+PyJWT==2.15.1
 redis==5.3.1
 requests==2.33.0
 structlog==25.3.0
