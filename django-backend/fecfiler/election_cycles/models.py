@@ -12,7 +12,6 @@ class ElectionCycle(
 ):
     class Office(models.TextChoices):
         HOUSE = "House"
-        PRESIDENTIAL = "Presidential"
         SENATE = "Senate"
 
     class ElectionType(models.TextChoices):
