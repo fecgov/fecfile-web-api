@@ -4,12 +4,13 @@ from ..serializers import (
     COVERAGE_DATE_REPORT_CODE_COLLISION,
     COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS,
 )
+from fecfiler.reports.form_3x.serializers import Form3XSerializer
 
 from fecfiler.user.models import User
 from fecfiler.reports.models import Report
 from rest_framework.request import Request, HttpRequest
-from fecfiler.reports.tests.utils import create_form3
-from fecfiler.transactions.tests.utils import create_schedule_a
+from fecfiler.reports.tests.utils import create_form3, create_form3x
+from fecfiler.transactions.tests.utils import create_schedule_a, create_ie
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.web_services.models import (
     FECStatus,
@@ -78,13 +79,13 @@ class F3SerializerTestCase(TestCase):
             data=self.valid_f3_report,
             context={"request": self.mock_request},
         )
-        valid_serializer.is_valid()
+        valid_serializer.is_valid(raise_exception=True)
         valid_serializer.save()
         valid_serializer = Form3Serializer(
             data=self.valid_f3_report,
             context={"request": self.mock_request},
         )
-        valid_serializer.is_valid()
+        valid_serializer.is_valid(raise_exception=True)
         self.assertRaises(
             type(COVERAGE_DATE_REPORT_CODE_COLLISION), valid_serializer.save
         )
@@ -97,7 +98,7 @@ class F3SerializerTestCase(TestCase):
         f3_report = create_form3(self.committee, "2024-01-01", "2024-02-01", {})
         # retrieve from manager to populate annotations
         f3_report = Report.objects.get(id=f3_report.id)
-        valid_serializer.is_valid()
+        valid_serializer.is_valid(raise_exception=True)
         representation = valid_serializer.to_representation(f3_report)
         self.assertEqual(
             representation["report_status"],
@@ -155,7 +156,7 @@ class F3SerializerTestCase(TestCase):
             data=self.valid_f3_report,
             context={"request": self.mock_request},
         )
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         self.assertRaises(
             type(COVERAGE_DATE_REPORT_CODE_COLLISION),
             serializer.update,
@@ -178,7 +179,7 @@ class F3SerializerTestCase(TestCase):
             data=self.valid_f3_report,
             context={"request": self.mock_request},
         )
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         self.assertRaises(
             type(COVERAGE_DATES_EXCLUDE_EXISTING_TRANSACTIONS),
             serializer.update,
@@ -207,7 +208,7 @@ class F3SerializerTestCase(TestCase):
             data=self.valid_f3_report,
             context={"request": self.mock_request},
         )
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         self.assertEqual(
             serializer.update(
                 report_a,
@@ -240,7 +241,7 @@ class F3SerializerTestCase(TestCase):
             data=self.valid_f3_report,
             context={"request": self.mock_request},
         )
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         self.assertEqual(
             serializer.update(
                 report_a,
@@ -266,7 +267,7 @@ class F3SerializerTestCase(TestCase):
             data=self.valid_f3_report,
             context={"request": self.mock_request},
         )
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         serializer.update(
             report,
             {
@@ -280,3 +281,81 @@ class F3SerializerTestCase(TestCase):
         report.refresh_from_db()
         self.assertIsNone(report.calculation_status)
         self.assertIsNone(report.calculation_token)
+
+    def test_update_coverage_dates_IE(self):
+        report = create_form3x(self.committee, "2024-01-01", "2024-03-31")
+        # disbursement within
+        ie = create_ie(
+            self.committee,
+            None,
+            "2024-03-31",
+            None,
+            "2024-03-31",
+            250,
+            "P2026",
+            None,
+            report=report,
+            memo_code=False,
+        )
+
+        def change_dates(report, from_date, through_date, expect_error=False):
+
+            validated_data = {
+                "coverage_from_date": from_date,
+                "coverage_through_date": through_date,
+            }
+            serializer = Form3XSerializer(
+                data=validated_data,
+                context={
+                    "request": self.mock_request,
+                    "fields_to_ignore": [
+                        "treasurer_first_name",
+                        "treasurer_last_name",
+                        "date_signed",
+                        "form_type",
+                        "filer_committee_id_number",
+                    ],
+                },
+            )
+            if expect_error:
+                with self.assertRaises(Exception):
+                    serializer.is_valid(raise_exception=True)
+                    serializer.update(
+                        report,
+                        {
+                            "coverage_from_date": from_date,
+                            "coverage_through_date": through_date,
+                        },
+                    )
+                return
+            serializer.is_valid(raise_exception=True)
+            serializer.update(
+                report,
+                {
+                    "coverage_from_date": from_date,
+                    "coverage_through_date": through_date,
+                },
+            )
+
+        change_dates(report, "2024-01-01", "2024-03-31")
+        change_dates(report, "2024-01-01", "2024-03-01", expect_error=True)
+        change_dates(report, "2024-04-01", "2024-04-31", expect_error=True)
+
+        # add dissem date.  ok for it to be outside range if disbursement date is inside
+        ie.schedule_e.dissemination_date = datetime.strptime(
+            "2023-12-31", "%Y-%m-%d"
+        ).date()
+        ie.schedule_e.save()
+        change_dates(report, "2024-01-01", "2024-03-31")
+
+        # should fail if disbursement date is not set and dissemination date is outside
+        ie.schedule_e.disbursement_date = None
+        ie.schedule_e.save()
+        change_dates(report, "2024-01-01", "2024-03-31", expect_error=True)
+
+        # ok if disbursemetn date is not set and dissem is inside
+        ie.schedule_e.dissemination_date = datetime.strptime(
+            "2024-02-01", "%Y-%m-%d"
+        ).date()
+        ie.schedule_e.save()
+        change_dates(report, "2024-01-01", "2024-03-31")
