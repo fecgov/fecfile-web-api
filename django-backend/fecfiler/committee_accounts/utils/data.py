@@ -238,6 +238,8 @@ def dump_committee_data(committee_id, redis=False):
     if committee is None:
         raise RuntimeError("No Committee Account found matching that Committee ID")
 
+    logger.info(f"Dumping data for committee {committee_id}")
+
     dumped_committee_data = dump_all_committee_data(committee)
     formatted_json = f"[{','.join(dumped_committee_data)}]"
 

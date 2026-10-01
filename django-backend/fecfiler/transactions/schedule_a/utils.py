@@ -1,6 +1,7 @@
 # For these transaction types, the contributor committee is used for the donor committee.
 from ..utils import add_org_ind_contact, add_candidate_contact
 from fecfiler.transactions.models import Transaction
+from fecfiler.contacts.shared_models import ContactType
 
 DONOR_COMMITTEE_USE_CONTRIBUTOR_TYPES = [
     "EARMARK_MEMO",
@@ -49,6 +50,8 @@ def add_schedule_a_contact_fields(instance: Transaction, representation: dict = 
         add_org_ind_contact(data, instance.contact_1, "contributor")
         data["contributor_employer"] = instance.contact_1.employer
         data["contributor_occupation"] = instance.contact_1.occupation
+        if instance.contact_1.type == ContactType.CANDIDATE:
+            add_candidate_contact(data, instance.contact_1, "donor", True)
         if instance.transaction_type_identifier in DONOR_COMMITTEE_USE_CONTRIBUTOR_TYPES:
             data["donor_committee_name"] = instance.contact_1.name
             data["donor_committee_fec_id"] = instance.contact_1.committee_id
