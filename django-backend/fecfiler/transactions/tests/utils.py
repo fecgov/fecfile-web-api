@@ -91,8 +91,8 @@ def create_schedule_b(
 def create_ie(
     committee: CommitteeAccount,
     contact: Contact,
-    disbursement_date: str,
-    dissemination_date: str,
+    disbursement_date: str | None,
+    dissemination_date: str | None,
     date_signed: str,
     amount: str,
     code: str,
@@ -415,7 +415,7 @@ def gen_schedule_f_request_data(
             "payee_candidate_state",
             "payee_candidate_district",
             "memo_code",
-            "memo_text_description"
+            "memo_text_description",
         ],
         "filer_designated_to_make_coordinated_expenditures": None,
         "first_name": None,
@@ -457,9 +457,7 @@ def gen_schedule_f_request_data(
         "quinary_street_1": None,
         "quinary_street_2": None,
         "quinary_zip": None,
-        "report_ids": [
-            report_uuid
-        ],
+        "report_ids": [report_uuid],
         "schedule_id": "F",
         "schema_name": "COORDINATED_PARTY_EXPENDITURES",
         "state": None,
@@ -475,5 +473,5 @@ def gen_schedule_f_request_data(
         "suffix": None,
         "text4000": None,
         "transaction_type_identifier": "COORDINATED_PARTY_EXPENDITURE",
-        "zip": None
+        "zip": None,
     }
