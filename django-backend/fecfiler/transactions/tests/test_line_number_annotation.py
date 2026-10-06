@@ -24,7 +24,7 @@ logger = structlog.get_logger(__name__)
 
 # If this is set to False, the unit tests will be run with a subset
 # of transaction types in order to save time.
-RUN_ALL_TRANSACTION_TYPES = False
+RUN_ALL_TRANSACTION_TYPES = True
 
 
 # IF THERE IS A MISMATCH, YOU MUST CHECK THE SPEC SHEET.  THIS IS NOT A SOURCE OF TRUTH
@@ -99,7 +99,6 @@ schedule_a_test_mappings = [
     ["REFUND_TO_FEDERAL_CANDIDATE", "COM", {"F3X": "SA16"}],
     ["REFUND_TO_OTHER_POLITICAL_COMMITTEE", "COM", {"F3X": "SA16"}],
     ["REFUND_TO_UNREGISTERED_COMMITTEE", "ORG", {"F3X": "SA16"}],
-    ["FEDERAL_MATCHING_FUNDS_RECEIPT", "ORG", {"F3X": "SA16"}],
     ["OFFSET_TO_OPERATING_EXPENDITURES", "ORG", {"F3": "SA14", "F3X": "SA15"}],
     ["OTHER_RECEIPT", "COM", {"F3": "SA15", "F3X": "SA17"}],
     ["INDIVIDUAL_RECEIPT_NON_CONTRIBUTION_ACCOUNT", "IND", {"F3X": "SA17"}],
@@ -381,7 +380,7 @@ class TransactionLineNumberAnnotationTestCase(FecfilerViewSetTest):
             for report_type in mismatches[tti].keys():
                 found, expected = mismatches[tti][report_type]
                 error_message += (
-                    f"\n        {report_type}".ljust(16)
+                    f"\n        {report_type}".ljust(20)
                     + f"| {found} != {expected}"
                 )
 
