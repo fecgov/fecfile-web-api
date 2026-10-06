@@ -78,7 +78,6 @@ class DotFECScheduleBTestCase(TestCase):
             "2024-01-04",
             "250.00",
             "GENERAL_DISBURSEMENT",
-            "SB21B",
             report=self.f3x,
         )
         schedule_b = self.disbursment_individual.schedule_b
@@ -109,7 +108,6 @@ class DotFECScheduleBTestCase(TestCase):
             "2024-01-10",
             "450.00",
             "GENERAL_DISBURSEMENT",
-            "SB21B",
             report=self.f3x,
         )
 

@@ -72,7 +72,7 @@ class DotFECScheduleETestCase(TestCase):
         )
 
         self.transaction = create_schedule_a(
-            "INDIVIDUAL_RECEIPT", self.committee, None, None, 1
+            "INDIVIDUAL_RECEIPT", self.committee, None, None, 1, report=self.f3x,
         )
         self.transaction.schedule_a.reattribution_redesignation_tag = REATTRIBUTED
         self.transaction.schedule_a.save()

@@ -187,7 +187,6 @@ def create_loan_from_bank(
         loan_interest_rate,
         secured,
         "LOAN_RECEIVED_FROM_BANK",
-        "SC/10",
         loan_incurred_date,
         report,
     )

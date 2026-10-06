@@ -169,7 +169,6 @@ class ReportModelTestCase(TestCase):
             self.committee,
             test_org,
             4000,
-            "SD9",
             "DEBT_OWED_BY_COMMITTEE",
             f3x_a
         )

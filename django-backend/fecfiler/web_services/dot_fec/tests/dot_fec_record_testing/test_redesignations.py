@@ -97,7 +97,6 @@ class DotFECRedesignationsTestCase(TestCase):
             "2024-01-04",
             "250.00",
             "GENERAL_DISBURSEMENT",
-            "SB21B",
             report=self.m1,
         )
         schedule_b = self.disbursment.schedule_b
@@ -128,7 +127,6 @@ class DotFECRedesignationsTestCase(TestCase):
             "2024-01-04",
             "250.00",
             "GENERAL_DISBURSEMENT",
-            "SB21B",
             report=self.m2,
         )
         self.disbursment_copy.reatt_redes = self.disbursment
@@ -166,7 +164,6 @@ class DotFECRedesignationsTestCase(TestCase):
             "2024-01-01",
             "10.00",
             "GENERAL_DISBURSEMENT",
-            "SB21B",
             report=self.m2,
         )
 
@@ -189,7 +186,6 @@ class DotFECRedesignationsTestCase(TestCase):
             "2024-01-01",
             "-10.00",
             "GENERAL_DISBURSEMENT",
-            "SB21B",
             report=self.m2,
         )
         self.redesignation_from.force_itemized = True
