@@ -231,7 +231,7 @@ schedule_b_test_mappings = [
     ["PAC_IN_KIND_OUT", "COM", {"F3": "SB17", "F3X": "SB21B"}],
     ["PARTY_IN_KIND_OUT", "COM", {"F3": "SB17", "F3X": "SB21B"}],
     ["IN_KIND_TRANSFER_OUT", "COM", {"F3X": "SB21B"}],
-    ["IN_KIND_TRANSFER_FEA_OUT", "COM", {"F3X": "SB21B"}],
+    ["IN_KIND_TRANSFER_FEA_OUT", "COM", {"F3X": "SB30B"}],
     ["IN_KIND_OUT_CONTRIBUTION_FROM_CANDIDATE", "CAN", {"F3": "SB17"}],
     ["IN_KIND_CONTRIBUTION_FROM_CANDIDATE_MEMO", "ORG", {"F3": "SB17"}],
     ["CONDUIT_EARMARK_OUT_DEPOSITED", "COM", {"F3X": "SB23"}],
@@ -410,6 +410,10 @@ class TransactionLineNumberAnnotationTestCase(FecfilerViewSetTest):
                     report=report
                 )
 
+                if report_type == "Unitemized":
+                    new_transaction.force_itemized = False
+                    new_transaction.save()
+
                 self.view.request = self.get_request(
                     params={
                         "report_id": report.id,
@@ -417,6 +421,7 @@ class TransactionLineNumberAnnotationTestCase(FecfilerViewSetTest):
                 )
                 queryset = self.view.get_queryset()
                 saved_transaction = queryset.get(id=new_transaction.id)
+
                 if saved_transaction.form_type != line_number_mappings[report_type]:
                     tti_mismatches = mismatches.get(tti, None) or {}
                     mismatches[tti] = {
