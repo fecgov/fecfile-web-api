@@ -32,14 +32,14 @@ class F3XReportTestCase(TestCase):
         generate_data(self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e", "f"])
         summary_a, _ = calculate_summary_columns(f3x)
 
-        # self.assertEqual(summary_a["line_6c"], Decimal("18085.17"))
-        # self.assertEqual(
-        #     summary_a["line_6d"],
-        #     Decimal("0") + +Decimal("18146.17"),  # line_6b  # line_6c
-        # )
-        # self.assertEqual(summary_a["line_8"], summary_a["line_6d"] - summary_a["line_7"])
-        # self.assertEqual(summary_a["line_9"], Decimal("250.00"))
-        # self.assertEqual(summary_a["line_10"], Decimal("250.00"))
+        self.assertEqual(summary_a["line_6c"], Decimal("18085.17"))
+        self.assertEqual(
+            summary_a["line_6d"],
+            Decimal("0") + +Decimal("18146.17"),  # line_6b  # line_6c
+        )
+        self.assertEqual(summary_a["line_8"], summary_a["line_6d"] - summary_a["line_7"])
+        self.assertEqual(summary_a["line_9"], Decimal("250.00"))
+        self.assertEqual(summary_a["line_10"], Decimal("250.00"))
         self.assertEqual(summary_a["line_11ai"], Decimal("10000.23"))
         self.assertEqual(summary_a["line_11aii"], Decimal("3.77"))
         self.assertEqual(
