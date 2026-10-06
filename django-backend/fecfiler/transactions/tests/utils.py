@@ -95,9 +95,10 @@ def create_ie(
     candidate: Contact,
     memo_code: bool = False,
     report: Report | None = None,
+    type="INDEPENDENT_EXPENDITURE",
 ):
     return create_test_transaction(
-        "INDEPENDENT_EXPENDITURE",
+        type,
         ScheduleE,
         committee,
         contact_1=contact,
