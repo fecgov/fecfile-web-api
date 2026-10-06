@@ -1,6 +1,24 @@
 LINE_MAPPINGS_BY_FORM_AND_LINE = {
     # Form 3 mappings
+    ("form_3_id", "SA11AI"): [
+        "RETURN_RECEIPT",
+        "PARTNERSHIP_RECEIPT",
+        "PARTNERSHIP_ATTRIBUTION",
+        "RECEIPT_FROM_UNREGISTERED_ORGANIZATION_RETURN",
+        "RECEIPT_FROM_UNREGISTERED_ORGANIZATION",
+        "TRIBAL_RECEIPT",
+        "INDIVIDUAL_RECEIPT",
+    ],
+    ("form_3_id", "SA11B"): ["PARTY_RECEIPT", "PARTY_RETURN"],
+    ("form_3_id", "SA11C"): ["PAC_RECEIPT", "PAC_RETURN"],
+    ("form_3_id", "SA11D"): ["CONTRIBUTION_FROM_CANDIDATE"],
     ("form_3_id", "SA14"): ["OFFSET_TO_OPERATING_EXPENDITURES"],
+    ("form_3_id", "SA15"): [
+        "INDIVIDUAL_RECOUNT_RECEIPT",
+        "PAC_RECOUNT_RECEIPT",
+        "PARTY_RECOUNT_RECEIPT",
+        "OTHER_RECEIPT",
+    ],
     # Form 3X mappings
     ("form_3x_id", "SC/9"): ["LOAN_BY_COMMITTEE"],
     ("form_3x_id", "SD9"): ["DEBT_OWED_TO_COMMITTEE"],
