@@ -16,7 +16,7 @@ def update_line_numbers(apps, schema_editor):
     )
     for transaction in unassigned_transactions:
         transaction.set_and_save_form_type()
-    print(f"Finished updating unassigned transactions")
+    print("Finished updating unassigned transactions")
 
     print(f"=================\n" f"Form 3 transactions: {f3_transactions.count()}")
     f3_transactions_updated = 0
@@ -26,7 +26,8 @@ def update_line_numbers(apps, schema_editor):
             f3_transactions_updated += 1
         else:
             print(
-                f"Transaction had no _form_type, ID: {transaction.id}, type: {transaction.transaction_type_identifier}"
+                f"Transaction had no _form_type, ID: {transaction.id}, "
+                f"type: {transaction.transaction_type_identifier}"
             )
     print(f"Form 3 transactions updated: {f3_transactions_updated}")
 

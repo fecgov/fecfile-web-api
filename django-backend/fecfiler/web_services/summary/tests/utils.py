@@ -1,5 +1,3 @@
-from fecfiler.transactions.models import Transaction
-
 from fecfiler.transactions.tests.utils import (
     create_ie,
     create_schedule_b,
