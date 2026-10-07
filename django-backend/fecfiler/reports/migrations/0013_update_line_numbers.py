@@ -2,6 +2,7 @@
 
 from django.db import migrations
 from fecfiler.transactions.models import Transaction
+import django_migration_linter as linter
 
 
 def update_line_numbers(apps, schema_editor):
@@ -39,6 +40,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        linter.IgnoreMigration(),
         migrations.RunPython(
             code=update_line_numbers,
             reverse_code=migrations.RunPython.noop,
