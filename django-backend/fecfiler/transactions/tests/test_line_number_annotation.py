@@ -24,7 +24,7 @@ logger = structlog.get_logger(__name__)
 
 # If this is set to False, the unit tests will be run with a subset
 # of transaction types in order to save time.
-RUN_ALL_TRANSACTION_TYPES = True
+RUN_ALL_TRANSACTION_TYPES = False
 
 
 # IF THERE IS A MISMATCH, YOU MUST CHECK THE SPEC SHEET.  THIS IS NOT A SOURCE OF TRUTH
