@@ -25,7 +25,9 @@ def update_line_numbers(apps, schema_editor):
         if transaction._form_type:
             f3_transactions_updated += 1
         else:
-            print(f"Transaction had no _form_type, ID: {transaction.id}")
+            print(
+                f"Transaction had no _form_type, ID: {transaction.id}, type: {transaction.transaction_type_identifier}"
+            )
     print(f"Form 3 transactions updated: {f3_transactions_updated}")
 
 
