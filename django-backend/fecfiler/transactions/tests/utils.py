@@ -87,8 +87,8 @@ def create_schedule_b(
 def create_ie(
     committee: CommitteeAccount,
     contact: Contact,
-    disbursement_date: str,
-    dissemination_date: str,
+    disbursement_date: str | None,
+    dissemination_date: str | None,
     date_signed: str,
     amount: str,
     code: str,
