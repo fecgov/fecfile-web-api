@@ -277,7 +277,6 @@ class DotFECSchARecordsTestCase(TestCase):
             self.contact_can,
             datetime.strptime("2024-01-10", "%Y-%m-%d"),
             "100.00",
-            form_type="SA11D",
         )
         add_schedule_a_contact_fields(candidate_contribution)
         candidate_row = serialize_instance("SchA", candidate_contribution).split(FS_STR)
