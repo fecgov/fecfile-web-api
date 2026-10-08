@@ -1,6 +1,7 @@
 from django.db import migrations
 from fecfiler.transactions.models import Transaction
 from fecfiler.transactions.managers import TransactionManager
+import django_migration_linter as linter
 
 
 class Migration(migrations.Migration):
@@ -46,5 +47,9 @@ class Migration(migrations.Migration):
                     )
 
     operations = [
+        # ignore is needed to allow importing Transaction model in migration
+        # which is required to include our custom model save logic which
+        # recalculates aggregates for the transaction chain
+        linter.IgnoreMigration(),
         migrations.RunPython(recalculate_entity_aggregates, migrations.RunPython.noop),
     ]
