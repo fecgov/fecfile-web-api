@@ -106,7 +106,7 @@ class DotFECSchARecordsTestCase(TestCase):
             datetime.strptime("2024-01-06", "%Y-%m-%d"),
             "1.00",
             "GENERAL",
-            "SA12",
+            report=self.f3x,
         ).id
         trans_org_id = create_schedule_a(
             "PARTNERSHIP_JF_TRANSFER_MEMO",
@@ -115,8 +115,8 @@ class DotFECSchARecordsTestCase(TestCase):
             datetime.strptime("2024-01-07", "%Y-%m-%d"),
             "5.00",
             "GENERAL",
-            "SA12",
             parent_id=trans_com_id,
+            report=self.f3x,
         ).id
         trans_ind_id = create_schedule_a(
             "PARTNERSHIP_ATTRIBUTION_JF_TRANSFER_MEMO",
@@ -125,8 +125,8 @@ class DotFECSchARecordsTestCase(TestCase):
             datetime.strptime("2024-01-08", "%Y-%m-%d"),
             "10.00",
             "GENERAL",
-            "SA12",
             parent_id=trans_org_id,
+            report=self.f3x,
         ).id
         trans_agg_id = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -135,8 +135,8 @@ class DotFECSchARecordsTestCase(TestCase):
             datetime.strptime("2024-01-09", "%Y-%m-%d"),
             "15.00",
             "GENERAL",
-            "SA11AI",
             purpose_description="Testing Aggregate Transaction",
+            report=self.f3x,
         ).id
 
         trans_donor = create_schedule_a(
@@ -146,7 +146,6 @@ class DotFECSchARecordsTestCase(TestCase):
             datetime.strptime("2024-01-21", "%Y-%m-%d"),
             "40.00",
             "GENERAL",
-            "SA11AI",
             memo_code=True,
         )
         trans_donor.contact_2 = self.contact_can
@@ -278,7 +277,6 @@ class DotFECSchARecordsTestCase(TestCase):
             self.contact_can,
             datetime.strptime("2024-01-10", "%Y-%m-%d"),
             "100.00",
-            form_type="SA11D",
         )
         add_schedule_a_contact_fields(candidate_contribution)
         candidate_row = serialize_instance("SchA", candidate_contribution).split(FS_STR)

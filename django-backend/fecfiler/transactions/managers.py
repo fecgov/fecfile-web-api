@@ -21,7 +21,6 @@ from django.db.models import (
     CharField,
     DecimalField,
     DateField,
-    UUIDField,
     OuterRef,
     Subquery,
     F,
@@ -118,7 +117,6 @@ class TransactionManager(SoftDeleteManager):
                     "_calendar_ytd_per_election_office",
                 ),
                 line_label=self.LINE_LABEL_CLAUSE(),
-                loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
                 report_code_label=self.REPORT_CODE_LABEL_CLAUSE(),
                 report_type=self.REPORT_TYPE_CLAUSE(),
             )
@@ -177,7 +175,6 @@ class TransactionManager(SoftDeleteManager):
                 transaction_ptr_id=F("id"),
                 line_label=self.LINE_LABEL_CLAUSE(),
                 report_code_label=report_code_label_clause,
-                loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
                 report_type=report_type_clause,
                 back_reference_tran_id_number=back_ref_id_clause,
                 report_ids_list=reports_subquery,
@@ -472,16 +469,6 @@ class TransactionManager(SoftDeleteManager):
             Report.objects.filter(transactions=OuterRef("pk"), form_24__isnull=True)
             .annotate(report_type=report_type_case)
             .values("report_type")[:1]
-        )
-
-    def LOAN_AGREEMENT_CLAUSE(self):
-        return Subquery(
-            self.model._base_manager.filter(
-                parent_transaction_id=OuterRef("pk"),
-                transaction_type_identifier="C1_LOAN_AGREEMENT",
-                deleted__isnull=True,
-            ).values("id")[:1],
-            output_field=UUIDField(),
         )
 
     def ORDER_KEY_CLAUSE(self):  # noqa: N802

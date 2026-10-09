@@ -59,7 +59,6 @@ class TasksTestCase(TestCase):
             "2023-01-05",
             "123.45",
             "GENERAL",
-            "SA11AI",
             itemized=True,
             report=self.f3x,
         )
@@ -113,7 +112,6 @@ class TasksTestCase(TestCase):
                 "2023-01-05",
                 "123.45",
                 "GENERAL",
-                "SA11AI",
                 itemized=True,
                 report=self.f3x,
             )
@@ -310,7 +308,6 @@ class PollingTasksTestCase(TestCase):
             "2023-01-05",
             "123.45",
             "GENERAL",
-            "SA11AI",
             itemized=True,
             report=self.f3x,
         )

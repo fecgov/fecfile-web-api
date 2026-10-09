@@ -1595,7 +1595,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "1000.00",
             "2025-12-31",
             "6%",
-            form_type="SC/10",
             loan_incurred_date="2025-01-01",
             report=q1_report,
             type="LOAN_BY_COMMITTEE",
@@ -1662,7 +1661,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "1000.00",
             "2025-12-31",
             "6%",
-            form_type="SC/10",
             loan_incurred_date="2025-01-01",
             report=q1_report,
         )
@@ -1717,7 +1715,6 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             "1000.00",
             "2025-12-31",
             "6%",
-            form_type="SC/10",
             loan_incurred_date="2025-01-01",
             report=test_q1_report_2025,
         )

@@ -29,9 +29,7 @@ class F3XReportTestCase(TestCase):
             datetime.strptime("2005-02-28", "%Y-%m-%d").date(),
             report_code="12C",
         )
-        self.debt = generate_data(
-            self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e", "f"]
-        )
+        generate_data(self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e", "f"])
         summary_a, _ = calculate_summary_columns(f3x)
 
         self.assertEqual(summary_a["line_6c"], Decimal("18085.17"))
@@ -130,14 +128,8 @@ class F3XReportTestCase(TestCase):
             datetime.strptime("2005-02-28", "%Y-%m-%d").date(),
             report_code="12C",
         )
-        self.debt = generate_data(
-            self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e", "f"]
-        )
+        generate_data(self.committee, self.contact_1, f3x, ["a", "b", "c", "d", "e", "f"])
         _, summary_b = calculate_summary_columns(f3x)
-
-        self.assertIsNotNone(self.debt)
-        if self.debt is not None:
-            self.assertEqual(self.debt.force_itemized, False)
 
         self.assertEqual(summary_b["line_6a"], Decimal("61"))
         self.assertEqual(summary_b["line_6c"], Decimal("18985.17"))
@@ -250,9 +242,7 @@ class F3XReportTestCase(TestCase):
         self.assertEqual(str(report.form_3x.L6a_year_for_above_ytd), "2026")
 
         report.coverage_from_date = datetime.strptime("2025-01-01", "%Y-%m-%d").date()
-        report.coverage_through_date = datetime.strptime(
-            "2025-01-31", "%Y-%m-%d"
-        ).date()
+        report.coverage_through_date = datetime.strptime("2025-01-31", "%Y-%m-%d").date()
         report.save(update_fields=["coverage_from_date", "coverage_through_date"])
 
         calculate_summary(report)
