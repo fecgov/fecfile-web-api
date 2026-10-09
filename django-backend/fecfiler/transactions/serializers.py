@@ -471,16 +471,6 @@ class TransactionListSerializer(ModelSerializer):
             "loan_agreement_id",
         ]
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        loan_agreement = instance.transaction_set.filter(
-            transaction_type_identifier="C1_LOAN_AGREEMENT"
-        ).first()
-        representation["loan_agreement_id"] = (
-            loan_agreement.id if loan_agreement else None
-        )
-        return representation
-
 
 class TransactionReportSerializer(CommitteeOwnedSerializer):
     id = UUIDField(required=False)
