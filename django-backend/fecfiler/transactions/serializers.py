@@ -470,11 +470,6 @@ class TransactionListSerializer(ModelSerializer):
             "loan_agreement_id",
         ]
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation["aggregate"] = instance.aggregate or 0
-        return representation
-
 
 class TransactionReportSerializer(CommitteeOwnedSerializer):
     id = UUIDField(required=False)
