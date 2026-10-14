@@ -242,9 +242,8 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
 
     def test_update_with_malicious_id_change(self):
-        original_payload = deepcopy(self.payloads["IN_KIND"])
+        original_payload = deepcopy(self.payloads["INDIVIDUAL_RECEIPT"])
         original_payload["report_ids"] = [str(self.q1_report.id)]
-        original_payload["children"][0]["report_ids"] = [str(self.q1_report.id)]
         request = self.post_request(original_payload)
 
         transaction = TransactionViewSet().save_transaction(request.data, request)
