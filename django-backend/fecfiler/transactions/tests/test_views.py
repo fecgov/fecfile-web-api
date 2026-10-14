@@ -1,5 +1,4 @@
 from decimal import Decimal
-from uuid import uuid4
 from rest_framework import status
 from rest_framework.request import HttpRequest, Request
 from fecfiler.user.models import User
@@ -251,8 +250,18 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             committee_id="C12344321"
         )
         other_committee.save()
-        other_contact = create_test_individual_contact("Last", "First", other_committee.id)
-        other_transaction = create_schedule_a("INDIVIDUAL_RECEIPT", other_committee, other_contact, "2024-01-01", "22.00")
+        other_contact = create_test_individual_contact(
+            "Last",
+            "First",
+            other_committee.id
+        )
+        other_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            other_committee,
+            other_contact,
+            "2024-01-01",
+            "22.00"
+        )
 
         updated_payload = deepcopy(original_payload)
         updated_payload["id"] = other_transaction.id
