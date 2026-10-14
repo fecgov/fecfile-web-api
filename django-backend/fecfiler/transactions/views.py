@@ -179,7 +179,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         with db_transaction.atomic():
             instance = self.get_object()
             transaction_id = request.data.get("id")
-            if transaction_id is not None and transaction_id != instance.id:
+            if transaction_id is not None and transaction_id != str(instance.id):
                 return Response(status=400)
 
             saved_transaction = self.save_transaction(
