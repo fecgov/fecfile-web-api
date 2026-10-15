@@ -61,7 +61,6 @@ class DotFECSerializerTestCase(TestCase):
             datetime.strptime("2020-04-19", "%Y-%m-%d"),
             "1234.56",
             "GENERAL",
-            "SA11AI",
         )
         self.transaction.add_to_report(self.f3x.id)
         self.transaction.save()

@@ -321,6 +321,7 @@ class TransactionViewTestCase(TestCase):
         self.assertEqual(original_debt_view.payment_amount, Decimal("3.50"))
 
     def test_line_label(self):
+        m1_report = create_form3x(self.committee, "2024-01-01", "2024-01-31", {})
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
             self.committee,
@@ -328,9 +329,9 @@ class TransactionViewTestCase(TestCase):
             "2024-01-01",
             "1.00",
             "GENERAL",
-            "SA11AI",
             False,
             itemized=True,
+            report=m1_report,
         )
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -339,8 +340,8 @@ class TransactionViewTestCase(TestCase):
             "2024-01-02",
             "2.00",
             "GENERAl",
-            "SA11AI",
             itemized=False,
+            report=m1_report,
         )
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -349,8 +350,8 @@ class TransactionViewTestCase(TestCase):
             "2024-01-03",
             "1000.00",
             "GENERAL",
-            "SA11AII",
             itemized=False,
+            report=m1_report,
         )
         create_schedule_b(
             "OPERATING_EXPENDITURE",
@@ -359,7 +360,7 @@ class TransactionViewTestCase(TestCase):
             "2024-01-04",
             "100.00",
             "GENERAL_DISBURSEMENT",
-            "SB21B",
+            report=m1_report,
         )
 
         view = Transaction.objects.filter(
@@ -466,7 +467,6 @@ class TransactionViewTestCase(TestCase):
             "2024-01-01",
             "20.00",
             "GENERAL",
-            "SA11AI",
             False,
             None,
         )
@@ -480,7 +480,6 @@ class TransactionViewTestCase(TestCase):
             "2024-01-04",
             "20.00",
             "GENERAL_DISBURSEMENT",
-            "SB21B",
         )
         obs = Transaction.objects.filter(id=schb.id)
         self.assertFalse(obs[0].itemized)
@@ -492,7 +491,6 @@ class TransactionViewTestCase(TestCase):
             "2024-01-01",
             "250.00",
             "GENERAL",
-            "SA11AI",
             False,
             None,
         )
@@ -506,7 +504,6 @@ class TransactionViewTestCase(TestCase):
             "2024-01-04",
             "250.00",
             "GENERAL_DISBURSEMENT",
-            "SB21B",
         )
         obs = Transaction.objects.filter(id=schb.id)
         self.assertTrue(obs[0].itemized)

@@ -498,8 +498,6 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
         transaction_data["debt"] = transaction_data.get("debt_id", None)
         transaction_data["loan"] = transaction_data.get("loan_id", None)
         transaction_data["reatt_redes"] = transaction_data.get("reatt_redes_id", None)
-        if transaction_data.get("form_type"):
-            transaction_data["_form_type"] = transaction_data["form_type"]
 
         # Track original instance for aggregation
         original_instance = None
