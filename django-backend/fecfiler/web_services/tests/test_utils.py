@@ -4,8 +4,9 @@ from fecfiler.reports.tests.utils import create_form3x
 from fecfiler.web_services.models import (
     FECSubmissionState,
     UploadSubmission,
+    WebPrintSubmission,
 )
-from ..utils.submission import fail_open_submissions
+from ..utils.submission import fail_open_submissions, fail_open_webprints
 
 
 class WebServicesUtilTestCase(TestCase):
@@ -36,6 +37,40 @@ class WebServicesUtilTestCase(TestCase):
 
         # fail open submissions
         fail_open_submissions()
+
+        # refresh from db and validate states
+        submission_completed.refresh_from_db()
+        submission_inprogress.refresh_from_db()
+        self.assertEqual(
+            submission_completed.fecfile_task_state, FECSubmissionState.SUCCEEDED.value
+        )
+        self.assertEqual(
+            submission_inprogress.fecfile_task_state, FECSubmissionState.FAILED.value
+        )
+
+    def test_fail_open_webprints(self):
+        # one report submission will be completed and should not be marked as failed
+        f3x_completed = create_form3x(self.committee, "2024-01-01", "2024-02-01", {})
+        submission_completed = WebPrintSubmission.objects.initiate_submission(
+            f3x_completed
+        )
+        submission_completed.save_state(FECSubmissionState.SUCCEEDED)
+        self.assertEqual(
+            submission_completed.fecfile_task_state, FECSubmissionState.SUCCEEDED.value
+        )
+
+        # another report submission will be in-progress and should be marked as failed
+        f3x_inprogress = create_form3x(self.committee, "2024-02-01", "2024-03-01", {})
+        submission_inprogress = WebPrintSubmission.objects.initiate_submission(
+            f3x_inprogress
+        )
+        self.assertEqual(
+            submission_inprogress.fecfile_task_state,
+            FECSubmissionState.INITIALIZING.value,
+        )
+
+        # fail open submissions
+        fail_open_webprints()
 
         # refresh from db and validate states
         submission_completed.refresh_from_db()
