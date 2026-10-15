@@ -5,7 +5,7 @@ from fecfiler.validation.serializers import FecSchemaValidatorSerializerMixin
 from fecfiler.reports.serializers import ReportCommitteeValidationMixin, ReportSerializer
 from fecfiler.contacts.serializers import (
     ContactCommitteeValidationMixin,
-    ContactSerializer
+    ContactSerializer,
 )
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import empty, ModelSerializer
@@ -66,7 +66,7 @@ class TransactionSerializer(
     FecSchemaValidatorSerializerMixin,
     CommitteeOwnedSerializer,
     ReportCommitteeValidationMixin,
-    ContactCommitteeValidationMixin
+    ContactCommitteeValidationMixin,
 ):
     """id must be explicitly configured in order to have it in validated_data
     https://github.com/encode/django-rest-framework/issues/2320#issuecomment-67502474"""
@@ -97,7 +97,7 @@ class TransactionSerializer(
         required=False, allow_null=True, read_only=True
     )
     back_reference_sched_name = CharField(required=False, allow_null=True, read_only=True)
-    form_type = CharField(required=False, allow_null=True)
+    form_type = CharField(required=False, allow_null=True, read_only=True)
     itemized = BooleanField(read_only=True)
     name = CharField(read_only=True)
     date = DateField(read_only=True)
@@ -269,6 +269,7 @@ class TransactionSerializer(
         self._context["fields_to_ignore"] = self._context.get(
             "fields_to_ignore",
             [
+                "form_type",
                 "filer_committee_id_number",
                 "back_reference_tran_id_number",
                 "contribution_aggregate",
@@ -293,15 +294,11 @@ class TransactionSerializer(
                 "reatt_redes",
                 "loan",
                 "debt",
-            ]
+            ],
         )
-        self.validate_contact_committee_ownership(data, [
-            'contact_1',
-            'contact_2',
-            'contact_3',
-            'contact_4',
-            'contact_5'
-        ])
+        self.validate_contact_committee_ownership(
+            data, ["contact_1", "contact_2", "contact_3", "contact_4", "contact_5"]
+        )
         super().validate(data_to_validate)
         return data
 
@@ -430,7 +427,7 @@ class TransactionListSerializer(ModelSerializer):
     back_reference_tran_id_number = CharField(
         required=False, allow_null=True, read_only=True
     )
-    form_type = CharField(required=False, allow_null=True)
+    form_type = CharField(required=False, allow_null=True, read_only=True)
     transaction_id = UUIDField(read_only=True)
     line_label = CharField(read_only=True)
     itemized = BooleanField(read_only=True)

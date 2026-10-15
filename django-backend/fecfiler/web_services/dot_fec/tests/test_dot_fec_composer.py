@@ -96,7 +96,6 @@ class DotFECSerializerTestCase(TestCase):
             datetime.strptime("2024-01-03", "%Y-%m-%d"),
             "1.00",
             "GENERAL",
-            "SA11AI",
         )
         self.transaction.add_to_report(self.f3x.id)
         self.transaction.save()
@@ -139,7 +138,6 @@ class DotFECSerializerTestCase(TestCase):
             datetime.strptime("2024-01-03", "%Y-%m-%d"),
             "50.00",
             "GENERAL",
-            "SA11AI",
         )
         later_transaction = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -148,7 +146,6 @@ class DotFECSerializerTestCase(TestCase):
             datetime.strptime("2024-01-04", "%Y-%m-%d"),
             "25.00",
             "GENERAL",
-            "SA11AI",
         )
         for transaction in [earlier_transaction, later_transaction]:
             transaction.add_to_report(self.f3x.id)
