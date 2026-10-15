@@ -1,4 +1,4 @@
-from ..models import UploadSubmission, FECSubmissionState
+from ..models import UploadSubmission, WebPrintSubmission, FECSubmissionState
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -9,3 +9,10 @@ def fail_open_submissions():
         fecfile_task_state__in=FECSubmissionState.get_terminal_statuses_strings()
     ).update(fecfile_task_state=FECSubmissionState.FAILED)
     logger.info("All in-progress report submissions have been marked as FAILED.")
+
+
+def fail_open_webprints():
+    WebPrintSubmission.objects.exclude(
+        fecfile_task_state__in=FECSubmissionState.get_terminal_statuses_strings()
+    ).update(fecfile_task_state=FECSubmissionState.FAILED)
+    logger.info("All in-progress report web prints have been marked as FAILED.")
