@@ -61,9 +61,3 @@ class Form24ViewSetTest(FecfilerViewSetTest):
         self.assertNotIn(str(self.f24_report_1.id), report_ids)
         self.assertIn(str(self.f24_report_2.id), report_ids)
         self.assertIn(str(self.f24_report_3.id), report_ids)
-
-    def test_pagination_page_size(self):
-        from fecfiler.reports.views import ReportViewSet
-
-        self.assertEqual(Form24ViewSet.pagination_class.page_size, 100)
-        self.assertEqual(ReportViewSet.pagination_class.page_size, 10)

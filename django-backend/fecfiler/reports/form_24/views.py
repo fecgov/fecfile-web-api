@@ -3,15 +3,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType
-from fecfiler.reports.views import ReportViewSet, ReportListPagination
+from fecfiler.reports.views import ReportViewSet
 from .serializers import Form24Serializer
 import structlog
 
 logger = structlog.get_logger(__name__)
-
-
-class Form24Pagination(ReportListPagination):
-    page_size = 100
 
 
 class Form24ViewSet(ReportViewSet):
@@ -25,7 +21,7 @@ class Form24ViewSet(ReportViewSet):
     )
 
     serializer_class = Form24Serializer
-    pagination_class = Form24Pagination
+
 
     @action(detail=False)
     def validation_check(self, request):
