@@ -827,7 +827,9 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         transaction = response.data
         logger.debug(transaction)
-        self.assertEqual(transaction.get("_calendar_ytd_per_election_office"), "153.00")
+        self.assertEqual(
+            transaction.get("calendar_ytd_per_election_office"), Decimal("153.00")
+        )
 
     def test_reatt_redes_multisave_transactions(self):
         txn1 = deepcopy(self.payloads["IN_KIND"])
