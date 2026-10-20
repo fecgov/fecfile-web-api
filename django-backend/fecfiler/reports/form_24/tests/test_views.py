@@ -1,7 +1,6 @@
 from ..views import Form24ViewSet
 from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
-from fecfiler.reports.models import Report
 from fecfiler.reports.tests.utils import create_form24
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
 from fecfiler.web_services.models import FECStatus, UploadSubmission
