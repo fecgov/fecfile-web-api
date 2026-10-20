@@ -22,7 +22,6 @@ class Form24ViewSet(ReportViewSet):
 
     serializer_class = Form24Serializer
 
-
     @action(detail=False)
     def validation_check(self, request):
         exclude_ids = (
