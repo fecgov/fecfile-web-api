@@ -67,7 +67,7 @@ class TransactionManager(SoftDeleteManager):
         "partition_by": [
             F("schedule_e__election_code"),
             F("contact_2__candidate_office"),
-            F("contact_2__candidate_state"),
+            F("candidate_state"),
             F("contact_2__candidate_district"),
             F("date__year"),
             F("aggregation_group"),
@@ -117,6 +117,7 @@ class TransactionManager(SoftDeleteManager):
                     "parent_transaction___calendar_ytd_per_election_office",
                     "_calendar_ytd_per_election_office",
                 ),
+                candidate_state=self.CANDIDATE_STATE_CLAUSE,
                 line_label=self.LINE_LABEL_CLAUSE(),
                 loan_agreement_id=self.LOAN_AGREEMENT_CLAUSE(),
                 report_code_label=self.REPORT_CODE_LABEL_CLAUSE(),
@@ -138,6 +139,7 @@ class TransactionManager(SoftDeleteManager):
                     "parent_transaction___calendar_ytd_per_election_office",
                     "_calendar_ytd_per_election_office",
                 ),
+                candidate_state=self.CANDIDATE_STATE_CLAUSE,
             )
         )
 
@@ -336,6 +338,10 @@ class TransactionManager(SoftDeleteManager):
         id_args.append(Value(None))
 
         return Coalesce(*id_args, output_field=TextField())
+
+    CANDIDATE_STATE_CLAUSE = Coalesce(
+        "schedule_e__so_candidate_state", "contact_2__candidate_state"
+    )
 
     DATE_CLAUSE = Coalesce(
         "schedule_a__contribution_date",

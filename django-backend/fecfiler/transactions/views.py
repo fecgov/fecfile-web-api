@@ -178,9 +178,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
             saved_transaction = self.save_transaction(
-                request.data,
-                request,
-                instance=self.get_object()
+                request.data, request, instance=self.get_object()
             )
             update_dependent_parent_purpose_description_if_needed(saved_transaction)
         return Response(saved_transaction.id)
@@ -344,7 +342,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             schedule_e__election_code=election_code, contact_2__candidate_office=office
         )
         if state:
-            filters &= Q(contact_2__candidate_state=state)
+            filters &= Q(candidate_state=state)
         if district:
             filters &= Q(contact_2__candidate_district=district)
 
@@ -479,13 +477,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def get_child_instance(self, child_id, committee_id):
         # ensure that child transaction belongs to this committee
-        child_instance = Transaction.objects.select_related(
-            "schedule_a", "schedule_b", "schedule_e", "contact_2"
-        ).filter(id=child_id, committee_account_id=committee_id).first()
-        if child_instance is None:
-            raise ValidationError(
-                {"children": ["Invalid child_id or child"]}
+        child_instance = (
+            Transaction.objects.select_related(
+                "schedule_a", "schedule_b", "schedule_e", "contact_2"
             )
+            .filter(id=child_id, committee_account_id=committee_id)
+            .first()
+        )
+        if child_instance is None:
+            raise ValidationError({"children": ["Invalid child_id or child"]})
         return child_instance
 
     def save_transaction(self, transaction_data, request, instance=None):
