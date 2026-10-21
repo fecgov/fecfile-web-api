@@ -2993,7 +2993,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         self.assertEqual(response.status_code, 400)
 
-    def test_update_itemization_aggregation_unaggregate(self):
+    def test_update_itemization_aggregation_unaggregate_individual_receipt(self):
         test_q1_report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
         test_ind_receipt_1 = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -3118,5 +3118,141 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(
             test_ind_receipt_3.aggregate,
+            160,
+        )
+
+    # TODO: Uncomment test when fix is implemented
+    def xtest_update_itemization_aggregation_unaggregate_independent_expenditure(self):
+        test_q1_report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        test_ie_1 = create_ie(
+            self.committee,
+            self.contact_1,
+            "2026-01-01",
+            None,
+            "2026-01-01",
+            "100.00",
+            "P2026",
+            self.contact_2,
+            report=test_q1_report,
+        )
+        test_ie_2 = create_ie(
+            self.committee,
+            self.contact_1,
+            "2026-01-02",
+            None,
+            "2026-01-02",
+            "50.00",
+            "P2026",
+            self.contact_2,
+            report=test_q1_report,
+        )
+        test_ie_3 = create_ie(
+            self.committee,
+            self.contact_1,
+            "2026-01-03",
+            None,
+            "2026-01-03",
+            "10.00",
+            "P2026",
+            self.contact_2,
+            report=test_q1_report,
+        )
+
+        # FORCE UNAGGREGATE
+        test_unaggregate_payload = {
+            "force_unaggregated": True,
+            "schedule_id": "E",
+            "schema_name": "INDEPENDENT_EXPENDITURES",
+        }
+
+        id = test_ie_2.id
+        response = self.send_viewset_put_request(
+            f"api/v1/transactions/{id}/update-itemization-aggregation/",
+            test_unaggregate_payload,
+            TransactionViewSet,
+            "update_itemization_aggregation",
+            pk=id,
+        )
+        self.assertEqual(response.status_code, 200)
+        test_ie_1.refresh_from_db()
+        test_ie_2.refresh_from_db()
+        test_ie_3.refresh_from_db()
+
+        # ie 1
+        self.assertEqual(
+            test_ie_1.schedule_e.expenditure_amount,
+            100,
+        )
+        self.assertEqual(
+            test_ie_1._calendar_ytd_per_election_office,
+            100,
+        )
+
+        # ie 2
+        self.assertEqual(
+            test_ie_2.schedule_e.expenditure_amount,
+            50,
+        )
+        self.assertEqual(
+            test_ie_2._calendar_ytd_per_election_office,
+            100,
+        )
+
+        # ie 3
+        self.assertEqual(
+            test_ie_3.schedule_e.expenditure_amount,
+            10,
+        )
+        self.assertEqual(
+            test_ie_3._calendar_ytd_per_election_office,
+            110,
+        )
+
+        # FORCE AGGREGATE
+        test_aggregate_payload = {
+            "force_unaggregated": False,
+            "schedule_id": "E",
+            "schema_name": "INDEPENDENT_EXPENDITURES",
+        }
+
+        id = test_ie_2.id
+        self.send_viewset_put_request(
+            f"api/v1/transactions/{id}/update-itemization-aggregation/",
+            test_aggregate_payload,
+            TransactionViewSet,
+            "update_itemization_aggregation",
+            pk=id,
+        )
+        test_ie_1.refresh_from_db()
+        test_ie_2.refresh_from_db()
+        test_ie_3.refresh_from_db()
+
+        # ie 1
+        self.assertEqual(
+            test_ie_1.schedule_e.expenditure_amount,
+            100,
+        )
+        self.assertEqual(
+            test_ie_1._calendar_ytd_per_election_office,
+            100,
+        )
+
+        # ie 2
+        self.assertEqual(
+            test_ie_2.schedule_e.expenditure_amount,
+            50,
+        )
+        self.assertEqual(
+            test_ie_2._calendar_ytd_per_election_office,
+            150,
+        )
+
+        # ie 3
+        self.assertEqual(
+            test_ie_3.schedule_e.expenditure_amount,
+            10,
+        )
+        self.assertEqual(
+            test_ie_3._calendar_ytd_per_election_office,
             160,
         )
