@@ -7,6 +7,8 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
+from fecfiler.reports.form_3.models import Form3
+from django.db.models import Exists, OuterRef
 
 
 class ElectionCyclesListPagination(PageNumberPagination):
@@ -16,7 +18,13 @@ class ElectionCyclesListPagination(PageNumberPagination):
 
 class ElectionCyclesViewSet(CommitteeOwnedViewMixin, ModelViewSet):
     def get_queryset(self):
-        cycles = super().get_queryset()
+        cycles = (
+            super()
+            .get_queryset()
+            .annotate(
+                has_form3=Exists(Form3.objects.filter(election_cycle_id=OuterRef("pk")))
+            )
+        )
         return cycles
 
     """
@@ -90,3 +98,26 @@ class ElectionCyclesViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 "end_date": end_date_failed,
             }
         )
+
+    @action(detail=False, methods=["get"], url_path="find-by-coverage")
+    def find_by_coverage(self, request):
+        start_date = request.query_params.get("start_date")
+        end_date = request.query_params.get("end_date")
+
+        if not start_date or not end_date:
+            return Response(
+                {"error": "Both start_date and end_date query parameters are required."},
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        queryset = self.get_queryset()
+        containing_cycle = queryset.filter(
+            start_date__lte=start_date,
+            end_date__gte=end_date,
+        ).first()
+
+        if not containing_cycle:
+            return Response({"message": "No containing election cycle found."})
+
+        serializer = self.get_serializer(containing_cycle)
+        return Response(serializer.data)
