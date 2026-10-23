@@ -8,7 +8,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST
 from fecfiler.reports.form_3.models import Form3
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Q
+from django.utils.dateparse import parse_date
 
 
 class ElectionCyclesListPagination(PageNumberPagination):
@@ -22,7 +23,12 @@ class ElectionCyclesViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             super()
             .get_queryset()
             .annotate(
-                has_form3=Exists(Form3.objects.filter(election_cycle_id=OuterRef("pk")))
+                has_form3=Exists(
+                    Form3.objects.filter(
+                        Q(election_cycle_id=OuterRef("pk"))
+                        | Q(next_election_cycle_id=OuterRef("pk"))
+                    )
+                )
             )
         )
         return cycles
@@ -101,23 +107,58 @@ class ElectionCyclesViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="find-by-coverage")
     def find_by_coverage(self, request):
-        start_date = request.query_params.get("start_date")
-        end_date = request.query_params.get("end_date")
+        start_date = parse_date(request.query_params.get("start_date", ""))
+        end_date = parse_date(request.query_params.get("end_date", ""))
 
-        if not start_date or not end_date:
+        if start_date is None or end_date is None:
             return Response(
-                {"error": "Both start_date and end_date query parameters are required."},
+                {
+                    "error": (
+                        "Both start_date and end_date query parameters "
+                        "are required and must be valid dates."
+                    )
+                },
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        if start_date > end_date:
+            return Response(
+                {"error": "start_date must be less than or equal to end_date."},
                 status=HTTP_400_BAD_REQUEST,
             )
 
         queryset = self.get_queryset()
-        containing_cycle = queryset.filter(
+
+        election_cycle = queryset.filter(
             start_date__lte=start_date,
-            end_date__gte=end_date,
+            end_date__gte=start_date,
         ).first()
 
-        if not containing_cycle:
-            return Response({"message": "No containing election cycle found."})
+        if not election_cycle:
+            return Response({"needs_cycle": True, "needs_next_cycle": False})
 
-        serializer = self.get_serializer(containing_cycle)
-        return Response(serializer.data)
+        response_data = {
+            "needs_cycle": False,
+            "needs_next_cycle": False,
+            "election_cycle": self.get_serializer(election_cycle).data,
+        }
+
+        if end_date <= election_cycle.end_date:
+            return Response(response_data)
+
+        next_cycle = (
+            queryset.filter(start_date__gt=election_cycle.end_date)
+            .order_by("start_date")
+            .first()
+        )
+
+        response_data["needs_next_cycle"] = (
+            not next_cycle
+            or end_date < next_cycle.start_date
+            or end_date > next_cycle.end_date
+        )
+        if response_data["needs_next_cycle"]:
+            return Response(response_data)
+
+        response_data["next_election_cycle"] = self.get_serializer(next_cycle).data
+        return Response(response_data)

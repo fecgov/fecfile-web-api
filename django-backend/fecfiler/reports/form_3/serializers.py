@@ -207,6 +207,11 @@ class Form3Serializer(BaseForm3Serializer):
         required=False,
         allow_null=True,
     )
+    next_election_cycle = PrimaryKeyRelatedField(
+        queryset=ElectionCycle.objects.all(),
+        required=False,
+        allow_null=True,
+    )
 
     L6a_total_contributions_period = DecimalField(
         required=False, allow_null=True, max_digits=11, decimal_places=2
