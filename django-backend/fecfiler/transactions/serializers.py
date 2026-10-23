@@ -105,7 +105,7 @@ class TransactionSerializer(
     debt_incurred_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     calendar_ytd_per_election_office = DecimalField(
-        max_digits=11, decimal_places=2, read_only=True
+        required=False, allow_null=True, read_only=True, max_digits=11, decimal_places=2
     )
     aggregate_general_elec_expended = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
@@ -137,6 +137,7 @@ class TransactionSerializer(
                     "reatt_redes_associations",  # reattribution/redesignation
                     "reporttransaction",
                     "_form_type",
+                    "_calendar_ytd_per_election_office",
                     "blocking_reports",
                 ]
             ] + [
@@ -197,6 +198,9 @@ class TransactionSerializer(
 
         # because form_type is a dynamic field
         representation["form_type"] = instance.form_type
+        representation["calendar_ytd_per_election_office"] = (
+            instance.calendar_ytd_per_election_office
+        )
 
         if not self.context.get("no_depth"):
             new_context = {"no_depth": True, "no_children": True}
@@ -270,6 +274,7 @@ class TransactionSerializer(
             "fields_to_ignore",
             [
                 "form_type",
+                "calendar_ytd_per_election_office",
                 "filer_committee_id_number",
                 "back_reference_tran_id_number",
                 "contribution_aggregate",
