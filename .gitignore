@@ -91,4 +91,4 @@ static/
 *.prof
 
 # exceptions
-!django-backend/static/
+!django-backend/static/templates/emails

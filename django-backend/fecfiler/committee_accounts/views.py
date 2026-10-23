@@ -240,7 +240,7 @@ class CommitteeMembershipViewSet(CommitteeOwnedViewMixin, viewsets.ModelViewSet)
                 )
                 if FLAG__ENABLE_EMAIL:
                     committee_data = get_committee_account_data(committee_id)
-                    committee_name = committee_data.get("name", None)
+                    committee_name = (committee_data or {}).get("name", None)
 
                     self.sendAddMemberEmailNotification(
                         committee_id,
