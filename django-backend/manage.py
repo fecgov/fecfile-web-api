@@ -26,6 +26,7 @@ allowed_commands = [
     "disable_user",
     "reset_submitting_report",
     "fail_open_submissions",
+    "fail_open_webprints",
     "dump_committee_data",
     "get_overview",
     "disable_committee_account",

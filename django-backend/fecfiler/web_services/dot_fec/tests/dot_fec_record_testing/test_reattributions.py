@@ -72,7 +72,6 @@ class DotFECReattributionsTestCase(TestCase):
             datetime.strptime("2024-01-09", "%Y-%m-%d"),
             "15.00",
             "GENERAL",
-            "SA11AI",
             purpose_description="Testing Aggregate Transaction",
             report=self.m1,
         )

@@ -85,8 +85,8 @@ class DotFECTextRecordsTestCase(TestCase):
             datetime.strptime("2024-01-03", "%Y-%m-%d"),
             "1.00",
             "GENERAL",
-            "SA11AII",
             itemized=True,
+            report=self.f3x,
         )
         transaction_memo = create_transaction_memo(
             self.committee, transaction, "TRANSACTION_MEMO_TEXT"

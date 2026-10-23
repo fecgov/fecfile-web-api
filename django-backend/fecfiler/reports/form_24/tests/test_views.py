@@ -3,6 +3,7 @@ from fecfiler.user.models import User
 from fecfiler.committee_accounts.models import CommitteeAccount
 from fecfiler.reports.tests.utils import create_form24
 from fecfiler.shared.viewset_test import FecfilerViewSetTest
+from fecfiler.web_services.models import FECStatus, UploadSubmission
 
 
 class Form24ViewSetTest(FecfilerViewSetTest):
@@ -43,3 +44,20 @@ class Form24ViewSetTest(FecfilerViewSetTest):
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.data["valid"])
+
+    def test_list_in_progress(self):
+        submission = UploadSubmission.objects.create(
+            fec_status=FECStatus.ACCEPTED,
+        )
+        self.f24_report_1.upload_submission = submission
+        self.f24_report_1.save()
+        response = self.send_viewset_get_request(
+            "/api/v1/reports/form-24/?in_progress=true",
+            Form24ViewSet,
+            "list",
+        )
+        self.assertEqual(response.status_code, 200)
+        report_ids = [r["id"] for r in response.data["results"]]
+        self.assertNotIn(str(self.f24_report_1.id), report_ids)
+        self.assertIn(str(self.f24_report_2.id), report_ids)
+        self.assertIn(str(self.f24_report_3.id), report_ids)

@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .models import Report
-from .managers import STATUS_CODE_SUCCESS
+from .managers import STATUS_CODE_SUCCESS, STATUS_CODE_IN_PROGRESS
 from .report_code_label import report_code_label_case
 from fecfiler.reports.utils.report import delete_all_reports
 from .serializers import ReportSerializer
@@ -136,6 +136,10 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                 queryset = queryset.filter(form_99__isnull=True)
             if "f1m" not in report_type_list:
                 queryset = queryset.filter(form_1m__isnull=True)
+
+        in_progress = self.request.query_params.get("in_progress")
+        if in_progress is not None and in_progress.lower() in ("true", "1"):
+            queryset = queryset.filter(report_status=STATUS_CODE_IN_PROGRESS)
 
         return queryset
 
