@@ -240,6 +240,45 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             updated_transaction.children[0].schedule_b.expenditure_amount, 999
         )
 
+    def test_update_with_malicious_id_change(self):
+        original_payload = deepcopy(self.payloads["INDIVIDUAL_RECEIPT"])
+        original_payload["report_ids"] = [str(self.q1_report.id)]
+        request = self.post_request(original_payload)
+
+        transaction = TransactionViewSet().save_transaction(request.data, request)
+        other_committee = CommitteeAccount(
+            committee_id="C12344321"
+        )
+        other_committee.save()
+        other_contact = create_test_individual_contact(
+            "Last",
+            "First",
+            other_committee.id
+        )
+        other_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            other_committee,
+            other_contact,
+            "2024-01-01",
+            "22.00"
+        )
+
+        updated_payload = deepcopy(original_payload)
+        updated_payload["id"] = other_transaction.id
+        updated_payload["contribution_amount"] = 999
+        response = self.send_viewset_put_request(
+            f"api/v1/transactions/{transaction.id}/",
+            updated_payload,
+            TransactionViewSet,
+            "update",
+            pk=transaction.id,
+            committee=self.committee,
+        )
+
+        other_transaction.refresh_from_db()
+        self.assertEqual(other_transaction.committee_account, other_committee)
+        self.assertEqual(response.status_code, 400)
+
     def test_update_with_memo_text_of_other_committee_fails(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
         payload = deepcopy(self.payloads["IN_KIND"])
