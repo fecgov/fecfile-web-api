@@ -34,7 +34,7 @@ class Form3(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="next_election_cycle",
+        related_name="next_form3s",
     )
 
     L6a_total_contributions_period = models.DecimalField(
