@@ -10,6 +10,7 @@ from rest_framework.status import HTTP_400_BAD_REQUEST
 from fecfiler.reports.form_3.models import Form3
 from django.db.models import Exists, OuterRef, Q
 from django.utils.dateparse import parse_date
+from rest_framework.exceptions import ValidationError
 
 
 class ElectionCyclesListPagination(PageNumberPagination):
@@ -162,3 +163,11 @@ class ElectionCyclesViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         response_data["next_election_cycle"] = self.get_serializer(next_cycle).data
         return Response(response_data)
+
+    def perform_destroy(self, instance):
+        if not instance.can_delete:
+            raise ValidationError(
+                "Cannot delete an election cycle associated with a Form 3.",
+                HTTP_400_BAD_REQUEST,
+            )
+        instance.delete()
