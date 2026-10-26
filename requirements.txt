@@ -7,7 +7,7 @@ django-deprecate-fields==0.2.3
 django-migration-linter==5.2.0
 django-structlog==9.1.1
 Django==5.2.18
-djangorestframework==3.17.2
+djangorestframework==3.18.3
 drf-spectacular==0.29.0
 drf-spectacular-sidecar==2026.4.14
 Faker==37.6.0
