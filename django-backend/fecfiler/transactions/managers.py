@@ -67,7 +67,7 @@ class TransactionManager(SoftDeleteManager):
         "partition_by": [
             F("schedule_e__election_code"),
             F("contact_2__candidate_office"),
-            Coalesce("schedule_e__so_candidate_state", "contact_2__candidate_state"),
+            F("contact_2__candidate_state"),
             F("contact_2__candidate_district"),
             F("date__year"),
             F("aggregation_group"),

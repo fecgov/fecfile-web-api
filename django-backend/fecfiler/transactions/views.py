@@ -177,10 +177,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
+            instance = self.get_object()
+            transaction_id = request.data.get("id")
+            if transaction_id is not None and transaction_id != str(instance.id):
+                return Response(status=400)
+
             saved_transaction = self.save_transaction(
                 request.data,
                 request,
-                instance=self.get_object()
+                instance=instance
             )
             update_dependent_parent_purpose_description_if_needed(saved_transaction)
         return Response(saved_transaction.id)

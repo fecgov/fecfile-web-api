@@ -1,6 +1,7 @@
 from django.db import transaction
 from fecfiler.reports.models import Report, ReportTransaction
 from fecfiler.reports.form_3.models import Form3
+from fecfiler.election_cycles.models import ElectionCycle
 from fecfiler.reports.serializers import (
     ReportSerializer,
     COVERAGE_DATE_REPORT_CODE_COLLISION,
@@ -12,6 +13,7 @@ from rest_framework.serializers import (
     DecimalField,
     DateField,
     BooleanField,
+    PrimaryKeyRelatedField,
 )
 from rest_framework.serializers import ValidationError
 from datetime import date
@@ -200,6 +202,11 @@ class Form3Serializer(BaseForm3Serializer):
 
     election_state = CharField(required=False, allow_null=True)
     election_district = CharField(required=False, allow_null=True)
+    election_cycle = PrimaryKeyRelatedField(
+        queryset=ElectionCycle.objects.all(),
+        required=False,
+        allow_null=True,
+    )
 
     L6a_total_contributions_period = DecimalField(
         required=False, allow_null=True, max_digits=11, decimal_places=2
