@@ -29,6 +29,13 @@ class Form3(models.Model):
     election_cycle = models.ForeignKey(
         ElectionCycle, on_delete=models.SET_NULL, null=True, blank=True
     )
+    next_election_cycle = models.ForeignKey(
+        ElectionCycle,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="next_form3s",
+    )
 
     L6a_total_contributions_period = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
