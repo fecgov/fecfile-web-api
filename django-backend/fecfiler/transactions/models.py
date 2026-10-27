@@ -179,6 +179,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     _calendar_ytd_per_election_office = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
+    entity_election_cycle_to_date = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
 
     @property
     def calendar_ytd_per_election_office(self):
