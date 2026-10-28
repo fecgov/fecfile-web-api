@@ -140,8 +140,8 @@ schedule_a_test_mappings_sampler = [
 ]
 
 schedule_b_test_mappings = [
-    ["OPERATING_EXPENDITURE", "ORG", {"F3X": "SB21B"}],
-    ["OPERATING_EXPENDITURE_VOID", "ORG", {"F3X": "SB21B"}],
+    ["OPERATING_EXPENDITURE", "ORG", {"F3": "SB17", "F3X": "SB21B"}],
+    ["OPERATING_EXPENDITURE_VOID", "ORG", {"F3": "SB17", "F3X": "SB21B"}],
     ["OTHER_DISBURSEMENT", "ORG", {"F3X": "SB29"}],
     ["OTHER_DISBURSEMENT_VOID", "COM", {"F3X": "SB29"}],
     ["OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT", "ORG", {"F3X": "SB21B"}],
@@ -213,6 +213,7 @@ schedule_b_test_mappings = [
 ]
 
 schedule_b_test_mappings_sampler = [
+    ["OPERATING_EXPENDITURE", "ORG", {"F3": "SB17", "F3X": "SB21B"}],
     ["OTHER_DISBURSEMENT_VOID", "COM", {"F3X": "SB29"}],
     ["OPERATING_EXPENDITURE_CREDIT_CARD_PAYMENT", "ORG", {"F3X": "SB21B"}],
     ["LOAN_MADE", "COM", {"F3X": "SB27"}],
