@@ -107,6 +107,9 @@ class TransactionSerializer(
     calendar_ytd_per_election_office = DecimalField(
         required=False, allow_null=True, read_only=True, max_digits=11, decimal_places=2
     )
+    entity_election_cycle_to_date = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True
+    )
     aggregate_general_elec_expended = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )
@@ -163,6 +166,7 @@ class TransactionSerializer(
                 "debt_incurred_amount",
                 "aggregate",
                 "calendar_ytd_per_election_office",
+                "entity_election_cycle_to_date",
                 "aggregate_general_elec_expended",
                 "loan_payment_to_date",
                 "balance",
@@ -443,6 +447,9 @@ class TransactionListSerializer(ModelSerializer):
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    entity_election_cycle_to_date = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True
+    )
     report_code_label = CharField(read_only=True)
     report_type = CharField(read_only=True)
     report_ids = ListField(child=UUIDField(), read_only=True, source="report_ids_list")
@@ -466,6 +473,7 @@ class TransactionListSerializer(ModelSerializer):
             "amount",
             "balance",
             "aggregate",
+            "entity_election_cycle_to_date",
             "report_code_label",
             "report_type",
             "report_ids",
