@@ -82,7 +82,8 @@ def strip_read_only_args_from_request(serializer_class):
                 data = request.data
                 read_only_fields = serializer_class.Meta.read_only_fields
                 for key in read_only_fields:
-                    del data[key]
+                    if key in data:
+                        del data[key]
 
             return function(*args, **kwargs)
         return wrapper
