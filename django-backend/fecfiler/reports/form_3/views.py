@@ -4,6 +4,7 @@ from rest_framework.viewsets import ModelViewSet
 from fecfiler.reports.models import Report
 from fecfiler.reports.managers import ReportType
 from fecfiler.reports.views import ReportViewSet
+from fecfiler.shared.utilities import strip_read_only_args_from_request
 from .serializers import Form3Serializer
 import structlog
 from rest_framework.response import Response
@@ -69,8 +70,10 @@ class Form3ViewSet(ReportViewSet):
     def create(self, request):
         return super(ModelViewSet, self).create(request)
 
+    @strip_read_only_args_from_request(Form3Serializer)
     def update(self, request, pk=None):
         return super(ModelViewSet, self).update(request, pk)
 
+    @strip_read_only_args_from_request(Form3Serializer)
     def partial_update(self, request, pk=None):
         return super(ModelViewSet, self).partial_update(request, pk)

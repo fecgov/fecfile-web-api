@@ -59,3 +59,21 @@ def query_fec_api(endpoint, params, raise_for_404=True):
         response.raise_for_status()
     response_data = response.json()
     return response_data.get("results", [])
+
+
+"""
+    strip_read_only_args_from_request
+"""
+def strip_read_only_args_from_request(serializer_class):
+    def decorator(function):
+        def wrapper(*args, **kwargs):
+            if len(args) >= 2:
+                request = args[1]
+                data = request.data
+                read_only_fields = serializer_class.Meta.read_only_fields
+                for key in read_only_fields:
+                    del data[key]
+
+            return function(*args, **kwargs)
+        return wrapper
+    return decorator
