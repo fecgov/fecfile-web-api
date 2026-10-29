@@ -59,32 +59,3 @@ def query_fec_api(endpoint, params, raise_for_404=True):
         response.raise_for_status()
     response_data = response.json()
     return response_data.get("results", [])
-
-
-"""
-    strip_read_only_args_from_request(serializer_class)
-
-    this function is a Decorator Factory.  This factory creates decorators
-    for modifying ViewSet endpoint methods, intercepting request data and
-    stripping out all attributes found in the read_only_fields as defined
-    in the serializer_class that was passed to the factory.
-
-    serializer_class
-        -> a valid Serializer *class* with a Meta subclass that defines read_only_fields
-"""
-
-
-def strip_read_only_args_from_request(serializer_class):
-    def decorator(function):
-        def wrapper(*args, **kwargs):
-            if len(args) >= 2:
-                request = args[1]
-                data = request.data
-                read_only_fields = serializer_class.Meta.read_only_fields
-                for key in read_only_fields:
-                    if key in data:
-                        del data[key]
-
-            return function(*args, **kwargs)
-        return wrapper
-    return decorator

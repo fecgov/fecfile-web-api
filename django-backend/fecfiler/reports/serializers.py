@@ -101,7 +101,7 @@ class ReportSerializer(
     FecSchemaValidatorSerializerMixin,
     ContactCommitteeValidationMixin,
 ):
-    id = UUIDField(required=False)
+    id = UUIDField(required=False, read_only=True)
 
     committee_name = CharField(required=False, allow_null=True)
     street_1 = CharField(required=False, allow_null=True)
@@ -201,14 +201,8 @@ class ReportSerializer(
 
         fields = get_fields()
         read_only_fields = [
-            "id",
             "created",
             "updated",
-            "form_3x_id",
-            "form_3_id",
-            "form_24_id",
-            "form_1m_id",
-            "form_99_id",
         ]
 
     @extend_schema_field(OpenApiTypes.STR)
