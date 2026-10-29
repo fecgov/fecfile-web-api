@@ -13,7 +13,7 @@ drf-spectacular-sidecar==2026.4.14
 Faker==37.6.0
 git+https://github.com/fecgov/fecfile-validate@7feacddf5c27462d6f576f4b8523eed7d2321240#egg=fecfile_validate&subdirectory=fecfile_validate_python
 github3.py==4.0.1
-GitPython==3.1.60
+GitPython==3.2.1
 gunicorn==23.0.0
 invoke==2.2.0
 jwcrypto==1.6.1
