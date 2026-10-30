@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .serializers import CashOnHandYearlySerializer
 from .models import CashOnHandYearly
+from django.conf import settings
 import structlog
 
 logger = structlog.getLogger(__name__)
@@ -52,3 +53,20 @@ class CashOnHandYearlyViewSet(CommitteeOwnedViewMixin):
 
         serializer = self.get_serializer(cash_on_hand_record)
         return Response(serializer.data)
+
+    if settings.E2E_TEST:
+        @action(
+            detail=False,
+            methods=["post"],
+            url_path="e2e-delete-cash-on-hand-overrides",
+        )
+        def e2e_delete_all_cash_on_hand_overrides(self, request):
+            committee_uuid = str(self.get_committee_uuid())
+            coh_overrides = CashOnHandYearly.objects.filter(
+                committee_account_id=committee_uuid
+            )
+
+            override_count = coh_overrides.count()
+            coh_overrides.delete()
+
+            return Response(f"Deleted {override_count} Cash on Hand Overrides")

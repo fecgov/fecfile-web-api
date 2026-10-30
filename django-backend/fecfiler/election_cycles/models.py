@@ -46,6 +46,10 @@ class ElectionCycle(
     start_date = models.DateField()
     end_date = models.DateField()
 
+    @property
+    def can_delete(self) -> bool:
+        return not (self.form3_set.exists() and not self.next_form3s.exists())
+
     def __str__(self):
         return f"{self.election_year} {self.office} ({self.election_type})"
 

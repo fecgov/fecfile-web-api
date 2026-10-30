@@ -240,6 +240,45 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             updated_transaction.children[0].schedule_b.expenditure_amount, 999
         )
 
+    def test_update_with_malicious_id_change(self):
+        original_payload = deepcopy(self.payloads["INDIVIDUAL_RECEIPT"])
+        original_payload["report_ids"] = [str(self.q1_report.id)]
+        request = self.post_request(original_payload)
+
+        transaction = TransactionViewSet().save_transaction(request.data, request)
+        other_committee = CommitteeAccount(
+            committee_id="C12344321"
+        )
+        other_committee.save()
+        other_contact = create_test_individual_contact(
+            "Last",
+            "First",
+            other_committee.id
+        )
+        other_transaction = create_schedule_a(
+            "INDIVIDUAL_RECEIPT",
+            other_committee,
+            other_contact,
+            "2024-01-01",
+            "22.00"
+        )
+
+        updated_payload = deepcopy(original_payload)
+        updated_payload["id"] = other_transaction.id
+        updated_payload["contribution_amount"] = 999
+        response = self.send_viewset_put_request(
+            f"api/v1/transactions/{transaction.id}/",
+            updated_payload,
+            TransactionViewSet,
+            "update",
+            pk=transaction.id,
+            committee=self.committee,
+        )
+
+        other_transaction.refresh_from_db()
+        self.assertEqual(other_transaction.committee_account, other_committee)
+        self.assertEqual(response.status_code, 400)
+
     def test_update_with_memo_text_of_other_committee_fails(self):
         other_committee = CommitteeAccount.objects.create(committee_id="C00000001")
         payload = deepcopy(self.payloads["IN_KIND"])
@@ -827,7 +866,9 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         transaction = response.data
         logger.debug(transaction)
-        self.assertEqual(transaction.get("_calendar_ytd_per_election_office"), "153.00")
+        self.assertEqual(
+            transaction.get("calendar_ytd_per_election_office"), Decimal("153.00")
+        )
 
     def test_reatt_redes_multisave_transactions(self):
         txn1 = deepcopy(self.payloads["IN_KIND"])
@@ -2991,7 +3032,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
 
         self.assertEqual(response.status_code, 400)
 
-    def test_update_itemization_aggregation_unaggregate(self):
+    def test_update_itemization_aggregation_unaggregate_individual_receipt(self):
         test_q1_report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
         test_ind_receipt_1 = create_schedule_a(
             "INDIVIDUAL_RECEIPT",
@@ -3116,5 +3157,141 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         )
         self.assertEqual(
             test_ind_receipt_3.aggregate,
+            160,
+        )
+
+    # TODO: Uncomment test when fix is implemented
+    def xtest_update_itemization_aggregation_unaggregate_independent_expenditure(self):
+        test_q1_report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
+        test_ie_1 = create_ie(
+            self.committee,
+            self.contact_1,
+            "2026-01-01",
+            None,
+            "2026-01-01",
+            "100.00",
+            "P2026",
+            self.contact_2,
+            report=test_q1_report,
+        )
+        test_ie_2 = create_ie(
+            self.committee,
+            self.contact_1,
+            "2026-01-02",
+            None,
+            "2026-01-02",
+            "50.00",
+            "P2026",
+            self.contact_2,
+            report=test_q1_report,
+        )
+        test_ie_3 = create_ie(
+            self.committee,
+            self.contact_1,
+            "2026-01-03",
+            None,
+            "2026-01-03",
+            "10.00",
+            "P2026",
+            self.contact_2,
+            report=test_q1_report,
+        )
+
+        # FORCE UNAGGREGATE
+        test_unaggregate_payload = {
+            "force_unaggregated": True,
+            "schedule_id": "E",
+            "schema_name": "INDEPENDENT_EXPENDITURES",
+        }
+
+        id = test_ie_2.id
+        response = self.send_viewset_put_request(
+            f"api/v1/transactions/{id}/update-itemization-aggregation/",
+            test_unaggregate_payload,
+            TransactionViewSet,
+            "update_itemization_aggregation",
+            pk=id,
+        )
+        self.assertEqual(response.status_code, 200)
+        test_ie_1.refresh_from_db()
+        test_ie_2.refresh_from_db()
+        test_ie_3.refresh_from_db()
+
+        # ie 1
+        self.assertEqual(
+            test_ie_1.schedule_e.expenditure_amount,
+            100,
+        )
+        self.assertEqual(
+            test_ie_1._calendar_ytd_per_election_office,
+            100,
+        )
+
+        # ie 2
+        self.assertEqual(
+            test_ie_2.schedule_e.expenditure_amount,
+            50,
+        )
+        self.assertEqual(
+            test_ie_2._calendar_ytd_per_election_office,
+            100,
+        )
+
+        # ie 3
+        self.assertEqual(
+            test_ie_3.schedule_e.expenditure_amount,
+            10,
+        )
+        self.assertEqual(
+            test_ie_3._calendar_ytd_per_election_office,
+            110,
+        )
+
+        # FORCE AGGREGATE
+        test_aggregate_payload = {
+            "force_unaggregated": False,
+            "schedule_id": "E",
+            "schema_name": "INDEPENDENT_EXPENDITURES",
+        }
+
+        id = test_ie_2.id
+        self.send_viewset_put_request(
+            f"api/v1/transactions/{id}/update-itemization-aggregation/",
+            test_aggregate_payload,
+            TransactionViewSet,
+            "update_itemization_aggregation",
+            pk=id,
+        )
+        test_ie_1.refresh_from_db()
+        test_ie_2.refresh_from_db()
+        test_ie_3.refresh_from_db()
+
+        # ie 1
+        self.assertEqual(
+            test_ie_1.schedule_e.expenditure_amount,
+            100,
+        )
+        self.assertEqual(
+            test_ie_1._calendar_ytd_per_election_office,
+            100,
+        )
+
+        # ie 2
+        self.assertEqual(
+            test_ie_2.schedule_e.expenditure_amount,
+            50,
+        )
+        self.assertEqual(
+            test_ie_2._calendar_ytd_per_election_office,
+            150,
+        )
+
+        # ie 3
+        self.assertEqual(
+            test_ie_3.schedule_e.expenditure_amount,
+            10,
+        )
+        self.assertEqual(
+            test_ie_3._calendar_ytd_per_election_office,
             160,
         )
