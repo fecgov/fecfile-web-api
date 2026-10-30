@@ -359,6 +359,37 @@ class ElectionCyclesViewSetTestCase(TestCase):
         )
         self.assertNotIn("next_election_cycle", response.data)
 
+    def test_find_by_coverage_needs_next_cycle_when_cycles_have_gap(self):
+        next_cycle = ElectionCycle.objects.create(
+            committee_account=self.committee,
+            office=ElectionCycle.Office.HOUSE,
+            election_type=ElectionCycle.ElectionType.GENERAL,
+            election_year="2026",
+            start_date="2025-01-02",
+            end_date="2026-12-31",
+        )
+
+        response = self.client.get(
+            "/api/v1/election-cycles/find-by-coverage/",
+            {
+                "start_date": "2024-06-01",
+                "end_date": "2025-06-30",
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertFalse(response.data["needs_cycle"])
+        self.assertTrue(response.data["needs_next_cycle"])
+        self.assertEqual(
+            response.data["election_cycle"]["id"],
+            str(self.cycle_1.id),
+        )
+        self.assertNotIn("next_election_cycle", response.data)
+        self.assertNotEqual(
+            str(next_cycle.id),
+            response.data["election_cycle"]["id"],
+        )
+
     def test_find_by_coverage_needs_next_cycle_when_end_date_is_in_gap(self):
         ElectionCycle.objects.create(
             committee_account=self.committee,
