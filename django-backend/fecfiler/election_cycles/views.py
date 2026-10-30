@@ -11,6 +11,7 @@ from fecfiler.reports.form_3.models import Form3
 from django.db.models import Exists, OuterRef, Q
 from django.utils.dateparse import parse_date
 from rest_framework.exceptions import ValidationError
+from datetime import timedelta
 
 
 class ElectionCyclesListPagination(PageNumberPagination):
@@ -155,6 +156,7 @@ class ElectionCyclesViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         response_data["needs_next_cycle"] = (
             not next_cycle
+            or next_cycle.start_date != election_cycle.end_date + timedelta(days=1)
             or end_date < next_cycle.start_date
             or end_date > next_cycle.end_date
         )
