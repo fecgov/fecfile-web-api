@@ -111,6 +111,10 @@ def create_ie(
             "expenditure_amount": amount,
             "election_code": code,
             "date_signed": date_signed,
+            "expenditure_purpose_descrip": "test_purpose_desc",
+            "support_oppose_code": "S",
+            "completing_last_name": "test_last_name",
+            "completing_first_name": "test_first_name",
         },
         transaction_data={
             "memo_code": memo_code,

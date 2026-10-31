@@ -3,16 +3,19 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.status import HTTP_400_BAD_REQUEST
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from .models import Report
 from .managers import STATUS_CODE_SUCCESS, STATUS_CODE_IN_PROGRESS
 from .report_code_label import report_code_label_case
 from fecfiler.reports.utils.report import delete_all_reports
+from fecfiler.reports.report_code_label import report_code_label_mapping
 from .serializers import ReportSerializer
 from fecfiler.transactions.aggregation import process_aggregation_for_debts
-from django.db.models import Case, Value, When, CharField, IntegerField, F
+from django.db.models import Case, Value, When, CharField, IntegerField, F, Q
 from django.db.models.functions import Concat, Trim
 from django.db import transaction as db_transaction
+from django.utils.dateparse import parse_date
 from django.conf import settings
 import structlog
 
@@ -162,6 +165,75 @@ class ReportViewSet(CommitteeOwnedViewMixin, ModelViewSet):
             )
         report.unamend()
         return Response(f"unamended {report}")
+
+    @action(detail=False, methods=["get"], url_path="check-overlap")
+    def check_overlap(self, request):
+        start_date = parse_date(request.query_params.get("start_date", ""))
+        end_date = parse_date(request.query_params.get("end_date", ""))
+
+        if start_date is None or end_date is None:
+            return Response(
+                {
+                    "error": (
+                        "Both start_date and end_date query parameters are required."
+                    )
+                },
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        queryset = self.get_queryset().filter(
+            Q(form_3__isnull=False) | Q(form_3x__isnull=False),
+        )
+
+        exclude_id = request.query_params.get("exclude_id")
+        if exclude_id:
+            queryset = queryset.exclude(id=exclude_id)
+
+        overlapping_reports = list(
+            queryset.filter(
+                coverage_from_date__lte=end_date,
+                coverage_through_date__gte=start_date,
+                coverage_from_date__isnull=False,
+                coverage_through_date__isnull=False,
+            ).values(
+                "report_code",
+                "coverage_from_date",
+                "coverage_through_date",
+            )
+        )
+
+        start_date_failed = any(
+            report["coverage_from_date"] <= start_date
+            <= report["coverage_through_date"]
+            for report in overlapping_reports
+        )
+
+        end_date_failed = any(
+            report["coverage_from_date"] <= end_date
+            <= report["coverage_through_date"]
+            for report in overlapping_reports
+        )
+
+        if overlapping_reports and not start_date_failed and not end_date_failed:
+            start_date_failed = True
+            end_date_failed = True
+
+        return Response(
+            {
+                "start_date": start_date_failed,
+                "end_date": end_date_failed,
+                "overlapping_reports": [
+                    {
+                        **report,
+                        "report_code_label": report_code_label_mapping.get(
+                            report["report_code"],
+                            report["report_code"],
+                        ),
+                    }
+                    for report in overlapping_reports
+                ],
+            }
+        )
 
     if settings.E2E_TEST:
 

@@ -179,6 +179,30 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
     _calendar_ytd_per_election_office = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )
+    # The direction we want to head with aggregates is to drop the word
+    # 'aggregate' (since it's redundant) from the field.  The following
+    # are the new names we will eventually rename things to:
+    #
+    # Python: aggregate -> entity_year_to_date
+    # Javascript: aggregate -> entityYearToDate
+    #
+    # Python: calendar_ytd_per_election_office -> election_office_year_to_date
+    # Javascript: calendarYTD -> electionOfficeYearToDate
+    #
+    # Python: entity_election_cycle_to_date
+    # Javascript: entityElectionCycleToDate
+    entity_election_cycle_to_date = models.DecimalField(
+        null=True, blank=True, max_digits=11, decimal_places=2
+    )
+
+    @property
+    def calendar_ytd_per_election_office(self):
+        return self._calendar_ytd_per_election_office
+
+    @calendar_ytd_per_election_office.setter
+    def calendar_ytd_per_election_office(self, value):
+        self._calendar_ytd_per_election_office = value
+
     loan_payment_to_date = models.DecimalField(
         null=True, blank=True, max_digits=11, decimal_places=2
     )

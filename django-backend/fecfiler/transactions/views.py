@@ -177,10 +177,13 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         with db_transaction.atomic():
+            instance = self.get_object()
+            transaction_id = request.data.get("id")
+            if transaction_id is not None and transaction_id != str(instance.id):
+                return Response(status=400)
+
             saved_transaction = self.save_transaction(
-                request.data,
-                request,
-                instance=self.get_object()
+                request.data, request, instance=instance
             )
             update_dependent_parent_purpose_description_if_needed(saved_transaction)
         return Response(saved_transaction.id)
@@ -375,6 +378,23 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         return self.find_and_process_previous(request, filters)
 
+    @action(detail=False, methods=["get"], url_path=r"previous/entity-election-cycle")
+    def previous_transaction_by_entity_election_cycle(self, request):
+        contact_1_id = request.query_params["contact_1_id"]
+        if (
+            not contact_1_id
+            or not request.query_params.get("date")
+            or not request.query_params.get("aggregation_group")
+        ):
+            return Response(
+                "contact_1_id, date, and aggregation_group are required.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        filters = Q(contact_1_id=contact_1_id)
+
+        return self.find_and_process_previous(request, filters)
+
     def find_and_process_previous(self, request, extra_filters):
         transaction_id = request.query_params.get("transaction_id")
         committee_uuid = self.get_committee_uuid()
@@ -427,6 +447,7 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     "aggregate": 0,
                     "calendar_ytd_per_election_office": 0,
                     "aggregate_general_elec_expended": 0,
+                    "entity_election_cycle_to_date": 0,
                     "message": "No previous transaction found.",
                 },
             )
@@ -457,6 +478,11 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
                     if getattr(previous_transaction, "schedule_f", None)
                     else 0
                 ),
+                "entity_election_cycle_to_date": (
+                    previous_transaction.entity_election_cycle_to_date
+                    if previous_transaction.entity_election_cycle_to_date is not None
+                    else 0
+                ),
             }
         )
 
@@ -465,6 +491,9 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
         if target.aggregate is not None:
             target.aggregate -= amount
+
+        if target.entity_election_cycle_to_date is not None:
+            target.entity_election_cycle_to_date -= amount
 
         if target.calendar_ytd_per_election_office is not None:
             target.calendar_ytd_per_election_office -= amount
@@ -479,13 +508,15 @@ class TransactionViewSet(CommitteeOwnedViewMixin, ModelViewSet):
 
     def get_child_instance(self, child_id, committee_id):
         # ensure that child transaction belongs to this committee
-        child_instance = Transaction.objects.select_related(
-            "schedule_a", "schedule_b", "schedule_e", "contact_2"
-        ).filter(id=child_id, committee_account_id=committee_id).first()
-        if child_instance is None:
-            raise ValidationError(
-                {"children": ["Invalid child_id or child"]}
+        child_instance = (
+            Transaction.objects.select_related(
+                "schedule_a", "schedule_b", "schedule_e", "contact_2"
             )
+            .filter(id=child_id, committee_account_id=committee_id)
+            .first()
+        )
+        if child_instance is None:
+            raise ValidationError({"children": ["Invalid child_id or child"]})
         return child_instance
 
     def save_transaction(self, transaction_data, request, instance=None):
