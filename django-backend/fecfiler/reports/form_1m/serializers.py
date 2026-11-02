@@ -214,4 +214,4 @@ class Form1MSerializer(ReportSerializer, ContactCommitteeValidationMixin):
             ]
         )
 
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "created", "updated"]
