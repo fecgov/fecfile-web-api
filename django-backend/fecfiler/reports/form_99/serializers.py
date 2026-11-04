@@ -55,4 +55,4 @@ class Form99Serializer(ReportSerializer):
             + ["fields_to_validate"]
         )
 
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "created", "updated"]
