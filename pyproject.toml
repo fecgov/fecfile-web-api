@@ -21,4 +21,5 @@ DEP002 = [
     "lxml",
     "whitenoise",
     "drf-spectacular-sidecar",
+    "kombu",
 ]
