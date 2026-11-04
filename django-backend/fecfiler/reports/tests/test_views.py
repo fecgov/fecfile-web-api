@@ -12,7 +12,7 @@ from fecfiler.reports.managers import STATUS_CODE_SUCCESS
 from fecfiler.transactions.tests.utils import create_schedule_a, create_loan
 from fecfiler.contacts.tests.utils import (
     create_test_committee_contact,
-    create_test_organization_contact
+    create_test_organization_contact,
 )
 from fecfiler.transactions.schedule_c.utils import carry_forward_loan
 from fecfiler.user.models import User
@@ -29,71 +29,71 @@ logger = structlog.get_logger(__name__)
 class ReportViewSetTest(FecfilerViewSetTest):
     def setUp(self):
         self.fields_to_validate = [
-            'committee_type',
-            'filer_committee_id_number',
-            'committee_name',
-            'street_1',
-            'street_2',
-            'city',
-            'state',
-            'zip',
-            'affiliated_date_form_f1_filed',
-            'affiliated_committee_fec_id',
-            'affiliated_committee_name',
-            'I_candidate_id_number',
-            'I_candidate_last_name',
-            'I_candidate_first_name',
-            'I_candidate_middle_name',
-            'I_candidate_prefix',
-            'I_candidate_suffix',
-            'I_candidate_office',
-            'I_candidate_state',
-            'I_candidate_district',
-            'I_date_of_contribution',
-            'II_candidate_id_number',
-            'II_candidate_last_name',
-            'II_candidate_first_name',
-            'II_candidate_middle_name',
-            'II_candidate_prefix',
-            'II_candidate_suffix',
-            'II_candidate_office',
-            'II_candidate_state',
-            'II_candidate_district',
-            'II_date_of_contribution',
-            'III_candidate_id_number',
-            'III_candidate_last_name',
-            'III_candidate_first_name',
-            'III_candidate_middle_name',
-            'III_candidate_prefix',
-            'III_candidate_suffix',
-            'III_candidate_office',
-            'III_candidate_state',
-            'III_candidate_district',
-            'III_date_of_contribution',
-            'IV_candidate_id_number',
-            'IV_candidate_last_name',
-            'IV_candidate_first_name',
-            'IV_candidate_middle_name',
-            'IV_candidate_prefix',
-            'IV_candidate_suffix',
-            'IV_candidate_office',
-            'IV_candidate_state',
-            'IV_candidate_district',
-            'IV_date_of_contribution',
-            'V_candidate_id_number',
-            'V_candidate_last_name',
-            'V_candidate_first_name',
-            'V_candidate_middle_name',
-            'V_candidate_prefix',
-            'V_candidate_suffix',
-            'V_candidate_office',
-            'V_candidate_state',
-            'V_candidate_district',
-            'V_date_of_contribution',
-            'date_of_original_registration',
-            'date_of_51st_contributor',
-            'date_committee_met_requirements',
-            'statusBy',
+            "committee_type",
+            "filer_committee_id_number",
+            "committee_name",
+            "street_1",
+            "street_2",
+            "city",
+            "state",
+            "zip",
+            "affiliated_date_form_f1_filed",
+            "affiliated_committee_fec_id",
+            "affiliated_committee_name",
+            "I_candidate_id_number",
+            "I_candidate_last_name",
+            "I_candidate_first_name",
+            "I_candidate_middle_name",
+            "I_candidate_prefix",
+            "I_candidate_suffix",
+            "I_candidate_office",
+            "I_candidate_state",
+            "I_candidate_district",
+            "I_date_of_contribution",
+            "II_candidate_id_number",
+            "II_candidate_last_name",
+            "II_candidate_first_name",
+            "II_candidate_middle_name",
+            "II_candidate_prefix",
+            "II_candidate_suffix",
+            "II_candidate_office",
+            "II_candidate_state",
+            "II_candidate_district",
+            "II_date_of_contribution",
+            "III_candidate_id_number",
+            "III_candidate_last_name",
+            "III_candidate_first_name",
+            "III_candidate_middle_name",
+            "III_candidate_prefix",
+            "III_candidate_suffix",
+            "III_candidate_office",
+            "III_candidate_state",
+            "III_candidate_district",
+            "III_date_of_contribution",
+            "IV_candidate_id_number",
+            "IV_candidate_last_name",
+            "IV_candidate_first_name",
+            "IV_candidate_middle_name",
+            "IV_candidate_prefix",
+            "IV_candidate_suffix",
+            "IV_candidate_office",
+            "IV_candidate_state",
+            "IV_candidate_district",
+            "IV_date_of_contribution",
+            "V_candidate_id_number",
+            "V_candidate_last_name",
+            "V_candidate_first_name",
+            "V_candidate_middle_name",
+            "V_candidate_prefix",
+            "V_candidate_suffix",
+            "V_candidate_office",
+            "V_candidate_state",
+            "V_candidate_district",
+            "V_date_of_contribution",
+            "date_of_original_registration",
+            "date_of_51st_contributor",
+            "date_committee_met_requirements",
+            "statusBy",
         ]
         self.committee = CommitteeAccount.objects.create(committee_id="C00000000")
         user = User.objects.create(email="test@fec.gov", username="gov")
@@ -701,7 +701,7 @@ class ReportViewSetTest(FecfilerViewSetTest):
                 "zip": "12345",
                 "country": "USA",
                 "committee_id": other_committee.committee_id,
-                "name": "test-com-name1"
+                "name": "test-com-name1",
             },
             "contact_affiliated_id": str(other_contact_1.id),
             "affiliated_date_form_f1_filed": "2026-08-19",
@@ -771,7 +771,7 @@ class ReportViewSetTest(FecfilerViewSetTest):
             "V_date_of_contribution": None,
             "date_of_51st_contributor": None,
             "date_of_original_registration": None,
-            "date_committee_met_requirements": None
+            "date_committee_met_requirements": None,
         }
         fields = f"?fields_to_validate={",".join(self.fields_to_validate)}"
 
@@ -784,7 +784,7 @@ class ReportViewSetTest(FecfilerViewSetTest):
         )
         self.assertEqual(response.status_code, 201)
         updated_payload = deepcopy(payload)
-        updated_payload["id"] = str(response.data.get('id'))
+        updated_payload["id"] = str(response.data.get("id"))
         del updated_payload["contact_affiliated"]
         updated_payload["contact_affiliated_id"] = str(contact_1.id)
         response = self.send_viewset_put_request(
@@ -793,7 +793,7 @@ class ReportViewSetTest(FecfilerViewSetTest):
             Form1MViewSet,
             "update",
             committee=other_committee,
-            pk=updated_payload['id']
+            pk=updated_payload["id"],
         )
 
         self.assertEqual(response.status_code, 400)
@@ -813,10 +813,166 @@ class ReportViewSetTest(FecfilerViewSetTest):
         view = ReportViewSet()
         view.format_kwarg = "format"
         request = self.build_viewset_get_request(
-            "/api/v1/reports",
-            committee=other_committee
+            "/api/v1/reports", committee=other_committee
         )
         request.query_params = {"page": 1}
         view.request = request
         response = view.list(request)
         self.assertEqual(len(response.data["results"]), 5)
+
+    def check_overlap(self, start_date=None, end_date=None, exclude_id=None):
+        """Send a GET request to the check-overlap action."""
+        params = []
+        if start_date is not None:
+            params.append(f"start_date={start_date}")
+        if end_date is not None:
+            params.append(f"end_date={end_date}")
+        if exclude_id is not None:
+            params.append(f"exclude_id={exclude_id}")
+
+        query_string = f"?{'&'.join(params)}" if params else ""
+        return self.send_viewset_get_request(
+            f"/api/v1/reports/check-overlap/{query_string}",
+            ReportViewSet,
+            "check_overlap",
+            committee=self.committee,
+        )
+
+    def test_check_overlap_missing_dates(self):
+        response = self.check_overlap(start_date="2026-01-01")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.data,
+            {"error": ("Both start_date and end_date query parameters are required.")},
+        )
+
+    def test_check_overlap_invalid_dates(self):
+        response = self.check_overlap(
+            start_date="not-a-date",
+            end_date="2026-02-01",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("error", response.data)
+
+    def test_check_overlap_no_overlapping_reports(self):
+        create_form3x(self.committee, "2026-01-01", "2026-01-31", {})
+
+        response = self.check_overlap(
+            start_date="2026-02-01",
+            end_date="2026-02-28",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.data,
+            {
+                "start_date": False,
+                "end_date": False,
+                "overlapping_reports": [],
+            },
+        )
+
+    def test_check_overlap_start_date_overlaps(self):
+        create_form3x(self.committee, "2026-01-10", "2026-01-20", {})
+
+        response = self.check_overlap(
+            start_date="2026-01-15",
+            end_date="2026-01-25",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["start_date"])
+        self.assertFalse(response.data["end_date"])
+        self.assertEqual(len(response.data["overlapping_reports"]), 1)
+
+    def test_check_overlap_end_date_overlaps(self):
+        create_form3x(self.committee, "2026-01-10", "2026-01-20", {})
+
+        response = self.check_overlap(
+            start_date="2026-01-01",
+            end_date="2026-01-15",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data["start_date"])
+        self.assertTrue(response.data["end_date"])
+        self.assertEqual(len(response.data["overlapping_reports"]), 1)
+
+    def test_check_overlap_existing_report_is_inside_requested_range(self):
+        create_form3x(self.committee, "2026-01-10", "2026-01-20", {})
+
+        response = self.check_overlap(
+            start_date="2026-01-01",
+            end_date="2026-01-31",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["start_date"])
+        self.assertTrue(response.data["end_date"])
+        self.assertEqual(len(response.data["overlapping_reports"]), 1)
+
+    def test_check_overlap_excludes_report_by_id(self):
+        report = create_form3x(
+            self.committee,
+            "2026-01-10",
+            "2026-01-20",
+            {},
+        )
+
+        response = self.check_overlap(
+            start_date="2026-01-15",
+            end_date="2026-01-25",
+            exclude_id=report.id,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.data["start_date"])
+        self.assertFalse(response.data["end_date"])
+        self.assertEqual(response.data["overlapping_reports"], [])
+
+    def test_check_overlap_includes_report_details(self):
+        report = create_form3x(
+            self.committee,
+            "2026-01-10",
+            "2026-01-20",
+            {},
+        )
+
+        response = self.check_overlap(
+            start_date="2026-01-15",
+            end_date="2026-01-25",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        overlapping_reports = response.data["overlapping_reports"]
+
+        self.assertEqual(len(overlapping_reports), 1)
+        self.assertEqual(
+            overlapping_reports[0]["report_code"],
+            report.report_code,
+        )
+        self.assertEqual(
+            str(overlapping_reports[0]["coverage_from_date"]),
+            "2026-01-10",
+        )
+        self.assertEqual(
+            str(overlapping_reports[0]["coverage_through_date"]),
+            "2026-01-20",
+        )
+        self.assertIn("report_code_label", overlapping_reports[0])
+        self.assertTrue(overlapping_reports[0]["report_code_label"])
+
+    def test_check_overlap_includes_shared_boundary_date(self):
+        create_form3x(self.committee, "2026-01-01", "2026-01-31", {})
+
+        response = self.check_overlap(
+            start_date="2026-01-31",
+            end_date="2026-02-28",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.data["start_date"])
+        self.assertFalse(response.data["end_date"])
+        self.assertEqual(len(response.data["overlapping_reports"]), 1)
