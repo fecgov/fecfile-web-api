@@ -105,6 +105,9 @@ class TransactionSerializer(
     debt_incurred_amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     calendar_ytd_per_election_office = DecimalField(
+        required=False, allow_null=True, read_only=True, max_digits=11, decimal_places=2
+    )
+    entity_election_cycle_to_date = DecimalField(
         max_digits=11, decimal_places=2, read_only=True
     )
     aggregate_general_elec_expended = DecimalField(
@@ -137,6 +140,7 @@ class TransactionSerializer(
                     "reatt_redes_associations",  # reattribution/redesignation
                     "reporttransaction",
                     "_form_type",
+                    "_calendar_ytd_per_election_office",
                     "blocking_reports",
                 ]
             ] + [
@@ -162,6 +166,7 @@ class TransactionSerializer(
                 "debt_incurred_amount",
                 "aggregate",
                 "calendar_ytd_per_election_office",
+                "entity_election_cycle_to_date",
                 "aggregate_general_elec_expended",
                 "loan_payment_to_date",
                 "balance",
@@ -197,6 +202,9 @@ class TransactionSerializer(
 
         # because form_type is a dynamic field
         representation["form_type"] = instance.form_type
+        representation["calendar_ytd_per_election_office"] = (
+            instance.calendar_ytd_per_election_office
+        )
 
         if not self.context.get("no_depth"):
             new_context = {"no_depth": True, "no_children": True}
@@ -270,6 +278,7 @@ class TransactionSerializer(
             "fields_to_ignore",
             [
                 "form_type",
+                "calendar_ytd_per_election_office",
                 "filer_committee_id_number",
                 "back_reference_tran_id_number",
                 "contribution_aggregate",
@@ -438,6 +447,9 @@ class TransactionListSerializer(ModelSerializer):
     amount = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     balance = DecimalField(max_digits=11, decimal_places=2, read_only=True)
     aggregate = DecimalField(max_digits=11, decimal_places=2, read_only=True)
+    entity_election_cycle_to_date = DecimalField(
+        max_digits=11, decimal_places=2, read_only=True
+    )
     report_code_label = CharField(read_only=True)
     report_type = CharField(read_only=True)
     report_ids = ListField(child=UUIDField(), read_only=True, source="report_ids_list")
@@ -461,6 +473,7 @@ class TransactionListSerializer(ModelSerializer):
             "amount",
             "balance",
             "aggregate",
+            "entity_election_cycle_to_date",
             "report_code_label",
             "report_type",
             "report_ids",
