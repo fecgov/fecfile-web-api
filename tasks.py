@@ -375,6 +375,14 @@ def deploy(ctx, space=None, branch=None, login=False, help=False):
         echo=True,
     )
 
+    # set any in-progress webprints to FAILED
+    task = "django-backend/manage.py fail_open_webprints"
+    task_name = "Fail non-terminal webprints"
+    ctx.run(
+        f"cf rt {APP_NAME} --command '{task}' --name '{task_name}'",
+        echo=True,
+    )
+
     # Allow proxy to connect to api via internal route
     add_network_policy = ctx.run(
         f"cf add-network-policy {PROXY_NAME} {APP_NAME}",
