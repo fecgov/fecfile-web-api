@@ -22,8 +22,9 @@ from fecfiler.transactions.utils_aggregation_prep import (
     _get_calendar_year_from_date,
     calculate_effective_amount,
 )
+from decimal import Decimal
 
-from django.db.models import Q, F, Sum, Value, DecimalField, OuterRef, Subquery
+from django.db.models import Q, Sum, Value, DecimalField, OuterRef, Subquery
 from django.db.models.functions import Coalesce
 import structlog
 
@@ -413,6 +414,21 @@ def process_aggregation_for_entity_election_cycle(
     election_cycle_start_date,
     election_cycle_end_date,
 ):
+    entity_election_cycle_to_date_subquery = Coalesce(
+        Subquery(
+            Transaction.objects.filter(
+                committee_account_id=committee_account_id,
+                aggregation_group=aggregation_group,
+                contact_1_id=contact_1_id,
+                date__gte=election_cycle_start_date,
+                date__lte=election_cycle_end_date,
+            )
+            .order_by("date", "created")
+            .annotate(agg=Transaction.objects.ENTITY_AGGREGATE_CLAUSE())
+            .values("agg")[:1]
+        ),
+        Decimal(0),
+    )
     return (
         Transaction.objects.filter(
             committee_account_id=committee_account_id,
@@ -423,7 +439,7 @@ def process_aggregation_for_entity_election_cycle(
         )
         .order_by("date", "created")
         .annotate(agg=Transaction.objects.ENTITY_AGGREGATE_CLAUSE())
-        .update(entity_election_cycle_to_date=F("agg"))
+        .update(entity_election_cycle_to_date=entity_election_cycle_to_date_subquery)
     )
 
 

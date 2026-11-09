@@ -336,19 +336,175 @@ class AggregationDirectFunctionTestCase(TestCase):
             date.fromisoformat(test_election_cycle_2_end_date),
         )
 
-    @patch("fecfiler.transactions.aggregation.process_aggregation_for_entity_contact")
-    def test_update_election_cycle_aggregates_for_transaction_update(self, delegate_mock):
-        transaction = MagicMock(
-            committee_account_id="committee-1",
-            aggregation_group="GENERAL",
-            contact_1_id="contact-1",
+    def test_process_aggregation_for_entity_election_cycle(self):
+        test_committee = CommitteeAccount.objects.create(committee_id="C00000003")
+        test_contact_1 = Contact.objects.create(
+            type=ContactType.INDIVIDUAL,
+            last_name="test_last_name",
+            first_name="test_first_name",
+            committee_account_id=test_committee.id,
         )
 
-        process_aggregation_for_entity(transaction, earliest_date=date(2024, 3, 1))
+        # Election cycle 1
+        test_election_cycle_1_start_date = "2023-01-01"
+        test_election_cycle_1_end_date = "2024-12-31"
+        ElectionCycle.objects.create(
+            committee_account=test_committee,
+            office=ElectionCycle.Office.SENATE,
+            election_type=ElectionCycle.ElectionType.GENERAL,
+            election_year="2026",
+            start_date=test_election_cycle_1_start_date,
+            end_date=test_election_cycle_1_end_date,
+        )
 
-        delegate_mock.assert_called_once_with(
-            "committee-1",
-            "GENERAL",
-            "contact-1",
-            date(2024, 3, 1),
+        # Election cycle 2
+        test_election_cycle_2_start_date = "2025-01-01"
+        test_election_cycle_2_end_date = "2026-12-31"
+        ElectionCycle.objects.create(
+            committee_account=test_committee,
+            office=ElectionCycle.Office.SENATE,
+            election_type=ElectionCycle.ElectionType.GENERAL,
+            election_year="2026",
+            start_date=test_election_cycle_2_start_date,
+            end_date=test_election_cycle_2_end_date,
+        )
+
+        # Create transactions and verify election cycle aggregates
+        test_committee_account_id = test_committee.id
+        test_aggregation_group = "GENERAL"
+        test_contact_1_id = test_contact_1.id
+
+        # Transaction 1 (outside election cycles)
+        test_schedule_a_1 = ScheduleA.objects.create(
+            contribution_date="2022-01-01",
+            contribution_amount=Decimal("1000.00"),
+        )
+        test_transaction_1 = Transaction.objects.create(
+            committee_account_id=test_committee_account_id,
+            transaction_type_identifier="INDIVIDUAL_RECEIPT",
+            aggregation_group=test_aggregation_group,
+            contact_1_id=test_contact_1_id,
+            schedule_a_id=test_schedule_a_1.id,
+        )
+        self.assertEqual(
+            test_transaction_1.entity_election_cycle_to_date,
+            None,
+        )
+
+        # Transaction 2 (outside election cycles)
+        test_schedule_a_2 = ScheduleA.objects.create(
+            contribution_date="2022-01-02",
+            contribution_amount=Decimal("500.00"),
+        )
+        test_transaction_2 = Transaction.objects.create(
+            committee_account_id=test_committee_account_id,
+            transaction_type_identifier="INDIVIDUAL_RECEIPT",
+            aggregation_group=test_aggregation_group,
+            contact_1_id=test_contact_1_id,
+            schedule_a_id=test_schedule_a_2.id,
+        )
+        test_transaction_1.refresh_from_db()
+        self.assertEqual(
+            test_transaction_1.entity_election_cycle_to_date,
+            None,
+        )
+        self.assertEqual(
+            test_transaction_2.entity_election_cycle_to_date,
+            None,
+        )
+
+        # Transaction 3 (inside election cycle 1)
+        test_schedule_a_3 = ScheduleA.objects.create(
+            contribution_date="2023-01-01",
+            contribution_amount=Decimal("100.00"),
+        )
+        test_transaction_3 = Transaction.objects.create(
+            committee_account_id=test_committee_account_id,
+            transaction_type_identifier="INDIVIDUAL_RECEIPT",
+            aggregation_group=test_aggregation_group,
+            contact_1_id=test_contact_1_id,
+            schedule_a_id=test_schedule_a_3.id,
+        )
+        test_transaction_1.refresh_from_db()
+        test_transaction_2.refresh_from_db()
+        self.assertEqual(
+            test_transaction_1.entity_election_cycle_to_date,
+            None,
+        )
+        self.assertEqual(
+            test_transaction_2.entity_election_cycle_to_date,
+            None,
+        )
+        self.assertEqual(
+            test_transaction_3.entity_election_cycle_to_date,
+            Decimal("100.00"),
+        )
+
+        # Transaction 4 (inside election cycle 1)
+        test_schedule_a_4 = ScheduleA.objects.create(
+            contribution_date="2023-01-02",
+            contribution_amount=Decimal("50.00"),
+        )
+        test_transaction_4 = Transaction.objects.create(
+            committee_account_id=test_committee_account_id,
+            transaction_type_identifier="INDIVIDUAL_RECEIPT",
+            aggregation_group=test_aggregation_group,
+            contact_1_id=test_contact_1_id,
+            schedule_a_id=test_schedule_a_4.id,
+        )
+        test_transaction_1.refresh_from_db()
+        test_transaction_2.refresh_from_db()
+        test_transaction_3.refresh_from_db()
+        self.assertEqual(
+            test_transaction_1.entity_election_cycle_to_date,
+            None,
+        )
+        self.assertEqual(
+            test_transaction_2.entity_election_cycle_to_date,
+            None,
+        )
+        self.assertEqual(
+            test_transaction_3.entity_election_cycle_to_date,
+            Decimal("100.00"),
+        )
+        self.assertEqual(
+            test_transaction_4.entity_election_cycle_to_date,
+            Decimal("150.00"),
+        )
+
+        # Transaction 5 (inside election cycle 1)
+        test_schedule_a_5 = ScheduleA.objects.create(
+            contribution_date="2023-01-03",
+            contribution_amount=Decimal("25.00"),
+        )
+        test_transaction_5 = Transaction.objects.create(
+            committee_account_id=test_committee_account_id,
+            transaction_type_identifier="INDIVIDUAL_RECEIPT",
+            aggregation_group=test_aggregation_group,
+            contact_1_id=test_contact_1_id,
+            schedule_a_id=test_schedule_a_5.id,
+        )
+        test_transaction_1.refresh_from_db()
+        test_transaction_2.refresh_from_db()
+        test_transaction_3.refresh_from_db()
+        test_transaction_4.refresh_from_db()
+        self.assertEqual(
+            test_transaction_1.entity_election_cycle_to_date,
+            None,
+        )
+        self.assertEqual(
+            test_transaction_2.entity_election_cycle_to_date,
+            None,
+        )
+        self.assertEqual(
+            test_transaction_3.entity_election_cycle_to_date,
+            Decimal("100.00"),
+        )
+        self.assertEqual(
+            test_transaction_4.entity_election_cycle_to_date,
+            Decimal("150.00"),
+        )
+        self.assertEqual(
+            test_transaction_5.entity_election_cycle_to_date,
+            Decimal("175.00"),
         )
