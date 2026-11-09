@@ -351,17 +351,18 @@ def update_election_cycle_aggregates_for_transaction(
     if (
         not transaction
         or not transaction.aggregation_group
-        or transaction.schedule not in [Schedule.A, Schedule.B, "A", "B"]
+        or not transaction.get_schedule_name() in [Schedule.A, Schedule.B, "A", "B"]
     ):
         return
 
+    transaction_date = transaction.get_date()
     if old_snapshot:
         old_entity_id = old_snapshot.get("contact_1_id")
         new_entity_id = transaction.contact_1_id
         entity_changed = old_entity_id != new_entity_id
 
         old_date = old_snapshot.get("date")
-        new_date = transaction.date
+        new_date = transaction_date
         date_changed = old_date != new_date
 
         old_effective_amount = old_snapshot.get("effective_amount")
@@ -391,8 +392,8 @@ def update_election_cycle_aggregates_for_transaction(
 
     election_cycle = ElectionCycle.objects.filter(
         committee_account_id=transaction.committee_account_id,
-        start_date__lte=transaction.date,
-        end_date__gte=transaction.date,
+        start_date__lte=transaction_date,
+        end_date__gte=transaction_date,
     ).first()
 
     if election_cycle:

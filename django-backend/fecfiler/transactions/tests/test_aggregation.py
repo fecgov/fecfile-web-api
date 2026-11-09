@@ -2,7 +2,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from unittest.mock import MagicMock, patch
 
-from django.test import SimpleTestCase
+from django.test import TestCase
 
 from fecfiler.transactions.aggregation import (
     process_aggregation_by_payee_candidate,
@@ -12,9 +12,14 @@ from fecfiler.transactions.aggregation import (
     reaggregate_after_report_deletion,
     schedule_a_over_two_hundred_types,
 )
+from fecfiler.committee_accounts.models import CommitteeAccount
+from fecfiler.contacts.models import Contact, ContactType
+from fecfiler.election_cycles.models import ElectionCycle
+from fecfiler.transactions.models import Transaction
+from fecfiler.transactions.schedule_a.models import ScheduleA
 
 
-class AggregationDirectFunctionTestCase(SimpleTestCase):
+class AggregationDirectFunctionTestCase(TestCase):
     @patch("fecfiler.transactions.aggregation.ScheduleD.objects.bulk_update")
     @patch("fecfiler.transactions.aggregation.Transaction.objects.filter")
     def test_process_aggregation_for_debts_returns_when_transaction_missing(
@@ -263,3 +268,87 @@ class AggregationDirectFunctionTestCase(SimpleTestCase):
 
         process_aggregation_for_election(trans)
         filter_mock.assert_not_called()
+
+    @patch(
+        "fecfiler.transactions.aggregation.process_aggregation_for_entity_election_cycle"
+    )
+    def test_update_election_cycle_aggregates_for_transaction(self, delegate_mock):
+        test_committee = CommitteeAccount.objects.create(committee_id="C00000003")
+        test_contact_1 = Contact.objects.create(
+            type=ContactType.INDIVIDUAL,
+            last_name="test_last_name",
+            first_name="test_first_name",
+            committee_account_id=test_committee.id,
+        )
+        test_election_cycle_1_start_date = "2023-01-01"
+        test_election_cycle_1_end_date = "2024-12-31"
+        ElectionCycle.objects.create(
+            committee_account=test_committee,
+            office=ElectionCycle.Office.SENATE,
+            election_type=ElectionCycle.ElectionType.GENERAL,
+            election_year="2026",
+            start_date=test_election_cycle_1_start_date,
+            end_date=test_election_cycle_1_end_date,
+        )
+        test_election_cycle_2_start_date = "2025-01-01"
+        test_election_cycle_2_end_date = "2026-12-31"
+        ElectionCycle.objects.create(
+            committee_account=test_committee,
+            office=ElectionCycle.Office.SENATE,
+            election_type=ElectionCycle.ElectionType.GENERAL,
+            election_year="2026",
+            start_date=test_election_cycle_2_start_date,
+            end_date=test_election_cycle_2_end_date,
+        )
+
+        test_committee_account_id = test_committee.id
+        test_aggregation_group = "GENERAL"
+        test_contact_1_id = test_contact_1.id
+        test_schedule_a = ScheduleA.objects.create(
+            contribution_date="2023-01-02",
+            contribution_amount=Decimal("100.00"),
+        )
+        test_transaction = Transaction.objects.create(
+            committee_account_id=test_committee_account_id,
+            transaction_type_identifier="INDIVIDUAL_RECEIPT",
+            aggregation_group=test_aggregation_group,
+            contact_1_id=test_contact_1_id,
+            schedule_a_id=test_schedule_a.id,
+        )
+
+        # assert create path
+        delegate_mock.assert_any_call(
+            test_committee_account_id,
+            test_aggregation_group,
+            test_contact_1_id,
+            date.fromisoformat(test_election_cycle_1_start_date),
+            date.fromisoformat(test_election_cycle_1_end_date),
+        )
+
+        test_transaction.schedule_a.contribution_date = date.fromisoformat("2025-01-02")
+        test_transaction.save()
+        # assert update path
+        delegate_mock.assert_any_call(
+            test_committee_account_id,
+            test_aggregation_group,
+            test_contact_1_id,
+            date.fromisoformat(test_election_cycle_2_start_date),
+            date.fromisoformat(test_election_cycle_2_end_date),
+        )
+
+    @patch("fecfiler.transactions.aggregation.process_aggregation_for_entity_contact")
+    def test_update_election_cycle_aggregates_for_transaction_update(self, delegate_mock):
+        transaction = MagicMock(
+            committee_account_id="committee-1",
+            aggregation_group="GENERAL",
+            contact_1_id="contact-1",
+        )
+
+        process_aggregation_for_entity(transaction, earliest_date=date(2024, 3, 1))
+
+        delegate_mock.assert_called_once_with(
+            "committee-1",
+            "GENERAL",
+            "contact-1",
+            date(2024, 3, 1),
+        )
