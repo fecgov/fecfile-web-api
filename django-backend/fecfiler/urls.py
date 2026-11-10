@@ -5,6 +5,8 @@ from fecfiler.settings import MOCK_OIDC_PROVIDER, INCLUDE_SILK
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularSwaggerView, SpectacularAPIView
 
+from fecfiler.imports.views import ImportPreviewView
+
 BASE_V1_URL = r"^api/v1/"
 
 urlpatterns = []
@@ -19,6 +21,7 @@ if INCLUDE_SILK:
     )
 
 urlpatterns += [
+    path("api/v1/imports/", ImportPreviewView.as_view(), name="import-preview"),
     re_path("api/schema", SpectacularAPIView.as_view(), name="schema"),
     re_path(
         "api/docs",
