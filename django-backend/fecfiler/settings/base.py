@@ -89,6 +89,8 @@ INSTALLED_APPS = [
     "drf_spectacular_sidecar",
     "django_structlog",
     "django_migration_linter",
+    "import_export",
+    "import_export_extensions",
     "fecfiler.committee_accounts",
     "fecfiler.reports",
     "fecfiler.transactions",
@@ -130,9 +132,14 @@ if INCLUDE_SILK:
 
     SILKY_DYNAMIC_PROFILING = WEB_SERVICES_PROFILING
 
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), ".local", "contact-imports")
+
 STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
 }
 

@@ -1,8 +1,10 @@
 from django.urls import path, include
 from fecfiler.routers import register_router
 from .views import ContactViewSet, DeletedContactsViewSet
+from .imports.views import ContactImportViewSet
 
 router = register_router()
+router.register(r"contacts/imports", ContactImportViewSet, basename="contact-imports")
 router.register(r"contacts", ContactViewSet, basename="contacts")
 router.register(r"contacts-deleted", DeletedContactsViewSet, basename="contacts-deleted")
 
