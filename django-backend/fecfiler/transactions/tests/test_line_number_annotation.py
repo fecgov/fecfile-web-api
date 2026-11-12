@@ -32,6 +32,7 @@ RUN_ALL_TRANSACTION_TYPES = False
 
 unitemized_f3_and_f3x = {"F3": "SA11AI", "F3X": "SA11AI", "Unitemized": "SA11AII"}
 unitemized_f3x = {"F3X": "SA11AI", "Unitemized": "SA11AII"}
+earmark_f3_and_f3x = {"F3": "SA11A", "F3X": "SA11AI", "Unitemized": "SA11AII"}
 
 schedule_a_test_mappings = [
     ["INDIVIDUAL_RECEIPT", "IND", unitemized_f3_and_f3x],
@@ -40,8 +41,8 @@ schedule_a_test_mappings = [
     ["PARTNERSHIP_ATTRIBUTION", "IND", unitemized_f3_and_f3x],
     ["IN_KIND_RECEIPT", "IND", unitemized_f3x],
     ["RETURN_RECEIPT", "IND", unitemized_f3_and_f3x],
-    ["EARMARK_RECEIPT", "IND", unitemized_f3x],
-    ["EARMARK_MEMO", "IND", unitemized_f3x],
+    ["EARMARK_RECEIPT", "IND", earmark_f3_and_f3x],
+    ["EARMARK_MEMO", "IND", earmark_f3_and_f3x],
     ["CONDUIT_EARMARK_RECEIPT_DEPOSITED", "IND", unitemized_f3x],
     ["CONDUIT_EARMARK_RECEIPT_UNDEPOSITED", "IND", unitemized_f3x],
     ["RECEIPT_FROM_UNREGISTERED_ORGANIZATION", "ORG", unitemized_f3_and_f3x],
@@ -135,6 +136,8 @@ schedule_a_test_mappings_sampler = [
     ["PAC_RETURN", "COM", {"F3": "SA11C", "F3X": "SA11C"}],
     ["CONTRIBUTION_FROM_CANDIDATE", "CAN", {"F3": "SA11D"}],
     ["PARTY_RECEIPT", "COM", {"F3": "SA11B", "F3X": "SA11B"}],
+    ["EARMARK_RECEIPT", "IND", {"F3": "SA11A"}],
+    ["EARMARK_MEMO", "IND", {"F3": "SA11A"}],
     ["EARMARK_MEMO", "IND", unitemized_f3x],
     ["CONDUIT_EARMARK_RECEIPT_DEPOSITED", "IND", unitemized_f3x],
 ]
