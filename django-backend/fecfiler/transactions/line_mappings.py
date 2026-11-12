@@ -10,7 +10,12 @@ LINE_MAPPINGS_BY_FORM_AND_LINE = {
         "INDIVIDUAL_RECEIPT",
     ],
     ("form_3_id", "SA11B"): ["PARTY_RECEIPT", "PARTY_RETURN"],
-    ("form_3_id", "SA11C"): ["PAC_RECEIPT", "PAC_RETURN"],
+    ("form_3_id", "SA11C"): [
+        "PAC_RECEIPT",
+        "PAC_RETURN",
+        "PAC_EARMARK_RECEIPT",
+        "PAC_EARMARK_MEMO",
+    ],
     ("form_3_id", "SA11D"): ["CONTRIBUTION_FROM_CANDIDATE"],
     ("form_3_id", "SA14"): ["OFFSET_TO_OPERATING_EXPENDITURES"],
     ("form_3_id", "SA15"): [
