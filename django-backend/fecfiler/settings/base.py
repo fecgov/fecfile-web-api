@@ -103,6 +103,7 @@ INSTALLED_APPS = [
     "fecfiler.mock_oidc_provider",
     "fecfiler.cash_on_hand",
     "fecfiler.election_cycles",
+    "fecfiler.imports",
 ]
 
 MIDDLEWARE = []
