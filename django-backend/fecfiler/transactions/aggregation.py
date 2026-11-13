@@ -288,8 +288,9 @@ def process_aggregation_for_election(transaction_instance, earliest_date=None):
     schedule_e = transaction_instance.schedule_e
     contact_2 = transaction_instance.contact_2
 
-    # Get the date - handle both date objects and date strings
-    transaction_date = transaction_instance.get_date()
+    disbursement_date = schedule_e.disbursement_date
+    dissemination_date = schedule_e.dissemination_date
+    transaction_date = disbursement_date or dissemination_date
     if not transaction_date:
         return
 
@@ -303,7 +304,6 @@ def process_aggregation_for_election(transaction_instance, earliest_date=None):
         "schedule_e__election_code": schedule_e.election_code,
         "contact_2__candidate_office": contact_2.candidate_office,
         "date__year": year,
-        "force_unaggregated__isnull": True,
         "deleted__isnull": True,
     }
 
