@@ -29,3 +29,4 @@ class Import(CommitteeOwnedModel):
 class ImportStatus(StrEnum):
     INITIAL = "initial"
     UPLOADED = "uploaded"
+    PARSING = "parsing"

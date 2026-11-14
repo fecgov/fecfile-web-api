@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from fecfiler.imports.models import Import, ImportStatus
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.decorators import action
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
@@ -15,35 +15,14 @@ from drf_spectacular.utils import extend_schema
 from django.http import HttpResponseBadRequest
 from fecfiler.imports.storage import save_upload
 
-
-class ImportUploadSerializer(serializers.Serializer):
-    file = serializers.FileField()
-
-    def validate(self, data):
-        # TODO validate size
-        # TODO validate file type
-        """
-        Ensure that we are not trying to start an import when there is already one going
-        """
-        request = self.context.get("request")
-        if not request:
-            raise ValidationError("Request context is required.")
-        committee_uuid = request.session.get("committee_uuid")
-        if not committee_uuid:
-            raise PermissionDenied("You must activate a committee account")
-        committee_account = CommitteeAccount.objects.get(id=committee_uuid)
-        existing_import = get_active_import(committee_account)
-        if existing_import is not None:
-            raise ValidationError(
-                f"This account already has an import in progress.  Cannot have more than one."
-            )
-        return super().validate(data)
+from fecfiler.imports.serializers import ImportSerializer, ImportUploadSerializer
 
 
-class ImportViewSet(CommitteeOwnedViewMixin):
+class ImportViewSet(CommitteeOwnedViewMixin, RetrieveModelMixin):
     """Handle a CSV upload for an active committee administrator, without saving it."""
 
     queryset = Import.objects.all()
+    serializer_class = ImportSerializer
 
     @action(
         detail=False,
@@ -52,6 +31,7 @@ class ImportViewSet(CommitteeOwnedViewMixin):
         url_path="upload-file",
     )
     def upload_file(self, request):
+        committee_uuid = self.get_committee_uuid()
         if len(request.FILES.getlist("file")) != 1 or len(request.FILES) != 1:
             raise ValidationError(
                 {"file": ["Upload exactly one file using the file field."]}
@@ -60,8 +40,7 @@ class ImportViewSet(CommitteeOwnedViewMixin):
             data=request.data, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
-        # return HttpResponseBadRequest("Invalid upload")
-        committee_uuid = request.session.get("committee_uuid")
+        self.validate_upload(request, committee_uuid)
 
         import_instance = Import.objects.create(
             committee_account_id=committee_uuid,
@@ -71,7 +50,36 @@ class ImportViewSet(CommitteeOwnedViewMixin):
 
         save_file(import_instance, request.FILES["file"])
 
-        return Response("good to go")
+        return Response(ImportSerializer(import_instance).data)
+
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="start-parse",
+    )
+    def start_parse(self, request, pk):
+        import_instance = self.get_object()
+        if import_instance.status != ImportStatus.UPLOADED:
+            raise ValidationError(
+                {"status": ["Cannot start parse unless file is uploaded."]}
+            )
+        import_instance.status = ImportStatus.PARSING
+        import_instance.save()
+        return Response(ImportSerializer(import_instance).data)
+
+    def validate_upload(self, request, committee_uuid):
+        # TODO validate size
+        # TODO validate file type
+        """
+        Ensure that we are not trying to start an import when there is already one going
+        """
+        committee_account = CommitteeAccount.objects.get(id=committee_uuid)
+        """off for now"""
+        # existing_import = get_active_import(committee_account)
+        # if existing_import is not None:
+        #     raise ValidationError(
+        #         f"This account already has an import in progress.  Cannot have more than one."
+        #     )
 
 
 def get_active_import(committee_account):
