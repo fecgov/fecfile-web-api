@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from fecfiler.imports.models import Import
+from fecfiler.imports.models import Import, ImportStatus
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.decorators import action
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
@@ -13,6 +13,7 @@ from rest_framework.views import APIView, PermissionDenied
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from django.http import HttpResponseBadRequest
+from fecfiler.imports.storage import save_upload
 
 
 class ImportUploadSerializer(serializers.Serializer):
@@ -36,7 +37,7 @@ class ImportUploadSerializer(serializers.Serializer):
             raise ValidationError(
                 f"This account already has an import in progress.  Cannot have more than one."
             )
-        return True
+        return super().validate(data)
 
 
 class ImportViewSet(CommitteeOwnedViewMixin):
@@ -59,6 +60,17 @@ class ImportViewSet(CommitteeOwnedViewMixin):
             data=request.data, context={"request": request}
         )
         serializer.is_valid(raise_exception=True)
+        # return HttpResponseBadRequest("Invalid upload")
+        committee_uuid = request.session.get("committee_uuid")
+
+        import_instance = Import.objects.create(
+            committee_account_id=committee_uuid,
+            uploaded_file_name=request.FILES["file"].name,
+            status=ImportStatus.INITIAL,
+        )
+
+        save_file(import_instance, request.FILES["file"])
+
         return Response("good to go")
 
 
@@ -71,3 +83,10 @@ def get_active_import(committee_account):
             f"Committee account ({committee_account.committee_id}) has more than one import."
         )
     return active_imports.first()
+
+
+def save_file(import_instance, file):
+    file.name = f"{import_instance.committee_account_id}_upload"
+    import_instance.uploaded_file_name = save_upload(file)
+    import_instance.status = ImportStatus.UPLOADED
+    import_instance.save()

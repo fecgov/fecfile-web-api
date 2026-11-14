@@ -3,7 +3,7 @@ from fecfiler.reports.models import Report
 from fecfiler.shared.utilities import generate_fec_uid
 from django.db import models
 import uuid
-from enum import Enum
+from enum import StrEnum
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -18,8 +18,14 @@ class Import(CommitteeOwnedModel):
         unique=True,
     )
     uploaded_file_name = models.TextField(null=True, blank=True)
+    status = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "imports"
+
+
+class ImportStatus(StrEnum):
+    INITIAL = "initial"
+    UPLOADED = "uploaded"

@@ -10,7 +10,7 @@ import sys
 import re
 
 from copy import deepcopy
-from enum import Enum
+from enum import Enum, StrEnum
 from .env import env
 from fecfiler.shared.utilities import get_float_from_string, get_boolean_from_string
 from fecfiler.web_services.profilers import WEB_SERVICES_PROFILING
@@ -21,6 +21,11 @@ from django.core.exceptions import ImproperlyConfigured
 
 class CeleryStorageType(Enum):
     AWS = "aws"
+    LOCAL = "local"
+
+
+class UploadStorageType(StrEnum):
+    S3 = "s3"
     LOCAL = "local"
 
 
@@ -585,6 +590,13 @@ SES_REGION = env.get_credential("SES_REGION")
 SES_DOMAIN = env.get_credential("SES_DOMAIN")
 SES_FROM_USER = env.get_credential("SES_FROM_USER") or "no-reply"
 SES_FROM_EMAIL = SES_FROM_USER + "@" + SES_DOMAIN if SES_DOMAIN else None
+
+
+"""IMPORT
+"""
+UPLOAD_STORAGE_TYPE = env.get_credential("UPLOAD_STORAGE_TYPE", UploadStorageType.LOCAL)
+UPLOAD_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "imports/uploads")
+
 
 """FEATURE FLAGS
 """
