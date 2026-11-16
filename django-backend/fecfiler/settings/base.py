@@ -595,7 +595,6 @@ SES_FROM_EMAIL = SES_FROM_USER + "@" + SES_DOMAIN if SES_DOMAIN else None
 """IMPORT
 """
 UPLOAD_STORAGE_TYPE = env.get_credential("UPLOAD_STORAGE_TYPE", UploadStorageType.LOCAL)
-UPLOAD_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "imports/uploads")
 
 
 """FEATURE FLAGS

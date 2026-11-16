@@ -18,6 +18,7 @@ class Import(CommitteeOwnedModel):
         unique=True,
     )
     uploaded_file_name = models.TextField(null=True, blank=True)
+    parsed_file_name = models.TextField(null=True, blank=True)
     status = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -29,4 +30,8 @@ class Import(CommitteeOwnedModel):
 class ImportStatus(StrEnum):
     INITIAL = "initial"
     UPLOADED = "uploaded"
-    PARSING = "parsing"
+    PARSE_INITIALIZING = "parse_initializing"
+    PARSE_STARTING_TASK = "parse_starting_task"
+    PARSE_READING_UPLOAD = "parse_reading_upload"
+    PARSE_WRITING_PARSED_FILE = "parse_writing_parsed_file"
+    PARSE_COMPLETED = "parse_completed"

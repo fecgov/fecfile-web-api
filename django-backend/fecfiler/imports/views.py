@@ -1,3 +1,4 @@
+import json
 from rest_framework import serializers
 from fecfiler.imports.models import Import, ImportStatus
 from rest_framework.mixins import RetrieveModelMixin
@@ -5,7 +6,7 @@ from rest_framework.decorators import action
 from fecfiler.committee_accounts.views import CommitteeOwnedViewMixin
 from fecfiler.committee_accounts.serializers import CommitteeOwnedSerializer
 from fecfiler.committee_accounts.models import CommitteeAccount
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -13,7 +14,8 @@ from rest_framework.views import APIView, PermissionDenied
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from django.http import HttpResponseBadRequest
-from fecfiler.imports.storage import save_upload
+from fecfiler.imports.storage import read_import_file, save_upload
+from fecfiler.imports.tasks import parse_upload
 
 from fecfiler.imports.serializers import ImportSerializer, ImportUploadSerializer
 
@@ -63,9 +65,22 @@ class ImportViewSet(CommitteeOwnedViewMixin, RetrieveModelMixin):
             raise ValidationError(
                 {"status": ["Cannot start parse unless file is uploaded."]}
             )
-        import_instance.status = ImportStatus.PARSING
+        import_instance.status = ImportStatus.PARSE_INITIALIZING
         import_instance.save()
+
+        parse_upload.apply_async(args=[import_instance.id], retry=False)
+
         return Response(ImportSerializer(import_instance).data)
+
+    @action(detail=True, methods=["get"], url_path="parsed-data")
+    def parsed_data(self, request, pk=None):
+        import_instance = self.get_object()
+
+        if not import_instance.parsed_file_name:
+            raise NotFound("Parsed data is not available yet.")
+
+        content = read_import_file(import_instance.parsed_file_name)
+        return Response(json.loads(content))
 
     def validate_upload(self, request, committee_uuid):
         # TODO validate size
