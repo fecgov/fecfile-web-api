@@ -191,6 +191,7 @@ class ReportSerializer(
                     "dotfec",
                     "report",
                     "reporttransaction",
+                    "source_imports",
                 ]
             ] + [
                 "report_status",
@@ -222,13 +223,7 @@ class ReportCommitteeValidationMixin:
                 id=report_id, committee_account=committee_account
             ).exists()
             if not exists:
-                raise ValidationError(
-                    {
-                        "report_id": (
-                            "Invalid report_id or report."
-                        )
-                    }
-                )
+                raise ValidationError({"report_id": ("Invalid report_id or report.")})
 
         report_ids = data.get("report_ids", [])
         if report_ids:
@@ -239,7 +234,5 @@ class ReportCommitteeValidationMixin:
 
             if valid_count != len(unique_ids):
                 raise ValidationError(
-                    {
-                        "report_ids": "One or more report_ids are invalid"
-                    }
+                    {"report_ids": "One or more report_ids are invalid"}
                 )

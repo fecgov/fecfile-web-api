@@ -18,10 +18,11 @@ logger = structlog.getLogger(__name__)
 class ImportSerializer(ModelSerializer):
     id = UUIDField(read_only=True)
     status = CharField(read_only=True)
+    report = PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = Import
-        fields = ["id", "status"]
+        fields = ["id", "status", "report"]
 
 
 class ImportUploadSerializer(Serializer):

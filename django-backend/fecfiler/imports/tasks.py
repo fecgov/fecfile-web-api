@@ -57,10 +57,12 @@ def start_import(import_id):
         import_instance.update_status(ImportStatus.IMPORT_STARTING_TASK)
 
         print(f"Starting import for {import_id}...")
-        import_report(import_instance)
+        report = import_report(import_instance)
         print(f"Finished import for {import_id}")
 
-        import_instance.update_status(ImportStatus.IMPORT_COMPLETED)
+        import_instance.report = report
+        import_instance.status = ImportStatus.IMPORT_COMPLETED
+        import_instance.save(update_fields=["status", "updated", "report"])
 
     except Exception as e:
         import_instance.update_status(ImportStatus.IMPORT_FAILED)

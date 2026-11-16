@@ -22,6 +22,13 @@ class Import(CommitteeOwnedModel):
     status = models.TextField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+    report = models.ForeignKey(
+        Report,
+        null=True,
+        blank=True,
+        related_name="source_imports",
+        on_delete=models.SET_NULL,
+    )
 
     class Meta:
         db_table = "imports"

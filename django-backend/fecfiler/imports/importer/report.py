@@ -12,6 +12,7 @@ def import_report(import_instance):
     report_data = build_report_payload(parsed_data["report"])
 
     report = create_imported_report(import_instance, report_data)
+    return report
 
 
 def load_parsed_data(import_instance):
