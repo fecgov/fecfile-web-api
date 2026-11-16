@@ -1,7 +1,7 @@
 from celery import shared_task
 from .models import Import, ImportStatus
 from .parser.parser import parse_upload_file
-from .storage import save_upload
+from .storage import save_import_file
 import json
 from django.core.files.base import ContentFile
 
@@ -31,7 +31,7 @@ def parse_upload(import_id):
         json.dumps(parsed_data, ensure_ascii=False, allow_nan=False).encode("utf-8"),
         name=parsed_data_file_name,
     )
-    save_upload(parsed_file)
+    save_import_file(parsed_file)
 
     import_instance.status = ImportStatus.PARSE_COMPLETED
     import_instance.parsed_file_name = parsed_data_file_name

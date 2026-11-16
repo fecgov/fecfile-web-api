@@ -31,8 +31,13 @@ class CommitteeOwnedSerializer(ModelSerializer):
         return super().to_internal_value(data)
 
     def get_committee_uuid(self):
-        request = self.context["request"]
-        committee_uuid = request.session.get("committee_uuid")
+        committee_uuid = self.context.get("committee_uuid")
+
+        if committee_uuid is None:
+            request = self.context.get("request")
+            if request is not None:
+                committee_uuid = request.session.get("committee_uuid")
+
         if not committee_uuid:
             raise PermissionDenied("You must activate a committee account")
         return committee_uuid

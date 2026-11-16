@@ -14,7 +14,7 @@ from rest_framework.views import APIView, PermissionDenied
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from django.http import HttpResponseBadRequest
-from fecfiler.imports.storage import read_import_file, save_upload
+from fecfiler.imports.storage import read_import_file, save_import_file
 from fecfiler.imports.tasks import parse_upload
 
 from fecfiler.imports.serializers import ImportSerializer, ImportUploadSerializer
@@ -110,6 +110,6 @@ def get_active_import(committee_account):
 
 def save_file(import_instance, file):
     file.name = f"{import_instance.committee_account_id}_upload"
-    import_instance.uploaded_file_name = save_upload(file)
+    import_instance.uploaded_file_name = save_import_file(file)
     import_instance.status = ImportStatus.UPLOADED
     import_instance.save()

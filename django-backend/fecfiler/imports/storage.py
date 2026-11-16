@@ -12,7 +12,7 @@ UPLOAD_LOCAL_STORAGE_DIRECTORY = os.path.join(BASE_DIR, "imports/uploads")
 
 
 # Should refactor this and web_service_storage to use a common storage interface
-def save_upload(file):
+def save_import_file(file):
     if UPLOAD_STORAGE_TYPE == UploadStorageType.LOCAL:
         if not os.path.exists(UPLOAD_LOCAL_STORAGE_DIRECTORY):
             os.makedirs(UPLOAD_LOCAL_STORAGE_DIRECTORY)
