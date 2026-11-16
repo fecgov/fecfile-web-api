@@ -7,8 +7,8 @@ import csv
 
 def parse_upload_file(import_instance: Import):
     committee_fec_id = import_instance.committee_account.committee_id
-    import_instance.status = ImportStatus.PARSE_READING_UPLOAD
-    import_instance.save(update_fields=["status", "updated"])
+
+    import_instance.update_status(ImportStatus.PARSE_READING_UPLOAD)
 
     upload_file = read_import_file(import_instance.uploaded_file_name)
 
@@ -24,7 +24,7 @@ def parse_upload_file(import_instance: Import):
     print(f"Parsing report row for {committee_fec_id}'s upload")
     report_row = next(reader)
     parsed_report = parse_report(report_row)
-    print(f"Parsed report for {committee_fec_id}'s upload: {parsed_report}")
+    print(f"Parsed report for {committee_fec_id}'s upload")
 
     print(f"Parsing transactions for {committee_fec_id}'s upload")
     parsed_transactions = parse_transactions(reader)

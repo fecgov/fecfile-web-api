@@ -35,6 +35,8 @@ def parse_boolean_yn(value):
 
 
 def preserve_value(value):
+    if value == "":
+        return None
     return value
 
 

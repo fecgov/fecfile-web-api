@@ -15,7 +15,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from django.http import HttpResponseBadRequest
 from fecfiler.imports.storage import read_import_file, save_import_file
-from fecfiler.imports.tasks import parse_upload
+from fecfiler.imports.tasks import parse_upload, start_import
 
 from fecfiler.imports.serializers import ImportSerializer, ImportUploadSerializer
 
@@ -65,8 +65,8 @@ class ImportViewSet(CommitteeOwnedViewMixin, RetrieveModelMixin):
             raise ValidationError(
                 {"status": ["Cannot start parse unless file is uploaded."]}
             )
-        import_instance.status = ImportStatus.PARSE_INITIALIZING
-        import_instance.save()
+
+        import_instance.update_status(ImportStatus.PARSE_INITIALIZING)
 
         parse_upload.apply_async(args=[import_instance.id], retry=False)
 
@@ -81,6 +81,20 @@ class ImportViewSet(CommitteeOwnedViewMixin, RetrieveModelMixin):
 
         content = read_import_file(import_instance.parsed_file_name)
         return Response(json.loads(content))
+
+    @action(detail=True, methods=["post"], url_path="start-import")
+    def start_import(self, request, pk):
+        import_instance = self.get_object()
+        if import_instance.status != ImportStatus.PARSE_COMPLETED:
+            raise ValidationError(
+                {"status": ["Cannot start import unless parsing is completed."]}
+            )
+
+        import_instance.update_status(ImportStatus.IMPORT_INITIALIZING)
+
+        start_import.apply_async(args=[import_instance.id], retry=False)
+
+        return Response(ImportSerializer(import_instance).data)
 
     def validate_upload(self, request, committee_uuid):
         # TODO validate size
@@ -112,4 +126,4 @@ def save_file(import_instance, file):
     file.name = f"{import_instance.committee_account_id}_upload"
     import_instance.uploaded_file_name = save_import_file(file)
     import_instance.status = ImportStatus.UPLOADED
-    import_instance.save()
+    import_instance.save(update_fields=["uploaded_file_name", "status"])
