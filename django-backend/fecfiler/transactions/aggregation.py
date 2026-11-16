@@ -24,8 +24,17 @@ from fecfiler.transactions.utils_aggregation_prep import (
 )
 from decimal import Decimal
 
-from django.db.models import Q, Sum, Value, DecimalField, OuterRef, Subquery
-from django.db.models.functions import Coalesce
+from django.db.models import (
+    Q,
+    Sum,
+    Value,
+    DecimalField,
+    OuterRef,
+    Subquery,
+    Func,
+    F,
+)
+from django.db.models.functions import Coalesce, Least
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -398,6 +407,14 @@ def update_election_cycle_aggregates_for_transaction(
     ).first()
 
     if election_cycle:
+        # print(
+        #    "xxxxxxxxxxxxxxxxxxxxxxxxxxx "
+        #    + str(transaction.schedule_a.contribution_amount)
+        #    + " "
+        #    + str(election_cycle.start_date)
+        #    + " "
+        #    + str(election_cycle.end_date)
+        # )
         return process_aggregation_for_entity_election_cycle(
             transaction.committee_account_id,
             transaction.aggregation_group,
@@ -414,6 +431,106 @@ def process_aggregation_for_entity_election_cycle(
     election_cycle_start_date,
     election_cycle_end_date,
 ):
+    """
+    subquery = Coalesce(
+        Subquery(
+            Transaction.objects.filter(
+                id=OuterRef("pk"),
+                committee_account_id=committee_account_id,
+                aggregation_group=aggregation_group,
+                contact_1_id=contact_1_id,
+                date__gte=election_cycle_start_date,
+                date__lte=election_cycle_end_date,
+            )
+            .order_by("date", "created")
+            .annotate(agg=Transaction.objects.ENTITY_AGGREGATE_CLAUSE())
+            .values("agg")[:1]
+        ),
+        Decimal(0),
+    )
+    """
+
+    """
+    all_transactions = list(
+        Transaction.objects.filter(
+            committee_account_id=committee_account_id,
+            aggregation_group=aggregation_group,
+            contact_1_id=contact_1_id,
+            date__gte=election_cycle_start_date,
+            date__lte=election_cycle_end_date,
+        ).annotate(x=Subquery(subquery))
+    )
+
+    print(
+        "================================ STARTING RUN1 ===================================="
+    )
+    for transaction in all_transactions:
+        print("ssssssssssssssssssssssssssssss333 " + str(transaction.x))
+    print(
+        "================================ ENDING RUN1 ===================================="
+    )
+    """
+
+    # Transaction.objects.filter(
+    #    id=OuterRef("id"),
+    #    committee_account_id=committee_account_id,
+    #    aggregation_group=aggregation_group,
+    #    contact_1_id=contact_1_id,
+    #    date__gte=election_cycle_start_date,
+    #    date__lte=election_cycle_end_date,
+    # ).order_by("date", "created").update(entity_election_cycle_to_date=subquery)
+
+    entity_election_cycle_to_date_subquery = Coalesce(
+        Subquery(
+            Transaction.objects.filter(
+                # id=OuterRef("pk"),
+                committee_account_id=committee_account_id,
+                aggregation_group=aggregation_group,
+                contact_1_id=contact_1_id,
+                date__gte=election_cycle_start_date,
+                date__lte=Least(election_cycle_end_date, election_cycle_start_date),
+            )
+            .order_by()
+            .annotate(agg=Func(F("amount"), function="SUM"))
+            .values("agg")[:1]
+        ),
+        Decimal(0),
+    )
+    (
+        Transaction.objects.filter(
+            committee_account_id=committee_account_id,
+            aggregation_group=aggregation_group,
+            contact_1_id=contact_1_id,
+            date__gte=election_cycle_start_date,
+            date__lte=election_cycle_end_date,
+        )
+        .order_by("date", "created")
+        .update(entity_election_cycle_to_date=entity_election_cycle_to_date_subquery)
+    )
+
+    all_transactions = list(
+        Transaction.objects.filter(
+            committee_account_id=committee_account_id,
+            aggregation_group=aggregation_group,
+            contact_1_id=contact_1_id,
+            date__gte=election_cycle_start_date,
+            date__lte=election_cycle_end_date,
+        ).order_by("date", "created")
+    )
+
+    print(
+        "================================ STARTING RUN3 ===================================="
+    )
+    for transaction in all_transactions:
+        print(
+            "ssssssssssssssssssssssssssssss333 "
+            + str(transaction.entity_election_cycle_to_date)
+        )
+    print(
+        "================================ ENDING RUN3 ===================================="
+    )
+
+    """
     entity_election_cycle_to_date_subquery = Coalesce(
         Subquery(
             Transaction.objects.filter(
@@ -438,9 +555,9 @@ def process_aggregation_for_entity_election_cycle(
             date__lte=election_cycle_end_date,
         )
         .order_by("date", "created")
-        .annotate(agg=Transaction.objects.ENTITY_AGGREGATE_CLAUSE())
         .update(entity_election_cycle_to_date=entity_election_cycle_to_date_subquery)
     )
+    """
 
 
 def reaggregate_after_report_deletion(report):
