@@ -359,7 +359,7 @@ def update_election_cycle_aggregates_for_transaction(
     if (
         not transaction
         or not transaction.aggregation_group
-        or not transaction.get_schedule_name() in [Schedule.A, Schedule.B, "A", "B"]
+        or transaction.get_schedule_name() not in [Schedule.A, Schedule.B, "A", "B"]
     ):
         return
 
