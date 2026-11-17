@@ -24,8 +24,15 @@ from fecfiler.transactions.utils_aggregation_prep import (
 )
 from decimal import Decimal
 
-from django.db.models import Q, Sum, Value, DecimalField, OuterRef, Subquery
-from django.db.models.functions import Coalesce
+from django.db.models import (
+    Q,
+    Sum,
+    Value,
+    DecimalField,
+    OuterRef,
+    Subquery,
+)
+from django.db.models.functions import Coalesce, Least
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -421,21 +428,26 @@ def process_aggregation_for_entity_election_cycle(
                 aggregation_group=aggregation_group,
                 contact_1_id=contact_1_id,
                 date__gte=election_cycle_start_date,
-                date__lte=election_cycle_end_date,
+                date__lte=Least(election_cycle_end_date, OuterRef("transaction_date")),
             )
-            .order_by("date", "created")
-            .annotate(agg=Transaction.objects.ENTITY_AGGREGATE_CLAUSE())
+            .order_by()
+            .annotate(agg=Transaction.objects.ELECTION_CYCLE_AGGREGATE_CLAUSE())
             .values("agg")[:1]
         ),
         Decimal(0),
     )
-    return (
+    (
         Transaction.objects.filter(
             committee_account_id=committee_account_id,
             aggregation_group=aggregation_group,
             contact_1_id=contact_1_id,
             date__gte=election_cycle_start_date,
             date__lte=election_cycle_end_date,
+        )
+        .annotate(
+            transaction_date=Subquery(
+                Transaction.objects.filter(id=OuterRef("id")).values("date")[:1]
+            )
         )
         .order_by("date", "created")
         .annotate(agg=Transaction.objects.ENTITY_AGGREGATE_CLAUSE())
