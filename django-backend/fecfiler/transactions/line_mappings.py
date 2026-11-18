@@ -12,8 +12,14 @@ LINE_MAPPINGS_BY_FORM_AND_LINE = {
         "EARMARK_MEMO",
     ],
     ("form_3_id", "SA11B"): ["PARTY_RECEIPT", "PARTY_RETURN"],
-    ("form_3_id", "SA11C"): ["PAC_RECEIPT", "PAC_RETURN"],
+    ("form_3_id", "SA11C"): [
+        "PAC_RECEIPT",
+        "PAC_RETURN",
+        "PAC_EARMARK_RECEIPT",
+        "PAC_EARMARK_MEMO",
+    ],
     ("form_3_id", "SA11D"): ["CONTRIBUTION_FROM_CANDIDATE"],
+    ("form_3_id", "SA12"): ["AUTHORIZED_COMMITTEE_TRANSFER"],
     ("form_3_id", "SA14"): ["OFFSET_TO_OPERATING_EXPENDITURES"],
     ("form_3_id", "SA15"): [
         "INDIVIDUAL_RECOUNT_RECEIPT",
@@ -44,6 +50,7 @@ LINE_MAPPINGS_BY_FORM_AND_LINE = {
         "OTHER_DISBURSEMENT_STAFF_REIMBURSEMENT_MEMO",
         "RECOUNT_ACCOUNT_DISBURSEMENT",
         "CONTRIBUTION_TO_OTHER_FEDERAL_COMMITTEE",
+        "CONTRIBUTION_TO_OTHER_FEDERAL_CANDIDATE",
     ],
     # Form 3X mappings
     ("form_3x_id", "SC/9"): ["LOAN_BY_COMMITTEE"],
