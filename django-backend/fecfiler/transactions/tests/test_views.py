@@ -246,21 +246,13 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
         request = self.post_request(original_payload)
 
         transaction = TransactionViewSet().save_transaction(request.data, request)
-        other_committee = CommitteeAccount(
-            committee_id="C12344321"
-        )
+        other_committee = CommitteeAccount(committee_id="C12344321")
         other_committee.save()
         other_contact = create_test_individual_contact(
-            "Last",
-            "First",
-            other_committee.id
+            "Last", "First", other_committee.id
         )
         other_transaction = create_schedule_a(
-            "INDIVIDUAL_RECEIPT",
-            other_committee,
-            other_contact,
-            "2024-01-01",
-            "22.00"
+            "INDIVIDUAL_RECEIPT", other_committee, other_contact, "2024-01-01", "22.00"
         )
 
         updated_payload = deepcopy(original_payload)
@@ -3160,8 +3152,7 @@ class TransactionViewsTestCase(FecfilerViewSetTest):
             160,
         )
 
-    # TODO: Uncomment test when fix is implemented
-    def xtest_update_itemization_aggregation_unaggregate_independent_expenditure(self):
+    def test_update_itemization_aggregation_unaggregate_independent_expenditure(self):
         test_q1_report = create_form3x(self.committee, "2026-01-01", "2026-02-01", {})
         test_ie_1 = create_ie(
             self.committee,
