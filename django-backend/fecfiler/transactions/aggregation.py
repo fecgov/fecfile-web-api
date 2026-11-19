@@ -424,6 +424,10 @@ def process_aggregation_for_entity_election_cycle(
     entity_election_cycle_to_date_subquery = Coalesce(
         Subquery(
             Transaction.objects.filter(
+                Q(
+                    ~Q(date=OuterRef("transaction_date"))
+                    | Q(created__lte=OuterRef("created"))
+                ),
                 committee_account_id=committee_account_id,
                 aggregation_group=aggregation_group,
                 contact_1_id=contact_1_id,
