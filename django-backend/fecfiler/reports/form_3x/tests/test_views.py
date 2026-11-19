@@ -176,3 +176,45 @@ class Form3XViewSetTest(FecfilerViewSetTest):
         )
 
         self.assertEqual(response.status_code, 404)
+
+    def test_update_ignores_id_in_request_body(self):
+        """The report updated must always be the one addressed by the URL.  A
+        different ``id`` in the request body must be ignored - otherwise a caller
+        could overwrite (and take ownership of) another committee's report."""
+        other_committee = CommitteeAccount.objects.create(committee_id="C09999999")
+        other_report = create_form3x(
+            other_committee, "2024-01-01", "2024-03-31", {}, report_code="Q1"
+        )
+        own_report = create_form3x(
+            self.committee, "2024-01-01", "2024-03-31", {}, report_code="Q1"
+        )
+
+        response = self.send_viewset_put_request(
+            f"/api/v1/reports/form3x/{str(own_report.id)}/",
+            {
+                "id": str(other_report.id),
+                "report_code": "Q2",
+                "form_type": "F3XN",
+                "treasurer_last_name": "Changed",
+                "treasurer_first_name": "Name",
+                "date_signed": "2004-01-01",
+                "coverage_from_date": "2025-01-01",
+                "coverage_through_date": "2025-02-01",
+            },
+            Form3XViewSet,
+            "update",
+            pk=own_report.id,
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # The other committee's report is untouched
+        other_report.refresh_from_db()
+        self.assertEqual(other_report.committee_account_id, other_committee.id)
+        self.assertEqual(str(other_report.coverage_from_date), "2024-01-01")
+        self.assertNotEqual(other_report.treasurer_last_name, "Changed")
+
+        # The report addressed by the URL received the update
+        own_report.refresh_from_db()
+        self.assertEqual(own_report.treasurer_last_name, "Changed")
+        self.assertEqual(str(own_report.coverage_from_date), "2025-01-01")
+        self.assertEqual(response.data["id"], str(own_report.id))
