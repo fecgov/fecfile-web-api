@@ -121,13 +121,13 @@ def calculate_summary_column_b(report: Report):
         else report.coverage_from_date
     )
 
-    ytd_transactions = Transaction.objects.filter(
+    election_cycle_transactions = Transaction.objects.filter(
         committee_account_id=committee_id,
         date__gte=cycle_start_date,
         date__lte=report_date,
     )
 
-    column_b = ytd_transactions.aggregate(
+    column_b = election_cycle_transactions.aggregate(
         line_14=get_line("SA14"),
     )
 
