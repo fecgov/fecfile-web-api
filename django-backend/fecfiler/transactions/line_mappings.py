@@ -20,7 +20,11 @@ LINE_MAPPINGS_BY_FORM_AND_LINE = {
         "PAC_EARMARK_MEMO",
     ],
     ("form_3_id", "SA11D"): ["CONTRIBUTION_FROM_CANDIDATE"],
-    ("form_3_id", "SA12"): ["AUTHORIZED_COMMITTEE_TRANSFER"],
+    ("form_3_id", "SA12"): [
+        "PAC_JF_TRANSFER_MEMO",
+        "PARTY_JF_TRANSFER_MEMO",
+        "AUTHORIZED_COMMITTEE_TRANSFER"
+    ],
     ("form_3_id", "SA14"): ["OFFSET_TO_OPERATING_EXPENDITURES"],
     ("form_3_id", "SA15"): [
         "INDIVIDUAL_RECOUNT_RECEIPT",
