@@ -356,53 +356,19 @@ def update_election_cycle_aggregates_for_transaction(
     transaction,
     old_snapshot=None,
 ):
-    if (
-        not transaction
-        or not transaction.aggregation_group
-        or transaction.get_schedule_name() not in [Schedule.A, Schedule.B, "A", "B"]
-    ):
+    if not should_aggregate_transaction(transaction):
         return
 
-    transaction_date = transaction.get_date()
     if old_snapshot:
-        old_entity_id = old_snapshot.get("contact_1_id")
-        new_entity_id = transaction.contact_1_id
-        entity_changed = old_entity_id != new_entity_id
+        reaggregate_old_election_cycle_if_needed(transaction, old_snapshot)
 
-        old_date = old_snapshot.get("date")
-        new_date = transaction_date
-        date_changed = old_date != new_date
-
-        old_effective_amount = old_snapshot.get("effective_amount")
-        new_effective_amount = calculate_effective_amount(transaction)
-        effective_amount_changed = old_effective_amount != new_effective_amount
-
-        if not entity_changed and not date_changed and not effective_amount_changed:
+        if not transaction_aggregation_changed(transaction, old_snapshot):
             return
 
-        if entity_changed or date_changed:
-            # Re-aggregate for the old entity and date range
-            if old_entity_id and old_date:
-                old_election_cycle = ElectionCycle.objects.filter(
-                    committee_account_id=transaction.committee_account_id,
-                    start_date__lte=old_date,
-                    end_date__gte=old_date,
-                ).first()
-
-                if old_election_cycle:
-                    process_aggregation_for_entity_election_cycle(
-                        transaction.committee_account_id,
-                        transaction.aggregation_group,
-                        old_entity_id,
-                        old_election_cycle.start_date,
-                        old_election_cycle.end_date,
-                    )
-
-    election_cycle = ElectionCycle.objects.filter(
-        committee_account_id=transaction.committee_account_id,
-        start_date__lte=transaction_date,
-        end_date__gte=transaction_date,
-    ).first()
+    election_cycle = get_election_cycle_for_date(
+        transaction.committee_account_id,
+        transaction.get_date(),
+    )
 
     if election_cycle:
         return process_aggregation_for_entity_election_cycle(
@@ -412,6 +378,55 @@ def update_election_cycle_aggregates_for_transaction(
             election_cycle.start_date,
             election_cycle.end_date,
         )
+
+
+def should_aggregate_transaction(transaction):
+    return (
+        transaction
+        and transaction.aggregation_group
+        and transaction.get_schedule_name() in [Schedule.A, Schedule.B, "A", "B"]
+    )
+
+
+def transaction_aggregation_changed(transaction, old_snapshot):
+    return (
+        old_snapshot.get("contact_1_id") != transaction.contact_1_id
+        or old_snapshot.get("date") != transaction.get_date()
+        or old_snapshot.get("effective_amount") != calculate_effective_amount(transaction)
+    )
+
+
+def reaggregate_old_election_cycle_if_needed(transaction, old_snapshot):
+    old_entity_id = old_snapshot.get("contact_1_id")
+    old_date = old_snapshot.get("date")
+
+    entity_changed = old_entity_id != transaction.contact_1_id
+    date_changed = old_date != transaction.get_date()
+
+    if not (entity_changed or date_changed) or not old_entity_id or not old_date:
+        return
+
+    old_election_cycle = get_election_cycle_for_date(
+        transaction.committee_account_id,
+        old_date,
+    )
+
+    if old_election_cycle:
+        process_aggregation_for_entity_election_cycle(
+            transaction.committee_account_id,
+            transaction.aggregation_group,
+            old_entity_id,
+            old_election_cycle.start_date,
+            old_election_cycle.end_date,
+        )
+
+
+def get_election_cycle_for_date(committee_account_id, date):
+    return ElectionCycle.objects.filter(
+        committee_account_id=committee_account_id,
+        start_date__lte=date,
+        end_date__gte=date,
+    ).first()
 
 
 def process_aggregation_for_entity_election_cycle(
