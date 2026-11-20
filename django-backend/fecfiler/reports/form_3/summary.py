@@ -36,7 +36,7 @@ def calculate_summary(report):
     form_3.L13b_all_other_loans_period = 0
     form_3.L13c_total_loans_period = 0
     form_3.L14_offsets_to_operating_expenditures_period = a.get("line_14", 0)
-    form_3.L15_other_receipts_period = 0
+    form_3.L15_other_receipts_period = a.get("line_15", 0)
     form_3.L16_total_receipts_period = 0
     form_3.L17_operating_expenditures_period = 0
     form_3.L18_transfers_to_other_authorized_committees_period = 0
@@ -72,7 +72,7 @@ def calculate_summary(report):
     form_3.L13b_all_other_loans_ytd = 0
     form_3.L13c_total_loans_ytd = 0
     form_3.L14_offsets_to_operating_expenditures_ytd = b.get("line_14", 0)
-    form_3.L15_other_receipts_ytd = 0
+    form_3.L15_other_receipts_ytd = b.get("line_15", 0)
     form_3.L16_total_receipts_ytd = 0
     form_3.L17_operating_expenditures_ytd = 0
     form_3.L18_transfers_to_other_authorized_committees_ytd = 0
@@ -105,6 +105,7 @@ def calculate_summary_column_a(report: Report):
     )
     column_a = report_transactions.aggregate(
         line_14=get_line("SA14"),
+        line_15=get_line("SA15"),
     )
 
     column_a["line_7b"] = column_a["line_14"]
@@ -129,6 +130,7 @@ def calculate_summary_column_b(report: Report):
 
     column_b = election_cycle_transactions.aggregate(
         line_14=get_line("SA14"),
+        line_15=get_line("SA15"),
     )
 
     column_b["line_7b"] = column_b["line_14"]

@@ -86,7 +86,7 @@ class F3ReportSummaryTestCase(TestCase):
             itemized=False,
             report=current_report,
         )
-        # Current report period non-SA14 transaction (excluded from Line 14)
+        # Current report period non-SA14/SA15 transaction (excluded from Lines 14 & 15)
         create_schedule_a(
             "INDIVIDUAL_RECEIPT",
             self.committee,
@@ -99,6 +99,42 @@ class F3ReportSummaryTestCase(TestCase):
             report=current_report,
         )
 
+        # Current report period SA15 transactions (non-memo)
+        create_schedule_a(
+            "OTHER_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2026-02-01",
+            "200.50",
+            "GENERAL",
+            memo_code=False,
+            itemized=False,
+            report=current_report,
+        )
+        create_schedule_a(
+            "INDIVIDUAL_RECOUNT_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2026-02-15",
+            "800.50",
+            "GENERAL",
+            memo_code=False,
+            itemized=True,
+            report=current_report,
+        )
+        # Current report period SA15 transaction with Memo Code checked (excluded)
+        create_schedule_a(
+            "OTHER_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2026-02-10",
+            "5000.00",
+            "GENERAL",
+            memo_code=True,
+            itemized=False,
+            report=current_report,
+        )
+
         # Earlier in election cycle (prior year, within election cycle)
         create_schedule_a(
             "OFFSET_TO_OPERATING_EXPENDITURES",
@@ -106,6 +142,17 @@ class F3ReportSummaryTestCase(TestCase):
             self.contact_1,
             "2025-02-01",
             "100.00",
+            "GENERAL",
+            memo_code=False,
+            itemized=True,
+            report=prior_report,
+        )
+        create_schedule_a(
+            "PARTY_RECOUNT_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2025-02-01",
+            "150.00",
             "GENERAL",
             memo_code=False,
             itemized=True,
@@ -123,6 +170,17 @@ class F3ReportSummaryTestCase(TestCase):
             itemized=True,
             report=prior_report,
         )
+        create_schedule_a(
+            "PAC_RECOUNT_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2025-02-15",
+            "400.00",
+            "GENERAL",
+            memo_code=True,
+            itemized=True,
+            report=prior_report,
+        )
         # Before election cycle start date (excluded from Column B)
         create_schedule_a(
             "OFFSET_TO_OPERATING_EXPENDITURES",
@@ -130,6 +188,17 @@ class F3ReportSummaryTestCase(TestCase):
             self.contact_1,
             "2024-11-05",
             "300.00",
+            "GENERAL",
+            memo_code=False,
+            itemized=True,
+            report=prior_report,
+        )
+        create_schedule_a(
+            "OTHER_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2024-11-05",
+            "350.00",
             "GENERAL",
             memo_code=False,
             itemized=True,
@@ -147,6 +216,17 @@ class F3ReportSummaryTestCase(TestCase):
             itemized=True,
             report=future_report,
         )
+        create_schedule_a(
+            "INDIVIDUAL_RECOUNT_RECEIPT",
+            self.committee,
+            self.contact_1,
+            "2026-04-01",
+            "600.00",
+            "GENERAL",
+            memo_code=False,
+            itemized=True,
+            report=future_report,
+        )
 
         return current_report
 
@@ -156,6 +236,7 @@ class F3ReportSummaryTestCase(TestCase):
 
         self.assertEqual(summary_a["line_14"], Decimal("2125.79"))
         self.assertEqual(summary_a["line_7b"], Decimal("2125.79"))
+        self.assertEqual(summary_a["line_15"], Decimal("1001.00"))
 
     def test_calculate_summary_column_b(self):
         f3 = self._create_f3_reports_and_transactions()
@@ -163,6 +244,7 @@ class F3ReportSummaryTestCase(TestCase):
 
         self.assertEqual(summary_b["line_14"], Decimal("2225.79"))
         self.assertEqual(summary_b["line_7b"], Decimal("2225.79"))
+        self.assertEqual(summary_b["line_15"], Decimal("1151.00"))
 
     def test_calculate_summary_saves_form_3_fields(self):
         f3 = self._create_f3_reports_and_transactions()
@@ -185,6 +267,14 @@ class F3ReportSummaryTestCase(TestCase):
             f3.form_3.L7b_total_offsets_to_operating_expenditures_ytd,
             Decimal("2225.79"),
         )
+        self.assertEqual(
+            f3.form_3.L15_other_receipts_period,
+            Decimal("1001.00"),
+        )
+        self.assertEqual(
+            f3.form_3.L15_other_receipts_ytd,
+            Decimal("1151.00"),
+        )
 
     def test_report_with_no_transactions(self):
         f3 = create_form3(
@@ -197,5 +287,7 @@ class F3ReportSummaryTestCase(TestCase):
 
         self.assertEqual(summary_a["line_14"], Decimal("0"))
         self.assertEqual(summary_a["line_7b"], Decimal("0"))
+        self.assertEqual(summary_a["line_15"], Decimal("0"))
         self.assertEqual(summary_b["line_14"], Decimal("0"))
         self.assertEqual(summary_b["line_7b"], Decimal("0"))
+        self.assertEqual(summary_b["line_15"], Decimal("0"))
