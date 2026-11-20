@@ -18,7 +18,7 @@ def calculate_summary(report):
     form_3.L6a_total_contributions_period = 0
     form_3.L6b_total_contribution_refunds_period = 0
     form_3.L6c_net_contributions_period = 0
-    form_3.L7a_total_operating_expenditures_period = 0
+    form_3.L7a_total_operating_expenditures_period = a.get("line_7a", 0)
     form_3.L7b_total_offsets_to_operating_expenditures_period = a.get("line_7b", 0)
     form_3.L7c_net_operating_expenditures_period = 0
     form_3.L8_cash_on_hand_at_close_period = 0
@@ -38,7 +38,7 @@ def calculate_summary(report):
     form_3.L14_offsets_to_operating_expenditures_period = a.get("line_14", 0)
     form_3.L15_other_receipts_period = a.get("line_15", 0)
     form_3.L16_total_receipts_period = 0
-    form_3.L17_operating_expenditures_period = 0
+    form_3.L17_operating_expenditures_period = a.get("line_17", 0)
     form_3.L18_transfers_to_other_authorized_committees_period = 0
     form_3.L19a_loan_repayments_of_loans_made_or_guaranteed_by_candidate_period = 0
     form_3.L19b_loan_repayments_of_all_other_loans_period = 0
@@ -57,7 +57,7 @@ def calculate_summary(report):
     form_3.L6a_total_contributions_ytd = 0
     form_3.L6b_total_contribution_refunds_ytd = 0
     form_3.L6c_net_contributions_ytd = 0
-    form_3.L7a_total_operating_expenditures_ytd = 0
+    form_3.L7a_total_operating_expenditures_ytd = b.get("line_7a", 0)
     form_3.L7b_total_offsets_to_operating_expenditures_ytd = b.get("line_7b", 0)
     form_3.L7c_net_operating_expenditures_ytd = 0
     form_3.L11ai_individuals_itemized_ytd = 0
@@ -74,7 +74,7 @@ def calculate_summary(report):
     form_3.L14_offsets_to_operating_expenditures_ytd = b.get("line_14", 0)
     form_3.L15_other_receipts_ytd = b.get("line_15", 0)
     form_3.L16_total_receipts_ytd = 0
-    form_3.L17_operating_expenditures_ytd = 0
+    form_3.L17_operating_expenditures_ytd = b.get("line_17", 0)
     form_3.L18_transfers_to_other_authorized_committees_ytd = 0
     form_3.L19a_loan_repayments_of_loans_made_or_guaranteed_by_candidate_ytd = 0
     form_3.L19b_loan_repayments_of_all_other_loans_ytd = 0
@@ -106,8 +106,10 @@ def calculate_summary_column_a(report: Report):
     column_a = report_transactions.aggregate(
         line_14=get_line("SA14"),
         line_15=get_line("SA15"),
+        line_17=get_line("SB17"),
     )
 
+    column_a["line_7a"] = column_a["line_17"]
     column_a["line_7b"] = column_a["line_14"]
 
     return column_a
@@ -131,8 +133,10 @@ def calculate_summary_column_b(report: Report):
     column_b = election_cycle_transactions.aggregate(
         line_14=get_line("SA14"),
         line_15=get_line("SA15"),
+        line_17=get_line("SB17"),
     )
 
+    column_b["line_7a"] = column_b["line_17"]
     column_b["line_7b"] = column_b["line_14"]
 
     return column_b
