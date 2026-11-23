@@ -429,6 +429,8 @@ def get_election_cycle_for_date(committee_account_id, date):
     ).first()
 
 
+# NOTE we can make this more efficient by noting when the transaction date is
+# We don't need to re-aggregate transactions before that date
 def process_aggregation_for_entity_election_cycle(
     committee_account_id,
     aggregation_group,
@@ -450,27 +452,25 @@ def process_aggregation_for_entity_election_cycle(
                 date__lte=Least(election_cycle_end_date, OuterRef("transaction_date")),
             )
             .order_by()
+            .values("contact_1_id")
             .annotate(agg=Transaction.objects.ELECTION_CYCLE_AGGREGATE_CLAUSE())
             .values("agg")[:1]
         ),
         Decimal(0),
     )
-    (
-        Transaction.objects.filter(
-            committee_account_id=committee_account_id,
-            aggregation_group=aggregation_group,
-            contact_1_id=contact_1_id,
-            date__gte=election_cycle_start_date,
-            date__lte=election_cycle_end_date,
+
+    Transaction.objects.filter(
+        committee_account_id=committee_account_id,
+        aggregation_group=aggregation_group,
+        contact_1_id=contact_1_id,
+        date__gte=election_cycle_start_date,
+        date__lte=election_cycle_end_date,
+    ).annotate(
+        transaction_date=Subquery(
+            Transaction.objects.filter(id=OuterRef("id")).values("date")[:1]
         )
-        .annotate(
-            transaction_date=Subquery(
-                Transaction.objects.filter(id=OuterRef("id")).values("date")[:1]
-            )
-        )
-        .order_by("date", "created")
-        .annotate(agg=Transaction.objects.ENTITY_AGGREGATE_CLAUSE())
-        .update(entity_election_cycle_to_date=entity_election_cycle_to_date_subquery)
+    ).update(
+        entity_election_cycle_to_date=entity_election_cycle_to_date_subquery
     )
 
 
