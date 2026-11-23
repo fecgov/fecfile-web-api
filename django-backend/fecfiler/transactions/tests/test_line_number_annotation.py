@@ -38,7 +38,7 @@ schedule_a_test_mappings = [
     ["TRIBAL_RECEIPT", "ORG", unitemized_f3_and_f3x],
     ["PARTNERSHIP_RECEIPT", "ORG", unitemized_f3_and_f3x],
     ["PARTNERSHIP_ATTRIBUTION", "IND", unitemized_f3_and_f3x],
-    ["IN_KIND_RECEIPT", "IND", unitemized_f3x],
+    ["IN_KIND_RECEIPT", "IND", unitemized_f3_and_f3x],
     [
         "IN_KIND_RECEIPT_FROM_UNREGISTERED_ORGANIZATION",
         "ORG",
@@ -208,7 +208,7 @@ schedule_b_test_mappings = [
     ["FEDERAL_ELECTION_ACTIVITY_CREDIT_CARD_PAYMENT_MEMO", "ORG", {"F3X": "SB30B"}],
     ["FEDERAL_ELECTION_ACTIVITY_STAFF_REIMBURSEMENT_MEMO", "ORG", {"F3X": "SB30B"}],
     ["FEDERAL_ELECTION_ACTIVITY_PAYMENT_TO_PAYROLL_MEMO", "ORG", {"F3X": "SB30B"}],
-    ["IN_KIND_OUT", "IND", {"F3X": "SB21B"}],
+    ["IN_KIND_OUT", "IND", {"F3": "SB17", "F3X": "SB21B"}],
     ["IN_KIND_OUT_FROM_UNREGISTERED_ORGANIZATION", "ORG", {"F3": "SB17"}],
     ["PAC_IN_KIND_OUT", "COM", {"F3X": "SB21B"}],
     ["PARTY_IN_KIND_OUT", "COM", {"F3X": "SB21B"}],
