@@ -367,7 +367,7 @@ class TransactionManager(SoftDeleteManager):
         "schedule_d__incurred_amount",
     )
 
-    AGGREGATE_AMOUNT = Case(
+    AMOUNT_FOR_AGGREGATE = Case(
         When(force_unaggregated=True, then=None), default=F("effective_amount")
     )
 
@@ -395,12 +395,15 @@ class TransactionManager(SoftDeleteManager):
 
     def ENTITY_AGGREGATE_CLAUSE(self):  # noqa: N802
         return Window(
-            expression=Sum(self.AGGREGATE_AMOUNT), **self.entity_aggregate_window
+            expression=Sum(self.AMOUNT_FOR_AGGREGATE), **self.entity_aggregate_window
         )
+
+    def ELECTION_CYCLE_AGGREGATE_CLAUSE(self):  # noqa: N802
+        return Sum(self.AMOUNT_FOR_AGGREGATE)
 
     def ELECTION_AGGREGATE_CLAUSE(self):  # noqa: N802
         return Window(
-            expression=Sum(self.AGGREGATE_AMOUNT), **self.election_aggregate_window
+            expression=Sum(self.AMOUNT_FOR_AGGREGATE), **self.election_aggregate_window
         )
 
     BACK_REFERENCE_CLAUSE = Coalesce(
