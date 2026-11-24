@@ -28,6 +28,7 @@ from fecfiler.transactions.schedule_e.models import ScheduleE
 from fecfiler.transactions.schedule_f.models import ScheduleF
 from fecfiler.contacts.models import Contact
 from fecfiler.transactions.line_mappings import LINE_MAPPINGS_BY_FORM_AND_LINE
+from fecfiler.settings import ENABLE_FORM_3
 
 import uuid
 import structlog
@@ -322,6 +323,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
         from fecfiler.transactions.aggregation import (
             process_aggregation_for_entity_contact,
             process_aggregation_for_election,
+            update_election_cycle_aggregates_for_transaction,
         )
 
         # Handle Schedule A/B (entity aggregation)
@@ -344,6 +346,10 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 self.contact_1_id,
                 earliest_date,
             )
+
+            # Always recalculate election cycle aggregates for this transaction
+            if ENABLE_FORM_3:
+                update_election_cycle_aggregates_for_transaction(self, old_snapshot)
 
             # If contact changed (update only), recalculate old contact's chain
             if old_snapshot and old_snapshot.get("contact_1_id"):
@@ -543,6 +549,7 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                 from fecfiler.transactions.aggregation import (
                     process_aggregation_for_entity_contact,
                     process_aggregation_for_election,
+                    update_election_cycle_aggregates_for_transaction,
                 )
 
                 if schedule in [Schedule.A, Schedule.B, "A", "B"]:
@@ -555,6 +562,9 @@ class Transaction(SoftDeleteModel, CommitteeOwnedModel):
                             self.contact_1_id,
                             current_date,
                         )
+                    # Recalculate election cycle aggregation after deletion
+                    if ENABLE_FORM_3:
+                        update_election_cycle_aggregates_for_transaction(self)
                 elif schedule in [Schedule.E, "E"]:
                     # Recalculate election aggregation chain after deletion
                     current_date = self.get_date()

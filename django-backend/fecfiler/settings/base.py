@@ -313,7 +313,6 @@ def get_logging_config(log_format=LINE):
         "()": structlog.stdlib.ProcessorFormatter,
         "processors": [
             structlog.stdlib.ProcessorFormatter.remove_processors_meta,
-            structlog.processors.dict_tracebacks,
             structlog.dev.ConsoleRenderer(
                 colors=True, exception_formatter=structlog.dev.rich_traceback
             ),
@@ -605,6 +604,8 @@ FLAG__ENABLE_IMPORT = get_boolean_from_string(
 FLAG__ENABLE_EMAIL = get_boolean_from_string(
     env.get_credential("FLAG__ENABLE_EMAIL", "False")
 )
+
+ENABLE_FORM_3 = get_boolean_from_string(env.get_credential("ENABLE_FORM_3", "False"))
 
 PRODUCTION_OPEN_FEC_API = env.get_credential("PRODUCTION_OPEN_FEC_API")
 PRODUCTION_OPEN_FEC_API_KEY = env.get_credential("PRODUCTION_OPEN_FEC_API_KEY")
