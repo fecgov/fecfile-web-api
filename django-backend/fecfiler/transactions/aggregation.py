@@ -1,4 +1,5 @@
 from fecfiler.transactions.models import Transaction
+from fecfiler.election_cycles.models import ElectionCycle
 from fecfiler.transactions.itemization import (
     update_itemization,
     cascade_itemization_to_parents,
@@ -7,6 +8,7 @@ from fecfiler.transactions.itemization import (
     get_all_children_ids,
 )
 from fecfiler.transactions.managers import (
+    Schedule,
     schedule_a_over_two_hundred_types,
     schedule_b_over_two_hundred_types,
     ITEMIZATION_THRESHOLD,
@@ -16,10 +18,21 @@ from fecfiler.transactions.schedule_f.models import ScheduleF
 from fecfiler.transactions.utils_aggregation_queries import (
     filter_queryset_for_previous_transactions_in_aggregation,
 )  # noqa: E501
-from fecfiler.transactions.utils_aggregation_prep import _get_calendar_year_from_date
+from fecfiler.transactions.utils_aggregation_prep import (
+    _get_calendar_year_from_date,
+    calculate_effective_amount,
+)
+from decimal import Decimal
 
-from django.db.models import Q, Sum, Value, DecimalField, OuterRef, Subquery
-from django.db.models.functions import Coalesce
+from django.db.models import (
+    Q,
+    Sum,
+    Value,
+    DecimalField,
+    OuterRef,
+    Subquery,
+)
+from django.db.models.functions import Coalesce, Least
 import structlog
 
 logger = structlog.get_logger(__name__)
@@ -337,6 +350,128 @@ def process_aggregation_for_election(transaction_instance, earliest_date=None):
         Transaction.objects.bulk_update(
             transactions_to_update, ["_calendar_ytd_per_election_office"], batch_size=64
         )
+
+
+def update_election_cycle_aggregates_for_transaction(
+    transaction,
+    old_snapshot=None,
+):
+    if not should_aggregate_transaction(transaction):
+        return
+
+    if old_snapshot:
+        reaggregate_old_election_cycle_if_needed(transaction, old_snapshot)
+
+        if not transaction_aggregation_changed(transaction, old_snapshot):
+            return
+
+    election_cycle = get_election_cycle_for_date(
+        transaction.committee_account_id,
+        transaction.get_date(),
+    )
+
+    if election_cycle:
+        return process_aggregation_for_entity_election_cycle(
+            transaction.committee_account_id,
+            transaction.aggregation_group,
+            transaction.contact_1_id,
+            election_cycle.start_date,
+            election_cycle.end_date,
+        )
+
+
+def should_aggregate_transaction(transaction):
+    return (
+        transaction
+        and transaction.aggregation_group
+        and transaction.get_schedule_name() in [Schedule.A, Schedule.B, "A", "B"]
+    )
+
+
+def transaction_aggregation_changed(transaction, old_snapshot):
+    return (
+        old_snapshot.get("contact_1_id") != transaction.contact_1_id
+        or old_snapshot.get("date") != transaction.get_date()
+        or old_snapshot.get("effective_amount") != calculate_effective_amount(transaction)
+    )
+
+
+def reaggregate_old_election_cycle_if_needed(transaction, old_snapshot):
+    old_entity_id = old_snapshot.get("contact_1_id")
+    old_date = old_snapshot.get("date")
+
+    entity_changed = old_entity_id != transaction.contact_1_id
+    date_changed = old_date != transaction.get_date()
+
+    if not (entity_changed or date_changed) or not old_entity_id or not old_date:
+        return
+
+    old_election_cycle = get_election_cycle_for_date(
+        transaction.committee_account_id,
+        old_date,
+    )
+
+    if old_election_cycle:
+        process_aggregation_for_entity_election_cycle(
+            transaction.committee_account_id,
+            transaction.aggregation_group,
+            old_entity_id,
+            old_election_cycle.start_date,
+            old_election_cycle.end_date,
+        )
+
+
+def get_election_cycle_for_date(committee_account_id, date):
+    return ElectionCycle.objects.filter(
+        committee_account_id=committee_account_id,
+        start_date__lte=date,
+        end_date__gte=date,
+    ).first()
+
+
+# NOTE we can make this more efficient by noting when the transaction date is
+# We don't need to re-aggregate transactions before that date
+def process_aggregation_for_entity_election_cycle(
+    committee_account_id,
+    aggregation_group,
+    contact_1_id,
+    election_cycle_start_date,
+    election_cycle_end_date,
+):
+    entity_election_cycle_to_date_subquery = Coalesce(
+        Subquery(
+            Transaction.objects.filter(
+                Q(
+                    ~Q(date=OuterRef("transaction_date"))
+                    | Q(created__lte=OuterRef("created"))
+                ),
+                committee_account_id=committee_account_id,
+                aggregation_group=aggregation_group,
+                contact_1_id=contact_1_id,
+                date__gte=election_cycle_start_date,
+                date__lte=Least(election_cycle_end_date, OuterRef("transaction_date")),
+            )
+            .order_by()
+            .values("contact_1_id")
+            .annotate(agg=Transaction.objects.ELECTION_CYCLE_AGGREGATE_CLAUSE())
+            .values("agg")[:1]
+        ),
+        Decimal(0),
+    )
+
+    Transaction.objects.filter(
+        committee_account_id=committee_account_id,
+        aggregation_group=aggregation_group,
+        contact_1_id=contact_1_id,
+        date__gte=election_cycle_start_date,
+        date__lte=election_cycle_end_date,
+    ).annotate(
+        transaction_date=Subquery(
+            Transaction.objects.filter(id=OuterRef("id")).values("date")[:1]
+        )
+    ).update(
+        entity_election_cycle_to_date=entity_election_cycle_to_date_subquery
+    )
 
 
 def reaggregate_after_report_deletion(report):
