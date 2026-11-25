@@ -39,6 +39,11 @@ schedule_a_test_mappings = [
     ["PARTNERSHIP_RECEIPT", "ORG", unitemized_f3_and_f3x],
     ["PARTNERSHIP_ATTRIBUTION", "IND", unitemized_f3_and_f3x],
     ["IN_KIND_RECEIPT", "IND", unitemized_f3_and_f3x],
+    [
+        "IN_KIND_RECEIPT_FROM_UNREGISTERED_ORGANIZATION",
+        "ORG",
+        {"F3": "SA11AI", "Unitemized F3": "SA11AII"},
+    ],
     ["RETURN_RECEIPT", "IND", unitemized_f3_and_f3x],
     ["EARMARK_RECEIPT", "IND", unitemized_f3_and_f3x],
     ["EARMARK_MEMO", "IND", unitemized_f3_and_f3x],
@@ -204,6 +209,7 @@ schedule_b_test_mappings = [
     ["FEDERAL_ELECTION_ACTIVITY_STAFF_REIMBURSEMENT_MEMO", "ORG", {"F3X": "SB30B"}],
     ["FEDERAL_ELECTION_ACTIVITY_PAYMENT_TO_PAYROLL_MEMO", "ORG", {"F3X": "SB30B"}],
     ["IN_KIND_OUT", "IND", {"F3": "SB17", "F3X": "SB21B"}],
+    ["IN_KIND_OUT_FROM_UNREGISTERED_ORGANIZATION", "ORG", {"F3": "SB17"}],
     ["PAC_IN_KIND_OUT", "COM", {"F3X": "SB21B"}],
     ["PARTY_IN_KIND_OUT", "COM", {"F3X": "SB21B"}],
     ["IN_KIND_TRANSFER_OUT", "COM", {"F3X": "SB21B"}],
@@ -364,11 +370,15 @@ class TransactionLineNumberAnnotationTestCase(FecfilerViewSetTest):
 
         for tti, entity_type, line_number_mappings in schedule_mappings:
             for report_type in line_number_mappings.keys():
-                if report_type != "Unitemized":
+                if report_type not in ("Unitemized", "Unitemized F3"):
                     report = self.get_report_for_type(report_type)
                     amount = "202.00"
                 else:
-                    report = self.f3x_report
+                    report = (
+                        self.f3_report
+                        if report_type == "Unitemized F3"
+                        else self.f3x_report
+                    )
                     amount = "105.00"
 
                 new_transaction = create_schedule_a(
@@ -380,7 +390,7 @@ class TransactionLineNumberAnnotationTestCase(FecfilerViewSetTest):
                     report=report
                 )
 
-                if report_type == "Unitemized":
+                if report_type in ("Unitemized", "Unitemized F3"):
                     new_transaction.force_itemized = False
                     new_transaction.save()
 

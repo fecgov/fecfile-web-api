@@ -19,9 +19,11 @@ from fecfiler.reports.tests.utils import (
 )
 from fecfiler.transactions.tests.utils import (
     create_schedule_a,
+    create_schedule_b,
 )
 from fecfiler.contacts.tests.utils import (
     create_test_individual_contact,
+    create_test_organization_contact,
     create_test_committee_contact,
 )
 from django.core.exceptions import ImproperlyConfigured
@@ -176,6 +178,57 @@ class DotFECSerializerTestCase(TestCase):
         split_report_row = split_content[1].split(FS_STR)
         self.assertEqual(split_report_row[9], "AK")
         self.assertEqual(split_report_row[10], "00")
+
+    def test_form3_unregistered_organization_in_kind_pair_is_in_dot_fec(self):
+        organization = create_test_organization_contact(
+            "Test Organization",
+            self.committee.id,
+            {
+                "street_1": "123 Test St",
+                "city": "Testville",
+                "state": "MD",
+                "zip": "12345",
+            },
+        )
+        receipt = create_schedule_a(
+            "IN_KIND_RECEIPT_FROM_UNREGISTERED_ORGANIZATION",
+            self.committee,
+            organization,
+            "2024-02-05",
+            "250.00",
+            report=self.f3,
+        )
+        receipt.schedule_a.election_code = "G2024"
+        receipt.schedule_a.save()
+
+        expenditure = create_schedule_b(
+            "IN_KIND_OUT_FROM_UNREGISTERED_ORGANIZATION",
+            self.committee,
+            organization,
+            "2024-02-05",
+            "250.00",
+            "GENERAL_DISBURSEMENT",
+            report=self.f3,
+        )
+        expenditure.parent_transaction = receipt
+        expenditure.save()
+        expenditure.schedule_b.election_code = "G2024"
+        expenditure.schedule_b.save()
+
+        rows = [
+            row.split(FS_STR)
+            for row in compose_dot_fec(self.f3.id).split(CRLF_STR)
+            if row
+        ]
+        receipt_row = next(row for row in rows if row[2] == receipt.transaction_id)
+        expenditure_row = next(
+            row for row in rows if row[2] == expenditure.transaction_id
+        )
+
+        self.assertEqual(receipt_row[0], "SA11AI")
+        self.assertEqual(receipt_row[17], "G2024")
+        self.assertEqual(expenditure_row[0], "SB17")
+        self.assertEqual(expenditure_row[17], "G2024")
 
     @patch("fecfiler.web_services.dot_fec.dot_fec_composer.FEC_FORMAT_VERSION", None)
     def test_missing_fec_format_version_raises_error(self):
